@@ -39,6 +39,10 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+
+    @Autowired
+    private ObjectMapper mapper;
+
     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
 
     @Test
@@ -54,7 +58,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
         try {
             String token = getAuthToken(admin.getEmail(), password);
             getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
-                    .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+                    .param("properties", mapper.writeValueAsString(restparams)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$",
                     ProcessMatcher.matchProcess("metadata-export-search", admin.getID().toString(), parameterList,
@@ -75,7 +79,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
                 Collectors.toList());
 
         getClient().perform(multipart("/api/system/scripts/metadata-export-search/processes")
-                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+                .param("properties", mapper.writeValueAsString(restparams)))
             .andExpect(status().isUnauthorized());
     }
 
@@ -90,7 +94,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
-                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+                .param("properties", mapper.writeValueAsString(restparams)))
             .andExpect(status().isForbidden());
     }
 
@@ -108,7 +112,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
         try {
             getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
-                                         .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+                                         .param("properties", mapper.writeValueAsString(restparams)))
                             .andExpect(status().isAccepted())
                             .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
@@ -129,7 +133,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
-                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+                .param("properties", mapper.writeValueAsString(restparams)))
             .andExpect(status().isInternalServerError());
 
         // NOTE: While the above call returns 500 (from Discovery), it DOES create a Process.

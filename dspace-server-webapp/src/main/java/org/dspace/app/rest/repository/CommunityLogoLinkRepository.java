@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.projection.Projection;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "logo" subresource of an individual community.
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.LOGO)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.LOGO)
 public class CommunityLogoLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

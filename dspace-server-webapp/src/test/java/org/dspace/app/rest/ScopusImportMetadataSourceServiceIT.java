@@ -96,7 +96,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
     }
 
     @Test
-    public void scopusImportMetadataGetRecordsEmptyResponceTest() throws Exception {
+    public void scopusImportMetadataGetRecordsEmptyResponseTest() throws Exception {
         context.turnOffAuthorisationSystem();
         String originApiKey = scopusServiceImpl.getApiKey();
         if (StringUtils.isBlank(originApiKey)) {
@@ -113,8 +113,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
 
             context.restoreAuthSystemState();
             Collection<ImportRecord> recordsImported = scopusServiceImpl.getRecords("roma", 0, 20);
-            ImportRecord  importedRecord = recordsImported.iterator().next();
-            assertTrue(importedRecord.getValueList().isEmpty());
+            assertTrue(recordsImported.isEmpty());
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
             scopusServiceImpl.setApiKey(originApiKey);
@@ -125,7 +124,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.3934/mine.2023004");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "10.3934/mine.2023004");
         MetadatumDTO title = createMetadatumDTO("dc","title", null,
                 "Hardy potential versus lower order terms in Dirichlet problems: regularizing effects<sup>†</sup>");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Journal");
@@ -172,7 +171,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
 
         //define second record
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", null, "10.3934/mine.2023001");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "relation", "hasversion", "10.3934/mine.2023001");
         MetadatumDTO title2 = createMetadatumDTO("dc","title", null,
                 "Large deviations for a binary collision model: energy evaporation<sup>†</sup>");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2023-01-01");

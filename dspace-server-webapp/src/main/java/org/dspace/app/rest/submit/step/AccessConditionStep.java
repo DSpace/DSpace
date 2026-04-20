@@ -9,9 +9,9 @@ package org.dspace.app.rest.submit.step;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.Operation;

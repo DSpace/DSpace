@@ -15,29 +15,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.ItemCountException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateProxyHelper;
 import org.dspace.eperson.Group;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
  * Class representing a collection.
@@ -54,9 +51,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "collection")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Collection extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
 
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -135,6 +130,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
 
     protected void setLogo(Bitstream logo) {
         this.logo = logo;
+        if (logo != null) {
+            logo.setCollection(this);
+        }
         setModified();
     }
 
@@ -157,7 +155,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     /**
      * Set the default group of submitters
      *
-     * Package protected in order to preven unauthorized calls to this method
+     * Package protected in order to prevent unauthorized calls to this method
      *
      * @param submitters the group of submitters
      */
@@ -231,7 +229,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, null, license);
     }
 
     /**
@@ -336,18 +334,4 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         }
         return collectionService;
     }
-
-    /**
-     * return count of the collection items
-     *
-     * @return int
-     */
-    public int countArchivedItems() {
-        try {
-            return collectionService.countArchivedItems(this);
-        } catch (ItemCountException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This controller will handle all the incoming calls on the api/code/items/{uuid}/owningCollection endpoint
+ * This controller will handle all the incoming calls on the api/core/items/{uuid}/owningCollection endpoint
  * where the uuid corresponds to the item of which you want to edit the owning collection.
  */
 @RestController

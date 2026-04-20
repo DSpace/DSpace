@@ -35,7 +35,7 @@ public class SearchFilterToAppliedFilterConverter {
             // facet as the authority is bind at the metadata level and so a facet could contains values from multiple
             // authorities
             // https://jira.duraspace.org/browse/DS-4209
-            authorityValue = authorityValueService.findByUID(context, searchFilter.getValue());
+            authorityValue = authorityValueService.findByUID(searchFilter.getValue());
         }
 
         SearchResultsRest.AppliedFilter appliedFilter;

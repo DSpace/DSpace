@@ -28,6 +28,8 @@ public class TypedLinkRest extends RestAddressableModel {
 
     private String type;
 
+    private String profile;
+
     public TypedLinkRest() {
     }
 
@@ -35,6 +37,11 @@ public class TypedLinkRest extends RestAddressableModel {
         this.href = href;
         this.rel = rel;
         this.type = type;
+    }
+
+    public TypedLinkRest(String href, LinksetRelationType rel, String type, String profile) {
+        this(href, rel, type);
+        this.profile = profile;
     }
 
     public String getHref() {
@@ -60,6 +67,19 @@ public class TypedLinkRest extends RestAddressableModel {
     @Override
     public String getType() {
         return type;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

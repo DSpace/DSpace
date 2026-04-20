@@ -10,6 +10,7 @@ package org.dspace.ctask.general;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +26,6 @@ import org.dspace.identifier.IdentifierProvider;
 import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.IdentifierService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Ensure that an object has all of the identifiers that it should, minting them
@@ -45,20 +45,6 @@ public class CreateMissingIdentifiers
             return Curator.CURATE_SKIP;
         }
 
-        // XXX Temporary escape when an incompatible provider is configured.
-        // XXX Remove this when the provider is fixed.
-        boolean compatible = DSpaceServicesFactory
-                .getInstance()
-                .getServiceManager()
-                .getServiceByName(
-                        VersionedHandleIdentifierProviderWithCanonicalHandles.class.getCanonicalName(),
-                        IdentifierProvider.class) == null;
-        if (!compatible) {
-            setResult("This task is not compatible with VersionedHandleIdentifierProviderWithCanonicalHandles");
-            return Curator.CURATE_ERROR;
-        }
-        // XXX End of escape
-
         String typeText = Constants.typeText[dso.getType()];
 
         // Get a Context
@@ -74,6 +60,18 @@ public class CreateMissingIdentifiers
         IdentifierService identifierService = IdentifierServiceFactory
                 .getInstance()
                 .getIdentifierService();
+
+        // XXX Temporary escape when an incompatible provider is configured.
+        // XXX Remove this when the provider is fixed.
+        List<IdentifierProvider> providerList = identifierService.getProviders();
+        boolean compatible =
+            providerList.stream().noneMatch(p -> p instanceof VersionedHandleIdentifierProviderWithCanonicalHandles);
+
+        if (!compatible) {
+            setResult("This task is not compatible with VersionedHandleIdentifierProviderWithCanonicalHandles");
+            return Curator.CURATE_ERROR;
+        }
+        // XXX End of escape
 
         // Register any missing identifiers.
         try {

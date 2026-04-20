@@ -8,15 +8,14 @@
 package org.dspace.health;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
-import javax.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -61,8 +60,7 @@ public class Report {
             Check check = check_entry.getValue();
 
             log.info(String.format("#%d. Processing [%s] at [%s]",
-                                   pos, check_name, new SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss.SSS").format(new Date())));
+                                   pos, check_name, Instant.now().toString()));
 
             try {
                 // do the stuff
@@ -82,7 +80,7 @@ public class Report {
     // create check list
     public static LinkedHashMap<String, Check> checks() {
         LinkedHashMap<String, Check> checks = new LinkedHashMap<>();
-        String check_names[] = DSpaceServicesFactory.getInstance().getConfigurationService()
+        String[] check_names = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                     .getArrayProperty("healthcheck.checks");
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
         for (String check_name : check_names) {

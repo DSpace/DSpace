@@ -9,21 +9,18 @@
 package org.dspace.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,19 +33,16 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 public class MultiFormatDateParserTest {
-    private static Locale vmLocale;
-    private final String testMessage;
     private final String toParseDate;
     private final String expectedFormat;
-    private final boolean expectedResult;
+    private final String expectedResult;
 
     /**
      * Test a single date format.
      * JUnit will instantiate this class repeatedly with data from {@link #dateFormatsToTest}.
      */
-    public MultiFormatDateParserTest(String testMessage, String toParseDate,
-                                     String expectedFormat, boolean expectedResult) {
-        this.testMessage = testMessage;
+    public MultiFormatDateParserTest(String toParseDate,
+                                     String expectedFormat, String expectedResult) {
         this.toParseDate = toParseDate;
         this.expectedFormat = expectedFormat;
         this.expectedResult = expectedResult;
@@ -59,40 +53,44 @@ public class MultiFormatDateParserTest {
      */
     @Parameterized.Parameters
     public static Collection dateFormatsToTest() {
+        // Format: "String to parse", "format of string", "expected result in UTC"
         return Arrays.asList(new Object[][] {
-            {"Should parse: yyyyMMdd", "19570127", "yyyyMMdd", true},
-            {"Should parse: dd-MM-yyyy", "27-01-1957", "dd-MM-yyyy", true},
-            {"Should parse: yyyy-MM-dd", "1957-01-27", "yyyy-MM-dd", true},
-            {"Should parse: MM/dd/yyyy", "01/27/1957", "MM/dd/yyyy", true},
-            {"Should parse: yyyy/MM/dd", "1957/01/27", "yyyy/MM/dd", true},
-            {"Should parse: yyyyMMddHHmm", "195701272006", "yyyyMMddHHmm", true},
-            {"Should parse: yyyyMMdd HHmm", "19570127 2006", "yyyyMMdd HHmm", true},
-            {"Should parse: dd-MM-yyyy HH:mm", "27-01-1957 20:06", "dd-MM-yyyy HH:mm", true},
-            {"Should parse: yyyy-MM-dd HH:mm", "1957-01-27 20:06", "yyyy-MM-dd HH:mm", true},
-            {"Should parse: MM/dd/yyyy HH:mm", "01/27/1957 20:06", "MM/dd/yyyy HH:mm", true},
-            {"Should parse: yyyy/MM/dd HH:mm", "1957/01/27 20:06", "yyyy/MM/dd HH:mm", true},
-            {"Should parse: yyyyMMddHHmmss", "19570127200620", "yyyyMMddHHmmss", true},
-            {"Should parse: yyyyMMdd HHmmss", "19570127 200620", "yyyyMMdd HHmmss", true},
-            {"Should parse: dd-MM-yyyy HH:mm:ss", "27-01-1957 20:06:20", "dd-MM-yyyy HH:mm:ss", true},
-            {"Should parse: MM/dd/yyyy HH:mm:ss", "01/27/1957 20:06:20", "MM/dd/yyyy HH:mm:ss", true},
-            {"Should parse: yyyy/MM/dd HH:mm:ss", "1957/01/27 20:06:20", "yyyy/MM/dd HH:mm:ss", true},
-            {"Should parse: yyyy MMM dd", "1957 Jan 27", "yyyy MMM dd", true},
-            {"Should parse: yyyy-MM", "1957-01", "yyyy-MM", true},
-            {"Should parse: yyyyMM", "195701", "yyyyMM", true},
-            {"Should parse: yyyy", "1957", "yyyy", true},
-            {"Should parse: yyyy-MM-dd'T'HH:mm:ss'Z'", "1957-01-27T12:34:56Z", "yyyy-MM-dd'T'HH:mm:ss'Z'", true},
-            {"Should parse: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "1957-01-27T12:34:56.789Z", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-                true},
-            {"Shouldn't parse: yyyy/MM/ddHH:mm:ss", "1957/01/2720:06:20", "yyyy/MM/ddHH:mm:ss", false}
+            {"19570127", "yyyyMMdd", "1957-01-27T00:00Z"},
+            {"27-01-1957", "dd-MM-yyyy", "1957-01-27T00:00Z"},
+            {"1957-01-27", "yyyy-MM-dd", "1957-01-27T00:00Z"},
+            {"01/27/1957", "MM/dd/yyyy", "1957-01-27T00:00Z"},
+            {"1957/01/27", "yyyy/MM/dd","1957-01-27T00:00Z"},
+            {"195701272006", "yyyyMMddHHmm", "1957-01-27T20:06Z"},
+            {"19570127 2006", "yyyyMMdd HHmm", "1957-01-27T20:06Z"},
+            {"27-01-1957 20:06", "dd-MM-yyyy HH:mm", "1957-01-27T20:06Z"},
+            {"1957-01-27 20:06", "yyyy-MM-dd HH:mm", "1957-01-27T20:06Z"},
+            {"01/27/1957 20:06", "MM/dd/yyyy HH:mm", "1957-01-27T20:06Z"},
+            {"1957/01/27 20:06", "yyyy/MM/dd HH:mm", "1957-01-27T20:06Z"},
+            {"19570127200620", "yyyyMMddHHmmss", "1957-01-27T20:06:20Z"},
+            {"19570127 200620", "yyyyMMdd HHmmss", "1957-01-27T20:06:20Z"},
+            {"27-01-1957 20:06:20", "dd-MM-yyyy HH:mm:ss", "1957-01-27T20:06:20Z"},
+            {"01/27/1957 20:06:20", "MM/dd/yyyy HH:mm:ss", "1957-01-27T20:06:20Z"},
+            {"1957/01/27 20:06:20", "yyyy/MM/dd HH:mm:ss", "1957-01-27T20:06:20Z"},
+            {"1957 Jan 27", "yyyy MMM dd", "1957-01-27T00:00Z"},
+            {"1957-01", "yyyy-MM", "1957-01-01T00:00Z"},
+            {"195701", "yyyyMM", "1957-01-01T00:00Z"},
+            {"1957", "yyyy", "1957-01-01T00:00Z"},
+            {"1957-01-27T12:34:56Z", "yyyy-MM-dd'T'HH:mm:ss'Z'", "1957-01-27T12:34:56Z"},
+            {"1957-01-27T12:34:56.789Z", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "1957-01-27T12:34:56.789Z"},
+            // Empty string result means that this should not parse successfully
+            {"1957/01/2720:06:20", "yyyy/MM/ddHH:mm:ss", ""}
         });
     }
 
+    /**
+     * Rule for setting the locale to English. This is necessary to test with the English month
+     * names. The rule restore the default locale after test.
+     */
+    @ClassRule
+    public static DefaultLocaleForTestRule defaultLocaleRule = DefaultLocaleForTestRule.en();
+
     @BeforeClass
     public static void setUpClass() {
-        // store default locale of the environment
-        vmLocale = Locale.getDefault();
-        // set default locale to English just for the test of this class
-        Locale.setDefault(Locale.ENGLISH);
         Map<String, String> formats = new HashMap<>(32);
         formats.put("\\d{8}", "yyyyMMdd");
         formats.put("\\d{1,2}-\\d{1,2}-\\d{4}", "dd-MM-yyyy");
@@ -127,12 +125,6 @@ public class MultiFormatDateParserTest {
         new MultiFormatDateParser().setPatterns(formats);
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-        // restore locale
-        Locale.setDefault(vmLocale);
-    }
-
     @Before
     public void setUp() {
     }
@@ -145,10 +137,13 @@ public class MultiFormatDateParserTest {
      * Test of parse method, of class MultiFormatDateParser.
      */
     @Test
-    public void testParse() throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(expectedFormat);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date result = MultiFormatDateParser.parse(toParseDate);
-        assertEquals(testMessage, expectedResult, simpleDateFormat.parse(toParseDate).equals(result));
+    public void testParse() {
+        ZonedDateTime result = MultiFormatDateParser.parse(toParseDate);
+        // Verify that the parsed ZonedDateTime is equal to the expected String result (or null if result is empty)
+        if (!expectedResult.isEmpty()) {
+            assertEquals("Should parse: " + expectedFormat, expectedResult, result.toString());
+        } else {
+            assertNull("Should not parse: " + expectedFormat, result);
+        }
     }
 }

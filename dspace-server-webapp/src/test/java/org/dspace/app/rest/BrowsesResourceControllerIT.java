@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.BrowseIndexMatcher.bis;
+import static org.dspace.app.rest.matcher.BrowseIndexMatcher.browseMatchers;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
 import static org.hamcrest.Matchers.contains;
@@ -20,6 +22,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.Period;
 
 import org.dspace.app.rest.matcher.BrowseEntryResourceMatcher;
 import org.dspace.app.rest.matcher.BrowseIndexMatcher;
@@ -64,24 +68,18 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //Our default Discovery config has 5 browse indexes, so we expect this to be reflected in the page
-                   // object
+                   // Dynamically obtain the total number of browse indices configured in dspace.cfg and check that the
+                   // response contains the correct number of browse indices
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(bis.length)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //The array of browse index should have a size 5
-                   .andExpect(jsonPath("$._embedded.browses", hasSize(5)))
+                   //The array of browse index should match the size of the total number of browse indices configured
+                   .andExpect(jsonPath("$._embedded.browses", hasSize(bis.length)))
 
-                   //Check that all (and only) the default browse indexes are present
-                   .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
-                       BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
-                       BrowseIndexMatcher.contributorBrowseIndex("asc"),
-                       BrowseIndexMatcher.titleBrowseIndex("asc"),
-                       BrowseIndexMatcher.subjectBrowseIndex("asc"),
-                       BrowseIndexMatcher.hierarchicalBrowseIndex("srsc")
-                   )))
+                   //Check that all (and only) the configured browse indexes are present
+                   .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(browseMatchers)))
         ;
     }
 
@@ -168,8 +166,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -260,6 +262,191 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
+    public void findBrowseBySubjectEntriesPagination() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2")
+                                           .build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Public item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+            .withTitle("Public item 2")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("TestingForMore").withSubject("ExtraEntry")
+            .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+            .withTitle("Public item 2")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("AnotherTest").withSubject("TestingForMore")
+            .withSubject("ExtraEntry")
+            .build();
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+            .withTitle("Withdrawn item 1")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("AnotherTest").withSubject("TestingForMore")
+            .withSubject("ExtraEntry").withSubject("WithdrawnEntry")
+            .withdrawn()
+            .build();
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+            .withTitle("Private item 1")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+            .withSubject("AnotherTest").withSubject("TestingForMore")
+            .withSubject("ExtraEntry").withSubject("PrivateEntry")
+            .makeUnDiscoverable()
+            .build();
+
+
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find which subjects are currently in the repository
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("projection", "full")
+                .param("size", "1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(0)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("projection", "full")
+                .param("size", "1")
+                .param("page","1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(1)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", 3)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("projection", "full")
+                .param("size", "1")
+                .param("page","2"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(2)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("sort", "value,desc")
+                .param("size", "1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(0)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("sort", "value,desc")
+                .param("size", "1")
+                .param("page","1"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(1)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("ExtraEntry", 3)
+                )));
+
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                .param("sort", "value,desc")
+                .param("size", "1")
+                .param("page","2"))
+
+            //** THEN **
+            //The status has to be 200
+            .andExpect(status().isOk())
+
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.size", is(1)))
+            .andExpect(jsonPath("$.page.number", is(2)))
+            //Check that there are indeed 3 different subjects
+            .andExpect(jsonPath("$.page.totalElements", is(3)))
+            //Check that the subject matches as expected
+            .andExpect(jsonPath("$._embedded.entries",
+                contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
+                )));
+    }
+
+    @Test
     public void findBrowseBySubjectEntriesWithAuthority() throws Exception {
         configurationService.setProperty("choices.plugin.dc.subject",
                                          "SolrSubjectAuthority");
@@ -278,8 +465,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection 1")
+            .withEntityType("Publication")
+            .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+            .withName("Collection 2")
+            .withEntityType("Publication")
+            .build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -327,7 +520,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Verify that they're sorted alphabetically
                    .andExpect(
                        jsonPath("$._embedded.entries",
-                            contains(
+                                contains(
                                 BrowseEntryResourceMatcher.matchBrowseEntry("Church studies", "VR110103", 2),
                                 BrowseEntryResourceMatcher.matchBrowseEntry("History of religion", "VR110102", 3),
                                 BrowseEntryResourceMatcher.matchBrowseEntry("Missionary studies", "VR110104", 1)
@@ -377,8 +570,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2").build();
 
         //2. Two public items with the same subject and another public item that contains that same subject, but also
         // another one
@@ -498,8 +695,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2")
+                                           .build();
 
         //2. Two public items with the same subject and another public item that contains that same subject, but also
         // another one
@@ -619,8 +822,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2")
+                                           .build();
 
         //2. Two public items with the same subject and another public item that contains that same subject, but also
         // another one
@@ -743,8 +952,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2").build();
 
         //2. Two public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -776,7 +989,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                         .withIssueDate("2017-08-10")
                                         .withAuthor("Mouse, Mickey")
                                         .withSubject("Cartoons").withSubject("Mice")
-                                        .withEmbargoPeriod("12 months")
+                                        .withEmbargoPeriod(Period.ofMonths(12))
                                         .build();
 
         //5. An item that is only readable for an internal groups
@@ -876,8 +1089,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2")
+                                           .build();
 
         //2. Two public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -909,7 +1128,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                         .withIssueDate("2017-08-10")
                                         .withAuthor("Mouse, Mickey")
                                         .withSubject("Cartoons").withSubject("Mice")
-                                        .withEmbargoPeriod("12 months")
+                                        .withEmbargoPeriod(Period.ofMonths(12))
                                         .build();
 
         //5. An item that is only readable for an internal groups
@@ -1008,7 +1227,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
 
         //2. Twenty-one public items that are readable by Anonymous
         for (int i = 0; i <= 20; i++) {
@@ -1074,8 +1295,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1224,8 +1449,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2")
+                                           .build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1351,8 +1582,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1454,7 +1689,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Turing, Alan Mathison", 1)
                                        )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                     .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=T")));
 
         //** WHEN **
@@ -1477,10 +1712,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Computing", 3)
                                        )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                     .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=C")));
 
-    };
+    }
+
+    ;
 
     @Test
     public void testBrowseByEntriesStartsWithAndDiacritics() throws Exception {
@@ -1494,8 +1731,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withEntityType("Publication")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2")
+                                           .withEntityType("Publication")
+                                           .build();
 
         //2. 4 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1579,7 +1822,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Ögren, Name", 1),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("Ortiz, Nombre", 1)
                                                )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Ó")));
 
 
@@ -1606,7 +1849,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("Teléfono", 1),
                                                 BrowseEntryResourceMatcher.matchBrowseEntry("Televisor", 1)
                                                )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Tele")));
 
         //** WHEN **
@@ -1629,10 +1872,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.entries",
                                        contains(BrowseEntryResourceMatcher.matchBrowseEntry("Guion", 1)
                                                )))
-                   //Verify that the startsWith paramater is included in the links
+                   //Verify that the startsWith parameter is included in the links
                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Guión")));
 
-    };
+    }
+
+    ;
 
     @Test
     public void testBrowseByItemsStartsWith() throws Exception {
@@ -1646,8 +1891,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1704,8 +1953,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         // ---- BROWSES BY ITEM ----
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
-        //with startsWith set to 199
-        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=199")
+        //with startsWith set to 1990
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
                                 .param("size", "2"))
 
                    //** THEN **
@@ -1714,8 +1963,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 2 items present in the repository
-                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   //We expect the totalElements to be the 5 items from 1990 til now
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
                    //We expect to jump to page 1 of the index
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$.page.size", is(2)))
@@ -1817,8 +2066,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1876,8 +2129,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
-        //with startsWith set to 199 and Page to 1
-        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=199")
+        //with startsWith set to 1990 and Page to 1
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
                                 .param("size", "1").param("page", "1"))
 
                    //** THEN **
@@ -1886,17 +2139,76 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 2 items present in the repository
-                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   //We expect the totalElements to be the 5 items present in the repository from 1990 until now
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
                    //We expect to jump to page 1 of the index
                    .andExpect(jsonPath("$.page.number", is(1)))
                    .andExpect(jsonPath("$.page.size", is(1)))
-                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=199")))
+                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=1990")))
 
-                   //Verify that the index jumps to the "Java" item.
-                   .andExpect(jsonPath("$._embedded.items",
-                        contains(
-                            ItemMatcher.matchItemWithTitleAndDateIssued(item3, "Java", "1995-05-23")
+                //Verify that the returned item is 2nd (page 0 first item, page 1 second item) item from 1990
+                // Items: Alan Turing - 1912; Blade Runner - 1982-06-25 || Python - 1990;
+                // Java - 1995-05-23; Zeta Reticuli - 2018-01-01; Moon - 2018-01-02; T-800 - 2029
+                // 2nd since 1990: Java
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item3,
+                                        "Java", "1995-05-23")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
+                .param("size", "2").param("page", "1"))
+                //Verify that the returned item is 3rd&4th item from 1990
+                // Items: Alan Turing - 1912; Blade Runner - 1982-06-25 || Python - 1990;
+                // Java - 1995-05-23; Zeta Reticuli - 2018-01-01; Moon - 2018-01-02; T-800 - 2029
+                // => Zeta Reticuli & Moon
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item7,
+                                        "Zeta Reticuli", "2018-01-01"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                        "Moon", "2018-01-02")
+                        )));
+
+        // Sort descending
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "2").param("page", "0"))
+                //Verify that the returned items are from 1990 and below dates
+                // Items: Alan Turing - 1912; Blade Runner - 1982-06-25 || Python - 1990;
+                // Java - 1995-05-23; Zeta Reticuli - 2018-01-01; Moon - 2018-01-02; T-800 - 2029
+                // => Python & Blade Runner
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "1").param("page", "0"))
+                //Verify that the returned item is the one closest to 1990 but below its upperBound (1990-12-31)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990&sort=default,DESC")
+                        .param("size", "3").param("page", "0"))
+                //Verify that the 3 returned items are from 1990 and below dates,
+                // with closest to upperBound 1990-12-31 as first
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Python", "1990"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item1,
+                                        "Alan Turing", "1912-06-23")
+                        )));
+
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1982-06&sort=default,DESC")
+                        .param("size", "1").param("page", "0"))
+                //Verify that the returned item is the one closest to 1982-06 but below its upperBound (1982-06-30)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Blade Runner", "1982-06-25")
                         )));
     }
 
@@ -1910,7 +2222,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Publication").withName("Collection 1").build();
 
         //2. 2 public items that are readable by Anonymous
         Item item1 = ItemBuilder.createItem(context, col1)
@@ -1992,8 +2305,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withEntityType("Publication")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withEntityType("Publication")
+                .build();
 
         //2. Two public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -2042,7 +2361,10 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .withEntityType("Publication")
+                .build();
 
         //2. Twenty-one public items that are readable by Anonymous
         for (int i = 0; i <= 20; i++) {
@@ -2117,8 +2439,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withEntityType("Publication")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withEntityType("Publication")
+                .build();
 
         Item item1 = ItemBuilder.createItem(context, col1)
                                 .withTitle("Item 1")

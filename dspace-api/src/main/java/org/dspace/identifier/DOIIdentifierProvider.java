@@ -14,9 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.annotation.PostConstruct;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.Filter;
@@ -30,8 +34,6 @@ import org.dspace.identifier.doi.DOIIdentifierException;
 import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,7 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Kim Shepherd
  */
 public class DOIIdentifierProvider extends FilteredIdentifierProvider {
-    private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * A DOIConnector connects the DOIIdentifierProvider to the API of the DOI
@@ -67,13 +69,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
+    public static final String CFG_DOI_METADATA = "identifier.doi.metadata";
     static final char SLASH = '/';
 
-    // Metadata field name elements
-    // TODO: move these to MetadataSchema or some such?
-    public static final String MD_SCHEMA = "dc";
-    public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = "uri";
+    // Metadata field name
+    public MetadataFieldName doiMetadataFieldName;
     // The DOI is queued for registered with the service provider
     public static final Integer TO_BE_REGISTERED = 1;
     // The DOI is queued for reservation with the service provider
@@ -168,6 +168,12 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             }
         }
         return this.NAMESPACE_SEPARATOR;
+    }
+
+    @PostConstruct
+    protected void setDOIMetadata() {
+        this.doiMetadataFieldName =
+            new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
     }
 
     /**
@@ -286,8 +292,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         try {
             doiRow = loadOrCreateDOI(context, dso, doi, filter);
         } catch (SQLException ex) {
-            log.error("Error in databse connection: " + ex.getMessage());
-            throw new RuntimeException("Error in database conncetion.", ex);
+            log.error("Error in database connection: {}", ex::getMessage);
+            throw new RuntimeException("Error in database connection.", ex);
         }
 
         if (DELETED.equals(doiRow.getStatus()) ||
@@ -473,7 +479,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     /**
      * Update metadata for a registered object
-     * If the DOI for hte item already exists, *always* skip the filter since it should only be used for
+     * If the DOI for the item already exists, *always* skip the filter since it should only be used for
      * allowing / disallowing reservation and registration, not metadata updates or deletions
      *
      * @param context       - DSpace context
@@ -492,7 +498,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
         if (doiService.findDOIByDSpaceObject(context, dso) != null) {
             // We can skip the filter here since we know the DOI already exists for the item
-            log.debug("updateMetadata: found DOIByDSpaceObject: " +
+            log.debug("updateMetadata: found DOIByDSpaceObject: {}",
                 doiService.findDOIByDSpaceObject(context, dso).getDoi());
             updateFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
                     "always_true_filter", TrueFilter.class);
@@ -501,7 +507,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         DOI doiRow = loadOrCreateDOI(context, dso, doi, updateFilter);
 
         if (PENDING.equals(doiRow.getStatus()) || MINTED.equals(doiRow.getStatus())) {
-            log.info("Not updating metadata for PENDING or MINTED doi: " + doi);
+            log.info("Not updating metadata for PENDING or MINTED doi: {}", doi);
             return;
         }
 
@@ -525,7 +531,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     /**
      * Update metadata for a registered object in the DOI Connector to update the agency records
-     * If the DOI for hte item already exists, *always* skip the filter since it should only be used for
+     * If the DOI for the item already exists, *always* skip the filter since it should only be used for
      * allowing / disallowing reservation and registration, not metadata updates or deletions
      *
      * @param context       - DSpace context
@@ -611,8 +617,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         try {
             doi = getDOIByObject(context, dso);
         } catch (SQLException e) {
-            log.error("Error while attemping to retrieve information about a DOI for "
-                + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " with ID " + dso.getID() + ".");
+            log.error("Error while attempting to retrieve information about a DOI for {} with ID {}.",
+                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso), dso.getID());
             throw new RuntimeException("Error while attempting to retrieve " +
                 "information about a DOI for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
                 " with ID " + dso.getID() + ".", e);
@@ -624,7 +630,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
             } catch (SQLException e) {
                 log.error("Error while creating new DOI for Object of " +
-                    "ResourceType {} with id {}.", dso.getType(), dso.getID());
+                    "ResourceType {} with id {}.", dso::getType, dso::getID);
                 throw new RuntimeException("Error while attempting to create a " +
                     "new DOI for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " with ID " +
                     dso.getID() + ".", e);
@@ -709,9 +715,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 doi = getDOIByObject(context, dso);
             }
         } catch (SQLException ex) {
-            log.error("Error while attemping to retrieve information about a DOI for " +
-                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
-                " with ID " + dso.getID() + ".", ex);
+            log.error("Error while attempting to retrieve information about a DOI for {} with ID {}.",
+                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso),
+                dso.getID(), ex);
             throw new RuntimeException("Error while attempting to retrieve " +
                 "information about a DOI for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
                 " with ID " + dso.getID() + ".", ex);
@@ -726,17 +732,17 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 doi = getDOIOutOfObject(dso);
             }
         } catch (AuthorizeException ex) {
-            log.error("Error while removing a DOI out of the metadata of an " +
-                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
-                " with ID " + dso.getID() + ".", ex);
+            log.error("Error while removing a DOI out of the metadata of an {} with ID {}.",
+                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso),
+                dso.getID(), ex);
             throw new RuntimeException("Error while removing a DOI out of the metadata of an " +
                 contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
                 " with ID " + dso.getID() + ".", ex);
 
         } catch (SQLException ex) {
-            log.error("Error while removing a DOI out of the metadata of an " +
-                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
-                " with ID " + dso.getID() + ".", ex);
+            log.error("Error while removing a DOI out of the metadata of an {} with ID {}.",
+                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso),
+                dso.getID(), ex);
             throw new RuntimeException("Error while removing a DOI out of the " +
                 "metadata of an " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
                 " with ID " + dso.getID() + ".", ex);
@@ -779,8 +785,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             throw new DOIIdentifierException("Not authorized to delete DOI.",
                     ex, DOIIdentifierException.UNAUTHORIZED_METADATA_MANIPULATION);
         } catch (SQLException ex) {
-            log.error("SQLException occurred while deleting a DOI out of an item: "
-                    + ex.getMessage());
+            log.error("SQLException occurred while deleting a DOI out of an item: {}",
+                    ex::getMessage);
             throw new RuntimeException("Error while deleting a DOI out of the " +
                     "metadata of an Item " + dso.getID(), ex);
         }
@@ -826,8 +832,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                     DOIIdentifierException.DOI_DOES_NOT_EXIST);
         }
         if (!TO_BE_DELETED.equals(doiRow.getStatus())) {
-            log.error("This identifier: {} couldn't be deleted. Delete it first from metadata.",
-                DOI.SCHEME + doiRow.getDoi());
+            log.error("This identifier: " + DOI.SCHEME
+                    + "{} couldn't be deleted. Delete it first from metadata.",
+                    doiRow::getDoi);
             throw new IllegalArgumentException("Couldn't delete this identifier:"
                                              + DOI.SCHEME + doiRow.getDoi()
                                              + ". Delete it first from metadata.");
@@ -863,7 +870,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
 
         if (doiRow.getDSpaceObject() == null) {
-            log.error("Found DOI " + doi + " in database, but no assigned Object could be found.");
+            log.error("Found DOI {} in database, but no assigned Object could be found.", doi);
             throw new IllegalStateException("Found DOI " + doi +
                 " in database, but no assigned Object could be found.");
         }
@@ -890,8 +897,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
 
         if (doiRow.getDoi() == null) {
-            log.error("A DOI with an empty doi column was found in the database. DSO-Type: " +
-                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + ", ID: " + dso.getID() + ".");
+            log.error("A DOI with an empty doi column was found in the database. DSO-Type: {}, ID: {}.",
+                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso),
+                dso.getID());
             throw new IllegalStateException("A DOI with an empty doi column was found in the database. DSO-Type: " +
                 contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + ", ID: " + dso.getID() + ".");
         }
@@ -1037,7 +1045,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item,
+                                                               doiMetadataFieldName.schema,
+                                                               doiMetadataFieldName.element,
+                                                               doiMetadataFieldName.qualifier,
+                                                               null);
         String leftPart = doiService.getResolver() + SLASH + getPrefix() + SLASH + getNamespaceSeparator();
         for (MetadataValue id : metadata) {
             if (id.getValue().startsWith(leftPart)) {
@@ -1066,8 +1078,12 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-            doiService.DOIToExternalForm(doi));
+        itemService.addMetadata(context, item,
+                                doiMetadataFieldName.schema,
+                                doiMetadataFieldName.element,
+                                doiMetadataFieldName.qualifier,
+                                null,
+                                doiService.DOIToExternalForm(doi));
         try {
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException ex) {
@@ -1094,7 +1110,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item,
+                                                               doiMetadataFieldName.schema,
+                                                               doiMetadataFieldName.element,
+                                                               doiMetadataFieldName.qualifier,
+                                                               null);
         List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
@@ -1103,9 +1123,19 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             }
         }
 
-        itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-                remainder);
+        itemService.clearMetadata(context, item,
+                                  doiMetadataFieldName.schema,
+                                  doiMetadataFieldName.element,
+                                  doiMetadataFieldName.qualifier,
+                                  null);
+        if (!remainder.isEmpty()) {
+            itemService.addMetadata(context, item,
+                                    doiMetadataFieldName.schema,
+                                    doiMetadataFieldName.element,
+                                    doiMetadataFieldName.qualifier,
+                                    null,
+                                    remainder);
+        }
         itemService.update(context, item);
     }
 
@@ -1134,13 +1164,13 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         if (contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso).equals("ITEM")) {
             try {
                 boolean result = filter.getResult(context, (Item) dso);
-                log.debug("Result of filter for " + dso.getHandle() + " is " + result);
+                log.debug("Result of filter for {} is {}", dso.getHandle(), result);
                 if (!result) {
                     throw new DOIIdentifierNotApplicableException("Item " + dso.getHandle() +
                             " was evaluated as 'false' by the item filter, not minting");
                 }
             } catch (LogicalStatementException e) {
-                log.error("Error evaluating item with logical filter: " + e.getLocalizedMessage());
+                log.error("Error evaluating item with logical filter: {}", e::getLocalizedMessage);
                 throw new DOIIdentifierNotApplicableException(e);
             }
         } else {

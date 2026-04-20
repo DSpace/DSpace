@@ -10,6 +10,7 @@ tags
 .project
 .classpath
 .checkstyle
+.factorypath
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
@@ -26,6 +27,9 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
+
+## Ignore project files created by Visual Studio Code
+.vscode/
 
 ## Ignore all *.properties file in root folder, EXCEPT build.properties (the default)
 ## KEPT FOR BACKWARDS COMPATIBILITY WITH 5.x (build.properties is now replaced with local.cfg)

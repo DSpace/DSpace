@@ -12,9 +12,9 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 
-@Component(BundleRest.CATEGORY + "." + BundleRest.NAME)
+@Component(BundleRest.CATEGORY + "." + BundleRest.PLURAL_NAME)
 public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, BundleRest> {
 
     private static final Logger log = LogManager.getLogger();
@@ -68,6 +68,9 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     public BundleRestRepository(BundleService dsoService) {
         super(dsoService);
@@ -168,7 +171,6 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
         Bitstream bitstream = null;
         if (StringUtils.isNotBlank(properties)) {
-            ObjectMapper mapper = new ObjectMapper();
             BitstreamRest bitstreamRest = null;
             try {
                 bitstreamRest = mapper.readValue(properties, BitstreamRest.class);

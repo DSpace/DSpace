@@ -8,8 +8,8 @@
 package org.dspace.discovery;
 
 import java.io.IOException;
-import javax.inject.Named;
 
+import jakarta.inject.Named;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,9 +88,11 @@ public class SolrSearchCore {
                     solrServer.setBaseURL(solrService);
                     solrServer.setUseMultiPartPost(true);
                     // Dummy/test query to search for Item (type=2) of ID=1
-                    SolrQuery solrQuery = new SolrQuery()
-                        .setQuery(SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableItem.TYPE +
-                                " AND " + SearchUtils.RESOURCE_ID_FIELD + ":1");
+                    SolrQuery solrQuery = new SolrQuery();
+                    solrQuery.setQuery("*:*");
+                    solrQuery.addFilterQuery(
+                            SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableItem.TYPE,
+                            SearchUtils.RESOURCE_ID_FIELD + ":1");
                     // Only return obj identifier fields in result doc
                     solrQuery.setFields(SearchUtils.RESOURCE_TYPE_FIELD, SearchUtils.RESOURCE_ID_FIELD);
                     solrServer.query(solrQuery, REQUEST_METHOD);

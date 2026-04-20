@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -137,8 +138,9 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
                     loadOrCreateDOI(context, dso, versionedDOI, filter);
                 } catch (SQLException ex) {
                     log.error(
-                        "A problem with the database connection occurd while processing DOI " + versionedDOI + ".", ex);
-                    throw new RuntimeException("A problem with the database connection occured.", ex);
+                        "A problem with the database connection occurred while processing DOI " + versionedDOI + ".",
+                        ex);
+                    throw new RuntimeException("A problem with the database connection occurred.", ex);
                 }
                 return versionedDOI;
             }
@@ -335,7 +337,11 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
         String bareDoiRef = doiService.DOIToExternalForm(bareDoi);
 
         List<MetadataValue> identifiers = itemService
-            .getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
+            .getMetadata(item,
+                         doiMetadataFieldName.schema,
+                         doiMetadataFieldName.element,
+                         doiMetadataFieldName.qualifier,
+                         Item.ANY);
         // We have to remove all DOIs referencing previous versions. To do that,
         // we store all identifiers we do not know in an array list, clear
         // dc.identifier.uri and add the safed identifiers.
@@ -344,20 +350,32 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
         ArrayList<String> newIdentifiers = new ArrayList<>(identifiers.size());
         boolean changed = false;
         for (MetadataValue identifier : identifiers) {
-            if (!StringUtils.startsWithIgnoreCase(identifier.getValue(), bareDoiRef)) {
+            if (!Strings.CI.startsWith(identifier.getValue(), bareDoiRef)) {
                 newIdentifiers.add(identifier.getValue());
             } else {
                 changed = true;
             }
         }
-        // reset the metadata if neccessary.
+        // reset the metadata if necessary.
         if (changed) {
             try {
-                itemService.clearMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
-                itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                itemService.clearMetadata(c, item,
+                                          doiMetadataFieldName.schema,
+                                          doiMetadataFieldName.element,
+                                          doiMetadataFieldName.qualifier,
+                                          Item.ANY);
+                // Checks if Array newIdentifiers is empty to avoid adding null values to the metadata field.
+                if (!newIdentifiers.isEmpty()) {
+                    itemService.addMetadata(c, item,
+                                            doiMetadataFieldName.schema,
+                                            doiMetadataFieldName.element,
+                                            doiMetadataFieldName.qualifier,
+                                            null,
+                                            newIdentifiers);
+                }
                 itemService.update(c, item);
             } catch (SQLException ex) {
-                throw new RuntimeException("A problem with the database connection occured.", ex);
+                throw new RuntimeException("A problem with the database connection occurred.", ex);
             }
         }
     }

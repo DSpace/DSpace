@@ -11,9 +11,9 @@
 <xsd:schema targetNamespace='https://dspace.org/workflow-curation'
             elementFormDefault='qualified'
             xmlns:xsd='http://www.w3.org/2001/XMLSchema'
-            xmlns:jaxb='http://java.sun.com/xml/ns/jaxb'
+            xmlns:jaxb='https://jakarta.ee/xml/ns/jaxb'
             xmlns='https://dspace.org/workflow-curation'
-            jaxb:version='2.1'>
+            jaxb:version='3.0'>
     <xsd:annotation>
 	<xsd:documentation>
 	    Workflow curation enables curation tasks to be assigned to

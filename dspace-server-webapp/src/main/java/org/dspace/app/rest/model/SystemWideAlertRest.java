@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,6 +19,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class SystemWideAlertRest extends BaseObjectRest<Integer> {
     public static final String NAME = "systemwidealert";
+    public static final String PLURAL_NAME = "systemwidealerts";
     public static final String CATEGORY = RestAddressableModel.SYSTEM;
 
     public String getCategory() {
@@ -34,10 +35,15 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     private Integer alertId;
     private String message;
     private String allowSessions;
-    private Date countdownTo;
+    private ZonedDateTime countdownTo;
     private boolean active;
 
     public Integer getAlertId() {
@@ -64,11 +70,11 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
         this.allowSessions = allowSessions;
     }
 
-    public Date getCountdownTo() {
+    public ZonedDateTime getCountdownTo() {
         return countdownTo;
     }
 
-    public void setCountdownTo(final Date countdownTo) {
+    public void setCountdownTo(final ZonedDateTime countdownTo) {
         this.countdownTo = countdownTo;
     }
 

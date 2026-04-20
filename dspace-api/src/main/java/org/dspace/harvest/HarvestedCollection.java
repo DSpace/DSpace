@@ -7,21 +7,19 @@
  */
 package org.dspace.harvest;
 
-import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import java.time.Instant;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
@@ -62,12 +60,10 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
     private int harvestStatus;
 
     @Column(name = "harvest_start_time", columnDefinition = "timestamp with time zone")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date harvestStartTime;
+    private Instant harvestStartTime;
 
     @Column(name = "last_harvested", columnDefinition = "timestamp with time zone")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastHarvested;
+    private Instant lastHarvested;
 
     @Transient
     public static final int TYPE_NONE = 0;
@@ -115,11 +111,10 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         setHarvestMetadataConfig(mdConfigId);
     }
 
-    /*
-     * Setters for the appropriate harvesting-related columns
+    /**
+     * Setters for the appropriate harvesting-related columns.
      *
-     * @param type
-     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL
+     * @param type harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL)
      */
     public void setHarvestType(int type) {
         this.harvestType = type;
@@ -157,7 +152,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         this.metadataConfigId = mdConfigId;
     }
 
-    public void setLastHarvested(Date lastHarvested) {
+    public void setLastHarvested(Instant lastHarvested) {
         this.lastHarvested = lastHarvested;
     }
 
@@ -165,7 +160,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         this.harvestMessage = message;
     }
 
-    public void setHarvestStartTime(Date date) {
+    public void setHarvestStartTime(Instant date) {
         this.harvestStartTime = date;
     }
 
@@ -203,11 +198,11 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         return harvestMessage;
     }
 
-    public Date getHarvestDate() {
+    public Instant getHarvestDate() {
         return lastHarvested;
     }
 
-    public Date getHarvestStartTime() {
+    public Instant getHarvestStartTime() {
         return harvestStartTime;
     }
 }

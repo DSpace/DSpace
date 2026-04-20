@@ -21,8 +21,9 @@ import org.dspace.app.rest.HarvesterMetadataController;
  */
 public class HarvesterMetadataRest extends BaseObjectRest {
 
-    public static final String CATEGORY = "config";
+    public static final String CATEGORY = RestModel.CONFIGURATION;
     public static final String NAME = "harvesterMetadata";
+    public static final String PLURAL_NAME = NAME;
 
     private List<Map<String,String>> configs;
 
@@ -40,6 +41,14 @@ public class HarvesterMetadataRest extends BaseObjectRest {
     @JsonIgnore
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
 

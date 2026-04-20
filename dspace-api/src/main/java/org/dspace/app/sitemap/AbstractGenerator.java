@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Date;
+import java.time.Instant;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -110,7 +110,7 @@ public abstract class AbstractGenerator {
      * @throws IOException if IO error
      *                     if an error occurs writing
      */
-    public void addURL(String url, Date lastMod) throws IOException {
+    public void addURL(String url, Instant lastMod) throws IOException {
         // Kick things off if this is the first call
         if (currentOutput == null) {
             startNewFile();
@@ -143,7 +143,7 @@ public abstract class AbstractGenerator {
 
     /**
      * Complete writing sitemap files and write the index files. This is invoked
-     * when all calls to {@link AbstractGenerator#addURL(String, Date)} have
+     * when all calls to {@link AbstractGenerator#addURL(String, Instant)} have
      * been completed, and invalidates the generator.
      *
      * @return number of sitemap files written.
@@ -177,7 +177,7 @@ public abstract class AbstractGenerator {
      *                applicable
      * @return the mark-up to include
      */
-    public abstract String getURLText(String url, Date lastMod);
+    public abstract String getURLText(String url, Instant lastMod);
 
     /**
      * Return the boilerplate at the top of a sitemap file.

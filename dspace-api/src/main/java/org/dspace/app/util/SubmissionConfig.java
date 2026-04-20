@@ -9,6 +9,7 @@ package org.dspace.app.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ import org.apache.logging.log4j.Logger;
  * @see org.dspace.app.util.SubmissionStepConfig
  */
 
-public class SubmissionConfig implements Serializable {
+public class SubmissionConfig implements Serializable, Iterable<SubmissionStepConfig> {
     /**
      * name of the item submission process
      */
@@ -44,7 +45,7 @@ public class SubmissionConfig implements Serializable {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfig.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfig.class);
 
     /**
      * Constructs a new Submission Configuration object, based on the XML
@@ -135,5 +136,37 @@ public class SubmissionConfig implements Serializable {
 
     public boolean hasMoreSteps(int stepNum) {
         return (getStep(stepNum + 1) != null);
+    }
+
+    /**
+     * Returns an iterator over the submission steps in this configuration.
+     *
+     * @return an Iterator of SubmissionStepConfig
+     */
+    @Override
+    public Iterator<SubmissionStepConfig> iterator() {
+        return new SubmissionStepConfigIterator(this);
+    }
+
+    private class SubmissionStepConfigIterator implements Iterator<SubmissionStepConfig> {
+
+        private final SubmissionConfig submissionConfig;
+
+        private int currentStep = 0;
+
+        public SubmissionStepConfigIterator(SubmissionConfig submissionConfig) {
+            this.submissionConfig = submissionConfig;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return submissionConfig.getStep(currentStep) != null;
+        }
+
+        @Override
+        public SubmissionStepConfig next() {
+            return submissionConfig.getStep(currentStep++);
+        }
+
     }
 }

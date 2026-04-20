@@ -37,7 +37,7 @@ public interface IngestionCrosswalk {
      * internal representations.  This version accepts metadata as a
      * <code>List</code> of JDOM XML elements.  It interprets the
      * contents of each element and adds the appropriate values to the
-     * DSpace Object's internal metadata represenation.
+     * DSpace Object's internal metadata representation.
      * <p>
      * Note that this method may be called several times for the same target
      * Item, if the metadata comes as several lists of elements, so it should

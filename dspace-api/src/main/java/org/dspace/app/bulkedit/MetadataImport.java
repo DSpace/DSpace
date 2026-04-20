@@ -20,10 +20,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authority.AuthorityValue;
@@ -41,6 +43,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityService;
@@ -89,7 +93,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     /**
      * The authority controlled fields
      */
-    protected static Set<String> authorityControlled;
+    protected Set<String> authorityControlled;
 
     /**
      * The prefix of the authority controlled field
@@ -162,6 +166,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                                    .getAuthorityValueService();
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
+        .getInstance()
+        .getMetadataAuthorityService();
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -253,7 +260,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 displayChanges(changes, true);
             }
 
-            // Finsh off and tidy up
+            // Finish off and tidy up
             c.restoreAuthSystemState();
             c.complete();
         } catch (Exception e) {
@@ -358,6 +365,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
         // Process each change
         rowCount = 1;
+
+        int maxItems = configurationService.getIntProperty("bulkedit.import.max.items", 1000);
+        int numItems = toImport.size();
+        if (numItems > maxItems && maxItems > 0) {
+            throw new MetadataImportException(
+                "Import contains " + numItems + " items, which exceeds the configured "
+                + "maximum of " + maxItems + ". You can change this limit by setting "
+                + "'bulkedit.import.max.items' in your local configuration.");
+        }
+
         for (DSpaceCSVLine line : toImport) {
             // Resolve target references to other items
             populateRefAndRowMap(line, line.getID());
@@ -494,7 +511,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                 // Check it has an owning collection
                 List<String> collections = line.get("collection");
-                if (collections == null) {
+                if (collections == null || collections.isEmpty()) {
                     throw new MetadataImportException(
                         "New items must have a 'collection' assigned in the form of a handle");
                 }
@@ -551,7 +568,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                     // Add the metadata to the item
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (!Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             itemService.addMetadata(c, item, dcv.getSchema(),
                                                     dcv.getElement(),
                                                     dcv.getQualifier(),
@@ -563,7 +580,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     }
                     //Add relations after all metadata has been processed
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             addRelationship(c, item, dcv.getElement(), dcv.getValue());
                         }
                     }
@@ -578,6 +595,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             wfItem = workflowService.startWithoutNotify(c, wsItem);
                         }
                     } else {
+                        // Add provenance info
+                        String provenance = installItemService.getSubmittedByProvenanceMessage(c, wsItem.getItem());
+                        itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provenance);
                         // Install the item
                         installItemService.installItem(c, wsItem);
                     }
@@ -738,10 +759,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             if (value == null || !value.contains(csv.getAuthoritySeparator())) {
                 simplyCopyValue(value, dcv);
             } else {
-                String[] parts = value.split(csv.getAuthoritySeparator());
-                dcv.setValue(parts[0]);
-                dcv.setAuthority(parts[1]);
-                dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+                resolveValueAndAuthority(value, dcv);
             }
 
             // fromAuthority==null: with the current implementation metadata values from external authority sources
@@ -808,7 +826,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 }
             }
 
-            if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+            if (Strings.CS.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
                     .findByLeftwardOrRightwardTypeName(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
@@ -821,8 +839,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 addRelationships(c, item, element, values);
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
-                itemService.addMetadata(c, item, schema, element, qualifier,
-                                        language, values, authorities, confidences);
+                if (!values.isEmpty()) {
+                    itemService.addMetadata(c, item, schema, element, qualifier,
+                                            language, values, authorities, confidences);
+                }
                 itemService.update(c, item);
             }
         }
@@ -1117,8 +1137,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     .getAuthoritySeparator() + dcv.getConfidence();
             }
 
-            // Add it
-            if ((value != null) && (!"".equals(value))) {
+            // Add it, if value is not blank
+            if (value != null && StringUtils.isNotBlank(value)) {
                 changes.registerAdd(dcv);
             }
         }
@@ -1133,18 +1153,29 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setElement(element);
         dcv.setQualifier(qualifier);
         dcv.setLanguage(language);
-        if (fromAuthority != null) {
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append(schema).append("_").append(element);
+
+        if (StringUtils.isNotEmpty(qualifier)) {
+            builder.append("_").append(qualifier);
+        }
+
+        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(builder.toString(),
+                Constants.ITEM, null);
+
+        if (fromAuthority != null && isAuthorityControlled) {
             if (value.indexOf(':') > 0) {
                 value = value.substring(0, value.indexOf(':'));
             }
 
             // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
+            List<AuthorityValue> byValue = authorityValueService.findByValue(schema, element, qualifier, value);
             AuthorityValue authorityValue = null;
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
                 String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
-                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
+                authorityValue = authorityValueService.generate(toGenerate, value, field);
                 dcv.setAuthority(toGenerate);
             } else {
                 authorityValue = byValue.get(0);
@@ -1156,10 +1187,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         } else if (value == null || !value.contains(csv.getAuthoritySeparator())) {
             simplyCopyValue(value, dcv);
         } else {
-            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
-            dcv.setValue(parts[0]);
-            dcv.setAuthority(parts[1]);
-            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+            resolveValueAndAuthority(value, dcv);
         }
         return dcv;
     }
@@ -1168,6 +1196,35 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setValue(value);
         dcv.setAuthority(null);
         dcv.setConfidence(Choices.CF_UNSET);
+    }
+
+    private void resolveValueAndAuthority(String value, BulkEditMetadataValue dcv) {
+        // Cells with valid authority are composed of three parts ~ <value>, <authority>, <confidence>
+        // The value itself may also include the authority separator though
+        String[] parts = value.split(csv.getEscapedAuthoritySeparator());
+
+        // If we don't have enough parts, assume the whole string is the value
+        if (parts.length < 3) {
+            simplyCopyValue(value, dcv);
+            return;
+        }
+
+        try {
+            // The last part of the cell must be a confidence value (integer)
+            int confidence = Integer.parseInt(parts[parts.length - 1]);
+            String authority = parts[parts.length - 2];
+            String plainValue = String.join(
+                csv.getAuthoritySeparator(),
+                ArrayUtils.subarray(parts, 0, parts.length - 2)
+            );
+
+            dcv.setValue(plainValue);
+            dcv.setAuthority(authority);
+            dcv.setConfidence(confidence);
+        } catch (NumberFormatException e) {
+            // Otherwise assume the whole string is the value
+            simplyCopyValue(value, dcv);
+        }
     }
 
     /**
@@ -1362,10 +1419,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     /**
      * is the field is defined as authority controlled
      */
-    private static boolean isAuthorityControlledField(String md) {
-        String mdf = StringUtils.substringAfter(md, ":");
+    private boolean isAuthorityControlledField(String md) {
+        String mdf = md.contains(":") ? StringUtils.substringAfter(md, ":") : md;
         mdf = StringUtils.substringBefore(mdf, "[");
-        return authorityControlled.contains(mdf);
+        return authorityControlled.contains(mdf) || authorityControlled.contains(md);
     }
 
     /**
@@ -1530,7 +1587,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 ContentServiceFactory.getInstance().getMetadataFieldService();
             int i = reference.indexOf(":");
             String mfValue = reference.substring(i + 1);
-            String mf[] = reference.substring(0, i).split("\\.");
+            String[] mf = reference.substring(0, i).split("\\.");
             if (mf.length < 2) {
                 throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
                                                       "Bad metadata field in reference: '" + reference
@@ -1647,7 +1704,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                   .getLabel();
                 } else {
                     // Target item may be archived; check there.
-                    // Add to errors if Realtionship.type cannot be derived
+                    // Add to errors if Relationship.type cannot be derived
                     Item targetItem = null;
                     if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                         targetItem = itemService.find(c, UUID.fromString(targetUUID));
@@ -1692,7 +1749,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                         } else {
                             // Origin item may be archived; check there.
-                            // Add to errors if Realtionship.type cannot be derived.
+                            // Add to errors if Relationship.type cannot be derived.
                             Item originItem = null;
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                                 DSpaceCSVLine dSpaceCSVLine = this.csv.getCSVLines()
@@ -1704,7 +1761,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                                 if (relTypes != null && relTypes.size() > 0) {
                                     String relTypeValue = relTypes.get(0);
-                                    relTypeValue = StringUtils.remove(relTypeValue, "\"").trim();
+                                    relTypeValue = Strings.CS.remove(relTypeValue, "\"").trim();
                                     originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
                                     validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                                 } else {
@@ -1796,5 +1853,4 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                    String targetType, String originType, String originTypeName) {
         return RelationshipUtils.matchRelationshipType(relTypes, targetType, originType, originTypeName);
     }
-
 }

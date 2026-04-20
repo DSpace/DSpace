@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAJournal;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
@@ -97,7 +97,7 @@ public class SHERPAv2JournalDataProvider extends AbstractExternalDataProvider {
         if (CollectionUtils.isNotEmpty(sherpaJournal.getIssns())) {
             String issn = sherpaJournal.getIssns().get(0);
             externalDataObject.addMetadata(new MetadataValueDTO(
-                    "dc", "identifier", "issn", null, issn));
+                "creativeworkseries", "issn", null, null, issn));
 
         }
 
@@ -134,7 +134,7 @@ public class SHERPAv2JournalDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+        return Strings.CI.equals(sourceIdentifier, source);
     }
 
     /**

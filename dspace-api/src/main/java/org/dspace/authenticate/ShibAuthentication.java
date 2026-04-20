@@ -20,9 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -160,7 +160,7 @@ public class ShibAuthentication implements AuthenticationMethod {
      * SUCCESS - authenticated OK. <br>
      * BAD_CREDENTIALS - user exists, but credentials (e.g. passwd)
      * don't match <br>
-     * CERT_REQUIRED - not allowed to login this way without X.509 cert.
+     * CERT_REQUIRED - not allowed to login this way without a cert.
      * <br>
      * NO_SUCH_USER - user not found using this method. <br>
      * BAD_ARGS - user/pw not appropriate for this method
@@ -287,7 +287,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
         try {
-            // User has not successfuly authenticated via shibboleth.
+            // User has not successfully authenticated via shibboleth.
             if (request == null ||
                 context.getCurrentUser() == null) {
                 return Collections.EMPTY_LIST;
@@ -309,7 +309,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             if (ignoreScope && ignoreValue) {
                 throw new IllegalStateException(
                     "Both config parameters for ignoring an roll attributes scope and value are turned on, this is " +
-                        "not a permissable configuration. (Note: ignore-scope defaults to true) The configuration " +
+                        "not a permissible configuration. (Note: ignore-scope defaults to true) The configuration " +
                         "parameters are: 'authentication.shib.role-header.ignore-scope' and 'authentication.shib" +
                         ".role-header.ignore-value'");
             }
@@ -391,7 +391,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             return new ArrayList<>(groups);
 
         } catch (Throwable t) {
-            log.error("Unable to validate any sepcial groups this user may belong too because of an exception.", t);
+            log.error("Unable to validate any special groups this user may belong too because of an exception.", t);
             return Collections.EMPTY_LIST;
         }
     }
@@ -417,8 +417,7 @@ public class ShibAuthentication implements AuthenticationMethod {
      * Predicate, is this an implicit authentication method. An implicit method
      * gets credentials from the environment (such as an HTTP request or even
      * Java system properties) rather than the explicit username and password.
-     * For example, a method that reads the X.509 certificates in an HTTPS
-     * request is implicit.
+     * For example, a method that provides IP-based authentication is implicit.
      *
      * @return true if this method uses implicit authentication.
      */
@@ -546,7 +545,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
     /**
      * Identify an existing EPerson based upon the shibboleth attributes provided on
-     * the request object. There are three cases where this can occurr, each as
+     * the request object. There are three cases where this can occur, each as
      * a fallback for the previous method.
      *
      * 1) NetID from Shibboleth Header (best)
@@ -671,7 +670,7 @@ public class ShibAuthentication implements AuthenticationMethod {
         if (!foundNetID && !foundEmail && !foundRemoteUser) {
             log.error(
                 "Shibboleth authentication was not able to find a NetId, Email, or Tomcat Remote user for which to " +
-                    "indentify a user from.");
+                    "identify a user from.");
         }
 
 
@@ -871,7 +870,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             String[] nameParts = MetadataFieldName.parse(field);
             ePersonService.setMetadataSingleValue(context, eperson,
-                    nameParts[0], nameParts[1], nameParts[2], value, null);
+                    nameParts[0], nameParts[1], nameParts[2], null, value);
             log.debug("Updated the eperson's '{}' metadata using header: '{}' = '{}'.",
                     field, header, value);
         }
@@ -917,7 +916,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                     " is not allowed to login.");
             return BAD_ARGS;
         } else if (eperson.getRequireCertificate()) {
-            // this user can only login with x.509 certificate
+            // this user can only login with a certificate
             log.error(
                 "Shibboleth-based password authentication failed for user " + username + " because the eperson object" +
                     " requires a certificate to authenticate..");
@@ -931,7 +930,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                          "compatibility mode.");
             return SUCCESS;
         } else {
-            // Passsword failure
+            // Password failure
             log.error(
                 "Shibboleth-based password authentication failed for user " + username + " because a bad password was" +
                     " supplied.");
@@ -944,7 +943,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     /**
      * Initialize Shibboleth Authentication.
      *
-     * During initalization the mapping of additional eperson metadata will be loaded from the DSpace.cfg
+     * During initialization the mapping of additional eperson metadata will be loaded from the DSpace.cfg
      * and cached. While loading the metadata mapping this method will check the EPerson object to see
      * if it supports the metadata field. If the field is not supported and autocreate is turned on then
      * the field will be automatically created.
@@ -985,7 +984,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             String[] metadataParts = metadataString.split("=>");
 
             if (metadataParts.length != 2) {
-                log.error("Unable to parse metadat mapping string: '" + metadataString + "'");
+                log.error("Unable to parse metadata mapping string: '" + metadataString + "'");
                 continue;
             }
 

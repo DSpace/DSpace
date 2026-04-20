@@ -7,11 +7,10 @@
  */
 package org.dspace.app.iiif.model.generator;
 
-import javax.validation.constraints.NotNull;
-
 import de.digitalcollections.iiif.model.OtherContent;
 import de.digitalcollections.iiif.model.PropertyValue;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * This generator wraps the other content domain model.

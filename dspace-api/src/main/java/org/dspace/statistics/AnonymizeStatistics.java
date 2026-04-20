@@ -11,19 +11,16 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
-import static java.util.Calendar.DAY_OF_YEAR;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.cli.Option.builder;
-import static org.apache.commons.lang.time.DateFormatUtils.format;
 import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.dspace.core.LogHelper.getHeader;
-import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,13 +74,9 @@ public class AnonymizeStatistics {
     private static final Object DNS_MASK =
             configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
 
-    private static final String TIME_LIMIT;
-
-    static {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(DAY_OF_YEAR, -configurationService.getIntProperty("anonymize_statistics.time_threshold", 90));
-        TIME_LIMIT = format(calendar, DATE_FORMAT_8601);
-    }
+    private static final String TIME_LIMIT =
+            Instant.now().minus(configurationService.getIntProperty("anonymize_statistics.time_threshold", 90),
+                                ChronoUnit.DAYS).toString();
 
     private AnonymizeStatistics() {
 
@@ -91,8 +84,22 @@ public class AnonymizeStatistics {
 
 
     public static void main(String... args) throws ParseException {
+        runAnonymizeStatistics(args);
+        // Note: Do NOT call System.exit() on success - let the JVM exit naturally.
+        // This allows launcher.xml scripts to be called via reflection in tests.
+    }
 
-        parseCommandLineOptions(createCommandLineOptions(), args);
+    /**
+     * Run the anonymize-statistics logic.
+     * This method is called by main() for CLI usage and directly by tests.
+     *
+     * @param args the command line arguments
+     * @throws ParseException if command line parsing error
+     */
+    public static void runAnonymizeStatistics(String... args) throws ParseException {
+        if (parseCommandLineOptions(createCommandLineOptions(), args)) {
+            return; // Help was printed, exit without running
+        }
         anonymizeStatistics();
     }
 
@@ -134,13 +141,20 @@ public class AnonymizeStatistics {
         return options;
     }
 
-    private static void parseCommandLineOptions(Options options, String... args) throws ParseException {
+    /**
+     * Parse the command line options.
+     * @param options the defined command-line options
+     * @param args the command line arguments
+     * @return true if help was printed (and script should exit), false to continue
+     * @throws ParseException if command line parsing error
+     */
+    private static boolean parseCommandLineOptions(Options options, String... args) throws ParseException {
 
         CommandLine commandLine = new DefaultParser().parse(options, args);
 
         if (commandLine.hasOption(HELP_OPTION)) {
             printHelp(options);
-            System.exit(-1);
+            return true;
         }
 
         if (commandLine.hasOption(SLEEP_OPTION)) {
@@ -154,6 +168,8 @@ public class AnonymizeStatistics {
         if (commandLine.hasOption(THREADS_OPTION)) {
             threads = parseInt(commandLine.getOptionValue(THREADS_OPTION));
         }
+
+        return false;
     }
 
     private static void printHelp(Options options) {
@@ -185,7 +201,7 @@ public class AnonymizeStatistics {
             long total = getDocuments().getResults().getNumFound();
             printInfo(total + " documents to update");
 
-            // The documents will be processed in seperate threads.
+            // The documents will be processed in separate threads.
             ExecutorService executorService = Executors.newFixedThreadPool(threads);
 
             QueryResponse documents;
@@ -276,7 +292,8 @@ public class AnonymizeStatistics {
                     ),
                     false
                 );
-                printInfo(updated + ": updated document with uid " + document.getFieldValue("uid") + " " + new Date());
+                printInfo(updated + ": updated document with uid " + document.getFieldValue("uid") + " " +
+                              Instant.now());
                 return true;
             } catch (Exception e) {
                 printError(e);

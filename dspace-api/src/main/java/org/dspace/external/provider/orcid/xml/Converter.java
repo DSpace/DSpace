@@ -9,13 +9,14 @@ package org.dspace.external.provider.orcid.xml;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import org.dspace.app.util.XMLUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -31,9 +32,7 @@ public abstract class Converter<T> {
 
     protected Object unmarshall(InputStream input, Class<?> type) throws SAXException, URISyntaxException {
         try {
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            XMLInputFactory xmlInputFactory = XMLUtils.getXMLInputFactory();
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(input);
 
             JAXBContext context = JAXBContext.newInstance(type);

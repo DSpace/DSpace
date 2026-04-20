@@ -8,14 +8,14 @@
 package org.dspace.harvest.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Collection;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -46,7 +46,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 
@@ -61,7 +61,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 
@@ -94,11 +94,11 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
     @Override
     public List<HarvestedCollection>
         findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(Context context,
-                                                                           Date startTime,
+                                                                           Instant startTime,
                                                                            int minimalType,
                                                                            int[] statuses,
                                                                            int expirationStatus,
-                                                                           Date expirationTime)
+                                                                           Instant expirationTime)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
@@ -138,7 +138,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
                             )
         );
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 
@@ -150,11 +150,10 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
 
     @Override
     public int count(Context context) throws SQLException {
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
-
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
+        criteriaQuery.select(criteriaBuilder.count(harvestedCollectionRoot));
         return count(context, criteriaQuery, criteriaBuilder, harvestedCollectionRoot);
     }
 

@@ -82,7 +82,9 @@ public class DiscoverFacetResultsConverter {
         facetResultsRest.setPrefix(prefix);
         facetResultsRest.setScope(dsoScope);
         facetResultsRest.setDsoTypes(dsoTypes);
-
+        if (configuration != null) {
+            facetResultsRest.setConfiguration(configuration.getId());
+        }
         facetResultsRest.setFacetEntry(convertFacetEntry(facetName, searchResult, configuration, page, projection));
 
         facetResultsRest.setSort(SearchResultsRest.Sorting.fromPage(page));
@@ -109,6 +111,7 @@ public class DiscoverFacetResultsConverter {
         }
 
         facetEntryRest.setFacetLimit(field.getFacetLimit());
+        facetEntryRest.setOpenByDefault(field.isOpenByDefault());
 
         //We requested one extra facet value. Check if that value is present to indicate that there are more results
         facetEntryRest.setHasMore(facetResults.size() > page.getPageSize());

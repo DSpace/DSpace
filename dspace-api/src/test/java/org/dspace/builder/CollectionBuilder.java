@@ -81,12 +81,12 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private CollectionBuilder create(final Community parent, final String handle) {
         try {
-            for (Collection collection : this.collectionService.findAll(context)) {
+            for (Collection collection : collectionService.findAll(context)) {
                 if (collection.getHandle().equalsIgnoreCase(handle)) {
                     this.collection = collection;
                 }
             }
-            this.collection = this.collectionService.create(context, parent, handle);
+            this.collection = collectionService.create(context, parent, handle);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -115,7 +115,21 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
      * @return this.
      */
     public CollectionBuilder withNameForLanguage(final String name, final String language) {
-        return addMetadataValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, language, name);
+        return addMetadataValue(collection,
+                                MetadataSchemaEnum.DC.getName(),
+                                "title",
+                                null,
+                                language,
+                                name);
+    }
+
+    public CollectionBuilder withSubmissionDefinition(final String name) {
+        return addMetadataValue(collection,
+                                MetadataSchemaEnum.DSPACE.getName(),
+                                "submission",
+                                "definition",
+                                null,
+                                name);
     }
 
     /**
@@ -241,6 +255,16 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     }
 
     /**
+     * Set the collection to use a shared workspace, allowing multiple users
+     * to collaborate on the same submission.
+     *
+     * @return this builder
+     */
+    public CollectionBuilder withSharedWorkspace() {
+        return setMetadataSingleValue(collection, MetadataSchemaEnum.DSPACE.getName(), "workspace", "shared", "true");
+    }
+
+    /**
      * remove the resource policies with type DEFAULT_ITEM_READ and
      * add new policy with type DEFAULT_ITEM_READ of
      * the new group to current collection.
@@ -253,8 +277,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     public CollectionBuilder withDefaultItemRead(Group group) throws SQLException, AuthorizeException {
         resourcePolicyService.removePolicies(context, collection, DEFAULT_ITEM_READ);
 
-        ResourcePolicy resourcePolicy = resourcePolicyService.create(context);
-        resourcePolicy.setGroup(group);
+        ResourcePolicy resourcePolicy = resourcePolicyService.create(context, null, group);
         resourcePolicy.setAction(DEFAULT_ITEM_READ);
         resourcePolicy.setdSpaceObject(collection);
         resourcePolicyService.update(context, resourcePolicy);

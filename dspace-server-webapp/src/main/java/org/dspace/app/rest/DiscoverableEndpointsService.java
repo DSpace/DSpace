@@ -84,7 +84,7 @@ public class DiscoverableEndpointsService {
 
     private boolean isLinkValid(Object controller, String href) {
         // FIXME we need to implement a check to be sure that there are no other
-        // controller with an highter precedence mapped on the same URL (this
+        // controller with an higher precedence mapped on the same URL (this
         // could be used to override default implementation)
         return true;
     }

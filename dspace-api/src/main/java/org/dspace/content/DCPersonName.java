@@ -44,7 +44,7 @@ public class DCPersonName {
      * @param rawValue the value entry from the database
      */
     public DCPersonName(String rawValue) {
-        // Null by default (representing noone)
+        // Null by default (representing no one)
         lastName = null;
         firstNames = null;
 

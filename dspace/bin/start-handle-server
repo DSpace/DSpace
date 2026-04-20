@@ -36,6 +36,6 @@ rm -f $HANDLEDIR/txns/lock
 # does not support more than one JVM writing to the same rolling log.
 nohup java $JAVA_OPTS -classpath `$BINDIR/dspace classpath` \
     -Ddspace.log.init.disable=true \
-    -Dlog4j.configuration=log4j-handle-plugin.properties \
+    -Dlog4j2.configurationFile=log4j2-handle-plugin.xml \
     net.handle.server.Main $HANDLEDIR \
     </dev/null >> $LOGDIR/handle-server.log 2>&1 &

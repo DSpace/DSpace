@@ -13,11 +13,12 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.JsonPatchConverter;
@@ -56,7 +57,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
+@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.PLURAL_NAME)
 public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstream, BitstreamRest> {
 
     private final BitstreamService bs;
@@ -78,6 +79,9 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
@@ -207,7 +211,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         }
         if (StringUtils.isNotBlank(filename)) {
             for (Bitstream bitstream : bitstreams) {
-                if (StringUtils.equals(bitstream.getName(), filename)) {
+                if (Strings.CS.equals(bitstream.getName(), filename)) {
                     return bitstream;
                 }
             }
@@ -266,7 +270,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
      */
     public void patchBitstreamsInBulk(Context context, JsonNode jsonNode) throws SQLException {
         int operationsLimit = configurationService.getIntProperty("rest.patch.operations.limit", 1000);
-        ObjectMapper mapper = new ObjectMapper();
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
         if (patch.getOperations().size() > operationsLimit) {

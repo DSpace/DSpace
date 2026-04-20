@@ -10,6 +10,8 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -17,9 +19,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +31,10 @@ import org.springframework.stereotype.Component;
  * the authenticated EPerson is allowed to perform the requested action.
  */
 @Component
+@Order(value = Ordered.HIGHEST_PRECEDENCE)
 public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(RestObjectPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -66,7 +69,7 @@ public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
 
             }
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
         return false;
     }

@@ -23,6 +23,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -42,6 +44,9 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersioningService;
 import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -51,8 +56,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Configurable XSLT-driven dissemination Crosswalk
@@ -88,7 +91,7 @@ public class XSLTDisseminationCrosswalk
     /**
      * log4j category
      */
-    private static final Logger LOG = LoggerFactory.getLogger(XSLTDisseminationCrosswalk.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     /**
      * DSpace context, will be created if XSLTDisseminationCrosswalk had been started by command-line.
@@ -105,8 +108,10 @@ public class XSLTDisseminationCrosswalk
             = ContentServiceFactory.getInstance().getItemService();
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected static final VersioningService versionService
+            = VersionServiceFactory.getInstance().getVersionService();
 
-    private static final String aliases[] = makeAliases(DIRECTION);
+    private static final String[] aliases = makeAliases(DIRECTION);
 
     public static String[] getPluginNames() {
         return (String[]) ArrayUtils.clone(aliases);
@@ -116,7 +121,7 @@ public class XSLTDisseminationCrosswalk
     // until there's an instance, so do it in constructor.
     private String schemaLocation = null;
 
-    private Namespace namespaces[] = null;
+    private Namespace[] namespaces = null;
 
     private boolean preferList = false;
 
@@ -140,12 +145,13 @@ public class XSLTDisseminationCrosswalk
         // right format for value of "schemaLocation" attribute.
         schemaLocation = configurationService.getProperty(prefix + "schemaLocation");
         if (schemaLocation == null) {
-            LOG.warn("No schemaLocation for crosswalk=" + myAlias + ", key=" + prefix + "schemaLocation");
+            LOG.warn("No schemaLocation for crosswalk={}, key={}schemaLocation", myAlias, prefix);
         } else if (schemaLocation.length() > 0 && schemaLocation.indexOf(' ') < 0) {
             // sanity check: schemaLocation should have space.
-            LOG.warn("Possible INVALID schemaLocation (no space found) for crosswalk=" +
-                         myAlias + ", key=" + prefix + "schemaLocation" +
-                         "\n\tCorrect format is \"{namespace} {schema-URL}\"");
+            LOG.warn("Possible INVALID schemaLocation (no space found) for crosswalk={},"
+                         + " key={}schemaLocation"
+                         + "\n\tCorrect format is \"{namespace} {schema-URL}\"",
+                    myAlias, prefix);
         }
 
         // grovel for namespaces of the form:
@@ -172,7 +178,7 @@ public class XSLTDisseminationCrosswalk
         try {
             init();
         } catch (CrosswalkInternalException e) {
-            LOG.error(e.toString());
+            LOG.error(e::toString);
         }
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
@@ -187,7 +193,7 @@ public class XSLTDisseminationCrosswalk
         try {
             init();
         } catch (CrosswalkInternalException e) {
-            LOG.error(e.toString());
+            LOG.error(e::toString);
         }
         return schemaLocation;
     }
@@ -220,19 +226,19 @@ public class XSLTDisseminationCrosswalk
         }
 
         for (Map.Entry<String, String> parameter : parameters.entrySet()) {
-            LOG.debug("Setting parameter {} to {}", parameter.getKey(), parameter.getValue());
+            LOG.debug("Setting parameter {} to {}", parameter::getKey, parameter::getValue);
             xform.setParameter(parameter.getKey(), parameter.getValue());
         }
 
         try {
-            Document ddim = new Document(createDIM(dso));
+            Document ddim = new Document(createDIM(context, dso));
             JDOMResult result = new JDOMResult();
             xform.transform(new JDOMSource(ddim), result);
             Element root = result.getDocument().getRootElement();
             root.detach();
             return root;
         } catch (TransformerException e) {
-            LOG.error("Got error: " + e.toString());
+            LOG.error("Got error: ()", e::toString);
             throw new CrosswalkInternalException("XSL translation failed: " + e.toString(), e);
         }
     }
@@ -270,7 +276,7 @@ public class XSLTDisseminationCrosswalk
 
         try {
             JDOMResult result = new JDOMResult();
-            xform.transform(new JDOMSource(createDIM(dso).getChildren()), result);
+            xform.transform(new JDOMSource(createDIM(context, dso).getChildren()), result);
             List<Content> contentList = result.getResult();
             // Transform List<Content> into List<Element>
             List<Element> elementList = contentList.stream()
@@ -278,13 +284,13 @@ public class XSLTDisseminationCrosswalk
                                                    .map(Element.class::cast).collect(Collectors.toList());
             return elementList;
         } catch (TransformerException e) {
-            LOG.error("Got error: " + e.toString());
+            LOG.error("Got error: {}", e::toString);
             throw new CrosswalkInternalException("XSL translation failed: " + e.toString(), e);
         }
     }
 
     /**
-     * Determine is this crosswalk can dessiminate the given object.
+     * Determine is this crosswalk can disseminate the given object.
      *
      * @see DisseminationCrosswalk
      */
@@ -304,7 +310,7 @@ public class XSLTDisseminationCrosswalk
         try {
             init();
         } catch (CrosswalkInternalException e) {
-            LOG.error(e.toString());
+            LOG.error(e::toString);
         }
         return preferList;
     }
@@ -312,11 +318,12 @@ public class XSLTDisseminationCrosswalk
     /**
      * Generate an intermediate representation of a DSpace object.
      *
-     * @param dso  The dspace object to build a representation of.
+     * @param context A DSpace context (currently unused)
+     * @param dso  The DSpace object to build a representation of.
      * @param dcvs list of metadata
      * @return element
      */
-    public static Element createDIM(DSpaceObject dso, List<MetadataValueDTO> dcvs) {
+    public static Element createDIM(Context context, DSpaceObject dso, List<MetadataValueDTO> dcvs) {
         Element dim = new Element("dim", DIM_NS);
         String type = Constants.typeText[dso.getType()];
         dim.setAttribute("dspaceType", type);
@@ -334,13 +341,20 @@ public class XSLTDisseminationCrosswalk
     /**
      * Generate an intermediate representation of a DSpace object.
      *
+     * @param context A DSpace context
      * @param dso The dspace object to build a representation of.
      * @return element
      */
-    public static Element createDIM(DSpaceObject dso) {
+    public static Element createDIM(Context context, DSpaceObject dso)
+            throws SQLException {
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
-            return createDIM(dso, item2Metadata(item));
+            Element dim = createDIM(context, dso, item2Metadata(item));
+            Version version = versionService.getVersion(context, item);
+            if (version != null) {
+                dim.setAttribute("itemVersion", String.valueOf(version.getVersionNumber()));
+            }
+            return dim;
         } else {
             Element dim = new Element("dim", DIM_NS);
             String type = Constants.typeText[dso.getType()];
@@ -480,9 +494,7 @@ public class XSLTDisseminationCrosswalk
         if (reason == null) {
             return value;
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Filtering out non-XML characters in string, reason=" + reason);
-            }
+            LOG.debug("Filtering out non-XML characters in string, reason={}", reason);
             StringBuilder result = new StringBuilder(value.length());
             for (int i = 0; i < value.length(); ++i) {
                 char c = value.charAt(i);
@@ -567,11 +579,11 @@ public class XSLTDisseminationCrosswalk
             System.err.println("===  Stack Trace  ===");
             e.printStackTrace(System.err);
             System.err.println("=====================");
-            LOG.error("Caught: {}.", e.toString());
-            LOG.error(e.getMessage());
+            LOG.error("Caught: {}.", e::toString);
+            LOG.error(e::getMessage);
             CharArrayWriter traceWriter = new CharArrayWriter(2048);
             e.printStackTrace(new PrintWriter(traceWriter));
-            LOG.error(traceWriter.toString());
+            LOG.error(traceWriter::toString);
             System.exit(1);
         }
 
@@ -588,11 +600,11 @@ public class XSLTDisseminationCrosswalk
             System.err.println("===  Stack Trace  ===");
             e.printStackTrace(System.err);
             System.err.println("=====================");
-            LOG.error("Caught: {}.", e.toString());
-            LOG.error(e.getMessage());
+            LOG.error("Caught: {}.", e::toString);
+            LOG.error(e::getMessage);
             CharArrayWriter traceWriter = new CharArrayWriter(2048);
             e.printStackTrace(new PrintWriter(traceWriter));
-            LOG.error(traceWriter.toString());
+            LOG.error(traceWriter::toString);
             System.exit(1);
         }
 

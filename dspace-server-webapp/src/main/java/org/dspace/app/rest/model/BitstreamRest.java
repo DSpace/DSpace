@@ -16,18 +16,10 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = BitstreamRest.BUNDLE,
-                method = "getBundle"
-        ),
-        @LinkRest(
-                name = BitstreamRest.FORMAT,
-                method = "getFormat"
-        ),
-        @LinkRest(
-                name = BitstreamRest.THUMBNAIL,
-                method = "getThumbnail"
-        )
+    @LinkRest(name = BitstreamRest.BUNDLE, method = "getBundle"),
+    @LinkRest(name = BitstreamRest.ACCESS_STATUS, method = "getAccessStatus"),
+    @LinkRest(name = BitstreamRest.FORMAT, method = "getFormat"),
+    @LinkRest(name = BitstreamRest.THUMBNAIL, method = "getThumbnail")
 })
 public class BitstreamRest extends DSpaceObjectRest {
     public static final String PLURAL_NAME = "bitstreams";
@@ -35,6 +27,7 @@ public class BitstreamRest extends DSpaceObjectRest {
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     public static final String BUNDLE = "bundle";
+    public static final String ACCESS_STATUS = "accessStatus";
     public static final String FORMAT = "format";
     public static final String THUMBNAIL = "thumbnail";
 
@@ -87,5 +80,10 @@ public class BitstreamRest extends DSpaceObjectRest {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }

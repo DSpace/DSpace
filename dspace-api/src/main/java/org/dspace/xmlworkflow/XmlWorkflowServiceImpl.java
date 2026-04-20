@@ -18,11 +18,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -38,6 +38,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -125,6 +126,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
+    protected CollectionService collectionService;
+    @Autowired(required = true)
     protected ConfigurationService configurationService;
     @Autowired(required = true)
     protected XmlWorkflowCuratorService xmlWorkflowCuratorService;
@@ -211,6 +214,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             wfi.setPublishedBefore(wsi.isPublishedBefore());
             xmlWorkflowItemService.update(context, wfi);
             removeUserItemPolicies(context, myitem, myitem.getSubmitter());
+            if (collectionService.isSharedWorkspace(context, collection)) {
+                removeGroupItemPolicies(context, myitem, collection.getSubmitters());
+                grantSubmitterGroupReadPolicies(context, myitem, collection.getSubmitters());
+            }
             grantSubmitterReadPolicies(context, myitem);
 
             context.turnOffAuthorisationSystem();
@@ -221,17 +228,24 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 //Get our next step, if none is found, archive our item
                 firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
                 if (firstStep == null) {
+                    // record the submitted provenance message
+                    recordStart(context, wfi.getItem(),null);
                     archive(context, wfi);
                 } else {
                     activateFirstStep(context, wf, firstStep, wfi);
                 }
 
             }
-            // remove the WorkspaceItem
-            workspaceItemService.deleteWrapper(context, wsi);
-            context.restoreAuthSystemState();
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
+
+            wsi = context.reloadEntity(wsi);
+            if (wsi != null) {
+                // remove the WorkspaceItem
+                workspaceItemService.deleteWrapper(context, wsi);
+                context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
                     itemService.getIdentifiers(context, wfi.getItem())));
+
+            }
+            context.restoreAuthSystemState();
             return wfi;
         } catch (WorkflowConfigurationException e) {
             throw new WorkflowException(e);
@@ -285,6 +299,21 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             if (!userHasPolicies.contains(Constants.READ)) {
                 addPolicyToItem(context, item, Constants.READ, submitter, ResourcePolicy.TYPE_SUBMISSION);
             }
+        }
+    }
+
+    protected void grantSubmitterGroupReadPolicies(Context context, Item item, Group group)
+        throws SQLException, AuthorizeException {
+
+        if (group == null) {
+            return;
+        }
+
+        boolean isNotReadPolicyAlreadyPresent = authorizeService.getPolicies(context, item).stream()
+            .noneMatch(policy -> group.equals(policy.getGroup()) && policy.getAction() == Constants.READ);
+
+        if (isNotReadPolicyAlreadyPresent) {
+            addGroupPolicyToItem(context, item, Constants.READ, group, ResourcePolicy.TYPE_SUBMISSION);
         }
     }
 
@@ -414,7 +443,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 || currentOutcome.getType() == ActionResult.TYPE.TYPE_SUBMISSION_PAGE) {
             //We either pressed the cancel button or got an order to return to the submission page, so don't return
             // an action
-            //By not returning an action we ensure ourselfs that we go back to the submission page
+            //By not returning an action we ensure ourselves that we go back to the submission page
             c.restoreAuthSystemState();
             return null;
         } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_OUTCOME) {
@@ -946,19 +975,19 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
 
-    protected void removeGroupItemPolicies(Context context, Item item, Group e)
+    protected void removeGroupItemPolicies(Context context, Item item, Group group)
         throws SQLException, AuthorizeException {
-        if (e != null && item.getSubmitter() != null) {
-            //Also remove any lingering authorizations from this user
-            authorizeService.removeGroupPolicies(context, item, e);
-            //Remove the bundle rights
-            List<Bundle> bundles = item.getBundles();
-            for (Bundle bundle : bundles) {
-                authorizeService.removeGroupPolicies(context, bundle, e);
-                List<Bitstream> bitstreams = bundle.getBitstreams();
-                for (Bitstream bitstream : bitstreams) {
-                    authorizeService.removeGroupPolicies(context, bitstream, e);
-                }
+        if (group == null) {
+            return;
+        }
+
+        authorizeService.removeGroupPolicies(context, item, group);
+        List<Bundle> bundles = item.getBundles();
+        for (Bundle bundle : bundles) {
+            authorizeService.removeGroupPolicies(context, bundle, group);
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            for (Bitstream bitstream : bitstreams) {
+                authorizeService.removeGroupPolicies(context, bitstream, group);
             }
         }
     }
@@ -1148,8 +1177,13 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         workflowItemRoleService.deleteForWorkflowItem(c, wfi);
 
         Item myitem = wfi.getItem();
+        Collection collection = wfi.getCollection();
+
         //Restore permissions for the submitter
         grantUserAllItemPolicies(c, myitem, myitem.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        if (collectionService.isSharedWorkspace(c, collection)) {
+            grantGroupAllItemPolicies(c, myitem, collection.getSubmitters(), ResourcePolicy.TYPE_SUBMISSION);
+        }
 
         // FIXME: How should this interact with the workflow system?
         // FIXME: Remove license
@@ -1175,7 +1209,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     public String getEPersonName(EPerson ePerson) {
         String submitter = ePerson.getFullName();
 
-        submitter = submitter + "(" + ePerson.getEmail() + ")";
+        submitter = submitter + " (" + ePerson.getEmail() + ")";
 
         return submitter;
     }
@@ -1187,25 +1221,36 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         DCDate now = DCDate.getCurrent();
 
         // Create provenance description
-        String provmessage = "";
+        StringBuffer provmessage = new StringBuffer();
 
-        if (myitem.getSubmitter() != null) {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                + " (" + myitem.getSubmitter().getEmail() + ") on "
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+        //behavior to generate provenance message, if set true, personal data (e.g. email) of submitter will be hidden
+        //default value false, personal data of submitter will be shown in provenance message
+        String isProvenancePrivacyActiveProperty =
+                configurationService.getProperty("metadata.privacy.dc.description.provenance", "false");
+        boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
+
+        if (myitem.getSubmitter() != null && !isProvenancePrivacyActive) {
+            provmessage.append("Submitted by ").append(myitem.getSubmitter().getFullName())
+                    .append(" (").append(myitem.getSubmitter().getEmail()).append(") on ")
+                    .append(now.toString());
         } else {
             // else, null submitter
-            provmessage = "Submitted by unknown (probably automated) on"
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage.append("Submitted by unknown (probably automated or submitter hidden) on ")
+                    .append(now.toString());
+        }
+        if (action != null) {
+            provmessage.append(" workflow start=").append(action.getProvenanceStartId()).append("\n");
+        } else {
+            provmessage.append("\n");
         }
 
         // add sizes and checksums of bitstreams
-        provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
+        provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
 
         // Add message to the DC
         itemService
             .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
-                         "description", "provenance", "en", provmessage);
+                         "description", "provenance", "en", provmessage.toString());
         itemService.update(context, myitem);
     }
 

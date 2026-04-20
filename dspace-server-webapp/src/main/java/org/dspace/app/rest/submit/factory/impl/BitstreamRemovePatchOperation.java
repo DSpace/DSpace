@@ -8,8 +8,8 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;

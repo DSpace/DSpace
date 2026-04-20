@@ -17,7 +17,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.service.DSpaceCRUDService;
 
 /**
  * Service interface class for the ResourcePolicy object.
@@ -26,7 +25,34 @@ import org.dspace.service.DSpaceCRUDService;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy> {
+public interface ResourcePolicyService {
+
+    public ResourcePolicy create(Context context, EPerson eperson, Group group) throws SQLException, AuthorizeException;
+
+    public ResourcePolicy find(Context context, int id) throws SQLException;
+
+    /**
+     * Persist a model object.
+     *
+     * @param context
+     * @param resourcePolicy object to be persisted.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
+    public void update(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException;
+
+
+    /**
+     * Persist a collection of model objects.
+     *
+     * @param context
+     * @param resourcePolicies object to be persisted.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
+    public void update(Context context, List<ResourcePolicy> resourcePolicies) throws SQLException, AuthorizeException;
+
+    public void delete(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException;
 
 
     public List<ResourcePolicy> find(Context c, DSpaceObject o) throws SQLException;
@@ -34,6 +60,24 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
     public List<ResourcePolicy> find(Context c, DSpaceObject o, String type) throws SQLException;
 
     public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId) throws SQLException;
+
+    /**
+     * Retrieves all resource policies for a specific DSpace object filtered by action and policy type.
+     * <p>
+     * This method returns policies that match all three criteria: the DSpace object, the action identifier,
+     * and the resource policy type. All conditions must be satisfied for a policy to be included in the results.
+     *
+     * @param c        the DSpace context object for database access
+     * @param o        the DSpace object whose policies to retrieve
+     * @param actionId the action identifier to filter by (as defined in {@link org.dspace.core.Constants})
+     * @param type     the resource policy type to filter by (e.g., {@link ResourcePolicy#TYPE_SUBMISSION},
+     *                 {@link ResourcePolicy#TYPE_WORKFLOW}, {@link ResourcePolicy#TYPE_CUSTOM},
+     *                 {@link ResourcePolicy#TYPE_INHERITED})
+     * @return a list of ResourcePolicy objects matching all specified criteria; returns an empty list
+     *         if no matching policies are found
+     * @throws SQLException if a database error occurs during the query
+     */
+    public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId, String type) throws SQLException;
 
     public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action) throws SQLException;
 

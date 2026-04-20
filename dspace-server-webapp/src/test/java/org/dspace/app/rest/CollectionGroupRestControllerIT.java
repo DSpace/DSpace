@@ -28,9 +28,9 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
-import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -41,10 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class CollectionGroupRestControllerIT extends AbstractControllerIntegrationTest {
 
-
-    @Autowired
-    private CollectionService collectionService;
-
     @Autowired
     private GroupService groupService;
 
@@ -53,6 +49,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Autowired
     private WorkflowService workflowService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     Collection collection;
 
@@ -68,7 +67,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionAdminGroupTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -81,7 +80,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionAdminGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection).build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -95,7 +94,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionAdminGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -109,7 +108,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionAdminGroupUnAuthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        collectionService.createAdministrators(context, collection);
+        GroupBuilder.createCollectionAdminGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -119,7 +118,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionAdminGroupForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        collectionService.createAdministrators(context, collection);
+        GroupBuilder.createCollectionAdminGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -145,8 +144,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupExtraMetadataSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -179,8 +176,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
 
@@ -208,8 +203,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -234,8 +227,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupSuccessParentCommunityAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -267,8 +258,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -300,8 +289,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -322,8 +309,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -345,8 +330,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -365,8 +348,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -388,8 +369,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -413,7 +392,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionAdminGroupTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        GroupBuilder.createCollectionAdminGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -428,7 +407,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionAdminGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        GroupBuilder.createCollectionAdminGroup(context, collection).build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -443,7 +422,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionAdminGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        GroupBuilder.createCollectionAdminGroup(context, collection).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -458,7 +437,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionAdminGroupUnAuthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -474,7 +453,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionAdminGroupForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -493,7 +472,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionAdminGroupNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -512,7 +491,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionSubmittersGroupTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submitters = collectionService.createSubmitters(context, collection);
+        Group submitters = GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -525,7 +504,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionSubmittersGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submitters = collectionService.createSubmitters(context, collection);
+        Group submitters = GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -539,7 +518,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionSubmittersGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submitters = collectionService.createSubmitters(context, collection);
+        Group submitters = GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -553,7 +532,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionSubmittersGroupUnAuthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        collectionService.createSubmitters(context, collection);
+        GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -563,7 +542,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionSubmittersGroupForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        collectionService.createSubmitters(context, collection);
+        GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -588,8 +567,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmitterGroupCreateSubmitterGroupExtraMetadataSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -623,8 +600,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmitterGroupCreateSubmitterGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -655,8 +630,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -679,8 +652,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupSuccessParentCommunityAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -713,8 +684,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -747,8 +716,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -768,8 +735,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -792,8 +757,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -812,8 +775,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -836,8 +797,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -860,7 +819,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionSubmitterGroupTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submittersGroup = collectionService.createSubmitters(context, collection);
+        GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -875,7 +834,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionSubmittersGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submittersGroup = collectionService.createSubmitters(context, collection);
+        GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -890,7 +849,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionSubmittersGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submittersGroup = collectionService.createSubmitters(context, collection);
+        GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -905,7 +864,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionSubmittersGroupUnAuthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submittersGroup = collectionService.createSubmitters(context, collection);
+        Group submittersGroup = GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -924,7 +883,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionSubmittersGroupForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submittersGroup = collectionService.createSubmitters(context, collection);
+        Group submittersGroup = GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -945,7 +904,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionSubmittersGroupNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group submittersGroup = collectionService.createSubmitters(context, collection);
+        GroupBuilder.createCollectionSubmitterGroup(context, collection).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -961,7 +920,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                itemGroupString, defaultItemRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -977,7 +937,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                itemGroupString, defaultItemRead).build();
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
@@ -995,7 +956,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                itemGroupString, defaultItemRead).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1012,7 +974,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                itemGroupString, defaultItemRead).build();
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -1025,7 +988,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                itemGroupString, defaultItemRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1054,8 +1018,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1086,8 +1048,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1115,8 +1075,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccessParentCommunityAdmin()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1149,8 +1107,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1183,8 +1139,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1210,8 +1164,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1239,8 +1191,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1259,8 +1209,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -1288,8 +1236,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -1321,7 +1267,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection, itemGroupString, defaultItemRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1345,7 +1291,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection, itemGroupString, defaultItemRead).build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1367,7 +1313,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection, itemGroupString, defaultItemRead).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1389,7 +1335,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                itemGroupString, defaultItemRead).build();
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -1408,7 +1355,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                itemGroupString, defaultItemRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1430,7 +1378,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection, itemGroupString, defaultItemRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1445,8 +1393,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1462,8 +1410,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1480,8 +1428,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1498,8 +1446,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1512,8 +1460,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1542,8 +1490,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1575,8 +1521,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupDcTitleUnprocessable()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1603,8 +1547,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccessParentCommunityAdmin()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1638,8 +1580,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccessCollectionAdmin()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1672,8 +1612,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1699,8 +1637,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1728,8 +1664,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1749,8 +1683,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupUnProcessableName()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -1779,8 +1711,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupUnProcessablePermanent()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -1811,8 +1741,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1835,8 +1765,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1859,8 +1789,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1882,8 +1812,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        Group role = GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1902,8 +1832,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1918,8 +1848,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
-                                                              defaultBitstreamRead);
+        GroupBuilder.createCollectionDefaultReadGroup(context, collection,
+                bitstreamGroupString, defaultBitstreamRead).build();
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1931,7 +1861,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     public void getWorkflowGroupForCollectionAndRole() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        Group group = GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1944,7 +1874,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getWorkflowGroupForCollectionAndRoleParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        Group group = GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1958,7 +1888,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getWorkflowGroupForCollectionAndRoleWrongUUIDCollectionNotFound() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1979,7 +1909,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     public void getWorkflowGroupCommunityAdmin() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        Group group = GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
@@ -1994,7 +1924,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getWorkflowGroupCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        Group group = GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
 
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
@@ -2009,7 +1939,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getWorkflowGroupUnAuthorized() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -2019,7 +1949,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getWorkflowGroupForbidden() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -2030,8 +1960,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
 
@@ -2060,8 +1988,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupExtraMetadataSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2095,8 +2021,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupWrongCollectionId() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2115,8 +2039,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupWrongRole() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2136,8 +2058,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2160,8 +2080,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupSuccessParentCommunityAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2194,8 +2112,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2228,8 +2144,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2251,8 +2165,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2275,8 +2187,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -2299,8 +2209,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -2324,7 +2232,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionWorkflowGroupTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -2339,7 +2247,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionWorkflowGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
@@ -2355,7 +2263,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionWorkflowGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
 
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
@@ -2371,7 +2279,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionWorkflowGroupUnAuthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        Group group = GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -2387,7 +2295,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionWorkflowGroupForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        Group group = GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -2406,7 +2314,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionWorkflowGroupNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -2418,7 +2326,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void deleteCollectionWorkflowGroupWithPooledTaskTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group reviewer = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        Group reviewer = GroupBuilder.createCollectionWorkflowRoleGroup(context, collection, "reviewer").build();
 
         // Submit an Item into the workflow -> moves to the "reviewer" step's pool.
         // The role must have at least one EPerson, otherwise the WSI gets archived immediately

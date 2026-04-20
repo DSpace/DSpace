@@ -6,30 +6,30 @@
 # http://www.dspace.org/license/
 #
 
-version: '3.7'
 networks:
-  dspacenet:
+  # Default to using network named 'dspacenet' from docker-compose.yml.
+  # Its full name will be prepended with the project name (e.g. "-p d7" means it will be named "d7_dspacenet")
+  default:
+    name: ${COMPOSE_PROJECT_NAME}_dspacenet
+    external: true
 services:
   dspace-angular:
     container_name: dspace-angular
     depends_on:
     - dspace
     environment:
-      DSPACE_UI_SSL: 'false'
-      DSPACE_UI_HOST: dspace-angular
-      DSPACE_UI_PORT: '4000'
-      DSPACE_UI_NAMESPACE: /
-      DSPACE_REST_SSL: 'false'
-      DSPACE_REST_HOST: localhost
-      DSPACE_REST_PORT: 8080
-      DSPACE_REST_NAMESPACE: /server
-    image: dspace/dspace-angular:dspace-7_x
-    networks:
-      dspacenet:
+      DSPACE_UI_SSL: ${DSPACE_UI_SSL:-false}
+      DSPACE_UI_HOST: ${DSPACE_UI_HOST:-dspace-angular}
+      DSPACE_UI_PORT: ${DSPACE_UI_PORT:-4000}
+      DSPACE_UI_NAMESPACE: ${DSPACE_UI_NAMESPACE:-/}
+      DSPACE_UI_BASEURL: ${DSPACE_UI_BASEURL:-http://localhost:4000}
+      DSPACE_REST_SSL: ${DSPACE_REST_SSL:-false}
+      DSPACE_REST_HOST: ${DSPACE_REST_HOST:-localhost}
+      DSPACE_REST_PORT: ${DSPACE_REST_PORT:-8080}
+      DSPACE_REST_NAMESPACE: ${DSPACE_REST_NAMESPACE:-/server}
+      # Ensure SSR can use the 'dspace' Docker image directly (see docker-compose-rest.yml)
+      DSPACE_REST_SSRBASEURL: ${DSPACE_REST_SSRBASEURL:-http://dspace:8080/server}
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-angular:${DSPACE_VER:-latest-dist}"
     ports:
     - published: 4000
       target: 4000
-    - published: 9876
-      target: 9876
-    stdin_open: true
-    tty: true

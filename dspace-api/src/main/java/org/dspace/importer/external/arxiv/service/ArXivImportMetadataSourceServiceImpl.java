@@ -14,15 +14,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import javax.el.MethodNotFoundException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -162,7 +162,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         // FIXME: we need this method?
-        throw new MethodNotFoundException("This method is not implemented for ArXiv");
+        throw new UnsupportedOperationException("This method is not implemented for ArXiv");
     }
 
     /**
@@ -219,7 +219,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
 
-                SAXBuilder saxBuilder = new SAXBuilder();
+                SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
                 Document document = saxBuilder.build(new StringReader(responseString));
                 Element root = document.getRootElement();
 
@@ -400,7 +400,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     private List<Element> splitToRecords(String recordsSrc) {
 
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
 

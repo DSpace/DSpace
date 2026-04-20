@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -36,8 +38,6 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Script that perform the bulk synchronization with ORCID registry of all the
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfiguration<OrcidBulkPush>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidBulkPush.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private OrcidQueueService orcidQueueService;
 
@@ -63,7 +63,7 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     /**
      * Cache that stores the synchronization mode set for a specific profile item.
      */
-    private Map<Item, OrcidSynchronizationMode> synchronizationModeByProfileItem = new HashMap<>();
+    private final Map<Item, OrcidSynchronizationMode> synchronizationModeByProfileItem = new HashMap<>();
 
     private boolean ignoreMaxAttempts = false;
 
@@ -105,7 +105,7 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     }
 
     /**
-     * Find all the Orcid Queue records that need to be synchronized and perfom the
+     * Find all the Orcid Queue records that need to be synchronized and perform the
      * synchronization.
      */
     private void performBulkSynchronization() throws SQLException {
@@ -130,7 +130,7 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     }
 
     /**
-     * If the current script execution is configued to ignore the max attemps,
+     * If the current script execution is configured to ignore the max attempts,
      * returns all the ORCID Queue records, otherwise returns the ORCID Queue
      * records that has an attempts value less than the configured max attempts
      * value.

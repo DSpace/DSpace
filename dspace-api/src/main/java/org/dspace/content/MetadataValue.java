@@ -7,24 +7,24 @@
  */
 package org.dspace.content;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
+import jakarta.annotation.Nullable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.proxy.HibernateProxyHelper;
+import org.hibernate.Length;
 
 /**
  * Database access class representing a Dublin Core metadata value.
@@ -59,9 +59,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     /**
      * The value of the field
      */
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
-    @Column(name = "text_value")
+    @Column(name = "text_value", length = Length.LONG32)
     private String value;
 
     /**
@@ -87,6 +85,13 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      */
     @Column(name = "confidence")
     private int confidence = -1;
+
+    /**
+     * Security level value
+     */
+    @Nullable
+    @Column(name = "security_level")
+    private Integer securityLevel;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "dspace_object_id")
@@ -143,6 +148,9 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      * @param language new language
      */
     public void setLanguage(String language) {
+        if (Strings.CS.equals(language, Item.ANY)) {
+            language = null;
+        }
         this.language = language;
     }
 
@@ -271,5 +279,30 @@ public class MetadataValue implements ReloadableEntity<Integer> {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        return "MetadataValue [id=" + id + ", metadataField=" + metadataField + ", value=" + value + ", language="
+            + language + ", place=" + place + ", authority=" + authority + ", confidence=" + confidence
+            + ", securityLevel=" + securityLevel + "]";
+    }
 
+    public String getSchema() {
+        return getMetadataField().getMetadataSchema().getName();
+    }
+
+    public String getElement() {
+        return getMetadataField().getElement();
+    }
+
+    public String getQualifier() {
+        return getMetadataField().getQualifier();
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(Integer securityLevel) {
+        this.securityLevel = securityLevel;
+    }
 }

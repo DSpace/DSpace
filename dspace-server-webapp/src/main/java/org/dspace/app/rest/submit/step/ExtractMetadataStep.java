@@ -20,6 +20,7 @@ import java.util.StringJoiner;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Equator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
@@ -47,7 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * This submission step allows to extract metadata from an uploaded file and/or
  * use provided identifiers/metadata to further enrich a submission.
- * 
+ *
  * The processing of the file is delegated to the Import Service (see
  * {@link ImportService} that can be extended with Data Provider specialized by
  * format (i.e. a Grobid extractor to get data from a PDF file, an extractor to
@@ -56,7 +57,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Some metadata are monitored by listener (see {@link MetadataListener} and when
  * changed the are used to generate an identifier that is used to query the
  * External Data Provider associated with the specific listener
- * 
+ *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -134,8 +135,8 @@ public class ExtractMetadataStep implements ListenerProcessingStep, UploadableSt
                     if (!CollectionUtils.isEqualCollection(prevMetadata, currMetadata, new Equator<MetadataValue>() {
                         @Override
                         public boolean equate(MetadataValue o1, MetadataValue o2) {
-                            return StringUtils.equals(o1.getValue(), o2.getValue())
-                                    && StringUtils.equals(o1.getAuthority(), o2.getAuthority());
+                            return Strings.CS.equals(o1.getValue(), o2.getValue())
+                                    && Strings.CS.equals(o1.getAuthority(), o2.getAuthority());
                         }
                         @Override
                         public int hash(MetadataValue o) {

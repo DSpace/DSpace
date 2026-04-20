@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dspace-dc-types SYSTEM "dspace-dc-types.dtd">
+
+<!--
+  This document was based on the OpenAIRE4 Guidelines for Literature Repositories
+  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/index.html
+  -->
+  
+<dspace-dc-types>
+    <dspace-header>
+        <title>COAR fields definition</title>
+    </dspace-header>
+    
+    <dc-schema>
+        <name>coar</name>
+        <namespace>http://dspace.org/coar</namespace>
+    </dc-schema>
+    
+    <dc-type>
+        <schema>coar</schema>
+        <element>notify</element>
+        <qualifier>review</qualifier>
+        <scope_note>Reviewed by</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>coar</schema>
+        <element>notify</element>
+        <qualifier>endorsement</qualifier>
+        <scope_note>Endorsement</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>coar</schema>
+        <element>notify</element>
+        <qualifier>examination</qualifier>
+        <scope_note>Examination</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>coar</schema>
+        <element>notify</element>
+        <qualifier>refused</qualifier>
+        <scope_note>Refused by</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>coar</schema>
+        <element>notify</element>
+        <qualifier>release</qualifier>
+        <scope_note>Released by</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>coar</schema>
+        <element>notify</element>
+        <qualifier>endorsedBy</qualifier>
+        <scope_note>Endorsed by</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

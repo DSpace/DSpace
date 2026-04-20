@@ -8,8 +8,8 @@
 package org.dspace.app.rest.signposting.processor.metadata;
 
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRelationType;
 import org.dspace.content.Item;

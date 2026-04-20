@@ -16,10 +16,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -239,14 +237,8 @@ public class InstallItemTest extends AbstractUnitTest {
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "today");
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "2011-01-01");
 
-        //get current date
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-        String date = sdf.format(calendar.getTime());
+        //get current date in YYYY-MM-DD format
+        String date = LocalDate.now().toString();
 
         Item result = installItemService.installItem(context, is, handle);
         context.restoreAuthSystemState();
@@ -254,8 +246,8 @@ public class InstallItemTest extends AbstractUnitTest {
         //Make sure the string "today" was replaced with today's date
         List<MetadataValue> issuedDates = itemService.getMetadata(result, "dc", "date", "issued", Item.ANY);
 
-        assertThat("testInstallItem_todayAsIssuedDate 0", issuedDates.get(0).getValue(), equalTo(date));
-        assertThat("testInstallItem_todayAsIssuedDate 1", issuedDates.get(1).getValue(), equalTo("2011-01-01"));
+        assertThat("testInstallItem_todayAsIssuedDate 0", issuedDates.get(0).getValue(), equalTo("2011-01-01"));
+        assertThat("testInstallItem_todayAsIssuedDate 1", issuedDates.get(1).getValue(), equalTo(date));
     }
 
     /**
@@ -290,12 +282,8 @@ public class InstallItemTest extends AbstractUnitTest {
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "today");
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "2011-01-01");
 
-        //get current date
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String date = sdf.format(calendar.getTime());
+        //get current date in YYYY-MM-DD format
+        String date = LocalDate.now().toString();
 
         Item result = installItemService.restoreItem(context, is, handle);
         context.restoreAuthSystemState();

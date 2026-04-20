@@ -4,11 +4,18 @@
                 xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" version="1.0">
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes"/>
 
-    <!-- An identity transformation to show the internal XOAI generated XML -->
     <xsl:template match="/">
+        <xsl:call-template name="dim-root">
+            <xsl:with-param name="xoai-root" select="." />
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- An identity transformation to show the internal XOAI generated XML -->
+    <xsl:template name="dim-root">
+        <xsl:param name="xoai-root" />
         <dim:dim xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://www.dspace.org/xmlns/dspace/dim http://www.dspace.org/schema/dim.xsd">
-            <xsl:apply-templates select="//doc:field[@name='value']"/>
+            <xsl:apply-templates select="$xoai-root//doc:field[@name='value']"/>
         </dim:dim>
     </xsl:template>
 
@@ -32,6 +39,18 @@
             <xsl:with-param name="language" select="../@name" />
             <xsl:with-param name="authority" select="following-sibling::doc:field[1][@name='authority']"/>
             <xsl:with-param name="confidence" select="following-sibling::doc:field[2][@name='confidence']"/>
+            <xsl:with-param name="value" select="text()"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="/doc:metadata/doc:element/doc:element/doc:field[@name='value']">
+        <xsl:call-template name="dimfield">
+            <xsl:with-param name="mdschema" select="../../@name"/>
+            <xsl:with-param name="element" select="../@name"/>
+            <xsl:with-param name="qualifier" />
+            <xsl:with-param name="language" />
+            <xsl:with-param name="authority" />
+            <xsl:with-param name="confidence" />
             <xsl:with-param name="value" select="text()"/>
         </xsl:call-template>
     </xsl:template>
@@ -62,6 +81,7 @@
 
             <xsl:choose>
                 <xsl:when test="$language='none'"/>
+                <xsl:when test="$language=''"/>
                 <xsl:otherwise>
                     <xsl:attribute name="lang">
                         <xsl:value-of select="$language"/>

@@ -264,7 +264,7 @@ public class WorkflowManagerDefault implements WorkflowManager {
                              boolean containerOperation)
         throws DSpaceSwordException {
         // the containerOperation flag tells us whether this method was called by an operation which happened on the
-        // container.  This workflow implementation only changes workflow states on contaner operations, not media
+        // container.  This workflow implementation only changes workflow states on container operations, not media
         // resource operations, so we just bounce this right back.
         if (!containerOperation) {
             return;

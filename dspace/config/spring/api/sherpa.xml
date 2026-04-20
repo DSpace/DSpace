@@ -17,7 +17,7 @@
 				<bean class="org.dspace.app.sherpa.submit.MetadataValueISSNExtractor">
 					<property name="metadataList">
 						<list>
-							<value>dc.identifier.issn</value>
+							<value>creativeworkseries.issn</value>
 						</list>
 					</property>
 				</bean>

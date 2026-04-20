@@ -7,7 +7,7 @@
  */
 package org.dspace.authorize;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.regex.Pattern;
 
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link PasswordValidatorService} that verifies if the given
- * passowrd matches the configured pattern.
+ * password matches the configured pattern.
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */

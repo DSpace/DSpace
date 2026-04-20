@@ -1,0 +1,1986 @@
+{
+  "number_of_results": 115409,
+  "time_taken": 63,
+  "items": [
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "uacs.edu.mk"
+      ],
+      "established": 2005,
+      "external_ids": [
+        {
+          "all": [
+            "grid.445944.c"
+          ],
+          "preferred": "grid.445944.c",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0446 4427"
+          ],
+          "preferred": "0000 0004 0446 4427",
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q7894510"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/05hknds03",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://uacs.edu.mk"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/University_American_College_Skopje"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "EU",
+            "continent_name": "Europe",
+            "country_code": "MK",
+            "country_name": "North Macedonia",
+            "country_subdivision_code": null,
+            "country_subdivision_name": "Grad Skopje",
+            "lat": 41.99646,
+            "lng": 21.43141,
+            "name": "Skopje"
+          },
+          "geonames_id": 785842
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "UACS"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "University American College Skopje"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "3-5lab.fr"
+      ],
+      "established": 2004,
+      "external_ids": [
+        {
+          "all": [
+            "grid.424877.a"
+          ],
+          "preferred": "grid.424877.a",
+          "type": "grid"
+        }
+      ],
+      "id": "https://ror.org/0509ggw88",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.3-5lab.fr"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "EU",
+            "continent_name": "Europe",
+            "country_code": "FR",
+            "country_name": "France",
+            "country_subdivision_code": "IDF",
+            "country_subdivision_name": "Île-de-France",
+            "lat": 48.64026,
+            "lng": 2.23858,
+            "name": "Marcoussis"
+          },
+          "geonames_id": 2995916
+        }
+      ],
+      "names": [
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "III V Lab"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "facility"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "dnb.nl"
+      ],
+      "established": 1814,
+      "external_ids": [
+        {
+          "all": [
+            "501100014104"
+          ],
+          "preferred": "501100014104",
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.459463.9"
+          ],
+          "preferred": "grid.459463.9",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0369 4300"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q1180205"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/02fabx761",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.dnb.nl"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/De_Nederlandsche_Bank"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "EU",
+            "continent_name": "Europe",
+            "country_code": "NL",
+            "country_name": "The Netherlands",
+            "country_subdivision_code": "NH",
+            "country_subdivision_name": "North Holland",
+            "lat": 52.37403,
+            "lng": 4.88969,
+            "name": "Amsterdam"
+          },
+          "geonames_id": 2759794
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "DNB"
+        },
+        {
+          "lang": "nl",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "De Nederlandsche Bank"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Dutch Bank"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "funder",
+        "other"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "kfupm.edu.sa"
+      ],
+      "established": 1963,
+      "external_ids": [
+        {
+          "all": [
+            "501100004055"
+          ],
+          "preferred": null,
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.412135.0"
+          ],
+          "preferred": "grid.412135.0",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0001 1091 0356"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q4116241"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/03yez3163",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.kfupm.edu.sa"
+        },
+        {
+          "type": "wikipedia",
+          "value": "http://en.wikipedia.org/wiki/King_Fahd_University_of_Petroleum_and_Minerals"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "SA",
+            "country_name": "Saudi Arabia",
+            "country_subdivision_code": "04",
+            "country_subdivision_name": "Eastern Province",
+            "lat": 26.28864,
+            "lng": 50.11396,
+            "name": "Dhahran"
+          },
+          "geonames_id": 107797
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "KFUPM"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "King Fahd University of Petroleum and Minerals"
+        },
+        {
+          "lang": "ar",
+          "types": [
+            "label"
+          ],
+          "value": "جامعة الملك فهد للبترول والمعادن"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education",
+        "funder"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [],
+      "established": null,
+      "external_ids": [
+        {
+          "all": [
+            "100006445"
+          ],
+          "preferred": null,
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.457570.4"
+          ],
+          "preferred": "grid.457570.4",
+          "type": "grid"
+        }
+      ],
+      "id": "https://ror.org/043trmd87",
+      "links": [
+        {
+          "type": "website",
+          "value": "http://chm.pse.umass.edu/"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "NA",
+            "continent_name": "North America",
+            "country_code": "US",
+            "country_name": "United States",
+            "country_subdivision_code": "MA",
+            "country_subdivision_name": "Massachusetts",
+            "lat": 42.37537,
+            "lng": -72.51925,
+            "name": "Amherst Center"
+          },
+          "geonames_id": 4929023
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "CHM"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Center for Hierarchical Manufacturing"
+        }
+      ],
+      "relationships": [
+        {
+          "label": "U.S. National Science Foundation",
+          "type": "related",
+          "id": "https://ror.org/021nxhr62"
+        },
+        {
+          "label": "University of Massachusetts Amherst",
+          "type": "related",
+          "id": "https://ror.org/0072zz521"
+        }
+      ],
+      "status": "active",
+      "types": [
+        "funder",
+        "nonprofit"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "musashino-u.ac.jp"
+      ],
+      "established": 1924,
+      "external_ids": [
+        {
+          "all": [
+            "100019640"
+          ],
+          "preferred": "100019640",
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.411867.d"
+          ],
+          "preferred": "grid.411867.d",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0001 0356 8417"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q6940182"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/04bcbax71",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.musashino-u.ac.jp"
+        },
+        {
+          "type": "wikipedia",
+          "value": "http://en.wikipedia.org/wiki/Musashino_University"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "JP",
+            "country_name": "Japan",
+            "country_subdivision_code": "13",
+            "country_subdivision_name": "Tokyo",
+            "lat": 35.6895,
+            "lng": 139.69171,
+            "name": "Tokyo"
+          },
+          "geonames_id": 1850147
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "alias"
+          ],
+          "value": "Musashino Daigaku"
+        },
+        {
+          "lang": null,
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Musashino University"
+        },
+        {
+          "lang": "ja",
+          "types": [
+            "label"
+          ],
+          "value": "武蔵野大学"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education",
+        "funder"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "hansung.ac.kr"
+      ],
+      "established": 1972,
+      "external_ids": [
+        {
+          "all": [
+            "501100002491"
+          ],
+          "preferred": null,
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.444079.a"
+          ],
+          "preferred": "grid.444079.a",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0532 678X"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q482765"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/048m9x696",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.hansung.ac.kr"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/Hansung_University"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "KR",
+            "country_name": "South Korea",
+            "country_subdivision_code": "11",
+            "country_subdivision_name": "Seoul",
+            "lat": 37.566,
+            "lng": 126.9784,
+            "name": "Seoul"
+          },
+          "geonames_id": 1835848
+        }
+      ],
+      "names": [
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Hansung University"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Hansung Woman's University"
+        },
+        {
+          "lang": "ko",
+          "types": [
+            "label"
+          ],
+          "value": "한성대학교"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education",
+        "funder"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "tuh.ie"
+      ],
+      "established": 1996,
+      "external_ids": [
+        {
+          "all": [
+            "grid.413305.0"
+          ],
+          "preferred": "grid.413305.0",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0617 5936"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q7680014"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/01fvmtt37",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.tuh.ie"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/Tallaght_Hospital"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "EU",
+            "continent_name": "Europe",
+            "country_code": "IE",
+            "country_name": "Ireland",
+            "country_subdivision_code": "L",
+            "country_subdivision_name": "Leinster",
+            "lat": 53.33306,
+            "lng": -6.24889,
+            "name": "Dublin"
+          },
+          "geonames_id": 2964574
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "AMNCH"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Adelaide and Meath Hospital, Dublin, incorporating the National Children's Hospital"
+        },
+        {
+          "lang": "ga",
+          "types": [
+            "alias"
+          ],
+          "value": "Ospidéal Adelaide agus na Mí, Baile Átha Cliath, ina gcorpraítear Ospidéal Náisiúnta na Leanaí"
+        },
+        {
+          "lang": "ga",
+          "types": [
+            "label"
+          ],
+          "value": "Ospidéal Ollscoile Thamhlachta"
+        },
+        {
+          "lang": "ga",
+          "types": [
+            "alias"
+          ],
+          "value": "Ospidéal Thamhlachta"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Tallaght Hospital"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Tallaght University Hospital"
+        }
+      ],
+      "relationships": [
+        {
+          "label": "Trinity College Dublin",
+          "type": "related",
+          "id": "https://ror.org/02tyrky19"
+        }
+      ],
+      "status": "active",
+      "types": [
+        "healthcare"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "mseuf.edu.ph"
+      ],
+      "established": 1947,
+      "external_ids": [
+        {
+          "all": [
+            "grid.448687.1"
+          ],
+          "preferred": "grid.448687.1",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0639 6528"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q3578221"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/02fhfq388",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://mseuf.edu.ph"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/Enverga_University"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "PH",
+            "country_name": "Philippines",
+            "country_subdivision_code": "40",
+            "country_subdivision_name": "Calabarzon",
+            "lat": 13.93139,
+            "lng": 121.61722,
+            "name": "Lucena City"
+          },
+          "geonames_id": 1705357
+        }
+      ],
+      "names": [
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Enverga University"
+        },
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "MSEUF"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Manuel S. Enverga University Foundation"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "plus.ac.at"
+      ],
+      "established": 1622,
+      "external_ids": [
+        {
+          "all": [
+            "501100005644"
+          ],
+          "preferred": null,
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.7039.d"
+          ],
+          "preferred": "grid.7039.d",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0001 1015 6330"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q27265"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/05gs8cd61",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.plus.ac.at/"
+        },
+        {
+          "type": "wikipedia",
+          "value": "http://en.wikipedia.org/wiki/University_of_Salzburg"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "EU",
+            "continent_name": "Europe",
+            "country_code": "AT",
+            "country_name": "Austria",
+            "country_subdivision_code": "5",
+            "country_subdivision_name": "Salzburg",
+            "lat": 47.79941,
+            "lng": 13.04399,
+            "name": "Salzburg"
+          },
+          "geonames_id": 2766824
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "PLUS"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Paris Lodron University of Salzburg"
+        },
+        {
+          "lang": "de",
+          "types": [
+            "label"
+          ],
+          "value": "Paris-Lodron-Universität Salzburg"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "University of Salzburg"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education",
+        "funder"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2024-11-18",
+          "schema_version": "2.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "hch.tums.ac.ir"
+      ],
+      "established": null,
+      "external_ids": [],
+      "id": "https://ror.org/04hgqjy83",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://hch.tums.ac.ir"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "IR",
+            "country_name": "Iran",
+            "country_subdivision_code": "23",
+            "country_subdivision_name": "Tehran",
+            "lat": 35.69439,
+            "lng": 51.42151,
+            "name": "Tehran"
+          },
+          "geonames_id": 112931
+        }
+      ],
+      "names": [
+        {
+          "lang": "en",
+          "types": [
+            "label",
+            "ror_display"
+          ],
+          "value": "Hakim Children Hospital"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Hakim Children's Hospital"
+        },
+        {
+          "lang": "fa",
+          "types": [
+            "label"
+          ],
+          "value": "بیمارستان کودکان حکیم"
+        },
+        {
+          "lang": "fa",
+          "types": [
+            "alias"
+          ],
+          "value": "بیمارستان کودکان حکیم دانشگاه علوم پزشکی تهران"
+        }
+      ],
+      "relationships": [
+        {
+          "label": "Tehran University of Medical Sciences",
+          "type": "related",
+          "id": "https://ror.org/01c4pz451"
+        }
+      ],
+      "status": "active",
+      "types": [
+        "healthcare"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "pstu.ac.bd"
+      ],
+      "established": 2000,
+      "external_ids": [
+        {
+          "all": [
+            "501100014587"
+          ],
+          "preferred": "501100014587",
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.443081.a"
+          ],
+          "preferred": "grid.443081.a",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0489 3643"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q7148748"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/03m50n726",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.pstu.ac.bd"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/Patuakhali_Science_and_Technology_University"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "BD",
+            "country_name": "Bangladesh",
+            "country_subdivision_code": "A",
+            "country_subdivision_name": "Barisal Division",
+            "lat": 22.33333,
+            "lng": 90.33333,
+            "name": "Patuakhali"
+          },
+          "geonames_id": 1337216
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "PSTU"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Patuakhali Science and Technology University"
+        },
+        {
+          "lang": "bn",
+          "types": [
+            "label"
+          ],
+          "value": "পটুয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education",
+        "funder"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "aih-net.com"
+      ],
+      "established": 1918,
+      "external_ids": [
+        {
+          "all": [
+            "grid.413984.3"
+          ],
+          "preferred": "grid.413984.3",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "Q11666229"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/04tg98e93",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://aih-net.com"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "JP",
+            "country_name": "Japan",
+            "country_subdivision_code": "40",
+            "country_subdivision_name": "Fukuoka",
+            "lat": 33.63654,
+            "lng": 130.68678,
+            "name": "Iizuka"
+          },
+          "geonames_id": 1861835
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Aso Iizuka Hospital"
+        },
+        {
+          "lang": "ja",
+          "types": [
+            "label"
+          ],
+          "value": "飯塚病院"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "healthcare"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "imsciences.edu.pk"
+      ],
+      "established": 1995,
+      "external_ids": [
+        {
+          "all": [
+            "grid.444989.c"
+          ],
+          "preferred": "grid.444989.c",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0609 2495"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q15983147"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/02m8e1r74",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://imsciences.edu.pk"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/Institute_of_Management_Sciences_(Peshawar)"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "PK",
+            "country_name": "Pakistan",
+            "country_subdivision_code": "KP",
+            "country_subdivision_name": "Khyber Pakhtunkhwa",
+            "lat": 34.008,
+            "lng": 71.57849,
+            "name": "Peshawar"
+          },
+          "geonames_id": 1168197
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "alias"
+          ],
+          "value": "IMSciences"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Institute of Management Sciences Peshawar"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2022-08-31",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "galgotiacollege.edu"
+      ],
+      "established": 1999,
+      "external_ids": [
+        {
+          "all": [
+            "0000 0004 1774 2078"
+          ],
+          "preferred": "0000 0004 1774 2078",
+          "type": "isni"
+        }
+      ],
+      "id": "https://ror.org/04a85ht85",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://galgotiacollege.edu"
+        },
+        {
+          "type": "wikipedia",
+          "value": "https://en.wikipedia.org/wiki/Galgotias_College"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "IN",
+            "country_name": "India",
+            "country_subdivision_code": "UP",
+            "country_subdivision_name": "Uttar Pradesh",
+            "lat": 28.49615,
+            "lng": 77.53601,
+            "name": "Greater Noida"
+          },
+          "geonames_id": 6954929
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "GCET"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Galgotias College of Engineering & Technology"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "Galgotias College of Engineering and Technology"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "eli-beams.eu"
+      ],
+      "established": 2015,
+      "external_ids": [
+        {
+          "all": [
+            "grid.494603.c"
+          ],
+          "preferred": "grid.494603.c",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 7422 3856"
+          ],
+          "preferred": "0000 0004 7422 3856",
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q39039051"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/00yzpcc69",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.eli-beams.eu"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "EU",
+            "continent_name": "Europe",
+            "country_code": "CZ",
+            "country_name": "Czechia",
+            "country_subdivision_code": "20",
+            "country_subdivision_name": "Central Bohemia",
+            "lat": 49.96321,
+            "lng": 14.4585,
+            "name": "Dolní Břežany"
+          },
+          "geonames_id": 3076915
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "ELI-BL"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Extreme Light Infrastructure Beamlines"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "facility"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [],
+      "established": 1972,
+      "external_ids": [
+        {
+          "all": [
+            "grid.430864.d"
+          ],
+          "preferred": "grid.430864.d",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0000 9018 7542"
+          ],
+          "preferred": null,
+          "type": "isni"
+        }
+      ],
+      "id": "https://ror.org/02437s643",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.uillinois.edu"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "NA",
+            "continent_name": "North America",
+            "country_code": "US",
+            "country_name": "United States",
+            "country_subdivision_code": "IL",
+            "country_subdivision_name": "Illinois",
+            "lat": 42.27113,
+            "lng": -89.094,
+            "name": "Rockford"
+          },
+          "geonames_id": 4907959
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "UICOMR"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "University of Illinois Chicago, Rockford campus"
+        },
+        {
+          "lang": "en",
+          "types": [
+            "alias"
+          ],
+          "value": "University of Illinois at Rockford"
+        }
+      ],
+      "relationships": [
+        {
+          "label": "University of Illinois Chicago",
+          "type": "parent",
+          "id": "https://ror.org/02mpq6x41"
+        },
+        {
+          "label": "Swedish American Hospital",
+          "type": "related",
+          "id": "https://ror.org/05scd7d31"
+        }
+      ],
+      "status": "active",
+      "types": [
+        "education"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "chatham.edu"
+      ],
+      "established": 1869,
+      "external_ids": [
+        {
+          "all": [
+            "grid.411264.4"
+          ],
+          "preferred": "grid.411264.4",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0000 9776 1631"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q5087708"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/05n2dnq32",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.chatham.edu"
+        },
+        {
+          "type": "wikipedia",
+          "value": "http://en.wikipedia.org/wiki/Chatham_University"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "NA",
+            "continent_name": "North America",
+            "country_code": "US",
+            "country_name": "United States",
+            "country_subdivision_code": "PA",
+            "country_subdivision_name": "Pennsylvania",
+            "lat": 40.44062,
+            "lng": -79.99589,
+            "name": "Pittsburgh"
+          },
+          "geonames_id": 5206379
+        }
+      ],
+      "names": [
+        {
+          "lang": "en",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Chatham University"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "lds.no"
+      ],
+      "established": 1992,
+      "external_ids": [
+        {
+          "all": [
+            "501100010678"
+          ],
+          "preferred": "501100010678",
+          "type": "fundref"
+        },
+        {
+          "all": [
+            "grid.416137.6"
+          ],
+          "preferred": "grid.416137.6",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0004 0627 3157"
+          ],
+          "preferred": null,
+          "type": "isni"
+        }
+      ],
+      "id": "https://ror.org/03ym7ve89",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://www.lovisenbergsykehus.no"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "EU",
+            "continent_name": "Europe",
+            "country_code": "NO",
+            "country_name": "Norway",
+            "country_subdivision_code": "03",
+            "country_subdivision_name": "Oslo",
+            "lat": 59.91273,
+            "lng": 10.74609,
+            "name": "Oslo"
+          },
+          "geonames_id": 3143244
+        }
+      ],
+      "names": [
+        {
+          "lang": "no",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Lovisenberg Diakonale Sykehus"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "funder",
+        "healthcare"
+      ]
+    },
+    {
+      "admin": {
+        "created": {
+          "date": "2018-11-14",
+          "schema_version": "1.0"
+        },
+        "last_modified": {
+          "date": "2024-12-11",
+          "schema_version": "2.1"
+        }
+      },
+      "domains": [
+        "uim-makassar.ac.id"
+      ],
+      "established": 2000,
+      "external_ids": [
+        {
+          "all": [
+            "grid.443680.d"
+          ],
+          "preferred": "grid.443680.d",
+          "type": "grid"
+        },
+        {
+          "all": [
+            "0000 0001 0588 5299"
+          ],
+          "preferred": null,
+          "type": "isni"
+        },
+        {
+          "all": [
+            "Q12523343"
+          ],
+          "preferred": null,
+          "type": "wikidata"
+        }
+      ],
+      "id": "https://ror.org/05baqgp89",
+      "links": [
+        {
+          "type": "website",
+          "value": "https://uim-makassar.ac.id/"
+        }
+      ],
+      "locations": [
+        {
+          "geonames_details": {
+            "continent_code": "AS",
+            "continent_name": "Asia",
+            "country_code": "ID",
+            "country_name": "Indonesia",
+            "country_subdivision_code": "SN",
+            "country_subdivision_name": "South Sulawesi",
+            "lat": -5.14861,
+            "lng": 119.43194,
+            "name": "Makassar"
+          },
+          "geonames_id": 1622786
+        }
+      ],
+      "names": [
+        {
+          "lang": null,
+          "types": [
+            "acronym"
+          ],
+          "value": "UIM"
+        },
+        {
+          "lang": "id",
+          "types": [
+            "ror_display",
+            "label"
+          ],
+          "value": "Universitas Islam Makassar"
+        }
+      ],
+      "relationships": [],
+      "status": "active",
+      "types": [
+        "education"
+      ]
+    }
+  ],
+  "meta": {
+    "types": [
+      {
+        "id": "company",
+        "title": "company",
+        "count": 30791
+      },
+      {
+        "id": "education",
+        "title": "education",
+        "count": 22599
+      },
+      {
+        "id": "funder",
+        "title": "funder",
+        "count": 17078
+      },
+      {
+        "id": "nonprofit",
+        "title": "nonprofit",
+        "count": 15641
+      },
+      {
+        "id": "healthcare",
+        "title": "healthcare",
+        "count": 14062
+      },
+      {
+        "id": "facility",
+        "title": "facility",
+        "count": 12758
+      },
+      {
+        "id": "other",
+        "title": "other",
+        "count": 9026
+      },
+      {
+        "id": "government",
+        "title": "government",
+        "count": 7599
+      },
+      {
+        "id": "archive",
+        "title": "archive",
+        "count": 3104
+      }
+    ],
+    "countries": [
+      {
+        "id": "us",
+        "title": "United States",
+        "count": 32118
+      },
+      {
+        "id": "gb",
+        "title": "United Kingdom",
+        "count": 7581
+      },
+      {
+        "id": "jp",
+        "title": "Japan",
+        "count": 5754
+      },
+      {
+        "id": "de",
+        "title": "Germany",
+        "count": 5372
+      },
+      {
+        "id": "fr",
+        "title": "France",
+        "count": 5110
+      },
+      {
+        "id": "cn",
+        "title": "China",
+        "count": 5001
+      },
+      {
+        "id": "ca",
+        "title": "Canada",
+        "count": 3610
+      },
+      {
+        "id": "in",
+        "title": "India",
+        "count": 3399
+      },
+      {
+        "id": "cz",
+        "title": "Czech Republic",
+        "count": 2843
+      },
+      {
+        "id": "it",
+        "title": "Italy",
+        "count": 2196
+      }
+    ],
+    "continents": [
+      {
+        "id": "eu",
+        "title": "Europe",
+        "count": 45322
+      },
+      {
+        "id": "na",
+        "title": "North America",
+        "count": 37230
+      },
+      {
+        "id": "as",
+        "title": "Asia",
+        "count": 23498
+      },
+      {
+        "id": "af",
+        "title": "Africa",
+        "count": 3835
+      },
+      {
+        "id": "sa",
+        "title": "South America",
+        "count": 3583
+      },
+      {
+        "id": "oc",
+        "title": "Oceania",
+        "count": 1945
+      },
+      {
+        "id": "an",
+        "title": "Antarctica",
+        "count": 2
+      }
+    ],
+    "statuses": [
+      {
+        "id": "active",
+        "title": "active",
+        "count": 115409
+      }
+    ]
+  }
+}

@@ -10,7 +10,7 @@ package org.dspace.rdf.storage;
 
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 /**
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)

@@ -23,8 +23,8 @@ import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDt
 /**
  * This class is an abstract implementation of {@link MetadataSource} useful in cases
  * of plain metadata sources.
- * It provides the methot to mapping metadata to DSpace Format when source is a file
- * whit a list of <key, value> strings.
+ * It provides the method to mapping metadata to DSpace Format when source is a file
+ * with a list of <key, value> strings.
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */

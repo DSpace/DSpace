@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import org.dspace.content.MetadataFieldName;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
 /**
@@ -92,6 +94,31 @@ public class ImportRecord {
             }
         }
         return values;
+    }
+
+    /**
+     * Returns an {@code Optional<String>} representing the value
+     * of the metadata {@code field} found inside the {@code valueList}.
+     * @param field String of the MetadataField to search
+     * @return {@code Optional<String>} non empty if found.
+     */
+    public Optional<String> getSingleValue(String field) {
+        MetadataFieldName metadataFieldName = new MetadataFieldName(field);
+        return getSingleValue(metadataFieldName.schema, metadataFieldName.element, metadataFieldName.qualifier);
+    }
+
+    /**
+     * Retrieves a single value for the given schema, element, and qualifier.
+     *
+     * @param  schema    the schema for the value
+     * @param  element   the element for the value
+     * @param  qualifier the qualifier for the value
+     * @return           an optional containing the single value, if present
+     */
+    public Optional<String> getSingleValue(String schema, String element, String qualifier) {
+        return getValue(schema, element, qualifier).stream()
+            .map(MetadatumDTO::getValue)
+            .findFirst();
     }
 
     /**

@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
@@ -73,6 +73,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     BundleService bundleService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private Collection collection;
     private Item item;
@@ -224,7 +227,6 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createBundleWithoutMetadata() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
         UUID bundleUuid = null;
@@ -255,7 +257,6 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createBundleWithMetadata() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         UUID bundleUuid = null;
         try {
         BundleRest bundleRest = new BundleRest();
@@ -300,8 +301,6 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createBundleAsAnonymous() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
 
@@ -318,8 +317,6 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createBundleWithInsufficientPermissions() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
 
@@ -339,15 +336,13 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createBundleWithSufficientPermissions() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         context.turnOffAuthorisationSystem();
 
         EPerson createBundleEperson = EPersonBuilder.createEPerson(context).withEmail("createm@bundle.org")
                                                     .withPassword("test")
                                                     .withNameInMetadata("Create", "Bundle").build();
 
-        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(createBundleEperson)
+        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context, createBundleEperson, null)
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(item).build();
         context.restoreAuthSystemState();
@@ -385,8 +380,6 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createBundleOnNonExistingItem() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
 
@@ -567,7 +560,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token)
             .perform(patch("/api/core/bundles/" + bundle1.getID())
             .content(requestBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
                  jsonPath("$.metadata",

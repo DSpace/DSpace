@@ -122,7 +122,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
         String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
 
-        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueue/search/findByProfileItem")
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueues/search/findByProfileItem")
             .param("profileItemId", itemPerson.getID().toString()))
                                   .andExpect(status().isOk())
                                   .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
@@ -131,7 +131,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                              )))
                                   .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient(tokenResearcher2).perform(get("/api/eperson/orcidqueue/search/findByProfileItem")
+        getClient(tokenResearcher2).perform(get("/api/eperson/orcidqueues/search/findByProfileItem")
             .param("profileItemId", itemPerson2.getID().toString()))
                                    .andExpect(status().isOk())
                                    .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.contains(
@@ -139,9 +139,9 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                               )))
                                    .andExpect(jsonPath("$.page.totalElements", is(1)))
                                    .andExpect(jsonPath("$._links.self.href", Matchers
-                .containsString("/api/eperson/orcidqueue/search/findByProfileItem")));
+                .containsString("/api/eperson/orcidqueues/search/findByProfileItem")));
 
-        getClient(tokenAdmin).perform(get("/api/eperson/orcidqueue/search/findByProfileItem")
+        getClient(tokenAdmin).perform(get("/api/eperson/orcidqueues/search/findByProfileItem")
             .param("profileItemId", itemPerson.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
@@ -213,7 +213,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
 
-        getClient(tokenResearcher2).perform(get("/api/eperson/orcidqueue/search/findByProfileItem")
+        getClient(tokenResearcher2).perform(get("/api/eperson/orcidqueues/search/findByProfileItem")
             .param("profileItemId", itemPerson.getID().toString()))
                                    .andExpect(status().isForbidden());
     }
@@ -259,7 +259,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/eperson/orcidqueue/search/findByProfileItem")
+        getClient().perform(get("/api/eperson/orcidqueues/search/findByProfileItem")
             .param("profileItemId", itemPerson.getID().toString()))
                    .andExpect(status().isUnauthorized());
     }
@@ -461,7 +461,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/eperson/orcidqueue/" + orcidQueue.getID().toString()))
+        getClient().perform(get("/api/eperson/orcidqueues/" + orcidQueue.getID().toString()))
                    .andExpect(status().isUnauthorized());
     }
 

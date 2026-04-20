@@ -24,7 +24,6 @@ import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.service.BitstreamService;
@@ -39,6 +38,7 @@ import org.dspace.core.LogHelper;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
@@ -78,6 +78,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected SubscribeService subscribeService;
+    @Autowired
+    protected ItemCounter itemCounter;
 
     protected CommunityServiceImpl() {
         super();
@@ -133,13 +135,15 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             throw new IllegalStateException(ex);
         }
 
-        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
+        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, newCommunity.getID(),
+                newCommunity.getHandle(), DetailType.HANDLE,
                 getIdentifiers(context, newCommunity)));
 
         // if creating a top-level Community, simulate an ADD event at the Site.
         if (parent == null) {
             context.addEvent(new Event(Event.ADD, Constants.SITE, siteService.findSite(context).getID(),
-                    Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
+                    Constants.COMMUNITY, newCommunity.getID(),
+                    newCommunity.getHandle(), DetailType.HANDLE,
                     getIdentifiers(context, newCommunity)));
         }
 
@@ -275,8 +279,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
         if (community.isMetadataModified()) {
             context.addEvent(
-                new Event(Event.MODIFY_METADATA, Constants.COMMUNITY, community.getID(), community.getDetails(),
-                          getIdentifiers(context, community)));
+                    new Event(Event.MODIFY_METADATA, Constants.COMMUNITY, community.getID(),
+                            community.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
+                            getIdentifiers(context, community)));
             community.clearModified();
         }
         community.clearDetails();
@@ -393,7 +398,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
         context.addEvent(
             new Event(Event.ADD, Constants.COMMUNITY, community.getID(), Constants.COLLECTION, collection.getID(),
-                      community.getHandle(), getIdentifiers(context, community)));
+                community.getHandle(), DetailType.HANDLE, getIdentifiers(context, community)));
     }
 
     @Override
@@ -438,8 +443,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             childCommunity.addParentCommunity(parentCommunity);
         }
         context.addEvent(new Event(Event.ADD, Constants.COMMUNITY, parentCommunity.getID(), Constants.COMMUNITY,
-                                   childCommunity.getID(), parentCommunity.getHandle(),
-                                   getIdentifiers(context, parentCommunity)));
+                childCommunity.getID(), parentCommunity.getHandle(), DetailType.HANDLE,
+                getIdentifiers(context, parentCommunity)));
     }
 
     @Override
@@ -464,7 +469,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // Remove any mappings
         context.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, community.getID(),
-                                   Constants.COLLECTION, removedId, removedHandle, removedIdentifiers));
+            Constants.COLLECTION, removedId, removedHandle, DetailType.HANDLE,
+            removedIdentifiers));
     }
 
     @Override
@@ -485,7 +491,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         context.addEvent(
             new Event(Event.REMOVE, Constants.COMMUNITY, parentCommunity.getID(), Constants.COMMUNITY, removedId,
-                      removedHandle, removedIdentifiers));
+                removedHandle, DetailType.HANDLE, removedIdentifiers));
     }
 
     @Override
@@ -525,8 +531,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         rawDelete(context, community);
         context.addEvent(
-            new Event(Event.REMOVE, Constants.SITE, siteService.findSite(context).getID(), Constants.COMMUNITY,
-                      removedId, removedHandle, removedIdentifiers));
+                new Event(Event.REMOVE, Constants.SITE, siteService.findSite(context).getID(), Constants.COMMUNITY,
+                        removedId, removedHandle, DetailType.HANDLE, removedIdentifiers));
 
     }
 
@@ -550,8 +556,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         log.info(LogHelper.getHeader(context, "delete_community",
                                       "community_id=" + community.getID()));
 
-        context.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, community.getID(), community.getHandle(),
-                                   getIdentifiers(context, community)));
+        context.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, community.getID(),
+            community.getHandle(), DetailType.HANDLE,
+            getIdentifiers(context, community)));
 
         subscribeService.deleteByDspaceObject(context, community);
 
@@ -694,10 +701,15 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Community findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
-        } else {
-            return find(context, UUID.fromString(id));
+        try {
+            if (StringUtils.isNumeric(id)) {
+                return findByLegacyId(context, Integer.parseInt(id));
+            } else {
+                return find(context, UUID.fromString(id));
+            }
+        } catch (IllegalArgumentException e) {
+            // Not a valid legacy ID or valid UUID
+            return null;
         }
     }
 
@@ -714,12 +726,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     /**
      * Returns total community archived items
      *
+     * @param context         DSpace context
      * @param community       Community
      * @return                total community archived items
-     * @throws ItemCountException
      */
     @Override
-    public int countArchivedItems(Community community) throws ItemCountException {
-        return ItemCounter.getInstance().getCount(community);
+    public int countArchivedItems(Context context, Community community) {
+        return itemCounter.getCount(context, community);
     }
 }

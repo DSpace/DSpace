@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -250,6 +250,11 @@ public class IPAuthentication implements AuthenticationMethod {
         }
 
         return groups;
+    }
+
+    @Override
+    public boolean areSpecialGroupsApplicable(Context context, HttpServletRequest request) {
+        return true;
     }
 
     @Override

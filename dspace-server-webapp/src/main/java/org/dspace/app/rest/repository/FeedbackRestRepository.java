@@ -8,11 +8,12 @@
 package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang.StringUtils;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.DSpaceFeedbackNotFoundException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -33,13 +34,16 @@ import org.springframework.stereotype.Component;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-@Component(FeedbackRest.CATEGORY + "." + FeedbackRest.NAME)
+@Component(FeedbackRest.CATEGORY + "." + FeedbackRest.PLURAL_NAME)
 public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, Integer> {
 
     @Autowired
     private FeedbackService feedbackService;
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -57,7 +61,6 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
     @PreAuthorize("permitAll()")
     protected FeedbackRest createAndReturn(Context context) throws AuthorizeException, SQLException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         FeedbackRest feedbackRest = null;
 
         String recipientEmail = configurationService.getProperty("feedback.recipient");
@@ -79,8 +82,14 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
             throw new DSpaceBadRequestException("e-mail and message fields are mandatory!");
         }
 
+        String pageUrl = feedbackRest.getPage();
+        String urlPrefix = configurationService.getProperty("dspace.ui.url");
+        if (StringUtils.isNotBlank(pageUrl) && ! Strings.CS.startsWith(pageUrl, urlPrefix)) {
+            throw new DSpaceBadRequestException("unexpected page url was submitted");
+        }
+
         try {
-            feedbackService.sendEmail(context, req, recipientEmail, senderEmail, message, feedbackRest.getPage());
+            feedbackService.sendEmail(context, req, recipientEmail, senderEmail, message, pageUrl);
         } catch (IOException | MessagingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

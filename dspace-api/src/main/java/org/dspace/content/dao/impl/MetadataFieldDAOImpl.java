@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.MetadataField;
@@ -158,7 +158,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         Join<MetadataField, MetadataSchema> join = metadataFieldRoot.join("metadataSchema");
         criteriaQuery.select(metadataFieldRoot);
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(join.get(MetadataSchema_.name)));
         orderList.add(criteriaBuilder.asc(metadataFieldRoot.get(MetadataField_.element)));
         orderList.add(criteriaBuilder.asc(metadataFieldRoot.get(MetadataField_.qualifier)));

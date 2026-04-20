@@ -71,7 +71,7 @@ import org.junit.rules.TemporaryFolder;
 
 /**
  * Basic integration testing for the AIP Backup and Restore feature
- * https://wiki.duraspace.org/display/DSDOC5x/AIP+Backup+and+Restore
+ * https://wiki.lyrasis.org/display/DSDOC9x/AIP+Backup+and+Restore
  *
  * @author Tim Donohue
  */
@@ -146,7 +146,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
             log.info("setUpClass() - CREATE TEST HIERARCHY");
-            // Create a hierachy of sub-Communities and Collections and Items,
+            // Create a hierarchy of sub-Communities and Collections and Items,
             // which looks like this:
             //  "Top Community"
             //      - "Child Community"
@@ -386,9 +386,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Create a custom resource policy for this community
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Special Read Only");
-        policy.setGroup(group);
         policy.setAction(Constants.READ);
         policies.add(policy);
 
@@ -600,9 +599,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Create a custom resource policy for this Collection
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Special Read Only");
-        policy.setGroup(group);
         policy.setAction(Constants.READ);
         policies.add(policy);
 
@@ -822,10 +820,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Create a custom resource policy for this Item
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy admin_policy = resourcePolicyService.create(context);
-        admin_policy.setRpName("Admin Read-Only");
         Group adminGroup = groupService.findByName(context, Group.ADMIN);
-        admin_policy.setGroup(adminGroup);
+        ResourcePolicy admin_policy = resourcePolicyService.create(context, null, adminGroup);
+        admin_policy.setRpName("Admin Read-Only");
         admin_policy.setAction(Constants.READ);
         policies.add(admin_policy);
         itemService.replaceAllItemPolicies(context, item, policies);

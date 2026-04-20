@@ -7,8 +7,7 @@
  */
 package org.dspace.app.rest.submit.step;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;

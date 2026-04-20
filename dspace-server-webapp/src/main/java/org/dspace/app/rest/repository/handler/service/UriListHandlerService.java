@@ -9,8 +9,8 @@ package org.dspace.app.rest.repository.handler.service;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -42,7 +42,7 @@ public class UriListHandlerService {
      * @param context   The relevant DSpace context
      * @param request   The current active Request
      * @param uriList   The list of Strings representing the UriList to be handled
-     * @param clazz     The class to be hadled
+     * @param clazz     The class to be handled
      * @param <T>       The class to be returned, same as the class parameter above
      * @return          The object that was handled through this method
      */

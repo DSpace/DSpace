@@ -128,7 +128,7 @@
         <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
     </bean>
     <bean id="scopus.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="scopusVolumeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
@@ -259,9 +259,5 @@
         key-type="java.lang.String" value-type="java.lang.String">
     	<entry key="http://www.w3.org/2005/Atom" value="ns" />
     </util:map>
-
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="3"/>
-    </bean>
 
 </beans>

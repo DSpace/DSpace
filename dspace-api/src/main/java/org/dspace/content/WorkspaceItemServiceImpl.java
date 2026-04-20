@@ -12,11 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
@@ -33,6 +30,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -96,11 +94,18 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public WorkspaceItem create(Context context, Collection collection, boolean template)
             throws AuthorizeException, SQLException {
-        return create(context, collection, null, template);
+        return create(context, collection, null, template, false);
     }
 
     @Override
-    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template)
+    public WorkspaceItem create(Context context, Collection collection, boolean template, boolean isNewVersion)
+            throws AuthorizeException, SQLException {
+        return create(context, collection, null, template, isNewVersion);
+    }
+
+    @Override
+    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template,
+                                boolean isNewVersion)
         throws AuthorizeException, SQLException {
         // Check the user has permission to ADD to the collection
         authorizeService.authorizeAction(context, collection, Constants.ADD);
@@ -118,64 +123,27 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         }
         item.setSubmitter(context.getCurrentUser());
 
-        // Now create the policies for the submitter to modify item and contents
-        // contents = bitstreams, bundles
-        // read permission
-        authorizeService.addPolicy(context, item, Constants.READ, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
-        // write permission
-        authorizeService.addPolicy(context, item, Constants.WRITE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
-        // add permission
-        authorizeService.addPolicy(context, item, Constants.ADD, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
-        // remove contents permission
-        authorizeService
-            .addPolicy(context, item, Constants.REMOVE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
-        // delete permission
-        authorizeService
-            .addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        // Now create the policies for the submitter to modify item and contents (bitstreams, bundles)
+        int[] actionIds = { Constants.READ, Constants.WRITE, Constants.ADD, Constants.REMOVE, Constants.DELETE };
+        for (int actionId : actionIds) {
+            authorizeService.addPolicy(context, item, actionId, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        }
+
+        if (collectionService.isSharedWorkspace(context, collection)) {
+            addPoliciesToSubmitterGroup(context, item, collection, actionIds);
+        }
 
         // Copy template if appropriate
-        Item templateItem = collection.getTemplateItem();
-
-        Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
-        Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
-
-        if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
-                !StringUtils.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
-            throw new IllegalStateException("The template item has entity type : (" +
-                      templateItemEntityType.get().getValue() + ") different than collection entity type : " +
-                      colEntityType.get().getValue());
-        }
-
-        if (template && colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
-            MetadataValue original = colEntityType.get();
-            MetadataField metadataField = original.getMetadataField();
-            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
-            // NOTE: dspace.entity.type = <blank> does not make sense
-            //       the collection entity type is by default blank when a collection is first created
-            if (StringUtils.isNotBlank(original.getValue())) {
-                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
-                                        metadataField.getQualifier(), original.getLanguage(), original.getValue());
-            }
-        }
-
-        if (template && (templateItem != null)) {
-            List<MetadataValue> md = itemService.getMetadata(templateItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-
-            for (MetadataValue aMd : md) {
-                MetadataField metadataField = aMd.getMetadataField();
-                MetadataSchema metadataSchema = metadataField.getMetadataSchema();
-                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
-                                        metadataField.getQualifier(), aMd.getLanguage(),
-                                        aMd.getValue());
-            }
-        }
+        itemService.populateWithTemplateItemMetadata(context, collection, template, item);
 
         itemService.update(context, item);
 
         // If configured, register identifiers (eg handle, DOI) now. This is typically used with the Show Identifiers
         // submission step which previews minted handles and DOIs during the submission process. Default: false
+        // Additional check needed: if we are creating a new version of an existing item we skip the identifier
+        // generation here, as this will be performed when the new version is created in VersioningServiceImpl
         if (DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getBooleanProperty("identifiers.submission.register", false)) {
+                .getBooleanProperty("identifiers.submission.register", false) && !isNewVersion) {
             try {
                 // Get map of filters to use for identifier types, while the item is in progress
                 Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters(true);
@@ -204,17 +172,16 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         return workspaceItem;
     }
 
-    private Optional<MetadataValue> getDSpaceEntityType(DSpaceObject dSpaceObject) {
-        return Objects.nonNull(dSpaceObject) ? dSpaceObject.getMetadata()
-                                                           .stream()
-                                                           .filter(x -> x.getMetadataField().toString('.')
-                                                                         .equalsIgnoreCase("dspace.entity.type"))
-                                                           .findFirst()
-                                             : Optional.empty();
-    }
-
     @Override
     public WorkspaceItem create(Context c, WorkflowItem workflowItem) throws SQLException, AuthorizeException {
+        WorkspaceItem potentialDuplicate = findByItem(c, workflowItem.getItem());
+        if (potentialDuplicate != null) {
+            throw new IllegalArgumentException(String.format(
+                "A workspace item referring to item %s already exists (%d)",
+                workflowItem.getItem().getID(),
+                potentialDuplicate.getID()
+            ));
+        }
         WorkspaceItem workspaceItem = workspaceItemDAO.create(c, new WorkspaceItem());
         workspaceItem.setItem(workflowItem.getItem());
         workspaceItem.setCollection(workflowItem.getCollection());
@@ -277,12 +244,9 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
          */
         Item item = workspaceItem.getItem();
-        if (!authorizeService.isAdmin(context)
-            && (item.getSubmitter() == null || (context.getCurrentUser() == null)
-                || (context.getCurrentUser().getID() != item.getSubmitter().getID()))) {
+        if (isNotAuthorizedToDelete(context, item)) {
             // Not an admit, not the submitter
-            throw new AuthorizeException("Must be an administrator or the "
-                                             + "original submitter to delete a workspace item");
+            throw new AuthorizeException("Must be an administrator or the submitter to delete a workspace item");
         }
 
         log.info(LogHelper.getHeader(context, "delete_workspace_item",
@@ -345,6 +309,51 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         source.getItem().removeMetadata(remove);
 
+    }
+
+    private void addPoliciesToSubmitterGroup(Context context, Item item, Collection collection, int[] actionIds)
+        throws SQLException, AuthorizeException {
+
+        Group submitters = collection.getSubmitters();
+        if (submitters == null) {
+            return;
+        }
+
+        for (int actionId : actionIds) {
+            authorizeService.addPolicy(context, item, actionId, submitters, ResourcePolicy.TYPE_SUBMISSION);
+        }
+
+    }
+
+    /**
+     * Determines if the current user is NOT authorized to delete a workspace item.
+     *
+     * <p><strong>Authorization Policy:</strong></p>
+     * <p>A user is <strong>authorized</strong> to delete a workspace item if <strong>ANY</strong>
+     * of the following conditions are met:</p>
+     * <ol>
+     *   <li><strong>Administrator:</strong> The current user is a DSpace administrator</li>
+     *   <li><strong>Original Submitter:</strong> The current user is the original submitter of the item
+     *       (matches {@code item.getSubmitter()})</li>
+     *   <li><strong>Explicit DELETE Permission:</strong> The current user has a DELETE permission
+     *       policy on the item (via {@link ResourcePolicy})</li>
+     * </ol>
+     *
+     * @param context DSpace context containing the current user
+     * @param item    the Item contained in the WorkspaceItem being evaluated for deletion
+     * @return {@code true} if the current user is NOT authorized to delete (deletion should be blocked);
+     *         {@code false} if the user IS authorized (deletion should proceed)
+     * @throws SQLException if database operations fail during authorization checks
+     * @see #deleteAll(Context, WorkspaceItem)
+     * @see AuthorizeService#isAdmin(Context)
+     * @see AuthorizeService#authorizeActionBoolean(org.dspace.core.Context, org.dspace.content.DSpaceObject, int)
+     */
+    private boolean isNotAuthorizedToDelete(Context context, Item item) throws SQLException {
+        EPerson submitter = item.getSubmitter();
+        EPerson currentUser = context.getCurrentUser();
+        return !authorizeService.isAdmin(context)
+            && (submitter == null || (currentUser == null) || (!submitter.getID().equals(currentUser.getID())))
+            && !authorizeService.authorizeActionBoolean(context, item, Constants.DELETE);
     }
 
 }

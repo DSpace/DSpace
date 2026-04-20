@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@Component(VocabularyRest.CATEGORY + "." + VocabularyRest.NAME + "." + VocabularyRest.ENTRIES)
+@Component(VocabularyRest.CATEGORY + "." + VocabularyRest.PLURAL_NAME + "." + VocabularyRest.ENTRIES)
 public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
@@ -51,7 +51,7 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("@vocabularySecurity.isVocabularyPublic(#name) || hasAuthority('AUTHENTICATED')")
     public Page<VocabularyEntryRest> filter(@Nullable HttpServletRequest request, String name,
                                           @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();

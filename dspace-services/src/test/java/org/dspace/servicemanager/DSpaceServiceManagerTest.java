@@ -16,9 +16,9 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.fakeservices.FakeService1;

@@ -114,7 +114,7 @@ public class CitationPage extends AbstractCurationTask {
                 // don't inherit now otherwise they will be copied over the moved bitstreams
                 resourcePolicyService.removeAllPolicies(Curator.curationContext(), dBundle);
             } catch (AuthorizeException e) {
-                log.error("User not authroized to create bundle on item \"{}\": {}",
+                log.error("User not authorized to create bundle on item \"{}\": {}",
                         item::getName, e::getMessage);
                 return;
             }
@@ -144,7 +144,7 @@ public class CitationPage extends AbstractCurationTask {
                 // don't inherit now otherwise they will be copied over the moved bitstreams
                 resourcePolicyService.removeAllPolicies(Curator.curationContext(), pBundle);
             } catch (AuthorizeException e) {
-                log.error("User not authroized to create bundle on item \""
+                log.error("User not authorized to create bundle on item \""
                               + item.getName() + "\": " + e.getMessage());
             }
             bundles = itemService.getBundles(item, "ORIGINAL");
@@ -173,7 +173,7 @@ public class CitationPage extends AbstractCurationTask {
                         InputStream citedInputStream =
                             new ByteArrayInputStream(
                                 citationDocument.makeCitedDocument(Curator.curationContext(), bitstream).getLeft());
-                        //Add the cited document to the approiate bundle
+                        //Add the cited document to the appropriate bundle
                         this.addCitedPageToItem(citedInputStream, bundle, pBundle,
                                                 dBundle, item, bitstream);
                         // now set the policies of the preservation and display bundle

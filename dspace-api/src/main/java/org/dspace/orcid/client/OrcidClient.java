@@ -10,11 +10,13 @@ package org.dspace.orcid.client;
 import java.util.List;
 import java.util.Optional;
 
+import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
  * Interface for classes that allow to contact ORCID.
@@ -160,5 +162,35 @@ public interface OrcidClient {
      * @throws OrcidClientException if some error occurs during the search
      */
     OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path);
+
+    /**
+     * Perform an expanded search with the given query and pagination using the api
+     * endpoint.
+     *
+     * @param accessToken the access token
+     * @param query       the query
+     * @param start       the start index
+     * @param rows        the number of rows to retrieve
+     * @return the expanded search result
+     */
+    ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows);
+
+    /**
+     * Perform an expanded search with the given query and pagination using the
+     * public endpoint.
+     *
+     * @param query the query
+     * @param start the start index
+     * @param rows  the number of rows to retrieve
+     * @return the expanded search result
+     */
+    ExpandedSearch expandedSearch(String query, int start, int rows);
+
+    /**
+     * Revokes the given {@param accessToken} with a POST method.
+     * @param orcidToken   the access token to revoke
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    void revokeToken(OrcidToken orcidToken);
 
 }

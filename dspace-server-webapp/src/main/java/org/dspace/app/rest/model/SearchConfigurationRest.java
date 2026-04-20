@@ -22,6 +22,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public static final String NAME = "discover";
+    public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
     @JsonIgnore
     private String scope;
@@ -39,6 +40,14 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public Class getController() {

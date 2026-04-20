@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
@@ -27,8 +29,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Drive the Curator and check results.
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CuratorReportTest
         extends AbstractUnitTest {
-    Logger LOG = LoggerFactory.getLogger(CuratorReportTest.class);
+    Logger LOG = LogManager.getLogger();
 
     public CuratorReportTest() {
     }

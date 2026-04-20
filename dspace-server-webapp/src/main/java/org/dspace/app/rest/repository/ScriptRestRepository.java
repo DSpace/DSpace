@@ -46,7 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * This is the REST repository dealing with the Script logic
  */
-@Component(ScriptRest.CATEGORY + "." + ScriptRest.NAME)
+@Component(ScriptRest.CATEGORY + "." + ScriptRest.PLURAL_NAME)
 public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, String> {
 
     private static final Logger log = LogManager.getLogger();
@@ -56,6 +56,9 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     // authorization is verified inside the method
@@ -123,9 +126,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private List<DSpaceCommandLineParameter> processPropertiesToDSpaceCommandLineParameters(String propertiesJson)
         throws IOException {
         List<ParameterValueRest> parameterValueRestList = new LinkedList<>();
-        ObjectMapper objectMapper = new ObjectMapper();
         if (StringUtils.isNotBlank(propertiesJson)) {
-            parameterValueRestList = Arrays.asList(objectMapper.readValue(propertiesJson, ParameterValueRest[].class));
+            parameterValueRestList = Arrays.asList(mapper.readValue(propertiesJson, ParameterValueRest[].class));
         }
 
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = new LinkedList<>();

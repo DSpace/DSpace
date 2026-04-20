@@ -42,6 +42,9 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void metadataExportTestWithoutFileParameterSucceeds() throws Exception {
 
@@ -77,7 +80,7 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/metadata-export/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(list)))
+                             .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("metadata-export",
@@ -128,7 +131,7 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/metadata-export/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(list)))
+                             .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("metadata-export",

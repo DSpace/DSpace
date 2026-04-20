@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the parent object of a group.
  */
-@Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.OBJECT)
+@Component(GroupRest.CATEGORY + "." + GroupRest.PLURAL_NAME + "." + GroupRest.OBJECT)
 public class GroupParentObjectLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository class that is responsible for handling {@link TemplateItemRest} objects
  */
-@Component(TemplateItemRest.CATEGORY + "." + TemplateItemRest.NAME)
+@Component(TemplateItemRest.CATEGORY + "." + TemplateItemRest.PLURAL_NAME)
 public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateItemRest, UUID> {
 
     @Autowired
@@ -48,6 +48,9 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
 
     @Autowired
     ResourcePatch<Item> resourcePatch;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -90,7 +93,6 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
      */
     public TemplateItemRest patchTemplateItem(TemplateItem templateItem, JsonNode jsonNode)
         throws SQLException, AuthorizeException {
-        ObjectMapper mapper = new ObjectMapper();
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
 

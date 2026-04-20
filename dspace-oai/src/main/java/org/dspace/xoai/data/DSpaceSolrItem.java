@@ -7,9 +7,9 @@
  */
 package org.dspace.xoai.data;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.core.ItemMetadata;
@@ -28,7 +28,7 @@ public class DSpaceSolrItem extends DSpaceItem {
     private final String unparsedMD;
     private ItemMetadata metadata;
     private final String handle;
-    private final Date lastMod;
+    private final Instant lastMod;
     private final List<ReferenceSet> sets;
     private final boolean deleted;
 
@@ -36,7 +36,7 @@ public class DSpaceSolrItem extends DSpaceItem {
         log.debug("Creating OAI Item from Solr source");
         unparsedMD = (String) doc.getFieldValue("item.compile");
         handle = (String) doc.getFieldValue("item.handle");
-        lastMod = (Date) doc.getFieldValue("item.lastmodified");
+        lastMod = ((java.util.Date) doc.getFieldValue("item.lastmodified")).toInstant();
         sets = new ArrayList<>();
 
         Collection<Object> fieldValues;
@@ -67,8 +67,8 @@ public class DSpaceSolrItem extends DSpaceItem {
     }
 
     @Override
-    public Date getDatestamp() {
-        return lastMod;
+    public java.util.Date getDatestamp() {
+        return java.util.Date.from(lastMod);
     }
 
     @Override

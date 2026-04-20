@@ -10,10 +10,11 @@ package org.dspace.eperson.service;
 import static org.dspace.content.MetadataSchemaEnum.EPERSON;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.validation.constraints.NotNull;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
@@ -97,9 +98,9 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      *
      * @param context The relevant DSpace Context.
      * @param query   The search string
-     * @param offset  Inclusive offset
+     * @param offset  Inclusive offset (the position of the first result to return)
      * @param limit   Maximum number of matches returned
-     * @return array of EPerson objects
+     * @return List of matching EPerson objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public List<EPerson> search(Context context, String query, int offset, int limit)
@@ -116,6 +117,34 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      */
     public int searchResultCount(Context context, String query)
         throws SQLException;
+
+    /**
+     * Find the EPersons that match the search query which are NOT currently members of the given Group.  The search
+     * query is run against firstname, lastname or email.
+     *
+     * @param context      DSpace context
+     * @param query        The search string
+     * @param excludeGroup Group to exclude results from. Members of this group will never be returned.
+     * @param offset       Inclusive offset (the position of the first result to return)
+     * @param limit        Maximum number of matches returned
+     * @return List of matching EPerson objects
+     * @throws SQLException if error
+     */
+    List<EPerson> searchNonMembers(Context context, String query, Group excludeGroup,
+                                 int offset, int limit) throws SQLException;
+
+    /**
+     * Returns the total number of EPersons that match the search query which are NOT currently members of the given
+     * Group. The search query is run against firstname, lastname or email. Can be used with searchNonMembers() to
+     * support pagination
+     *
+     * @param context      DSpace context
+     * @param query        The search string
+     * @param excludeGroup Group to exclude results from. Members of this group will never be returned.
+     * @return List of matching EPerson objects
+     * @throws SQLException if error
+     */
+    int searchNonMembersCount(Context context, String query, Group excludeGroup) throws SQLException;
 
     /**
      * Find all the {@code EPerson}s in a specific order by field.
@@ -156,6 +185,19 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      */
     public List<EPerson> findAll(Context context, int sortField, int pageSize, int offset)
         throws SQLException;
+
+    /**
+     * The "System EPerson" is a fake account that exists only to receive email.
+     * It has an email address that should be presumed usable.  It does not
+     * exist in the database and is not complete.
+     *
+     * @param context current DSpace session.
+     * @return an EPerson that can presumably receive email.
+     * @throws SQLException
+     */
+    @NotNull
+    public EPerson getSystemEPerson(Context context)
+            throws SQLException;
 
     /**
      * Create a new eperson
@@ -221,7 +263,7 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * @return a list of epeople
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException;
+    public List<EPerson> findNotActiveSince(Context context, Instant date) throws SQLException;
 
     /**
      * Check for presence of EPerson in tables that have constraints on
@@ -238,14 +280,42 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     public List<String> getDeleteConstraints(Context context, EPerson ePerson) throws SQLException;
 
     /**
-     * Retrieve all accounts which belong to at least one of the specified groups.
+     * Retrieve all EPerson accounts which belong to at least one of the specified groups.
+     * <P>
+     * WARNING: This method may have bad performance issues for Groups with a very large number of members,
+     * as it will load all member EPerson objects into memory.
+     * <P>
+     * For better performance, use the paginated version of this method.
      *
      * @param c      The relevant DSpace Context.
      * @param groups set of eperson groups
      * @return a list of epeople
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException;
+    List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException;
+
+    /**
+     * Retrieve all EPerson accounts which belong to at least one of the specified groups, in a paginated fashion.
+     *
+     * @param c      The relevant DSpace Context.
+     * @param groups Set of group(s) to check membership in
+     * @param pageSize number of EPerson objects to load at one time. Set to <=0 to disable pagination
+     * @param offset number of page to load (starting with 1). Set to <=0 to disable pagination
+     * @return a list of epeople
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    List<EPerson> findByGroups(Context c, Set<Group> groups, int pageSize, int offset) throws SQLException;
+
+    /**
+     * Count all EPerson accounts which belong to at least one of the specified groups. This provides the total
+     * number of results to expect from corresponding findByGroups() for pagination purposes.
+     *
+     * @param c      The relevant DSpace Context.
+     * @param groups Set of group(s) to check membership in
+     * @return total number of (unique) EPersons who are a member of one or more groups.
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    int countByGroups(Context c, Set<Group> groups) throws SQLException;
 
     /**
      * Retrieve all accounts which are subscribed to receive information about new items.
@@ -276,4 +346,37 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      *                      access error or other errors.
      */
     EPerson findByProfileItem(Context context, Item profile) throws SQLException;
+
+    /**
+     * Check if the given user is the owner of the given item. An EPerson is considered the "owner" of an item if
+     * their UUID appears in the authority field of the item's {@code dspace.object.owner} metadata.
+     *
+     * <p><strong>How Ownership Is Determined:</strong></p>
+     * <ol>
+     *   <li>Retrieves all {@code dspace.object.owner} metadata values from the item</li>
+     *   <li>Extracts the authority field from each metadata value</li>
+     *   <li>Compares the authority UUID to the user's EPerson UUID</li>
+     *   <li>Returns {@code true} if ANY {@code dspace.object.owner} authority matches the user's UUID</li>
+     * </ol>
+     *
+     * <p><strong>Multiple Owners:</strong></p>
+     * <p>An item can have multiple {@code dspace.object.owner} metadata values, allowing for
+     * shared ownership. If the user matches ANY of the owner authority values, they are considered
+     * an owner.</p>
+     *
+     * <p><strong>Important Notes:</strong></p>
+     * <ul>
+     *   <li>This method does NOT check if the user is the item's submitter (use
+     *       {@code item.getSubmitter()} for that)</li>
+     *   <li>If the user parameter is {@code null}, this method returns {@code false}</li>
+     * </ul>
+     *
+     * @param user the EPerson to check for ownership
+     * @param item the item to check ownership of
+     * @return {@code true} if the user's UUID matches any {@code dspace.object.owner} authority;
+     *         {@code false} otherwise (including when user is {@code null})
+     * @see org.dspace.content.MetadataAdministratorAndOwnerAccess
+     * @see org.dspace.discovery.SharedWorkspaceSolrIndexPlugin
+     */
+    boolean isOwnerOfItem(EPerson user, Item item);
 }

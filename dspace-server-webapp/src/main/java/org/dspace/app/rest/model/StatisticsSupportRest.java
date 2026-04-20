@@ -12,6 +12,7 @@ import org.dspace.app.rest.StatisticsRestController;
 public class StatisticsSupportRest extends BaseObjectRest<String> {
 
     public static final String NAME = "statistics";
+    public static final String PLURAL_NAME = "statistics";
     public static final String CATEGORY = RestModel.STATISTICS;
 
     public String getCategory() {
@@ -24,5 +25,10 @@ public class StatisticsSupportRest extends BaseObjectRest<String> {
 
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return null;
     }
 }

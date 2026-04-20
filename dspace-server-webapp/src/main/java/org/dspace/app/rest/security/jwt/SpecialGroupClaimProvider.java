@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,17 +34,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpecialGroupClaimProvider implements JWTClaimProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(SpecialGroupClaimProvider.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String SPECIAL_GROUPS = "sg";
 
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Override
     public String getKey() {
         return SPECIAL_GROUPS;
     }
 
+    @Override
     public Object getValue(Context context, HttpServletRequest request) {
         List<Group> groups = new ArrayList<>();
         try {
@@ -57,6 +59,7 @@ public class SpecialGroupClaimProvider implements JWTClaimProvider {
         return groupIds;
     }
 
+    @Override
     public void parseClaim(Context context, HttpServletRequest request, JWTClaimsSet jwtClaimsSet) {
         try {
             List<String> groupIds = jwtClaimsSet.getStringListClaim(SPECIAL_GROUPS);

@@ -58,6 +58,16 @@ public class DOIServiceImpl implements DOIService {
     }
 
     @Override
+    public void delete(Context context, DOI doi) throws SQLException {
+        doiDAO.delete(context, doi);
+    }
+
+    @Override
+    public List<DOI> findAll(Context context) throws SQLException {
+        return doiDAO.findAll(context, DOI.class);
+    }
+
+    @Override
     public DOI findByDoi(Context context, String doi) throws SQLException {
         return doiDAO.findByDoi(context, doi);
     }

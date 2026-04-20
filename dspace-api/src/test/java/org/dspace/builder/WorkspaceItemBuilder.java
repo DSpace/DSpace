@@ -7,10 +7,15 @@
  */
 package org.dspace.builder;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Objects;
+import java.util.UUID;
 
+import org.dspace.app.ldn.NotifyPatternToTrigger;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -41,14 +46,31 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     public static WorkspaceItemBuilder createWorkspaceItem(final Context context, final Collection col) {
         WorkspaceItemBuilder builder = new WorkspaceItemBuilder(context);
-        return builder.create(context, col);
+        return builder.create(context, col, null);
     }
 
-    private WorkspaceItemBuilder create(final Context context, final Collection col) {
+    public static WorkspaceItemBuilder createWorkspaceItem(final Context context, final Collection col, UUID uuid) {
+        WorkspaceItemBuilder builder = new WorkspaceItemBuilder(context);
+        return builder.create(context, col, uuid);
+    }
+
+    /**
+     * Create with a specific UUID (e.g. restoring items with Packager import)
+     *
+     * @param context DSpace context
+     * @param col Parent collection
+     * @param uuid Item UUID
+     * @return WorkspaceItemBuilder
+     */
+    private WorkspaceItemBuilder create(final Context context, final Collection col, UUID uuid) {
         this.context = context;
 
         try {
-            workspaceItem = workspaceItemService.create(context, col, false);
+            if (uuid == null) {
+                workspaceItem = workspaceItemService.create(context, col, false);
+            } else {
+                workspaceItem = workspaceItemService.create(context, col, uuid, false, false);
+            }
             item = workspaceItem.getItem();
         } catch (Exception e) {
             return handleException(e);
@@ -89,6 +111,9 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
      * @throws IOException
      */
     public static void deleteWorkspaceItem(Integer id) throws SQLException, IOException {
+        if (Objects.isNull(id)) {
+            return;
+        }
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             WorkspaceItem workspaceItem = workspaceItemService.find(c, id);
@@ -114,10 +139,12 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
                 delete(c, workspaceItem);
             } else {
                 item = c.reloadEntity(item);
-                // check if the wsi has been pushed to the workflow
-                XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
-                if (wfi != null) {
-                    workflowItemService.delete(c, wfi);
+                if (item != null) {
+                    // check if the wsi has been pushed to the workflow
+                    XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
+                    if (wfi != null) {
+                        workflowItemService.delete(c, wfi);
+                    }
                 }
             }
             item = c.reloadEntity(item);
@@ -134,13 +161,25 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return workspaceItemService;
     }
 
-    protected WorkspaceItemBuilder addMetadataValue(final String schema,
-            final String element, final String qualifier, final String value) {
+    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String value) {
+        return addMetadataValue(schema, element, qualifier, null, value, null, -1);
+    }
+
+    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
+                                                    String value) {
+        return addMetadataValue(schema, element, qualifier, language, value, null, -1);
+    }
+
+    protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
+                                                    String value, String authority, int confidence) {
+
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, language,
+                                    value, authority, confidence);
         } catch (Exception e) {
             return handleException(e);
         }
+
         return this;
     }
 
@@ -152,7 +191,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     protected WorkspaceItemBuilder setMetadataSingleValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, null,
                     value);
         } catch (Exception e) {
             return handleException(e);
@@ -165,12 +204,38 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
+    public WorkspaceItemBuilder withTitleForLanguage(final String title, final String language) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "title", null, language, title);
+    }
+
     public WorkspaceItemBuilder withIssueDate(final String issueDate) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "date", "issued", new DCDate(issueDate).toString());
     }
 
     public WorkspaceItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
+    }
+
+    public WorkspaceItemBuilder withAuthor(String authorName, String authority) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", null, authorName, authority,
+                                600);
+    }
+
+    public WorkspaceItemBuilder withAuthorAffilitation(final String affilation) {
+        return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
+    }
+
+    public WorkspaceItemBuilder withEditor(final String editorName) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
+    }
+
+    public WorkspaceItemBuilder withEditor(String editorName, String authority) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "editor", null, editorName, authority,
+                                600);
+    }
+
+    public WorkspaceItemBuilder withProject(final String projectName) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "relation", "project", projectName);
     }
 
     public WorkspaceItemBuilder withSubject(final String subject) {
@@ -181,10 +246,30 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "identifier", "issn", issn);
     }
 
-    public WorkspaceItemBuilder withEntityType(final String entityType) {
-        return addMetadataValue("dspace", "entity", "type", entityType);
+    public WorkspaceItemBuilder withSubjectForLanguage(final String subject, final String language) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, language, subject);
     }
 
+    public WorkspaceItemBuilder withEntityType(final String entityType) {
+        return setMetadataSingleValue("dspace", "entity", "type", entityType);
+    }
+
+    public WorkspaceItemBuilder withOrcidIdentifier(String orcid) {
+        return addMetadataValue("person", "identifier", "orcid", orcid);
+    }
+
+    public WorkspaceItemBuilder withCustomUrl(String url) {
+        return setMetadataSingleValue("dspace", "customurl", null, url);
+    }
+
+    public WorkspaceItemBuilder withCustomIdentifierUrl(String url, String authority) {
+        return addMetadataValue("oairecerif", "identifier", "url", Item.ANY, url, authority, 600);
+    }
+
+    public WorkspaceItemBuilder withOldCustomUrl(String url) {
+        return addMetadataValue("dspace", "customurl", "old", url);
+
+    }
     public WorkspaceItemBuilder withAbstract(final String subject) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(),"description", "abstract", subject);
     }
@@ -208,6 +293,10 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return this;
     }
 
+    public WorkspaceItemBuilder withFulltext(String name, String source, byte[] content) {
+        return withFulltext(name, source, new ByteArrayInputStream(content));
+    }
+
     public WorkspaceItemBuilder withFulltext(String name, String source, InputStream is) {
         try {
             Item item = workspaceItem.getItem();
@@ -219,4 +308,20 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         }
         return this;
     }
+
+    public WorkspaceItemBuilder withCOARNotifyService(NotifyServiceEntity notifyService, String pattern) {
+        Item item = workspaceItem.getItem();
+
+        try {
+            NotifyPatternToTrigger notifyPatternToTrigger = notifyPatternToTriggerService.create(context);
+            notifyPatternToTrigger.setItem(item);
+            notifyPatternToTrigger.setNotifyService(notifyService);
+            notifyPatternToTrigger.setPattern(pattern);
+            notifyPatternToTriggerService.update(context, notifyPatternToTrigger);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
+    }
+
 }

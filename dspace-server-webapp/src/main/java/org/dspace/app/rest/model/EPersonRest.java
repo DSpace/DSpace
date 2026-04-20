@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -20,20 +20,18 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = EPersonRest.GROUPS,
-                method = "getGroups"
-        )
+    @LinkRest(name = EPersonRest.GROUPS, method = "getGroups")
 })
 public class EPersonRest extends DSpaceObjectRest {
     public static final String NAME = "eperson";
+    public static final String PLURAL_NAME = "epersons";
     public static final String CATEGORY = RestAddressableModel.EPERSON;
 
     public static final String GROUPS = "groups";
 
     private String netid;
 
-    private Date lastActive;
+    private Instant lastActive;
 
     private boolean canLogIn;
 
@@ -52,6 +50,11 @@ public class EPersonRest extends DSpaceObjectRest {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public String getNetid() {
         return netid;
     }
@@ -60,11 +63,11 @@ public class EPersonRest extends DSpaceObjectRest {
         this.netid = netid;
     }
 
-    public Date getLastActive() {
+    public Instant getLastActive() {
         return lastActive;
     }
 
-    public void setLastActive(Date lastActive) {
+    public void setLastActive(Instant lastActive) {
         this.lastActive = lastActive;
     }
 

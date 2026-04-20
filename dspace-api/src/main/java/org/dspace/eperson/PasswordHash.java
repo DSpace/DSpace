@@ -16,10 +16,10 @@ import java.util.Arrays;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * For handling digested secrets (such as passwords).
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author mwood
  */
 public class PasswordHash {
-    private static final Logger log = LoggerFactory.getLogger(PasswordHash.class);
+    private static final Logger log = LogManager.getLogger();
     private static final ConfigurationService config
         = DSpaceServicesFactory.getInstance().getConfigurationService();
     private static final Charset UTF_8 = Charset.forName("UTF-8"); // Should always succeed:  UTF-8 is required
@@ -133,7 +133,7 @@ public class PasswordHash {
         try {
             hash = digest(salt, algorithm, password);
         } catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage());
+            log.error(e::getMessage);
             hash = new byte[] {0};
         }
     }
@@ -149,7 +149,7 @@ public class PasswordHash {
         try {
             candidate = digest(salt, algorithm, secret);
         } catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage());
+            log.error(e::getMessage);
             return false;
         }
         return Arrays.equals(candidate, hash);
@@ -225,7 +225,7 @@ public class PasswordHash {
         if (null == rng) {
             rng = new SecureRandom();
             log.info("Initialized a random number stream using {} provided by {}",
-                     rng.getAlgorithm(), rng.getProvider());
+                    rng::getAlgorithm, rng::getProvider);
             rngUses = 0;
         }
 

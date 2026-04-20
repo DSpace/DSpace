@@ -58,12 +58,12 @@ public class HarvestThread extends Thread {
             } catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this.toString());
                 log.error(e.getMessage() + " " + e.getCause());
-                hc.setHarvestMessage("Runtime error occured while generating an OAI response");
+                hc.setHarvestMessage("Runtime error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             } catch (Exception ex) {
                 log.error("General exception in thread: " + this.toString());
                 log.error(ex.getMessage() + " " + ex.getCause());
-                hc.setHarvestMessage("Error occured while generating an OAI response");
+                hc.setHarvestMessage("Error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             } finally {
                 try {

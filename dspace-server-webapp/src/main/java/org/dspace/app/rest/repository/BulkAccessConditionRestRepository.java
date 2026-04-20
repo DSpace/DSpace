@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.it)
  */
-@Component(BulkAccessConditionRest.CATEGORY + "." + BulkAccessConditionRest.NAME)
+@Component(BulkAccessConditionRest.CATEGORY + "." + BulkAccessConditionRest.PLURAL_NAME)
 public class BulkAccessConditionRestRepository extends DSpaceRestRepository<BulkAccessConditionRest, String> {
 
     @Autowired

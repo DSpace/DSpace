@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowException;

@@ -10,6 +10,7 @@ package org.dspace.curate;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +19,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -90,6 +93,7 @@ public class Curator {
     protected TaskResolver resolver = new TaskResolver();
     protected TxScope txScope = TxScope.OPEN;
     protected CommunityService communityService;
+    protected DSpaceObjectUtils dspaceObjectUtils;
     protected ItemService itemService;
     protected HandleService handleService;
     protected DSpaceRunnableHandler handler;
@@ -109,6 +113,7 @@ public class Curator {
      */
     public Curator() {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
+        dspaceObjectUtils = UtilServiceFactory.getInstance().getDSpaceObjectUtils();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
         resolver = new TaskResolver();
@@ -248,7 +253,7 @@ public class Curator {
             //Save the context on current execution thread
             curationCtx.set(c);
 
-            DSpaceObject dso = handleService.resolveToObject(c, id);
+            DSpaceObject dso = dspaceObjectUtils.findDSpaceObject(c,id);
             if (dso != null) {
                 curate(dso);
             } else {
@@ -330,7 +335,7 @@ public class Curator {
         }
         if (taskQ != null) {
             taskQ.enqueue(queueId, new TaskQueueEntry(c.getCurrentUser().getName(),
-                                                      System.currentTimeMillis(), perfList, id));
+                                                      Instant.now().toEpochMilli(), perfList, id));
         } else {
             System.out.println("curate - no TaskQueue implemented");
         }

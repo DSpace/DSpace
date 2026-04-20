@@ -12,12 +12,14 @@ import static java.util.Collections.singletonList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -32,10 +34,13 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFunctionConfiguration;
+import org.dspace.discovery.configuration.MultiLanguageDiscoverSearchFilterFacet;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.services.ConfigurationService;
@@ -110,15 +115,21 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                     String sortDirection)
             throws IllegalArgumentException, SearchServiceException {
 
-        DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
-                                                           dsoTypes);
+        DiscoverQuery queryArgs =
+            buildCommonDiscoverQuery(
+                context, discoveryConfiguration, query, searchFilters,
+                dsoTypes, scope
+            );
 
         //When all search criteria are set, configure facet results
         addFaceting(context, scope, queryArgs, discoveryConfiguration);
 
         //Configure pagination and sorting
         configurePagination(pageSize, offset, queryArgs);
-        configureSorting(sortProperty, sortDirection, queryArgs, discoveryConfiguration.getSearchSortConfiguration());
+        configureSorting(
+            sortProperty, sortDirection, queryArgs, discoveryConfiguration.getSearchSortConfiguration(),
+            scope
+        );
 
         addDiscoveryHitHighlightFields(discoveryConfiguration, queryArgs);
         return queryArgs;
@@ -185,7 +196,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
             throws IllegalArgumentException {
 
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
-                                                           dsoTypes);
+                                                           dsoTypes, scope);
 
         //When all search criteria are set, configure facet results
         addFacetingForFacets(context, scope, prefix, queryArgs, discoveryConfiguration, facetName, pageSize);
@@ -200,8 +211,8 @@ public class DiscoverQueryBuilder implements InitializingBean {
     }
 
     private void configurePaginationForFacets(Long offset, DiscoverQuery queryArgs) {
-        if (offset != null) {
-            queryArgs.setFacetOffset(Math.toIntExact(offset));
+        if (offset != null && queryArgs.getFacetFields().size() == 1) {
+            queryArgs.getFacetFields().get(0).setOffset(offset.intValue());
         }
     }
 
@@ -241,12 +252,17 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         } else {
 
+            String indexFieldName = facet.getIndexFieldName();
+            if (facet instanceof MultiLanguageDiscoverSearchFilterFacet) {
+                indexFieldName = context.getCurrentLocale().getLanguage() + "_" + indexFieldName;
+            }
+
             //Add one to our facet limit to make sure that if we have more then the shown facets that we show our
             // "show more" url
             int facetLimit = pageSize + 1;
             //This should take care of the sorting for us
             prefix = StringUtils.isNotBlank(prefix) ? prefix.toLowerCase() : null;
-            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit,
+            queryArgs.addFacetField(new DiscoverFacetField(indexFieldName, facet.getType(), facetLimit,
                                                            facet.getSortOrderSidebar(),
                                                            StringUtils.trimToNull(prefix)));
         }
@@ -254,9 +270,11 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration,
                                                    String query,
-                                                   List<QueryBuilderSearchFilter> searchFilters, List<String> dsoTypes)
+                                                   List<QueryBuilderSearchFilter> searchFilters,
+                                                   List<String> dsoTypes,
+                                                   IndexableObject scope)
             throws IllegalArgumentException {
-        DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration);
+        DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration, scope);
 
         queryArgs.addFilterQueries(convertFiltersToString(context, discoveryConfiguration, searchFilters));
 
@@ -275,19 +293,27 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return queryArgs;
     }
 
-    private DiscoverQuery buildBaseQueryForConfiguration(DiscoveryConfiguration discoveryConfiguration) {
+    private DiscoverQuery buildBaseQueryForConfiguration(DiscoveryConfiguration discoveryConfiguration,
+        IndexableObject scope) {
+
         DiscoverQuery queryArgs = new DiscoverQuery();
         queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
-        queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
-                                                         .toArray(
-                                                                 new String[discoveryConfiguration
-                                                                         .getDefaultFilterQueries()
-                                                                         .size()]));
+
+        String[] queryArray = discoveryConfiguration.getDefaultFilterQueries()
+            .toArray(new String[discoveryConfiguration.getDefaultFilterQueries().size()]);
+
+        if (scope != null && discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
+            for (int i = 0; i < queryArray.length; i++) {
+                queryArray[i] = MessageFormat.format(queryArray[i], scope.getID());
+            }
+        }
+
+        queryArgs.addFilterQueries(queryArray);
         return queryArgs;
     }
 
     private void configureSorting(String sortProperty, String sortDirection, DiscoverQuery queryArgs,
-                                  DiscoverySortConfiguration searchSortConfiguration)
+        DiscoverySortConfiguration searchSortConfiguration, IndexableObject scope)
             throws IllegalArgumentException, SearchServiceException {
         String sortBy = sortProperty;
         String sortOrder = sortDirection;
@@ -302,7 +328,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         if (StringUtils.isNotBlank(sortBy) && !isConfigured(sortBy, searchSortConfiguration)) {
             throw new SearchServiceException(
-                    "The field: " + sortBy + "is not configured for the configuration!");
+                    "The field: " + sortBy + " is not configured for the configuration!");
         }
 
 
@@ -311,8 +337,18 @@ public class DiscoverQueryBuilder implements InitializingBean {
                 .getSortFieldConfiguration(sortBy);
 
         if (sortFieldConfiguration != null) {
-            String sortField = searchService
-                    .toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+
+            String sortField;
+
+            if (DiscoverySortFunctionConfiguration.SORT_FUNCTION.equals(sortFieldConfiguration.getType())) {
+                sortField = MessageFormat.format(
+                    ((DiscoverySortFunctionConfiguration) sortFieldConfiguration).getFunction(scope.getID()),
+                    scope.getID());
+            } else {
+                sortField = searchService
+                    .toSortFieldIndex(
+                        sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+            }
 
             if ("asc".equalsIgnoreCase(sortOrder)) {
                 queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);
@@ -364,7 +400,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private String getDsoType(String dsoType) throws IllegalArgumentException {
         for (IndexFactory indexFactory : indexableFactories) {
-            if (StringUtils.equalsIgnoreCase(indexFactory.getType(), dsoType)) {
+            if (Strings.CI.equals(indexFactory.getType(), dsoType)) {
                 return indexFactory.getType();
             }
         }
@@ -407,11 +443,19 @@ public class DiscoverQueryBuilder implements InitializingBean {
                     throw new IllegalArgumentException(searchFilter.getName() + " is not a valid search filter");
                 }
 
-                DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context,
-                                                                              filter.getIndexFieldName(),
-                                                                              searchFilter.getOperator(),
-                                                                              searchFilter.getValue(),
-                                                                              discoveryConfiguration);
+                String field = filter.getIndexFieldName();
+                if (filter instanceof MultiLanguageDiscoverSearchFilterFacet) {
+                    field = context.getCurrentLocale().getLanguage() + "_" + field;
+                }
+
+                DiscoverFilterQuery filterQuery =
+                    searchService.toFilterQuery(
+                        context,
+                        field,
+                        searchFilter.getOperator(),
+                        searchFilter.getValue(),
+                        discoveryConfiguration
+                );
 
                 if (filterQuery != null) {
                     filterQueries.add(filterQuery.getFilterQuery());

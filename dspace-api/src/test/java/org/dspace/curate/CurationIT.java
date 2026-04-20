@@ -43,8 +43,9 @@ public class CurationIT extends AbstractIntegrationTestWithDatabase {
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            script.initialize(args, testDSpaceRunnableHandler, null);
-            script.run();
+            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                script.run();
+            }
         }
     }
 
@@ -69,8 +70,9 @@ public class CurationIT extends AbstractIntegrationTestWithDatabase {
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            script.initialize(args, testDSpaceRunnableHandler, null);
-            script.run();
+            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                script.run();
+            }
         }
     }
 }

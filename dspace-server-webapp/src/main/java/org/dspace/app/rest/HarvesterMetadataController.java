@@ -9,9 +9,9 @@ package org.dspace.app.rest;
 
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.HarvesterMetadataRest;

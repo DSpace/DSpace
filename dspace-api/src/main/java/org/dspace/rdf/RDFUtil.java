@@ -12,8 +12,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -90,7 +91,7 @@ public class RDFUtil {
 
     /**
      * Loads converted data of a DSpaceObject identified by the URI provided
-     * as {@code identifier}. This method uses the RDFStorage configurated in
+     * as {@code identifier}. This method uses the RDFStorage configured in
      * the DSpace configuration.  Close the model
      * ({@link com.hp.hpl.jena.rdf.model.Model#close() Model.close()}) as soon
      * as possible to free system resources.
@@ -192,7 +193,7 @@ public class RDFUtil {
         } else {
             boolean found = false;
             for (String type : dsoTypes) {
-                if (StringUtils.equalsIgnoreCase(Constants.typeText[dso.getType()], type.trim())) {
+                if (Strings.CI.equals(Constants.typeText[dso.getType()], type.trim())) {
                     found = true;
                     break;
                 }
@@ -200,7 +201,7 @@ public class RDFUtil {
             if (!found) {
                 log.warn("Configuration of DSpaceObjects of type "
                              + Constants.typeText[dso.getType()]
-                             + " prohibitted by configuration.");
+                             + " prohibited by configuration.");
                 return null;
             }
         }

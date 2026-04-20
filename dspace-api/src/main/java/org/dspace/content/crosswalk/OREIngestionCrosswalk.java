@@ -14,8 +14,8 @@ import java.net.ConnectException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -99,7 +99,7 @@ public class OREIngestionCrosswalk
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
-        Date timeStart = new Date();
+        Instant timeStart = Instant.now();
 
         if (dso.getType() != Constants.ITEM) {
             throw new CrosswalkObjectNotSupported("OREIngestionCrosswalk can only crosswalk an Item.");
@@ -173,7 +173,7 @@ public class OREIngestionCrosswalk
                 try {
                     // Make sure the url string escapes all the oddball characters
                     String processedURL = encodeForURL(href);
-                    // Generate a requeset for the aggregated resource
+                    // Generate a request for the aggregated resource
                     ARurl = new URL(processedURL);
                     in = ARurl.openStream();
                 } catch (FileNotFoundException fe) {
@@ -209,7 +209,8 @@ public class OREIngestionCrosswalk
 
         }
         log.info(
-            "OREIngest for Item " + item.getID() + " took: " + (new Date().getTime() - timeStart.getTime()) + "ms.");
+            "OREIngest for Item " + item.getID() + " took: " +
+                (Instant.now().toEpochMilli() - timeStart.toEpochMilli()) + "ms.");
     }
 
 
@@ -219,17 +220,17 @@ public class OREIngestionCrosswalk
      * @param sourceString source unescaped string
      */
     private String encodeForURL(String sourceString) {
-        Character lowalpha[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+        Character[] lowalpha = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
             'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
             's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-        Character upalpha[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        Character[] upalpha = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
             'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
             'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-        Character digit[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        Character mark[] = {'-', '_', '.', '!', '~', '*', '\'', '(', ')'};
+        Character[] digit = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        Character[] mark = {'-', '_', '.', '!', '~', '*', '\'', '(', ')'};
 
         // reserved
-        Character reserved[] = {';', '/', '?', ':', '@', '&', '=', '+', '$', ',', '%', '#'};
+        Character[] reserved = {';', '/', '?', ':', '@', '&', '=', '+', '$', ',', '%', '#'};
 
         Set<Character> URLcharsSet = new HashSet<Character>();
         URLcharsSet.addAll(Arrays.asList(lowalpha));

@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.LinkNotFoundException;
 import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
@@ -21,6 +21,7 @@ import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.DSpaceControlledVocabulary;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (4Science.it)
  */
-@Component(VocabularyRest.CATEGORY + "." + VocabularyEntryDetailsRest.NAME + "." + VocabularyEntryDetailsRest.CHILDREN)
+@Component(VocabularyRest.CATEGORY + "." + VocabularyEntryDetailsRest.PLURAL_NAME + "." +
+    VocabularyEntryDetailsRest.CHILDREN)
 public class VocabularyEntryDetailsChildrenLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
@@ -60,11 +62,19 @@ public class VocabularyEntryDetailsChildrenLinkRepository extends AbstractDSpace
         List<VocabularyEntryDetailsRest> results = new ArrayList<VocabularyEntryDetailsRest>();
         ChoiceAuthority authority = choiceAuthorityService.getChoiceAuthorityByAuthorityName(vocabularyName);
         if (StringUtils.isNotBlank(id) && authority.isHierarchical()) {
+            //FIXME hack to deal with an improper use on the angular side of the node id (otherinformation.id) to
+            // build a vocabulary entry details ID
+            boolean fix = false;
+            if (authority instanceof DSpaceControlledVocabulary && !StringUtils.startsWith(id, vocabularyName)) {
+                id = vocabularyName + DSpaceControlledVocabulary.ID_SPLITTER + id;
+                fix = true;
+            }
             Choices choices = choiceAuthorityService.getChoicesByParent(vocabularyName, id, (int) pageable.getOffset(),
                     pageable.getPageSize(), context.getCurrentLocale().toString());
             for (Choice value : choices.values) {
-                results.add(authorityUtils.convertEntryDetails(value, vocabularyName, authority.isHierarchical(),
-                        utils.obtainProjection()));
+                results.add(authorityUtils.convertEntryDetails(fix, value, vocabularyName, authority.isHierarchical(),
+                                                               authority.storeAuthorityInMetadata(),
+                                                               utils.obtainProjection()));
             }
             Page<VocabularyEntryDetailsRest> resources = new PageImpl<VocabularyEntryDetailsRest>(results, pageable,
                     choices.total);

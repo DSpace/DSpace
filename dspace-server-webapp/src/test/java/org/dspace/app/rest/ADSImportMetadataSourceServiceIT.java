@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.el.MethodNotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -117,7 +116,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
     }
 
-    @Test(expected = MethodNotFoundException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void adsImportMetadataFindMatchingRecordsTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -169,7 +168,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Babak, S.");
         MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Di Fiore, L.");
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Virgo Collaboration");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.1103/PhysRevLett.116.061102");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1103/PhysRevLett.116.061102");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "article");
         MetadatumDTO adsbibcode = createMetadatumDTO("dc", "identifier", "other", "2016PhRvL.116f1102A");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2016");
@@ -220,7 +219,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "Babak, S.");
         MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Vorvick, C.");
         MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "Wade, M.");
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.1103/PhysRevLett.119.161101");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1103/PhysRevLett.119.161101");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "article");
         MetadatumDTO adsbibcode2 = createMetadatumDTO("dc", "identifier", "other", "2017PhRvL.119p1101A");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2017");

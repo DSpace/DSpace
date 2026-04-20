@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Constants;
 import org.springframework.util.FileCopyUtils;
 
@@ -71,7 +72,7 @@ public class MigrationUtils {
                 // {tablename}_{columnname(s)}_{suffix}
                 // see: http://stackoverflow.com/a/4108266/3750035
                 constraintName = StringUtils.lowerCase(tableName);
-                if (!StringUtils.equals(constraintSuffix, "pkey")) {
+                if (!Strings.CS.equals(constraintSuffix, "pkey")) {
                     constraintName += "_" + StringUtils.lowerCase(columnName);
                 }
 
@@ -108,7 +109,7 @@ public class MigrationUtils {
 
         // As long as we have a constraint name, drop it
         if (constraintName != null && !constraintName.isEmpty()) {
-            // This drop constaint SQL should be the same in all databases
+            // This drop constraint SQL should be the same in all databases
             String dropConstraintSQL = "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName;
             if (cascade) {
                 dropConstraintSQL += " CASCADE";

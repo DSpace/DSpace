@@ -7,25 +7,23 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import java.sql.SQLException;
-import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
-import org.dspace.util.TimeHelpers;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -39,6 +37,9 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
     private ResourcePolicyService resourcePolicyService;
     @Autowired
     private AccessConditionConfigurationService accessConditionConfigurationService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
@@ -57,13 +58,13 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
 
         // Clamp access condition dates to midnight UTC
         for (AccessConditionDTO condition : accessConditions) {
-            Date date = condition.getStartDate();
+            LocalDate date = condition.getStartDate();
             if (null != date) {
-                condition.setStartDate(TimeHelpers.toMidnightUTC(date));
+                condition.setStartDate(date);
             }
             date = condition.getEndDate();
             if (null != date) {
-                condition.setEndDate(TimeHelpers.toMidnightUTC(date));
+                condition.setEndDate(date);
             }
         }
 
@@ -72,6 +73,9 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         if (absolutePath.length == 1) {
             // to replace completely the access conditions
             resourcePolicyService.removePolicies(context, item, ResourcePolicy.TYPE_CUSTOM);
+            if (isAppendModeDisabled() && item.isArchived()) {
+                resourcePolicyService.removePolicies(context, item, ResourcePolicy.TYPE_INHERITED, Constants.READ);
+            }
         }
 
         // apply policies
@@ -92,11 +96,15 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
     }
 
     private void verifyAccessConditions(Context context, AccessConditionConfiguration configuration,
-            List<AccessConditionDTO> accessConditions) throws SQLException, AuthorizeException, ParseException {
+            List<AccessConditionDTO> accessConditions) {
         for (AccessConditionDTO dto : accessConditions) {
             AccessConditionResourcePolicyUtils.canApplyResourcePolicy(context, configuration.getOptions(),
                     dto.getName(), dto.getStartDate(), dto.getEndDate());
         }
+    }
+
+    private boolean isAppendModeDisabled() {
+        return !configurationService.getBooleanProperty("core.authorization.installitem.inheritance-read.append-mode");
     }
 
     @Override

@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ public class ProviderStackTest {
             this.prefix = prefix;
         }
 
+        @Override
         public String getPrefix() {
             return prefix;
         }
@@ -55,6 +57,7 @@ public class ProviderStackTest {
             this.order = order;
         }
 
+        @Override
         public int getOrder() {
             return order;
         }
@@ -77,11 +80,15 @@ public class ProviderStackTest {
             }
 
             public <T> List<T> getServicesByType(Class<T> type) {
-                return new ArrayList<T>();
+                return new ArrayList<>();
             }
 
             public List<String> getServicesNames() {
-                return new ArrayList<String>();
+                return new ArrayList<>();
+            }
+
+            public <T> Map<String, T> getServicesWithNamesByType(Class<T> type) {
+                return new HashMap<>();
             }
 
             public boolean isServiceExists(String name) {
@@ -106,11 +113,10 @@ public class ProviderStackTest {
             public void unregisterService(String name) {
             }
         };
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(sm, Provider.class);
-        assertNotNull(providers.hashCode());
+        ProviderStack<Provider> providers = new ProviderStack<>(sm, Provider.class);
         assertNotNull(providers.toString());
         assertEquals(0, providers.size());
-        assertTrue(providers.getProviders().size() == 0);
+        assertTrue(providers.getProviders().isEmpty());
 
         providers.clear();
         providers = null;
@@ -121,13 +127,12 @@ public class ProviderStackTest {
      */
     @Test
     public void testProviderStackTArray() {
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
         // check the order
@@ -148,13 +153,12 @@ public class ProviderStackTest {
     @Test
     public void testAddProvider() {
         // preload
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
         // check the order
@@ -213,13 +217,12 @@ public class ProviderStackTest {
     @Test
     public void testRemoveProvider() {
         // preload
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -244,13 +247,12 @@ public class ProviderStackTest {
     @Test
     public void testGetProviders() {
         // preload
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -259,7 +261,7 @@ public class ProviderStackTest {
         assertEquals(4, l.size());
         l = null;
 
-        providers = new ProviderStack<Provider>();
+        providers = new ProviderStack<>();
         l = providers.getProviders();
         assertNotNull(l);
         assertEquals(0, l.size());
@@ -275,13 +277,12 @@ public class ProviderStackTest {
     @Test
     public void testGetIterator() {
         // preload
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -297,7 +298,7 @@ public class ProviderStackTest {
         assertNotNull(it.next());
         assertFalse(it.hasNext());
 
-        providers = new ProviderStack<Provider>();
+        providers = new ProviderStack<>();
         it = providers.getIterator();
         assertNotNull(it);
         assertFalse(it.hasNext());
@@ -313,13 +314,12 @@ public class ProviderStackTest {
     @Test
     public void testGetProvider() {
         // preload
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -342,13 +342,12 @@ public class ProviderStackTest {
     @Test
     public void testSize() {
         // preload
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -362,18 +361,16 @@ public class ProviderStackTest {
     @Test
     public void testClear() {
         // preload
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             new UnorderedProvider("ccc"),
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
         providers.clear();
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(0, providers.size());
 
@@ -388,14 +385,13 @@ public class ProviderStackTest {
     public void testRefresh() {
         Provider p1 = new OrderedProvider("aaa", 2);
         Provider p2 = new UnorderedProvider("ccc");
-        ProviderStack<Provider> providers = new ProviderStack<Provider>(new Provider[] {
+        ProviderStack<Provider> providers = new ProviderStack<>(new Provider[] {
             p2,
             new UnorderedProvider("ddd"),
             new OrderedProvider("bbb", 5),
             p1
         });
 
-        assertNotNull(providers.hashCode());
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 

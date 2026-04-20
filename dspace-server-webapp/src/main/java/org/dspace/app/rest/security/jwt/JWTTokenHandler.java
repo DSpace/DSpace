@@ -9,9 +9,8 @@ package org.dspace.app.rest.security.jwt;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jose.CompressionAlgorithm;
 import com.nimbusds.jose.EncryptionMethod;
@@ -31,16 +30,17 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
@@ -59,7 +59,7 @@ public abstract class JWTTokenHandler {
     private static final int MAX_CLOCK_SKEW_SECONDS = 60;
     private static final String AUTHORIZATION_TOKEN_PARAMETER = "authentication-token";
 
-    private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private List<JWTClaimProvider> jwtClaimProviders;
@@ -135,7 +135,7 @@ public abstract class JWTTokenHandler {
         // As long as the JWT is valid, parse all claims and return the EPerson
         if (isValidToken(request, signedJWT, jwtClaimsSet, ePerson)) {
 
-            log.debug("Received valid token for username: " + ePerson.getEmail());
+            log.debug("Received valid token for username: {}", ePerson::getEmail);
 
             for (JWTClaimProvider jwtClaimProvider : jwtClaimProviders) {
                 jwtClaimProvider.parseClaim(context, request, jwtClaimsSet);
@@ -143,7 +143,7 @@ public abstract class JWTTokenHandler {
 
             return ePerson;
         } else {
-            log.warn(getIpAddress(request) + " tried to use an expired or non-valid token");
+            log.warn("{} tried to use an expired or non-valid token", getIpAddress(request));
             return null;
         }
     }
@@ -155,9 +155,10 @@ public abstract class JWTTokenHandler {
      * @param request current Request
      * @param previousLoginDate date of last login (before this one)
      * @return string version of signed JWT
-     * @throws JOSEException
+     * @throws JOSEException passed through.
+     * @throws SQLException passed through.
      */
-    public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate)
+    public String createTokenForEPerson(Context context, HttpServletRequest request, Instant previousLoginDate)
         throws JOSEException, SQLException {
 
         // Verify that the user isn't trying to use a short lived token to generate another token
@@ -279,11 +280,11 @@ public abstract class JWTTokenHandler {
             JWSVerifier verifier = new MACVerifier(buildSigningKey(ePerson));
 
             //If token is valid and not expired return eperson in token
-            Date expirationTime = jwtClaimsSet.getExpirationTime();
+            java.util.Date expirationTime = jwtClaimsSet.getExpirationTime();
             return signedJWT.verify(verifier)
                 && expirationTime != null
                 //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
-                && DateUtils.isAfter(expirationTime, new Date(), MAX_CLOCK_SKEW_SECONDS);
+                && DateUtils.isAfter(expirationTime, java.util.Date.from(Instant.now()), MAX_CLOCK_SKEW_SECONDS);
         }
     }
 
@@ -355,7 +356,8 @@ public abstract class JWTTokenHandler {
         }
 
         return builder
-            .expirationTime(new Date(System.currentTimeMillis() + getExpirationPeriod()))
+            .expirationTime(java.util.Date.from(
+                Instant.ofEpochMilli(Instant.now().toEpochMilli() + getExpirationPeriod())))
             .build();
     }
 
@@ -399,7 +401,7 @@ public abstract class JWTTokenHandler {
      * @return EPerson object of current user, with an updated session salt
      * @throws SQLException
      */
-    protected EPerson updateSessionSalt(final Context context, final Date previousLoginDate) throws SQLException {
+    protected EPerson updateSessionSalt(final Context context, final Instant previousLoginDate) throws SQLException {
         EPerson ePerson;
 
         try {
@@ -409,7 +411,8 @@ public abstract class JWTTokenHandler {
             //This allows a user to login on multiple devices/browsers at the same time.
             if (StringUtils.isBlank(ePerson.getSessionSalt())
                 || previousLoginDate == null
-                || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > getExpirationPeriod())) {
+                || (ePerson.getLastActive().toEpochMilli() - previousLoginDate.toEpochMilli() > getExpirationPeriod())
+            ) {
                 log.debug("Regenerating auth token as session salt was either empty or expired..");
                 ePerson.setSessionSalt(generateRandomKey());
                 ePersonService.update(context, ePerson);

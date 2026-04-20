@@ -21,6 +21,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -30,8 +32,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,9 +40,9 @@ import org.xml.sax.SAXException;
 /**
  * @author Richard Jones
  *
- * This class takes an xml document as passed in the arguments and
+ * This class takes an XML document as passed in the arguments and
  * uses it to create metadata elements in the Metadata Registry if
- * they do not already exist
+ * they do not already exist.
  *
  * The format of the XML file is as follows:
  *
@@ -69,7 +69,7 @@ public class MetadataImporter {
     /**
      * logging category
      */
-    private static final Logger log = LoggerFactory.getLogger(MetadataImporter.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Default constructor
@@ -89,6 +89,7 @@ public class MetadataImporter {
      * @throws SAXException                 if parser error
      * @throws NonUniqueMetadataException   if duplicate metadata
      * @throws RegistryImportException      if import fails
+     * @throws XPathExpressionException     passed through
      **/
     public static void main(String[] args)
         throws ParseException, SQLException, IOException, TransformerException,
@@ -125,6 +126,7 @@ public class MetadataImporter {
      * @throws SAXException                 if parser error
      * @throws NonUniqueMetadataException   if duplicate metadata
      * @throws RegistryImportException      if import fails
+     * @throws XPathExpressionException     passed through
      */
     public static void loadRegistry(String file, boolean forceUpdate)
         throws SQLException, IOException, TransformerException, ParserConfigurationException, AuthorizeException,
@@ -203,7 +205,7 @@ public class MetadataImporter {
 
         if (s == null) {
             // Schema does not exist - create
-            log.info("Registering Schema " + name + " (" + namespace + ")");
+            log.info("Registering Schema {}({})", name, namespace);
             metadataSchemaService.create(context, name, namespace);
         } else {
             // Schema exists - if it's the same namespace, allow the type imports to continue
@@ -215,7 +217,7 @@ public class MetadataImporter {
             // It's a different namespace - have we been told to update?
             if (updateExisting) {
                 // Update the existing schema namespace and continue to type import
-                log.info("Updating Schema " + name + ": New namespace " + namespace);
+                log.info("Updating Schema {}: New namespace {}", name, namespace);
                 s.setNamespace(namespace);
                 metadataSchemaService.update(context, s);
             } else {
@@ -274,7 +276,7 @@ public class MetadataImporter {
         if (qualifier == null) {
             fieldName = schema + "." + element;
         }
-        log.info("Registering metadata field " + fieldName);
+        log.info("Registering metadata field {}", fieldName);
         MetadataField field = metadataFieldService.create(context, schemaObj, element, qualifier, scopeNote);
         metadataFieldService.update(context, field);
     }

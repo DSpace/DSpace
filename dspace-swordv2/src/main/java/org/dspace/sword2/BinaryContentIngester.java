@@ -75,7 +75,7 @@ public class BinaryContentIngester extends AbstractSwordContentIngester {
                 context, item, "dc", "description", null, null,
                 "Zip file deposted by SWORD without accompanying metadata");
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, item, verboseDescription);
 
@@ -139,7 +139,7 @@ public class BinaryContentIngester extends AbstractSwordContentIngester {
             bs.setName(context, deposit.getFilename());
             bitstreamService.update(context, bs);
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, item, verboseDescription);
 

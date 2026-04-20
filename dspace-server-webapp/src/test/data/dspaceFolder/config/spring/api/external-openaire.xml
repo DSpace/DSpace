@@ -4,8 +4,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 	default-lazy-init="true">
 
-	<bean id="openAIRERestConnector"
-		class="org.dspace.external.OpenAIRERestConnector">
+	<bean id="openaireRestConnector"
+		class="org.dspace.external.OpenaireRestConnector">
 		<constructor-arg
 			value="${openaire.api.url:https://api.openaire.eu}" />
 		<property name="tokenEnabled"
@@ -18,10 +18,10 @@
 			value="${openaire.token.clientSecret}" />
 	</bean>
 	<bean
-		class="org.dspace.external.provider.impl.MockOpenAIREFundingDataProvider"
+		class="org.dspace.external.provider.impl.MockOpenaireFundingDataProvider"
 		init-method="init">
-		<property name="sourceIdentifier" value="openAIREFunding" />
-		<property name="connector" ref="openAIRERestConnector" />
+		<property name="sourceIdentifier" value="openaireFunding" />
+		<property name="connector" ref="openaireRestConnector" />
 		<property name="supportedEntityTypes">
 			<list>
 				<value>Project</value>

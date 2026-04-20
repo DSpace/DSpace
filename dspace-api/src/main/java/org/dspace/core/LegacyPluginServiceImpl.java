@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -192,7 +193,7 @@ public class LegacyPluginServiceImpl implements PluginService {
             classname = sequenceConfig.get(iname);
         }
 
-        Object result[] = (Object[]) Array.newInstance(interfaceClass, classname.length);
+        Object[] result = (Object[]) Array.newInstance(interfaceClass, classname.length);
         for (int i = 0; i < classname.length; ++i) {
             log.debug("Adding Sequence plugin for interface= " + iname + ", class=" + classname[i]);
             result[i] = getAnonymousPlugin(classname[i]);
@@ -219,10 +220,10 @@ public class LegacyPluginServiceImpl implements PluginService {
 
     // Map of named plugin classes, [intfc,name] -> class
     // Also contains intfc -> "marker" to mark when interface has been loaded.
-    private final Map<String, String> namedPluginClasses = new HashMap<>();
+    private final Map<String, String> namedPluginClasses = new ConcurrentHashMap<>();
 
     // load and cache configuration data for the given interface.
-    private void configureNamedPlugin(String iname)
+    private synchronized void configureNamedPlugin(String iname)
         throws ClassNotFoundException {
         int found = 0;
 
@@ -277,7 +278,7 @@ public class LegacyPluginServiceImpl implements PluginService {
                 for (String classname : selfNamedVals) {
                     try {
                         Class pluginClass = Class.forName(classname, true, loader);
-                        String names[] = (String[]) pluginClass.getMethod("getPluginNames").
+                        String[] names = (String[]) pluginClass.getMethod("getPluginNames").
                             invoke(null);
                         if (names == null || names.length == 0) {
                             log.error(
@@ -302,16 +303,15 @@ public class LegacyPluginServiceImpl implements PluginService {
     }
 
     // add info for a named plugin to cache, under all its names.
-    private int installNamedConfigs(String iname, String classname, String names[])
+    private int installNamedConfigs(String iname, String classname, String[] names)
         throws ClassNotFoundException {
         int found = 0;
         for (int i = 0; i < names.length; ++i) {
             String key = iname + SEP + names[i];
-            if (namedPluginClasses.containsKey(key)) {
+            String existing = namedPluginClasses.putIfAbsent(key, classname);
+            if (existing != null) {
                 log.error("Name collision in named plugin, implementation class=\"" + classname +
                               "\", name=\"" + names[i] + "\"");
-            } else {
-                namedPluginClasses.put(key, classname);
             }
             log.debug("Got Named Plugin, intfc=" + iname + ", name=" + names[i] + ", class=" + classname);
             ++found;

@@ -34,7 +34,7 @@ import org.dspace.workflow.WorkflowException;
  * The ingest methods are also given an attribute-value
  * list of "parameters"  which may modify their actions.
  * The parameters list is a generalized mechanism to pass parameters
- * from the requestor to the packager, since different packagers will
+ * from the requester to the packager, since different packagers will
  * understand different sets of parameters.
  *
  * @author Larry Stone

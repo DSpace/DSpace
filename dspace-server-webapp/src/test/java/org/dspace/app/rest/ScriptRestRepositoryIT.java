@@ -88,11 +88,15 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void findAllScriptsTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/system/scripts"))
+        getClient(token).perform(get("/api/system/scripts")
+                        .param("size", String.valueOf(scriptConfigurations.size())))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", containsInAnyOrder(
                             scriptConfigurations
@@ -450,7 +454,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                     .perform(multipart("/api/system/scripts/mock-script/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
+                                 .param("properties", mapper.writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -494,7 +498,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                     .perform(multipart("/api/system/scripts/mock-script/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
+                                 .param("properties", mapper.writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -531,7 +535,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                     .perform(multipart("/api/system/scripts/mock-script/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
+                                 .param("properties", mapper.writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -646,7 +650,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .perform(multipart("/api/system/scripts/mock-script/processes")
                                  .file(bitstreamFile)
                                  .characterEncoding("UTF-8")
-                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
+                                 .param("properties", mapper.writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -737,7 +741,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token).perform(post("/api/system/scripts/mock-script/processes")
                                          .contentType("multipart/form-data")
-                                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                                         .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(ProcessMatcher.matchProcess("mock-script",
                                                                         String.valueOf(admin.getID()),

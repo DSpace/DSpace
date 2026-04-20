@@ -8,17 +8,15 @@
 package org.dspace.app.rest.filter;
 
 import java.io.IOException;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Servlet Filter whose only role is to clean up open Context objects in
@@ -29,8 +27,6 @@ import org.slf4j.LoggerFactory;
  * @see ContextUtil
  */
 public class DSpaceRequestContextFilter implements Filter {
-    private static final Logger log = LoggerFactory.getLogger(DSpaceRequestContextFilter.class);
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         //noop

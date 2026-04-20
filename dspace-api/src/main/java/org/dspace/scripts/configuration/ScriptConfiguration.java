@@ -10,6 +10,7 @@ package org.dspace.scripts.configuration;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -37,6 +38,8 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     private String description;
 
     private String name;
+
+    private boolean isVisibleFromUI = true;
 
     /**
      * Generic getter for the description
@@ -105,8 +108,33 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
      */
     public abstract Options getOptions();
 
+    /**
+     * The getter for the options of the Script (help information)
+     * 
+     * @return the options value of this ScriptConfiguration for help
+     */
+    public Options getHelpOptions() {
+        Options options = new Options();
+
+        options.addOption(Option.builder("h").longOpt("help").desc("help").hasArg(false).required(false).build());
+
+        return options;
+    }
+
     @Override
     public void setBeanName(String beanName) {
         this.name = beanName;
+    }
+
+    /**
+     * The getter for isVisibleFromUI, the default is true
+     * @return true if the script is visible from the UI, false otherwise.
+     */
+    public boolean getIsVisibleFromUI() {
+        return this.isVisibleFromUI;
+    }
+
+    public void setIsVisibleFromUI(boolean isVisibleFromUI) {
+        this.isVisibleFromUI = isVisibleFromUI;
     }
 }

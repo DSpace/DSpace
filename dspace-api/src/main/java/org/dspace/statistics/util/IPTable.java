@@ -174,6 +174,9 @@ public class IPTable {
      * @throws IPFormatException Exception Class to deal with IPFormat errors.
      */
     public boolean contains(String ip) throws IPFormatException {
+        if (null == ip) {
+            throw new IPFormatException("Address may not be null");
+        }
 
         try {
             long ipToTest = ipToLong(InetAddress.getByName(ip));

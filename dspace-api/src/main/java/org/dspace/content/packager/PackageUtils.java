@@ -72,7 +72,7 @@ public class PackageUtils {
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
     // to initialize hash tables that convert to and from.
-    protected static final String ccMetadataMap[] = {
+    protected static final String[] ccMetadataMap = {
         // getMetadata()  ->  DC element.term
         "name",                    "dc.title",
         "introductory_text",       "dc.description",
@@ -503,7 +503,7 @@ public class PackageUtils {
                     wsi = workspaceItemService.create(context, (Collection)parent, params.useCollectionTemplate());
                 } else {
                     wsi = workspaceItemService.create(context, (Collection)parent,
-                            uuid, params.useCollectionTemplate());
+                            uuid, params.useCollectionTemplate(), false);
                 }
 
                 // Please note that we are returning an Item which is *NOT* yet in the Archive,

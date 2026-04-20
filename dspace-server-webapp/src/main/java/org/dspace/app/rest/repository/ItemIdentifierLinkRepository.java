@@ -12,9 +12,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.IdentifierRest;
 import org.dspace.app.rest.model.IdentifiersRest;
 import org.dspace.app.rest.model.ItemRest;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the identifier of an Item
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.IDENTIFIERS)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.IDENTIFIERS)
 public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
     @Autowired
     ItemService itemService;

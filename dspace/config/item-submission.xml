@@ -47,17 +47,15 @@
         <name-map collection-handle="123456789/29" submission-name="JournalVolume"/>
         <name-map collection-handle="123456789/30" submission-name="JournalIssue"/>
         -->
-        <!-- These configurations enable default submission forms per Entity type 
-            
+        <!-- These configurations enable default submission forms per Entity type
+
             The  collection-entity-type will be the entity-type attribute associated with a collection,
-            typically the entity name that is associated with a collection if any created or loaded 
+            typically the entity name that is associated with a collection if any created or loaded
             (that is usually specified in relationship-types.xml).
             - - - - - -
             PLEASE NOTICE THAT YOU WILL HAVE TO RESTART DSPACE
             - - - - - -
-            Uncomment if you intend to use them
-        -->  
-        <!-- 
+        -->
         <name-map collection-entity-type="Publication" submission-name="Publication"/>
         <name-map collection-entity-type="Person" submission-name="Person"/>
         <name-map collection-entity-type="Project" submission-name="Project"/>
@@ -65,7 +63,15 @@
         <name-map collection-entity-type="Journal" submission-name="Journal"/>
         <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
         <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
-         -->
+        <name-map collection-entity-type="Dataset" submission-name="Dataset"/>
+
+        <!-- Example of configuration using a community handle to map an Item Submission Process.
+
+            This configuration maps the submission process to the community's descendant
+            collections that do not have a mapping defined by collection-handle or entity-type
+
+        <name-map community-handle="123456789/1234" submission-name="xxxx"/>
+        -->
 
     </submission-map>
 
@@ -148,6 +154,11 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
+        <step-definition id="datasetStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
 
         <step-definition id="upload">
             <heading>submit.progressbar.upload</heading>
@@ -167,6 +178,11 @@
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
 	        <type>cclicense</type>
         </step-definition>
+        <step-definition id="custom-url">
+            <heading>submit.progressbar.CustomUrlStep</heading>
+            <processing-class>org.dspace.app.rest.submit.step.CustomUrlStep</processing-class>
+            <type>custom-url</type>
+        </step-definition>
 
 		<!-- This optional step may allow the user to select access conditions on the item -->
         <step-definition id="itemAccessConditions">
@@ -175,6 +191,11 @@
             <type>accessCondition</type>
         </step-definition>
 
+        <step-definition id="owner" mandatory="true">
+            <heading>submit.progressbar.describe.owner</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
         <!-- This optional step may enrich the current submission using information extracted
              from uploaded files or metadata.  -->
         <!-- Please note that this step will be triggered only when a request is performed,
@@ -189,28 +210,28 @@
             <type>extract</type>
         </step-definition>
 
-        <!-- OpenAIRE submission steps/forms -->
-        <step-definition id="openAIREProjectForm" mandatory="true">
+        <!-- Openaire submission steps/forms -->
+        <step-definition id="openaireProjectForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREPersonForm" mandatory="true">
+        <step-definition id="openairePersonForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREOrganizationForm" mandatory="true">
+        <step-definition id="openaireOrganizationForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREPublicationPageoneForm" mandatory="true">
+        <step-definition id="openairePublicationPageoneForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREPublicationPagetwoForm" mandatory="true">
+        <step-definition id="openairePublicationPagetwoForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -235,6 +256,20 @@
             <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
             <type>identifiers</type>
         </step-definition>
+
+        <step-definition id="coarnotify">
+            <heading>submit.progressbar.coarnotify</heading>
+            <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
+            <type>coarnotify</type>
+        </step-definition>
+
+        <!-- Detect duplicates step -->
+        <step-definition id="duplicates">
+            <heading>submit.progressbar.duplicates</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DuplicateDetectionStep</processing-class>
+            <type>duplicates</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -272,6 +307,14 @@
             <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
             <!-- <step id="sherpaPolicies"/> -->
 
+            <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
+                 that duplicate-detection.cfg is properly configured and items have been reindexed since
+                 enabling the feature -->
+            <!-- <step id="duplicates"/> -->
+
+            <!--Step will be COAR Notify services to the item -->
+            <!-- <step id="coarnotify"/> -->
+
             <!--Step will be to Upload the item -->
             <step id="upload"/>
 
@@ -282,6 +325,43 @@
 
             <!--Step will be to Sign off on the required DSpace License agreement -->
             <step id="license"/>
+        </submission-process>
+
+        <!-- Submission form used during item editing for traditional items (post-publication via EditItem system).
+             Used by FULL mode for items without an entity type. Differs from "traditional" by excluding
+             collection and license steps. -->
+        <submission-process name="traditional-edit">
+            <!--Uncommment to display the SAMPLE step as your first step -->
+            <!--<step id="sample"/> -->
+
+            <!-- To include the 'Show Identifiers' step, uncomment the line below. Make sure
+                 that identifiers.cfg and identifier-service.xml are properly configured. -->
+            <!--<step id="identifiers"/>-->
+            <!--Step will be to Describe the item. -->
+            <step id="traditionalpageone"/>
+            <step id="traditionalpagetwo"/>
+
+            <!-- Uncomment this step to allow the user to embargo or access restrict the entire item -->
+            <!-- <step id="itemAccessConditions"/> -->
+
+            <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
+            <!-- <step id="sherpaPolicies"/> -->
+
+            <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
+                 that duplicate-detection.cfg is properly configured and items have been reindexed since
+                 enabling the feature -->
+            <!-- <step id="duplicates"/> -->
+
+            <!--Step will be COAR Notify services to the item -->
+            <!-- <step id="coarnotify"/> -->
+
+            <!--Step will be to Upload the item -->
+            <step id="upload"/>
+
+            <!-- <step id="extractionstep"/> -->
+
+            <!-- Uncomment this step to allow the user to select a Creative Commons License -->
+            <!-- <step id="cclicense"/> -->
         </submission-process>
 
         <!--
@@ -299,6 +379,15 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Publication editing (post-publication via EditItem system).
+             Differs from "Publication" by excluding collection and license steps. -->
+        <submission-process name="publication-edit">
+            <!-- Publications use a custom first step, but share page 2 with "traditional" Item form -->
+            <step id="publicationStep"/>
+            <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+        </submission-process>
+
         <!--
         Submission Process for 'Person' Entities
         To enable: create a collection for Persons and add it to the <submission-map> tag linking to this process
@@ -306,8 +395,34 @@
         <submission-process name="Person">
             <step id="collection"/>
             <step id="personStep"/>
+            <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
+                 customized during submission.-->
+            <!-- <step id="custom-url"/> -->
             <step id="upload"/>
             <step id="license"/>
+        </submission-process>
+
+        <!-- Submission form used during Person editing (post-publication via EditItem system).
+             Used by OWNER mode in edititem-service.xml. Differs from "Person" by excluding
+             collection and license steps. -->
+        <submission-process name="person-edit">
+            <step id="personStep"/>
+            <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
+                 customized during submission.-->
+            <!-- <step id="custom-url"/> -->
+            <step id="upload"/>
+        </submission-process>
+
+        <!-- Submission form used during Person editing by administrators (post-publication via EditItem system).
+             Used by FULL mode in edititem-service.xml. Includes owner step for managing dspace.object.owner
+             metadata. Differs from "Person" by excluding collection and license steps. -->
+        <submission-process name="admin-person-edit">
+            <step id="personStep"/>
+            <!-- The custom-url step can be uncommented to allow the Person's custom URL (when enabled) to be
+                 customized during submission.-->
+            <!-- <step id="custom-url"/> -->
+            <step id="owner" />
+            <step id="upload" />
         </submission-process>
 
         <!--
@@ -321,6 +436,13 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Project editing (post-publication via EditItem system).
+             Differs from "Project" by excluding collection and license steps. -->
+        <submission-process name="project-edit">
+            <step id="projectStep"/>
+            <step id="upload"/>
+        </submission-process>
+
         <!--
         Submission Process for 'OrgUnit' Entities
         To enable: create a collection for OrgUnits and add it to the <submission-map> tag linking to this process
@@ -330,6 +452,13 @@
             <step id="orgUnitStep"/>
             <step id="upload"/>
             <step id="license"/>
+        </submission-process>
+
+        <!-- Submission form used during OrgUnit editing (post-publication via EditItem system).
+             Differs from "OrgUnit" by excluding collection and license steps. -->
+        <submission-process name="orgunit-edit">
+            <step id="orgUnitStep"/>
+            <step id="upload"/>
         </submission-process>
 
         <!--
@@ -343,6 +472,13 @@
             <step id="license"/>
         </submission-process>
 
+        <!-- Submission form used during Journal editing (post-publication via EditItem system).
+             Differs from "Journal" by excluding collection and license steps. -->
+        <submission-process name="journal-edit">
+            <step id="journalStep"/>
+            <step id="upload"/>
+        </submission-process>
+
         <!--
         Submission Process for 'JournalVolume' Entities
         To enable: create a collection for JournalVolumes and add it to the <submission-map> tag linking to this process
@@ -352,6 +488,13 @@
             <step id="journalVolumeStep"/>
             <step id="upload"/>
             <step id="license"/>
+        </submission-process>
+
+        <!-- Submission form used during JournalVolume editing (post-publication via EditItem system).
+             Differs from "JournalVolume" by excluding collection and license steps. -->
+        <submission-process name="journalvolume-edit">
+            <step id="journalVolumeStep"/>
+            <step id="upload"/>
         </submission-process>
 
         <!--
@@ -365,13 +508,42 @@
             <step id="license"/>
         </submission-process>
 
-        <!-- OpenAIRE submission processes -->
-        <submission-process name="openAIREPublicationSubmission">
+        <!-- Submission form used during JournalIssue editing (post-publication via EditItem system).
+             Differs from "JournalIssue" by excluding collection and license steps. -->
+        <submission-process name="journalissue-edit">
+            <step id="journalIssueStep"/>
+            <step id="upload"/>
+        </submission-process>
+
+        <!--
+        Submission Process for 'Dataset' Entities.
+        To enable: create a collection for Datasets and add it to the <submission-map> tag linking to this process
+         -->
+        <submission-process name="Dataset">
+            <step id="collection"/>
+            <!-- Datasets use a custom first step, but share page 2 with "traditional" Item form -->
+            <step id="datasetStep"/>
+            <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+            <step id="license"/>
+        </submission-process>
+
+        <!-- Submission form used during Dataset editing (post-publication via EditItem system).
+             Differs from "Dataset" by excluding collection and license steps. -->
+        <submission-process name="dataset-edit">
+            <!-- Datasets use a custom first step, but share page 2 with "traditional" Item form -->
+            <step id="datasetStep"/>
+            <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+        </submission-process>
+
+        <!-- Openaire submission processes -->
+        <submission-process name="openairePublicationSubmission">
             <step id="collection"/>
 
             <!--Step will be to Describe the item. -->
-            <step id="openAIREPublicationPageoneForm"/>
-            <step id="openAIREPublicationPagetwoForm"/>
+            <step id="openairePublicationPageoneForm"/>
+            <step id="openairePublicationPagetwoForm"/>
 
             <!--Step will be to Upload the item -->
             <!-- step id="upload-with-embargo"/-->
@@ -379,18 +551,22 @@
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
+
+            <!-- Step allows the user to select a Creative Commons License -->
+            <!-- Required for OpenAIREv4 support -->
+            <step id="cclicense"/>
         </submission-process>
-        <submission-process name="openAIREPersonSubmission">
+        <submission-process name="openairePersonSubmission">
             <step id="collection"/>
-            <step id="openAIREPersonForm"/>
+            <step id="openairePersonForm"/>
         </submission-process>
-        <submission-process name="openAIREProjectSubmission">
+        <submission-process name="openaireProjectSubmission">
             <step id="collection"/>
-            <step id="openAIREProjectForm"/>
+            <step id="openaireProjectForm"/>
         </submission-process>
-        <submission-process name="openAIREOrganizationSubmission">
+        <submission-process name="openaireOrganizationSubmission">
             <step id="collection"/>
-            <step id="openAIREOrganizationForm"/>
+            <step id="openaireOrganizationForm"/>
         </submission-process>
     </submission-definitions>
 

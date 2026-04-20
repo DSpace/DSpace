@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "count": 1,
+    "db_response_time_ms": 30,
+    "page": 1,
+    "per_page": 25,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/A5016721535",
+      "orcid": "https://orcid.org/0000-0002-9429-5000",
+      "display_name": "Claudio Giovanni Cortese",
+      "ids": {
+        "openalex": "https://openalex.org/A5023888391",
+        "orcid": "https://orcid.org/0000-0001-6187-6610",
+        "scopus": "http://www.scopus.com/inward/authorDetails.url?authorID=36455008000&partnerID=MN8TOARS"
+      },
+      "affiliations": [
+        {
+          "institution": {
+            "id": "https://openalex.org/I116067653",
+            "ror": "https://ror.org/02p77k626",
+            "display_name": "University of Rome Tor Vergata",
+            "country_code": "IT",
+            "type": "funder",
+            "lineage": [
+              "https://openalex.org/I116067653"
+            ]
+          },
+          "years": [
+            2021,
+            2019,
+            2018,
+            2017,
+            2015,
+            2014,
+            2012,
+            2011,
+            2010,
+            2009
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I4210107146",
+            "ror": "https://ror.org/01j0qa041",
+            "display_name": "Ospedali Riuniti di Ancona",
+            "country_code": "IT",
+            "type": "healthcare",
+            "lineage": [
+              "https://openalex.org/I4210107146"
+            ]
+          },
+          "years": [
+            2021
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I71267560",
+            "ror": "https://ror.org/05290cv24",
+            "display_name": "University of Naples Federico II",
+            "country_code": "IT",
+            "type": "funder",
+            "lineage": [
+              "https://openalex.org/I71267560"
+            ]
+          },
+          "years": [
+            2018,
+            2000,
+            1990,
+            1989,
+            1988,
+            1987
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I197604219",
+            "ror": "https://ror.org/02eq2w707",
+            "display_name": "National Academies of Sciences, Engineering, and Medicine",
+            "country_code": "US",
+            "type": "government",
+            "lineage": [
+              "https://openalex.org/I197604219"
+            ]
+          },
+          "years": [
+            2015
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I4210150112",
+            "ror": "https://ror.org/05rcxtd95",
+            "display_name": "Fondazione Santa Lucia",
+            "country_code": "IT",
+            "type": "healthcare",
+            "lineage": [
+              "https://openalex.org/I4210150112",
+              "https://openalex.org/I4210153126"
+            ]
+          },
+          "years": [
+            2014
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I10457146",
+            "ror": "https://ror.org/02ma57s91",
+            "display_name": "Universidad de Santiago de Chile",
+            "country_code": "CL",
+            "type": "funder",
+            "lineage": [
+              "https://openalex.org/I10457146"
+            ]
+          },
+          "years": [
+            2013
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I4210138843",
+            "ror": "https://ror.org/03z475876",
+            "display_name": "Policlinico Tor Vergata",
+            "country_code": "IT",
+            "type": "healthcare",
+            "lineage": [
+              "https://openalex.org/I4210138843"
+            ]
+          },
+          "years": [
+            2010,
+            2004
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I4210123352",
+            "ror": "https://ror.org/02sy42d13",
+            "display_name": "Bambino Gesù Children's Hospital",
+            "country_code": "IT",
+            "type": "healthcare",
+            "lineage": [
+              "https://openalex.org/I4210123352",
+              "https://openalex.org/I4210153126"
+            ]
+          },
+          "years": [
+            2006,
+            2000,
+            1996
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I36443711",
+            "ror": "https://ror.org/0530bdk91",
+            "display_name": "Magna Graecia University",
+            "country_code": "IT",
+            "type": "education",
+            "lineage": [
+              "https://openalex.org/I36443711"
+            ]
+          },
+          "years": [
+            2005,
+            2004,
+            1993
+          ]
+        },
+        {
+          "institution": {
+            "id": "https://openalex.org/I59725666",
+            "ror": "https://ror.org/041sz8d87",
+            "display_name": "University of Reggio Calabria",
+            "country_code": "IT",
+            "type": "funder",
+            "lineage": [
+              "https://openalex.org/I59725666"
+            ]
+          },
+          "years": [
+            2004,
+            1991
+          ]
+        }
+      ],
+      "works_api_url": "https://api.openalex.org/works?filter=author.id:A5016721535",
+      "updated_date": "2025-02-17T14:37:11.703707",
+      "created_date": "2023-07-21"
+    }
+  ],
+  "group_by": []
+}

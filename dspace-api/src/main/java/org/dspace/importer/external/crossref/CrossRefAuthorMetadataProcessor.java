@@ -42,8 +42,8 @@ public class CrossRefAuthorMetadataProcessor implements JsonPathMetadataProcesso
             JsonNode author = authors.next();
             String givenName = author.at("/given").textValue();
             String familyName = author.at("/family").textValue();
-            if (StringUtils.isNoneBlank(givenName) && StringUtils.isNoneBlank(familyName)) {
-                values.add(givenName + " " + familyName);
+            if (StringUtils.isNotBlank(givenName) && StringUtils.isNotBlank(familyName)) {
+                values.add(familyName.trim() + ", " + givenName.trim());
             }
         }
         return values;

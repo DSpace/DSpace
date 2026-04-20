@@ -79,6 +79,14 @@ public final class DSpace {
         return getServiceManager().getServiceByName(RequestService.class.getName(), RequestService.class);
     }
 
+    /**
+     * Convenience to look up a service in the service manager.
+     * @see(ServiceManager#getServiceByName).
+     *
+     * @param <T> Type of the service to be found.
+     * @param type Type of the service to be found.
+     * @return an instance of the service, or null if not found.
+     */
     public <T> T getSingletonService(Class<T> type) {
         return getServiceManager().getServiceByName(type.getName(), type);
     }

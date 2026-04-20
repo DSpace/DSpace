@@ -12,8 +12,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;

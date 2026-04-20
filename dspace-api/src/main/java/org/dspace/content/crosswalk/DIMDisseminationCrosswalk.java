@@ -36,7 +36,7 @@ import org.jdom2.Namespace;
  */
 public class DIMDisseminationCrosswalk
     implements DisseminationCrosswalk {
-    // Non-existant XSD schema
+    // Non-existent XSD schema
     public static final String DIM_XSD = "null";
 
     // Namespaces
@@ -45,7 +45,7 @@ public class DIMDisseminationCrosswalk
 
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
-    private static final Namespace namespaces[] = {DIM_NS};
+    private static final Namespace[] namespaces = {DIM_NS};
 
     @Override
     public Namespace[] getNamespaces() {

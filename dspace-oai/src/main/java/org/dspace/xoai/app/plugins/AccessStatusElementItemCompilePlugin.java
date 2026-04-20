@@ -8,12 +8,16 @@
 package org.dspace.xoai.app.plugins;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.access.status.DefaultAccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
+import org.dspace.content.AccessStatus;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.xoai.app.XOAIExtensionItemCompilePlugin;
@@ -31,6 +35,13 @@ import org.dspace.xoai.util.ItemUtils;
  *          <field name="value">open.access</field>
  *       </element>
  *   </element>
+ *   OR
+ *   <element name="others">
+ *       <element name="access-status">
+ *          <field name="value">embargo</field>
+ *          <field name="embargo">2024-10-10</field>
+ *       </element>
+ *   </element>
  * }
  * </pre>
  * Returning Values are based on:
@@ -43,11 +54,20 @@ public class AccessStatusElementItemCompilePlugin implements XOAIExtensionItemCo
         AccessStatusService accessStatusService = AccessStatusServiceFactory.getInstance().getAccessStatusService();
 
         try {
-            String accessStatusType;
-            accessStatusType = accessStatusService.getAccessStatus(context, item);
+            AccessStatus accessStatusResult = accessStatusService.getAnonymousAccessStatus(context, item);
+            String accessStatusType = accessStatusResult.getStatus();
+            LocalDate availabilityDate = accessStatusResult.getAvailabilityDate();
+            String embargoFromItem = null;
+            if (accessStatusType == DefaultAccessStatusHelper.EMBARGO && availabilityDate != null) {
+                embargoFromItem = availabilityDate.toString();
+            }
 
             Element accessStatus = ItemUtils.create("access-status");
             accessStatus.getField().add(ItemUtils.createValue("value", accessStatusType));
+
+            if (StringUtils.isNotEmpty(embargoFromItem)) {
+                accessStatus.getField().add(ItemUtils.createValue("embargo", embargoFromItem));
+            }
 
             Element others;
             List<Element> elements = metadata.getElement();

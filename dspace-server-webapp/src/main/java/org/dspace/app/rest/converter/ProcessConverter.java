@@ -39,10 +39,13 @@ public class ProcessConverter implements DSpaceConverter<Process, ProcessRest> {
         processRest.setId(process.getID());
         processRest.setScriptName(process.getName());
         processRest.setProcessId(process.getID());
-        processRest.setUserId(process.getEPerson().getID());
+        if (process.getEPerson() != null) {
+            processRest.setUserId(process.getEPerson().getID());
+        }
         processRest.setProcessStatus(process.getProcessStatus());
         processRest.setStartTime(process.getStartTime());
         processRest.setEndTime(process.getFinishedTime());
+        processRest.setCreationTime(process.getCreationTime());
         processRest.setParameterRestList(processService.getParameters(process).stream()
                 .map(x -> (ParameterValueRest) converter.toRest(x, projection)).collect(Collectors.toList()));
         return processRest;

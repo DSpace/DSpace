@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jaxen.JaxenException;
@@ -71,7 +71,7 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
     }
 
     /**
-     * Retrieve the the ScopusID, orcid, author name and affiliationID
+     * Retrieve the ScopusID, orcid, author name and affiliationID
      * metadata associated with the given element object.
      * If the value retrieved from the element is empty
      * it is set PLACEHOLDER_PARENT_METADATA_VALUE
@@ -82,11 +82,19 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
     private List<MetadatumDTO> getMetadataOfAuthors(Element element) throws JaxenException {
         List<MetadatumDTO> metadatums = new ArrayList<MetadatumDTO>();
         Element authname = element.getChild("authname", NAMESPACE);
+        Element surname = element.getChild("surname", NAMESPACE);
+        Element givenName = element.getChild("given-name", NAMESPACE);
         Element scopusId = element.getChild("authid", NAMESPACE);
         Element orcid = element.getChild("orcid", NAMESPACE);
         Element afid = element.getChild("afid", NAMESPACE);
 
-        addMetadatum(metadatums, getMetadata(getElementValue(authname), this.authname));
+        if (authname != null) {
+            addMetadatum(metadatums, getMetadata(getElementValue(authname), this.authname));
+        } else {
+            addMetadatum(metadatums, getMetadata(getElementValue(surname) + ", " +
+                    getElementValue(givenName), this.authname));
+        }
+
         addMetadatum(metadatums, getMetadata(getElementValue(scopusId), this.scopusId));
         addMetadatum(metadatums, getMetadata(getElementValue(orcid), this.orcid));
         addMetadatum(metadatums, getMetadata(StringUtils.isNotBlank(afid.getValue())

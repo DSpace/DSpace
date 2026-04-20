@@ -79,7 +79,7 @@ public interface IndexingService {
     /**
      * Atomically update the index of a single field for an object
      * @param context       The DSpace context
-     * @param uniqueIndexId The unqiue index ID of the object to update the index for
+     * @param uniqueIndexId The unique index ID of the object to update the index for
      * @param field         The field to update
      * @param fieldModifier The modifiers for the field to update. More information on how to atomically update a solr
      *                      field using a field modifier can be found here: https://yonik.com/solr/atomic-updates/

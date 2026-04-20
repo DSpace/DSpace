@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +112,7 @@ public class FeedContentDisseminator extends AbstractSimpleDC
             desc = bitstream.getName();
         }
         entry.setSummary(desc);
-        entry.setUpdated(new Date()); // required, though content is spurious
+        entry.setUpdated(java.util.Date.from(Instant.now())); // required, though content is spurious
 
         // add an edit-media link for the bitstream ...
         Abdera abdera = new Abdera();

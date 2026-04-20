@@ -9,9 +9,9 @@ package org.dspace.content.crosswalk;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +65,7 @@ public class OREDisseminationCrosswalk
                                                                                      .getConfigurationService();
 
 
-    private static final Namespace namespaces[] = {ATOM_NS, ORE_NS, ORE_ATOM, RDF_NS, DCTERMS_NS, DS_NS};
+    private static final Namespace[] namespaces = {ATOM_NS, ORE_NS, ORE_ATOM, RDF_NS, DCTERMS_NS, DS_NS};
 
 
     @Override
@@ -141,9 +141,9 @@ public class OREDisseminationCrosswalk
         uriRLink.setAttribute("type", "application/atom+xml");
 
         Element remPublished = new Element("published", ATOM_NS);
-        remPublished.addContent(Utils.formatISO8601Date(new Date()));
+        remPublished.addContent(Utils.formatISO8601Date(LocalDateTime.now()));
         Element remUpdated = new Element("updated", ATOM_NS);
-        remUpdated.addContent(Utils.formatISO8601Date(new Date()));
+        remUpdated.addContent(Utils.formatISO8601Date(LocalDateTime.now()));
 
         Element remCreator = new Element("source", ATOM_NS);
         Element remGenerator = new Element("generator", ATOM_NS);
@@ -331,14 +331,14 @@ public class OREDisseminationCrosswalk
      * @param sourceString source unescaped string
      */
     private String encodeForURL(String sourceString) {
-        Character lowalpha[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+        Character[] lowalpha = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
             'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
             's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-        Character upalpha[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        Character[] upalpha = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
             'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
             'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-        Character digit[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        Character mark[] = {'-', '_', '.', '!', '~', '*', '\'', '/', '(', ')'};
+        Character[] digit = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        Character[] mark = {'-', '_', '.', '!', '~', '*', '\'', '/', '(', ')'};
 
         // reserved
         //Character reserved[] = {';' , '/' , '?' , ':' , '@' , '&' , '=' , '+' , '$' , ',' ,'%', '#'};

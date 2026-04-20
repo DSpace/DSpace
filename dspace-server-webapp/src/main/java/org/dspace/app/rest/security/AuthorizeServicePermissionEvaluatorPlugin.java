@@ -9,10 +9,14 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -24,21 +28,19 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.util.UUIDUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * DSpaceObjectPermissionEvaluatorPlugin will check persmissions based on the DSpace {@link AuthorizeService}.
+ * DSpaceObjectPermissionEvaluatorPlugin will check permissions based on the DSpace {@link AuthorizeService}.
  * This service will validate if the authenticated user is allowed to perform an action on the given DSpace Object
  * based on the resource policies attached to that DSpace object.
  */
 @Component
 public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthorizeServicePermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -51,6 +53,9 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
 
     @Autowired
     private ContentServiceFactory contentServiceFactory;
+
+    @Autowired
+    private BitstreamCrisSecurityService bitstreamCrisSecurityService;
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
@@ -86,6 +91,29 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                         return true;
                     }
 
+                    if (dSpaceObject instanceof Bitstream && ((Bitstream) dSpaceObject).isDeleted()) {
+                        return true; // Let downstream REST layer handle with 404
+                    }
+
+                    if (dSpaceObject instanceof Bitstream && Objects.isNull(ePerson)
+                            && authorizeService.authorizeActionBoolean(context, (Bitstream) dSpaceObject,
+                                    restPermission.getDspaceApiActionId())) {
+                        return true;
+                    }
+
+                    if (dSpaceObject instanceof Bitstream bit && !Objects.isNull(ePerson)) {
+                        try {
+                            if (bitstreamCrisSecurityService
+                                    .isBitstreamAccessAllowedByCrisSecurity(context, ePerson, bit)) {
+                                return true;
+                            }
+                        } catch (Exception e) {
+                            log.warn(
+                                    "We got an exception during the security evaluation, safe fallback " +
+                                    "ignoring extra grant.",
+                                    e);
+                        }
+                    }
 
                     if (dSpaceObject instanceof Item) {
                         Item item = (Item) dSpaceObject;
@@ -106,7 +134,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
             }
 
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
 
         return false;

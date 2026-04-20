@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.EntityTypeRest;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository that is responsible to manage EntityType Rest objects
  */
-@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.NAME)
+@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.PLURAL_NAME)
 public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRest, Integer> {
 
     @Autowired
