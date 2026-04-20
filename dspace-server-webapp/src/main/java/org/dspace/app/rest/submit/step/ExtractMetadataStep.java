@@ -20,6 +20,7 @@ import java.util.StringJoiner;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Equator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.submit.ListenerProcessingStep;
@@ -27,6 +28,7 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -157,8 +159,9 @@ public class ExtractMetadataStep implements ListenerProcessingStep, UploadableSt
     }
 
     @Override
-    public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-            InProgressSubmission wsi, MultipartFile multipartFile)
+    public Pair<Bitstream, ErrorRest> upload(Context context, SubmissionService submissionService,
+                                             SubmissionStepConfig stepConfig,
+                                             InProgressSubmission wsi, MultipartFile multipartFile)
         throws IOException {
 
         Item item = wsi.getItem();
@@ -191,7 +194,7 @@ public class ExtractMetadataStep implements ListenerProcessingStep, UploadableSt
         } finally {
             file.delete();
         }
-        return null;
+        return Pair.of(null, null);
     }
 
 }

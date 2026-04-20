@@ -11,9 +11,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.mediafilter.FormatFilter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -91,6 +93,19 @@ public interface MediaFilterService {
      * @throws Exception if error occurs
      */
     public boolean processBitstream(Context context, Item item, Bitstream source, FormatFilter formatFilter)
+        throws Exception;
+
+    /**
+     * Returns all {@code item}'s bitstreams that are derived from {@code formatFilter}.
+     *
+     * @param item
+     * @param sourceBitstream
+     * @param formatFilter
+     * @return
+     * @throws Exception
+     */
+    Pair<List<Bitstream>, Bundle> getBitstreamsDerivedFromFilter(Item item, Bitstream sourceBitstream,
+                                                                 FormatFilter formatFilter)
         throws Exception;
 
     /**
