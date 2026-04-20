@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -40,11 +41,17 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
-        MetadataValueRest metadataValueToAdd = metadataPatchUtils.extractMetadataValueFromOperation(operation);
+        // Atmire modifications START
+        List<MetadataValueRest> metadataValuesToAdd = metadataPatchUtils.extractMetadataValueFromOperation(operation);
+        // Atmire modifications END
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
         String indexInPath = metadataPatchUtils.getIndexFromPath(operation.getPath());
 
-        add(context, resource, dsoService, metadataField, metadataValueToAdd, indexInPath);
+        // Atmire modifications START
+        for (MetadataValueRest metadataValue : metadataValuesToAdd) {
+            add(context, resource, dsoService, metadataField, metadataValue, indexInPath);
+        }
+        // Atmire modifications END
         return resource;
     }
 
