@@ -72,13 +72,14 @@ public final class DSpaceObjectMetadataPatchUtils {
                         }
                     } else {
                         MetadataValueRest metadataValue = objectMapper.treeToValue(valueNode, MetadataValueRest.class);
-                        if (operation.getValue() instanceof String) {
-                            String valueString = (String) operation.getValue();
-                            metadataValue = new MetadataValueRest();
-                            metadataValue.setValue(valueString);
-                        }
                         metadataValues.add(metadataValue);
                     }
+                }
+                if (operation.getValue() instanceof String) {
+                    String valueString = (String) operation.getValue();
+                    MetadataValueRest metadataValue = new MetadataValueRest();
+                    metadataValue.setValue(valueString);
+                    metadataValues.add(metadataValue);
                 }
             }
         } catch (IOException e) {
