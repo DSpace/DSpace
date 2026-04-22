@@ -14,6 +14,8 @@ public class XOAIScriptOptions {
     public static final String IMPORT_ACTION = "import";
     public static final String CLEAN_CACHE_ACTION = "clean-cache";
 
+    private XOAIScriptOptions() {}
+
     protected static String getAction(CommandLine commandLine) {
         final String action = commandLine.getOptionValue("a");
         if (action == null) {
