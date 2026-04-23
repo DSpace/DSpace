@@ -583,4 +583,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     public int countTotal(Context context) throws SQLException {
         return bundleDAO.countRows(context);
     }
+
+    public int countBitstreams(Context context, Bundle bundle) throws SQLException {
+        return bundleDAO.countBitstreams(context, bundle);
+    }
 }
