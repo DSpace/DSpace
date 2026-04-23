@@ -295,10 +295,21 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException {
+        // Set WorkspaceItem's Collection to destination collection
         source.setCollection(toCollection);
 
+        // Set entity type according to destination collection
+        this.itemService.setEntityType(
+                context,
+                source.getItem(),
+                this.collectionService.getEntityType(source.getCollection()               )
+        );
+
+        // Remove metadata fields that do not occur in destination collection's submission form:
         List<MetadataValue> remove = new ArrayList<>();
+        // Query differences between collections' submission forms
         List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
+        // Of differences found, keep only those that are actually present on the item
         for (String toRemove : diff) {
             for (MetadataValue value : source.getItem().getMetadata()) {
                 if (value.getMetadataField().toString('.').equals(toRemove)) {
@@ -306,7 +317,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 }
             }
         }
-
+        // Remove the metadata
         source.getItem().removeMetadata(remove);
 
     }
