@@ -8,8 +8,8 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import javax.persistence.Query;
 
-import jakarta.persistence.Query;
 import org.dspace.content.Bundle;
 import org.dspace.content.dao.BundleDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
