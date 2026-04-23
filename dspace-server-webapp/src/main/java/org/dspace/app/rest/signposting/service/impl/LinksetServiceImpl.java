@@ -26,6 +26,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -47,6 +48,9 @@ public class LinksetServiceImpl implements LinksetService {
 
     @Autowired
     protected ItemService itemService;
+
+    @Autowired
+    protected BundleService bundleService;
 
     @Autowired
     private BitstreamMetadataReadPermissionEvaluatorPlugin bitstreamMetadataReadPermissionEvaluatorPlugin;
@@ -86,7 +90,7 @@ public class LinksetServiceImpl implements LinksetService {
 
         List<LinksetNode> linksetNodes = new ArrayList<>();
         if (object.getType() == Constants.ITEM) {
-            int itemBitstreamsCount = countItemBitstreams((Item) object);
+            int itemBitstreamsCount = countItemBitstreams(context, (Item) object);
 
             // Do not include individual bitstream typed links if their number exceeds
             // the limit in the configuration.
@@ -170,12 +174,12 @@ public class LinksetServiceImpl implements LinksetService {
         }
     }
 
-    private int countItemBitstreams(Item item) {
+    private int countItemBitstreams(Context context, Item item) {
         try {
             int countBitstreams = 0;
             List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
             for (Bundle bundle: bundles) {
-                countBitstreams += bundle.getBitstreams().size();
+                countBitstreams += bundleService.countBitstreams(context, bundle);
             }
             return countBitstreams;
         } catch (SQLException e) {
