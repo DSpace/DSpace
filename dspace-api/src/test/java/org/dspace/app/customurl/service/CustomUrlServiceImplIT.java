@@ -272,6 +272,7 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
 
     private void reindexItem(Item item) throws SQLException, SearchServiceException {
         context.commit();
+        item = context.reloadEntity(item);
         indexingService.indexContent(context, new IndexableItem(item), true);
         indexingService.commit();
     }
