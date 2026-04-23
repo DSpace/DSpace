@@ -288,7 +288,18 @@ public class CustomUrlConsumer implements Consumer {
      */
     private void assignCustomUrlToItem(Context context, Item item, String customUrl) {
         log.info("Assigning custom URL '{}' to item {}", customUrl, item.getID());
-        customUrlService.replaceCustomUrl(context, item, customUrl);
+        // Evict and re-fetch the item to ensure a clean managed entity.
+        // During event dispatch the item may have detached associations
+        // that cause "detached entity passed to persist" errors.
+        try {
+            context.uncacheEntity(item);
+            Item managedItem = itemService.find(context, item.getID());
+            if (managedItem != null) {
+                customUrlService.replaceCustomUrl(context, managedItem, customUrl);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to reload item " + item.getID(), e);
+        }
     }
 
     /**
