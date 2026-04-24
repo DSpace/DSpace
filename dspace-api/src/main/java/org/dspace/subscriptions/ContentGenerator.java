@@ -66,11 +66,18 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     @Autowired
     private ItemService itemService;
 
-    private static final String NEW_ITEMS_LABEL = "New Items";
-    private static final String MODIFIED_ITEMS_LABEL = "Modified Items";
     private static final int MAX_METADATA_VALUES = 3;
-    private static final String COMMUNITY_NOTE_PREFIX = " (via community subscription to \"";
-    private static final String COMMUNITY_NOTE_SUFFIX = "\")";
+    private static final String NEW_ITEMS_LABEL_KEY = "org.dspace.subscriptions.ContentGenerator.new-items-label";
+    private static final String MODIFIED_ITEMS_LABEL_KEY =
+            "org.dspace.subscriptions.ContentGenerator.modified-items-label";
+    private static final String INTRO_NEW_AND_MODIFIED_KEY =
+            "org.dspace.subscriptions.ContentGenerator.intro.new-and-modified";
+    private static final String INTRO_NEW_KEY = "org.dspace.subscriptions.ContentGenerator.intro.new";
+    private static final String INTRO_MODIFIED_KEY = "org.dspace.subscriptions.ContentGenerator.intro.modified";
+    private static final String COMMUNITY_NOTE_PREFIX_KEY =
+            "org.dspace.subscriptions.ContentGenerator.community-note-prefix";
+    private static final String COMMUNITY_NOTE_SUFFIX_KEY =
+            "org.dspace.subscriptions.ContentGenerator.community-note-suffix";
     private static final String LINE_SEPARATOR = System.lineSeparator();
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
@@ -109,9 +116,9 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 Map<Collection, List<IndexableObject>> modifiedItemsByCollection = partitionedItems.get(false).stream()
                         .collect(groupingBy(obj -> ((Item) obj.getIndexedObject()).getOwningCollection()));
 
-                String intro = buildIntro(newItemsByCollection, modifiedItemsByCollection);
+                String intro = buildIntro(newItemsByCollection, modifiedItemsByCollection, supportedLocale);
                 String combinedSection = buildCombinedSection(newItemsByCollection, modifiedItemsByCollection,
-                        collectionToCommunityNameMap);
+                        collectionToCommunityNameMap, supportedLocale);
 
                 if (combinedSection.equals(EMPTY)) {
                     log.debug("subscription(s) of eperson {} do(es) not match any new or modified items: " +
@@ -158,13 +165,14 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     }
 
     private String buildIntro(Map<Collection, List<IndexableObject>> newItems,
-                              Map<Collection, List<IndexableObject>> modifiedItems) {
+                              Map<Collection, List<IndexableObject>> modifiedItems,
+                              Locale locale) {
         if (!newItems.isEmpty() && !modifiedItems.isEmpty()) {
-            return "New and modified items are available in the collections you have subscribed to:";
+            return I18nUtil.getMessage(INTRO_NEW_AND_MODIFIED_KEY, locale);
         } else if (!newItems.isEmpty()) {
-            return "New items are available in the collections you have subscribed to:";
+            return I18nUtil.getMessage(INTRO_NEW_KEY, locale);
         } else if (!modifiedItems.isEmpty()) {
-            return "Modified items are available in the collections you have subscribed to:";
+            return I18nUtil.getMessage(INTRO_MODIFIED_KEY, locale);
         } else {
             return "";
         }
@@ -172,7 +180,8 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
 
     private String buildCombinedSection(Map<Collection, List<IndexableObject>> newItemsByCollection,
                                         Map<Collection, List<IndexableObject>> modifiedItemsByCollection,
-                                        Map<Collection, String> collectionToCommunity) {
+                                        Map<Collection, String> collectionToCommunity,
+                                        Locale locale) {
         if (newItemsByCollection.isEmpty() && modifiedItemsByCollection.isEmpty()) {
             return EMPTY;
         }
@@ -183,17 +192,18 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
         allCollections.addAll(modifiedItemsByCollection.keySet());
 
         for (Collection collection : allCollections) {
-            String header = buildCollectionHeader(collection, collectionToCommunity);
+            String header = buildCollectionHeader(collection, collectionToCommunity, locale);
             sb.append(header);
 
             List<IndexableObject> newItems = newItemsByCollection.get(collection);
             List<IndexableObject> modifiedItems = modifiedItemsByCollection.get(collection);
             if (newItems != null && !newItems.isEmpty()) {
-                sb.append(buildSectionHeader(NEW_ITEMS_LABEL, newItems.size()));
+                sb.append(buildSectionHeader(I18nUtil.getMessage(NEW_ITEMS_LABEL_KEY, locale), newItems.size()));
                 sb.append(buildItemsBlock(newItems));
             }
             if (modifiedItems != null && !modifiedItems.isEmpty()) {
-                sb.append(buildSectionHeader(MODIFIED_ITEMS_LABEL, modifiedItems.size()));
+                sb.append(buildSectionHeader(I18nUtil.getMessage(MODIFIED_ITEMS_LABEL_KEY, locale),
+                        modifiedItems.size()));
                 sb.append(buildItemsBlock(modifiedItems));
             }
             sb.append(LINE_SEPARATOR);
@@ -201,11 +211,14 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
         return sb.toString();
     }
 
-    private String buildCollectionHeader(Collection collection, Map<Collection, String> collectionToCommunity) {
+    private String buildCollectionHeader(Collection collection, Map<Collection, String> collectionToCommunity,
+                                         Locale locale) {
         String name = collection.getName();
         String communityNote = "";
         if (collectionToCommunity != null && collectionToCommunity.containsKey(collection)) {
-            communityNote = COMMUNITY_NOTE_PREFIX + collectionToCommunity.get(collection) + COMMUNITY_NOTE_SUFFIX;
+            communityNote = I18nUtil.getMessage(COMMUNITY_NOTE_PREFIX_KEY, locale)
+                    + collectionToCommunity.get(collection)
+                    + I18nUtil.getMessage(COMMUNITY_NOTE_SUFFIX_KEY, locale);
         }
         String fullHeader = name + communityNote + ":" + LINE_SEPARATOR;
         String underline = "-".repeat(Math.max(0, name.length() + communityNote.length())) + LINE_SEPARATOR;
