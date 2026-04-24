@@ -7,18 +7,22 @@
  */
 package org.dspace.handle;
 
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -26,6 +30,7 @@ import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
@@ -56,6 +61,10 @@ public class HandleServiceImpl implements HandleService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
+    @Autowired(required = true)
+    @Qualifier("org.dspace.content.ItemServiceImpl") // We must choose one
+    protected DSpaceObjectService dspaceObjectService;
+
     @Autowired
     protected SiteService siteService;
 
@@ -81,12 +90,27 @@ public class HandleServiceImpl implements HandleService {
             return null;
         }
 
-        String url = configurationService.getProperty("dspace.ui.url")
-            + "/handle/" + handle;
-
-        log.debug("Resolved {} to {}", handle, url);
-
-        return url;
+        /* Unfortunately we must choose between module coupling and circular
+         * dependency here.  Knowledge of the structure of URLs should be
+         * encapsulated in dspace-server-webapp, but that and the Handle plugin
+         * both depend on dspace-api.  Assuming the URL structure here seemed
+         * less troublesome -- mwood.
+         */
+        DSpaceObject object = dbhandle.getDSpaceObject();
+        String objectID = object.getID().toString();
+        String objectType = dspaceObjectService.getTypeTextPlural(object).toLowerCase();
+        try {
+            String url = new URIBuilder(configurationService.getProperty("dspace.ui.url"))
+                    .setPathSegments(objectType, objectID)
+                    .build()
+                    .toString();
+            log.debug("Resolved {} to {}", handle, url);
+            return url;
+        } catch (URISyntaxException e) {
+            log.error("Could not construct a URL for handle {}:  {}",
+                    handle, e.getMessage());
+            return null;
+        }
     }
 
     @Override
@@ -98,12 +122,39 @@ public class HandleServiceImpl implements HandleService {
 
         String handle = null;
 
-        if (url.startsWith(dspaceUrl)) {
+        if (url.startsWith(dspaceUrl)) { // legacy DSO URL
             handle = url.substring(dspaceUrl.length());
-        }
-
-        if (url.startsWith(handleResolver)) {
+        } else if (url.startsWith(handleResolver)) { // Handle URL
             handle = url.substring(handleResolver.length());
+        } else { // current DSO URL
+            URIBuilder parsedURI;
+            try {
+                parsedURI = new URIBuilder(url);
+            } catch (URISyntaxException e) {
+                log.error("Not a URL", e.getMessage());
+                return null;
+            }
+            List<String> path = parsedURI.getPathSegments();
+            if (path.size() == 2) { // OBJECT_TYPE / UUID
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(path.get(1));
+                } catch (IllegalArgumentException e) {
+                    log.error("'{}' is not a UUID",
+                            path.get(1), e.getMessage());
+                    return null;
+                }
+                DSpaceObject dso = dspaceObjectService.find(context, uuid);
+                if (null == dso) {
+                    log.error("'{}' does not identify a DSpaceObject",
+                            parsedURI.getPath());
+                    return null;
+                } else {
+                    handle = dso.getHandle();
+                }
+            } else {
+                log.error("could not resolve '{}' to a Handle", url);
+            }
         }
 
         if (null == handle) {

@@ -38,7 +38,7 @@ import org.junit.Test;
 public class SiteTest extends AbstractUnitTest {
 
     /**
-     * log4j category
+     * Log category
      */
     private static final Logger log = LogManager.getLogger(SiteTest.class);
 
@@ -63,6 +63,7 @@ public class SiteTest extends AbstractUnitTest {
     @Override
     public void init() {
         super.init();
+        configurationService.reloadConfig();
         try {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
