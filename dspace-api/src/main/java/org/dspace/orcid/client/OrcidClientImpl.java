@@ -43,6 +43,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidEntityType;
@@ -59,6 +60,7 @@ import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
  * Implementation of {@link OrcidClient}.
@@ -181,6 +183,20 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
+    @Override
+    public ExpandedSearch expandedSearch(String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
+    @Override
     public void revokeToken(OrcidToken orcidToken) {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
@@ -252,6 +268,10 @@ public class OrcidClientImpl implements OrcidClient {
         return delete(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
+    }
+
+    private String formatExpandedSearchParameters(String query, int start, int rows) {
+        return String.format("?q=%s&start=%s&rows=%s", query, start, rows);
     }
 
     private void executeSuccessful(HttpUriRequest httpUriRequest) {
@@ -351,8 +371,7 @@ public class OrcidClientImpl implements OrcidClient {
     @SuppressWarnings("unchecked")
     private <T> T unmarshall(HttpEntity entity, Class<T> clazz) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XMLInputFactory xmlInputFactory = XMLUtils.getXMLInputFactory();
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(entity.getContent());
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         return (T) unmarshaller.unmarshal(xmlStreamReader);

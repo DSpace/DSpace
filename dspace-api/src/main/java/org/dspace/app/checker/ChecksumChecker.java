@@ -97,7 +97,7 @@ public final class ChecksumChecker {
         options.addOption("h", "help", false, "Help");
         options.addOption("d", "duration", true, "Checking duration");
         options.addOption("c", "count", true, "Check count");
-        options.addOption("a", "handle", true, "Specify a handle to check");
+        options.addOption("i", "handle", true, "Specify a handle to check");
         options.addOption("v", "verbose", false, "Report all processing");
 
         Option option;
@@ -105,7 +105,7 @@ public final class ChecksumChecker {
         option = Option.builder("b")
                 .longOpt("bitstream-ids")
                 .hasArgs()
-                .desc("Space separated list of bitstream ids")
+                .desc("Space separated list of bitstream UUIDs")
                 .build();
         options.addOption(option);
 
@@ -131,6 +131,17 @@ public final class ChecksumChecker {
         try {
             context = new Context();
 
+            int mutuallyExclusiveOpts = 0;
+            for (char c : new char[]{'l', 'L', 'd', 'b', 'i','c'}) {
+                if (line.hasOption(c)) {
+                    mutuallyExclusiveOpts++;
+                }
+            }
+            if (mutuallyExclusiveOpts > 1) {
+                System.err.println("Please use only one option of -l, -L, -d, -b, -i, or -c");
+                LOG.error("Please use only one option of -l, -L, -d, -b, -i, or -c");
+                System.exit(1);
+            }
 
             // Prune stage
             if (line.hasOption('p')) {
@@ -168,13 +179,13 @@ public final class ChecksumChecker {
                         bitstreams.add(bitstreamService.find(context, UUID.fromString(ids[i])));
                     } catch (NumberFormatException nfe) {
                         System.err.println("The following argument: " + ids[i]
-                                               + " is not an integer");
+                                               + " is not an UUID");
                         System.exit(0);
                     }
                 }
                 dispatcher = new IteratorDispatcher(bitstreams.iterator());
-            } else if (line.hasOption('a')) {
-                dispatcher = new HandleDispatcher(context, line.getOptionValue('a'));
+            } else if (line.hasOption('i')) {
+                dispatcher = new HandleDispatcher(context, line.getOptionValue('i'));
             } else if (line.hasOption('d')) {
                 // run checker process for specified duration
                 try {
@@ -182,6 +193,8 @@ public final class ChecksumChecker {
                         new SimpleDispatcher(context, processStart, true), Instant.ofEpochMilli(
                         Instant.now().toEpochMilli() + Utils.parseDuration(line.getOptionValue('d'))));
                 } catch (Exception e) {
+                    System.err.println("Couldn't parse " + line.getOptionValue('d')
+                                  + " as a duration");
                     LOG.fatal("Couldn't parse " + line.getOptionValue('d')
                                   + " as a duration: ", e);
                     System.exit(0);
@@ -225,18 +238,24 @@ public final class ChecksumChecker {
     private static void printHelp(Options options) {
         HelpFormatter myhelp = new HelpFormatter();
 
-        myhelp.printHelp("Checksum Checker\n", options);
-        System.out.println("\nSpecify a duration for checker process, using s(seconds),"
-                               + "m(minutes), or h(hours): ChecksumChecker -d 30s"
-                               + " OR ChecksumChecker -d 30m"
-                               + " OR ChecksumChecker -d 2h");
-        System.out.println("\nSpecify bitstream IDs: ChecksumChecker -b 13 15 17 20");
-        System.out.println("\nLoop once through all bitstreams: "
-                               + "ChecksumChecker -l");
-        System.out.println("\nLoop continuously through all bitstreams: ChecksumChecker -L");
-        System.out.println("\nCheck a defined number of bitstreams: ChecksumChecker -c 10");
-        System.out.println("\nReport all processing (verbose)(default reports only errors): ChecksumChecker -v");
-        System.out.println("\nDefault (no arguments) is equivalent to '-c 1'");
+        myhelp.printHelp("checker\n", options);
+        System.out.println("\nChecksum Checker usage examples:");
+        System.out.println("\nThe following options are mutually exclusive:");
+        System.out.println(" - Specify a duration for checker process, using s(seconds),"
+                               + "m(minutes), or h(hours): checker -d 30s"
+                               + " OR checker -d 30m"
+                               + " OR checker -d 2h");
+        System.out.println(" - Specify bitstream UUIDs: checker -b 550e8400-e29b-41d4-a716-446655440000"
+                               + " f3f2e850-b5d4-11ef-ac7e-96584d5248b2");
+        System.out.println(" - Specify handle: checker -i 12345/100");
+        System.out.println(" - Loop once through all bitstreams: "
+                               + "checker -l");
+        System.out.println(" - Loop continuously through all bitstreams: checker -L");
+        System.out.println(" - Check a defined number of bitstreams: checker -c 10");
+        System.out.println("\nThe following options can be used in combination with others above:");
+        System.out.println(" - Report all processing to checker.log (by default logs only errors): checker -v");
+        System.out.println(" - Prune old results from the database: checker -p");
+        System.out.println("\nDefault (no arguments) is equivalent to 'checker -c 1'\n");
         System.exit(0);
     }
 

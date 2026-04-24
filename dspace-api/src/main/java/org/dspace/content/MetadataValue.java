@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
@@ -85,6 +86,13 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     @Column(name = "confidence")
     private int confidence = -1;
 
+    /**
+     * Security level value
+     */
+    @Nullable
+    @Column(name = "security_level")
+    private Integer securityLevel;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "dspace_object_id")
     protected DSpaceObject dSpaceObject;
@@ -140,7 +148,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      * @param language new language
      */
     public void setLanguage(String language) {
-        if (StringUtils.equals(language, Item.ANY)) {
+        if (Strings.CS.equals(language, Item.ANY)) {
             language = null;
         }
         this.language = language;
@@ -271,5 +279,30 @@ public class MetadataValue implements ReloadableEntity<Integer> {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        return "MetadataValue [id=" + id + ", metadataField=" + metadataField + ", value=" + value + ", language="
+            + language + ", place=" + place + ", authority=" + authority + ", confidence=" + confidence
+            + ", securityLevel=" + securityLevel + "]";
+    }
 
+    public String getSchema() {
+        return getMetadataField().getMetadataSchema().getName();
+    }
+
+    public String getElement() {
+        return getMetadataField().getElement();
+    }
+
+    public String getQualifier() {
+        return getMetadataField().getQualifier();
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(Integer securityLevel) {
+        this.securityLevel = securityLevel;
+    }
 }

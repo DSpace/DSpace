@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -119,7 +120,7 @@ public class RestRepositoryUtils {
                 if (name.isEmpty()) {
                     name = method.getName();
                 }
-                if (StringUtils.equals(name, searchMethodName)) {
+                if (Strings.CS.equals(name, searchMethodName)) {
                     searchMethod = method;
                     break;
                 }
@@ -268,7 +269,7 @@ public class RestRepositoryUtils {
         Method linkMethod = null;
         Method[] methods = linkRepository.getClass().getMethods();
         for (Method m : methods) {
-            if (StringUtils.equals(m.getName(), methodName)) {
+            if (Strings.CS.equals(m.getName(), methodName)) {
                 linkMethod = m;
                 break;
             }

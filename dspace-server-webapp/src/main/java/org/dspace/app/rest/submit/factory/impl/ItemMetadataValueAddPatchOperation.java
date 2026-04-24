@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -165,10 +165,10 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
         // (with this operator virtual value can only be moved or deleted).
         int idx = 0;
         for (MetadataValueRest ll : list) {
-            if (StringUtils.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+            if (Strings.CS.startsWith(ll.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
 
                 Optional<MetadataValue> preExistentMv = preExistentMetadata.stream().filter(mvr ->
-                    StringUtils.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
+                    Strings.CS.equals(ll.getAuthority(), mvr.getAuthority())).findFirst();
 
                 if (!preExistentMv.isPresent()) {
                     throw new UnprocessableEntityException(
@@ -180,9 +180,17 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                 this.updateRelationshipPlace(context, source, idx, rel);
 
             } else {
-                getDSpaceObjectService()
-                        .addMetadata(context, source, metadata[0], metadata[1], metadata[2],
-                                ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx);
+                if (ll.getSecurityLevel() != null) {
+                    getDSpaceObjectService()
+                            .addMetadataInPlaceSecured(context, source, metadata[0], metadata[1], metadata[2],
+                                    ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(),
+                                    idx, ll.getSecurityLevel());
+                } else {
+                    getDSpaceObjectService()
+                            .addMetadata(context, source, metadata[0], metadata[1], metadata[2],
+                                    ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx);
+                }
+
             }
             idx++;
         }
@@ -214,7 +222,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     private void updateRelationshipPlace(Context context, Item dso, int place, Relationship rs) {
 
         try {
-            if (rs.getLeftItem().equals(dso)) {
+            if (rs.getLeftItem().getID().equals(dso.getID())) {
                 rs.setLeftPlace(place);
             } else {
                 rs.setRightPlace(place);

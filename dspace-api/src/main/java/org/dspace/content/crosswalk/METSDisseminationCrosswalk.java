@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.packager.PackageDisseminator;
@@ -62,7 +63,7 @@ public class METSDisseminationCrosswalk
     private static final Namespace METS_NS = Namespace
         .getNamespace("mets", "http://www.loc.gov/METS/");
 
-    private static final Namespace namespaces[] = {METS_NS, MODS_NS, XLINK_NS};
+    private static final Namespace[] namespaces = {METS_NS, MODS_NS, XLINK_NS};
 
     /**
      * URL of METS XML Schema
@@ -129,7 +130,7 @@ public class METSDisseminationCrosswalk
 
             try {
                 //Return just the root Element of the METS file
-                SAXBuilder builder = new SAXBuilder();
+                SAXBuilder builder = XMLUtils.getSAXBuilder();
                 Document metsDocument = builder.build(tempFile);
                 return metsDocument.getRootElement();
             } catch (JDOMException je) {

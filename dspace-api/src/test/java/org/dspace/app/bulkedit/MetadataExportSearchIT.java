@@ -258,4 +258,35 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         assertNotNull(exception);
         assertEquals("nonExisting is not a valid search filter", exception.getMessage());
     }
+
+    @Test
+    public void exportMetadataSearchDoubleQuotedArgumentTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item quotedItem1 = ItemBuilder.createItem(context, collection)
+                .withTitle("The Special Runnable Item")
+                .withSubject("quoted-subject")
+                .build();
+        Item quotedItem2 = ItemBuilder.createItem(context, collection)
+                .withTitle("The Special Item")
+                .withSubject("quoted-subject")
+                .build();
+        context.restoreAuthSystemState();
+
+        int result = runDSpaceScript(
+                "metadata-export-search",
+                "-q", "title:\"Special Runnable\"",
+                "-n", filename);
+
+        assertEquals(0, result);
+
+        Item[] expectedResult = new Item[] {quotedItem1};
+        checkItemsPresentInFile(filename, expectedResult);
+
+        File file = new File(filename);
+        try (Reader reader = Files.newReader(file, Charset.defaultCharset());
+             CSVReader csvReader = new CSVReader(reader)) {
+            List<String[]> lines = csvReader.readAll();
+            assertEquals("Unexpected extra items in export", 2, lines.size());
+        }
+    }
 }

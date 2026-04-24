@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.dspace.app.util.MetadataExposureServiceImpl;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -176,7 +178,7 @@ public class DSpaceCSV implements Serializable {
                     headings.add(element);
                 } else if (!"id".equals(element)) {
                     String authorityPrefix = "";
-                    if (StringUtils.startsWith(element, "[authority]")) {
+                    if (Strings.CS.startsWith(element, "[authority]")) {
                         element = StringUtils.substringAfter(element, "[authority]");
                         AuthorityValue authorityValueType = authorityValueService.getAuthorityValueType(element);
                         if (authorityValueType != null) {
@@ -213,7 +215,7 @@ public class DSpaceCSV implements Serializable {
                     }
 
                     // Check that the scheme exists
-                    if (!StringUtils.equals(metadataSchema, MetadataSchemaEnum.RELATION.getName())) {
+                    if (!Strings.CS.equals(metadataSchema, MetadataSchemaEnum.RELATION.getName())) {
                         MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
                         if (foundSchema == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],
@@ -322,20 +324,7 @@ public class DSpaceCSV implements Serializable {
         // Set the metadata fields to ignore
         ignore = new HashMap<>();
 
-        // Specify default values
-        String[] defaultValues =
-            new String[] {
-                "dc.date.accessioned", "dc.date.available", "dc.date.updated", "dc.description.provenance"
-            };
-        String[] toIgnoreArray =
-            DSpaceServicesFactory.getInstance()
-                                 .getConfigurationService()
-                                 .getArrayProperty("bulkedit.ignore-on-export", defaultValues);
-        for (String toIgnoreString : toIgnoreArray) {
-            if (!"".equals(toIgnoreString.trim())) {
-                ignore.put(toIgnoreString.trim(), toIgnoreString.trim());
-            }
-        }
+        getConfiguredIgnoreFields();
     }
 
     /**
@@ -351,6 +340,40 @@ public class DSpaceCSV implements Serializable {
             }
         }
         return false;
+    }
+
+    /**
+     * Sets the ignored fields with 'bulkedit.ignore-on-export'
+     *
+     * Also adds 'metadata.hide.*' fields to ignored if 'bulkedit.ignore-on-export.include-metadata-hide' is true
+     */
+    private void getConfiguredIgnoreFields() {
+        // Specify default values
+        String[] defaultValues =
+            new String[] {
+                "dc.date.accessioned", "dc.date.available", "dc.date.updated", "dc.description.provenance"
+            };
+        String[] toIgnoreArray =
+                DSpaceServicesFactory.getInstance()
+                        .getConfigurationService()
+                        .getArrayProperty("bulkedit.ignore-on-export", defaultValues);
+
+        boolean ignoreHiddenMetadata = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getBooleanProperty("bulkedit.ignore-on-export.include-metadata-hide", true);
+        if (ignoreHiddenMetadata) {
+            List<String> hiddenMetadata = DSpaceServicesFactory.getInstance().getConfigurationService()
+                    .getPropertyKeys(MetadataExposureServiceImpl.CONFIG_PREFIX);
+            for (String hiddenMetadataKey : hiddenMetadata) {
+                String key = hiddenMetadataKey.split(MetadataExposureServiceImpl.CONFIG_PREFIX)[1];
+                ignore.put(key.trim(), key.trim());
+            }
+        }
+
+        for (String toIgnoreString : toIgnoreArray) {
+            if (!"".equals(toIgnoreString.trim())) {
+                ignore.put(toIgnoreString.trim(), toIgnoreString.trim());
+            }
+        }
     }
 
     /**

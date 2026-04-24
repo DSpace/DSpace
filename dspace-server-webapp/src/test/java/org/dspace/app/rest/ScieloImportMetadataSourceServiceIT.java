@@ -146,62 +146,62 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
+        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Torres Marzo, Ricardo");
+        MetadatumDTO title = createMetadatumDTO("dc", "title", null, "Requena Jiménez, Miguel, Los espacios"
+                                       + " de la muerte en Roma, Madrid, Síntesis, 2021, 365 págs."
+                                       + " más bibliografía en línea, ISBN 978-84-135759-6-4.");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof", "Nova tellus");
+        MetadatumDTO volume = createMetadatumDTO("oaire", "citation", "volume", "39");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2021");
         MetadatumDTO citation = createMetadatumDTO("oaire", "citation", "issue", "2");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.19130/iifl.nt.2021.39.2.901");
+        MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "0185-3058");
+        MetadatumDTO other = createMetadatumDTO("dc", "identifier", "other", "S0185-30582021000200231-mex");
         MetadatumDTO endPage = createMetadatumDTO("oaire", "citation", "endPage", "236");
         MetadatumDTO subject = createMetadatumDTO("dc", "subject", null, "Roma");
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null, "Historia");
         MetadatumDTO subject3 = createMetadatumDTO("dc", "subject", null, "ritos funerarios");
         MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null, "inframundo");
         MetadatumDTO subject5 = createMetadatumDTO("dc", "subject", null, "epitafios");
-        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Torres Marzo, Ricardo");
-        MetadatumDTO title = createMetadatumDTO("dc", "title", null, "Requena Jiménez, Miguel, Los espacios"
-                                       + " de la muerte en Roma, Madrid, Síntesis, 2021, 365 págs."
-                                       + " más bibliografía en línea, ISBN 978-84-135759-6-4.");
-        MetadatumDTO volume = createMetadatumDTO("oaire", "citation", "volume", "39");
-        MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "0185-3058");
-        MetadatumDTO other = createMetadatumDTO("dc", "identifier", "other", "S0185-30582021000200231-mex");
         MetadatumDTO startPage = createMetadatumDTO("oaire", "citation", "startPage", "231");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.19130/iifl.nt.2021.39.2.901");
 
+        metadatums.add(author);
+        metadatums.add(title);
         metadatums.add(ispartof);
+        metadatums.add(volume);
         metadatums.add(date);
         metadatums.add(citation);
-        metadatums.add(doi);
+        metadatums.add(issn);
+        metadatums.add(other);
         metadatums.add(endPage);
         metadatums.add(subject);
         metadatums.add(subject2);
         metadatums.add(subject3);
         metadatums.add(subject4);
         metadatums.add(subject5);
-        metadatums.add(author);
-        metadatums.add(title);
-        metadatums.add(volume);
-        metadatums.add(issn);
-        metadatums.add(other);
         metadatums.add(startPage);
+        metadatums.add(doi);
 
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
         //define second record
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "MAGRI, GEO");
+        MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
+                "Rinegoziazione e revisione del contratto. Tribunale di Roma, Sez. VI, 27 agosto 2020");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof", "Revista de Derecho Privado");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2021");
         MetadatumDTO citation2 = createMetadatumDTO("oaire", "citation", "issue", "41");
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.18601/01234366.n41.14");
+        MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "0123-4366");
+        MetadatumDTO other2 = createMetadatumDTO("dc", "identifier", "other", "S0123-43662021000200397-col");
         MetadatumDTO endPage2 = createMetadatumDTO("oaire", "citation", "endPage", "418");
         MetadatumDTO subject6 = createMetadatumDTO("dc", "subject", null, "sopravvenienza contrattuale");
         MetadatumDTO subject7 = createMetadatumDTO("dc", "subject", null, "covro");
         MetadatumDTO subject8 = createMetadatumDTO("dc", "subject", null, "buona fede in senso oggettivo");
         MetadatumDTO subject9 = createMetadatumDTO("dc", "subject", null, "obbligo di rinegoziare");
         MetadatumDTO subject10 = createMetadatumDTO("dc", "subject", null, "revisione del contratto");
-        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "MAGRI, GEO");
-        MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
-                "Rinegoziazione e revisione del contratto. Tribunale di Roma, Sez. VI, 27 agosto 2020");
-        MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "0123-4366");
-        MetadatumDTO other2 = createMetadatumDTO("dc", "identifier", "other", "S0123-43662021000200397-col");
         MetadatumDTO startPage2 = createMetadatumDTO("oaire", "citation", "startPage", "397");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.18601/01234366.n41.14");
         MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
                 "ABSTRACT: The Tribunal of Rome imposes an obligation to renegotiate long-term contracts,"
               + " the balance of which has been modified by the covro pandemic. The decision establishes a"
@@ -209,21 +209,21 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
               + " the possibility of a judicial review. This is a long-awaited decision in doctrine which complies"
               + " with the indications of the Supreme Court of Cassation expressed in its memorandum 56/2020.");
 
+        metadatums2.add(author2);
+        metadatums2.add(title2);
         metadatums2.add(ispartof2);
         metadatums2.add(date2);
         metadatums2.add(citation2);
-        metadatums2.add(doi2);
+        metadatums2.add(issn2);
+        metadatums2.add(other2);
         metadatums2.add(endPage2);
         metadatums2.add(subject6);
         metadatums2.add(subject7);
         metadatums2.add(subject8);
         metadatums2.add(subject9);
         metadatums2.add(subject10);
-        metadatums2.add(author2);
-        metadatums2.add(title2);
-        metadatums2.add(issn2);
-        metadatums2.add(other2);
         metadatums2.add(startPage2);
+        metadatums2.add(doi2);
         metadatums2.add(description);
 
         ImportRecord secondRecord = new ImportRecord(metadatums2);

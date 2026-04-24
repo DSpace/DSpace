@@ -7,9 +7,7 @@
  */
 package org.dspace.identifier.doi;
 
-import static org.dspace.identifier.DOIIdentifierProvider.DOI_ELEMENT;
-import static org.dspace.identifier.DOIIdentifierProvider.DOI_QUALIFIER;
-import static org.dspace.identifier.DOIIdentifierProvider.MD_SCHEMA;
+import static org.dspace.identifier.DOIIdentifierProvider.CFG_DOI_METADATA;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,7 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -40,8 +38,10 @@ import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.crosswalk.ParameterizedDisseminationCrosswalk;
@@ -386,12 +386,16 @@ public class DataCiteConnector
         }
         if (configurationService.hasProperty(CFG_HOSTINGINSTITUTION)) {
             parameters.put("hostinginstitution",
-                           configurationService.getProperty(CFG_HOSTINGINSTITUTION));
+                    configurationService.getProperty(CFG_HOSTINGINSTITUTION));
         }
-        parameters.put("mdSchema", MD_SCHEMA);
-        parameters.put("mdElement", DOI_ELEMENT);
+
+        MetadataFieldName doiMetadataFieldName =
+            new MetadataFieldName(this.configurationService.getProperty(CFG_DOI_METADATA, "dc.identifier.doi"));
+
+        parameters.put("mdSchema", doiMetadataFieldName.schema);
+        parameters.put("mdElement", doiMetadataFieldName.element);
         // Pass an empty string for qualifier if the metadata field doesn't have any
-        parameters.put("mdQualifier", DOI_QUALIFIER);
+        parameters.put("mdQualifier", doiMetadataFieldName.qualifier);
 
         Element root = null;
         try {
@@ -829,7 +833,7 @@ public class DataCiteConnector
         }
 
         // parse the XML
-        SAXBuilder saxBuilder = new SAXBuilder();
+        SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
         Document doc = null;
         try {
             doc = saxBuilder.build(new ByteArrayInputStream(content.getBytes("UTF-8")));

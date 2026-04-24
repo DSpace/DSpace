@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,9 +26,11 @@ import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.orcid.MockOrcid;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -45,7 +48,10 @@ import org.springframework.context.ApplicationContext;
 public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    ConfigurationService configurationService;
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     @Autowired
     private SubmissionFormRestRepository submissionFormRestRepository;
@@ -161,11 +167,13 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                      VocabularyMatcher.matchProperties("common_iso_languages", "common_iso_languages", true , false),
                      VocabularyMatcher.matchProperties("SolrAuthorAuthority", "SolrAuthorAuthority", false , false),
                      VocabularyMatcher.matchProperties("SRPublisher", "SRPublisher", false , false),
-                     VocabularyMatcher.matchProperties("SRJournalTitle", "SRJournalTitle", false , false)
+                     VocabularyMatcher.matchProperties("SRJournalTitle", "SRJournalTitle", false , false),
+                     VocabularyMatcher.matchProperties("funding_types", "funding_types", true, false),
+                     VocabularyMatcher.matchProperties("currency", "currency", true, false)
                  )))
         .andExpect(jsonPath("$._links.self.href",
             Matchers.containsString("api/submission/vocabularies")))
-        .andExpect(jsonPath("$.page.totalElements", is(6)));
+        .andExpect(jsonPath("$.page.totalElements", is(8)));
     }
 
     @Test
@@ -203,6 +211,59 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)))
                 .andExpect(jsonPath("$.page.totalPages", Matchers.is(13)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+    }
+
+    /**
+     * Verifies that anonymous users can browse entries from a
+     * {@link org.dspace.content.authority.DSpaceControlledVocabulary}-backed
+     * vocabulary (XML hierarchical taxonomy like SRSC).
+     * These vocabularies are public and must not require authentication.
+     */
+    @Test
+    public void correctSrscQueryAnonymousUserTest() throws Exception {
+        getClient().perform(
+                            get("/api/submission/vocabularies/srsc/entries")
+                                .param("filter", "Research")
+                                .param("size", "2"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                            VocabularyMatcher.matchVocabularyEntry(
+                                "Research Subject Categories", "", "vocabularyEntry"),
+                            VocabularyMatcher.matchVocabularyEntry(
+                                "Family research",
+                                "SOCIAL SCIENCES::Social sciences::Social work"
+                                    + "::Family research",
+                                "vocabularyEntry"))))
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)))
+                        .andExpect(jsonPath("$.page.totalPages", Matchers.is(13)))
+                        .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+    }
+
+    /**
+     * Verifies that anonymous users can browse entries from a
+     * {@link DCInputAuthority}-backed vocabulary (value-pairs).
+     * These vocabularies are public and must not require authentication.
+     */
+    @Test
+    public void correctCommonTypesQueryAnonymousUserTest() throws Exception {
+        getClient().perform(
+                        get("/api/submission/vocabularies/common_types/entries")
+                            .param("filter", "Book")
+                            .param("size", "2"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.entries",
+                            Matchers.containsInAnyOrder(
+                                VocabularyMatcher.matchVocabularyEntry(
+                                    "Book", "Book", "vocabularyEntry"),
+                                VocabularyMatcher.matchVocabularyEntry(
+                                    "Book chapter", "Book chapter",
+                                    "vocabularyEntry"))))
+                        .andExpect(jsonPath("$.page.totalElements",
+                            Matchers.is(2)))
+                        .andExpect(jsonPath("$.page.totalPages",
+                            Matchers.is(1)))
+                        .andExpect(jsonPath("$.page.size",
+                            Matchers.is(2)));
     }
 
     @Test
@@ -310,8 +371,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         VocabularyMatcher.matchVocabularyEntry("Американська (USA)", "en_US", "vocabularyEntry")
                         )))
                 .andExpect(jsonPath("$._embedded.entries[*].authority").doesNotExist())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)))
-                .andExpect(jsonPath("$.page.totalPages", Matchers.is(6)))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(13)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(7)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
 
         configurationService.setProperty("default.locale","en");
@@ -489,4 +550,51 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("entryID", "VR131402"))
                         .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void shouldReturnPrefixedAuthorityForHierarchicalSuggestions() throws Exception {
+
+        String vocabularyName = "srsc";
+
+        configurationService.setProperty("authority.controlled.dc.subject", true);
+
+        configurationService.setProperty("vocabulary.plugin.authority.store", true);
+        configurationService.setProperty("vocabulary.plugin." + vocabularyName + ".hierarchy.store", true);
+        configurationService.setProperty("vocabulary.plugin." + vocabularyName + ".hierarchy.suggest", true);
+        configurationService.setProperty("vocabulary.plugin." + vocabularyName + ".delimiter", "::");
+
+        pluginService.clearNamedPluginClasses();
+        cas.clearCache();
+        metadataAuthorityService.clearCache();
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Test collection")
+                                           .withEntityType("Publication")
+                                           .build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Publication title 2")
+                   .withSubject("committed relationships")
+                   .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularies/" + vocabularyName + "/entries")
+                .param("metadata", "dc.subject")
+                .param("collection", col1.getID().toString())
+                .param("filter", "human"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries[2]", Matchers.allOf(
+                        hasJsonPath("$.authority", is(vocabularyName + ":SCB119")),
+                        // now the display value with suggestions
+                        hasJsonPath("$.display", is("HUMANITIES and RELIGION::Other humanities and religion")),
+                        hasJsonPath("$.value", is("HUMANITIES and RELIGION::Other humanities and religion"))
+                        )));
+    }
+
 }

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.PoolTaskRest;
@@ -52,7 +52,7 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
 
-        if (!StringUtils.equalsIgnoreCase(PoolTaskRest.NAME, targetType)) {
+        if (!Strings.CI.equals(PoolTaskRest.NAME, targetType)) {
             return false;
         }
 

@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BitstreamFormatBuilder;
@@ -44,6 +46,8 @@ import org.dspace.builder.WorkspaceItemBuilder;
  * builders.
  */
 public class AbstractBuilderCleanupUtil {
+
+    private static final Logger log = LogManager.getLogger(AbstractBuilderCleanupUtil.class);
 
     private final LinkedHashMap<String, List<AbstractBuilder>> map
             = new LinkedHashMap<>();
@@ -98,14 +102,33 @@ public class AbstractBuilderCleanupUtil {
     /**
      * This method takes care of iterating over all the AbstractBuilders in the predefined order and calls
      * the cleanup method to delete the objects from the database.
-     * @throws Exception    If something goes wrong
+     * <p>
+     * Each builder is cleaned up inside its own try/catch so that a single failure (e.g. the intermittent
+     * Hibernate {@link java.util.ConcurrentModificationException} in resource registry cleanup) does not
+     * abort cleanup of the remaining builders. The first failure is rethrown at the end with any subsequent
+     * failures attached as suppressed exceptions, so nothing is silently swallowed.
+     * </p>
+     * @throws Exception    If one or more builders fail to clean up
      */
     public void cleanupBuilders() throws Exception {
+        Exception firstFailure = null;
         for (Map.Entry<String, List<AbstractBuilder>> entry : map.entrySet()) {
             List<AbstractBuilder> list = entry.getValue();
             for (AbstractBuilder abstractBuilder : list) {
-                abstractBuilder.cleanup();
+                try {
+                    abstractBuilder.cleanup();
+                } catch (Exception e) {
+                    log.error("Error cleaning up builder {}", abstractBuilder.getClass().getName(), e);
+                    if (firstFailure == null) {
+                        firstFailure = e;
+                    } else {
+                        firstFailure.addSuppressed(e);
+                    }
+                }
             }
+        }
+        if (firstFailure != null) {
+            throw firstFailure;
         }
     }
 

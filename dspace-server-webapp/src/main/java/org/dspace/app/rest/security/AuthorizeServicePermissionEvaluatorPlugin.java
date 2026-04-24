@@ -9,12 +9,14 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -52,6 +54,9 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
     @Autowired
     private ContentServiceFactory contentServiceFactory;
 
+    @Autowired
+    private BitstreamCrisSecurityService bitstreamCrisSecurityService;
+
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
                                        DSpaceRestPermission permission) {
@@ -86,6 +91,29 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                         return true;
                     }
 
+                    if (dSpaceObject instanceof Bitstream && ((Bitstream) dSpaceObject).isDeleted()) {
+                        return true; // Let downstream REST layer handle with 404
+                    }
+
+                    if (dSpaceObject instanceof Bitstream && Objects.isNull(ePerson)
+                            && authorizeService.authorizeActionBoolean(context, (Bitstream) dSpaceObject,
+                                    restPermission.getDspaceApiActionId())) {
+                        return true;
+                    }
+
+                    if (dSpaceObject instanceof Bitstream bit && !Objects.isNull(ePerson)) {
+                        try {
+                            if (bitstreamCrisSecurityService
+                                    .isBitstreamAccessAllowedByCrisSecurity(context, ePerson, bit)) {
+                                return true;
+                            }
+                        } catch (Exception e) {
+                            log.warn(
+                                    "We got an exception during the security evaluation, safe fallback " +
+                                    "ignoring extra grant.",
+                                    e);
+                        }
+                    }
 
                     if (dSpaceObject instanceof Item) {
                         Item item = (Item) dSpaceObject;

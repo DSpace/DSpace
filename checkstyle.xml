@@ -76,6 +76,12 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
             <property name="separateLineBetweenGroups" value="true"/>
             <property name="customImportOrderRules" value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE"/>
         </module>
+        <!-- Forbid obsolete Apache Commons Lang 2 imports -->
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="org.apache.commons.lang"/> <!-- use org.apache.commons.lang3 instead -->
+            <message key="import.illegal"
+                     value="Do not use obsolete Apache Commons Lang 2; use Lang 3 or (preferably) JDK alternatives"/>
+        </module>
 
         <!-- ##### Javadocs requirements ##### -->
         <!-- Requirements for Javadocs for classes/interfaces -->
@@ -105,6 +111,9 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <module name="LeftCurly"/>
         <!-- Right braces should be on start of a new line (default value) -->
         <module name="RightCurly"/>
+
+        <!-- Enforce Java-style array declaration instead of C-style -->
+        <module name="ArrayTypeStyle"/>
 
         <!-- ##### Indentation / Whitespace requirements ##### -->
         <!-- Require 4-space indentation (default value) -->

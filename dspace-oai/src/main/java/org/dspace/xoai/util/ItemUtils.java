@@ -18,10 +18,10 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -35,7 +35,6 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -50,14 +49,8 @@ import org.dspace.xoai.data.DSpaceItem;
 public class ItemUtils {
     private static final Logger log = LogManager.getLogger(ItemUtils.class);
 
-    private static final MetadataExposureService metadataExposureService
-            = UtilServiceFactory.getInstance().getMetadataExposureService();
-
     private static final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
-
-    private static final RelationshipService relationshipService
-            = ContentServiceFactory.getInstance().getRelationshipService();
 
     private static final BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
@@ -143,7 +136,7 @@ public class ItemUtils {
                     bitstream.getField().add(createValue("name", name));
                 }
                 if (oname != null) {
-                    bitstream.getField().add(createValue("originalName", name));
+                    bitstream.getField().add(createValue("originalName", oname));
                 }
                 if (description != null) {
                     bitstream.getField().add(createValue("description", description));
@@ -163,6 +156,19 @@ public class ItemUtils {
         }
 
         return bundles;
+    }
+
+    /**
+     * Sanitizes a string to remove characters that are invalid
+     * in XML 1.0 using the Apache Commons Text library.
+     * @param value The string to sanitize.
+     * @return A sanitized string, or null if the input was null.
+     */
+    private static String sanitize(String value) {
+        if (value == null) {
+            return null;
+        }
+        return StringEscapeUtils.escapeXml10(value);
     }
 
     /**
@@ -281,7 +287,7 @@ public class ItemUtils {
             valueElem = language;
         }
 
-        valueElem.getField().add(createValue("value", val.getValue()));
+        valueElem.getField().add(createValue("value", sanitize(val.getValue())));
         if (val.getAuthority() != null) {
             valueElem.getField().add(createValue("authority", val.getAuthority()));
             if (val.getConfidence() != Choices.CF_NOVALUE) {
@@ -302,15 +308,12 @@ public class ItemUtils {
         // read all metadata into Metadata Object
         metadata = new Metadata();
 
-        List<MetadataValue> vals = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+
+        List<MetadataValue> vals = UtilServiceFactory.getInstance().getMetadataSecurityService()
+                                                     .getPermissionFilteredMetadataValues(context, item);
         for (MetadataValue val : vals) {
             MetadataField field = val.getMetadataField();
             try {
-                // Don't expose fields that are hidden by configuration
-                if (metadataExposureService.isHidden(context, field.getMetadataSchema().getName(), field.getElement(),
-                        field.getQualifier())) {
-                    continue;
-                }
 
                 Element schema = getElement(metadata.getElement(), field.getMetadataSchema().getName());
                 if (schema == null) {

@@ -208,8 +208,8 @@ public class OAIHarvester {
     /**
      * Cycle through the options and find the metadata namespace matching the provided key.
      *
-     * @param metadataKey
-     * @return Namespace of the designated metadata format. Returns null of not found.
+     * @param metadataKey the metadata format key (e.g. dc, qdc) as defined in oai.cfg
+     * @return Namespace of the designated metadata format. Returns null if not found.
      */
     public static Namespace getDMDNamespace(String metadataKey) {
         String metadataString = null;
