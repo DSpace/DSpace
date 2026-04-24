@@ -303,14 +303,14 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             source.setCollection(toCollection);
 
             // Do entity types of Item and Collection mismatch now?
-            if(!this.itemService.getEntityType(source.getItem()).equals(
-                    this.collectionService.getEntityType(source.getCollection())
-            )){
+            String currentEntityTypeOfItem = this.itemService.getEntityType(source.getItem());
+            String entityTypeOfCurrentCollection = this.collectionService.getEntityType(source.getCollection());
+            if (!currentEntityTypeOfItem.equals(entityTypeOfCurrentCollection)) {
                 // Set entity type according to *current* Collection's type
                 this.itemService.setEntityType(
                         context,
                         source.getItem(),
-                        this.collectionService.getEntityType(source.getCollection())
+                        entityTypeOfCurrentCollection
                 );
             }
 
