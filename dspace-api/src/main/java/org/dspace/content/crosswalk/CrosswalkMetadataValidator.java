@@ -109,8 +109,8 @@ public class CrosswalkMetadataValidator {
                         }
                     } else if (!fieldChoice.equals("ignore")) {
                         throw new CrosswalkException(
-                            "The '" + element + "." + qualifier + "' element has not been defined in this DSpace " +
-                                "instance. ");
+                            "The '" + mdSchema.getName() + "." + element + "." + qualifier +
+                                "' element has not been defined in this DSpace instance.");
                     }
                 }
             }
