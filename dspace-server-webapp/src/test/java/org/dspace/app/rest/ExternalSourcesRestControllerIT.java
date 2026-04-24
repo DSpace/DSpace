@@ -43,11 +43,11 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
                                 ExternalSourceMatcher.matchExternalSource("scopus", "scopus", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaJournalIssn", "sherpaJournalIssn", false),
+                                    "opfJournalIssn", "opfJournalIssn", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaJournal", "sherpaJournal", false),
+                                    "opfJournal", "opfJournal", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                    "sherpaPublisher", "sherpaPublisher", false),
+                                    "opfPublisher", "opfPublisher", false),
                                 ExternalSourceMatcher.matchExternalSource(
                                         "pubmed", "pubmed", false),
                                 ExternalSourceMatcher.matchExternalSource(

@@ -64,7 +64,7 @@ import org.xml.sax.SAXException;
  * Intended use: cataloging tool in workflow and general curation.
  * The task uses a URL 'template' to compose the service call, e.g.
  *
- * <p>{@code http://www.sherpa.ac.uk/romeo/api29.php?issn=\{dc.identifier.issn\}}
+ * <p>{@code http://www.openpolicyfinder.jisc.ac.uk/api29.php?issn=\{dc.identifier.issn\}}
  *
  * <p>Task will substitute the value of the passed item's metadata field
  * in the {parameter} position. If multiple values are present in the
