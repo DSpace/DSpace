@@ -456,16 +456,31 @@ public abstract class AbstractMETSDisseminator
                                 // contents are unchanged
                                 ze.setTime(DEFAULT_MODIFIED_DATE);
                             }
-                            ze.setSize(auth ? bitstream.getSizeBytes() : 0);
-                            zip.putNextEntry(ze);
+
+                            InputStream bitstreamInput = null;
+                            // If user is authorized to read this bitstream, attempt to retrieve it.
+                            // If it cannot be retrieved, we'll log a warning and replace with a zero-length file.
                             if (auth) {
-                                InputStream input = bitstreamService.retrieve(context, bitstream);
-                                Utils.copy(input, zip);
-                                input.close();
+                                try {
+                                    bitstreamInput = bitstreamService.retrieve(context, bitstream);
+                                } catch (Exception e) {
+                                    log.warn("Adding zero-length file for Bitstream, uuid={}."
+                                                 + " Bitstream is unable to be retrieved from assetstore."
+                                                 + " Error={}", bitstream.getID(), e.getMessage());
+                                }
+                            }
+
+                            // If bitstream was able to be retrieved, save its size in Zip entry.
+                            ze.setSize(bitstreamInput != null ? bitstream.getSizeBytes() : 0);
+                            zip.putNextEntry(ze);
+
+                            // Assuming bitstream was able to be retrieved above, copy it to Zip and close InputStream
+                            if (auth && bitstreamInput != null) {
+                                Utils.copy(bitstreamInput, zip);
+                                bitstreamInput.close();
                             } else {
-                                log.warn("Adding zero-length file for Bitstream, uuid="
-                                             + String.valueOf(bitstream.getID())
-                                             + ", not authorized for READ.");
+                                log.warn("Adding zero-length file for Bitstream, uuid={}"
+                                             + ", not authorized for READ.", bitstream.getID());
                             }
                             zip.closeEntry();
                         } else if (unauth != null && unauth.equalsIgnoreCase("skip")) {
@@ -629,6 +644,13 @@ public abstract class AbstractMETSDisseminator
                         ByteArrayOutputStream disseminateOutput = new ByteArrayOutputStream();
                         sxwalk.disseminate(context, dso, disseminateOutput);
                         disseminateOutput.close();
+
+                        // If our disseminated output has zero size, exit immediately (i.e. return a null mdSec).
+                        // Likely, the outputstream failed to be created, so we cannot include it in this package.
+                        if (disseminateOutput.size() == 0) {
+                            return null;
+                        }
+
                         // Convert output to an inputstream, so we can write to manifest or Zip file
                         ByteArrayInputStream crosswalkedStream = new ByteArrayInputStream(
                             disseminateOutput.toByteArray());

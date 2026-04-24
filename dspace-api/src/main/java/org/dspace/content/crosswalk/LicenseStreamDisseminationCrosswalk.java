@@ -56,7 +56,12 @@ public class LicenseStreamDisseminationCrosswalk
             Bitstream licenseBs = PackageUtils.findDepositLicense(context, (Item) dso);
 
             if (licenseBs != null) {
-                Utils.copy(bitstreamService.retrieve(context, licenseBs), out);
+                try {
+                    Utils.copy(bitstreamService.retrieve(context, licenseBs), out);
+                } catch (Exception e) {
+                    log.warn("Could not retrieve license file for Item with UUID={}. " +
+                                 "Leaving it out of generated package. Error{}", dso.getID(), e.getMessage());
+                }
             }
         }
     }
