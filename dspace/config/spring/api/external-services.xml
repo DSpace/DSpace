@@ -216,26 +216,26 @@
         </property>
     </bean>
 
-    <!-- Sherpa importers -->
-    <bean class="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider" init-method="init">
-        <property name="sherpaService">
-            <bean class="org.dspace.app.sherpa.SHERPAService">
+    <!-- Open Policy Finder importers -->
+    <bean class="org.dspace.external.provider.impl.OpenPolicyFinderJournalISSNDataProvider" init-method="init">
+        <property name="openPolicyFinderService">
+            <bean class="org.dspace.app.openpolicyfinder.OpenPolicyFinderService">
                 <property name="maxNumberOfTries" value="3"/>
                 <property name="sleepBetweenTimeouts" value="2000"/>
                 <property name="timeout" value="5000"/>
             </bean>
         </property>
-        <property name="sourceIdentifier" value="sherpaJournalIssn"/>
+        <property name="sourceIdentifier" value="opfJournalIssn"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Journal</value>
             </list>
         </property>
     </bean>
-    <bean class="org.dspace.external.provider.impl.SHERPAv2JournalDataProvider" init-method="init">
-        <property name="sourceIdentifier" value="sherpaJournal"/>
-        <property name="sherpaService">
-            <bean class="org.dspace.app.sherpa.SHERPAService">
+    <bean class="org.dspace.external.provider.impl.OpenPolicyFinderJournalDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="opfJournal"/>
+        <property name="openPolicyFinderService">
+            <bean class="org.dspace.app.openpolicyfinder.OpenPolicyFinderService">
                 <property name="maxNumberOfTries" value="3"/>
                 <property name="sleepBetweenTimeouts" value="2000"/>
                 <property name="timeout" value="5000"/>
@@ -247,10 +247,10 @@
             </list>
         </property>
     </bean>
-    <bean class="org.dspace.external.provider.impl.SHERPAv2PublisherDataProvider" init-method="init">
-        <property name="sourceIdentifier" value="sherpaPublisher"/>
-        <property name="sherpaService">
-            <bean class="org.dspace.app.sherpa.SHERPAService">
+    <bean class="org.dspace.external.provider.impl.OpenPolicyFinderPublisherDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="opfPublisher"/>
+        <property name="openPolicyFinderService">
+            <bean class="org.dspace.app.openpolicyfinder.OpenPolicyFinderService">
                 <property name="maxNumberOfTries" value="3"/>
                 <property name="sleepBetweenTimeouts" value="2000"/>
                 <property name="timeout" value="5000"/>

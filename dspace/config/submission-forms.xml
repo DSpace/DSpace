@@ -719,7 +719,7 @@
                     <!--<filter>creativework.publisher:somepublishername</filter>-->
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
-                    <externalsources>sherpaJournal</externalsources>
+                    <externalsources>opfJournal</externalsources>
                 </relation-field>
             </row>
             <row>
