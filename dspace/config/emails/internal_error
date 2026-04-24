@@ -10,15 +10,61 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Internal Server Error")
-An internal server error occurred on ${params[0]}:
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Server Error Occurred</title>
+    <style>
+        #parse("_email_common_styles")
+        .error-details {
+            background-color: #fff3f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .error-message {
+            background-color: #fce4e4;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        .exception {
+            background-color: #ffdada;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Internal Server Error Occurred</h2>
 
-Date:       ${params[1]}
-Session ID: ${params[2]}
-User:       ${params[5]}
-IP address: ${params[6]}
+        <div class="error-box">
+            An internal server error occurred on ${params[0]}
+        </div>
 
-${params[3]}
+        <div class="error-details">
+            <div class="detail-item"><strong>Date:</strong> ${params[1]}</div>
+            <div class="detail-item"><strong>Session ID:</strong> ${params[2]}</div>
+            <div class="detail-item"><strong>User:</strong> ${params[5]}</div>
+            <div class="detail-item"><strong>IP address:</strong> ${params[6]}</div>
+        </div>
 
-Exception:
-${params[4]}
+        <div class="error-message">
+            ${params[3]}
+        </div>
+
+        <p><strong>Exception:</strong></p>
+        <div class="exception">
+          ${params[4]}
+        </div>
+    </div>
+</body>
+</html>

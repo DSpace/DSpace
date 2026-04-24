@@ -10,30 +10,74 @@
 ##  {5} custom message sent by the grantor.
 ##  {6} URL of the requested Item including the secure access token
 ##  {7} expiration date of the granted access (timestamp, formatted in requestitem.cfg)
-
+#set($mimetype = "text/html")
 #set($subject = 'Request for Copy of Restricted Document is Granted')
-Dear ${params[0]}:
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Copy Granted Token</title>
+    <style>
+        #parse("_email_common_styles")
+        .greeting {
+            margin-bottom: 20px;
+        }
+        .secure-link {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .access-info {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .message {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #007cba;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="greeting">Dear ${params[0]},</p>
 
-Your request for a copy of the file(s) from the below document has been approved.  The following link will grant access to the files you requested.
+        <div class="success-box">
+            Your request for a copy of the file(s) from the below document has been approved. The following link will grant access to the files you requested.
+        </div>
 
-Secure link: ${params[6]}
+        <div class="secure-link">
+            <p><strong>Secure link:</strong></p>
+            <p><a href="${params[6]}" class="button">Access Files</a></p>
+            <p>${params[6]}</p>
+        </div>
 
-    ${params[2]}
-    ${params[1]}
+        <div class="detail-box">
+            ${params[2]}<br>
+            <a href="${params[1]}">${params[1]}</a>
+        </div>
 
-#if( $params[7] )
+        #if( $params[7] )
+        <div class="access-info">
+            <p><strong>Your access will last until ${params[7]}.</strong></p>
+        </div>
+        #end
 
+        #if( $params[5] )
+        <div class="message">
+            <p><strong>An additional message from the approver follows:</strong></p>
+            <p>${params[5]}</p>
+        </div>
+        #end
 
-Your access will last until ${params[7]}.
-#end
-#if( $params[5] )
-
-
-
-An additional message from the approver follows:
-
-${params[5]}
-#end
-
-Best regards,
-The ${config.get('dspace.name')} Team
+        <p class="signature">Best regards,<br>
+        The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

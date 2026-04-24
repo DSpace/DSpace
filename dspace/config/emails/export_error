@@ -6,11 +6,28 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: The item export you requested was not completed.")
-The item export you requested was not completed, due to the following reason:
- ${params[0]}
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Export Request Failed</title>
+    <style>
+        #parse("_email_common_styles")
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>The item export you requested was not completed, due to the following reason:</p>
 
-For more information you may contact your system administrator:
- ${params[1]}
+        <div class="error-box">
+            ${params[0]}
+        </div>
 
-The ${config.get('dspace.name')} Team
+        <p>For more information you may contact your system administrator:</p>
+        <p><a href="${params[1]}">${params[1]}</a></p>
+
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

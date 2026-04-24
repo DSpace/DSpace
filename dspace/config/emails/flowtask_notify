@@ -7,17 +7,57 @@
 ## {4}  Task result
 ## {5}  Workflow action taken
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Curation Task Report")
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curation Task Completed</title>
+    <style>
+        #parse("_email_common_styles")
+        .submission-info {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .result {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #007cba;
+        }
+        .action {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Curation Task Completed</h2>
 
-Title:         ${params[0]}
-Collection:    ${params[1]}
-Submitted by:  ${params[2]}
+        <div class="submission-info">
+            <p><strong>Title:</strong> ${params[0]}<br>
+            <strong>Collection:</strong> ${params[1]}<br>
+            <strong>Submitted by:</strong> ${params[2]}</p>
+        </div>
 
-Curation task ${params[3]} has been performed
-with the following result:
+        <p>Curation task <strong>${params[3]}</strong> has been performed with the following result:</p>
 
-${params[4]}
+        <div class="result">
+            ${params[4]}
+        </div>
 
-Action taken on the submission: ${params[5]}
+        <div class="action">
+            Action taken on the submission: ${params[5]}
+        </div>
 
-The ${config.get('dspace.name')} Team
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>

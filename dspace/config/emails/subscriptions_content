@@ -2,17 +2,61 @@
 ##
 ## Parameters: {0} Communities updates
 ##             {1} Collections updates
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')} Subscriptions")
-This email is sent from ${config.get('dspace.name')} based on the chosen subscription preferences.
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Update</title>
+    <style>
+        #parse("_email_common_styles")
+        .section-title {
+            color: #007cba;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .items-list {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Subscription Update</h2>
 
-#if( not( "$params[0]" == "" ))
-Community Subscriptions:
-------------------------
-List of changed items : ${params[0]}
+        <div class="info-box">
+            This email is sent from ${config.get('dspace.name')} based on your chosen subscription preferences.
+        </div>
 
-#end
-#if( not( "$params[1]" == "" ))
-Collection Subscriptions:
--------------------------
-List of changed items : ${params[1]}
-#end
+        #if( not( "$params[0]" == "" ))
+        <div class="detail-box">
+            <h3 class="section-title">Community Subscriptions</h3>
+            <p><strong>List of changed items:</strong></p>
+            <div class="items-list">
+                ${params[0]}
+            </div>
+        </div>
+        #end
+
+        #if( not( "$params[1]" == "" ))
+        <div class="detail-box">
+            <h3 class="section-title">Collection Subscriptions</h3>
+            <p><strong>List of changed items:</strong></p>
+            <div class="items-list">
+                ${params[1]}
+            </div>
+        </div>
+        #end
+
+    </div>
+</body>
+</html>

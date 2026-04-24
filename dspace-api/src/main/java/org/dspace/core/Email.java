@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +30,6 @@ import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
 import jakarta.mail.Address;
-import jakarta.mail.BodyPart;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
@@ -39,6 +40,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimePart;
 import jakarta.mail.internet.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -173,6 +175,11 @@ public class Email {
      */
     private String charset;
 
+    /**
+     * The MIME type this message will be sent in
+     */
+    private String mimeType;
+
     /** The message being assembled. */
     MimeMessage message;
 
@@ -212,6 +219,7 @@ public class Email {
         template = null;
         replyTo = null;
         charset = null;
+        mimeType = null;
     }
 
     /**
@@ -241,8 +249,46 @@ public class Email {
         StringResourceRepository repo = (StringResourceRepository)
                 templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
         repo.putStringResource(contentName, content);
+        loadSiblingTemplates(name, repo);
         // Turn content into a template.
         template = templateEngine.getTemplate(contentName);
+    }
+
+    /**
+     * Load template fragments in the same directory as the requested template.
+     * Fragments are files prefixed with underscore and can be referenced via
+     * Velocity {@code #parse()} by filename.
+     *
+     * @param templatePath full path to the template file.
+     * @param repo Velocity repository used to resolve template names.
+     */
+    private void loadSiblingTemplates(String templatePath, StringResourceRepository repo) {
+        File templateFile = new File(templatePath);
+        File parentDir = templateFile.getParentFile();
+        if (parentDir == null || !parentDir.isDirectory()) {
+            return;
+        }
+
+        File[] siblingTemplates = parentDir.listFiles((dir, filename) ->
+                filename.startsWith("_") && !filename.equals(templateFile.getName()));
+        if (siblingTemplates == null) {
+            return;
+        }
+
+        for (File siblingTemplate : siblingTemplates) {
+            if (!siblingTemplate.isFile() || !siblingTemplate.canRead()) {
+                continue;
+            }
+            try {
+                String siblingContent = Files.readString(siblingTemplate.toPath(), StandardCharsets.UTF_8);
+                // Register by basename for #parse("_fragment") and by absolute path
+                // for administrators who prefer explicit references.
+                repo.putStringResource(siblingTemplate.getName(), siblingContent);
+                repo.putStringResource(siblingTemplate.getAbsolutePath(), siblingContent);
+            } catch (IOException ex) {
+                LOG.warn("Cannot load email template fragment '{}': {}", siblingTemplate, ex.getMessage());
+            }
+        }
     }
 
     /**
@@ -332,6 +378,15 @@ public class Email {
     }
 
     /**
+     * Set the MIME type of the message.
+     *
+     * @param mt the name of a MIME type, such as "text/plain" (default) or "text/html".
+     */
+    public void setMimeType(String mt) {
+        mimeType = mt;
+    }
+
+    /**
      * "Reset" the message. Clears the arguments, attachments and recipients,
      * but leaves the subject and content intact.
      */
@@ -343,6 +398,7 @@ public class Email {
         moreAttachments.clear();
         replyTo = null;
         charset = null;
+        mimeType = null;
     }
 
     /**
@@ -393,6 +449,10 @@ public class Email {
         // If no character set specified, attempt to retrieve a default
         if (charset == null) {
             charset = config.getProperty("mail.charset");
+        }
+
+        if (mimeType == null) {
+            mimeType = config.getProperty("mail.mimetype");
         }
 
         // Get session
@@ -467,7 +527,13 @@ public class Email {
                     subject = headerValue;
                 }
             } else if ("charset".equalsIgnoreCase(headerName)) {
-                charset = headerValue;
+                if (headerValue != null) {
+                    charset = headerValue;
+                }
+            } else if ("mimetype".equalsIgnoreCase(headerName)) {
+                if (headerValue != null) {
+                    mimeType = headerValue;
+                }
             } else {
                 message.setHeader(headerName, headerValue);
             }
@@ -482,17 +548,13 @@ public class Email {
 
         // Attach the body.
         if (attachments.isEmpty() && moreAttachments.isEmpty()) { // Flat body.
-            if (charset != null) {
-                message.setText(body, charset);
-            } else {
-                message.setText(body);
-            }
+            setBody(message, body);
         } else { // Add attachments.
             Multipart multipart = new MimeMultipart();
 
             // create the first part of the email
-            BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(body);
+            MimeBodyPart messageBodyPart = new MimeBodyPart();
+            setBody(messageBodyPart, body);
             multipart.addBodyPart(messageBodyPart);
 
             // Add file attachments
@@ -523,6 +585,27 @@ public class Email {
             Address[] replyToAddr = new Address[1];
             replyToAddr[0] = new InternetAddress(replyTo);
             message.setReplyTo(replyToAddr);
+        }
+    }
+
+    /**
+     * Set mail body on a {@link MimePart} (works for both {@link MimeMessage}
+     * and {@link MimeBodyPart}).  When a MIME type is configured the charset is
+     * always included, defaulting to UTF-8 if not explicitly set.
+     *
+     * @param part     target message or body part.
+     * @param bodyText rendered body text.
+     * @throws MessagingException passed through.
+     */
+    private void setBody(MimePart part, String bodyText) throws MessagingException {
+        if (mimeType != null && charset != null) {
+            part.setContent(bodyText, mimeType + "; charset=" + charset);
+        } else if (mimeType != null) {
+            part.setContent(bodyText, mimeType + "; charset=UTF-8");
+        } else if (charset != null) {
+            part.setText(bodyText, charset);
+        } else {
+            part.setText(bodyText);
         }
     }
 
@@ -600,7 +683,6 @@ public class Email {
      */
     public static Email getEmail(String emailFile)
         throws IOException {
-        String charset = null;
         StringBuilder contentBuffer = new StringBuilder();
         try (
             InputStream is = new FileInputStream(emailFile);
@@ -620,9 +702,6 @@ public class Email {
         }
         Email email = new Email();
         email.setContent(emailFile, contentBuffer.toString());
-        if (charset != null) {
-            email.setCharset(charset);
-        }
         return email;
     }
 

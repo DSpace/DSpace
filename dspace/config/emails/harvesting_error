@@ -8,15 +8,48 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
+#set($mimetype = "text/html")
 #set($subject = "${config.get('dspace.name')}: Harvesting Error")
-Collection ${params[0]} failed on harvest:
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Failed for Collection</title>
+    <style>
+        #parse("_email_common_styles")
+        .error-details {
+            background-color: #fff3f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .exception {
+            background-color: #fce4e4;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #d32f2f;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Collection ${params[0]} failed on harvest</h2>
 
-Date:       	${params[1]}
-Status Flag: 	${params[2]}
+        <div class="error-details">
+            <p><strong>Date:</strong> ${params[1]}<br>
+            <strong>Status Flag:</strong> ${params[2]}</p>
+        </div>
 
-${params[3]}
+        <p>${params[3]}</p>
 
-Exception:
-${params[4]}
+        <p><strong>Exception:</strong></p>
+        <div class="exception">
+          ${params[4]}
+        </div>
 
-The ${config.get('dspace.name')} Team
+        <p class="signature">The ${config.get('dspace.name')} Team</p>
+    </div>
+</body>
+</html>
