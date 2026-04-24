@@ -295,31 +295,44 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException {
-        // Set WorkspaceItem's Collection to destination collection
-        source.setCollection(toCollection);
+        // First, check if there's anything to do at all
+        if(fromCollection.equals(toCollection)) {
+            return; // Nothing to do here.
+        } else {
+            // Set WorkspaceItem's Collection to destination Collection
+            source.setCollection(toCollection);
 
-        // Set entity type according to destination collection
-        this.itemService.setEntityType(
-                context,
-                source.getItem(),
-                this.collectionService.getEntityType(source.getCollection()               )
-        );
-
-        // Remove metadata fields that do not occur in destination collection's submission form:
-        List<MetadataValue> remove = new ArrayList<>();
-        // Query differences between collections' submission forms
-        List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
-        // Of differences found, keep only those that are actually present on the item
-        for (String toRemove : diff) {
-            for (MetadataValue value : source.getItem().getMetadata()) {
-                if (value.getMetadataField().toString('.').equals(toRemove)) {
-                    remove.add(value);
-                }
+            // Do entity types of Item and Collection mismatch now?
+            if(!this.itemService.getEntityType(source.getItem()).equals(
+                    this.collectionService.getEntityType(source.getCollection())
+            )){
+                // Set entity type according to *current* Collection's type
+                this.itemService.setEntityType(
+                        context,
+                        source.getItem(),
+                        this.collectionService.getEntityType(source.getCollection())
+                );
             }
-        }
-        // Remove the metadata
-        source.getItem().removeMetadata(remove);
 
+            // Check for differences between Collections' submission forms
+            List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
+            // If there are differences,
+            // remove metadata fields that do not occur in destination Collection's submission form:
+            if(!diff.isEmpty()) {
+                List<MetadataValue> remove = new ArrayList<>();
+                // Of differences found, keep only those that are actually present on the item
+                for (String toRemove : diff) {
+                    for (MetadataValue value : source.getItem().getMetadata()) {
+                        if (value.getMetadataField().toString('.').equals(toRemove)) {
+                            remove.add(value);
+                        }
+                    }
+                }
+                // Remove the metadata
+                source.getItem().removeMetadata(remove);
+            }
+
+        }
     }
 
     private void addPoliciesToSubmitterGroup(Context context, Item item, Collection collection, int[] actionIds)
