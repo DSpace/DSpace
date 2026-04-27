@@ -93,7 +93,6 @@ public class WebApplication {
         googleAsyncEventListener.sendCollectedEvents();
     }
 
-
     /**
      * Register the "DSpaceContextListener" so that it is loaded
      * for this Application.
