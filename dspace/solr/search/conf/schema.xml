@@ -294,7 +294,10 @@
     <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.coll" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.parent" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" required="false" omitNorms="true" />
-  
+
+    <!-- Cached item count for communities and collections, updated periodically by ItemCountDAOSolr -->
+    <field name="item.count" type="pint" indexed="true" stored="true" required="false" />
+
     <field name="a_spell" type="textSpell" />
     <copyField source="fulltext" dest="a_spell" />
     <copyField source="fulltext" dest="fulltext_hl" />
