@@ -6002,6 +6002,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                        .withPassword(password)
                                        .build();
 
+        EPerson anotherEperson = EPersonBuilder.createEPerson(context)
+                                       .withEmail("anothereperson@test.com")
+                                       .withPassword(password)
+                                       .build();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -6084,9 +6089,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk());
 
             // Verify author can also PATCH (modify) the workspace item
-            Operation authorPatchOperation = new AddOperation("/sections/traditionalpageone/dc.title",
-                                                              List.of(Map.of("value", "Title by author")));
-            String authorPatchBody = getPatchContent(List.of(authorPatchOperation));
+            List<Operation> ops = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title", List.of(Map.of("value", "Title by author"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued", List.of(Map.of("value", "2026")))
+            );
+            String authorPatchBody = getPatchContent(ops);
             getClient(getAuthToken(author.getEmail(), password))
                 .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
                              .content(authorPatchBody)
@@ -6094,6 +6101,26 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
                                     is("Title by author")));
+
+            // only submitter can update license
+            List<Operation> addGrant = new ArrayList<Operation>();
+            addGrant.add(new AddOperation("/sections/license/granted", true));
+            String submitterPatchBody = getPatchContent(addGrant);
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(submitterPatchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // only submitter can upload a file
+            InputStream pdf = InputStream.nullInputStream();
+            final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                                    "application/pdf", pdf);
+            getClient(submitterToken)
+                .perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID()).file(pdfFile))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
+
 
             getClient(getAuthToken(author.getEmail(), password))
                 .perform(get("/api/discover/search/objects")
@@ -6109,6 +6136,15 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded").exists())
                 .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+            context.commit();
+
+            // author cannot deposit
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .contentType(textUriContentType))
+                .andExpect(status().isForbidden());
 
         } finally {
             WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
