@@ -213,6 +213,59 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
     }
 
+    /**
+     * Verifies that anonymous users can browse entries from a
+     * {@link org.dspace.content.authority.DSpaceControlledVocabulary}-backed
+     * vocabulary (XML hierarchical taxonomy like SRSC).
+     * These vocabularies are public and must not require authentication.
+     */
+    @Test
+    public void correctSrscQueryAnonymousUserTest() throws Exception {
+        getClient().perform(
+                            get("/api/submission/vocabularies/srsc/entries")
+                                .param("filter", "Research")
+                                .param("size", "2"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                            VocabularyMatcher.matchVocabularyEntry(
+                                "Research Subject Categories", "", "vocabularyEntry"),
+                            VocabularyMatcher.matchVocabularyEntry(
+                                "Family research",
+                                "SOCIAL SCIENCES::Social sciences::Social work"
+                                    + "::Family research",
+                                "vocabularyEntry"))))
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)))
+                        .andExpect(jsonPath("$.page.totalPages", Matchers.is(13)))
+                        .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+    }
+
+    /**
+     * Verifies that anonymous users can browse entries from a
+     * {@link DCInputAuthority}-backed vocabulary (value-pairs).
+     * These vocabularies are public and must not require authentication.
+     */
+    @Test
+    public void correctCommonTypesQueryAnonymousUserTest() throws Exception {
+        getClient().perform(
+                        get("/api/submission/vocabularies/common_types/entries")
+                            .param("filter", "Book")
+                            .param("size", "2"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.entries",
+                            Matchers.containsInAnyOrder(
+                                VocabularyMatcher.matchVocabularyEntry(
+                                    "Book", "Book", "vocabularyEntry"),
+                                VocabularyMatcher.matchVocabularyEntry(
+                                    "Book chapter", "Book chapter",
+                                    "vocabularyEntry"))))
+                        .andExpect(jsonPath("$.page.totalElements",
+                            Matchers.is(2)))
+                        .andExpect(jsonPath("$.page.totalPages",
+                            Matchers.is(1)))
+                        .andExpect(jsonPath("$.page.size",
+                            Matchers.is(2)));
+    }
+
     @Test
     public void notScrollableVocabularyRequiredQueryTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);

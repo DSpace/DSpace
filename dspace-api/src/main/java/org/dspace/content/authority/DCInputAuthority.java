@@ -217,6 +217,19 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         }
     }
 
+    /**
+     * Value-pairs from submission forms are always considered public.
+     * They contain static, non-sensitive dropdown options (e.g., document
+     * types, languages, OpenAIRE vocabularies) that must be browsable
+     * by anonymous users in submission vocabulary lookups.
+     *
+     * @return always {@code true}
+     */
+    @Override
+    public boolean isPublic() {
+        return true;
+    }
+
     @Override
     public boolean isScrollable() {
         return true;

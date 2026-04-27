@@ -23,10 +23,13 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.security.service.MetadataSecurityService;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSecurityEvaluation;
 import org.dspace.core.Context;
@@ -133,18 +136,29 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         this.dcInputsReader = new DCInputsReader();
     }
 
+
     @Override
-    public List<MetadataValue> getPermissionFilteredMetadataValues(Context context, Item item) {
-        List<MetadataValue> values = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
-        return getPermissionFilteredMetadata(context, item, values);
+    public <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso,
+                                                                                            String schema,
+                                                                   String element, String qualifier, String language) {
+        DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+        List<MetadataValue> values =
+            dSpaceObjectService.getMetadata(dso, schema, element, qualifier, language);
+        return getPermissionFilteredMetadata(context, dso, values);
     }
 
     @Override
-    public List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context, Item item) {
-        String language = context != null ? context.getCurrentLocale().getLanguage() : Item.ANY;
+    public <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso) {
+        return this.getPermissionFilteredMetadataValues(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+    }
 
-        List<MetadataValue> values = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, language, true);
-        return getPermissionFilteredMetadata(context, item, values);
+    @Override
+    public <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context,
+                                                                                                   T dso) {
+        String language = context != null ? context.getCurrentLocale().getLanguage() : Item.ANY;
+        DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+        List<MetadataValue> values = dSpaceObjectService.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, language);
+        return getPermissionFilteredMetadata(context, dso, values);
     }
 
     /**
@@ -163,46 +177,46 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      *   <li><strong>Public Access:</strong> Fields configured as public are always visible</li>
      *   <li><strong>Edit Permission:</strong> Users who can edit the item see all non-hidden fields</li>
      *   <li><strong>View Permission:</strong> Regular users see only public and non-hidden fields</li>
-     *   <li><strong>No Access:</strong> Withdrawn items hide all metadata from non-admins</li>
+     *   <li><strong>No Access:</strong> Withdrawn dso hide all metadata from non-admins</li>
      * </ul>
      *
      * @param context        the DSpace context containing user and permission information
-     * @param item           the item whose metadata should be filtered
+     * @param dso           the dso whose metadata should be filtered
      * @param metadataValues the complete list of metadata values to filter
      * @return filtered list containing only metadata values the user can access
      */
-    private List<MetadataValue> getPermissionFilteredMetadata(Context context, Item item,
+    private <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadata(Context context, T dso,
                                                               List<MetadataValue> metadataValues) {
 
-        if (item.isWithdrawn() && isNotAdmin(context, item)) {
+        if ((dso instanceof Item item) && item.isWithdrawn() && isNotAdmin(context, dso)) {
             return List.of();
         }
 
         Optional<List<DCInputSet>> inputs = submissionDefinitionInputs();
         if (inputs.isPresent()) {
-            return getFromSubmission(context, item, inputs.get(), metadataValues);
+            return getFromSubmission(context, dso, inputs.get(), metadataValues);
         }
 
         return metadataValues.stream()
-                                .filter(value -> isMetadataValueVisible(context, item, value))
-                                .filter(value -> isMetadataValueReturnAllowed(context, item, value))
+                             .filter(value -> isMetadataValueVisible(context, dso, value))
+                             .filter(value -> isMetadataValueReturnAllowed(context, dso, value))
                                 .collect(Collectors.toList());
 
     }
 
-    private boolean canEditItem(Context context, Item item) {
+    private boolean canEditItem(Context context, Item dso) {
         if (context == null) {
             return false;
         }
         try {
-            return this.itemService.canEdit(context, item);
+            return itemService.canEdit(context, dso);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private boolean isMetadataValueVisible(Context context, Item item, MetadataValue value) {
-        return isMetadataFieldVisible(context, item, value.getMetadataField());
+    private <T extends DSpaceObject> boolean isMetadataValueVisible(Context context, T dso, MetadataValue value) {
+        return isMetadataFieldVisible(context, dso, value.getMetadataField());
     }
 
     /**
@@ -211,7 +225,7 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * <p><strong>Visibility Rules (in order of precedence):</strong></p>
      * <ol>
      *   <li><strong>Public Field:</strong> Always visible if configured in {@code metadata.publicField}</li>
-     *   <li><strong>Permission Check:</strong> Visible if user can edit item OR field is not hidden</li>
+     *   <li><strong>Permission Check:</strong> Visible if user can edit dso OR field is not hidden</li>
      * </ol>
      * 
      * <p><strong>Configuration Examples:</strong></p>
@@ -224,18 +238,18 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * </pre>
      * 
      * @param context the DSpace context for permission checking
-     * @param item the item containing the metadata field
+     * @param dso the dso containing the metadata field
      * @param metadataField the metadata field to check for visibility
      * @return true if the field should be visible to the current user, false otherwise
      */
-    private boolean isMetadataFieldVisible(Context context, Item item,
+    private <T extends DSpaceObject> boolean isMetadataFieldVisible(Context context, T dso,
                                            MetadataField metadataField) {
 
         if (isPublicMetadataField(metadataField)) {
             return true;
         }
 
-        if (isMetadataFieldVisibleFor(context, item, metadataField)) {
+        if (isMetadataFieldVisibleFor(context, dso, metadataField)) {
             return true;
         }
 
@@ -252,20 +266,26 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * </ul>
      * 
      * <p>This implements the principle that content editors should see all metadata to properly
-     * manage items, while regular users only see publicly visible fields.</p>
+     * manage dso, while regular users only see publicly visible fields.</p>
      * 
      * @param context the DSpace context for checking edit permissions
-     * @param item the item to check edit permissions against
+     * @param dso the dso to check edit permissions against
      * @param metadataField the field to check hidden status for
      * @return true if field is not hidden OR user can edit the item
      */
-    private boolean isMetadataFieldVisibleFor(Context context, Item item, MetadataField metadataField) {
-        return isNotHidden(context, metadataField) || canEditItem(context, item);
+    private <T extends DSpaceObject> boolean isMetadataFieldVisibleFor(Context context, T dso,
+                                                                       MetadataField metadataField) {
+        return isNotHidden(context, metadataField) || ((dso instanceof Item item) && canEditItem(context, item));
     }
 
-    private boolean isMetadataValueReturnAllowed(Context context, Item item, MetadataValue metadataValue) {
+    private <T extends DSpaceObject> boolean isMetadataValueReturnAllowed(Context context, T dso,
+                                                                          MetadataValue metadataValue) {
         Integer securityLevel = metadataValue.getSecurityLevel();
         if (securityLevel == null) {
+            return true;
+        }
+
+        if (!(dso instanceof Item item)) {
             return true;
         }
 
@@ -329,6 +349,7 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     private Optional<List<DCInputSet>> submissionDefinitionInputs() {
         return Optional.ofNullable(requestService.getCurrentRequest())
                        .map(rq -> (String) rq.getAttribute("submission-name"))
+                       .filter(StringUtils::isNotBlank)
                        .map(this::dcInputsSet);
     }
 
@@ -340,9 +361,9 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         }
     }
 
-    private boolean isNotAdmin(Context context, Item item) {
+    private <T extends DSpaceObject> boolean isNotAdmin(Context context, T dso) {
         try {
-            return context == null || !authorizeService.isAdmin(context, item);
+            return context == null || !authorizeService.isAdmin(context, dso);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
@@ -372,12 +393,12 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * users only see fields that are relevant to their current submission workflow step.</p>
      *
      * @param context        the DSpace context for permission checking
-     * @param item           the item being processed in the submission workflow
+     * @param dso            the dso being processed in the submission workflow
      * @param dcInputSets    the submission form definitions that apply to this context
      * @param metadataValues the metadata values to filter
      * @return filtered list containing only submission-relevant and permission-allowed metadata
      */
-    private List<MetadataValue> getFromSubmission(Context context, Item item,
+    private <T extends DSpaceObject> List<MetadataValue> getFromSubmission(Context context, T dso,
                                                   final List<DCInputSet> dcInputSets,
                                                   final List<MetadataValue> metadataValues) {
 
@@ -386,7 +407,7 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         for (MetadataValue metadataValue : metadataValues) {
             MetadataField field = metadataValue.getMetadataField();
             if (dcInputsContainsField(dcInputSets, field)
-                || isMetadataFieldVisible(context, item, field)) {
+                || isMetadataFieldVisible(context, dso, field)) {
                 filteredMetadataValues.add(metadataValue);
             }
         }

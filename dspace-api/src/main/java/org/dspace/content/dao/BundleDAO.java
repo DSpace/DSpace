@@ -23,6 +23,8 @@ import org.dspace.core.Context;
 public interface BundleDAO extends DSpaceObjectLegacySupportDAO<Bundle> {
     int countRows(Context context) throws SQLException;
 
+    int countBitstreams(Context context, Bundle bundle) throws SQLException;
+
     /**
      * Acquires a pessimistic write lock on the given bundle row and refreshes the entity from the
      * database.

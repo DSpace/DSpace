@@ -87,7 +87,7 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
 
     @Test
     public void testGenerateUniqueCustomUrl_MixedScriptAndSpecialCharacters() {
-        // Test mixed scripts and symbols (Preserves Latin and Numbers, strips others)
+        // Test mixed scripts and symbols (Preserves Latin and Numbers, strips non-Latin)
         String mixed = customUrlService.generateUniqueCustomUrl(context, "Study 2024: Étude 数据研究");
         assertEquals("study-2024-etude", mixed);
 
@@ -96,6 +96,14 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
 
         String emoji = customUrlService.generateUniqueCustomUrl(context, "Climate Change 🌍🌡️");
         assertEquals("climate-change", emoji);
+
+        // Test Cyrillic mixed with Latin
+        String cyrillic = customUrlService.generateUniqueCustomUrl(context, "Test Тестовый Publication");
+        assertEquals("test-publication", cyrillic);
+
+        // Test Arabic mixed with Latin
+        String arabic = customUrlService.generateUniqueCustomUrl(context, "Study اختبار Research");
+        assertEquals("study-research", arabic);
     }
 
     @Test
@@ -119,7 +127,21 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
 
     @Test(expected = IllegalArgumentException.class)
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnPureNonLatin() {
-        // This string contains ONLY characters that are stripped by [^a-z0-9]
+        // This string contains ONLY Cyrillic characters
+        // After normalization, all non-Latin characters are stripped, resulting in empty string
+        customUrlService.generateUniqueCustomUrl(context, "Тестовая статья");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGenerateUniqueCustomUrl_ThrowsExceptionOnPureArabic() {
+        // This string contains ONLY Arabic characters
+        // After normalization, all non-Latin characters are stripped, resulting in empty string
+        customUrlService.generateUniqueCustomUrl(context, "اختبار المقالة");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGenerateUniqueCustomUrl_ThrowsExceptionOnPureChinese() {
+        // This string contains ONLY Chinese characters
         // Resulting slug is empty -> Should throw exception
         customUrlService.generateUniqueCustomUrl(context, "测试文章标题");
     }
@@ -250,6 +272,7 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
 
     private void reindexItem(Item item) throws SQLException, SearchServiceException {
         context.commit();
+        item = context.reloadEntity(item);
         indexingService.indexContent(context, new IndexableItem(item), true);
         indexingService.commit();
     }

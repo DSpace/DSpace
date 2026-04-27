@@ -28,6 +28,7 @@ import eu.openaire.oaf.model.base.FunderType;
 import eu.openaire.oaf.model.base.FundingTreeType;
 import eu.openaire.oaf.model.base.FundingType;
 import eu.openaire.oaf.model.base.Project;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
@@ -169,7 +170,19 @@ public class OpenaireFundingDataProvider extends AbstractExternalDataProvider {
         String encodedQuery = encodeValue(query);
 
         Response projectResponse = connector.searchProjectByKeywords(0, 0, encodedQuery);
-        return Integer.parseInt(projectResponse.getHeader().getTotal());
+        if (projectResponse == null || projectResponse.getHeader() == null) {
+            return 0;
+        }
+        String total = projectResponse.getHeader().getTotal();
+        if (StringUtils.isBlank(total)) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(total);
+        } catch (NumberFormatException e) {
+            log.error("Failed to parse search result count from OpenAIRE: {}", e.getMessage());
+            return 0;
+        }
     }
 
     /**

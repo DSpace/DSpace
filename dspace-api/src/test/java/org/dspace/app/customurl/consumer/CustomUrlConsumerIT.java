@@ -189,6 +189,63 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testNoCustomUrlAdditionOccursOnItemWithPureNonLatinCharacters() throws SQLException {
+
+        context.turnOffAuthorisationSystem();
+
+        // Test with pure Cyrillic characters - should not generate URL
+        Item cyrillicItem = ItemBuilder.createItem(context, collection)
+                                       .withMetadata("person", "familyName", null, "Тестовый")
+                                       .withMetadata("person", "givenName", null, "Пользователь")
+                                       .build();
+
+        // Test with pure Arabic characters - should not generate URL
+        Item arabicItem = ItemBuilder.createItem(context, collection)
+                                     .withMetadata("person", "familyName", null, "اختبار")
+                                     .build();
+
+        // Test with pure Chinese characters - should not generate URL
+        Item chineseItem = ItemBuilder.createItem(context, collection)
+                                      .withMetadata("person", "familyName", null, "测试")
+                                      .withMetadata("person", "givenName", null, "用户")
+                                      .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        cyrillicItem = context.reloadEntity(cyrillicItem);
+        arabicItem = context.reloadEntity(arabicItem);
+        chineseItem = context.reloadEntity(chineseItem);
+
+        // All should have no custom URL since normalization would result in empty string
+        assertThat(itemService.getMetadataByMetadataString(cyrillicItem, "dspace.customurl"), empty());
+        assertThat(itemService.getMetadataByMetadataString(arabicItem, "dspace.customurl"), empty());
+        assertThat(itemService.getMetadataByMetadataString(chineseItem, "dspace.customurl"), empty());
+
+    }
+
+    @Test
+    public void testCustomUrlAdditionWithMixedLatinAndNonLatinCharacters() throws SQLException {
+
+        context.turnOffAuthorisationSystem();
+
+        // Test that Latin characters are preserved while non-Latin are stripped
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withMetadata("person", "familyName", null, "Smith")
+                               .withMetadata("person", "givenName", null, "John测试Тест")
+                               .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        item = context.reloadEntity(item);
+
+        // Non-Latin characters (测试, Тест) should be stripped, leaving only "Smith John"
+        assertThat(item.getMetadata(), hasItem(with("dspace.customurl", "smith-john")));
+
+    }
+
+    @Test
     public void testNoCustomUrlAdditionOccursOnNotSupportedEntities() throws SQLException {
 
         context.turnOffAuthorisationSystem();
@@ -475,6 +532,16 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
                                        .withTitle("Advanced Algorithms Study")
                                        .build();
 
+        // Commit so the consumer fires and assigns the custom URL to the original item
+        context.restoreAuthSystemState();
+        context.commit();
+
+        originalItem = context.reloadEntity(originalItem);
+        // Verify the original item has the custom URL before versioning
+        assertThat(originalItem.getMetadata(), hasItem(with("dspace.customurl", "advanced-algorithms-study")));
+
+        context.turnOffAuthorisationSystem();
+
         // Create a new version using VersionBuilder (like VersionRestRepositoryIT)
         Version newVersion = VersionBuilder.createVersion(context, originalItem, "Second version").build();
         Item versionedItem = newVersion.getItem();
@@ -491,6 +558,7 @@ public class CustomUrlConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         // The versioned item will have the same title, so it should get the same custom URL
         versionedItem = context.reloadEntity(versionedItem);
+        originalItem = context.reloadEntity(originalItem);
 
         // Verify the versioned item got the same custom URL
         assertThat(versionedItem.getMetadata(), hasItem(with("dspace.customurl", "advanced-algorithms-study")));
