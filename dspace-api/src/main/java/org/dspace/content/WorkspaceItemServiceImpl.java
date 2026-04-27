@@ -296,7 +296,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException {
         // First, check if there's anything to do at all
-        if(fromCollection.equals(toCollection)) {
+        if (fromCollection.equals(toCollection)) {
             return; // Nothing to do here.
         } else {
             // Set WorkspaceItem's Collection to destination Collection
@@ -335,7 +335,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
             // If there are differences,
             // remove metadata fields that do not occur in destination Collection's submission form:
-            if(!diff.isEmpty()) {
+            if (!diff.isEmpty()) {
                 List<MetadataValue> remove = new ArrayList<>();
                 // Of differences found, keep only those that are actually present on the item
                 for (String toRemove : diff) {
