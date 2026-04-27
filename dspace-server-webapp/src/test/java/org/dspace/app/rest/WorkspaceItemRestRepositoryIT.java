@@ -11190,6 +11190,505 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
     }
 
 
+    /**
+     * Scenario 1: Any submitter of a shared-workspace collection can View, Edit, Delete, and Deposit
+     * workspace items created by other submitters.
+     */
+    @Test
+    public void testSubmitterCanViewEditDeleteDepositInSharedWorkspace() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection pubCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withName("Publication Collection")
+                                                    .withEntityType("Publication")
+                                                    .withSubmitterGroup(submitter1, submitter2)
+                                                    .withSharedWorkspace()
+                                                    .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String submitter1Token = getAuthToken(submitter1.getEmail(), password);
+            String submitter2Token = getAuthToken(submitter2.getEmail(), password);
+
+            // Submitter1 creates workspace item for view/edit/deposit test
+            getClient(submitter1Token)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef1.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter1 creates another workspace item for delete test
+            getClient(submitter1Token)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef2.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter2 CAN view
+            getClient(submitter2Token)
+                .perform(get("/api/submission/workspaceitems/" + idRef1.get()))
+                .andExpect(status().isOk());
+
+            // Submitter2 CAN edit (add title and date for deposit validation)
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by submitter2"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued",
+                                  List.of(Map.of("value", "2026")))
+            );
+            getClient(submitter2Token)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Grant license (needed for deposit validation)
+            List<Operation> licenseOps = List.of(
+                new AddOperation("/sections/license/granted", true));
+            getClient(submitter1Token)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(licenseOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Upload a file (needed for deposit validation)
+            InputStream pdf = InputStream.nullInputStream();
+            MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                              "application/pdf", pdf);
+            getClient(submitter1Token)
+                .perform(multipart("/api/submission/workspaceitems/" + idRef1.get()).file(pdfFile))
+                .andExpect(status().isCreated());
+
+            // Submitter2 CAN deposit
+            getClient(submitter2Token)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef1.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().is2xxSuccessful());
+
+            // Submitter2 CAN delete (using second workspace item)
+            getClient(submitter2Token)
+                .perform(delete("/api/submission/workspaceitems/" + idRef2.get()))
+                .andExpect(status().isNoContent());
+
+        } finally {
+            if (idRef1.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef2.get());
+            }
+        }
+    }
+
+    /**
+     * Scenario 2: Authors/Co-authors who are also in the Submitter group of the same collection
+     * can View, Edit, Delete, and Deposit.
+     */
+    @Test
+    public void testAuthorSubmitterSameCollectionCanViewEditDeleteDeposit() throws Exception {
+        // Configure authority control for dc.contributor.author
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        // Clear authority caches BEFORE entity creation (required for authority-controlled fields)
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson authorSubmitter = EPersonBuilder.createEPerson(context)
+                                                .withEmail("authorsubmitter@test.com")
+                                                .withPassword(password)
+                                                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        // Person collection for researcher profiles
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Person Collection")
+                                                       .withEntityType("Person")
+                                                       .build();
+
+        // Publication collection with BOTH submitter AND authorSubmitter in submitter group
+        Collection pubCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withName("Publication Collection")
+                                                    .withEntityType("Publication")
+                                                    .withSubmitterGroup(submitter, authorSubmitter)
+                                                    .withSharedWorkspace()
+                                                    .build();
+
+        // Create a researcher profile (Person entity) owned by authorSubmitter
+        Item authorProfile = ItemBuilder.createItem(context, personCollection)
+                                        .withTitle("Author Submitter")
+                                        .withIssueDate("2020-01-01")
+                                        .withDspaceObjectOwner(authorSubmitter)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String submitterToken = getAuthToken(submitter.getEmail(), password);
+            String authorSubmitterToken = getAuthToken(authorSubmitter.getEmail(), password);
+
+            // Submitter creates workspace item for view/edit/deposit test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef1.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter creates another workspace item for delete test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef2.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Add author metadata pointing to authorSubmitter's profile
+            Map<String, String> authorValue = new HashMap<>();
+            authorValue.put("value", "Author Submitter");
+            authorValue.put("authority", authorProfile.getID().toString());
+            authorValue.put("display", "Author Submitter");
+            authorValue.put("confidence", String.valueOf(Choices.CF_ACCEPTED));
+
+            List<Operation> addAuthorOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                  List.of(authorValue)));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(addAuthorOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Also add author to workspace item 2 for delete test
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef2.get())
+                             .content(getPatchContent(addAuthorOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // AuthorSubmitter CAN view
+            getClient(authorSubmitterToken)
+                .perform(get("/api/submission/workspaceitems/" + idRef1.get()))
+                .andExpect(status().isOk());
+
+            // AuthorSubmitter CAN edit (add title and date for deposit)
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by author-submitter"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued",
+                                  List.of(Map.of("value", "2026")))
+            );
+            getClient(authorSubmitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Grant license
+            List<Operation> licenseOps = List.of(
+                new AddOperation("/sections/license/granted", true));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(licenseOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Upload a file (needed for deposit validation)
+            InputStream pdf = InputStream.nullInputStream();
+            MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                              "application/pdf", pdf);
+            getClient(submitterToken)
+                .perform(multipart("/api/submission/workspaceitems/" + idRef1.get()).file(pdfFile))
+                .andExpect(status().isCreated());
+
+            // AuthorSubmitter CAN deposit (is author BUT also submitter of same collection)
+            getClient(authorSubmitterToken)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef1.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().is2xxSuccessful());
+
+            // AuthorSubmitter CAN delete (using second workspace item)
+            getClient(authorSubmitterToken)
+                .perform(delete("/api/submission/workspaceitems/" + idRef2.get()))
+                .andExpect(status().isNoContent());
+
+        } finally {
+            if (idRef1.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef2.get());
+            }
+        }
+    }
+
+    /**
+     * Scenario 3: Authors/Co-authors in a different collection's submitter group
+     * can View and Edit, but CANNOT Deposit.
+     */
+    @Test
+    public void testAuthorSubmitterDifferentCollectionCannotDeposit() throws Exception {
+        // Configure authority control for dc.contributor.author
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        // Clear authority caches BEFORE entity creation (required for authority-controlled fields)
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson author = EPersonBuilder.createEPerson(context)
+                                       .withEmail("author@test.com")
+                                       .withPassword(password)
+                                       .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        // Person collection for researcher profiles
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Person Collection")
+                                                       .withEntityType("Person")
+                                                       .build();
+
+        // Publication collection 1: submitter only (author is NOT in this submitter group)
+        Collection pubCollection1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                     .withName("Publication Collection 1")
+                                                     .withEntityType("Publication")
+                                                     .withSubmitterGroup(submitter)
+                                                     .withSharedWorkspace()
+                                                     .build();
+
+        // Publication collection 2: author is in THIS submitter group (different collection)
+        Collection pubCollection2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                     .withName("Publication Collection 2")
+                                                     .withEntityType("Publication")
+                                                     .withSubmitterGroup(author)
+                                                     .withSharedWorkspace()
+                                                     .build();
+
+        // Create researcher profile for author
+        Item authorProfile = ItemBuilder.createItem(context, personCollection)
+                                        .withTitle("Author Person")
+                                        .withIssueDate("2020-01-01")
+                                        .withDspaceObjectOwner(author)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            String submitterToken = getAuthToken(submitter.getEmail(), password);
+            String authorToken = getAuthToken(author.getEmail(), password);
+
+            // Submitter creates workspace item in pubCollection1
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection1.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Add author metadata pointing to author's profile
+            Map<String, String> authorValue = new HashMap<>();
+            authorValue.put("value", "Author Person");
+            authorValue.put("authority", authorProfile.getID().toString());
+            authorValue.put("display", "Author Person");
+            authorValue.put("confidence", String.valueOf(Choices.CF_ACCEPTED));
+
+            List<Operation> addAuthorOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                  List.of(authorValue)));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef.get())
+                             .content(getPatchContent(addAuthorOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Author CAN view (is co-author, shared workspace grants access)
+            getClient(authorToken)
+                .perform(get("/api/submission/workspaceitems/" + idRef.get()))
+                .andExpect(status().isOk());
+
+            // Author CAN edit
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by author"))));
+            getClient(authorToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Author CANNOT deposit (submitter of DIFFERENT collection, not this one)
+            getClient(authorToken)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().isForbidden());
+
+        } finally {
+            if (idRef.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+            }
+        }
+    }
+
+    /**
+     * Scenario 5: The specific submitter who started the item submission
+     * can View, Edit, Delete, and Deposit.
+     */
+    @Test
+    public void testOriginalSubmitterCanViewEditDeleteDepositInSharedWorkspace() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection pubCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withName("Publication Collection")
+                                                    .withEntityType("Publication")
+                                                    .withSubmitterGroup(submitter)
+                                                    .withSharedWorkspace()
+                                                    .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String submitterToken = getAuthToken(submitter.getEmail(), password);
+
+            // Original submitter creates workspace item for view/edit/deposit test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef1.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Original submitter creates another workspace item for delete test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef2.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Original submitter CAN view
+            getClient(submitterToken)
+                .perform(get("/api/submission/workspaceitems/" + idRef1.get()))
+                .andExpect(status().isOk());
+
+            // Original submitter CAN edit (add title and date for deposit)
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by original submitter"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued",
+                                  List.of(Map.of("value", "2026")))
+            );
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Grant license
+            List<Operation> licenseOps = List.of(
+                new AddOperation("/sections/license/granted", true));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(licenseOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Upload a file (needed for deposit validation)
+            InputStream pdf = InputStream.nullInputStream();
+            MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                              "application/pdf", pdf);
+            getClient(submitterToken)
+                .perform(multipart("/api/submission/workspaceitems/" + idRef1.get()).file(pdfFile))
+                .andExpect(status().isCreated());
+
+            // Original submitter CAN deposit
+            getClient(submitterToken)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef1.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().is2xxSuccessful());
+
+            // Original submitter CAN delete (using second workspace item)
+            getClient(submitterToken)
+                .perform(delete("/api/submission/workspaceitems/" + idRef2.get()))
+                .andExpect(status().isNoContent());
+
+        } finally {
+            if (idRef1.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef2.get());
+            }
+        }
+    }
+
     private String uri(Item item) {
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         return utils.linkToSingleResource(itemRest, "self").getHref();

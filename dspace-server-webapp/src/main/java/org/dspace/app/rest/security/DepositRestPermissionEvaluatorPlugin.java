@@ -16,12 +16,14 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.profile.service.ResearcherProfileService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +39,14 @@ import org.springframework.stereotype.Component;
  * permission WRITE.
  * </p>
  * <p>
- * This plugin loads the workspace item by that ID and checks:
+ * This plugin loads the workspace item by that ID and allows deposit if
+ * the current user is either the original submitter or a member of the
+ * collection's submitters group. This means:
  * <ul>
- *   <li>If the current user is the author of the item, deposit is denied.</li>
- *   <li>Otherwise, deposit is allowed if the current user is the submitter.</li>
+ *   <li>The original submitter can always deposit.</li>
+ *   <li>Any submitter of the same collection (shared workspace) can deposit.</li>
+ *   <li>Authors who are also submitters of the same collection can deposit.</li>
+ *   <li>Authors who are not submitters of the collection cannot deposit.</li>
  * </ul>
  * </p>
  *
@@ -61,7 +67,7 @@ public class DepositRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     private WorkspaceItemService workspaceItemService;
 
     @Autowired
-    private ResearcherProfileService researcherProfileService;
+    private GroupService groupService;
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
@@ -93,13 +99,19 @@ public class DepositRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
                 return false;
             }
 
-            // Authors of the item cannot deposit it
-            if (researcherProfileService.isAuthorOf(context, ePerson, workspaceItem.getItem())) {
-                return false;
+            // Allow deposit if the user is the original submitter
+            if (ePerson.equals(workspaceItem.getSubmitter())) {
+                return true;
             }
 
-            // Non-author submitters are allowed to deposit
-            return ePerson.equals(workspaceItem.getSubmitter());
+            // Allow deposit if the user is in the collection's submitters group
+            Collection collection = workspaceItem.getCollection();
+            if (collection != null) {
+                Group submitters = collection.getSubmitters();
+                return submitters != null && groupService.isMember(context, ePerson, submitters);
+            }
+
+            return false;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
