@@ -302,19 +302,36 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             // Set WorkspaceItem's Collection to destination Collection
             source.setCollection(toCollection);
 
-            // Do entity types of Item and Collection mismatch now?
-            String currentEntityTypeOfItem = this.itemService.getEntityType(source.getItem());
-            String entityTypeOfCurrentCollection = this.collectionService.getEntityType(source.getCollection());
+            // Do entity types of Item and Collection differ now?
+            // (Trying to handle null values returned for untyped Items while doing so...)
+            String currentEntityTypeOfItem =
+                    this.itemService.getEntityType(source.getItem()) == null ?
+                            "none" : this.itemService.getEntityType(source.getItem());
+            String entityTypeOfCurrentCollection =
+                    this.collectionService.getEntityType(source.getCollection()) == null ?
+                            "none" : this.collectionService.getEntityType(source.getCollection());
+
+            // Check for entity type mismatch
             if (!currentEntityTypeOfItem.equals(entityTypeOfCurrentCollection)) {
-                // Set entity type according to *current* Collection's type
-                this.itemService.setEntityType(
-                        context,
-                        source.getItem(),
-                        entityTypeOfCurrentCollection
-                );
+                // If Collection has no entity type, we delete dspace.entity.type from the Item
+                // There *could* be several values present for dspace.entity.type; this deletes all of them.
+                if (entityTypeOfCurrentCollection.equals("none")) {
+                    List<MetadataValue> toRemove = this.itemService.getMetadataByMetadataString(
+                            source.getItem(),
+                            "dspace.entity.type"
+                    );
+                    source.getItem().removeMetadata(toRemove);
+                } else {
+                    // Otherwise, set entity type according to *current* Collection's type
+                    this.itemService.setEntityType(
+                            context,
+                            source.getItem(),
+                            entityTypeOfCurrentCollection
+                    );
+                }
             }
 
-            // Check for differences between Collections' submission forms
+            // Check for differences between Collections' submission forms involved
             List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
             // If there are differences,
             // remove metadata fields that do not occur in destination Collection's submission form:
