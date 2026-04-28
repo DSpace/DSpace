@@ -626,10 +626,10 @@ public class LogicalFilterTest extends AbstractUnitTest {
                 filter.getResult(context, itemOne));
             // Test the filter on itemTwo - this item has no policies: expect false
             assertFalse("itemTwo unexpectedly matched the 'is readable by Test Group' test",
-                    filter.getResult(context, itemTwo));
+                filter.getResult(context, itemTwo));
             // Test the filter on itemThree - this item has only a person related policy: expect false
             assertFalse("itemThree unexpectedly matched the 'is readable by Test Group' test",
-                    filter.getResult(context, itemThree));
+                filter.getResult(context, itemThree));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the ReadableByGroup filter" + e.getMessage());
