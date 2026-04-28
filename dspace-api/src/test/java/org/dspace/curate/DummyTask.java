@@ -10,6 +10,7 @@ package org.dspace.curate;
 import java.io.IOException;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 /**
  * Makes no model changes, but records certain property values for inspection.
@@ -21,7 +22,7 @@ public class DummyTask
     }
 
     @Override
-    public int perform(DSpaceObject dso)
+    public int perform(Context context, DSpaceObject dso)
             throws IOException {
         CuratorTest.runParameter = taskProperty(CuratorTest.RUN_PARAMETER_NAME);
         CuratorTest.taskProperty = taskProperty(CuratorTest.TASK_PROPERTY_NAME);
