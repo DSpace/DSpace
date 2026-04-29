@@ -29,7 +29,7 @@
         <antlr4.version>4.13.0</antlr4.version>
         <postgresql.driver.version>42.7.10</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
-        <solr.client.version>8.11.4</solr.client.version>
+        <solr.client.version>9.10.1</solr.client.version>
 
         <ehcache.version>3.11.1</ehcache.version>
         <errorprone.version>2.48.0</errorprone.version>
@@ -1461,7 +1461,7 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.13.2</version>
+                <version>2.14.0</version>
             </dependency>
 
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
