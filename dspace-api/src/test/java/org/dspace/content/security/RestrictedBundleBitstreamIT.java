@@ -17,11 +17,13 @@ import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -45,6 +47,9 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
+        Community parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("parent community")
+                .build();
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Test Restricted Bundle Collection").build();
         context.restoreAuthSystemState();
