@@ -4164,15 +4164,4 @@
         <property name="defaultSortOrder" value="asc"/>
     </bean>
 
-    <bean id="sortTitleAsc" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
-        <property name="metadataField" value="dc.title"/>
-        <property name="defaultSortOrder" value="asc"/>
-    </bean>
-
-    <bean id="sortDateIssuedDesc" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
-        <property name="metadataField" value="dc.date.issued"/>
-        <property name="type" value="date"/>
-        <property name="defaultSortOrder" value="desc"/>
-    </bean>
-
 </beans>
