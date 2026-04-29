@@ -83,9 +83,9 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
         Bitstream reloadedBitstream = context.reloadEntity(licenseBitstream);
 
         // Expect license bundle and bitstream to have NO policies
-        Assert.assertTrue("In-progress license bundle should have NO policies",
+        Assert.assertTrue("Installed license bundle should have NO policies",
                 reloadedLicenseBundle.getResourcePolicies().isEmpty());
-        Assert.assertTrue("In-progress license bitstream should have NO policies",
+        Assert.assertTrue("Installed license bitstream should have NO policies",
                 reloadedBitstream.getResourcePolicies().isEmpty());
     }
 
