@@ -207,7 +207,11 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
 
     private CharSequence getContent(Bitstream bitstream) throws IOException, SQLException, AuthorizeException {
         try (InputStream input = bitstreamService.retrieve(context, bitstream)) {
-            return IOUtils.toString(input, "UTF-8");
+            // TEXT bundles are now expected to be admin-only, and this test does not care about authZ
+            context.turnOffAuthorisationSystem();
+            CharSequence content = IOUtils.toString(input, "UTF-8");
+            context.restoreAuthSystemState();
+            return content;
         }
     }
 
