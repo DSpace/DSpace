@@ -33,6 +33,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests of the requirement that some bundles and bitstreams should not inherit parent container
+ * policies (e.g. TEXT, LICENSE, SWORD)
+ *
+ * @author Kim Shepherd
+ */
 public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithDatabase {
 
     private final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
@@ -58,21 +64,15 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
     public void testRestrictedBundleBitstreamInProgress() throws Exception {
         context.turnOffAuthorisationSystem();
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withSubmitter(eperson)
                 .withTitle("In-progress item with a license added")
-                .grantLicense()
                 .build();
         context.restoreAuthSystemState();
 
-        // Expect license bundle and bitstream to have the usual set of workspace policies
-        // so the submitter can ADD, etc.
-        // This class isn't concerned with the policies themselves, just testing that the logic
-        // to clear all policies and return early is not being called
-        Bundle licenseBundle = workspaceItem.getItem().getBundles("LICENSE").getFirst();
-        Bitstream licenseBitstream = licenseBundle.getBitstreams().getFirst();
-        Assert.assertFalse("In-progress license bundle should have ADDs etc",
-                licenseBundle.getResourcePolicies().isEmpty());
-        Assert.assertFalse("In-progress license bitstream should have ADDs etc",
-                licenseBitstream.getResourcePolicies().isEmpty());
+        Bundle licenseBundle = BundleBuilder.createBundle(context, workspaceItem.getItem())
+            .withName("LICENSE").build();
+        Bitstream licenseBitstream = BitstreamBuilder.createBitstream(context, licenseBundle,
+                IOUtils.toInputStream("TEST LICENCE", CharEncoding.UTF_8)).build();
 
         // Install the item
         context.turnOffAuthorisationSystem();
@@ -83,10 +83,11 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
         Bitstream reloadedBitstream = context.reloadEntity(licenseBitstream);
 
         // Expect license bundle and bitstream to have NO policies
-        Assert.assertTrue("In-progress license bundle should have NO policies",
+        Assert.assertTrue("Installed license bundle should have NO policies",
                 reloadedLicenseBundle.getResourcePolicies().isEmpty());
-        Assert.assertTrue("In-progress license bitstream should have NO policies",
+        Assert.assertTrue("Installed license bitstream should have NO policies",
                 reloadedBitstream.getResourcePolicies().isEmpty());
+
     }
 
     @Test
