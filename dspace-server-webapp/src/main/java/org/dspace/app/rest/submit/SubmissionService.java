@@ -376,7 +376,7 @@ public class SubmissionService {
      * Utility method used by the {@link WorkspaceItemRestRepository} and
      * {@link WorkflowItemRestRepository} to deal with the upload in an inprogress
      * submission
-     * 
+     *
      * @param context DSpace Context Object
      * @param request the http request containing the upload request
      * @param wsi     the inprogress submission current rest representation
@@ -424,7 +424,7 @@ public class SubmissionService {
             UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
             Bitstream originalFile = null;
             if (uploadableStep instanceof UploadStep) {
-                originalFile = findOriginalFile(request, (UploadStep) uploadableStep, source);
+                originalFile = findOriginalFile(request);
             }
             Bitstream newFile;
             ErrorRest err;
@@ -459,7 +459,7 @@ public class SubmissionService {
      * Utility method used by the {@link WorkspaceItemRestRepository} and
      * {@link WorkflowItemRestRepository} to deal with the patch of an inprogress
      * submission
-     * 
+     *
      * @param context DSpace Context Object
      * @param request the http request
      * @param source  the current inprogress submission
@@ -538,27 +538,15 @@ public class SubmissionService {
     }
 
     /**
-     * If {@code request} has parameter 'replaceFile', returns the file at index 'replaceFile'
-     * from the list of uploaded files in {@code submission}.
+     * If {@code request} has parameter 'replaceFile', interpret it as a Bitstream UUID
      * Otherwise, returns null.
      */
-    private Bitstream findOriginalFile(HttpServletRequest request, UploadStep uploadStep,
-                                       InProgressSubmission submission) throws SQLException {
+    private Bitstream findOriginalFile(HttpServletRequest request) throws SQLException {
         String replaceFile = request.getParameter("replaceFile");
         if (replaceFile == null) {
             return null;
         }
-        int originalFileIndex;
-        try {
-            originalFileIndex = Integer.parseInt(replaceFile);
-        } catch (NumberFormatException e) {
-            throw new DSpaceBadRequestException(e.getMessage(), e);
-        }
-        List<UploadBitstreamRest> files = uploadStep.getData(this, submission, null).getFiles();
-        if (originalFileIndex < 0 || originalFileIndex >= files.size()) {
-            throw new DSpaceBadRequestException("Provided file index is out of bounds");
-        }
-        UUID uuid = files.get(originalFileIndex).getUuid();
+        UUID uuid = UUID.fromString(replaceFile);
         return bitstreamService.find(new Context(), uuid);
     }
 

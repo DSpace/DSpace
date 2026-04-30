@@ -10820,11 +10820,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        int oldFileIndex = 0;
         // Upload new file, to replace old one
         getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
                 .file(newFile)
-                .param("replaceFile", Integer.toString(oldFileIndex))
+                .param("replaceFile", originalBitstream.getID().toString())
                 .param("replaceName", "true"))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
@@ -10890,16 +10889,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                 .file(newFile)
                 .param("replaceFile", bitstream.getName()))
             .andExpect(status().isBadRequest());
-        // UUID is not supported
+        // Integer is not supported
         getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
                 .file(newFile)
-                .param("replaceFile", bitstream.getID().toString()))
-            .andExpect(status().isBadRequest());
-        // Parameter cannot be out of bounds
-        int fileIndexOutOfBounds = 1;
-        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
-                .file(newFile)
-                .param("replaceFile", Integer.toString(fileIndexOutOfBounds)))
+                .param("replaceFile", "0"))
             .andExpect(status().isBadRequest());
     }
 
@@ -10955,8 +10948,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
             .withIssueDate("2017-10-17")
             .build();
         // Create file that will be replaced
+        Bitstream originalFile;
         try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
-            BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+            originalFile = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
                 .withName("Bitstream")
                 .withDescription("description")
                 .withMimeType("text/plain")
@@ -10969,11 +10963,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        int oldFileIndex = 0;
         // Upload new file, to replace old one
         getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
                 .file(newFile)
-                .param("replaceFile", Integer.toString(oldFileIndex)))
+                .param("replaceFile", originalFile.getID().toString()))
             .andExpect(status().isForbidden());
     }
 
@@ -11009,11 +11002,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        int oldFileIndex = 0;
         // Upload new file, to replace old one
         getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
                 .file(newFile)
-                .param("replaceFile", Integer.toString(oldFileIndex)))
+                .param("replaceFile", originalFile.getID().toString()))
             .andExpect(status().isForbidden());
     }
 
