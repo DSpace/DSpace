@@ -788,7 +788,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
 
         assertThat(testDSpaceRunnableHandler.getErrorMessages(), hasItem(
-            containsString("invalid access condition, The access condition embargo requires a start date.")
+            containsString("invalid access condition, The access condition 'embargo' requires a start date.")
         ));
     }
 
@@ -830,7 +830,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
 
         assertThat(testDSpaceRunnableHandler.getErrorMessages(), hasItem(
-            containsString("invalid access condition, The access condition lease requires an end date.")
+            containsString("invalid access condition, The access condition 'lease' requires an end date.")
         ));
     }
 

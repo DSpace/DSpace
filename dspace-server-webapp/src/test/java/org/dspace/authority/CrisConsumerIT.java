@@ -497,6 +497,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
                                                    .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf",
                                                                  pdf)
                                                    .withAuthor("Mario Rossi")
+                                                   .withType("Article")
                                                    .grantLicense()
                                                    .build();
 
@@ -1183,7 +1184,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
             // Verify researcher URLs were imported from ORCID
             List<MetadataValue> researcherUrls = itemService.getMetadataByMetadataString(author,
-                "oairecerif.identifier.url");
+                                                                                         "oairecerif.identifier.url");
             assertThat("Should have 4 researcher URLs from ORCID", researcherUrls, hasSize(4));
 
             context.turnOffAuthorisationSystem();
