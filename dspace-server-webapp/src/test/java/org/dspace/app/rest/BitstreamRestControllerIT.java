@@ -1662,6 +1662,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
         configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("core.authorization.bitstream.author.bypass-restrictions", "true");
         pluginService.clearNamedPluginClasses();
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
