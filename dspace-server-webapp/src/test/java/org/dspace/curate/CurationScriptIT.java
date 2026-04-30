@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
@@ -708,6 +709,189 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             }
         }
         return false;
+    }
+
+    /**
+     * Test DBTaskQueue basic functionality including enqueue, dequeue and release operations.
+     *
+     * @author Stefano Maffei (stefano.maffei at 4science.com)
+     * @throws Exception if test fails
+     */
+    @Test
+    public void testDBTaskQueue() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create a test item for curation
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Test Community")
+                .build();
+        Collection testCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Test Collection")
+                .build();
+        Item testItem = ItemBuilder.createItem(context, testCollection)
+                .withTitle("Test Item for DBTaskQueue")
+                .withIssueDate("2026-02-10")
+                .withAuthor("Test, Author")
+                .build();
+
+        // Create DBTaskQueue instance
+        DBTaskQueue dbTaskQueue = new DBTaskQueue();
+
+        String queueName = "testQueue";
+        long ticket = System.currentTimeMillis();
+
+        // Create test TaskQueueEntry using the correct constructor
+        TaskQueueEntry testEntry = new TaskQueueEntry(
+                admin.getID().toString(),
+                System.currentTimeMillis(),
+                Arrays.asList("noop"),
+                testItem.getHandle()
+        );
+
+        context.restoreAuthSystemState();
+
+        try {
+            // Test 1: Check initial queue is empty
+            String[] initialQueues = dbTaskQueue.queueNames();
+            boolean queueExists = false;
+            for (String queue : initialQueues) {
+                if (queueName.equals(queue)) {
+                    queueExists = true;
+                    break;
+                }
+            }
+            assertFalse("Queue should not exist initially", queueExists);
+
+            // Test 2: Enqueue a task
+            dbTaskQueue.enqueue(queueName, testEntry);
+
+            // Verify queue exists after enqueue
+            String[] queuesAfterEnqueue = dbTaskQueue.queueNames();
+            boolean foundQueue = false;
+            for (String queue : queuesAfterEnqueue) {
+                if (queueName.equals(queue)) {
+                    foundQueue = true;
+                    break;
+                }
+            }
+            assertTrue("Queue should exist after enqueue", foundQueue);
+
+            // Test 3: Dequeue tasks
+            java.util.Set<TaskQueueEntry> dequeuedTasks = dbTaskQueue.dequeue(queueName, ticket);
+            assertFalse("Dequeued tasks should not be empty", dequeuedTasks.isEmpty());
+            org.junit.Assert.assertEquals("Should have exactly one task", 1, dequeuedTasks.size());
+
+            // Verify the dequeued task matches what we enqueued
+            TaskQueueEntry dequeuedTask = dequeuedTasks.iterator().next();
+            org.junit.Assert.assertEquals("EPersonID should match", testEntry.getEpersonId(),
+                    dequeuedTask.getEpersonId());
+            org.junit.Assert.assertEquals("ObjectID should match", testEntry.getObjectId(),
+                    dequeuedTask.getObjectId());
+
+            // Test 4: Release with remove=true
+            dbTaskQueue.release(queueName, ticket, true);
+
+            // Test 5: Try to dequeue after release (should be empty as tasks were removed)
+            long differentTicket = ticket + 1000;
+            java.util.Set<TaskQueueEntry> afterRelease = dbTaskQueue.dequeue(queueName, differentTicket);
+            assertTrue("Queue should be empty after release with remove=true", afterRelease.isEmpty());
+
+            // Clean up - release any remaining lock
+            dbTaskQueue.release(queueName, differentTicket, false);
+
+        } catch (Exception e) {
+            // Clean up in case of error
+            try {
+                dbTaskQueue.release(queueName, ticket, true);
+            } catch (Exception ignored) {
+                // Ignore cleanup errors
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Test curate script execution with -q option to process curation queues.
+     * This test verifies the integration between DBTaskQueue and the curation script.
+     *
+     * @author Stefano Maffei (stefano.maffei at 4science.com)
+     * @throws Exception if test fails
+     */
+    @Test
+    public void testCurateScriptWithQueueOption() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create a test item for curation
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Test Community for Queue")
+                .build();
+        Collection testCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Test Collection for Queue")
+                .build();
+        Item testItem = ItemBuilder.createItem(context, testCollection)
+                .withTitle("Test Item for Queue Processing")
+                .withIssueDate("2026-02-10")
+                .withAuthor("Queue, Test")
+                .build();
+
+        String queueName = "testQueueScript";
+
+        context.restoreAuthSystemState();
+
+        try {
+            // Step 1: Populate the queue using DBTaskQueue
+            DBTaskQueue dbTaskQueue = new DBTaskQueue();
+            TaskQueueEntry testEntry = new TaskQueueEntry(
+                    admin.getID().toString(),
+                    System.currentTimeMillis(),
+                    Arrays.asList("noop"),
+                    testItem.getHandle()
+            );
+
+            dbTaskQueue.enqueue(queueName, testEntry);
+
+            // Verify the queue has been populated
+            String[] queueNames = dbTaskQueue.queueNames();
+            boolean queueFound = false;
+            for (String queue : queueNames) {
+                if (queueName.equals(queue)) {
+                    queueFound = true;
+                    break;
+                }
+            }
+            assertTrue("Queue should exist before processing", queueFound);
+
+            // Step 2: Execute curate script with -q option using TestDSpaceRunnableHandler
+            String[] args = new String[] {"curate", "-q", queueName};
+            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+
+            ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+            ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+
+            DSpaceRunnable script = null;
+            if (scriptConfiguration != null) {
+                script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+            }
+            if (script != null) {
+                script.initialize(args, testDSpaceRunnableHandler, admin);
+                script.run();
+            }
+
+            // Step 3: Verify the queue has been processed (should be empty after processing)
+            // Note: The queue should be empty after successful processing as tasks are consumed
+            String[] queuesAfterProcessing = dbTaskQueue.queueNames();
+            assertTrue("Queue should be empty after processing", ArrayUtils.isEmpty(queuesAfterProcessing));
+
+        } catch (Exception e) {
+            // Clean up in case of error
+            try {
+                DBTaskQueue dbTaskQueue = new DBTaskQueue();
+                dbTaskQueue.release(queueName, System.currentTimeMillis(), true);
+            } catch (Exception ignored) {
+                // Ignore cleanup errors
+            }
+            throw e;
+        }
     }
 
 }
