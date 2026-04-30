@@ -555,7 +555,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             }
 
             context.dispatchEvents();
-            indexingService.commit();
             return item;
         } catch (Exception e) {
             return handleException(e);
