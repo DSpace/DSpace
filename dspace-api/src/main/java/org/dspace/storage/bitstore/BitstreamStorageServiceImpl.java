@@ -217,7 +217,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public InputStream retrieve(Context context, Bitstream bitstream)
         throws SQLException, IOException {
         Integer storeNumber = bitstream.getStoreNumber();
-        return this.getStore(storeNumber).get(bitstream);
+        return new LeakTrackingInputStream(this.getStore(storeNumber).get(bitstream), "retrieve");
     }
 
     @Override

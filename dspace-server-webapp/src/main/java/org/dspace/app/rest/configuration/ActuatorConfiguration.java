@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.DiscoverableEndpointsService;
+import org.dspace.app.rest.health.BitstreamStreamAnomaliesHealthIndicator;
 import org.dspace.app.rest.health.GeoIpHealthIndicator;
 import org.dspace.app.rest.health.SEOHealthIndicator;
 import org.dspace.app.rest.health.SolrHealthIndicator;
@@ -93,6 +94,12 @@ public class ActuatorConfiguration {
     @ConditionalOnEnabledHealthIndicator("geoIp")
     public GeoIpHealthIndicator geoIpHealthIndicator() {
         return new GeoIpHealthIndicator();
+    }
+
+    @Bean
+    @ConditionalOnEnabledHealthIndicator("bitstreamStreamAnomalies")
+    public BitstreamStreamAnomaliesHealthIndicator bitstreamStreamAnomaliesHealthIndicator() {
+        return new BitstreamStreamAnomaliesHealthIndicator();
     }
 
     public String getActuatorBasePath() {
