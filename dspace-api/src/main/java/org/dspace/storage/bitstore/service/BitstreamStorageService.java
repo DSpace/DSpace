@@ -165,20 +165,23 @@ public interface BitstreamStorageService {
     public void printStores(Context context) throws SQLException;
 
     /**
-     * Migrate all the assets from assetstoreSource to assetstoreDestination
+     * Migrate all the assets from assetstoreSource to assetstoreDestination.
      *
      * @param context               The relevant DSpace Context.
      * @param assetstoreSource      source assetstore
      * @param assetstoreDestination destination assetstore
      * @param deleteOld             whether to delete files from the source assetstore after migration
      * @param batchCommitSize       batch size
+     * @param skipDeleted           if true, bitstreams marked as deleted in the database are skipped
+     * @param continueOnError       if true, errors on individual bitstreams are logged but do not stop the migration
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld,
-                        Integer batchCommitSize) throws IOException, SQLException, AuthorizeException;
+                        Integer batchCommitSize, boolean skipDeleted, boolean continueOnError)
+        throws IOException, SQLException, AuthorizeException;
 
 
     /**
