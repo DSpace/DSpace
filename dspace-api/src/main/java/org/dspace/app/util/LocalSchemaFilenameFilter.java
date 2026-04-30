@@ -17,7 +17,11 @@ import java.util.regex.Pattern;
 
 public class LocalSchemaFilenameFilter implements FilenameFilter {
 
-    static Pattern patt = Pattern.compile("^metadata_.*.xml$");
+    /**
+     * Pattern to match metadata schema files (e.g. metadata_dcterms.xml).
+     */
+    public static final Pattern PATTERN = Pattern.compile("^metadata_.*.xml$");
+    static Pattern patt = PATTERN;
 
     @Override
     public boolean accept(File arg0, String arg1) {
