@@ -8,6 +8,7 @@
 package org.dspace.app.util.service;
 
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.dspace.content.DSpaceObject;
@@ -43,4 +44,15 @@ public interface DSpaceObjectUtils {
      * @throws SQLException
      */
     public DSpaceObject findDSpaceObject(Context context, String id) throws SQLException;
+
+    /**
+     * Resolves a handle or UUID identifier to a basic handle-addressable DSpace Object
+     * (Item, Collection, or Community) and returns it as Optional/empty.
+     *
+     * @param identifier   The UUID or handle of the DSpace object.
+     * @return An Optional containing the DSpaceObject if found.
+     * @throws SQLException If database error occurs.
+     */
+    Optional<DSpaceObject> resolveBasicDSpaceObject(Context context, String identifier)
+            throws SQLException;
 }

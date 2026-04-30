@@ -9,22 +9,14 @@ package org.dspace.deletion.process;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +34,7 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
         extends ScriptConfiguration<T> {
 
     @Autowired
-    ItemService itemService;
-    @Autowired
-    HandleService handleService;
-    @Autowired
-    CommunityService communityService;
-    @Autowired
-    CollectionService collectionService;
+    DSpaceObjectUtils dspaceObjectUtils;
 
     Logger log = LogManager.getLogger();
 
@@ -95,7 +81,7 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
             try {
                 for (DSpaceCommandLineParameter parameter : commandLineParameters) {
                     if ("-i".equals(parameter.getName())) {
-                        DSpaceObject dso = resolveDSpaceObject(context, parameter.getValue())
+                        DSpaceObject dso = dspaceObjectUtils.resolveBasicDSpaceObject(context, parameter.getValue())
                                 .orElseThrow(() -> new IllegalArgumentException("Could not resolve %s to DSpace Object"
                                         .formatted(parameter.getValue())));
                         return authorizeService.authorizeActionBoolean(context, dso, Constants.DELETE, true);
@@ -118,37 +104,5 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
-    /**
-     * Resolves the identifier (Item, Collection, or Community).
-     *
-     * @param identifier   The UUID or handle of the DSpace object.
-     * @return An Optional containing the DSpaceObject if found.
-     * @throws SQLException If database error occurs.
-     */
-    private Optional<DSpaceObject> resolveDSpaceObject(Context context, String identifier)
-            throws SQLException {
-        UUID uuid = null;
-        try {
-            uuid = UUID.fromString(identifier);
-        } catch (Exception e) {
-            // It's not a UUID, proceed to treat it as a handle.
-        }
 
-        if (uuid != null) {
-            Item item = itemService.find(context, uuid);
-            if (item != null) {
-                return Optional.of(item);
-            }
-            Community community = communityService.find(context, uuid);
-            if (community != null) {
-                return Optional.of(community);
-            }
-            Collection collection = collectionService.find(context, uuid);
-            if (collection != null) {
-                return Optional.of(collection);
-            }
-        }
-        DSpaceObject dso = handleService.resolveToObject(context, identifier);
-        return dso != null ? Optional.of(dso) : Optional.empty();
-    }
 }

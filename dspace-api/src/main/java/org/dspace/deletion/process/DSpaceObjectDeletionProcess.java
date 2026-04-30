@@ -14,24 +14,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.deletion.process.strategies.DSpaceObjectDeletionStrategy;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.handle.service.HandleService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
@@ -48,11 +40,8 @@ public class DSpaceObjectDeletionProcess
 
     public static final String OBJECT_DELETION_SCRIPT = "object-deletion";
 
-    private ItemService itemService;
-    private HandleService handleService;
-    private CommunityService communityService;
     private AuthorizeService authorizeService;
-    private CollectionService collectionService;
+    private DSpaceObjectUtils dspaceObjectUtils;
 
     private String id;
     private Context context;
@@ -62,10 +51,6 @@ public class DSpaceObjectDeletionProcess
     @Override
     public void setup() throws ParseException {
         ServiceManager serviceManager = new DSpace().getServiceManager();
-        itemService = ContentServiceFactory.getInstance().getItemService();
-        handleService = HandleServiceFactory.getInstance().getHandleService();
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         deletionStrategies.addAll(serviceManager.getServicesByType(DSpaceObjectDeletionStrategy.class));
 
@@ -91,7 +76,7 @@ public class DSpaceObjectDeletionProcess
     @Override
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
-        Optional<DSpaceObject> dSpaceObjectOptional = resolveDSpaceObject(this.id);
+        Optional<DSpaceObject> dSpaceObjectOptional = dspaceObjectUtils.resolveBasicDSpaceObject(context, this.id);
 
         if (dSpaceObjectOptional.isEmpty()) {
             var error = String.format("DSpaceObject for provided identifier:%s doesn't exist!", this.id);
@@ -125,39 +110,6 @@ public class DSpaceObjectDeletionProcess
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
             context.setCurrentUser(ePerson);
         }
-    }
-
-    /**
-     * Resolves the identifier (Item, Collection, or Community).
-     *
-     * @param identifier   The UUID or handle of the DSpace object.
-     * @return An Optional containing the DSpaceObject if found.
-     * @throws SQLException If database error occurs.
-     */
-    private Optional<DSpaceObject> resolveDSpaceObject(String identifier) throws SQLException {
-        UUID uuid = null;
-        try {
-            uuid = UUID.fromString(identifier);
-        } catch (Exception e) {
-            // It's not a UUID, proceed to treat it as a handle.
-        }
-
-        if (uuid != null) {
-            Item item = itemService.find(context, uuid);
-            if (item != null) {
-                return Optional.of(item);
-            }
-            Community community = communityService.find(context, uuid);
-            if (community != null) {
-                return Optional.of(community);
-            }
-            Collection collection = collectionService.find(context, uuid);
-            if (collection != null) {
-                return Optional.of(collection);
-            }
-        }
-        DSpaceObject dso = handleService.resolveToObject(context, identifier);
-        return dso != null ? Optional.of(dso) : Optional.empty();
     }
 
     @Override
