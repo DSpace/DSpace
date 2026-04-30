@@ -288,6 +288,25 @@
                 </relation-field>
               </row>
               -->
+            <!-- Uncomment this block to enable the Advisor field on your submission form.
+                 This adds a relationship lookup for advisor entities linked to publications.
+            <row>
+                <relation-field>
+                    <relationship-type>isAdvisorOfPublication</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Advisor</label>
+                    <hint>Enter the advisor's name (Family name, Given names).</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>advisor</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <required></required>
+                </relation-field>
+            </row>
+            -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
