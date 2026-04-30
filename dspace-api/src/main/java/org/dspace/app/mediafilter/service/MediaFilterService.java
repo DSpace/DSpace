@@ -8,7 +8,7 @@
 package org.dspace.app.mediafilter.service;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -151,5 +151,17 @@ public interface MediaFilterService {
      */
     public void setLogHandler(DSpaceRunnableHandler handler);
 
-    public void setFromDate(LocalDate fromDate);
+    /** 
+     * Used to set start date (or time, if no specific date of force parameter is given) for filtering items
+     * @param fromDate the datetime from which to filter items
+    */
+    public void setFromDate(Instant fromDate);
+
+    /**
+     * If true, the MediaFilter will store the start time (site metadata dspace.filtermedia.lastdate)
+     * when the script is run and use that as the fromDate for filtering items in the next run.
+     * This allows running the script multiple times a day, restricting the run only to new or modified items.
+     * @param useAutoDate true to use autoDate (default is false)
+    */
+    public void setUseAutoDate(boolean useAutoDate);
 }

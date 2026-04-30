@@ -7,11 +7,18 @@
  */
 package org.dspace.app.mediafilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,6 +39,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.SiteService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,6 +52,7 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected Community topComm1;
     protected Community topComm2;
     protected Community childComm1_1;
@@ -186,6 +195,77 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
         checkItemHasBeenProcessed(item1_2_2_b);
     }
 
+    @Test
+    public void mediaFilterScriptFromDateTest() throws Exception {
+
+        // setting earlier last modified so date-based filtering will not be applied here
+        Instant oldModifiedTime = Instant.now().minus(2, ChronoUnit.DAYS);
+        item1_1_a.setLastModified(oldModifiedTime);
+        performMediaFilterScript(null, new String[] {"-d",LocalDate.now().toString()}); // setting to start of day
+        checkItemHasBeenNotProcessed(item1_1_a);
+        checkItemHasBeenProcessed(item1_1_b);
+
+        String lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
+        assertTrue("Last date should be null before first autodate run", lastDate == null);
+
+        // should not update, because -a option cannot be used with -i
+        performMediaFilterScript(col1_1, new String[] {"-a"});
+        checkItemHasBeenNotProcessed(item1_1_a);
+        assertEquals("The item " + item1_1_a.getName() + " should NOT have been modified",
+            oldModifiedTime.truncatedTo(ChronoUnit.MILLIS), item1_1_a.getLastModified().truncatedTo(ChronoUnit.MILLIS));
+
+        lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
+        assertTrue("Last date should still be null", lastDate == null);
+
+        // should work with full run, as well as update the last modified date
+        performMediaFilterScript(null, new String[] {"-a"});
+
+        lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
+        Instant lastInstant = Instant.parse(lastDate);
+        assertTrue("Last date should be set after autodate run", lastInstant != null);
+
+        // all items (esp. item1_1_a) should have been processed by now
+        Item[] items = {item1_1_a,item1_1_b,item1_2_a,item1_2_b,item1_1_1_a,
+            item1_1_1_b,item1_1_2_a,item1_1_2_b,item1_2_1_a,item1_2_1_b,
+            item1_2_2_a,item1_2_2_b,item2_1_a,item2_1_b};
+        Instant latestModified = item1_1_a.getLastModified();
+        for (Item i: items) {
+            checkItemHasBeenProcessed(i);
+            if (i.getLastModified().isAfter(latestModified)) {
+                latestModified = i.getLastModified();
+            }
+        }
+        assertNotEquals("The item " + item1_1_a.getName() + " should have been modified",
+            oldModifiedTime.truncatedTo(ChronoUnit.MILLIS), item1_1_a.getLastModified().truncatedTo(ChronoUnit.MILLIS));
+        // TODO: check site metadata
+
+        context.turnOffAuthorisationSystem();
+        // add new item with modified date, to verify that it will be skipped in next run
+        Item item2_1_c = ItemBuilder.createItem(context, col2_1).withTitle("Item 2_1_c").
+            withIssueDate("2017-10-17").build();
+        addBitstream(item2_1_c, "test.txt");
+        item2_1_c.setLastModified(oldModifiedTime);
+        context.restoreAuthSystemState();
+
+        // new run: should not update items anymore, including item2_1_c based on modification date
+        performMediaFilterScript(null, new String[] {"-a"});
+        item2_1_c = context.reloadEntity(item2_1_c); // needs to reloaded separately because created in this method
+
+        lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
+        assertTrue("Last date should be modified after autodate run", lastInstant.isBefore(Instant.parse(lastDate)));
+
+        for (Item i: items) {
+            assertFalse("Item should not have been modified on second run",i.getLastModified().isAfter(latestModified));
+        }
+        checkItemHasBeenNotProcessed(item2_1_c);
+
+        // finally, perform a full run without -a to verify that item2_1_c will be processed as well
+        performMediaFilterScript(null);
+        item2_1_c = context.reloadEntity(item2_1_c);
+
+        checkItemHasBeenProcessed(item2_1_c);
+    }
+
     private void checkItemHasBeenNotProcessed(Item item) throws IOException, SQLException, AuthorizeException {
         List<Bundle> textBundles = item.getBundles("TEXT");
         assertTrue("The item " + item.getName() + " should NOT have the TEXT bundle", textBundles.size() == 0);
@@ -212,11 +292,22 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void performMediaFilterScript(DSpaceObject dso) throws Exception {
+        performMediaFilterScript(dso, null);
+    }
+
+    private void performMediaFilterScript(DSpaceObject dso, String[] moreArgs) throws Exception {
+        ArrayList<String> argsList = new ArrayList<String>();
+        argsList.add("filter-media");
         if (dso != null) {
-            runDSpaceScript("filter-media", "-i", dso.getHandle());
-        } else {
-            runDSpaceScript("filter-media");
+            argsList.add("-i");
+            argsList.add(dso.getHandle());
         }
+        if (moreArgs != null) {
+            for (String arg : moreArgs) {
+                argsList.add(arg);
+            }
+        }
+        runDSpaceScript(argsList.toArray(new String[0]));
         // reload our items to see the changes
         item1_1_a = context.reloadEntity(item1_1_a);
         item1_1_b = context.reloadEntity(item1_1_b);
@@ -232,6 +323,6 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
         item1_2_2_b = context.reloadEntity(item1_2_2_b);
         item2_1_a = context.reloadEntity(item2_1_a);
         item2_1_b = context.reloadEntity(item2_1_b);
-
     }
+
 }
