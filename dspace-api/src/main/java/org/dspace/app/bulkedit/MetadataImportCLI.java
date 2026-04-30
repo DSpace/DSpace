@@ -16,13 +16,24 @@ import org.apache.commons.cli.ParseException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
  * CLI variant for the {@link MetadataImport} class
  * This has been made so that we can specify the behaviour of the determineChanges method to be specific for the CLI
  */
-public class MetadataImportCLI extends MetadataImport {
+public class MetadataImportCLI<T extends ScriptConfiguration<?>> extends MetadataImport<T> {
+
+    /**
+     * Constructor for MetadataImportCLI.
+     * Command-line interface wrapper for MetadataImport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public MetadataImportCLI(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     protected boolean determineChange(DSpaceRunnableHandler handler) throws IOException {

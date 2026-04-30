@@ -40,6 +40,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.qaevent.service.OpenaireClientFactory;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
@@ -73,8 +74,8 @@ import org.dspace.utils.DSpace;
  * @author Luca Giamminonni (luca.giamminonni at 4Science.it)
  *
  */
-public class OpenaireEventsImport
-    extends DSpaceRunnable<OpenaireEventsImportScriptConfiguration<OpenaireEventsImport>> {
+public class OpenaireEventsImport<T extends ScriptConfiguration<?>>
+    extends DSpaceRunnable<T> {
 
     private HandleService handleService;
 
@@ -96,12 +97,15 @@ public class OpenaireEventsImport
 
     private Context context;
 
-    @Override
-    @SuppressWarnings({ "rawtypes" })
-    public OpenaireEventsImportScriptConfiguration getScriptConfiguration() {
-        OpenaireEventsImportScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-openaire-events", OpenaireEventsImportScriptConfiguration.class);
-        return configuration;
+    /**
+     * Constructor for OpenaireEventsImport script.
+     * Imports OpenAIRE quality assurance events from JSON files or directly
+     * from the OpenAIRE broker to enhance repository metadata quality.
+     * 
+     * @param scriptConfiguration The script configuration defining import source and event processing options
+     */
+    public OpenaireEventsImport(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override

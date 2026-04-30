@@ -35,9 +35,9 @@ import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.profile.OrcidSynchronizationMode;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * Script that perform the bulk synchronization with ORCID registry of all the
@@ -46,7 +46,7 @@ import org.dspace.utils.DSpace;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfiguration<OrcidBulkPush>> {
+public class OrcidBulkPush<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -66,6 +66,17 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     private final Map<Item, OrcidSynchronizationMode> synchronizationModeByProfileItem = new HashMap<>();
 
     private boolean ignoreMaxAttempts = false;
+
+    /**
+     * Constructor for OrcidBulkPush script.
+     * Performs bulk synchronization of researcher profiles and publications
+     * with ORCID registry for batch-mode configured users.
+     * 
+     * @param scriptConfiguration The script configuration defining synchronization parameters and retry settings
+     */
+    public OrcidBulkPush(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     public void setup() throws ParseException {
@@ -319,13 +330,6 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
 
     private boolean isOrcidSynchronizationDisabled() {
         return !configurationService.getBooleanProperty("orcid.synchronization-enabled", true);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public OrcidBulkPushScriptConfiguration<OrcidBulkPush> getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("orcid-bulk-push",
-            OrcidBulkPushScriptConfiguration.class);
     }
 
 }
