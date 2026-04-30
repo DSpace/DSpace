@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.authorize.AuthorizeException;
@@ -83,6 +84,18 @@ public interface RequestItemService {
      * @return the matching requests, or null if not found.
      */
     Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+
+    /**
+     * Fetch requests by bitstream UUID. Uses a UUID parameter rather than a
+     * Bitstream object so it can find orphaned entries even when the bitstream
+     * row no longer exists.
+     *
+     * @param context current DSpace session.
+     * @param bitstreamId the bitstream UUID to search for.
+     * @return the matching requests (or empty iterator)
+     * @throws SQLException passed through.
+     */
+    Iterator<RequestItem> findByBitstreamId(Context context, UUID bitstreamId) throws SQLException;
 
     /**
      * Save updates to the record. Only accept_request, decision_date, access_period are settable.
