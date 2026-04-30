@@ -19,6 +19,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.input.NullInputStream;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -741,6 +742,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // externally, if it is an externally referenced file)
             InputStream fileStream = getFileInputStream(pkgFile, params, path);
 
+            // Before proceeding we must ensure we have a non-empty input stream
+            // NOTE: If getFileInputStream encounters a zero-sized file, then it returns NullInputStream
+            if (fileStream == null || fileStream instanceof NullInputStream) {
+                log.warn("Empty InputStream encountered for Bitstream with ID={} in zip file={}. " +
+                             "Skipping adding this empty bitstream to Item={}", mfileID, pkgFile, item.getID());
+                continue;
+            }
+
             // retrieve bundle name from manifest
             String bundleName = METSManifest.getBundleName(mfile);
 
@@ -1304,7 +1313,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
      *                zip)
      * @param params  Parameters passed to METSIngester
      * @param path    the File path (either path in Zip package or a URL)
-     * @return the InputStream for the file
+     * @return the InputStream for the file, or NullInputStream if a zero-sized entry is encountered
      * @throws MetadataValidationException if validation error
      * @throws IOException                 if IO error
      */
@@ -1337,12 +1346,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // Retrieve the manifest file entry by name
             ZipEntry manifestEntry = zipPackage.getEntry(path);
 
-            // Get inputStream associated with this file
-            if (manifestEntry != null) {
+            if (manifestEntry.getSize() > 0) {
+                // Get inputStream associated with this file
                 return zipPackage.getInputStream(manifestEntry);
             } else {
-                throw new MetadataValidationException("Manifest file references file '"
-                                                          + path + "' not included in the zip.");
+                log.warn("Zero-sized file entry={} found in zip file={}. Returning empty InputStream.",
+                         path, pkgFile);
+                return new NullInputStream();
             }
         }
     }
