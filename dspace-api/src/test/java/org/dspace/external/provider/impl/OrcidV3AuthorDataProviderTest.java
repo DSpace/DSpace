@@ -13,17 +13,26 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.util.List;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 import org.dspace.AbstractDSpaceTest;
-import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.client.OrcidConfiguration;
 import org.junit.Before;
 import org.junit.Test;
+import org.orcid.jaxb.model.v3.release.record.Record;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedResult;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
+import org.springframework.test.util.ReflectionTestUtils;
 
 
 /**
@@ -34,10 +43,9 @@ import org.junit.Test;
  */
 public class OrcidV3AuthorDataProviderTest extends AbstractDSpaceTest {
 
-    private static final String SEARCH_XML_PATH = "org/dspace/external/provider/orcid-v3-author/search.xml";
-    private static final String PERSON1_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record1.xml";
-    private static final String PERSON2_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record2.xml";
-    private static final String PERSON3_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record3.xml";
+    private static final String RECORD1_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record1.xml";
+    private static final String RECORD2_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record2.xml";
+    private static final String RECORD3_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record3.xml";
 
     public static final String ORCID_SEARCH_QUERY = "search?q=0000-0000-0000-0000";
 
@@ -46,28 +54,51 @@ public class OrcidV3AuthorDataProviderTest extends AbstractDSpaceTest {
     @Before
     public void setup() throws Exception {
         dataProvider = new OrcidV3AuthorDataProvider();
-
-        OrcidRestConnector mockRestConnector = mock(OrcidRestConnector.class);
-
-        dataProvider.setOrcidRestConnector(mockRestConnector);
         dataProvider.setSourceIdentifier("orcid");
         dataProvider.setOrcidUrl("https://orcid.org");
 
-        dataProvider.setClientId("client-id");
-        dataProvider.setClientSecret("client-secret");
-        dataProvider.setOAUTHUrl("https://orcid.org/oauth");
+        OrcidClient mockOrcidClient = mock(OrcidClient.class);
+        OrcidConfiguration mockConfig = mock(OrcidConfiguration.class);
+        when(mockConfig.isApiConfigured()).thenReturn(false);
 
-        InputStream searchXmlStream = getClass().getClassLoader().getResourceAsStream(SEARCH_XML_PATH);
-        InputStream person1XmlStream = getClass().getClassLoader().getResourceAsStream(PERSON1_XML_PATH);
-        InputStream person2XmlStream = getClass().getClassLoader().getResourceAsStream(PERSON2_XML_PATH);
-        InputStream person3XmlStream = getClass().getClassLoader().getResourceAsStream(PERSON3_XML_PATH);
+        // Inject mocks via reflection since fields are @Autowired
+        ReflectionTestUtils.setField(dataProvider, "orcidClient", mockOrcidClient);
+        ReflectionTestUtils.setField(dataProvider, "orcidConfiguration", mockConfig);
 
-        when(mockRestConnector.get("search?q=search%3Fq%3D0000-0000-0000-0000&start=0&rows=10", null))
-                .thenReturn(searchXmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0001", null)).thenReturn(person1XmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0002", null)).thenReturn(person2XmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0003", null)).thenReturn(person3XmlStream);
+        // Load record XML test data
+        Record record1 = loadRecord(RECORD1_XML_PATH);
+        Record record2 = loadRecord(RECORD2_XML_PATH);
+        Record record3 = loadRecord(RECORD3_XML_PATH);
 
+        // Build ExpandedSearch result with 3 ORCID IDs
+        ExpandedSearch searchResult = new ExpandedSearch();
+        searchResult.setNumFound(3L);
+        ExpandedResult r1 = new ExpandedResult();
+        r1.setOrcidId("0000-0000-0000-0001");
+        ExpandedResult r2 = new ExpandedResult();
+        r2.setOrcidId("0000-0000-0000-0002");
+        ExpandedResult r3 = new ExpandedResult();
+        r3.setOrcidId("0000-0000-0000-0003");
+        searchResult.getResults().add(r1);
+        searchResult.getResults().add(r2);
+        searchResult.getResults().add(r3);
+
+        // Mock search (public API, no token)
+        when(mockOrcidClient.expandedSearch(anyString(), anyInt(), anyInt()))
+                .thenReturn(searchResult);
+
+        // Mock record retrieval (public API, no token)
+        when(mockOrcidClient.getRecord("0000-0000-0000-0001")).thenReturn(record1);
+        when(mockOrcidClient.getRecord("0000-0000-0000-0002")).thenReturn(record2);
+        when(mockOrcidClient.getRecord("0000-0000-0000-0003")).thenReturn(record3);
+    }
+
+    private Record loadRecord(String path) throws Exception {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(path)) {
+            JAXBContext jaxbContext = JAXBContext.newInstance(Record.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (Record) unmarshaller.unmarshal(is);
+        }
     }
 
     @Test

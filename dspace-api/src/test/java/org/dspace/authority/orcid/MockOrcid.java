@@ -7,80 +7,106 @@
  */
 package org.dspace.authority.orcid;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 
-import org.dspace.external.OrcidConnectionException;
-import org.dspace.external.OrcidRestConnector;
-import org.mockito.ArgumentMatchers;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.exception.OrcidClientException;
+import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedResult;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
- * Mock the ORCID source using a mock rest connector so that query will be
- * resolved against static file
- * 
+ * Mock the ORCID source using a mock OrcidClient so that queries will be
+ * resolved against static files.
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
 public class MockOrcid extends Orcidv3SolrAuthorityImpl {
 
-    OrcidRestConnector orcidRestConnector;
+    private OrcidClient mockOrcidClient;
 
     @Override
     public void init() {
-        initializeAccessToken();
-        orcidRestConnector = Mockito.mock(OrcidRestConnector.class);
+        mockOrcidClient = Mockito.mock(OrcidClient.class);
+        // Mock getReadPublicAccessToken to return a mock token
+        OrcidTokenResponseDTO mockToken = new OrcidTokenResponseDTO();
+        mockToken.setAccessToken("mock-access-token");
+        lenient().when(mockOrcidClient.getReadPublicAccessToken()).thenReturn(mockToken);
+        // Set via field injection workaround
+        this.orcidClient = mockOrcidClient;
     }
 
     /**
      * Call this to set up mocking for any test classes that need it. We don't set it in init()
-     * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing
+     * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing.
+     *
+     * @throws OrcidClientException if mock setup fails
      */
-    public void setupNoResultsSearch() throws OrcidConnectionException {
-        when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
-                .thenAnswer(new Answer<InputStream>() {
-                    @Override
-                    public InputStream answer(InvocationOnMock invocation) {
-                        return this.getClass().getResourceAsStream("orcid-search-noresults.xml");
-                    }
-                });
-    }
-    /**
-     * Call this to set up mocking for any test classes that need it. We don't set it in init()
-     * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing
-     */
-    public void setupSingleSearch() throws OrcidConnectionException {
-        when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?q=Bollini"), ArgumentMatchers.any()))
-                .thenAnswer(new Answer<InputStream>() {
-                    @Override
-                    public InputStream answer(InvocationOnMock invocation) {
-                        return this.getClass().getResourceAsStream("orcid-search.xml");
-                    }
-                });
-    }
-    /**
-     * Call this to set up mocking for any test classes that need it. We don't set it in init()
-     * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing
-     */
-    public void setupSearchWithResults() throws OrcidConnectionException {
-        when(orcidRestConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
-                .thenAnswer(new Answer<InputStream>() {
-                    @Override
-                    public InputStream answer(InvocationOnMock invocation) {
-                        return this.getClass().getResourceAsStream("orcid-person.xml");
-                    }
-                });
-
-        setOrcidRestConnector(orcidRestConnector);
+    public void setupNoResultsSearch() throws OrcidClientException {
+        ExpandedSearch emptySearch = new ExpandedSearch();
+        when(mockOrcidClient.expandedSearch(anyString(), anyString(), anyInt(), anyInt()))
+                .thenReturn(emptySearch);
+        when(mockOrcidClient.expandedSearch(anyString(), anyInt(), anyInt()))
+                .thenReturn(emptySearch);
     }
 
-    @Override
-    public void initializeAccessToken() {
-        if (getAccessToken() == null) {
-            setAccessToken("mock-access-token");
+    /**
+     * Call this to set up mocking for any test classes that need it. We don't set it in init()
+     * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing.
+     *
+     * @throws OrcidClientException if mock setup fails
+     */
+    public void setupSingleSearch() throws OrcidClientException {
+        // Return a single search result matching orcid-search.xml (ORCID ID 0000-0002-9029-1854).
+        // Only matches queries containing "Bollini", leaving the no-results mock for other queries.
+        // In the 4-arg version (accessToken, query, start, rows) the query is the 2nd arg.
+        // In the 3-arg version (query, start, rows) the query is the 1st arg.
+        ExpandedSearch singleResult = new ExpandedSearch();
+        ExpandedResult result = new ExpandedResult();
+        result.setOrcidId("0000-0002-9029-1854");
+        singleResult.getResults().add(result);
+        singleResult.setNumFound(1L);
+        when(mockOrcidClient.expandedSearch(anyString(), contains("Bollini"), anyInt(), anyInt()))
+                .thenReturn(singleResult);
+        when(mockOrcidClient.expandedSearch(contains("Bollini"), anyInt(), anyInt()))
+                .thenReturn(singleResult);
+    }
+
+    /**
+     * Call this to set up mocking for any test classes that need it. We don't set it in init()
+     * or other AbstractIntegrationTest implementations will complain of unnecessary Mockito stubbing.
+     *
+     * @throws OrcidClientException if mock setup fails
+     */
+    public void setupSearchWithResults() throws OrcidClientException {
+        Person person = loadPersonFromXml();
+        when(mockOrcidClient.getPerson(anyString(), anyString())).thenReturn(person);
+        when(mockOrcidClient.getPerson(anyString())).thenReturn(person);
+    }
+
+    /**
+     * Load a Person object from the test XML resource.
+     *
+     * @return the Person object
+     */
+    private Person loadPersonFromXml() {
+        try (InputStream is = this.getClass().getResourceAsStream("orcid-person.xml")) {
+            JAXBContext jaxbContext = JAXBContext.newInstance(Person.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (Person) unmarshaller.unmarshal(is);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load mock ORCID person XML", e);
         }
     }
 }

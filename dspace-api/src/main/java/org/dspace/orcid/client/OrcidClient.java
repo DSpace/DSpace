@@ -14,6 +14,7 @@ import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.orcid.jaxb.model.v3.release.record.Person;
+import org.orcid.jaxb.model.v3.release.record.Record;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
@@ -54,6 +55,36 @@ public interface OrcidClient {
      * @throws OrcidClientException if some error occurs during the search
      */
     Person getPerson(String accessToken, String orcid);
+
+    /**
+     * Retrieves a summary of the ORCID person related to the given orcid
+     * using the public endpoint.
+     *
+     * @param  orcid                the orcid id of the record to retrieve
+     * @return                      the Person
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    Person getPerson(String orcid);
+
+    /**
+     * Retrieves the full ORCID record (person + activities) for the given orcid.
+     *
+     * @param  accessToken          the access token
+     * @param  orcid                the orcid id of the record to retrieve
+     * @return                      the Record
+     * @throws OrcidClientException if some error occurs during the retrieval
+     */
+    Record getRecord(String accessToken, String orcid);
+
+    /**
+     * Retrieves the full ORCID record (person + activities) for the given orcid
+     * using the public endpoint.
+     *
+     * @param  orcid                the orcid id of the record to retrieve
+     * @return                      the Record
+     * @throws OrcidClientException if some error occurs during the retrieval
+     */
+    Record getRecord(String orcid);
 
     /**
      * Retrieves all the works related to the given orcid.
