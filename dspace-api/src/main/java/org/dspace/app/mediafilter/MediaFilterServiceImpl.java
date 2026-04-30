@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -329,23 +330,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         String newName = formatFilter.getFilteredName(source.getName());
 
         // check if destination bitstream exists
-        Bundle existingBundle = null;
-        List<Bitstream> existingBitstreams = new ArrayList<>();
-        List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
-
-        if (!bundles.isEmpty()) {
-            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
-            for (Bundle bundle : bundles) {
-                List<Bitstream> bitstreams = bundle.getBitstreams();
-
-                for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName().trim().equals(newName.trim())) {
-                        existingBundle = bundle;
-                        existingBitstreams.add(bitstream);
-                    }
-                }
-            }
-        }
+        Pair<List<Bitstream>, Bundle> bitstreamsAndBundle = getBitstreamsDerivedFromFilter(item, source, formatFilter);
+        List<Bitstream> existingBitstreams = bitstreamsAndBundle.getLeft();
+        Bundle existingBundle = bitstreamsAndBundle.getRight();
 
         // if exists and overwrite = false, exit
         if (!overWrite && (!existingBitstreams.isEmpty())) {
@@ -380,6 +367,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 return false;
             }
 
+            List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
             Bundle targetBundle; // bundle we're modifying
             if (bundles.isEmpty()) {
                 // create new bundle if needed
@@ -424,6 +412,28 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
 
         return true;
+    }
+
+    @Override
+    public Pair<List<Bitstream>, Bundle> getBitstreamsDerivedFromFilter(Item item, Bitstream sourceBitstream,
+                                                                        FormatFilter formatFilter) throws Exception {
+        Bundle lastBundle = null;
+        String filteredName = formatFilter.getFilteredName(sourceBitstream.getName());
+        List<Bitstream> derivedBitstreams = new ArrayList<>();
+        List<Bundle> bundleList = itemService.getBundles(item, formatFilter.getBundleName());
+        if (!bundleList.isEmpty()) {
+            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
+            for (Bundle bundle : bundleList) {
+                List<Bitstream> bitstreamList = bundle.getBitstreams();
+                for (Bitstream bitstream : bitstreamList) {
+                    if (bitstream.getName().trim().equals(filteredName.trim())) {
+                        lastBundle = bundle;
+                        derivedBitstreams.add(bitstream);
+                    }
+                }
+            }
+        }
+        return Pair.of(derivedBitstreams, lastBundle);
     }
 
     @Override

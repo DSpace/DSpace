@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -37,6 +38,7 @@ import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.WorkflowItemRestRepository;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
+import org.dspace.app.rest.submit.step.UploadStep;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -49,6 +51,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.ItemService;
@@ -102,6 +105,8 @@ public class SubmissionService {
     protected CreativeCommonsService creativeCommonsService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private BitstreamService bitstreamService;
     @Lazy
     @Autowired
     private ConverterService converter;
@@ -371,7 +376,7 @@ public class SubmissionService {
      * Utility method used by the {@link WorkspaceItemRestRepository} and
      * {@link WorkflowItemRestRepository} to deal with the upload in an inprogress
      * submission
-     * 
+     *
      * @param context DSpace Context Object
      * @param request the http request containing the upload request
      * @param wsi     the inprogress submission current rest representation
@@ -380,7 +385,9 @@ public class SubmissionService {
      * @return the errors present in the resulting inprogress submission
      */
     public List<ErrorRest> uploadFileToInprogressSubmission(Context context, HttpServletRequest request,
-            AInprogressSubmissionRest wsi, InProgressSubmission source, MultipartFile file) {
+                                                            AInprogressSubmissionRest wsi, InProgressSubmission source,
+                                                            MultipartFile file)
+        throws SQLException, AuthorizeException, IOException {
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
             submissionConfigService.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
@@ -415,14 +422,27 @@ public class SubmissionService {
         }
         for (Object[] stepInstanceAndCfg : stepInstancesAndConfigs) {
             UploadableStep uploadableStep = (UploadableStep) stepInstanceAndCfg[0];
+            Bitstream originalFile = null;
+            if (uploadableStep instanceof UploadStep) {
+                originalFile = findOriginalFile(request);
+            }
+            Bitstream newFile;
             ErrorRest err;
             try {
-                err = uploadableStep.upload(context, this, (SubmissionStepConfig) stepInstanceAndCfg[1],
+                Pair<Bitstream, ErrorRest> bitstreamAndError =
+                    uploadableStep.upload(context, this, (SubmissionStepConfig) stepInstanceAndCfg[1],
                         source, file);
+                newFile = bitstreamAndError.getLeft();
+                err = bitstreamAndError.getRight();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            if (err != null) {
+            if (err == null) {
+                if (originalFile != null && newFile != null) {
+                    boolean replaceName = Boolean.parseBoolean(request.getParameter("replaceName"));
+                    bitstreamService.replace(context, originalFile, newFile, replaceName);
+                }
+            } else {
                 errors.add(err);
             }
         }
@@ -439,7 +459,7 @@ public class SubmissionService {
      * Utility method used by the {@link WorkspaceItemRestRepository} and
      * {@link WorkflowItemRestRepository} to deal with the patch of an inprogress
      * submission
-     * 
+     *
      * @param context DSpace Context Object
      * @param request the http request
      * @param source  the current inprogress submission
@@ -515,6 +535,19 @@ public class SubmissionService {
                 step.doPostProcessing(context, source);
             }
         }
+    }
+
+    /**
+     * If {@code request} has parameter 'replaceFile', interpret it as a Bitstream UUID
+     * Otherwise, returns null.
+     */
+    private Bitstream findOriginalFile(HttpServletRequest request) throws SQLException {
+        String replaceFile = request.getParameter("replaceFile");
+        if (replaceFile == null) {
+            return null;
+        }
+        UUID uuid = UUID.fromString(replaceFile);
+        return bitstreamService.find(new Context(), uuid);
     }
 
 }

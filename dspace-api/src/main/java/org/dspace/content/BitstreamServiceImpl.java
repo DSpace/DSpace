@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -21,24 +22,32 @@ import java.util.stream.Collectors;
 
 import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.mediafilter.FormatFilter;
+import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.event.EventDetail;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -74,6 +83,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BitstreamStorageService bitstreamStorageService;
     @Autowired(required = true)
     protected RequestItemService requestItemService;
+    @Autowired(required = true)
+    protected BitstreamLinkingService bitstreamLinkingService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+    @Autowired
+    protected MediaFilterService mediaFilterService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -109,16 +124,25 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public Bitstream clone(Context context, Bitstream bitstream)
             throws SQLException, AuthorizeException {
-        // Create a new bitstream with a new ID.
-        Bitstream clonedBitstream = bitstreamDAO.create(context, new Bitstream());
-        // Set the internal identifier, file size, checksum, and
-        // checksum algorithm as same as the given bitstream.
-        clonedBitstream.setInternalId(bitstream.getInternalId());
-        clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
-        clonedBitstream.setChecksum(bitstream.getChecksum());
-        clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
-        clonedBitstream.setFormat(bitstream.getBitstreamFormat());
-        update(context, clonedBitstream);
+        Bitstream clonedBitstream = null;
+        context.turnOffAuthorisationSystem();
+        try {
+            // Create a new bitstream with a new ID.
+            clonedBitstream = bitstreamDAO.create(context, new Bitstream());
+            // Set the internal identifier, file size, checksum, and
+            // checksum algorithm as same as the given bitstream.
+            clonedBitstream.setInternalId(bitstream.getInternalId());
+            clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
+            clonedBitstream.setChecksum(bitstream.getChecksum());
+            clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+            clonedBitstream.setFormat(bitstream.getBitstreamFormat());
+            clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
+
+            bitstreamLinkingService.cloneMetadata(context, bitstream, clonedBitstream);
+            update(context, clonedBitstream);
+        } finally {
+            context.restoreAuthSystemState();
+        }
         return clonedBitstream;
     }
 
@@ -160,6 +184,114 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             new Event(Event.CREATE, Constants.BITSTREAM, b.getID(), Constants.ITEM, itemUUID,
                 b.getChecksum(), DetailType.BITSTREAM_CHECKSUM, getIdentifiers(context, b)));
         return b;
+    }
+
+    @Override
+    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream, boolean replaceName)
+        throws SQLException, AuthorizeException, IOException {
+
+        if (!configurationService.getBooleanProperty("replace-bitstream.enabled", false)) {
+            throw new IllegalStateException("Bitstream replacement is not enabled");
+        }
+
+        Bundle firstBundle = oldBitstream.getBundles().get(0);
+        if (firstBundle == null) {
+            throw new IllegalArgumentException(
+                String.format("Can't replace bitstream (id:%s) that isn't in a bundle", oldBitstream.getID()));
+        }
+        bundleService.addBitstream(context, firstBundle, newBitstream);
+        newBitstream.setFormat(bitstreamFormatService.guessFormat(context, newBitstream));
+
+        String newBitstreamName = oldBitstream.getName();
+        if (replaceName) {
+            // Undo title change of copy function
+            newBitstreamName = newBitstream.getName();
+        } else if (
+            !Objects.equals(
+                FilenameUtils.getExtension(newBitstream.getName()),
+                FilenameUtils.getExtension(oldBitstream.getName()))
+        ) {
+            newBitstreamName = String.join(
+                ".",
+                FilenameUtils.removeExtension(oldBitstream.getName()),
+                FilenameUtils.getExtension(newBitstream.getName())
+            );
+        }
+        bitstreamLinkingService.replaceMetadata(context, oldBitstream, newBitstream, newBitstreamName);
+        // Move bitstream policies
+        List<ResourcePolicy> oldResourcePolicies = oldBitstream.getResourcePolicies();
+        authorizeService.removeAllPolicies(context, newBitstream);
+        authorizeService.addPolicies(context, oldResourcePolicies, newBitstream);
+
+        // Restore primary if needed
+        if (firstBundle.getPrimaryBitstream() == oldBitstream) {
+            firstBundle.unsetPrimaryBitstreamID();
+            firstBundle.setPrimaryBitstreamID(newBitstream);
+        }
+        Item item = (Item) getParentObject(context, oldBitstream);
+        if (item != null) {
+            deleteDerivedBitstreams(context, item, oldBitstream);
+        }
+        for (Bundle bundle: oldBitstream.getBundles()) {
+            // Add new bitstream to all other bundles old bitstream was in
+            if (!bundle.getID().equals(firstBundle.getID())) {
+                bundleService.addBitstream(context, bundle, newBitstream);
+            }
+            // Restore order of bitstreams in every bundle
+            restoreOrderOfBitstreams(context, bundle, oldBitstream, newBitstream);
+            // Remove old bitstream from every bundle
+            bundle.removeBitstream(oldBitstream);
+        }
+        delete(context, oldBitstream);
+        return newBitstream;
+    }
+
+    private void deleteDerivedBitstreams(Context context, Item item, Bitstream bitstream) {
+        String[] filterNames = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                   .getArrayProperty("filter.plugins");
+        for (String filterName : filterNames) {
+            //get filter of this name & add to list of filters
+            FormatFilter filter = (FormatFilter) CoreServiceFactory.getInstance().getPluginService()
+                                                     .getNamedPlugin(FormatFilter.class, filterName);
+            if (filter == null) {
+                continue;
+            }
+            try {
+                List<Bitstream> derivedBitstreamList =
+                    mediaFilterService.getBitstreamsDerivedFromFilter(item, bitstream, filter).getLeft();
+                for (Bitstream derivedBitstream : derivedBitstreamList) {
+                    delete(context, derivedBitstream);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * Restores the original order of bitstreams after replacing a bitstream in its bundle.
+     * @param context the current DSpace context
+     * @param bundle the bundle we want ro restore the order of bitstreams froms
+     * @param oldBitstream the old bitstream object we are removing
+     * @param newBitstream the new bitstream object that will be replacing the oldBistream
+     */
+    private void restoreOrderOfBitstreams(Context context, Bundle bundle, Bitstream oldBitstream,
+                                          Bitstream newBitstream) throws AuthorizeException, SQLException {
+
+        Bitstream[] bitstreams = bundle.getBitstreams().toArray(Bitstream[]::new);
+        UUID[] newBitstreamOrder = new UUID[bitstreams.length];
+        for (int i = 0; i < bitstreams.length; i++) {
+            if (bitstreams[i].getID() == oldBitstream.getID()) {
+                newBitstreamOrder[i] = newBitstream.getID();
+            } else if (bitstreams[i].getID() == newBitstream.getID()) {
+                newBitstreamOrder[i] = oldBitstream.getID();
+            } else {
+                newBitstreamOrder[i] = bitstreams[i].getID();
+            }
+        }
+        // Set the new order in our bundle !
+        bundleService.setOrder(context, bundle, newBitstreamOrder);
+        bundleService.update(context, bundle);
     }
 
     @Override

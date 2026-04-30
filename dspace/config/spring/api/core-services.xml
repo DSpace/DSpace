@@ -185,5 +185,8 @@
           class="org.dspace.app.customurl.consumer.CustomUrlConsumerConfig"/>
 
     <context:component-scan base-package="org.dspace.identifier.doi.crossref" />
+
+    <bean class="org.dspace.content.BitstreamLinkingServiceImpl"/>
+
 </beans>
 
