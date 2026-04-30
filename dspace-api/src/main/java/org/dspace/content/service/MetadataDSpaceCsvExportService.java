@@ -7,7 +7,9 @@
  */
 package org.dspace.content.service;
 
+import java.io.InputStream;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.content.Community;
@@ -57,6 +59,34 @@ public interface MetadataDSpaceCsvExportService {
      */
     public DSpaceCSV export(Context context, Community community,
                             boolean exportAll, DSpaceRunnableHandler handler) throws Exception;
+
+    /**
+     * Streaming version of {@link #handleExport} that writes CSV data to a temp file
+     * and returns an InputStream, avoiding accumulation of all items in memory.
+     *
+     * @param context           The relevant DSpace context
+     * @param exportAllItems    A boolean indicating whether or not the entire repository should be exported
+     * @param exportAllMetadata Defines if all metadata should be exported or only the allowed ones
+     * @param identifier        The handle or UUID for the DSpaceObject to be exported
+     * @param handler           The handler for logging
+     * @return An InputStream over the CSV content; caller must close it
+     * @throws Exception If something goes wrong
+     */
+    InputStream handleExportStreaming(Context context, boolean exportAllItems, boolean exportAllMetadata,
+                                     String identifier, DSpaceRunnableHandler handler) throws Exception;
+
+    /**
+     * Streaming version of {@link #export(Context, Iterator, boolean, DSpaceRunnableHandler)}
+     * that writes CSV data to a temp file and returns an InputStream.
+     *
+     * @param context               The relevant DSpace context
+     * @param itemIteratorSupplier  Supplier that provides a fresh item iterator (may be called twice)
+     * @param exportAll             Defines if all metadata should be exported or only the allowed ones
+     * @return An InputStream over the CSV content; caller must close it
+     * @throws Exception If something goes wrong
+     */
+    InputStream exportStreaming(Context context, Supplier<Iterator<Item>> itemIteratorSupplier,
+                                boolean exportAll) throws Exception;
 
     int getCsvExportLimit();
 
