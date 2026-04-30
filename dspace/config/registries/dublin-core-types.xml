@@ -338,6 +338,27 @@
     this item.</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>audiovideo</qualifier>
+    <scope_note>Description note for associated audio/video content.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>audiotranscript</qualifier>
+    <scope_note>Transcript for associated audio/video content.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>videodescription</qualifier>
+    <scope_note>Description for associated video content.</scope_note>
+  </dc-type>
+
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
