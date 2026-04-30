@@ -29,6 +29,7 @@ import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
@@ -42,7 +43,9 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.I18nUtil;
 import org.dspace.deletion.process.DSpaceObjectDeletionProcess;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +67,9 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     private Bitstream bitstream5;
     private Bitstream bitstream6;
     private Collection collection;
+    private EPerson communityAdmin;
+    private Community adminCommunity;
+    private Collection collInAdminCommunity;
 
     @Autowired
     private ItemService itemService;
@@ -72,6 +78,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
+
         community = CommunityBuilder.createCommunity(context)
                                     .withName("My community")
                                     .build();
@@ -138,8 +145,43 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
     }
 
+    /**
+     * A user with delete permission (e.g. admin) on a parent object, but not the
+     * object itself, should be allowed to run the script to delete by inheriteance
+     */
     @Test
-    public void asyncDetetionOfItemTest() throws Exception {
+    public void testScriptConfigurationAuthorizeAllowsParentAdmin() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        communityAdmin = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("first (community admin)", "last (community admin)")
+                .withEmail("communityadmin@email.com")
+                .withCanLogin(true)
+                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                .withPassword(password)
+                .build();
+
+        adminCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Community with an administrator")
+                .withAdminGroup(communityAdmin).build();
+
+        collInAdminCommunity = CollectionBuilder.createCollection(context, adminCommunity)
+                .withName("Collection beneath community with an administrator")
+                .build();
+        context.restoreAuthSystemState();
+
+        String tokenCommunityAdmin = getAuthToken(communityAdmin.getEmail(), password);
+        String[] args = new String[]{ OBJECT_DELETION_SCRIPT, "-i", collInAdminCommunity.getID().toString() };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        DSpaceObjectDeletionProcess deletionProcess = new DSpaceObjectDeletionProcess();
+        deletionProcess.initialize(args, handler, admin);
+        deletionProcess.run();
+        getClient(tokenCommunityAdmin).perform(get("/api/core/collections/" + collInAdminCommunity.getID()))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void asyncDeletionOfItemTest() throws Exception {
         // verify that item with bitstreams exist
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/items/" + item1.getID()))
@@ -207,7 +249,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfCollectionTest() throws Exception {
+    public void asyncDeletionOfCollectionTest() throws Exception {
 
         // verify that collection with items/bitstreams exists
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -299,7 +341,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfCommunityTest() throws Exception {
+    public void asyncDeletionOfCommunityTest() throws Exception {
 
         // verify that community with collections/items/bitstreams exists
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -399,7 +441,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfUnsupportedObjectTest() throws Exception {
+    public void asyncDeletionOfUnsupportedObjectTest() throws Exception {
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
@@ -423,7 +465,7 @@ public class DSpaceObjectDeletionProcessIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void asyncDetetionOfItemByHandleTest() throws Exception {
+    public void asyncDeletionOfItemByHandleTest() throws Exception {
         // verify that item with bitstreams exist
         AtomicReference<String> idRef = new AtomicReference<>();
 
