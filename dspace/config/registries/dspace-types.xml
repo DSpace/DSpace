@@ -442,4 +442,11 @@
         <scope_note>History log of curation tasks performed on the item with timestamps</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>pdfviewer</element>
+        <qualifier>enabled</qualifier>
+        <scope_note>Field to represent whether the pdf viewer is enabled for this dso or not.</scope_note>
+    </dc-type>
+
 </dspace-dc-types>
