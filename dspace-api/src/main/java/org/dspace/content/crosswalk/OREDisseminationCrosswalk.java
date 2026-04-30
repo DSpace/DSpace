@@ -103,7 +103,7 @@ public class OREDisseminationCrosswalk
 
         if (oaiUrl == null) {
             throw new CrosswalkInternalException(
-                "Base uri for the ore generator has not been set. Check the ore.authoritative.source setting.");
+                "Base uri for the ore generator has not been set. Check the oai.ore.authoritative.source setting.");
         }
 
         String uriA = oaiUrl + "/metadata/handle/" + item.getHandle() + "/ore.xml";
