@@ -341,7 +341,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         closed.clear();
         controllerFormDefinitions.clear();
         authoritiesFormDefinitions.clear();
-        submissionConfigService.reload();
+        if (submissionConfigService != null) {
+            submissionConfigService.reload();
+        }
         initialized = false;
     }
 

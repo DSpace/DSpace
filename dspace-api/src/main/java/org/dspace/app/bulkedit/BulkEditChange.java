@@ -8,7 +8,11 @@
 package org.dspace.app.bulkedit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -19,11 +23,25 @@ import org.dspace.content.Item;
  * @author Stuart Lewis
  */
 public class BulkEditChange {
+    /**
+     * UUID referring to an existing item or a temporary UUID representing the item to be created
+     */
+    private UUID uuid;
 
     /**
      * The item these changes relate to
      */
     private Item item;
+
+    /**
+     * Optional extra identifiers
+     */
+    private Map<String, String> identifiers;
+
+    /**
+     * List of metadata fields to clear
+     */
+    private List<BulkEditMetadataField> clear;
 
     /**
      * The List of hashtables with the new elements
@@ -94,7 +112,9 @@ public class BulkEditChange {
     /**
      * Initialise a change holder for a new item
      */
-    public BulkEditChange() {
+    public BulkEditChange(UUID tempUUID) {
+        uuid = tempUUID;
+
         // Set the item to be null
         item = null;
         newItem = true;
@@ -103,6 +123,8 @@ public class BulkEditChange {
         newOwningCollection = null;
 
         // Initialise the arrays
+        identifiers = new HashMap<>();
+        clear = new ArrayList<>();
         adds = new ArrayList<>();
         removes = new ArrayList<>();
         constant = new ArrayList<>();
@@ -118,11 +140,13 @@ public class BulkEditChange {
      */
     public BulkEditChange(Item i) {
         // Store the item
-        item = i;
+        setItem(i);
         newItem = false;
         empty = true;
 
         // Initialise the arrays
+        identifiers = new HashMap<>();
+        clear = new ArrayList<>();
         adds = new ArrayList<>();
         removes = new ArrayList<>();
         constant = new ArrayList<>();
@@ -139,6 +163,7 @@ public class BulkEditChange {
     public void setItem(Item i) {
         // Store the item
         item = i;
+        uuid = i.getID();
     }
 
     /**
@@ -151,6 +176,15 @@ public class BulkEditChange {
         adds.add(dcv);
         complete.add(dcv);
         empty = false;
+    }
+
+    /**
+     * Add a removed metadata value
+     *
+     * @param bemf The value to remove
+     */
+    public void registerClear(BulkEditMetadataField bemf) {
+        clear.add(bemf);
     }
 
     /**
@@ -176,66 +210,39 @@ public class BulkEditChange {
     }
 
     /**
-     * Add a new mapped Collection
-     *
-     * @param c The new mapped Collection
-     */
-    public void registerNewMappedCollection(Collection c) {
-        // Add the new owning Collection
-        newMappedCollections.add(c);
-        empty = false;
-    }
-
-    /**
-     * Add an old mapped Collection
-     *
-     * @param c The old mapped Collection
-     */
-    public void registerOldMappedCollection(Collection c) {
-        // Add the old owning Collection (if it isn't there already, or is an old collection)
-        boolean found = false;
-
-        if ((this.getOldOwningCollection() != null) &&
-            (this.getOldOwningCollection().getHandle().equals(c.getHandle()))) {
-            found = true;
-        }
-
-        for (Collection collection : oldMappedCollections) {
-            if (collection.getHandle().equals(c.getHandle())) {
-                found = true;
-            }
-        }
-
-        if (!found) {
-            oldMappedCollections.add(c);
-            empty = false;
-        }
-    }
-
-    /**
-     * Register a change to the owning collection
-     *
-     * @param oldC The old owning collection
-     * @param newC The new owning collection
-     */
-    public void changeOwningCollection(Collection oldC, Collection newC) {
-        // Store the old owning collection
-        oldOwningCollection = oldC;
-
-        // Store the new owning collection
-        newOwningCollection = newC;
-        empty = false;
-    }
-
-    /**
      * Set the owning collection of an item
      *
-     * @param newC The new owning collection
+     * @param cols   the new Collections
      */
-    public void setOwningCollection(Collection newC) {
-        // Store the new owning collection
-        newOwningCollection = newC;
-        //empty = false;
+    public void registerCollections(List<Collection> cols) {
+        Collection owningCollection = cols.isEmpty() ? null : cols.get(0);
+        List<Collection> mappedCollections = cols.size() < 2 ? List.of() : cols.subList(1, cols.size());
+
+        if (item != null) {
+            if (owningCollection != null && !Objects.equals(owningCollection, item.getOwningCollection())) {
+                newOwningCollection = owningCollection;
+                oldOwningCollection = item.getOwningCollection();
+                empty = false;
+            }
+
+            for (Collection oldCollection : item.getCollections()) {
+                if (oldCollection == item.getOwningCollection()) {
+                    continue;
+                }
+                if (!mappedCollections.contains(oldCollection)) {
+                    oldMappedCollections.add(oldCollection);
+                    empty = false;
+                }
+            }
+            for (Collection newMappedCollection : mappedCollections) {
+                newMappedCollections.add(newMappedCollection);
+                empty = false;
+            }
+        } else if (owningCollection != null) {
+            newOwningCollection = owningCollection;
+            newMappedCollections.addAll(mappedCollections);
+            empty = false;
+        }
     }
 
     /**
@@ -249,6 +256,27 @@ public class BulkEditChange {
     }
 
     /**
+     * Set an optional identifier
+     */
+    public void setIdentifier(String key, String value) {
+        identifiers.put(key, value);
+    }
+
+    /**
+     * Get an optional identifier
+     */
+    public String getIdentifier(String key) {
+        return identifiers.get(key);
+    }
+
+    /**
+     * Get all optional identifiers
+     */
+    public Map<String, String> getIdentifiers() {
+        return identifiers;
+    }
+
+    /**
      * Get the list of elements and their values that have been added.
      *
      * @return the list of elements and their values that have been added.
@@ -256,6 +284,10 @@ public class BulkEditChange {
     public List<BulkEditMetadataValue> getAdds() {
         // Return the array
         return adds;
+    }
+
+    public List<BulkEditMetadataField> getClear() {
+        return clear;
     }
 
     /**
@@ -402,5 +434,28 @@ public class BulkEditChange {
      */
     public boolean hasChanges() {
         return !empty;
+    }
+
+    /**
+     * Get the UUID of the Item
+     * May be a fake UUID as a temporary placeholder for items to be imported
+     * The fake UUID can then be used as a reference throughout the same import
+     */
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public static Map<String, List<BulkEditMetadataValue>> getMetadataByField(List<BulkEditMetadataValue> metadata) {
+        Map<String, List<BulkEditMetadataValue>> map = new HashMap<>();
+        for (BulkEditMetadataValue value : metadata) {
+            String mdField = BulkEditMetadataField.key(
+                value.getSchema(), value.getElement(), value.getQualifier(), value.getLanguage()
+            );
+            if (!map.containsKey(mdField)) {
+                map.put(mdField, new ArrayList<>());
+            }
+            map.get(mdField).add(value);
+        }
+        return map;
     }
 }
