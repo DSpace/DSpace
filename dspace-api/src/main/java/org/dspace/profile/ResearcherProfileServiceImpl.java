@@ -199,6 +199,17 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         Item item = findItemByURI(context, uri)
             .orElseThrow(() -> new IllegalArgumentException("No item found by URI " + uri));
 
+        return claim(context, ePerson, item);
+    }
+
+    @Override
+    public ResearcherProfile claim(Context context, EPerson ePerson, Item item)
+        throws SQLException, AuthorizeException {
+
+        if (item == null) {
+            throw new IllegalArgumentException("The provided item is null");
+        }
+
         if (!item.isArchived() || item.isWithdrawn()) {
             throw new IllegalArgumentException(
                 "Only archived items can be claimed to create a researcher profile. Item ID: " + item.getID());
