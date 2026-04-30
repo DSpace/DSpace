@@ -1213,12 +1213,12 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testSherpaImportFiller() throws Exception {
+    public void testOpfImportFiller() throws Exception {
 
         try {
             // AuthorAuthority configuration provided by setUp() method
-            // Add JournalAuthority with special Sherpa configurations
-            addJournalAuthorityWithSherpaConfig();
+            // Add JournalAuthority with special Open Policy Finder configurations
+            addJournalAuthorityWithOpfConfig();
 
             String issn = "2731-0582";
 
@@ -1473,13 +1473,13 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     }
 
     /**
-     * Special configuration for Sherpa journal import tests.
-     * Adds JournalAuthority with additional Sherpa-specific configurations.
+     * Special configuration for Open Policy Finder journal import tests.
+     * Adds JournalAuthority with additional Open Policy Finder-specific configurations.
      */
-    private void addJournalAuthorityWithSherpaConfig() throws Exception {
+    private void addJournalAuthorityWithOpfConfig() throws Exception {
         addJournalAuthority();
 
-        // Additional Sherpa-specific configurations
+        // Additional Open Policy Finder-specific configurations
         configurationService.setProperty("choices.closed.dc.relation.journal", "true");
         configurationService.setProperty("cris.ItemAuthority.JournalAuthority.relationshipType", "Journal");
 

@@ -15,7 +15,7 @@
                     <bean class="org.dspace.authority.filler.ItemMetadataImportFiller" parent="fullItemMetadataConfiguration" />
                 </entry>
                 <entry key="ORCID" value-ref="orcidImportFiller" />
-                <entry key="ISSN" value-ref="sherpaImportFiller" />
+                <entry key="ISSN" value-ref="opfImportFiller" />
             </map>
         </property>
     </bean>
@@ -107,8 +107,8 @@
        <constructor-arg name="authorityIdentifier" value="ORCID"/>
     </bean>
 
-    <bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="sherpaImportFiller" >
-       <constructor-arg name="externalDataProvider" ref="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider"/>
+    <bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="opfImportFiller" >
+       <constructor-arg name="externalDataProvider" ref="org.dspace.external.provider.impl.OpenPolicyFinderJournalISSNDataProvider"/>
        <constructor-arg name="authorityIdentifier" value="ISSN"/>
     </bean>
 
