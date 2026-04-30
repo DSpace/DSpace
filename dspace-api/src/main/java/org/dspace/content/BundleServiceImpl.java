@@ -142,6 +142,12 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // Check authorisation
         authorizeService.authorizeAction(context, bundle, Constants.ADD);
 
+        // Acquire a pessimistic write lock on the bundle row and refresh from DB.
+        // This serialises concurrent add/remove/reorder operations on the same bundle and ensures
+        // that the bitstream list we work with reflects the current database state, preventing
+        // bitstream_order gaps that would cause null entries in getBitstreams().
+        bundleDAO.lockForWrite(context, bundle);
+
         log.info(LogHelper.getHeader(context, "add_bitstream", "bundle_id="
                 + bundle.getID() + ",bitstream_id=" + bitstream.getID()));
 
@@ -225,6 +231,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             throws AuthorizeException, SQLException, IOException {
         // Check authorisation
         authorizeService.authorizeAction(context, bundle, Constants.REMOVE);
+
+        // Acquire a pessimistic write lock on the bundle row and refresh from DB before modifying
+        // the bitstream list. See addBitstream() for a detailed explanation.
+        bundleDAO.lockForWrite(context, bundle);
 
         log.info(LogHelper.getHeader(context, "remove_bitstream",
                 "bundle_id=" + bundle.getID() + ",bitstream_id=" + bitstream.getID()));
@@ -404,6 +414,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Override
     public void setOrder(Context context, Bundle bundle, UUID[] bitstreamIds) throws AuthorizeException, SQLException {
         authorizeService.authorizeAction(context, bundle, Constants.WRITE);
+
+        // Acquire a pessimistic write lock on the bundle row and refresh from DB before reordering
+        // the bitstream list. See addBitstream() for a detailed explanation.
+        bundleDAO.lockForWrite(context, bundle);
 
         List<Bitstream> currentBitstreams = bundle.getBitstreams();
         List<Bitstream> updatedBitstreams = new ArrayList<Bitstream>();

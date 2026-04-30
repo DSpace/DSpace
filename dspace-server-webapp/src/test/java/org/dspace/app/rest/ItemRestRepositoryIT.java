@@ -4466,9 +4466,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .build();
         context.restoreAuthSystemState();
 
-        // Should still fail with HTTP 204
+        // Should now find the THUMBNAIL bitstream, even if it doesn't match the ORIGINAL Bitstream's name
         getClient().perform(get("/api/core/items/" + item.getID() + "/thumbnail"))
-                   .andExpect(status().isNoContent());
+                   .andExpect(status().isOk());
     }
 
     @Test
