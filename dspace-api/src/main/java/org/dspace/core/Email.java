@@ -457,7 +457,7 @@ public class Email {
 
         // Set some message header fields
         Instant date = Instant.now();
-        message.setSentDate(java.util.Date.from(date));
+        message.setSentDate(java.util.Date.from(date)); // NOPMD - required by third-party API
         message.setFrom(new InternetAddress(from));
 
         for (String headerName : templateHeaders) {

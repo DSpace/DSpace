@@ -154,6 +154,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 IndexDiscoveryScriptConfiguration.class);
     }
 
+    @Override
     public void setup() throws ParseException {
         try {
             context = new Context(Context.Mode.READ_ONLY);

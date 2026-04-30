@@ -23,26 +23,32 @@ public final class InternalRequestImpl extends AbstractRequestImpl implements Re
     public InternalRequestImpl() {
     }
 
+    @Override
     public ServletRequest getServletRequest() {
         return null;
     }
 
+    @Override
     public HttpServletRequest getHttpServletRequest() {
         return null;
     }
 
+    @Override
     public ServletResponse getServletResponse() {
         return null;
     }
 
+    @Override
     public HttpServletResponse getHttpServletResponse() {
         return null;
     }
 
+    @Override
     public Object getAttribute(String name) {
         return attributes.get(name);
     }
 
+    @Override
     public void setAttribute(String name, Object o) {
         attributes.put(name, o);
     }

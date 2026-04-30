@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 public class SearchConfigurationResourceHalLinkFactory
     extends HalLinkFactory<SearchConfigurationResource, DiscoveryRestController> {
 
+    @Override
     protected void addLinks(SearchConfigurationResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
         SearchConfigurationRest data = halResource.getContent();
@@ -41,10 +42,12 @@ public class SearchConfigurationResourceHalLinkFactory
         }
     }
 
+    @Override
     protected Class<SearchConfigurationResource> getResourceClass() {
         return SearchConfigurationResource.class;
     }
 
+    @Override
     protected Class<DiscoveryRestController> getControllerClass() {
         return DiscoveryRestController.class;
     }

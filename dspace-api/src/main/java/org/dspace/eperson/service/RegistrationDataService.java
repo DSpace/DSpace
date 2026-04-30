@@ -32,6 +32,7 @@ import org.dspace.service.DSpaceCRUDService;
  */
 public interface RegistrationDataService extends DSpaceCRUDService<RegistrationData> {
 
+    @Override
     RegistrationData create(Context context) throws SQLException, AuthorizeException;
 
     RegistrationData create(Context context, String netId) throws SQLException, AuthorizeException;

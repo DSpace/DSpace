@@ -26,14 +26,17 @@ public class EntityTypeRest extends BaseObjectRest<Integer> {
     public static final String CATEGORY = RestModel.CORE;
     public static final String RELATION_SHIP_TYPES = "relationshiptypes";
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }

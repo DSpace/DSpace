@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetsResource> {
 
+    @Override
     protected void addLinks(FacetsResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         List<SearchFacetEntryResource> data = halResource.getFacetResources();
         SearchResultsRest content = halResource.getContent();
@@ -40,6 +41,7 @@ public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<Fa
         }
     }
 
+    @Override
     protected Class<FacetsResource> getResourceClass() {
         return FacetsResource.class;
     }

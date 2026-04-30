@@ -50,11 +50,13 @@ public class SearchFacetEntryRest extends RestAddressableModel {
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
     @JsonIgnore
+    @Override
     public String getType() {
         return NAME;
     }
@@ -67,6 +69,7 @@ public class SearchFacetEntryRest extends RestAddressableModel {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return DiscoveryRestController.class;
     }

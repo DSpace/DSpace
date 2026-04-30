@@ -21,10 +21,12 @@ public class AuthnRest extends BaseObjectRest<Integer> {
     public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestAddressableModel.AUTHENTICATION;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -37,6 +39,7 @@ public class AuthnRest extends BaseObjectRest<Integer> {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return AuthenticationRestController.class;
     }

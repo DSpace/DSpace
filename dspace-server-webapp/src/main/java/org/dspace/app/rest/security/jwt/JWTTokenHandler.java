@@ -280,11 +280,13 @@ public abstract class JWTTokenHandler {
             JWSVerifier verifier = new MACVerifier(buildSigningKey(ePerson));
 
             //If token is valid and not expired return eperson in token
-            java.util.Date expirationTime = jwtClaimsSet.getExpirationTime();
+            java.util.Date expirationTime = jwtClaimsSet.getExpirationTime(); // NOPMD - required by third-party API
             return signedJWT.verify(verifier)
                 && expirationTime != null
                 //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
-                && DateUtils.isAfter(expirationTime, java.util.Date.from(Instant.now()), MAX_CLOCK_SKEW_SECONDS);
+                && DateUtils.isAfter(expirationTime,
+                    java.util.Date.from(Instant.now()), // NOPMD - required by third-party API
+                    MAX_CLOCK_SKEW_SECONDS);
         }
     }
 
@@ -356,7 +358,7 @@ public abstract class JWTTokenHandler {
         }
 
         return builder
-            .expirationTime(java.util.Date.from(
+            .expirationTime(java.util.Date.from( // NOPMD - required by third-party API
                 Instant.ofEpochMilli(Instant.now().toEpochMilli() + getExpirationPeriod())))
             .build();
     }

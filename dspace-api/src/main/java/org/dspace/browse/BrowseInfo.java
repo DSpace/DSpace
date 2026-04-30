@@ -646,6 +646,7 @@ public class BrowseInfo {
      *
      * @return String representation
      */
+    @Override
     public String toString() {
         try {
             StringBuffer sb = new StringBuffer();

@@ -101,16 +101,16 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
     }
 
     @Override
-    public java.util.Date getEarliestDate() {
+    public java.util.Date getEarliestDate() { // NOPMD - required by third-party API
         // Look at the database!
         try {
-            return java.util.Date.from(dateResolver.getEarliestDate(context));
+            return java.util.Date.from(dateResolver.getEarliestDate(context)); // NOPMD - required by third-party API
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         } catch (InvalidMetadataFieldException e) {
             log.error(e.getMessage(), e);
         }
-        return java.util.Date.from(Instant.now());
+        return java.util.Date.from(Instant.now()); // NOPMD - required by third-party API
     }
 
     @Override

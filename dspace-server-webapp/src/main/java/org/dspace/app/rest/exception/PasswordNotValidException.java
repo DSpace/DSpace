@@ -30,6 +30,7 @@ public class PasswordNotValidException extends UnprocessableEntityException impl
         super(I18nUtil.getMessage(MESSAGE_KEY), cause);
     }
 
+    @Override
     public String getMessageKey() {
         return MESSAGE_KEY;
     }

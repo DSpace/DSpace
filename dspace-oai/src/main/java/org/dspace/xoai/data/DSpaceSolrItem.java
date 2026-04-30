@@ -36,7 +36,8 @@ public class DSpaceSolrItem extends DSpaceItem {
         log.debug("Creating OAI Item from Solr source");
         unparsedMD = (String) doc.getFieldValue("item.compile");
         handle = (String) doc.getFieldValue("item.handle");
-        lastMod = ((java.util.Date) doc.getFieldValue("item.lastmodified")).toInstant();
+        lastMod = ((java.util.Date) // NOPMD - required by third-party API
+                doc.getFieldValue("item.lastmodified")).toInstant();
         sets = new ArrayList<>();
 
         Collection<Object> fieldValues;
@@ -67,8 +68,8 @@ public class DSpaceSolrItem extends DSpaceItem {
     }
 
     @Override
-    public java.util.Date getDatestamp() {
-        return java.util.Date.from(lastMod);
+    public java.util.Date getDatestamp() { // NOPMD - required by third-party API
+        return java.util.Date.from(lastMod); // NOPMD - required by third-party API
     }
 
     @Override

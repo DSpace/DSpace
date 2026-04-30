@@ -46,6 +46,7 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }

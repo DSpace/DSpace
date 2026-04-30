@@ -34,6 +34,7 @@ public class UserBasedFilterQASecurity implements QASecurity {
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Override
     public Optional<String> generateFilterQuery(Context context, EPerson user) {
         try {
             if (allowAdmins && authorizeService.isAdmin(context, user)) {
@@ -46,10 +47,12 @@ public class UserBasedFilterQASecurity implements QASecurity {
         }
     }
 
+    @Override
     public boolean canSeeQASource(Context context, EPerson user) {
         return user != null;
     }
 
+    @Override
     public boolean canSeeQAEvent(Context context, EPerson user, QAEvent qaEvent) {
         try {
             return (allowAdmins && authorizeService.isAdmin(context, user))

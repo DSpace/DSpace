@@ -7,7 +7,7 @@
  */
 package org.dspace.builder;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 import org.dspace.app.audit.AuditEvent;
@@ -30,7 +30,7 @@ public class AuditEventBuilder extends AbstractBuilder<AuditEvent, AuditSolrServ
         super(context);
         audit = new AuditEvent();
         audit.setUuid(UUID.randomUUID());
-        audit.setDatetime(new Date());
+        audit.setDatetime(Instant.now());
     }
 
     public static AuditEventBuilder createAuditEvent(final Context context) {
@@ -86,7 +86,7 @@ public class AuditEventBuilder extends AbstractBuilder<AuditEvent, AuditSolrServ
         return this;
     }
 
-    public AuditEventBuilder withTimeStamp(final Date timeStamp) {
+    public AuditEventBuilder withTimeStamp(final Instant timeStamp) {
         this.audit.setDatetime(timeStamp);
         return this;
     }

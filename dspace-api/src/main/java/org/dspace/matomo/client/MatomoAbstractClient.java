@@ -75,6 +75,7 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
         return this.matomoRequestBuilder.buildJSON(new MatomoBulkRequest(token, details));
     }
 
+    @Override
     public void sendDetails(List<MatomoRequestDetails> details) {
         if (details == null || details.isEmpty()) {
             log.warn("Cannot send an empty request!");
