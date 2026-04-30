@@ -61,7 +61,7 @@
         <property name="description" value="Manage the OAI-PMH harvesting of external collections"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.harvest.HarvestCli"/>
     </bean>
-        
+
     <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
         <property name="description" value="Cleanup all the old processes in the specified state"/>
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
@@ -71,12 +71,12 @@
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
     </bean>
-    
+
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
     </bean>
-    
+
     <bean id="solr-database-resync" class="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration">
         <property name="description" value="Update the database status of Items in solr"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
@@ -126,6 +126,11 @@
     <bean id="item-enhancer" class="org.dspace.content.enhancer.script.ItemEnhancerScriptConfiguration">
         <property name="description" value="Script that checks and updated virtual stale metadata on all items"/>
         <property name="dspaceRunnableClass" value="org.dspace.content.enhancer.script.ItemEnhancerScript"/>
+    </bean>
+
+    <bean id="xoai-script" class="org.dspace.xoai.script.XOAIScriptConfiguration">
+        <property name="description" value=""/>
+        <property name="dspaceRunnableClass" value="org.dspace.xoai.script.XOAIScript"/>
     </bean>
 
 </beans>
