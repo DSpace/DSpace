@@ -10,14 +10,18 @@ package org.dspace.core;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +59,14 @@ public class LDN {
 
     /** Velocity template for the message*/
     private Template template;
+
+    /** Allowed base directory for LDN messages / templates **/
+    private static final ConfigurationService configurationService =
+        DSpaceServicesFactory.getInstance().getConfigurationService();
+    private static final String dspaceDir = configurationService.getProperty("dspace.dir", "/dspace");
+    private static final Path allowedTemplateBasePath = Paths.get(
+            configurationService.getProperty( "ldn.template.path", dspaceDir + File.separatorChar
+                    + "config" + File.separatorChar + "ldn"));
 
     /**
      * Create a new ldn message.
@@ -144,8 +156,14 @@ public class LDN {
     public static LDN getLDNMessage(String ldnMessageFile)
         throws IOException {
         StringBuilder contentBuffer = new StringBuilder();
+        Path ldnMessagePath = new File(ldnMessageFile).toPath().normalize();
+        Path realLdnMessagePath = allowedTemplateBasePath.resolve(ldnMessagePath).normalize();
+        if (!realLdnMessagePath.startsWith(allowedTemplateBasePath)) {
+            throw new IOException("Illegal LDN message path: '" + ldnMessagePath + "'");
+        }
+
         try (
-            InputStream is = new FileInputStream(ldnMessageFile);
+            InputStream is = new FileInputStream(realLdnMessagePath.toFile());
             InputStreamReader ir = new InputStreamReader(is, "UTF-8");
             BufferedReader reader = new BufferedReader(ir);
             ) {
