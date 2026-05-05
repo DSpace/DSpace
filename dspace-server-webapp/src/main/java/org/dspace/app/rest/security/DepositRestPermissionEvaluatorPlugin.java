@@ -16,12 +16,13 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.RequestService;
@@ -67,6 +68,9 @@ public class DepositRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     private WorkspaceItemService workspaceItemService;
 
     @Autowired
+    private AuthorizeService authorizeService;
+
+    @Autowired
     private GroupService groupService;
 
     @Override
@@ -75,7 +79,7 @@ public class DepositRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (!DSpaceRestPermission.WRITE.equals(restPermission)
-                || !StringUtils.equalsIgnoreCase(WorkflowItemRest.NAME, targetType)) {
+            || !StringUtils.equalsIgnoreCase(WorkflowItemRest.NAME, targetType)) {
             return false;
         }
 
@@ -88,7 +92,7 @@ public class DepositRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         try {
             EPerson ePerson = ePersonService.findByEmail(context,
-                    (String) authentication.getPrincipal());
+                                                         (String) authentication.getPrincipal());
             if (ePerson == null) {
                 return false;
             }
@@ -107,8 +111,7 @@ public class DepositRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
             // Allow deposit if the user is in the collection's submitters group
             Collection collection = workspaceItem.getCollection();
             if (collection != null) {
-                Group submitters = collection.getSubmitters();
-                return submitters != null && groupService.isMember(context, ePerson, submitters);
+                return authorizeService.authorizeActionBoolean(context, collection, Constants.ADD);
             }
 
             return false;
