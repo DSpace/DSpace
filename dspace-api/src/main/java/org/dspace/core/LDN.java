@@ -18,7 +18,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
@@ -26,15 +25,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class representing an LDN message json
@@ -57,18 +52,6 @@ public class LDN {
 
     /** Velocity template settings. */
     private static final String RESOURCE_REPOSITORY_NAME = "LDN";
-    private static final Properties VELOCITY_PROPERTIES = new Properties();
-    static {
-        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADERS, "string");
-        VELOCITY_PROPERTIES.put("resource.loader.string.description",
-                "Velocity StringResource loader");
-        VELOCITY_PROPERTIES.put("resource.loader.string.class",
-                StringResourceLoader.class.getName());
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.name",
-                RESOURCE_REPOSITORY_NAME);
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.static",
-                "false");
-    }
 
     /** Velocity template for the message*/
     private Template template;
@@ -112,14 +95,13 @@ public class LDN {
      * @throws IOException        if IO error
      */
     public String generateLDNMessage() {
-        ConfigurationService config
-            = DSpaceServicesFactory.getInstance().getConfigurationService();
-
         VelocityEngine templateEngine = new VelocityEngine();
-        templateEngine.init(VELOCITY_PROPERTIES);
+        templateEngine.init(Utils.getSecureVelocityProperties(RESOURCE_REPOSITORY_NAME));
 
         VelocityContext vctx = new VelocityContext();
-        vctx.put("config", new LDN.UnmodifiableConfigurationService(config));
+        // Pass a restricted (via configuration) list of resolved Configuration keys and values, for
+        // template lookup
+        vctx.put("config", Utils.getAllowedTemplateConfig());
         vctx.put("params", Collections.unmodifiableList(arguments));
 
         if (null == template) {
@@ -181,32 +163,5 @@ public class LDN {
         LDN ldn = new LDN();
         ldn.setContent(ldnMessageFile, contentBuffer.toString());
         return ldn;
-    }
-
-    /**
-     * Wrap ConfigurationService to prevent templates from modifying
-     * the configuration.
-     */
-    public static class UnmodifiableConfigurationService {
-        private final ConfigurationService configurationService;
-
-        /**
-         * Swallow an instance of ConfigurationService.
-         *
-         * @param cs the real instance, to be wrapped.
-         */
-        public UnmodifiableConfigurationService(ConfigurationService cs) {
-            configurationService = cs;
-        }
-
-        /**
-         * Look up a key in the actual ConfigurationService.
-         *
-         * @param key to be looked up in the DSpace configuration.
-         * @return whatever value ConfigurationService associates with {@code key}.
-         */
-        public String get(String key) {
-            return configurationService.getProperty(key);
-        }
     }
 }
