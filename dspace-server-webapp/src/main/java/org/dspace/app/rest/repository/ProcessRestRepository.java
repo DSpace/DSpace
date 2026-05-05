@@ -36,7 +36,10 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.Process_;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.util.ClusteringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -65,6 +68,14 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Autowired
     private EPersonService epersonService;
 
+    @EventListener(ApplicationReadyEvent.class)
+    public void initClusteringUuid() throws SQLException, AuthorizeException, IOException {
+        Context context = new Context();
+        context.turnOffAuthorisationSystem();
+        UUID uuid = ClusteringUtil.createOrGetClusteringUuid();
+        processService.failProcessesOfInstance(context, uuid);
+        context.complete();
+    }
 
     @Override
     @PreAuthorize("hasPermission(#id, 'PROCESS', 'READ')")

@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -194,6 +195,22 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         criteriaQuery.select(processRoot);
         criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
         return count(context, criteriaQuery, criteriaBuilder, processRoot);
+    }
+
+    @Override
+    public List<Process> findByInstance(Context context, UUID instance, int limit, int offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+
+        Root<Process> processRoot = criteriaQuery.from(Process.class);
+        criteriaQuery.select(processRoot);
+        criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.INSTANCE), instance));
+
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.desc(processRoot.get(Process_.PROCESS_ID)));
+        criteriaQuery.orderBy(orderList);
+
+        return list(context, criteriaQuery, false, Process.class, limit, offset);
     }
 
 }

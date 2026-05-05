@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.ListUtils;
@@ -47,6 +48,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.util.ClusteringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -84,6 +86,7 @@ public class ProcessServiceImpl implements ProcessService {
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(new Date());
+        process.setInstance(ClusteringUtil.createOrGetClusteringUuid());
         Optional.ofNullable(specialGroups)
             .ifPresent(sg -> {
                 // we use a set to be sure no duplicated special groups are stored with process
@@ -319,6 +322,33 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public int countByUser(Context context, EPerson user) throws SQLException {
         return processDAO.countByUser(context, user);
+    }
+
+    @Override
+    public List<Process> findByInstance(Context context, UUID uuid, int limit, int offset) throws SQLException {
+        return processDAO.findByInstance(context, uuid, limit, offset);
+    }
+
+    @Override
+    public void failProcessesOfInstance(Context context, UUID uuid)
+        throws SQLException, IOException, AuthorizeException {
+        List<Process> processesToBeFailed = findByInstance(context, uuid, -1, -1);
+        for (Process process : processesToBeFailed) {
+            if (    process.getProcessStatus() == ProcessStatus.FAILED ||
+                    process.getProcessStatus() == ProcessStatus.COMPLETED) {
+                continue;
+            }
+            context.setCurrentUser(process.getEPerson());
+            // Fail the process
+            log.info("Process with ID {} has a uuid of another tomcat: {}, failing it now.", process.getID(),
+                process.getInstance());
+            fail(context, process);
+            // But still attach its log to the process
+            appendLog(process.getID(), process.getName(),
+                String.format("Process had a uuid of another tomcat: %s", process.getInstance()),
+                ProcessLogLevel.ERROR);
+            createLogBitstream(context, process);
+        }
     }
 
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {

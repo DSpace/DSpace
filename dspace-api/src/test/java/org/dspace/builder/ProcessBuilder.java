@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ProcessStatus;
@@ -70,6 +71,11 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         process.setStartTime(simpleDateFormat.parse(startTime));
         process.setFinishedTime(simpleDateFormat.parse(endTime));
+        return this;
+    }
+
+    public ProcessBuilder withInstance(UUID instance) {
+        process.setInstance(instance);
         return this;
     }
 

@@ -10,6 +10,7 @@ package org.dspace.scripts;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -82,6 +83,9 @@ public class Process implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "bitstream_id")}
     )
     private List<Bitstream> bitstreams;
+
+    @Column(name = "instance")
+    private UUID instance;
 
     /*
      * Special Groups associated with this Process
@@ -241,6 +245,14 @@ public class Process implements ReloadableEntity<Integer> {
      */
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    public UUID getInstance() {
+        return instance;
+    }
+
+    public void setInstance(UUID uuid) {
+        this.instance = uuid;
     }
 
     /**
