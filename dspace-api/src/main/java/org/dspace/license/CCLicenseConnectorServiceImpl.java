@@ -9,344 +9,405 @@ package org.dspace.license;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.text.MessageFormat;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.client.DSpaceHttpClientFactory;
-import org.dspace.app.util.XMLUtils;
 import org.dspace.services.ConfigurationService;
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.xml.sax.InputSource;
 
 /**
- * Implementation for the Creative commons license connector service.
- * This class is responsible for all the calls to the CC license API and parsing the response
+ * Implementation for the Creative Commons license connector service.
+ *
+ * <p>This service builds Creative Commons license definitions from a local CSV
+ * configuration and resolves license URIs based on user-selected field values.</p>
+ *
+ * <p>It does not perform any outbound HTTP calls. All license metadata is derived
+ * from local configuration files:</p>
+ * <ul>
+ *   <li>{@code dspace.cc-license.csv} — license definitions and URL mappings</li>
+ *   <li>{@code dspace.cc-license.rdf} — RDF metadata for license names and titles</li>
+ * </ul>
+ *
+ * <p>The service also applies business rules for mapping user selections
+ * (commercial use, derivatives, jurisdiction) into CC license units.</p>
  */
 public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService, InitializingBean {
 
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLicenseConnectorServiceImpl.class);
 
-    private CloseableHttpClient client;
-    protected SAXBuilder parser = XMLUtils.getSAXBuilder();
+    @Autowired
+    private CCLicenseCSVRepository csvRepo;
 
-    private String postArgument = "answers";
-    private String postAnswerFormat =
-            "<answers> " +
-                    "<locale>{1}</locale>" +
-                    "<license-{0}>" +
-                    "{2}" +
-                    "</license-{0}>" +
-                    "</answers>";
+    // Answer map keys
+    private static final String FIELD_COMMERCIAL  = "commercial";
+    private static final String FIELD_DERIVATIVES = "derivatives";
+    private static final String FIELD_JURISDICTION = "jurisdiction";
 
+    // RDF namespaces
+    private static final Namespace NS_RDF = Namespace.getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+    private static final Namespace NS_CC = Namespace.getNamespace("cc", "http://creativecommons.org/ns#");
+    private static final Namespace NS_DCTERMS = Namespace.getNamespace("dcterms", "http://purl.org/dc/terms/");
+    private static final Namespace NS_OWL = Namespace.getNamespace("owl", "http://www.w3.org/2002/07/owl#");
+
+    protected SAXBuilder parser = new SAXBuilder();
+
+    /** Lazily-parsed RDF document, shared across calls. */
+    private Document rdfDocument;
 
     @Autowired
     private ConfigurationService configurationService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
-
-        // disallow DTD parsing to ensure no XXE attacks can occur.
-        // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
         parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
     }
 
     /**
-     * Retrieves the CC Licenses for the provided language from the CC License API
+     * Builds the list of available license options for the UI.
      *
-     * @param language - the language to retrieve the licenses for
-     * @return a map of licenses with the id and the license for the provided language
+     * <p>Licenses are grouped based on the CSV {@code ENTRY_POINT} column:</p>
+     * <ul>
+     *   <li>{@code CC_GROUP} — grouped Creative Commons license families (e.g. CC 3.0, 4.0)</li>
+     *   <li>{@code DIRECT} — standalone licenses (e.g. public domain tools)</li>
+     * </ul>
+     *
+     * <p>CC_GROUP entries share a common license structure but differ in version and optional jurisdiction support.</p>
+     *
+     * @param language the current language in the ui
+     *
+     * @return A map of licenseId's to CCLicense
      */
+    @Override
     public Map<String, CCLicense> retrieveLicenses(String language) {
-        String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
+        Map<String, CCLicense> licenses = new LinkedHashMap<>();
 
-        String uri = ccLicenseUrl + "/?locale=" + language;
-        HttpGet httpGet = new HttpGet(uri);
+        for (CCLicenseCSVRow row : csvRepo.getEntryPoints()) {
 
-        List<String> licenses;
-        try (CloseableHttpResponse response = client.execute(httpGet)) {
-            licenses = retrieveLicenses(response);
-        } catch (JDOMException | IOException e) {
-            log.error("Error while retrieving the license details using url: " + uri, e);
-            licenses = Collections.emptyList();
-        }
+            if ("CC_GROUP".equals(row.getEntryPoint())) {
+                String id = "CC " + row.getVersion();
+                boolean includeJurisdiction = "3.0".equals(row.getVersion());
 
-        Map<String, CCLicense> ccLicenses = new HashMap<>();
-
-        for (String license : licenses) {
-
-            String licenseUri = ccLicenseUrl + "/license/" + license + "?locale=" + language;
-            HttpGet licenseHttpGet = new HttpGet(licenseUri);
-            try (CloseableHttpResponse response = client.execute(licenseHttpGet)) {
-                CCLicense ccLicense = retrieveLicenseObject(license, response);
-                ccLicenses.put(ccLicense.getLicenseId(), ccLicense);
-            } catch (JDOMException | IOException e) {
-                log.error("Error while retrieving the license details using url: " + licenseUri, e);
-            }
-        }
-
-        return ccLicenses;
-    }
-
-    /**
-     * Retrieve the list of licenses from the response from the CC License API and remove the licenses configured
-     * to be excluded
-     *
-     * @param response The response from the API
-     * @return a list of license identifiers for which details need to be retrieved
-     * @throws IOException
-     * @throws JDOMException
-     */
-    private List<String> retrieveLicenses(CloseableHttpResponse response)
-            throws IOException, JDOMException {
-
-        List<String> domains = new LinkedList<>();
-        String[] excludedLicenses = configurationService.getArrayProperty("cc.license.classfilter");
-
-        String responseString = EntityUtils.toString(response.getEntity());
-        XPathExpression<Element> licenseClassXpath =
-            XPathFactory.instance().compile("//licenses/license", Filters.element());
-
-        try (StringReader stringReader = new StringReader(responseString)) {
-            InputSource is = new InputSource(stringReader);
-            org.jdom2.Document classDoc = this.parser.build(is);
-
-            List<Element> elements = licenseClassXpath.evaluate(classDoc);
-            for (Element element : elements) {
-                String licenseId = getSingleNodeValue(element, "@id");
-                if (StringUtils.isNotBlank(licenseId) && !ArrayUtils.contains(excludedLicenses, licenseId)) {
-                    domains.add(licenseId);
+                if (!licenses.containsKey(id)) {
+                    licenses.put(id,
+                            buildCCLicense(
+                                    id,
+                                    "Creative Commons License (" + row.getVersion() + ")",
+                                    includeJurisdiction
+                            )
+                    );
                 }
+            } else if ("DIRECT".equals(row.getEntryPoint())) {
+                licenses.put(
+                        row.getIdentifier(),
+                        new CCLicense(
+                                row.getIdentifier(),
+                                row.getTitle(),
+                                Collections.emptyList()
+                        )
+                );
             }
         }
 
-        return domains;
-
+        return licenses;
     }
 
     /**
-     * Parse the response for a single CC License and return the corresponding CC License Object
+     * Builds a CC license with the standard commercial/derivatives fields,
+     * and optionally a jurisdiction field for 3.0.
      *
-     * @param licenseId the license id of the CC License to retrieve
-     * @param response  for a specific CC License response
-     * @return the corresponding CC License Object
-     * @throws IOException
-     * @throws JDOMException
+     * @param id The ID of the CC License
+     * @param label The Label to user for the License
+     * @param includeJurisdiction   If Jurisdiction information should be included only used for 3.0
+     *
+     * @return Created CCLicense
      */
-    private CCLicense retrieveLicenseObject(final String licenseId, CloseableHttpResponse response)
-            throws IOException, JDOMException {
+    private CCLicense buildCCLicense(String id, String label, boolean includeJurisdiction) {
+        CCLicenseField commercial = new CCLicenseField(
+                FIELD_COMMERCIAL, "Allow commercial uses of your work?", "",
+                List.of(new CCLicenseFieldEnum("y", "Yes (visitors may copy, distribute, display and perform your " +
+                                        "Submission for any purpose, including commercial purposes)", ""),
+                        new CCLicenseFieldEnum("n", "No (visitors may copy, distribute, display and perform your " +
+                                        "Submission, but only for non-commercial purposes)", "")
+                )
+        );
 
-        String responseString = EntityUtils.toString(response.getEntity());
+        CCLicenseField derivatives = new CCLicenseField(FIELD_DERIVATIVES, "Allow modifications of your work?", "",
+                List.of(
+                        new CCLicenseFieldEnum("y", "Yes", ""),
+                        new CCLicenseFieldEnum("sa", "ShareAlike (visitors are permitted to copy, display," +
+                                " perform and modify your Submission, as long as they distribute the modified" +
+                                " version on similar use terms)", ""),
+                        new CCLicenseFieldEnum("n", "No (visitors are only permitted to copy and distribute" +
+                                " unaltered versions of your Submission)", "")
+                )
+        );
 
-        XPathExpression<Object> licenseClassXpath =
-            XPathFactory.instance().compile("//licenseclass", Filters.fpassthrough());
-        XPathExpression<Element> licenseFieldXpath =
-            XPathFactory.instance().compile("field", Filters.element());
+        if (!includeJurisdiction) {
+            return new CCLicense(id, label, List.of(commercial, derivatives));
+        }
 
-        try (StringReader stringReader = new StringReader(responseString)) {
-            InputSource is = new InputSource(stringReader);
+        // Build jurisdiction enum from the CSV — all distinct non-blank jurisdiction
+        // codes that appear under version 3.0 in the CSV.
+        CCLicenseField jurisdiction = new CCLicenseField(
+                FIELD_JURISDICTION,
+                "Jurisdiction",
+                "",
+                buildJurisdictionEnums()
+        );
 
-            org.jdom2.Document classDoc = this.parser.build(is);
 
-            Object element = licenseClassXpath.evaluateFirst(classDoc);
-            String licenseLabel = getSingleNodeValue(element, "label");
+        return new CCLicense(id, label, List.of(commercial, derivatives, jurisdiction));
+    }
 
-            List<CCLicenseField> ccLicenseFields = new LinkedList<>();
+    /**
+     * Builds a list of valid JurisdictionsEnums for the given liceneses in configured csv.
+     *
+     * @return Valid CCLicenseFieldEnum's
+     */
+    private List<CCLicenseFieldEnum> buildJurisdictionEnums() {
 
-            List<Element> licenseFields = licenseFieldXpath.evaluate(element);
-            for (Element licenseField : licenseFields) {
-                CCLicenseField ccLicenseField = parseLicenseField(licenseField);
-                ccLicenseFields.add(ccLicenseField);
+        // 1. Check config override
+        String configured = configurationService.getProperty("dspace.cc-license.jurisdiction");
+
+        Map<String, CCLicenseFieldEnum> seen = new LinkedHashMap<>();
+
+        // Always include generic/unported first
+        seen.put("", new CCLicenseFieldEnum("", "Generic (Unported)", ""));
+
+        if (configured != null && !configured.isBlank()) {
+            String code = configured.trim();
+            seen.put(code, new CCLicenseFieldEnum(code, code.toUpperCase(), ""));
+            return List.copyOf(seen.values());
+        }
+
+        // 2. Otherwise derive from repository (NO CSV IO)
+        for (String code : csvRepo.getJurisdictionsByVersion("3.0")) {
+            if (!seen.containsKey(code)) {
+                seen.put(code, new CCLicenseFieldEnum(code, code.toUpperCase(), ""));
             }
-
-            return new CCLicense(licenseId, licenseLabel, ccLicenseFields);
-        }
-    }
-
-    private CCLicenseField parseLicenseField(final Element licenseField) {
-        String id = getSingleNodeValue(licenseField, "@id");
-        String label = getSingleNodeValue(licenseField, "label");
-        String description = getSingleNodeValue(licenseField, "description");
-
-        XPathExpression<Element> enumXpath =
-            XPathFactory.instance().compile("enum", Filters.element());
-        List<Element> enums = enumXpath.evaluate(licenseField);
-
-        List<CCLicenseFieldEnum> ccLicenseFieldEnumList = new LinkedList<>();
-
-        for (Element enumElement : enums) {
-            CCLicenseFieldEnum ccLicenseFieldEnum = parseEnum(enumElement);
-            ccLicenseFieldEnumList.add(ccLicenseFieldEnum);
         }
 
-        return new CCLicenseField(id, label, description, ccLicenseFieldEnumList);
-
-    }
-
-    private CCLicenseFieldEnum parseEnum(final Element enumElement) {
-        String id = getSingleNodeValue(enumElement, "@id");
-        String label = getSingleNodeValue(enumElement, "label");
-        String description = getSingleNodeValue(enumElement, "description");
-
-        return new CCLicenseFieldEnum(id, label, description);
-    }
-
-
-    private String getNodeValue(final Object el) {
-        if (el instanceof Element) {
-            return ((Element) el).getValue();
-        } else if (el instanceof Attribute) {
-            return ((Attribute) el).getValue();
-        } else if (el instanceof String) {
-            return (String) el;
-        } else {
-            return null;
-        }
-    }
-
-    private String getSingleNodeValue(final Object t, String query) {
-        XPathExpression xpath =
-            XPathFactory.instance().compile(query, Filters.fpassthrough());
-        Object singleNode = xpath.evaluateFirst(t);
-
-        return getNodeValue(singleNode);
+        return List.copyOf(seen.values());
     }
 
     /**
-     * Retrieve the CC License URI based on the provided license id, language and answers to the field questions from
-     * the CC License API
+     * Resolves the canonical URL for a license selection.
      *
-     * @param licenseId - the ID of the license
-     * @param language  - the language for which to retrieve the full answerMap
-     * @param answerMap - the answers to the different field questions
-     * @return the CC License URI
+     * For CC0, PDM, and PDUS the URL is looked up directly by IDENTIFIER in the CSV.
+     *
+     * For CC 4.0 and CC 3.0, the {@code commercial} and {@code derivatives}
+     * answers are mapped to a CC unit string (e.g. {@code by-nc-sa}), then the
+     * CSV is searched for a row matching version + unit + jurisdiction.
+     *
+     * @param licenseId The id of the given license
+     * @param language The current language
+     * @param answerMap The current answers
+     *
+     * @return The canonical URL for a license selection
      */
-    public String retrieveRightsByQuestion(String licenseId,
-                                           String language,
+    @Override
+    public String retrieveRightsByQuestion(String licenseId, String language,
                                            Map<String, String> answerMap) {
 
-        String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
+        CCLicenseCSVRow entry = csvRepo.getByIdentifier(licenseId);
 
-
-        HttpPost httpPost = new HttpPost(ccLicenseUrl + "/license/" + licenseId + "/issue");
-
-
-        String answers = createAnswerString(answerMap);
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        String text = MessageFormat.format(postAnswerFormat, licenseId, language, answers);
-        builder.addTextBody(postArgument, text);
-
-        HttpEntity multipart = builder.build();
-
-        httpPost.setEntity(multipart);
-
-        try (CloseableHttpResponse response = client.execute(httpPost)) {
-            return retrieveLicenseUri(response);
-        } catch (JDOMException | IOException e) {
-            log.error("Error while retrieving the license uri for license : " + licenseId + " with answers "
-                              + answerMap.toString(), e);
+        if (entry == null) {
+            log.warn("Unknown licenseId: {}", licenseId);
+            return null;
         }
-        return null;
-    }
 
-    /**
-     * Parse the response for the CC License URI request and return the corresponding CC License URI
-     *
-     * @param response for a specific CC License URI response
-     * @return the corresponding CC License URI as a string
-     * @throws IOException
-     * @throws JDOMException
-     */
-    private String retrieveLicenseUri(final CloseableHttpResponse response)
-            throws IOException, JDOMException {
+        // Direct lookup licenses (CC0, PDM, PDUS, etc.)
+        if (isDirectLicense(entry)) {
+            return entry.getUrl();
+        }
 
-        String responseString = EntityUtils.toString(response.getEntity());
-        XPathExpression<Object> licenseClassXpath =
-            XPathFactory.instance().compile("//result/license-uri", Filters.fpassthrough());
+        // CC licenses (3.0 / 4.0)
+        if (isCreativeCommons(entry)) {
+            String version = entry.getVersion();
+            String commercial = answerMap.get(FIELD_COMMERCIAL);
+            String derivatives = answerMap.get(FIELD_DERIVATIVES);
 
-        try (StringReader stringReader = new StringReader(responseString)) {
-            InputSource is = new InputSource(stringReader);
-            org.jdom2.Document classDoc = this.parser.build(is);
+            String unit = resolveUnit(commercial, derivatives);
 
-            Object node = licenseClassXpath.evaluateFirst(classDoc);
-            String nodeValue = getNodeValue(node);
-
-            if (StringUtils.isNotBlank(nodeValue)) {
-                return nodeValue;
+            String jurisdiction = "";
+            if ("3.0".equals(version)) {
+                jurisdiction = answerMap.get(FIELD_JURISDICTION);
             }
+
+            return csvRepo.findUri(version, unit, jurisdiction);
         }
+
+        log.warn("Unhandled license type: {}", licenseId);
         return null;
     }
 
-    private String createAnswerString(final Map<String, String> parameterMap) {
-        StringBuilder sb = new StringBuilder();
-        for (String key : parameterMap.keySet()) {
-            sb.append("<");
-            sb.append(key);
-            sb.append(">");
-            sb.append(parameterMap.get(key));
-            sb.append("</");
-            sb.append(key);
-            sb.append(">");
+    /**
+     * Maps user answers for commercial use and derivative permissions into a
+     * Creative Commons license unit identifier.
+     *
+     * <p>This method encodes the Creative Commons license decision matrix and
+     * determines the correct license component string (e.g. {@code by-nc-sa}).</p>
+     *
+     * <p>Valid combinations correspond to standard CC license variants.</p>
+     * @param commercial the commercial license
+     * @param derivatives the derivative answers of that license
+     * @return The license usage string
+     */
+    private String resolveUnit(String commercial, String derivatives) {
+        boolean allowCommercial = "y".equals(commercial);
+        boolean allowDerivatives = "y".equals(derivatives);
+        boolean shareAlike = "sa".equals(derivatives);
+
+        if (allowCommercial && allowDerivatives) {
+            return "by";
         }
-        return sb.toString();
+        if (allowCommercial && shareAlike) {
+            return "by-sa";
+        }
+        if (allowCommercial) {
+            return "by-nd";
+        }
+        if (allowDerivatives) {
+            return "by-nc";
+        }
+        if (shareAlike) {
+            return "by-nc-sa";
+        }
+        return "by-nc-nd";
     }
 
     /**
-     * Retrieve the license RDF document based on the license URI
+     * Locates the {@code cc:License} element in the local {@code index.rdf} whose
+     * {@code rdf:about} or {@code owl:sameAs} attribute matches {@code licenseURI}
+     * and returns it wrapped in a single-element Document.
      *
-     * @param licenseURI - The license URI for which to retrieve the license RDF document
-     * @return the license RDF document
-     * @throws IOException
+     * @param licenseURI
+     * @return The valid document for the given licenseURI
      */
     @Override
     public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
-        String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
-        String issueUrl = ccLicenseUrl + "/details?license-uri=" + licenseURI;
-        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
-            CloseableHttpResponse httpResponse = httpClient.execute(new HttpPost(issueUrl));
-            // parsing document from input stream
-            InputStream stream = httpResponse.getEntity().getContent();
-            Document doc = parser.build(stream);
-            return doc;
+        try {
+            Document index = getOrParseRdfDocument();
+            if (index == null) {
+                return null;
+            }
+
+            String normalisedURI = normaliseUri(licenseURI);
+
+            for (Element license : index.getRootElement().getChildren("License", NS_CC)) {
+                String about = license.getAttributeValue("about", NS_RDF);
+
+                Element sameAsEl = license.getChild("sameAs", NS_OWL);
+                String sameAs = (sameAsEl != null)
+                        ? sameAsEl.getAttributeValue("resource", NS_RDF)
+                        : null;
+
+                if (normalisedURI.equals(normaliseUri(about))
+                        || normalisedURI.equals(normaliseUri(sameAs))) {
+                    Element rdf = new Element("RDF", NS_RDF);
+                    rdf.addContent(license.clone());
+
+                    Element rdfWrapper = new Element("rdf", NS_RDF);
+                    rdfWrapper.addContent(rdf);
+
+                    Element result = new Element("result");
+                    result.addContent(rdfWrapper);
+
+                    return new Document(result);
+                }
+            }
+
+            log.warn("No cc:License found in RDF for URI: " + licenseURI);
         } catch (Exception e) {
-            log.error("Error while retrieving the license document for URI: " + licenseURI, e);
+            log.error("Error retrieving RDF license document for URI: " + licenseURI, e);
         }
         return null;
     }
 
     /**
-     * Retrieve the license Name from the license document
+     * Extracts the English {@code dcterms:title} from a {@code cc:License} element
+     * document returned by {@link #retrieveLicenseRDFDoc}.
+     * Falls back to the first available title if no English title is present.
      *
-     * @param doc - The license document from which to retrieve the license name
+     * @param doc The RDF index document for this license
+     *
      * @return the license name
      */
+    @Override
     public String retrieveLicenseName(final Document doc) {
-        return getSingleNodeValue(doc, "//result/license-name");
+        if (doc == null || doc.getRootElement() == null) {
+            return null;
+        }
+
+        Element root = doc.getRootElement();
+        String fallback = null;
+
+        List<Element> titles = XPathFactory.instance()
+                .compile(".//dcterms:title", Filters.element(), null, NS_DCTERMS)
+                .evaluate(root);
+
+        if (!titles.isEmpty()) {
+            for (Element title : titles) {
+                String lang = title.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+                String value = title.getTextTrim();
+
+                if ("en".equals(lang)) {
+                    return value;
+                }
+            }
+
+            // fallback if no English match
+            return titles.get(0).getTextTrim();
+        }
+        return fallback;
     }
 
+    private Document getOrParseRdfDocument() {
+        if (rdfDocument != null) {
+            return rdfDocument;
+        }
+        String rdfPath = configurationService.getProperty("dspace.cc-license.rdf");
+        if (StringUtils.isBlank(rdfPath)) {
+            log.error("Configuration property 'dspace.cc-license.rdf' is not set.");
+            return null;
+        }
+        try (InputStream is = Files.newInputStream(Paths.get(rdfPath))) {
+            rdfDocument = parser.build(is);
+        } catch (Exception e) {
+            log.error("Failed to parse CC license RDF from: " + rdfPath, e);
+        }
+        return rdfDocument;
+    }
+
+    /**
+     * Normalizes a license URI for comparison purposes by converting HTTPS
+     * schemes to HTTP to match legacy RDF values.
+     */
+    private static String normaliseUri(String uri) {
+        if (uri == null) {
+            return null;
+        }
+        return uri.startsWith("https://") ? "http://" + uri.substring(8) : uri;
+    }
+
+    private boolean isDirectLicense(CCLicenseCSVRow row) {
+        return "publicdomain".equalsIgnoreCase(row.getCategory());
+    }
+
+    private boolean isCreativeCommons(CCLicenseCSVRow row) {
+        return "licenses".equalsIgnoreCase(row.getCategory());
+    }
 }
