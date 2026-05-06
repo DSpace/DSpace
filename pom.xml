@@ -134,7 +134,16 @@
                                 <rules>
                                     <bannedDependencies>
                                         <excludes>
+                                            <!-- Ban usage of Log4j v1 -->
                                             <exclude>log4j:log4j</exclude>
+                                            <!-- Ban usage of Javax dependencies. We use Jakarta equivalents -->
+                                            <exclude>javax.annotation:javax.annotation-api</exclude>
+                                            <exclude>javax.inject:javax.inject</exclude>
+                                            <exclude>javax.mail:mail</exclude>
+                                            <exclude>com.sun.mail:javax.mail</exclude>
+                                            <exclude>javax.persistence:javax.persistence-api</exclude>
+                                            <exclude>javax.servlet:servlet-api</exclude>
+                                            <exclude>javax.validation:validation-api</exclude>
                                         </excludes>
                                     </bannedDependencies>
                                 </rules>
