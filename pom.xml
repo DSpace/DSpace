@@ -1433,13 +1433,6 @@
                 <version>${asm.version}</version>
             </dependency>
 
-            <!-- Solr-core and Postgres disagree on versions of Checker Qual -->
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-qual</artifactId>
-                <version>3.54.0</version>
-            </dependency>
-
             <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
                  and OpenAIRE Broker-Client -->
             <dependency>
