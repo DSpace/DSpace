@@ -10,12 +10,12 @@ package org.dspace.curate;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +38,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.secure.SecureFileAccess;
 import org.dspace.utils.DSpace;
 
 /**
@@ -113,7 +114,12 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
             // load taskFile
             BufferedReader reader = null;
             try {
-                reader = new BufferedReader(new FileReader(this.taskFile));
+                String dspaceDir = DSpaceServicesFactory.getInstance()
+                    .getConfigurationService().getProperty("dspace.dir");
+                String allowedTaskFileBasePath = DSpaceServicesFactory.getInstance()
+                    .getConfigurationService().getProperty("curate.taskfile.base", dspaceDir);
+                reader = SecureFileAccess.getBufferedReader(this.taskFile, allowedTaskFileBasePath,
+                        "curation-taskfile", StandardCharsets.UTF_8);
                 while ((taskName = reader.readLine()) != null) {
                     if (verbose) {
                         super.handler.logInfo("Adding task: " + taskName);
@@ -189,12 +195,23 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
     private Curator initCurator() throws FileNotFoundException {
         Curator curator = new Curator(handler);
         OutputStream reporterStream;
+        String dspaceDir = DSpaceServicesFactory.getInstance()
+            .getConfigurationService().getProperty("dspace.dir");
+        String allowedReporterBasePath = DSpaceServicesFactory.getInstance()
+            .getConfigurationService().getProperty("curate.reporter.base",
+                    dspaceDir + File.separatorChar + "log");
         if (null == this.reporter) {
-            reporterStream = NullOutputStream.NULL_OUTPUT_STREAM;
+            reporterStream = NullOutputStream.INSTANCE;
         } else if ("-".equals(this.reporter)) {
             reporterStream = System.out;
         } else {
-            reporterStream = new PrintStream(this.reporter);
+            try {
+                reporterStream = new PrintStream(
+                    SecureFileAccess.getOutputStream(
+                    this.reporter, allowedReporterBasePath, "curation-reporter"));
+            } catch (IOException e) {
+                throw new FileNotFoundException(e.getLocalizedMessage());
+            }
         }
         Writer reportWriter = new OutputStreamWriter(reporterStream);
         curator.setReporter(reportWriter);
