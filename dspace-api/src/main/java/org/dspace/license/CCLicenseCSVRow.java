@@ -17,6 +17,7 @@ package org.dspace.license;
  * build lookup indexes for license resolution (version, unit, jurisdiction).</p>
  */
 public class CCLicenseCSVRow {
+    private String id;
     private String category;
     private String version;
     private String unit;
@@ -25,6 +26,14 @@ public class CCLicenseCSVRow {
     private String identifier;
     private String title;
     private String entryPoint;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getCategory() {
         return category;

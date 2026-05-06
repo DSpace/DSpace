@@ -100,10 +100,12 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
                 String id = "CC " + row.getVersion();
                 boolean includeJurisdiction = "3.0".equals(row.getVersion());
 
+                // We are storing url here because the ID is not unique and because the rest repository
+                // won't accept and id with a space in it
                 if (!licenses.containsKey(id)) {
-                    licenses.put(id,
+                    licenses.put(row.getId(),
                             buildCCLicense(
-                                    id,
+                                    row.getId(),
                                     "Creative Commons License (" + row.getVersion() + ")",
                                     includeJurisdiction
                             )
@@ -111,9 +113,9 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
                 }
             } else if ("DIRECT".equals(row.getEntryPoint())) {
                 licenses.put(
-                        row.getIdentifier(),
+                        row.getId(),
                         new CCLicense(
-                                row.getIdentifier(),
+                                row.getId(),
                                 row.getTitle(),
                                 Collections.emptyList()
                         )
@@ -315,16 +317,16 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
                         ? sameAsEl.getAttributeValue("resource", NS_RDF)
                         : null;
 
-                if (normalisedURI.equals(normaliseUri(about))
-                        || normalisedURI.equals(normaliseUri(sameAs))) {
-                    Element rdf = new Element("RDF", NS_RDF);
-                    rdf.addContent(license.clone());
+                if (normalisedURI.equals(normaliseUri(about)) || normalisedURI.equals(normaliseUri(sameAs))) {
+                    // XSL expects: result/rdf/rdf:RDF/cc:License
+                    Element rdfRDF = new Element("RDF", NS_RDF); // <rdf:RDF>
+                    rdfRDF.addContent(license.clone());
 
-                    Element rdfWrapper = new Element("rdf", NS_RDF);
-                    rdfWrapper.addContent(rdf);
+                    Element rdfPlain = new Element("rdf"); // plain <rdf>, no namespace
+                    rdfPlain.addContent(rdfRDF);
 
                     Element result = new Element("result");
-                    result.addContent(rdfWrapper);
+                    result.addContent(rdfPlain);
 
                     return new Document(result);
                 }

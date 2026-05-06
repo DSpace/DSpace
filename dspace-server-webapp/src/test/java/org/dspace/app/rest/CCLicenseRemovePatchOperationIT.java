@@ -33,10 +33,7 @@ import org.junit.Test;
 
 /**
  * Class to test the methods from the CCLicenseRemovePatchOperation
- * Since the CC Licenses are obtained from the CC License API, a mock service has been implemented
- * This mock service will return a fixed set of CC Licenses using a similar structure to the ones obtained from the
- * CC License API.
- * Refer to {@link org.dspace.license.MockCCLicenseConnectorServiceImpl} for more information
+ * CC License no longer is gotten from an api and is gotten directly form csv and index.rdf
  */
 public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrationTest {
 

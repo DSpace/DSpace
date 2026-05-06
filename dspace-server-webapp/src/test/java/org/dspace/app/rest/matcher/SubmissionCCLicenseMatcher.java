@@ -22,61 +22,31 @@ public class SubmissionCCLicenseMatcher {
     private SubmissionCCLicenseMatcher() {
     }
 
-    public static Matcher<? super Object> matchLicenseEntry(int count, int[] amountOfFieldsAndEnums) {
+    public static Matcher<? super Object> matchLicenseEntry(
+            String id,
+            String name,
+            int[] enumsPerField
+    ) {
         return allOf(
-                matchLicenseProperties(count),
-                matchFields(count, amountOfFieldsAndEnums)
+                hasJsonPath("$.id", is(id)),
+                hasJsonPath("$.name", is(name)),
+                matchFields(enumsPerField)
         );
     }
 
-    private static Matcher<? super Object> matchFields(int count, int[] amountOfFieldsAndEnums) {
+    private static Matcher<? super Object> matchFields(int[] enumsPerField) {
         List<Matcher<? super Object>> matchers = new LinkedList<>();
-        for (int index = 0; index < amountOfFieldsAndEnums.length; index++) {
-            matchers.add(matchField(count, index, amountOfFieldsAndEnums[index]));
+
+        for (int i = 0; i < enumsPerField.length; i++) {
+            int enumCount = enumsPerField[i];
+
+            matchers.add(allOf(
+                    hasJsonPath("$.id"),
+                    hasJsonPath("$.label"),
+                    hasJsonPath("$.enums.length()", is(enumCount))
+            ));
         }
+
         return hasJsonPath("$.fields", containsInAnyOrder(matchers));
-    }
-
-    private static Matcher<? super Object> matchField(int count, int fieldIndex, int amountOfEnums) {
-        return allOf(
-                matchLicenseFieldProperties(count, fieldIndex),
-                matchEnums(count, fieldIndex, amountOfEnums)
-        );
-
-    }
-
-    private static Matcher<? super Object> matchEnums(int count, int fieldIndex, int amountOfEnums) {
-        List<Matcher<? super Object>> matchers = new LinkedList<>();
-        for (int index = 0; index < amountOfEnums; index++) {
-            matchers.add(matchLicenseFieldEnumProperties(count, fieldIndex, index));
-        }
-//        return hasJsonPath("$.enums");
-        return hasJsonPath("$.enums", containsInAnyOrder(matchers));
-    }
-
-
-    public static Matcher<? super Object> matchLicenseProperties(int count) {
-        return allOf(
-                hasJsonPath("$.id", is("license" + count)),
-                hasJsonPath("$.name", is("License " + count + " - Name"))
-        );
-    }
-
-    public static Matcher<? super Object> matchLicenseFieldProperties(int count, int fieldIndex) {
-        return allOf(
-                hasJsonPath("$.id", is("license" + count + "-field" + fieldIndex)),
-                hasJsonPath("$.label", is("License " + count + " - Field " + fieldIndex + " - Label")),
-                hasJsonPath("$.description", is("License " + count + " - Field " + fieldIndex + " - Description"))
-        );
-    }
-
-    public static Matcher<? super Object> matchLicenseFieldEnumProperties(int count, int fieldIndex, int enumIndex) {
-        return allOf(
-                hasJsonPath("$.id", is("license" + count + "-field" + fieldIndex + "-enum" + enumIndex)),
-                hasJsonPath("$.label",
-                    is("License " + count + " - Field " + fieldIndex + " - Enum " + enumIndex + " - Label")),
-                hasJsonPath("$.description",
-                    is("License " + count + " - Field " + fieldIndex + " - Enum " + enumIndex + " - " + "Description"))
-        );
     }
 }

@@ -57,9 +57,11 @@ public class CCLicenseCSVRepository implements InitializingBean {
             String[] header = reader.readNext();
             Map<String, Integer> col = mapHeader(header);
 
+            int i = 1;
             String[] row;
             while ((row = reader.readNext()) != null) {
                 CCLicenseCSVRow r = new CCLicenseCSVRow();
+                r.setId("license" + i);
                 r.setCategory(row[col.get("CATEGORY")]);
                 r.setVersion(row[col.get("VERSION")]);
                 r.setUnit(row[col.get("UNIT")]);
@@ -68,7 +70,7 @@ public class CCLicenseCSVRepository implements InitializingBean {
                 r.setIdentifier(row[col.get("IDENTIFIER")]);
                 r.setTitle(row[col.get("TITLE")]);
                 r.setEntryPoint(row[col.get("ENTRY_POINT")]);
-
+                i++;
                 result.add(r);
             }
         }
@@ -95,7 +97,7 @@ public class CCLicenseCSVRepository implements InitializingBean {
             byVersion.computeIfAbsent(row.getVersion(), k -> new ArrayList<>()).add(row);
 
             // identifier lookup (for PD)
-            byIdentifier.put(row.getIdentifier(), row);
+            byIdentifier.put(row.getId(), row);
 
             // entry points
             if (row.getEntryPoint() != null && !row.getEntryPoint().isBlank()) {

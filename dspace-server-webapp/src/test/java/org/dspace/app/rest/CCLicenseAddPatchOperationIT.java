@@ -30,55 +30,117 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;
 import org.junit.Test;
-
 /**
  * Class to test the methods from the CCLicenseAddPatchOperation
- * Since the CC Licenses are obtained from the CC License API, a mock service has been implemented
- * This mock service will return a fixed set of CC Licenses using a similar structure to the ones obtained from the
- * CC License API.
- * Refer to {@link org.dspace.license.MockCCLicenseConnectorServiceImpl} for more information
+ * CC License now grabs from a set csv and index.rdf file
+ *
  */
 public class CCLicenseAddPatchOperationIT extends AbstractControllerIntegrationTest {
-
 
     @Test
     public void patchSubmissionCCLicense() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)
-                                              .withName("Community")
-                                              .build();
+                .withName("Community")
+                .build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-                                                 .withName("Collection")
-                                                 .build();
+                .withName("Collection")
+                .build();
 
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                                                          .withTitle("Workspace Item")
-                                                          .build();
+                .withTitle("Workspace Item")
+                .build();
 
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<>();
-        AddOperation addOperation = new AddOperation("/sections/cclicense/uri",
-                                                     "https://creativecommons.org/licenses/by-nc-sa/4.0/");
-
-        ops.add(addOperation);
-        String patchBody = getPatchContent(ops);
-
+        ops.add(new AddOperation("/sections/cclicense/uri",
+                "https://creativecommons.org/licenses/by-nc-sa/4.0/"));
 
         getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
-                                              .content(patchBody)
-                                              .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.sections.cclicense", allOf(
-                                     hasJsonPath("$.uri", is("https://creativecommons.org/licenses/by-nc-sa/4.0/")),
-                                     hasJsonPath("$.rights",
-                                                 is("Attribution-NonCommercial-ShareAlike 4.0 International")),
-                                     hasJsonPath("$.file.name", is("license_rdf"))
-                             )));
+                        .content(getPatchContent(ops))
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.cclicense", allOf(
+                        hasJsonPath("$.uri", is("https://creativecommons.org/licenses/by-nc-sa/4.0/")),
+                        hasJsonPath("$.rights",
+                                is("Attribution-NonCommercial-ShareAlike 4.0 International")),
+                        hasJsonPath("$.file.name", is("license_rdf"))
+                )));
+    }
+
+    @Test
+    public void patchSubmissionCCLicense30WithJurisdiction() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withName("Collection")
+                .build();
+
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withTitle("Workspace Item")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new AddOperation("/sections/cclicense/uri",
+                "https://creativecommons.org/licenses/by/3.0/de/"));
+
+        getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                        .content(getPatchContent(ops))
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.cclicense", allOf(
+                        hasJsonPath("$.uri", is("https://creativecommons.org/licenses/by/3.0/de/")),
+                        hasJsonPath("$.rights", is("Namensnennung 3.0 Deutschland")),
+                        hasJsonPath("$.file.name", is("license_rdf"))
+                )));
+    }
+
+    @Test
+    public void patchSubmissionCC0License() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withName("Collection")
+                .build();
+
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withTitle("Workspace Item")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new AddOperation("/sections/cclicense/uri",
+                "https://creativecommons.org/publicdomain/zero/1.0/"));
+
+        getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                        .content(getPatchContent(ops))
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.cclicense", allOf(
+                        hasJsonPath("$.uri", is("https://creativecommons.org/publicdomain/zero/1.0/")),
+                        hasJsonPath("$.rights", is("CC0 1.0 Universal")),
+                        hasJsonPath("$.file.name", is("license_rdf"))
+                )));
     }
 
     @Test
@@ -86,44 +148,36 @@ public class CCLicenseAddPatchOperationIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)
-                                              .withName("Community")
-                                              .build();
+                .withName("Community")
+                .build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-                                                 .withName("Collection")
-                                                 .build();
+                .withName("Collection")
+                .build();
 
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                                                          .withTitle("Workspace Item")
-                                                          .build();
+                .withTitle("Workspace Item")
+                .build();
 
         context.restoreAuthSystemState();
-
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<>();
-        AddOperation addOperation = new AddOperation("/sections/cclicense/uri", "invalid-license-uri");
-
-        ops.add(addOperation);
-        String patchBody = getPatchContent(ops);
-
+        ops.add(new AddOperation("/sections/cclicense/uri", "invalid-license-uri"));
 
         getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
-                                              .content(patchBody)
-                                              .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                             .andExpect(status().isInternalServerError());
+                        .content(getPatchContent(ops))
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isInternalServerError());
 
         getClient(adminToken).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID())
-                                              .content(patchBody)
-                                              .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.sections.cclicense", allOf(
-                                     hasJsonPath("$.uri", nullValue()),
-                                     hasJsonPath("$.rights",nullValue()),
-                                     hasJsonPath("$.file", nullValue())
-                             )));
-
-
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.cclicense", allOf(
+                        hasJsonPath("$.uri", nullValue()),
+                        hasJsonPath("$.rights", nullValue()),
+                        hasJsonPath("$.file", nullValue())
+                )));
     }
 }
