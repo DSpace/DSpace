@@ -140,7 +140,9 @@ public class OpenPolicyFinderService {
                 sleepBetweenTimeouts));
 
             try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
-                Thread.sleep(sleepBetweenTimeouts);
+                if (numberOfTries > 1) {
+                    Thread.sleep(sleepBetweenTimeouts);
+                }
 
                 // Construct a default HTTP method (first result)
                 method = constructHttpGet(type, field, predicate, value, start, limit);
@@ -157,6 +159,9 @@ public class OpenPolicyFinderService {
                             "Open Policy Finder return not OK status: " + statusCode);
                         String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
                         log.error("Error from Open Policy Finder HTTP request: " + errorBody);
+                        // The error body has consumed the response stream; skip the JSON parsing block
+                        // below (which would otherwise throw "Attempted read from closed stream").
+                        continue;
                     }
 
                     HttpEntity responseBody = response.getEntity();
@@ -248,7 +253,9 @@ public class OpenPolicyFinderService {
                 sleepBetweenTimeouts));
 
             try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
-                Thread.sleep(sleepBetweenTimeouts);
+                if (numberOfTries > 1) {
+                    Thread.sleep(sleepBetweenTimeouts);
+                }
 
                 // Construct a default HTTP method (first result)
                 method = constructHttpGet(type, field, predicate, value, start, limit);
@@ -265,6 +272,9 @@ public class OpenPolicyFinderService {
                             "Open Policy Finder return not OK status: " + statusCode);
                         String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
                         log.error("Error from Open Policy Finder HTTP request: " + errorBody);
+                        // The error body has consumed the response stream; skip the JSON parsing block
+                        // below (which would otherwise throw "Attempted read from closed stream").
+                        continue;
                     }
 
                     HttpEntity responseBody = response.getEntity();
@@ -378,12 +388,11 @@ public class OpenPolicyFinderService {
             method.addHeader("x-api-key", apiKey);
         }
 
-        // Set connection parameters
-        int timeout = 5000;
+        // Set connection parameters (uses the configured timeout from the openpolicyfinder.timeout property)
         method.setConfig(RequestConfig.custom()
-            .setConnectionRequestTimeout(timeout)
-            .setConnectTimeout(timeout)
-            .setSocketTimeout(timeout)
+            .setConnectionRequestTimeout(this.timeout)
+            .setConnectTimeout(this.timeout)
+            .setSocketTimeout(this.timeout)
             .build());
 
         return method;

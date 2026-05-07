@@ -19,6 +19,7 @@
 					<property name="metadataList">
 						<list>
 							<value>creativeworkseries.issn</value>
+							<value>dc.identifier.issn</value>
 						</list>
 					</property>
 				</bean>
