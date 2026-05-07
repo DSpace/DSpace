@@ -1275,17 +1275,19 @@
                 <groupId>org.springframework.ldap</groupId>
                 <artifactId>spring-ldap-core</artifactId>
                 <version>${spring-ldap.version}</version>
-	    </dependency>
-            <!-- Specify the version of micrometer to use. Solves dependency convergence issues in spring-ldap-core -->
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-core</artifactId>
-                <version>1.14.14</version>
-            </dependency>
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-observation</artifactId>
-                <version>1.14.14</version>
+                <exclusions>
+                    <!-- Ignore micrometer dependencies from spring-ldap-core because
+                         they cause convergence issues with the version pulled in by
+                         the main spring framework (spring.version) -->
+                    <exclusion>
+                        <groupId>io.micrometer</groupId>
+                        <artifactId>micrometer-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>io.micrometer</groupId>
+                        <artifactId>micrometer-observation</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
