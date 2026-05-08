@@ -25,6 +25,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -126,6 +129,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                                                                                      .getWorkspaceItemService();
     protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+
+    protected final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
 
     /**
      * <p>
@@ -763,10 +770,23 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 bitstream.setSequenceID(Integer.parseInt(seqID));
             }
 
+            // Get TYPE_SUBMISSION policies before removing them in the `manifest.crosswalkBitstream` method.
+            List<ResourcePolicy> bitstreamPolicies =
+                authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
+
             // crosswalk this bitstream's administrative metadata located in
             // METS manifest (or referenced externally)
             manifest.crosswalkBitstream(context, params, bitstream, mfileID,
                                         mdRefCallback);
+
+            // Only add the saved TYPE_SUBMISSION policies if the crosswalk actually removed them to prevent duplicates.
+            if (!bitstreamPolicies.isEmpty()) {
+                List<ResourcePolicy> remainingSubmissionPolicies =
+                    authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
+                if (remainingSubmissionPolicies.isEmpty()) {
+                    authorizeService.addPolicies(context, bitstreamPolicies, bitstream);
+                }
+            }
 
             // is this the primary bitstream?
             if (primaryID != null && mfileID.equals(primaryID)) {
