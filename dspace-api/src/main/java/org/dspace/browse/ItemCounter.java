@@ -58,9 +58,12 @@ public class ItemCounter {
      * @return count (-1 is returned if count could not be determined or is disabled)
      */
     public int getCount(Context context, DSpaceObject dso) {
-        boolean showStrengths = configurationService.getBooleanProperty("webui.strengths.show", false);
+        boolean showCommunityStrengths = configurationService
+            .getBooleanProperty("webui.community.strengths.show", false);
+        boolean showCollectionStrengths = configurationService
+            .getBooleanProperty("webui.collection.strengths.show", false);
         boolean useCache = configurationService.getBooleanProperty("webui.strengths.cache", true);
-        if (!showStrengths) {
+        if (!showCommunityStrengths && !showCollectionStrengths) {
             return -1;
         }
 
@@ -76,6 +79,10 @@ public class ItemCounter {
         // if we make it this far, we need to manually count
         if (dso instanceof Collection) {
             try {
+                if (!showCollectionStrengths) {
+                    return -1;
+                }
+
                 return itemService.countItems(context, (Collection) dso);
             } catch (SQLException e) {
                 log.error("Error counting number of Items in Collection {} :", dso.getID(), e);
@@ -85,6 +92,10 @@ public class ItemCounter {
 
         if (dso instanceof Community) {
             try {
+                if (!showCommunityStrengths) {
+                    return -1;
+                }
+
                 return itemService.countItems(context, ((Community) dso));
             } catch (SQLException e) {
                 log.error("Error counting number of Items in Community {} :", dso.getID(), e);
