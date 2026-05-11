@@ -30,6 +30,7 @@ public class CCLicenseCSVRepository implements InitializingBean {
 
     private Map<String, List<CCLicenseCSVRow>> byVersion = new HashMap<>();
     private Map<String, CCLicenseCSVRow> byIdentifier = new HashMap<>();
+    private Map<String, CCLicenseCSVRow> byUri = new HashMap<>();
     private List<CCLicenseCSVRow> entryPoints = new ArrayList<>();
     private Map<String, String> licenseUriIndex = new HashMap<>();
 
@@ -99,6 +100,8 @@ public class CCLicenseCSVRepository implements InitializingBean {
             // identifier lookup (for PD)
             byIdentifier.put(row.getId(), row);
 
+            byUri.put(row.getUrl(), row);
+
             // entry points
             if (row.getEntryPoint() != null && !row.getEntryPoint().isBlank()) {
                 entryPoints.add(row);
@@ -150,6 +153,10 @@ public class CCLicenseCSVRepository implements InitializingBean {
                 .filter(j -> j != null && !j.isBlank())
                 .distinct()
                 .toList();
+    }
+
+    public CCLicenseCSVRow getByURI(String uri) {
+        return byUri.get(uri);
     }
 
     /**

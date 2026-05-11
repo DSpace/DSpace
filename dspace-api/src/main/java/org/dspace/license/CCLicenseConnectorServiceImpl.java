@@ -7,25 +7,13 @@
  */
 package org.dspace.license;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -38,13 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * from local configuration files:</p>
  * <ul>
  *   <li>{@code dspace.cc-license.csv} — license definitions and URL mappings</li>
- *   <li>{@code dspace.cc-license.rdf} — RDF metadata for license names and titles</li>
  * </ul>
  *
  * <p>The service also applies business rules for mapping user selections
  * (commercial use, derivatives, jurisdiction) into CC license units.</p>
  */
-public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService, InitializingBean {
+public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService {
 
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLicenseConnectorServiceImpl.class);
 
@@ -56,24 +43,8 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     private static final String FIELD_DERIVATIVES = "derivatives";
     private static final String FIELD_JURISDICTION = "jurisdiction";
 
-    // RDF namespaces
-    private static final Namespace NS_RDF = Namespace.getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-    private static final Namespace NS_CC = Namespace.getNamespace("cc", "http://creativecommons.org/ns#");
-    private static final Namespace NS_DCTERMS = Namespace.getNamespace("dcterms", "http://purl.org/dc/terms/");
-    private static final Namespace NS_OWL = Namespace.getNamespace("owl", "http://www.w3.org/2002/07/owl#");
-
-    protected SAXBuilder parser = new SAXBuilder();
-
-    /** Lazily-parsed RDF document, shared across calls. */
-    private Document rdfDocument;
-
     @Autowired
     private ConfigurationService configurationService;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-    }
 
     /**
      * Builds the list of available license options for the UI.
@@ -291,118 +262,9 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         return "by-nc-nd";
     }
 
-    /**
-     * Locates the {@code cc:License} element in the local {@code index.rdf} whose
-     * {@code rdf:about} or {@code owl:sameAs} attribute matches {@code licenseURI}
-     * and returns it wrapped in a single-element Document.
-     *
-     * @param licenseURI
-     * @return The valid document for the given licenseURI
-     */
     @Override
-    public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
-        try {
-            Document index = getOrParseRdfDocument();
-            if (index == null) {
-                return null;
-            }
-
-            String normalisedURI = normaliseUri(licenseURI);
-
-            for (Element license : index.getRootElement().getChildren("License", NS_CC)) {
-                String about = license.getAttributeValue("about", NS_RDF);
-
-                Element sameAsEl = license.getChild("sameAs", NS_OWL);
-                String sameAs = (sameAsEl != null)
-                        ? sameAsEl.getAttributeValue("resource", NS_RDF)
-                        : null;
-
-                if (normalisedURI.equals(normaliseUri(about)) || normalisedURI.equals(normaliseUri(sameAs))) {
-                    // XSL expects: result/rdf/rdf:RDF/cc:License
-                    Element rdfRDF = new Element("RDF", NS_RDF); // <rdf:RDF>
-                    rdfRDF.addContent(license.clone());
-
-                    Element rdfPlain = new Element("rdf"); // plain <rdf>, no namespace
-                    rdfPlain.addContent(rdfRDF);
-
-                    Element result = new Element("result");
-                    result.addContent(rdfPlain);
-
-                    return new Document(result);
-                }
-            }
-
-            log.warn("No cc:License found in RDF for URI: " + licenseURI);
-        } catch (Exception e) {
-            log.error("Error retrieving RDF license document for URI: " + licenseURI, e);
-        }
-        return null;
-    }
-
-    /**
-     * Extracts the English {@code dcterms:title} from a {@code cc:License} element
-     * document returned by {@link #retrieveLicenseRDFDoc}.
-     * Falls back to the first available title if no English title is present.
-     *
-     * @param doc The RDF index document for this license
-     *
-     * @return the license name
-     */
-    @Override
-    public String retrieveLicenseName(final Document doc) {
-        if (doc == null || doc.getRootElement() == null) {
-            return null;
-        }
-
-        Element root = doc.getRootElement();
-        String fallback = null;
-
-        List<Element> titles = XPathFactory.instance()
-                .compile(".//dcterms:title", Filters.element(), null, NS_DCTERMS)
-                .evaluate(root);
-
-        if (!titles.isEmpty()) {
-            for (Element title : titles) {
-                String lang = title.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-                String value = title.getTextTrim();
-
-                if ("en".equals(lang)) {
-                    return value;
-                }
-            }
-
-            // fallback if no English match
-            return titles.get(0).getTextTrim();
-        }
-        return fallback;
-    }
-
-    private Document getOrParseRdfDocument() {
-        if (rdfDocument != null) {
-            return rdfDocument;
-        }
-        String rdfPath = configurationService.getProperty("dspace.cc-license.rdf");
-        if (StringUtils.isBlank(rdfPath)) {
-            log.error("Configuration property 'dspace.cc-license.rdf' is not set.");
-            return null;
-        }
-        try (InputStream is = Files.newInputStream(Paths.get(rdfPath))) {
-            rdfDocument = parser.build(is);
-        } catch (Exception e) {
-            log.error("Failed to parse CC license RDF from: " + rdfPath, e);
-        }
-        return rdfDocument;
-    }
-
-    /**
-     * Normalizes a license URI for comparison purposes by converting HTTPS
-     * schemes to HTTP to match legacy RDF values.
-     */
-    private static String normaliseUri(String uri) {
-        if (uri == null) {
-            return null;
-        }
-        return uri.startsWith("https://") ? "http://" + uri.substring(8) : uri;
+    public String retrieveLicenseName(final String licenseURI) {
+        return this.csvRepo.getByURI(licenseURI).getTitle();
     }
 
     private boolean isDirectLicense(CCLicenseCSVRow row) {
