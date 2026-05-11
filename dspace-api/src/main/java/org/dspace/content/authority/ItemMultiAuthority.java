@@ -8,6 +8,7 @@
 package org.dspace.content.authority;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -114,9 +115,11 @@ public class ItemMultiAuthority implements LinkableEntityAuthority {
         solrQuery.setStart(start);
         solrQuery.setRows(limit);
 
-        String entityType = getLinkedEntityType();
-        if (StringUtils.isNotBlank(entityType)) {
-            String filter = "dspace.entity.type:" + entityType;
+        String[] entityTypes = getLinkedEntityTypes();
+        if (entityTypes != null && entityTypes.length > 0) {
+            String filter = Arrays.stream(entityTypes)
+                .map(entityType -> "dspace.entity.type:" + entityType)
+                .collect(Collectors.joining(" OR "));
             solrQuery.addFilterQuery(filter);
         }
 
@@ -184,8 +187,25 @@ public class ItemMultiAuthority implements LinkableEntityAuthority {
     }
 
     @Override
-    public String getLinkedEntityType() {
-        return configurationService.getProperty("cris.ItemAuthority." + field + ".entityType");
+    public String[] getLinkedEntityTypes() {
+        return configurationService.getArrayProperty("cris.ItemAuthority." + field + ".entityType");
+    }
+
+    @Override
+    public String getPrimaryLinkedEntityType() {
+        String entityType = configurationService.getProperty(
+            "cris.ItemAuthority." + authorityName + ".primaryEntityType");
+        if (StringUtils.isNotBlank(entityType)) {
+            return entityType;
+        }
+
+        // fallback strategy
+        String[] entityTypes = getLinkedEntityTypes();
+        if (entityTypes != null && entityTypes.length == 1) {
+            return entityTypes[0];
+        }
+
+        return null;
     }
 
     @Override

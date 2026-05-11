@@ -263,12 +263,19 @@ public interface ChoiceAuthorityService {
     public void clearCache() throws SubmissionConfigReaderException;
 
     /**
-     * Retrieves the entity type for a metadata field if its ChoiceAuthority
+     * Retrieves the entity types for a metadata field if its ChoiceAuthority
      * supports entity linking.
      * @param fieldKey The metadata field (e.g., "dc_contributor_author").
      * @return The entity type (e.g., "Person"), or null if not linkable.
      */
-    String getLinkedEntityType(String fieldKey);
+    String[] getLinkedEntityTypes(String fieldKey);
+
+    /**
+     * Get the primary entity type starting from the metadata field.
+     *
+     * @return       the primary entity type as a String
+     */
+    String getPrimaryLinkedEntityType(String fieldKey);
 
     /**
      * Wrapper that calls getTopChoices method of the plugin.
