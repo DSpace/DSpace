@@ -251,8 +251,12 @@ public class Process implements ReloadableEntity<Integer> {
         return instance;
     }
 
-    public void setInstance(UUID uuid) {
-        this.instance = uuid;
+    /**
+     * Sets the instance uuid that indicates which tomcat started this process.
+     * @param instance
+     */
+    public void setInstance(UUID instance) {
+        this.instance = instance;
     }
 
     /**

@@ -7,3 +7,4 @@
 --
 
 ALTER TABLE process ADD COLUMN instance UUID;
+CREATE INDEX process_instance_idx ON process(instance);

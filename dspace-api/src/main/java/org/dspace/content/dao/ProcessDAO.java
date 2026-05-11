@@ -123,7 +123,7 @@ public interface ProcessDAO extends GenericDAO<Process> {
 
 
     /**
-     * Returns a list of all Process objects in the database by the given uuid.
+     * Returns a list of all Process objects in the database by the given instance.
      *
      * @param context The relevant DSpace context
      * @param instance    The instance to search for

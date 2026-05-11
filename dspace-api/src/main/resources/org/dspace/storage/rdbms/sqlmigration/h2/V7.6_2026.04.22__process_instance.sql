@@ -6,4 +6,5 @@
 -- http://www.dspace.org/license/
 --
 
-ALTER TABLE process ADD COLUMN instance UUID DEFAULT gen_random_uuid();
+ALTER TABLE process ADD COLUMN instance UUID;
+CREATE INDEX process_instance_idx ON process(instance);

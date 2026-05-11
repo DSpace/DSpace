@@ -325,14 +325,14 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<Process> findByInstance(Context context, UUID uuid, int limit, int offset) throws SQLException {
-        return processDAO.findByInstance(context, uuid, limit, offset);
+    public List<Process> findByInstance(Context context, UUID instance, int limit, int offset) throws SQLException {
+        return processDAO.findByInstance(context, instance, limit, offset);
     }
 
     @Override
-    public void failProcessesOfInstance(Context context, UUID uuid)
+    public void failProcessesOfInstance(Context context, UUID instance)
         throws SQLException, IOException, AuthorizeException {
-        List<Process> processesToBeFailed = findByInstance(context, uuid, -1, -1);
+        List<Process> processesToBeFailed = findByInstance(context, instance, -1, -1);
         for (Process process : processesToBeFailed) {
             if (    process.getProcessStatus() == ProcessStatus.FAILED ||
                     process.getProcessStatus() == ProcessStatus.COMPLETED) {
@@ -340,12 +340,13 @@ public class ProcessServiceImpl implements ProcessService {
             }
             context.setCurrentUser(process.getEPerson());
             // Fail the process
-            log.info("Process with ID {} has a uuid of another tomcat: {}, failing it now.", process.getID(),
+            log.info("Process with ID {} has an instance uuid belonging to this tomcat: {}, failing it now.",
+                process.getID(),
                 process.getInstance());
             fail(context, process);
             // But still attach its log to the process
             appendLog(process.getID(), process.getName(),
-                String.format("Process had a uuid of another tomcat: %s", process.getInstance()),
+                String.format("Process has an instance uuid belonging to this tomcat: %s", process.getInstance()),
                 ProcessLogLevel.ERROR);
             createLogBitstream(context, process);
         }
