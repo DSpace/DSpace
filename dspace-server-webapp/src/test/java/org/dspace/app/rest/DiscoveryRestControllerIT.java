@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -1257,6 +1258,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             SortOptionMatcher.sortOptionMatcher(
                 "dc.date.accessioned", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
                    )));
+    }
+
+    @Test
+    public void discoverSearchSelfLinkContainsConfigurationParameterWhenProvided() throws Exception {
+
+        getClient().perform(get("/api/discover/search")
+                   .param("configuration", "default"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._links.self.href", endsWith(
+                       "/api/discover/search?configuration=default")));
     }
 
     @Test
