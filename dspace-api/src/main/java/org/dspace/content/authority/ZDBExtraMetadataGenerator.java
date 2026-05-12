@@ -12,12 +12,22 @@ import java.util.Map;
 import org.dspace.authority.AuthorityValue;
 
 /**
- * 
- * 
- * @author Mykhaylo Boychuk (4science.it)
+ * Strategy interface for generating extra metadata entries to attach to
+ * ZDB authority choices.
  *
+ * <p>Implementations extract specific metadata (e.g., ISSN, title) from a
+ * {@link AuthorityValue} and return them as key-value pairs for use as
+ * extras on {@link org.dspace.content.authority.Choice} objects.</p>
+ *
+ * @author Mykhaylo Boychuk (4science.it)
  */
 public interface ZDBExtraMetadataGenerator {
 
+    /**
+     * Build extra metadata entries from the given authority value.
+     *
+     * @param val the {@link AuthorityValue} to extract metadata from
+     * @return a map of extra metadata key-value pairs
+     */
     public Map<String, String> build(AuthorityValue val);
 }

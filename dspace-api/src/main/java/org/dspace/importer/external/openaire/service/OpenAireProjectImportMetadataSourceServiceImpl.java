@@ -137,6 +137,9 @@ public class OpenAireProjectImportMetadataSourceServiceImpl extends AbstractImpo
         return null;
     }
 
+    /**
+     * Callable that searches OpenAIRE projects by name query.
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -197,6 +200,9 @@ public class OpenAireProjectImportMetadataSourceServiceImpl extends AbstractImpo
         }
     }
 
+    /**
+     * Callable that searches OpenAIRE projects by grant ID.
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -253,10 +259,21 @@ public class OpenAireProjectImportMetadataSourceServiceImpl extends AbstractImpo
         }
     }
 
+    /**
+     * Override the default HTTP client builder supplier (useful for testing).
+     *
+     * @param httpClientBuilderSupplier the supplier to use
+     */
     public void setHttpClientBuilderSupplier(Supplier<HttpClientBuilder> httpClientBuilderSupplier) {
         this.httpClientBuilderSupplier = httpClientBuilderSupplier;
     }
 
+    /**
+     * Parse an OpenAIRE XML response string and extract individual result elements.
+     *
+     * @param recordsSrc the raw XML response body
+     * @return list of {@code result} elements, or an empty list on parse error
+     */
     private List<Element> splitToRecords(String recordsSrc) {
         try {
             SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();

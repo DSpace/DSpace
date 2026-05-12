@@ -28,12 +28,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ * Authority provider for projects that extends {@link ItemAuthority} with
+ * results from the OpenAIRE Research Graph API.
+ *
+ * <p>After retrieving local Solr-based matches, this authority appends additional
+ * project entries fetched from the OpenAIRE API. Each external result is enriched
+ * with extra metadata produced by configured {@link OpenAIREExtraMetadataGenerator}
+ * implementations (e.g., grant number mapping).</p>
+ *
  * @author Mykhaylo Boychuk (4science.it)
  */
 public class OpenAIREProjectAuthority extends ItemAuthority {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidAuthority.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenAIREProjectAuthority.class);
 
     private ServiceManager serviceManager = new DSpace().getServiceManager();
 
@@ -46,6 +53,10 @@ public class OpenAIREProjectAuthority extends ItemAuthority {
         .getServiceByName("OpenAIREService", OpenAireProjectImportMetadataSourceServiceImpl.class);
 
 
+    /**
+     * {@inheritDoc}
+     * <p>Appends OpenAIRE project results to the Solr-based matches.</p>
+     */
     @Override
     public Choices getMatches(String text, int start, int limit, String locale) {
 

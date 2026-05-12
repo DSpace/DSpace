@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
@@ -21,6 +21,12 @@ import org.dspace.content.authority.zdb.ZDBService;
 import org.dspace.content.authority.zdb.ZDBServicesFactory;
 
 /**
+ * Authority provider for journals that extends {@link ItemAuthority} with
+ * external results from the ZDB (Zeitschriftendatenbank) SRU API.
+ *
+ * <p>After retrieving local Solr-based matches, this authority appends additional
+ * journal entries fetched from the ZDB service. Extra metadata (e.g., ISSN, title)
+ * is generated via configured {@link ZDBExtraMetadataGenerator} implementations.</p>
  *
  * @author Mykhaylo Boychuk (4science.it)
  */
@@ -36,6 +42,10 @@ public class ZDBAuthority extends ItemAuthority {
         this.source = ZDBServicesFactory.getInstance().getZDBService();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Appends external ZDB journal results to the Solr-based matches.</p>
+     */
     @Override
     public Choices getMatches(String query, int start, int limit, String locale) {
         Choices choices = super.getMatches(query, start, limit, locale);
@@ -43,6 +53,15 @@ public class ZDBAuthority extends ItemAuthority {
                            choices.start, choices.total, choices.confidence, choices.more);
     }
 
+    /**
+     * Add external ZDB results to the existing choices array.
+     *
+     * @param text    the search query
+     * @param choices the existing Solr-based choices
+     * @param start   the start index
+     * @param max     the maximum number of external results to add
+     * @return the combined array of choices
+     */
     protected Choice[] addExternalResults(String text, Choices choices, int start, int max) {
         if (source != null) {
             try {

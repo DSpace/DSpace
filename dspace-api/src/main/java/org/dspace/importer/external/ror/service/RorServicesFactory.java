@@ -10,14 +10,26 @@ package org.dspace.importer.external.ror.service;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Factory that handles {@code RorImportMetadataSourceService} instance
+ * Factory that handles {@code RorImportMetadataSourceService} instance.
  *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
- **/
+ */
 public abstract class RorServicesFactory {
 
+    /**
+     * Return the {@link RorImportMetadataSourceService} instance for querying
+     * the ROR API.
+     *
+     * @return the ROR import metadata source service
+     */
     public abstract RorImportMetadataSourceService getRorImportMetadataSourceService();
 
+    /**
+     * Return the singleton instance of this factory, retrieved from the
+     * DSpace service manager.
+     *
+     * @return the {@link RorServicesFactory} instance
+     */
     public static RorServicesFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
                                     .getServiceByName("rorServiceFactory", RorServicesFactory.class);

@@ -26,6 +26,21 @@ import org.dspace.importer.external.ror.service.RorServicesFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+/**
+ * Authority provider for organizational units that extends {@link ItemAuthority}
+ * with a fallback to the ROR (Research Organization Registry) API.
+ *
+ * <p>When a Solr-based search returns no results, this authority queries the ROR API
+ * to find matching organizational units. The results are converted to {@link Choice}
+ * objects with configurable extra metadata (e.g., ROR ID, type, acronym, country)
+ * that can be toggled for display and data purposes via configuration properties.</p>
+ *
+ * <p>Configuration properties follow the pattern:
+ * {@code cris.RorOrgUnitAuthority.[pluginInstance.]<extraType>.display} and
+ * {@code cris.RorOrgUnitAuthority.[pluginInstance.]<extraType>.as-data}.</p>
+ *
+ * @author Mykhaylo Boychuk (4science.it)
+ */
 public class RorOrgUnitAuthority extends ItemAuthority {
 
     private final RorImportMetadataSourceService rorImportMetadataSource =
@@ -39,6 +54,10 @@ public class RorOrgUnitAuthority extends ItemAuthority {
 
     private String authorityName;
 
+    /**
+     * {@inheritDoc}
+     * <p>Falls back to the ROR API when the Solr-based search returns no results.</p>
+     */
     @Override
     public Choices getMatches(String text, int start, int limit, String locale) {
 
@@ -166,11 +185,13 @@ public class RorOrgUnitAuthority extends ItemAuthority {
         return prefix + rorId;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String[] getLinkedEntityTypes() {
         return configurationService.getArrayProperty("cris.ItemAuthority." + authorityName + ".entityType");
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getPrimaryLinkedEntityType() {
         String entityType = configurationService.getProperty(
@@ -188,11 +209,13 @@ public class RorOrgUnitAuthority extends ItemAuthority {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPluginInstanceName(String name) {
         authorityName = name;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getPluginInstanceName() {
         return authorityName;

@@ -17,7 +17,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -35,7 +35,13 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
- * 
+ * Service that queries the ZDB (Zeitschriftendatenbank) SRU API to search for
+ * and retrieve journal metadata.
+ *
+ * <p>Uses {@link DSpaceHttpClientFactory} for HTTP requests and parses the XML
+ * responses to build {@link ZDBAuthorityValue} objects containing titles, ISSNs,
+ * publishers, and alternative titles.</p>
+ *
  * @author Mykhaylo Boychuk (4science.it)
  */
 public class ZDBService {
@@ -45,6 +51,14 @@ public class ZDBService {
     @Autowired
     private ConfigurationService configurationService;
 
+    /**
+     * Execute an HTTP GET against the given URL, parse the ZDB XML response,
+     * and return a list of {@link ZDBAuthorityValue} objects.
+     *
+     * @param requestURL the fully-qualified ZDB SRU or detail URL
+     * @return list of parsed authority values
+     * @throws IOException if the HTTP request fails
+     */
     private List<ZDBAuthorityValue> search(String requestURL) throws IOException {
 
         List<ZDBAuthorityValue> results = new ArrayList<ZDBAuthorityValue>();
@@ -114,6 +128,13 @@ public class ZDBService {
         return results;
     }
 
+    /**
+     * Parse a single {@code rdf:RDF} element into a {@link ZDBAuthorityValue},
+     * extracting the ZDB ID, titles, publishers, ISSNs, and alternative titles.
+     *
+     * @param rdfElementRoot the {@code rdf:RDF} element from the ZDB response
+     * @return a populated {@link ZDBAuthorityValue}
+     */
     private ZDBAuthorityValue getRecord(Element rdfElementRoot) {
 
         Element rdfDescElementRoot = XMLUtils.getSingleElement(rdfElementRoot, "rdf:Description");
@@ -153,6 +174,13 @@ public class ZDBService {
         return zdbItem;
     }
 
+    /**
+     * Retrieve a single ZDB record by its identifier.
+     *
+     * @param id the ZDB record identifier
+     * @return the matching {@link AuthorityValue}, or {@code null} if not found
+     * @throws IOException if the HTTP request fails
+     */
     public AuthorityValue details(String id) throws IOException {
 
         String url = buildDetailsURL(id);
@@ -163,6 +191,16 @@ public class ZDBService {
         return null;
     }
 
+    /**
+     * Search the ZDB SRU API for journals matching the given title query.
+     *
+     * @param query    the title search string (must not be empty)
+     * @param page     the page number (currently unused by ZDB)
+     * @param pagesize the desired page size (currently unused by ZDB)
+     * @return list of matching {@link ZDBAuthorityValue} entries
+     * @throws IOException              if the HTTP request fails
+     * @throws IllegalArgumentException if the query is empty
+     */
     public List<ZDBAuthorityValue> list(String query, int page, int pagesize) throws IOException {
         if (StringUtils.isEmpty(query)) {
             throw new IllegalArgumentException("The query must not be empty");
@@ -180,6 +218,12 @@ public class ZDBService {
         return search(queryURL);
     }
 
+    /**
+     * Build the detail URL for a specific ZDB record.
+     *
+     * @param id the ZDB record identifier
+     * @return the formatted detail URL
+     */
     public String buildDetailsURL(String id) {
         return MessageFormat.format(configurationService.getProperty("cris.zdb.detail.url"), id);
     }
