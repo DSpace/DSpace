@@ -7,8 +7,19 @@
  */
 package org.dspace.deletion.process;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.commons.cli.Options;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.service.DSpaceObjectUtils;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.configuration.ScriptConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Script configuration for the batch deletion process of DSpace objects (Item, Collection, Community).
@@ -21,6 +32,11 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  */
 public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObjectDeletionProcess>
         extends ScriptConfiguration<T> {
+
+    @Autowired
+    DSpaceObjectUtils dspaceObjectUtils;
+
+    Logger log = LogManager.getLogger();
 
     private Class<T> dspaceRunnableClass;
 
@@ -48,6 +64,35 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
             super.options = options;
         }
         return options;
+    }
+
+    /**
+     * Match the authorization check implemented in AuthorizeServicePermissionEvaluatorPlugin
+     * and REST usage: hasPermission('DELETE') for the DSO, with inherit = true
+     * @param context DSpace context of the current user
+     * @param commandLineParameters command line parameters, required to parse and resolve the DSO identifier
+     * @return result of authorize delete check, default is to call super method
+     * @throws IllegalArgumentException if the identifier cannot be resolved
+     * @throws SQLException if the DAO operation for the authZ check fails
+     */
+    @Override
+    public boolean isAllowedToExecute(Context context, List<DSpaceCommandLineParameter> commandLineParameters) {
+        if (null != commandLineParameters) {
+            try {
+                for (DSpaceCommandLineParameter parameter : commandLineParameters) {
+                    if ("-i".equals(parameter.getName())) {
+                        DSpaceObject dso = dspaceObjectUtils.resolveBasicDSpaceObject(context, parameter.getValue())
+                                .orElseThrow(() -> new IllegalArgumentException("Could not resolve %s to DSpace Object"
+                                        .formatted(parameter.getValue())));
+                        return authorizeService.authorizeActionBoolean(context, dso, Constants.DELETE, true);
+                    }
+                }
+            } catch (IllegalArgumentException | SQLException e) {
+                log.error(e.getMessage());
+            }
+        }
+
+        return super.isAllowedToExecute(context, commandLineParameters);
     }
 
     @Override
