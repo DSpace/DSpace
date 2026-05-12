@@ -50,4 +50,8 @@
         <property name="singleResultOnAggregate" value="false"/>
      </bean>
 
+     <bean id="org.dspace.content.authority.OpenAIRECodeExtraMetadataGenerator"
+    	class="org.dspace.content.authority.OpenAIRECodeExtraMetadataGenerator">
+     </bean>
+
 </beans>

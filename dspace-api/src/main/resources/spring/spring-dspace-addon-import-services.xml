@@ -323,4 +323,12 @@
         <constructor-arg value="3"/>
     </bean>
 
+    <bean id="OpenAIREService"
+          class="org.dspace.importer.external.openaire.service.OpenAireProjectImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="metadataFieldMapping" ref="openaireProjectMetadataFieldMapping"/>
+    </bean>
+    <bean id="openaireProjectMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREProjectFieldMapping">
+    </bean>
+
 </beans>
