@@ -373,7 +373,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
      * Verifies that when disseminating an item that has relationships,
      * ALL related items also get their own correctly named zip files.
      * article -> author, author2
-     * author  -> article, article2   (transitive — article2 should also be disseminated)
+     * author  -> article, article2   (transitive — article2 should not be disseminated)
      */
     @Test
     public void packagerExportRelatedItemsFileNamingTest() throws Exception {
@@ -390,7 +390,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
             assertTrue("author zip should exist",   authorZip.exists());
             assertTrue("author2 zip should exist",  author2Zip.exists());
-            assertTrue("article2 zip should exist (transitive via author)", article2Zip.exists());
+            assertFalse("article2 zip should exist (transitive via author)", article2Zip.exists());
         } finally {
             cleanupPrefixFiles("packagerRelNamingTest");
             prefixFile.delete();
@@ -398,8 +398,8 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
-     * Disseminating article with -z "all" should transitively reach article2
-     * (article -> author -> article2) and embed author metadata in article2's METS.
+     * Disseminating article with -z "all" should not transitively reach article2
+     * (article -> author -> article2) but author should have article2 metadata in its mets
      */
     @Test
     public void packagerExportTransitiveRelationshipInMetsTest() throws Exception {
@@ -409,25 +409,35 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
             context.commit();
 
             String base = prefixFile.getAbsolutePath().replaceAll("\\.[^.]+$", "");
+            File authorZip  = new File(base + "_ITEM@" + author.getHandle().replace("/", "-")  + ".zip");
             File article2Zip = new File(base + "_ITEM@" + article2.getHandle().replace("/", "-") + ".zip");
 
-            assertTrue("Transitive article2 zip must exist", article2Zip.exists());
+            assertFalse("Transitive article2 zip must not exist", article2Zip.exists());
+            assertTrue("author zip should exist",   authorZip.exists());
 
-            // article2's METS should contain author's familyName (virtual metadata)
-            METSManifest manifest = getManifest(article2Zip);
+            // article2's METS should not contain author's familyName (virtual metadata)
+            METSManifest manifest = getManifest(authorZip);
             assertNotNull(manifest);
-            boolean foundFamilyName = false;
-            for (Element element : manifest.getItemDmds()) {
-                if (element.getValue().contains("familyName")) {
-                    foundFamilyName = true;
-                    break;
-                }
-            }
-            assertTrue("article2 METS should embed author familyName via relationship", foundFamilyName);
+            boolean foundArticle = manifest.getRelObjStructDiv()
+                    .getChildren()
+                    .stream()
+                    .anyMatch(div ->
+                            "rels_isPublicationOfAuthor".equals(div.getAttributeValue("ID")) &&
+                                    hasAttributeValueRecursive(div, "urn:uuid:" + article2.getID())
+                    );
+            assertTrue("article2 relationship should be embeded in structMap of author", foundArticle);
         } finally {
             cleanupPrefixFiles("packagerTransitiveTest");
             prefixFile.delete();
         }
+    }
+
+    private boolean hasAttributeValueRecursive(Element element, String value) {
+        return element != null && (
+                element.getAttributes().stream().anyMatch(attr -> value.equals(attr.getValue())) ||
+                        element.getChildren().stream()
+                                .anyMatch(child -> hasAttributeValueRecursive(child, value))
+        );
     }
 
     /**
@@ -862,6 +872,76 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void packagerImportCommunityRelationships() throws Exception {
+        try {
+            configService.setProperty("upload.temp.dir", tempFile.getParent());
+            performExportRecursiveScript(parentCommunity.getHandle(), tempFile);
+            String path = tempFile.getAbsolutePath().split("\\.")[0];
+            resultFile = new File(path + "_COMMUNITY@" +
+                    parentCommunity.getHandle().replace("/", "-") + ".zip");
+            context.commit();
+            UUID articleID = article.getID();
+            UUID authorID = author.getID();
+            UUID author2ID = author2.getID();
+            context.turnOffAuthorisationSystem();
+            Iterator<Item> items = itemService.findAll(context);
+            int i = 0;
+            while (items.hasNext()) {
+                Item item = items.next();
+                i++;
+                ItemBuilder.deleteItem(item.getID());
+            }
+            // Read ID from the actual article zip that was created
+            CommunityBuilder.deleteCommunity(parentCommunity.getID());
+            context.commit();
+            context.restoreAuthSystemState();
+
+            List<Collection> collections = collectionService.findAll(context);
+            assertTrue(collections.isEmpty());
+            items = itemService.findAll(context);
+            assertFalse(items.hasNext());
+
+            performReplaceRecursiveScript(resultFile);
+            context.commit();
+
+            Iterator<Item> restoredItems = itemService.findAll(context);
+            int j = 0;
+            while (restoredItems.hasNext()) {
+                restoredItems.next();
+                j++;
+            }
+            assertEquals(i , j);
+
+            Item restoredArticle = itemService.find(context, articleID);
+
+            assertNotNull("Primary item should be restored", restoredArticle);
+
+            List<Relationship> relationships = relationshipService.findByItem(context, restoredArticle);
+
+            assertTrue(relationships.stream().anyMatch( rel ->
+                    rel.getRightItem().getID().equals(authorID) || rel.getLeftItem().getID().equals(authorID)
+            ));
+            assertTrue(relationships.stream().anyMatch( rel ->
+                    rel.getRightItem().getID().equals(author2ID) || rel.getLeftItem().getID().equals(author2ID)
+            ));
+
+            List<RelationshipMetadataValue> meta = relationshipMetadataService
+                    .getRelationshipMetadata(restoredArticle, true);
+            boolean foundFamilyName   = meta.stream()
+                    .anyMatch(v -> v.getValue().contains("familyName"));
+            boolean foundSecondFamily = meta.stream()
+                    .anyMatch(v -> v.getValue().contains("secondFamily"));
+            assertTrue("Relationship to author should be restored",  foundFamilyName);
+            assertTrue("Relationship to author2 should be restored", foundSecondFamily);
+
+            assertEquals(2, relationships.size());
+        } finally {
+            tempFile.delete();
+            resultFile.delete();
+        }
+    }
+
+    @Test
     public void packagerImportAllRelationships() throws Exception {
         try {
             performExportWithScopeScript(article.getHandle(), tempFile, "all");
@@ -957,6 +1037,11 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
                 "AIP", outputFile.getPath());
     }
 
+    private void performExportRecursiveScript(String handle, File outputFile) throws Exception {
+        runDSpaceScript("packager", "-d", "-a", "-z", "-u", "-e", "admin@email.com", "-i", handle, "-t",
+                "AIP", outputFile.getPath());
+    }
+
     private void performExportWithScopeScript(String handle, File outputFile, String scope) throws Exception {
         runDSpaceScript("packager", "-d", "-e", "admin@email.com", "-i", handle,
                 "-z", scope, "-t", "AIP", outputFile.getPath());
@@ -990,6 +1075,11 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
     private void performReplaceScript(File outputFile) throws Exception {
         runDSpaceScript("packager", "-r", "-z", "all", "-f", "-u", "-e", "admin@email.com", "-t",
+                "AIP", outputFile.getPath());
+    }
+
+    private void performReplaceRecursiveScript(File outputFile) throws Exception {
+        runDSpaceScript("packager", "-r", "-a", "-z", "all", "-f", "-u", "-e", "admin@email.com", "-t",
                 "AIP", outputFile.getPath());
     }
 }

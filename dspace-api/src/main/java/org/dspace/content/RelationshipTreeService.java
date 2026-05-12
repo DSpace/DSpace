@@ -32,65 +32,70 @@ public class RelationshipTreeService {
     private RelationshipService relationshipService;
 
     public static final String SCOPE_ALL = "all";
-    public static final String SCOPE_RECURSIVE_SUFFIX = ":r";
 
     public Node getTree(Context context, Item item, String scopeString) {
-        Node node = null;
-        getNode(context, item, buildScopeMap(scopeString), new HashSet<>(), -1, node);
-        return node;
+        return getNode(context, item, buildScopeSet(scopeString), new HashSet<>(), -1);
     }
 
     public Set<UUID> getItemsInTree(Context context, Item item, String scopeString, boolean includeRoot) {
         Set<UUID> itemsInTree = new HashSet<>();
-        Node node = null;
-        getNode(context, item, buildScopeMap(scopeString), itemsInTree, -1, node);
+
+        getNode(context, item, buildScopeSet(scopeString), itemsInTree, -1);
+
         if (!includeRoot) {
             itemsInTree.remove(item.getID());
         }
+
         return itemsInTree;
     }
 
-    public static Map<String, Boolean> buildScopeMap(String scopeString) {
-        Map<String, Boolean> scope = new HashMap<>();
+    public static Set<String> buildScopeSet(String scopeString) {
+        Set<String> scope = new HashSet<>();
+
         if (isScopeNone(scopeString)) {
-            return scope; // empty map = no traversal
+            return scope; // empty set = no traversal
         }
+
         if (isScopeAll(scopeString)) {
-            scope.put(SCOPE_ALL, true); // recursive by definition
+            scope.add(SCOPE_ALL);
             return scope;
         }
+
         for (String part : scopeString.split(",")) {
-            boolean recursive = part.endsWith(SCOPE_RECURSIVE_SUFFIX);
-            String relName = recursive ? part.substring(0, part.length() - SCOPE_RECURSIVE_SUFFIX.length()) : part;
-            scope.put(relName, recursive);
+            scope.add(part.trim());
         }
+
         return scope;
     }
 
-    private void getNode(Context context, Item item, Map<String, Boolean> scope,
-                         Set<UUID> itemsInTree, int place, Node node) {
+    private Node getNode(Context context, Item item, Set<String> scope,
+                         Set<UUID> itemsInTree, int place) {
         try {
             if (item.getHandle() == null) {
                 //Not archived don't add
+                return null;
             } else {
                 itemsInTree.add(item.getID());
-                node = new Node(item.getID(), getFirstMetadataValue(item, "relationship", "type"),
-                        getFirstMetadataValue(item, "dc", "title"),
-                        place, getRels(context, item, scope, itemsInTree));
+
+                return new Node(item.getID(), getFirstMetadataValue(item, "relationship", "type"),
+                        getFirstMetadataValue(item, "dc", "title"), place, getRels(context, item, scope, itemsInTree)
+                );
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Map<String, SortedSet<Node>> getRels(Context context, Item item, Map<String, Boolean> scope,
+    private Map<String, SortedSet<Node>> getRels(Context context, Item item, Set<String> scope,
                                                  Set<UUID> itemsInTree)
             throws SQLException {
         Map<String, SortedSet<Node>> rels = new HashMap<>();
+
         for (Relationship rel : relationshipService.findByItem(context, item)) {
             String relName;
             Item childItem;
             int childPlace;
+
             if (rel.getLeftItem().getID().equals(item.getID())) { // this item is on the left
                 relName = rel.getRelationshipType().getRightwardType();
                 childItem = rel.getRightItem();
@@ -100,41 +105,27 @@ public class RelationshipTreeService {
                 childItem = rel.getLeftItem();
                 childPlace = rel.getRightPlace();
             }
-            if (scope.containsKey(relName) || scope.containsKey(SCOPE_ALL)) {
+
+            if (scope.contains(relName) || scope.contains(SCOPE_ALL)) {
                 // we care about this relationship
+
                 SortedSet<Node> relatedItems = rels.get(relName);
+
                 if (relatedItems == null) {
                     relatedItems = new TreeSet<>(Comparator.comparingInt(node -> node.place));
                     rels.put(relName, relatedItems);
                 }
-                Map<String, Boolean> childScope;
-                if (itemsInTree.contains(childItem.getID())) {
-                    childScope = Map.of();
-                } else {
-                    // if the child isn't in the tree yet, include in-scope rels
-                    childScope = new HashMap<>(scope);
-                    // ..but exclude the current relName if it's non-recursive
-                    boolean recursive = false;
-                    if (scope.containsKey(SCOPE_ALL)) {
-                        recursive = scope.get(SCOPE_ALL);
-                        if (!recursive) {
-                            childScope.remove(SCOPE_ALL);
-                        }
+
+                if (!itemsInTree.contains(childItem.getID())) {
+                    Node node = getNode(context, childItem, Set.of(), itemsInTree, childPlace);
+
+                    if (node != null) {
+                        relatedItems.add(node);
                     }
-                    if (scope.containsKey(relName)) { // if exact relName is specified, prefer its recursive setting
-                        recursive = scope.get(relName);
-                        if (!recursive) {
-                            childScope.remove(relName); // don't go deeper for this relName if given as non-recursive
-                        }
-                    }
-                }
-                Node node = null;
-                getNode(context, childItem, childScope, itemsInTree, childPlace, node);
-                if (node != null) {
-                    relatedItems.add(node);
                 }
             }
         }
+
         return rels;
     }
 
@@ -164,19 +155,22 @@ public class RelationshipTreeService {
 
         private void print(PrintStream printStream, String prefix) {
             String placeString = "";
+
             if (place >= 0) {
                 placeString = "[" + place + "] ";
             }
+
             printStream.println(prefix + placeString + id + " (" + entityType + ") \"" + title + "\"");
+
             for (String relName : rels.keySet()) {
                 System.out.println(prefix + "  " + relName);
+
                 for (Node child : rels.get(relName)) {
                     child.print(printStream, prefix + "    ");
                 }
             }
         }
     }
-
 
     public static boolean isScopeAll(String scope) {
         return SCOPE_ALL.equalsIgnoreCase(scope) || "*".equals(scope);
@@ -185,36 +179,4 @@ public class RelationshipTreeService {
     public static boolean isScopeNone(String scope) {
         return scope == null || scope.isEmpty();
     }
-
-    public static boolean isRecursive(String scope) {
-        if (isScopeNone(scope)) {
-            return false;
-        }
-        if (isScopeAll(scope)) {
-            return true;
-        }
-        return scope.endsWith(SCOPE_RECURSIVE_SUFFIX);
-    }
-
-    public static ParsedScope parseScope(String scope) {
-        if (isScopeNone(scope) || isScopeAll(scope)) {
-            return null;
-        }
-        boolean recursive = scope.endsWith(SCOPE_RECURSIVE_SUFFIX);
-        String typeName = recursive
-                ? scope.substring(0, scope.length() - SCOPE_RECURSIVE_SUFFIX.length())
-                : scope;
-        return new ParsedScope(typeName, recursive);
-    }
-
-    public static final class ParsedScope {
-        public final String typeName;
-        public final boolean recursive;
-
-        public ParsedScope(String typeName, boolean recursive) {
-            this.typeName  = typeName;
-            this.recursive = recursive;
-        }
-    }
 }
-

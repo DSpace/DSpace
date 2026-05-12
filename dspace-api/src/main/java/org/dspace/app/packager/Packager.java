@@ -830,7 +830,6 @@ public class Packager {
                     // Walk the full relationship tree and disseminate each related item
                     if (dso.getType() == Constants.ITEM) {
                         Item parentItem = (Item) dso;
-                        boolean recursive = RelationshipTreeService.isRecursive(pkgParams.getProperty("scope"));
 
                         Queue<UUID> toProcess = new LinkedList<>(treeService
                                 .getItemsInTree(context, parentItem, pkgParams.getProperty("scope"), false));
@@ -848,11 +847,6 @@ public class Packager {
                                 dip.disseminate(context, relatedItem, pkgParams, relPkgFile);
                                 if (relPkgFile.exists()) {
                                     System.out.println("\nCREATED package file: " + relPkgFile.getCanonicalPath());
-                                }
-                                // Add this item's own relations to the queue
-                                if (recursive) {
-                                    toProcess.addAll(treeService.getItemsInTree(context, relatedItem,
-                                            pkgParams.getProperty("scope"), false));
                                 }
                             }
                         }
@@ -984,6 +978,9 @@ public class Packager {
             } catch (WorkflowException e) {
                 throw new PackageException(e);
             }
+        }
+        if (pkgParams.recursiveModeEnabled()) {
+            replacedPathToUUID = sip.getPathToNewUUID();
         }
         if (!pkgParams.getBooleanProperty("dryRun", false)) {
             // Wire relationships for each replaced Item.

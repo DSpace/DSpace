@@ -74,7 +74,7 @@ public class PackagerFileService {
     }
 
     public List<FileNode> getFileNodeTree(Context context, String sourceFilesPath, String scope) throws SQLException {
-        return getFileNodes(context, sourceFilesPath, RelationshipTreeService.buildScopeMap(scope), new HashSet<>());
+        return getFileNodes(context, sourceFilesPath, RelationshipTreeService.buildScopeSet(scope), new HashSet<>());
     }
 
     public List<String> getPathsInTree(Context context, String sourceFilePath, String scopeString) throws SQLException {
@@ -108,7 +108,7 @@ public class PackagerFileService {
     }
 
     public List<FileNode> getFileNodes(Context context, String sourceFilePath,
-                                       Map<String, Boolean> scope, Set<String> filesInTree) throws SQLException {
+                                       Set<String> scope, Set<String> filesInTree) throws SQLException {
         List<FileNode> fileNodes = new ArrayList<>();
         filesInTree.add(sourceFilePath);
         FileNode fileNode = new FileNode(getSourceFileHandle(sourceFilePath),
@@ -174,7 +174,7 @@ public class PackagerFileService {
         return handle;
     }
 
-    public Map<String, List<FileNode>> getRels(Context context, String sourceFilePath, Map<String, Boolean> scope,
+    public Map<String, List<FileNode>> getRels(Context context, String sourceFilePath, Set<String> scope,
                                                Set<String> filesInTree) throws SQLException {
         Map<String, List<FileNode>> rels = new HashMap<>();
         Element relsParentElement = getRelsStrucMap(getManifestData(sourceFilePath));
@@ -188,7 +188,7 @@ public class PackagerFileService {
             String uuid = null;
             String relName = relElement.getAttributeValue("ID").split("_")[1];
             int type;
-            if (scope.containsKey(relName) || scope.containsKey(SCOPE_ALL)) {
+            if (scope.contains(relName) || scope.contains(SCOPE_ALL)) {
                 // we care about this relationship
                 for (Object relElementChildren : relElement.getChildren()) {
                     //The children of relElementChildrenElement are that items MPTR elements
@@ -203,39 +203,12 @@ public class PackagerFileService {
                         relatedItems = new ArrayList<>();
                         rels.put(relName, relatedItems);
                     }
-                    Map<String, Boolean> childScope;
-                    if (filesInTree.contains(path)) {
-                        childScope = Map.of();
-                    } else {
-                        // if the child isn't in the tree yet, include in-scope rels
-                        childScope = new HashMap<>(scope);
-                        // ..but exclude the current relName if it's non-recursive
-                        boolean recursive = false;
-                        if (scope.containsKey(SCOPE_ALL)) {
-                            recursive = scope.get(SCOPE_ALL);
-                            if (!recursive) {
-                                childScope.remove(SCOPE_ALL);
-                            }
-                        }
-                        if (scope.containsKey(relName)) { // if exact relName is specified, prefer its recursive setting
-                            recursive = scope.get(relName);
-                            if (!recursive) {
-                                childScope.remove(relName); // don't go deeper for this relName
-                                // if given as non-recursive
-                            }
-                        }
-                    }
                     //Iterate through children
                     if (!filesInTree.contains(path)) {
                         filesInTree.add(path);
                         FileNode fileNode;
-                        if (new File(path).exists()) {
-                            fileNode = new FileNode(handle, path,
-                                    getRels(context, path, childScope, filesInTree), uuid, type);
-                        } else {
-                            fileNode = new FileNode(handle, path, Map.of(), uuid, type);
-                            fileNode.setAction(PackagerIngestAction.SKIP_RELATED_FILE_NOT_FOUND);
-                        }
+                        fileNode = new FileNode(handle, path, Map.of(), uuid, type);
+                        fileNode.setAction(PackagerIngestAction.SKIP_RELATED_FILE_NOT_FOUND);
                         if (fileNode.action == null) {
                             getAction(context, fileNode);
                         }
