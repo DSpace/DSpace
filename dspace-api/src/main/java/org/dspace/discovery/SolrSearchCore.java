@@ -54,7 +54,7 @@ public class SolrSearchCore {
      * Get access to current SolrClient. If no current SolrClient exists, a new one is initialized, see initSolr().
      * @return SolrClient Solr client
      */
-    public SolrClient getSolr() {
+    public synchronized SolrClient getSolr() {
         if (solr == null) {
             initSolr();
         }
