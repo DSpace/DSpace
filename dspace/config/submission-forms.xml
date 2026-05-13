@@ -49,8 +49,7 @@
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <dc-qualifier>audiovideo</dc-qualifier>
+                    <dc-element>type</dc-element>
                     <repeatable>false</repeatable>
                     <label>Audio or Video media type</label>
                     <input-type value-pairs-name="audio_video_media_type">dropdown</input-type>
@@ -60,25 +59,27 @@
             </row>
             <row>
                 <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <dc-qualifier>audiotranscript</dc-qualifier>
+                    <dc-schema>dspace</dc-schema>
+                    <dc-element>bitstream</dc-element>
+                    <dc-qualifier>transcript</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Audio Transcription</label>
                     <input-type>textarea</input-type>
                     <hint>Enter a transcription for the file</hint>
+                    <type-bind>audio,audio+video</type-bind>
                     <required></required>
                 </field>
             </row>
             <row>
                 <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <dc-qualifier>videodescription</dc-qualifier>
+                    <dc-schema>dspace</dc-schema>
+                    <dc-element>bitstream</dc-element>
+                    <dc-qualifier>textalternative</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Video Description</label>
+                    <label>Text alternative</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter a video description for the file</hint>
+                    <hint>Enter a text alternative or video description for the file</hint>
+                    <type-bind>video,audio+video</type-bind>
                     <required></required>
                 </field>
             </row>
@@ -2172,7 +2173,7 @@
             </pair>
             <pair>
                 <displayed-value>Audio and Video</displayed-value>
-                <stored-value>audiovideo</stored-value>
+                <stored-value>audio+video</stored-value>
             </pair>
             <pair>
                 <displayed-value>Neither</displayed-value>
