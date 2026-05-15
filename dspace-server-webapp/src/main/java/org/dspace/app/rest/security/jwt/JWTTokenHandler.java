@@ -65,7 +65,7 @@ public abstract class JWTTokenHandler {
     private List<JWTClaimProvider> jwtClaimProviders;
 
     @Autowired
-    private ConfigurationService configurationService;
+    protected ConfigurationService configurationService;
 
     @Autowired
     private EPersonClaimProvider ePersonClaimProvider;
@@ -78,6 +78,13 @@ public abstract class JWTTokenHandler {
 
     private String generatedJwtKey;
     private String generatedEncryptionKey;
+
+    /**
+     * Get the default expiration period for this handler if not
+     * defined in configuration.
+     * @return default expiration period if not explicitly defined in configuration
+     */
+    public abstract long getExpirationPeriod();
 
     /**
      * Get the configuration property key for the token secret.
@@ -218,10 +225,6 @@ public abstract class JWTTokenHandler {
         }
 
         return secret;
-    }
-
-    public long getExpirationPeriod() {
-        return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 1800000);
     }
 
     public boolean isEncryptionEnabled() {
