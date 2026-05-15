@@ -47,9 +47,12 @@
         <property name="minPartSizeBytes" value="${assetstore.s3.minPartSizeBytes}"/>
 
         <!-- Specifies the maximum number of S3 connections that should be established during a transfer.
-             If not provided, it will be based on targetThroughputGbps
+             If not provided, it will be based on the machines available processors and memory.
         -->
-        <property name="maxConcurrency" value="${assetstore.s3.maxConcurrency}"/>
+        <property name="maxConcurrency" value="${assetstore.s3.maxConcurrency:}"/>
+
+        <!-- The factor of available memory to use for calculating the maximum concurrency. Default is 0.1 (10%). -->
+        <property name="memoryUsageFactor" value="${assetstore.s3.memoryUsageFactor:0.1}"/>
 
         <!-- The algorithm the S3 client will use to create a checksum when doing putObject. -->
         <property name="s3ChecksumAlgorithm" value="${assetstore.s3.s3ChecksumAlgorithm}"/>
