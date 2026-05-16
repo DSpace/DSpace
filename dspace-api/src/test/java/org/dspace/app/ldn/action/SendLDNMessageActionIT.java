@@ -255,7 +255,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
             LDN.getLDNMessage("../modules/dspace.cfg");
             fail("IOException should have been thrown for illegal template path");
         } catch (IOException e) {
-            assertTrue(e.getMessage().contains("Illegal LDN message path:"));
+            assertTrue(e.getMessage().contains("Illegal file path attempted for I/O (ldn):"));
         }
     }
 
