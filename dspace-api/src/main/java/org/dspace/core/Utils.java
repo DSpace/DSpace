@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -532,8 +533,11 @@ public final class Utils {
         List<String> allowedConfigurationKeys = List.of(configurationService.getArrayProperty(
                     "message.templates.allowed-config", DEFAULT_ALLOWED_TEMPLATE_CONFIGS));
         return allowedConfigurationKeys.stream()
-            .map(key -> Map.entry(key, configurationService.getProperty(key)))
-            .filter(entry -> entry.getValue() != null)
+            .map(key -> {
+                String value = configurationService.getProperty(key);
+                return value != null ? Map.entry(key, value) : null;
+            })
+            .filter(Objects::nonNull)
             .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue
