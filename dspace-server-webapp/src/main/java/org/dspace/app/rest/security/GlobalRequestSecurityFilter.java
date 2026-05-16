@@ -43,7 +43,13 @@ public class GlobalRequestSecurityFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String normalizedPath = normaliseUrl(request.getRequestURI());
         // Return 403 forbidden if JSP execution or URL traversal is attempted
-        if (isTraversalAttempt(normalizedPath) || isJspExecutionAttempt(normalizedPath)) {
+        if (isTraversalAttempt(normalizedPath)) {
+            logger.warn("Path traversal attempt detected. Skipping request: " + request.getRequestURI());
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        if (isJspExecutionAttempt(normalizedPath)) {
+            logger.warn("JSP execution attempt detected. Skipping request: " + request.getRequestURI());
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
