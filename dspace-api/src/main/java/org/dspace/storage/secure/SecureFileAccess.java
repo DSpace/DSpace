@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Decent I/O path validation - not perfect when symlinks are used and we are writing
@@ -32,23 +33,28 @@ public final class SecureFileAccess {
      * before validation, as this breaks for new files which don't yet exist. This can make the resulting
      * validation still vulnerable to symlink traversal in some cases
      * @param file the unvalidated file, usually derived from user input or configuration
-     * @param allowedBasePath the allowed base path for this use case as per system configuration
+     * @param allowedBasePaths list of allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
-    public static Path validatePathForWrite(String file, String allowedBasePath, String purpose)
+    public static Path validatePathForWrite(String file, List<String> allowedBasePaths, String purpose)
             throws IOException {
-        Path basePath = Path.of(allowedBasePath)
-                            .toRealPath()
-                            .normalize();
-        if (basePath == null) {
-            throw new IOException("Null base path can not be provided for validation");
+        for (String allowedBasePath : allowedBasePaths) {
+            Path basePath = Path.of(allowedBasePath)
+                                .toRealPath()
+                                .normalize();
+            if (basePath == null) {
+                throw new IOException("Null base path can not be provided for validation");
+            }
+            Path resolvedPath = basePath.resolve(file).normalize();
+            if (resolvedPath.startsWith(basePath)) {
+                return resolvedPath;
+            }
         }
-        Path resolvedPath = basePath.resolve(file).normalize();
-        if (!resolvedPath.startsWith(basePath)) {
-            throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
-        }
-        return resolvedPath;
+        
+        // If no valid path was resolved and returned by now
+        // we raise an exception and treat this as illegal access
+        throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
     }
 
     /**
@@ -60,47 +66,51 @@ public final class SecureFileAccess {
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
-    public static Path validatePathForRead(String file, String allowedBasePath, String purpose)
+    public static Path validatePathForRead(String file, List<String> allowedBasePaths, String purpose)
             throws IOException {
-        Path basePath = Path.of(allowedBasePath)
-                            .toRealPath()
-                            .normalize();
-        if (basePath == null) {
-            throw new IOException("Null base path can not be provided for validation");
+        for (String allowedBasePath : allowedBasePaths) {
+            Path basePath = Path.of(allowedBasePath)
+                                .toRealPath()
+                                .normalize();
+            if (basePath == null) {
+                throw new IOException("Null base path can not be provided for validation");
+            }
+            Path resolvedPath = basePath.resolve(file).toRealPath().normalize();
+            if (resolvedPath.startsWith(basePath)) {
+                return resolvedPath;
+            }
         }
-        Path resolvedPath = basePath.resolve(file).toRealPath().normalize();
-        if (!resolvedPath.startsWith(basePath)) {
-            throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
-        }
-        return resolvedPath;
+        // If no valid path was resolved and returned by now
+        // we raise an exception and treat this as illegal access
+        throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
     }
 
     /**
      * Get a buffered reader after validating file path.
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
-     * @param allowedBasePath the allowed base path for this use case as per system configuration
+     * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
-    public static BufferedReader getBufferedReader(String unvalidatedFile, String allowedBasePath,
+    public static BufferedReader getBufferedReader(String unvalidatedFile, List<String> allowedBasePaths,
             String purpose, Charset charset) throws IOException {
         if (charset == null) {
             charset = StandardCharsets.UTF_8;
         }
-        Path validatedFile = validatePathForRead(unvalidatedFile, allowedBasePath, purpose);
+        Path validatedFile = validatePathForRead(unvalidatedFile, allowedBasePaths, purpose);
         return Files.newBufferedReader(validatedFile, charset);
     }
 
     /**
      * Get an input stream after validating file path.
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
-     * @param allowedBasePath the allowed base path for this use case as per system configuration
+     * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
-    public static InputStream getInputStream(String unvalidatedFile, String allowedBasePath, String purpose)
+    public static InputStream getInputStream(String unvalidatedFile, List<String> allowedBasePaths, String purpose)
             throws IOException {
-        Path validatedFile = validatePathForRead(unvalidatedFile, allowedBasePath, purpose);
+        Path validatedFile = validatePathForRead(unvalidatedFile, allowedBasePaths, purpose);
         return Files.newInputStream(validatedFile);
 
     }
@@ -109,13 +119,13 @@ public final class SecureFileAccess {
      * Get an input stream after validating file path. Adds NOFOLLOW_LINKS link option to
      * help ensure some extra safety since new files can't use toRealPath() for link calculation
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
-     * @param allowedBasePath the allowed base path for this use case as per system configuration
+     * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
-    public static OutputStream getOutputStream(String unvalidatedFile, String allowedBasePath, String purpose)
+    public static OutputStream getOutputStream(String unvalidatedFile, List<String> allowedBasePaths, String purpose)
             throws IOException {
-        Path validatedFile = validatePathForWrite(unvalidatedFile, allowedBasePath, purpose);
+        Path validatedFile = validatePathForWrite(unvalidatedFile, allowedBasePaths, purpose);
         return Files.newOutputStream(validatedFile, LinkOption.NOFOLLOW_LINKS);
     }
 }
