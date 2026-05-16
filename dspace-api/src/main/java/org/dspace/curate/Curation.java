@@ -18,8 +18,10 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -117,8 +119,10 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
             try {
                 String dspaceDir = DSpaceServicesFactory.getInstance()
                     .getConfigurationService().getProperty("dspace.dir");
-                String allowedTaskFileBasePath = DSpaceServicesFactory.getInstance()
-                    .getConfigurationService().getProperty("curate.taskfile.base", dspaceDir);
+                List<String> allowedTaskFileBasePath = Arrays.stream(
+                        DSpaceServicesFactory.getInstance().getConfigurationService()
+                        .getArrayProperty("curate.taskfile.base", new String[]{dspaceDir})
+                        ).toList();
                 reader = SecureFileAccess.getBufferedReader(this.taskFile, allowedTaskFileBasePath,
                         "curation-taskfile", StandardCharsets.UTF_8);
                 while ((taskName = reader.readLine()) != null) {
@@ -198,9 +202,10 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         OutputStream reporterStream;
         String dspaceDir = DSpaceServicesFactory.getInstance()
             .getConfigurationService().getProperty("dspace.dir");
-        String allowedReporterBasePath = DSpaceServicesFactory.getInstance()
-            .getConfigurationService().getProperty("curate.reporter.base",
-                    dspaceDir + File.separatorChar + "log");
+        List<String> allowedReporterBasePaths = Arrays.stream(
+            DSpaceServicesFactory.getInstance()
+            .getConfigurationService().getArrayProperty("curate.reporter.base",
+                    new String[]{dspaceDir + File.separatorChar + "log"})).toList();
         if (null == this.reporter) {
             reporterStream = NullOutputStream.INSTANCE;
         } else if ("-".equals(this.reporter)) {
@@ -209,7 +214,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
             try {
                 reporterStream = new PrintStream(
                     SecureFileAccess.getOutputStream(
-                    this.reporter, allowedReporterBasePath, "curation-reporter"));
+                    this.reporter, allowedReporterBasePaths, "curation-reporter"));
             } catch (IOException e) {
                 throw new FileNotFoundException(e.getLocalizedMessage());
             }
