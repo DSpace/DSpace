@@ -10,6 +10,7 @@ package org.dspace.app.requestitem.service;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.content.Bitstream;
@@ -40,7 +41,7 @@ public interface RequestItemService {
      * @return the token of the request item
      * @throws SQLException if database error
      */
-    public String createRequest(Context context, Bitstream bitstream, Item item,
+    String createRequest(Context context, Bitstream bitstream, Item item,
             boolean allFiles, String reqEmail, String reqName, String reqMessage)
         throws SQLException;
 
@@ -49,35 +50,51 @@ public interface RequestItemService {
      *
      * @param context current DSpace session.
      * @return all item requests.
-     * @throws java.sql.SQLException passed through.
+     * @throws SQLException passed through.
      */
-    public List<RequestItem> findAll(Context context)
+    List<RequestItem> findAll(Context context)
             throws SQLException;
 
     /**
-     * Retrieve a request by its token.
+     * Retrieve a request by its approver token.
      *
      * @param context current DSpace session.
-     * @param token the token identifying the request.
+     * @param token the token identifying the request to be approved.
      * @return the matching request, or null if not found.
      */
-    public RequestItem findByToken(Context context, String token);
+    RequestItem findByToken(Context context, String token);
 
     /**
-     * Retrieve a request based on the item.
+     * Retrieve all requests (as iterator) for a given item
      * @param context current DSpace session.
      * @param item the item to find requests for.
-     * @return the matching requests, or null if not found.
+     * @return the matching requests (or empty iterator)
      */
-    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+    Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+
 
     /**
-     * Save updates to the record. Only accept_request, and decision_date are set-able.
+     * Retrieve all requests (as iterator) for a given bitstream UUID
+     * A UUID parameter is used here rather than Bitstream object, to make it usable
+     * in situations even when a bitstream object no longer exists, but orphaned
+     * entries need to be found by their (previous) bitstream UUID.
+     *
+     * @param context current DSpace context
+     * @param bitstreamId the bitstream UUID to search for
+     * @return the matching requests (or empty iterator)
+     */
+    Iterator<RequestItem> findByBitstreamId(Context context, UUID bitstreamId) throws SQLException;
+
+    /**
+     * Save updates to the record. Only accept_request, decision_date, access_period are settable.
+     *
+     * Note: the "is settable" rules mentioned here are enforced in RequestItemRest with annotations meaning that
+     * these JSON properties are considered READ-ONLY by the core DSpaceRestRepository methods
      *
      * @param context     The relevant DSpace Context.
      * @param requestItem requested item
      */
-    public void update(Context context, RequestItem requestItem);
+    void update(Context context, RequestItem requestItem);
 
     /**
      * Remove the record from the database.
@@ -85,7 +102,7 @@ public interface RequestItemService {
      * @param context current DSpace context.
      * @param request record to be removed.
      */
-    public void delete(Context context, RequestItem request);
+    void delete(Context context, RequestItem request);
 
     /**
      * Is there at least one valid READ resource policy for this object?
@@ -94,6 +111,6 @@ public interface RequestItemService {
      * @return true if a READ policy applies.
      * @throws SQLException passed through.
      */
-    public boolean isRestricted(Context context, DSpaceObject o)
+    boolean isRestricted(Context context, DSpaceObject o)
             throws SQLException;
 }
