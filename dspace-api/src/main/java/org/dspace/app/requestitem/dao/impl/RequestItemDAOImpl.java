@@ -9,6 +9,7 @@ package org.dspace.app.requestitem.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -42,10 +43,22 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
         criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.token), token));
         return uniqueResult(context, criteriaQuery, false, RequestItem.class);
     }
+
     @Override
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "FROM RequestItem WHERE item_id= :uuid");
-        query.setParameter("uuid", item.getID());
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RequestItem.class);
+        Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
+        criteriaQuery.select(requestItemRoot);
+        criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.item), item));
+        Query query = createQuery(context, criteriaQuery);
+        return iterate(query);
+    }
+
+    @Override
+    public Iterator<RequestItem> findByBitstreamId(Context context, UUID bitstreamId) throws SQLException {
+        Query query = createQuery(context, "FROM RequestItem WHERE bitstream.id = :bitstreamId");
+        query.setParameter("bitstreamId", bitstreamId);
         return iterate(query);
     }
 }
