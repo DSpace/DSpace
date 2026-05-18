@@ -515,6 +515,28 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             throw new IllegalStateException("Bitstream " + bitstream.getID().toString()
                     + " must be deleted before it can be removed from the database.");
         }
+
+        // Defensively remove any remaining bundle2bitstream references.
+        // Normally delete() already cleans these up, but orphaned rows from
+        // historical bugs can cause FK constraint violations on hard-delete.
+        final List<Bundle> bundles = bitstream.getBundles();
+        for (Bundle bundle : bundles) {
+            if (bitstream.equals(bundle.getPrimaryBitstream())) {
+                bundle.unsetPrimaryBitstreamID();
+            }
+            bundle.removeBitstream(bitstream);
+        }
+        bundles.clear();
+
+        // Remove any orphaned request items referencing this bitstream
+        Iterator<RequestItem> requestItems = requestItemService.findByBitstreamId(context, bitstream.getID());
+        while (requestItems.hasNext()) {
+            requestItemService.delete(context, requestItems.next());
+        }
+
+        // Remove any remaining authorization policies
+        authorizeService.removeAllPolicies(context, bitstream);
+
         bitstreamDAO.delete(context, bitstream);
     }
 
