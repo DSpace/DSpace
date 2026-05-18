@@ -80,8 +80,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
     //temporary set a negative expiration time so the token is invalid immediately
     @Test
     public void testExpiredToken() throws Exception {
-        when(configurationService.getLongProperty("jwt.shortLived.token.expiration", 1800000))
-            .thenReturn(-99999999L);
+        when(shortLivedJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = shortLivedJWTTokenHandler

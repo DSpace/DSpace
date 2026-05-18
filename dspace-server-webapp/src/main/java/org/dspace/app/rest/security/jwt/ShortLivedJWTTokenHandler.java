@@ -40,6 +40,11 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
     private static final Logger log = LogManager.getLogger(ShortLivedJWTTokenHandler.class);
 
     /**
+     * Default expiration period for short-lived tokens in milliseconds
+     */
+    private static final long DEFAULT_EXPIRATION_PERIOD = 2000;
+
+    /**
      * Determine if current JWT is valid for the given EPerson object.
      * To be valid, current JWT *must* have been signed by the EPerson and not be expired.
      * If EPerson is null or does not have a known active session, false is returned immediately.
@@ -88,6 +93,11 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
             }
         }
         return ePerson;
+    }
+
+    @Override
+    public long getExpirationPeriod() {
+        return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), DEFAULT_EXPIRATION_PERIOD);
     }
 
     @Override

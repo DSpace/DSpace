@@ -8,6 +8,7 @@
 package org.dspace.content.crosswalk;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 
@@ -56,7 +57,12 @@ public class LicenseStreamDisseminationCrosswalk
             Bitstream licenseBs = PackageUtils.findDepositLicense(context, (Item) dso);
 
             if (licenseBs != null) {
-                Utils.copy(bitstreamService.retrieve(context, licenseBs), out);
+                try (final InputStream bitInputStream = bitstreamService.retrieve(context, licenseBs)) {
+                    Utils.copy(bitInputStream, out);
+                } catch (Exception e) {
+                    log.warn("Could not retrieve license file for Item with UUID={}. " +
+                                 "Leaving it out of generated package. Error{}", dso.getID(), e.getMessage());
+                }
             }
         }
     }

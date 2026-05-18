@@ -449,11 +449,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         // Remove any RequestItem entities associated with this bitstream ensuring there are no requests referencing
         // a deleted bitstream
-        List<RequestItem> requestItems = requestItemService.findAll(context);
-        for (RequestItem requestItem : requestItems) {
-            if (bitstream.equals(requestItem.getBitstream())) {
-                requestItemService.delete(context, requestItem);
-            }
+        Iterator<RequestItem> requestItems = requestItemService.findByBitstreamId(context, bitstream.getID());
+        while (requestItems.hasNext()) {
+            requestItemService.delete(context, requestItems.next());
         }
 
         // Remove policies only after the bitstream has been updated (otherwise the current user has not WRITE rights)

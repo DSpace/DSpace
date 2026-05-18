@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -144,8 +145,10 @@ public class BitstreamResource extends AbstractResource {
                         bitstream.getSizeBytes(),
                         bitstreamService.retrieve(context, bitstream));
             }
-        } catch (SQLException | AuthorizeException | IOException e) {
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e.getMessage());
         }
 
         LOG.debug("fetched document {} {}", shouldGenerateCoverPage, document);
