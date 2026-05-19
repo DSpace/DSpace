@@ -52,8 +52,15 @@
         -->
         <property name="maxConcurrency" value="${assetstore.s3.maxConcurrency:}"/>
 
-        <!-- The factor of available memory to use for calculating the maximum concurrency. Default is 0.1 (10%). -->
-        <property name="memoryUsageFactor" value="${assetstore.s3.memoryUsageFactor:0.1}"/>
+        <!-- The factor of available memory to use for calculating the maximum concurrency.
+             Uses custom heuristics to determine the maximum concurrency based on the available memory and the configured memory usage factor.
+             If not provided, it will use parameters from the AWS SDK defaults, which are based on the available processors and memory.
+             Be careful when changing this value, as setting it too high or not setting at all may cause out of memory errors.
+        -->
+        <property name="memoryUsageFactor" value="${assetstore.s3.memoryUsageFactor:}"/>
+
+        <!-- The initial buffer size in bytes for reading from S3. If not specified it will be determined by AWS SDK-->
+        <property name="initialReadBufferSizeInBytes" value="${assetstore.s3.initialReadBufferSizeInBytes:}"/>
 
         <!-- The algorithm the S3 client will use to create a checksum when doing putObject. -->
         <property name="s3ChecksumAlgorithm" value="${assetstore.s3.s3ChecksumAlgorithm}"/>
