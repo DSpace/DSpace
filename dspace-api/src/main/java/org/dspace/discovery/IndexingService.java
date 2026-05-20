@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.core.Context;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
  * Interface used for indexing IndexableObject into discovery
@@ -86,4 +87,26 @@ public interface IndexingService {
      */
     void atomicUpdate(Context context, String uniqueIndexId, String field, Map<String,Object> fieldModifier)
             throws SolrServerException, IOException;
+    /**
+     * Iterates over all documents in the Lucene index and verifies they are in
+     * the database, if not, they are removed. Registers a heartbeat after each batch.
+     *
+     * @param handler       The handler to register the heartbeat with
+     * @throws IOException            IO exception
+     * @throws SQLException           sql exception
+     * @throws SearchServiceException occurs when something went wrong with querying the solr server
+     */
+    void cleanIndex(DSpaceRunnableHandler handler)
+        throws IOException, SQLException, SearchServiceException;
+
+    /**
+     * Iterates over all Items, Collections and Communities and updates them in
+     * the index. Registers a heartbeat after every object is indexed.
+     *
+     * @param context The DSpace context
+     * @param force   Whether the reindexing should be forced
+     * @param type    The type of object to index
+     * @param handler The runnable handler used to register heartbeats
+     */
+    void updateIndex(Context context, boolean force, String type, DSpaceRunnableHandler handler);
 }

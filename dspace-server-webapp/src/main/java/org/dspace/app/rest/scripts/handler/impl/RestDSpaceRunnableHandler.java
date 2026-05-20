@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -328,5 +329,27 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             }
         }
         return specialGroups;
+    }
+
+    @Override
+    public void registerHeartbeat() {
+        Context context = new Context(Context.Type.OBJECT_BOUND);
+        try {
+            Process process = processService.find(context, processId);
+            Instant now = Instant.now();
+            Instant last = process.getHeartbeat();
+            if (last != null && last.isAfter(now.minusSeconds(60))) {
+                return;
+            }
+            process.setHeartbeat(now);
+            processService.update(context, process);
+            context.commit();
+        } catch (SQLException e) {
+            log.error("Error updating heartbeat for process {}", processId, e);
+        } finally {
+            if (context.isValid()) {
+                context.abort();
+            }
+        }
     }
 }

@@ -81,70 +81,69 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         }
 
         switch (indexClientOptions) {
-            case REMOVE:
-                handler.logInfo("Removing " + commandLine.getOptionValue("r") + " from Index");
-                indexer.unIndexContent(context, indexableObject.get().getUniqueIndexID());
-                break;
-            case CLEAN:
-                handler.logInfo("Cleaning Index");
-                indexer.cleanIndex();
-                break;
-            case DELETE:
-                handler.logInfo("Deleting Index");
-                indexer.deleteIndex();
-                break;
-            case BUILD:
-            case BUILDANDSPELLCHECK:
-                handler.logInfo("(Re)building index from scratch.");
-                if (StringUtils.isNotBlank(type)) {
-                    handler.logWarning(String.format(
-                            "Type option, %s, not applicable for entire index rebuild option, b"
-                                    + ", type will be ignored",
-                            TYPE_OPTION));
-                }
-                indexer.deleteIndex();
-                indexer.createIndex(context);
-                if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
-                    checkRebuildSpellCheck(commandLine, indexer);
-                }
-                break;
-            case OPTIMIZE:
-                handler.logInfo("Optimizing search core.");
-                indexer.optimize();
-                break;
-            case SPELLCHECK:
+        case REMOVE:
+            handler.logInfo("Removing " + commandLine.getOptionValue("r") + " from Index");
+            indexer.unIndexContent(context, indexableObject.get().getUniqueIndexID());
+            break;
+        case CLEAN:
+            handler.logInfo("Cleaning Index");
+            indexer.cleanIndex(handler);
+            break;
+        case DELETE:
+            handler.logInfo("Deleting Index");
+            indexer.deleteIndex();
+            break;
+        case BUILD:
+        case BUILDANDSPELLCHECK:
+            handler.logInfo("(Re)building index from scratch.");
+            if (StringUtils.isNotBlank(type)) {
+                handler.logWarning(String.format(
+                        "Type option, %s, not applicable for entire index rebuild option, b"
+                        + ", type will be ignored",
+                        TYPE_OPTION));
+            }
+            indexer.deleteIndex();
+            indexer.createIndex(context);
+            if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);
-                break;
-            case INDEX:
-                handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
-                final long startTimeMillis = Instant.now().toEpochMilli();
-                final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
+            }
+            break;
+        case OPTIMIZE:
+            handler.logInfo("Optimizing search core.");
+            indexer.optimize();
+            break;
+        case SPELLCHECK:
+            checkRebuildSpellCheck(commandLine, indexer);
+            break;
+        case INDEX:
+            handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
+            final long startTimeMillis = Instant.now().toEpochMilli();
+            final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
                     indexableObject.get());
-                final long seconds = (Instant.now().toEpochMilli() - startTimeMillis) / 1000;
-                handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") +
-                                " in " + seconds + " seconds");
-                break;
-            case UPDATE:
-            case UPDATEANDSPELLCHECK:
-                handler.logInfo("Updating Index");
-                indexer.updateIndex(context, false, type);
-                if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
-                    checkRebuildSpellCheck(commandLine, indexer);
-                }
-                break;
-            case FORCEUPDATE:
-            case FORCEUPDATEANDSPELLCHECK:
-                handler.logInfo("Updating Index");
-                indexer.updateIndex(context, true, type);
-                if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
-                    checkRebuildSpellCheck(commandLine, indexer);
-                }
-                break;
-            default:
-                handler.handleException("Invalid index client option.");
-                break;
-        }
-
+            final long seconds = (Instant.now().toEpochMilli() - startTimeMillis) / 1000;
+            handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") +
+                    " in " + seconds + " seconds");
+            break;
+        case UPDATE:
+        case UPDATEANDSPELLCHECK:
+            handler.logInfo("Updating Index");
+            indexer.updateIndex(context, false, type, handler);
+            if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
+                checkRebuildSpellCheck(commandLine, indexer);
+            }
+            break;
+        case FORCEUPDATE:
+        case FORCEUPDATEANDSPELLCHECK:
+            handler.logInfo("Updating Index");
+            indexer.updateIndex(context, true, type, handler);
+            if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
+                checkRebuildSpellCheck(commandLine, indexer);
+            }
+            break;
+        default:
+            handler.handleException("Invalid index client option.");
+            break;
+    }
         handler.logInfo("Done with indexing");
     }
 

@@ -103,6 +103,7 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
         handler.logInfo("Found " + processes.size() + " processes to be deleted");
         for (Process process : processes) {
             processService.delete(context, process);
+            handler.registerHeartbeat();
         }
 
         handler.logInfo("Process cleanup completed");

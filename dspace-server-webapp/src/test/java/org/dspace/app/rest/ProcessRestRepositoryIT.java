@@ -7,12 +7,14 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.dspace.app.rest.matcher.ProcessMatcher.matchProcess;
 import static org.dspace.content.ProcessStatus.SCHEDULED;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,20 +22,30 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessFileTypesMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
+import org.dspace.app.rest.model.ParameterValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
@@ -44,10 +56,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+
+
 public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     Process process;
 
@@ -952,5 +970,77 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
                                             is("script_output")));
 
+    }
+    @Test
+    public void getProcessWithNullHeartbeat() throws Exception {
+        Process processWithoutHeartbeat = ProcessBuilder
+            .createProcess(context, admin, "mock-script", parameters)
+            .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/" + processWithoutHeartbeat.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.heartbeat").value(Matchers.nullValue()));
+    }
+
+    @Test
+    public void getProcessWithHeartbeat() throws Exception {
+        Instant heartbeat = Instant.now();
+
+        Process processWithHeartbeat = ProcessBuilder
+            .createProcess(context, admin, "mock-script", parameters)
+            .withHeartbeat(heartbeat)
+            .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/" + processWithHeartbeat.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.heartbeat").value(heartbeat.toString()));
+    }
+    @Test
+    public void getProcessHeartbeatUpdatedDuringDiscovery() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                        .withName("Test Community")
+                                        .build();
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                        .withName("Test Collection")
+                                        .build();
+        ItemBuilder.createItem(context, col).withTitle("Test Item 1").build();
+        ItemBuilder.createItem(context, col).withTitle("Test Item 2").build();
+        ItemBuilder.createItem(context, col).withTitle("Test Item 3").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        LinkedList<DSpaceCommandLineParameter> discoveryParams = new LinkedList<>();
+        discoveryParams.add(new DSpaceCommandLineParameter("-f", "true"));
+
+        List<ParameterValueRest> list = new LinkedList<>();
+        for (DSpaceCommandLineParameter param : discoveryParams) {
+            list.add((ParameterValueRest) dSpaceRunnableParameterConverter.convert(param, Projection.DEFAULT));
+        }
+
+        try {
+            getClient(token)
+                .perform(multipart("/api/system/scripts/index-discovery/processes")
+                    .param("properties", new ObjectMapper().writeValueAsString(list)))
+                .andExpect(status().isAccepted())
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+
+            Thread.sleep(10000);
+
+            getClient(token).perform(get("/api/system/processes/" + idRef.get()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.heartbeat").value(Matchers.notNullValue()));
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
     }
 }

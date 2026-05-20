@@ -77,6 +77,7 @@ import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1667,6 +1668,79 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return null;
     }
 
+
+    @Override
+    public void cleanIndex(DSpaceRunnableHandler handler) throws IOException, SQLException, SearchServiceException {
+        Context context = new Context();
+        context.turnOffAuthorisationSystem();
+
+        try {
+            if (solrSearchCore.getSolr() == null) {
+                return;
+            }
+            SolrQuery countQuery = new SolrQuery("*:*");
+            countQuery.setRows(0);
+            QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery, solrSearchCore.REQUEST_METHOD);
+            long total = totalResponse.getResults().getNumFound();
+
+            int start = 0;
+            int batch = 100;
+
+            SolrQuery query = new SolrQuery();
+            query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
+                            SearchUtils.RESOURCE_TYPE_FIELD);
+            query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
+            query.setQuery("*:*");
+            query.setRows(batch);
+
+            while (start < total) {
+                query.setStart(start);
+                QueryResponse rsp = solrSearchCore.getSolr().query(query, solrSearchCore.REQUEST_METHOD);
+                SolrDocumentList docs = rsp.getResults();
+
+                for (SolrDocument doc : docs) {
+                    String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_UNIQUE_ID);
+                    IndexableObject o = findIndexableObject(context, doc);
+                    if (o == null) {
+                        log.info("Deleting: " + uniqueID);
+                        unIndexContent(context, uniqueID);
+                    } else {
+                        log.debug("Keeping: " + o.getUniqueIndexID());
+                    }
+                }
+
+                start += batch;
+                handler.registerHeartbeat();
+            }
+        } catch (IOException | SQLException | SolrServerException e) {
+            log.error("Error cleaning discovery index: " + e.getMessage(), e);
+        } finally {
+            context.abort();
+        }
+    }
+
+    @Override
+    public void updateIndex(Context context, boolean force, String type, DSpaceRunnableHandler handler) {
+        try {
+            final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.getIndexFactories();
+            for (IndexFactory indexableObjectService : indexableObjectServices) {
+                if (type == null || StringUtils.equals(indexableObjectService.getType(), type)) {
+                    final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
+                    while (indexableObjects.hasNext()) {
+                        final IndexableObject indexableObject = indexableObjects.next();
+                        indexContent(context, indexableObject, force);
+                        context.uncacheEntity(indexableObject.getIndexedObject());
+                        handler.registerHeartbeat();
+                    }
+                }
+            }
+            if (solrSearchCore.getSolr() != null) {
+                solrSearchCore.getSolr().commit();
+            }
+        } catch (IOException | SQLException | SolrServerException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
     @Override
     public SolrSearchCore getSolrSearchCore() {
         return solrSearchCore;

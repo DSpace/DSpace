@@ -81,6 +81,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         }
 
         DSpaceCSV csv = this.export(context, toExport, exportAllMetadata, handler);
+        DSpaceCSV csv = this.export(context, toExport, exportAllMetadata, handler);
         return csv;
     }
 
@@ -144,6 +145,33 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         }
 
         return result.iterator();
+    }
+
+    /**
+     * Exports the given items to a DSpaceCSV. Registers a heartbeat after every item exported.
+     *
+     * @param context       The DSpace context
+     * @param toExport      Iterator over the items to export
+     * @param exportAll     Whether to export all metadata fields or only the non-hidden ones
+     * @param handler       The handler to register the heartbeat with
+     * @return              A DSpaceCSV containing the exported items
+     * @throws Exception    If something goes wrong during the export
+     */
+    @Override
+    public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll,
+                            DSpaceRunnableHandler handler) throws Exception {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+        DSpaceCSV csv = new DSpaceCSV(exportAll);
+        while (toExport.hasNext()) {
+            Item item = toExport.next();
+            csv.addItem(item);
+            context.uncacheEntity(item);
+            // Register a heartbeat after every item to indicate the process is still running
+            handler.registerHeartbeat();
+        }
+        context.setMode(originalMode);
+        return csv;
     }
 
     @Override

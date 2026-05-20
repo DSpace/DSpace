@@ -64,6 +64,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom2.Document;
@@ -131,9 +132,11 @@ public class OAIHarvester {
     // DOMbuilder class for the DOM -> JDOM conversions
     private static final DOMBuilder db = new DOMBuilder();
     // The point at which this thread should terminate itself
+    protected DSpaceRunnableHandler handler;
 
     /* Initialize the harvester with a collection object */
-    public OAIHarvester(Context c, DSpaceObject dso, HarvestedCollection hc) throws HarvestingException, SQLException {
+    public OAIHarvester(Context c, DSpaceObject dso, HarvestedCollection hc,
+                        DSpaceRunnableHandler handler) throws HarvestingException, SQLException {
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
         bundleService = ContentServiceFactory.getInstance().getBundleService();
@@ -148,6 +151,7 @@ public class OAIHarvester {
         pluginService = CoreServiceFactory.getInstance().getPluginService();
 
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        this.handler = handler;
 
         if (dso.getType() != Constants.COLLECTION) {
             throw new HarvestingException("OAIHarvester can only harvest collections");
@@ -179,7 +183,11 @@ public class OAIHarvester {
             throw new HarvestingException("Metadata declaration not found");
         }
     }
-
+     /* Initialize the harvester with a collection object */
+    public OAIHarvester(Context c, DSpaceObject dso, HarvestedCollection hc)
+            throws HarvestingException, SQLException {
+        this(c, dso, hc, null);
+    }
 
     /**
      * Search the configuration options and find the ORE serialization string
@@ -384,6 +392,9 @@ public class OAIHarvester {
                         currentRecord++;
 
                         processRecord(record, OREPrefix, currentRecord, totalListSize);
+                        if (handler != null) {
+                            handler.registerHeartbeat();
+                        }
                         ourContext.dispatchEvents();
 
                         intermediateCommit();

@@ -151,6 +151,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             Item item = i.next();
             exportItem(c, item, fullPath, mySequenceNumber, migrate, excludeBitstreams);
             c.uncacheEntity(item);
+            handler.registerHeartbeat();
             mySequenceNumber++;
         }
     }

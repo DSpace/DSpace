@@ -320,6 +320,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     itemFolderMap.put(dircontents[i], item);
 
                     c.uncacheEntity(item);
+                    handler.registerHeartbeat();
                     logInfo(i + " " + dircontents[i]);
                 }
             }
@@ -689,6 +690,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Item newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
             c.uncacheEntity(oldItem);
             c.uncacheEntity(newItem);
+            handler.registerHeartbeat();
         }
     }
 
@@ -715,6 +717,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 logInfo("Deleting item " + itemID);
                 deleteItem(c, myitem);
                 c.uncacheEntity(myitem);
+                handler.registerHeartbeat();
             }
         }
     }
