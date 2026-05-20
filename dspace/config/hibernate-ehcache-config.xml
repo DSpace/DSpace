@@ -145,6 +145,8 @@
       </resources>
     </cache>
 
+    <!-- Relationship types are generally created once and edited rarely. But they are queried frequently.
+         Makes sense to cache it -->
     <cache alias="org.dspace.content.RelationshipType"
            uses-template="default">
         <expiry>
@@ -155,6 +157,7 @@
         </resources>
     </cache>
 
+    <!-- Like RelationshipTypes, Entity Types are also rarely edited and queried frequently -->
     <cache alias="org.dspace.content.EntityType"
            uses-template="default">
         <expiry>
