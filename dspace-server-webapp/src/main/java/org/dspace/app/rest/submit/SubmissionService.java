@@ -38,6 +38,7 @@ import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.WorkflowItemRestRepository;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
+import org.dspace.app.rest.security.WorkflowSecurityUtils;
 import org.dspace.app.rest.submit.step.UploadStep;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
@@ -115,6 +116,8 @@ public class SubmissionService {
     private SubmissionConfigService submissionConfigService;
     @Autowired
     private DuplicateDetectionService duplicateDetectionService;
+    @Autowired
+    private WorkflowSecurityUtils workflowSecurityUtils;
 
     public SubmissionService() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
@@ -250,41 +253,29 @@ public class SubmissionService {
      */
     public XmlWorkflowItem createWorkflowItem(Context context, String requestUriListString)
             throws SQLException, AuthorizeException, WorkflowException {
-        XmlWorkflowItem wi = null;
-        if (StringUtils.isBlank(requestUriListString)) {
-            throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
+        Integer id = workflowSecurityUtils.parseIdFromUri(requestUriListString);
+        if (id == null) {
+            throw new UnprocessableEntityException("The provided workspaceitem URI is not valid: " +
+                                                       requestUriListString);
         }
-        String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + WorkspaceItemRest.PLURAL_NAME
-                + "\\/";
-        String[] split = requestUriListString.split(regex, 2);
-        if (split.length != 2) {
-            throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
-        }
-        WorkspaceItem wsi = null;
-        int id = 0;
-        try {
-            id = Integer.parseInt(split[1]);
-            wsi = workspaceItemService.find(context, id);
-        } catch (NumberFormatException e) {
-            throw new UnprocessableEntityException("The provided workspaceitem URI is not valid", e);
-        }
+
+        WorkspaceItem wsi = workspaceItemService.find(context, id);
         if (wsi == null) {
-            throw new UnprocessableEntityException("Workspace item is not found");
+            throw new UnprocessableEntityException("Workspace item not found with id: " + id);
         }
+
         WorkspaceItemRest wsiRest = converter.toRest(wsi, utils.obtainProjection());
-        if (!wsiRest.getErrors().isEmpty()) {
+        if (wsiRest != null && !wsiRest.getErrors().isEmpty()) {
             throw new UnprocessableEntityException(
                     "Start workflow failed due to validation error on workspaceitem");
         }
 
         try {
-            wi = workflowService.start(context, wsi);
+            return workflowService.start(context, wsi);
         } catch (IOException e) {
             throw new RuntimeException("The workflow could not be started for workspaceItem with" +
                                                " id:  " + id, e);
         }
-
-        return wi;
     }
 
     private AccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
