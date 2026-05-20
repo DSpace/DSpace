@@ -53,12 +53,6 @@ public abstract class DSpaceItem implements Item {
         return elems;
     }
 
-
-    private List<String> getMetadata(String schema, String element) {
-        List<Element> metadata = this.getMetadata().getMetadata().getElement();
-        return values(filter(flat(filter(metadata, schema)), element));
-    }
-
     private List<String> getMetadata(String schema, String element, String qualifier) {
         List<Element> metadata = this.getMetadata().getMetadata().getElement();
         return values(filter(flat(filter(flat(filter(metadata, schema)), element)), qualifier));
@@ -88,7 +82,7 @@ public abstract class DSpaceItem implements Item {
     public List<String> getMetadata(String field) {
         String[] parts = field.split(Pattern.quote("."));
         if (parts.length == 2) {
-            return this.getMetadata(parts[0], parts[1]);
+            return this.getMetadata(parts[0], parts[1], null);
         } else if (parts.length == 3) {
             return this.getMetadata(parts[0], parts[1], parts[2]);
         } else {
