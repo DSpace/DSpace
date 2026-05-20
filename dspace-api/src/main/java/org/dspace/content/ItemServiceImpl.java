@@ -1231,14 +1231,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Bundle> bunds = item.getBundles();
         for (Bundle mybundle : bunds) {
             // If the bundle is restricted (e.g. LICENSE, TEXT, SWORD) simply
-            // remove all policies and return
+            // remove all policies and continue to the next bundle
             boolean restrictedBundle = restrictedBundles.contains(mybundle.getName());
             if (restrictedBundle) {
                 authorizeService.removeAllPolicies(context, mybundle);
                 for (Bitstream bitstream : mybundle.getBitstreams()) {
                     authorizeService.removeAllPolicies(context, bitstream);
                 }
-                return;
+                continue;
             }
 
             // If collection has default READ policies, remove the bundle's READ policies.

@@ -2191,8 +2191,22 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .build();
         }
 
+        // Anonymous users cannot access bitstreams in restricted bundles (LICENSE)
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                .param("handle", publicItem1.getHandle())
+                .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+            )
+            .andExpect(status().isNoContent());
 
         getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                .param("handle", publicItem1.getHandle())
+                .param("filename", "BitstreamName")
+            )
+            .andExpect(status().isNoContent());
+
+        // Admin users can still access bitstreams in restricted bundles
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/search/byItemHandle")
                 .param("handle", publicItem1.getHandle())
                 .param("sequence", String.valueOf(bitstream1.getSequenceID()))
             )
@@ -2202,7 +2216,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 BitstreamMatcher.matchProperties(bitstream1)
             ));
 
-        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+        getClient(adminToken).perform(get("/api/core/bitstreams/search/byItemHandle")
                 .param("handle", publicItem1.getHandle())
                 .param("filename", "BitstreamName")
             )
@@ -2245,8 +2259,18 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .build();
         }
 
-
+        // Anonymous users cannot access bitstreams in restricted bundles (LICENSE)
         getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                .param("handle", publicItem1.getHandle())
+                .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+                .param("filename", "WrongBitstreamName")
+
+            )
+            .andExpect(status().isNoContent());
+
+        // Admin users can still access bitstreams in restricted bundles
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/search/byItemHandle")
                 .param("handle", publicItem1.getHandle())
                 .param("sequence", String.valueOf(bitstream1.getSequenceID()))
                 .param("filename", "WrongBitstreamName")
