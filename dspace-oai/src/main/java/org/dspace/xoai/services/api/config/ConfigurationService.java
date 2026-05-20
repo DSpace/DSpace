@@ -15,4 +15,6 @@ public interface ConfigurationService {
     boolean getBooleanProperty(String module, String key, boolean defaultValue);
 
     boolean getBooleanProperty(String key, boolean defaultValue);
+
+    void ensureRequiredConfiguration();
 }
