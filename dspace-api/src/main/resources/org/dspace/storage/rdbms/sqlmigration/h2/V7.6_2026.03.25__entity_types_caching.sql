@@ -6,4 +6,6 @@
 -- http://www.dspace.org/license/
 --
 
+-- H2 does not support upper and hence the migration differs slightly from the postgres version
+-- In a test environment this will not make a meaningful impact
 CREATE INDEX entity_type_label_upper_idx ON entity_type (label);
