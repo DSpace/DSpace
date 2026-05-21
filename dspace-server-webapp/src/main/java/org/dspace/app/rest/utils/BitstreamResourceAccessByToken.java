@@ -109,7 +109,7 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
         }
 
         @Override
-        public InputStream getInputstream() {
+        public InputStream getInputStream() {
             try (Context context = initializeContext()) {
                 context.turnOffAuthorisationSystem();
                 return bitstreamService.retrieve(context, bitstreamService.find(context, bitstreamUUID));
