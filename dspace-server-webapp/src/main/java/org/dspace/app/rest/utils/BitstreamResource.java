@@ -29,6 +29,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -106,7 +107,7 @@ public class BitstreamResource extends AbstractResource {
     public InputStream getInputStream() throws IOException {
         fetchDocument();
 
-        return document.getInputstream();
+        return document.getInputStream();
     }
 
     @Override
@@ -203,7 +204,7 @@ public class BitstreamResource extends AbstractResource {
         return context;
     }
 
-    protected abstract class BitstreamDocument {
+    protected abstract class BitstreamDocument implements InputStreamSource {
         private final String etag;
         private final long length;
 
@@ -211,8 +212,6 @@ public class BitstreamResource extends AbstractResource {
             this.etag = etag;
             this.length = length;
         }
-
-        abstract InputStream getInputstream();
 
         public String getEtag() {
             return etag;
@@ -232,7 +231,7 @@ public class BitstreamResource extends AbstractResource {
         }
 
         @Override
-        public InputStream getInputstream() {
+        public InputStream getInputStream() throws IOException {
             try (Context context = initializeContext()) {
                 return bitstreamService.retrieve(context, bitstreamService.find(context, bitstreamUUID));
             } catch (SQLException | AuthorizeException | IOException e) {
@@ -250,7 +249,7 @@ public class BitstreamResource extends AbstractResource {
         }
 
         @Override
-        public InputStream getInputstream() {
+        public InputStream getInputStream() {
             return coverpage;
         }
     }
