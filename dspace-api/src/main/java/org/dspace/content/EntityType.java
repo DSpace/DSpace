@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import java.util.Objects;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +20,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing an EntityType
@@ -26,6 +29,8 @@ import org.dspace.core.ReloadableEntity;
  * This also has a label that will be used to identify what kind of EntityType this object is
  */
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name = "entity_type")
 public class EntityType implements ReloadableEntity<Integer> {
 
