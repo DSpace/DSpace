@@ -8,8 +8,8 @@
 package org.dspace.identifier.doi.crossref;
 
 import java.io.IOException;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;

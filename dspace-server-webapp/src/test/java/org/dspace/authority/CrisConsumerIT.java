@@ -39,6 +39,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.dspace.app.customurl.consumer.CustomUrlConsumerConfig;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -66,6 +67,7 @@ import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.impl.OrcidV3AuthorDataProvider;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
+import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.junit.Test;
@@ -1213,12 +1215,12 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testSherpaImportFiller() throws Exception {
+    public void testOpfImportFiller() throws Exception {
 
         try {
             // AuthorAuthority configuration provided by setUp() method
-            // Add JournalAuthority with special Sherpa configurations
-            addJournalAuthorityWithSherpaConfig();
+            // Add JournalAuthority with special Open Policy Finder configurations
+            addJournalAuthorityWithOpfConfig();
 
             String issn = "2731-0582";
 
@@ -1304,6 +1306,47 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         // check that the entity type equals to the entity type of the owning collection
         assertThat(itemService.getEntityType(context.reloadEntity(wsitem.getItem())), is("Publication"));
     }
+
+
+    @Test
+    public void testPublicationSubmissionWithCustomUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        // Create a publication collection
+        Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
+                                                   .withName("Publications Collection")
+                                                   .withEntityType("Publication")
+                                                   .build();
+
+        WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, publications)
+                                                   .withTitle("Submission Item")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf",
+                                                                 InputStream.nullInputStream())
+                                                   .withAuthor("Mario Rossi")
+                                                   .withAuthorAffilitation("4Science")
+                                                   .withEditor("Mario Rossi")
+                                                   .grantLicense()
+                                                   .build();
+
+        new DSpace().getSingletonService(CustomUrlConsumerConfig.class).reload();
+
+        context.restoreAuthSystemState();
+
+        // Configure Publication entity type to use dc.title
+        configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Publication");
+        configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Publication", "dc.title");
+
+
+        String authToken = getAuthToken(submitter.getEmail(), password);
+
+        getClient(authToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                                         .content("/api/submission/workspaceitems/" + wsitem.getID())
+                                         .contentType(textUriContentType))
+                            .andExpect(status().isCreated());
+    }
+
 
     private ItemRest getItemViaRestByID(String authToken, UUID id) throws Exception {
         MvcResult result = getClient(authToken)
@@ -1473,13 +1516,13 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     }
 
     /**
-     * Special configuration for Sherpa journal import tests.
-     * Adds JournalAuthority with additional Sherpa-specific configurations.
+     * Special configuration for Open Policy Finder journal import tests.
+     * Adds JournalAuthority with additional Open Policy Finder-specific configurations.
      */
-    private void addJournalAuthorityWithSherpaConfig() throws Exception {
+    private void addJournalAuthorityWithOpfConfig() throws Exception {
         addJournalAuthority();
 
-        // Additional Sherpa-specific configurations
+        // Additional Open Policy Finder-specific configurations
         configurationService.setProperty("choices.closed.dc.relation.journal", "true");
         configurationService.setProperty("cris.ItemAuthority.JournalAuthority.relationshipType", "Journal");
 

@@ -94,6 +94,18 @@ public interface ResearcherProfileService {
         throws SQLException, AuthorizeException, SearchServiceException;
 
     /**
+     * Claims and links an eperson to an existing DSpaceObject directly, without
+     * resolving a URI to an object
+     * @param  context                  the relevant DSpace Context.
+     * @param  ePerson                  the ePerson
+     * @param  item                     DSpace item to convert to a researcher profile
+     * @return                          the created profile
+     * @throws IllegalArgumentException if the given dso is null or cannot be claimed
+     */
+    ResearcherProfile claim(Context context, EPerson ePerson, Item item)
+            throws SQLException, AuthorizeException;
+
+    /**
      * Check if the given item has an entity type compatible with that of the
      * researcher profile. If the given item does not have an entity type, the check
      * returns false.

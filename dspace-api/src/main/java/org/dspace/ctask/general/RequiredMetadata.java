@@ -22,6 +22,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Suspendable;
@@ -42,8 +43,8 @@ public class RequiredMetadata extends AbstractCurationTask {
     protected Map<String, List<String>> reqMap = new HashMap<String, List<String>>();
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         try {
             reader = new DCInputsReader();
         } catch (DCInputsReaderException dcrE) {
@@ -58,7 +59,7 @@ public class RequiredMetadata extends AbstractCurationTask {
      * @throws IOException if IO error
      */
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
             int count = 0;

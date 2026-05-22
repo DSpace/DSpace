@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -219,10 +220,10 @@ public class LegacyPluginServiceImpl implements PluginService {
 
     // Map of named plugin classes, [intfc,name] -> class
     // Also contains intfc -> "marker" to mark when interface has been loaded.
-    private final Map<String, String> namedPluginClasses = new HashMap<>();
+    private final Map<String, String> namedPluginClasses = new ConcurrentHashMap<>();
 
     // load and cache configuration data for the given interface.
-    private void configureNamedPlugin(String iname)
+    private synchronized void configureNamedPlugin(String iname)
         throws ClassNotFoundException {
         int found = 0;
 
@@ -307,11 +308,10 @@ public class LegacyPluginServiceImpl implements PluginService {
         int found = 0;
         for (int i = 0; i < names.length; ++i) {
             String key = iname + SEP + names[i];
-            if (namedPluginClasses.containsKey(key)) {
+            String existing = namedPluginClasses.putIfAbsent(key, classname);
+            if (existing != null) {
                 log.error("Name collision in named plugin, implementation class=\"" + classname +
                               "\", name=\"" + names[i] + "\"");
-            } else {
-                namedPluginClasses.put(key, classname);
             }
             log.debug("Got Named Plugin, intfc=" + iname + ", name=" + names[i] + ", class=" + classname);
             ++found;

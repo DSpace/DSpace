@@ -20,12 +20,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.input.NullInputStream;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -127,6 +131,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                                                                                      .getWorkspaceItemService();
     protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+
+    protected final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
 
     /**
      * <p>
@@ -739,6 +747,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // externally, if it is an externally referenced file)
             InputStream fileStream = getFileInputStream(pkgFile, params, path);
 
+            // Before proceeding we must ensure we have a non-empty input stream
+            // NOTE: If getFileInputStream encounters a zero-sized file, then it returns NullInputStream
+            if (fileStream == null || fileStream instanceof NullInputStream) {
+                log.warn("Empty InputStream encountered for Bitstream with ID={} in zip file={}. " +
+                             "Skipping adding this empty bitstream to Item={}", mfileID, pkgFile, item.getID());
+                continue;
+            }
+
             // retrieve bundle name from manifest
             String bundleName = METSManifest.getBundleName(mfile);
 
@@ -761,10 +777,23 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 bitstream.setSequenceID(Integer.parseInt(seqID));
             }
 
+            // Get TYPE_SUBMISSION policies before removing them in the `manifest.crosswalkBitstream` method.
+            List<ResourcePolicy> bitstreamPolicies =
+                authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
+
             // crosswalk this bitstream's administrative metadata located in
             // METS manifest (or referenced externally)
             manifest.crosswalkBitstream(context, params, bitstream, mfileID,
                                         mdRefCallback);
+
+            // Only add the saved TYPE_SUBMISSION policies if the crosswalk actually removed them to prevent duplicates.
+            if (!bitstreamPolicies.isEmpty()) {
+                List<ResourcePolicy> remainingSubmissionPolicies =
+                    authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
+                if (remainingSubmissionPolicies.isEmpty()) {
+                    authorizeService.addPolicies(context, bitstreamPolicies, bitstream);
+                }
+            }
 
             // is this the primary bitstream?
             if (primaryID != null && mfileID.equals(primaryID)) {
@@ -1302,7 +1331,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
      *                zip)
      * @param params  Parameters passed to METSIngester
      * @param path    the File path (either path in Zip package or a URL)
-     * @return the InputStream for the file
+     * @return the InputStream for the file, or NullInputStream if a zero-sized entry is encountered
      * @throws MetadataValidationException if validation error
      * @throws IOException                 if IO error
      */
@@ -1335,12 +1364,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // Retrieve the manifest file entry by name
             ZipEntry manifestEntry = zipPackage.getEntry(path);
 
-            // Get inputStream associated with this file
-            if (manifestEntry != null) {
+            if (manifestEntry.getSize() > 0) {
+                // Get inputStream associated with this file
                 return zipPackage.getInputStream(manifestEntry);
             } else {
-                throw new MetadataValidationException("Manifest file references file '"
-                                                          + path + "' not included in the zip.");
+                log.warn("Zero-sized file entry={} found in zip file={}. Returning empty InputStream.",
+                         path, pkgFile);
+                return new NullInputStream();
             }
         }
     }

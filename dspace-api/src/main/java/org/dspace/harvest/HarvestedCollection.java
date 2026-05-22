@@ -111,11 +111,10 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         setHarvestMetadataConfig(mdConfigId);
     }
 
-    /*
-     * Setters for the appropriate harvesting-related columns
+    /**
+     * Setters for the appropriate harvesting-related columns.
      *
-     * @param type
-     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL
+     * @param type harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL)
      */
     public void setHarvestType(int type) {
         this.harvestType = type;

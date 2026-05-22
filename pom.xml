@@ -19,35 +19,35 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>21</java.version>
-        <spring.version>6.2.17</spring.version>
-        <spring-ldap.version>3.3.6</spring-ldap.version>
-        <spring-boot.version>3.5.11</spring-boot.version>
-        <spring-security.version>6.5.9</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>6.2.18</spring.version>
+        <spring-ldap.version>3.3.7</spring-ldap.version>
+        <spring-boot.version>3.5.14</spring-boot.version>
+        <spring-security.version>6.5.10</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.10.Final</hibernate.version>
         <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
         <!-- Pin antlr4-runtime to the version required by Hibernate (compiled with ANTLR tool 4.13.0) -->
         <antlr4.version>4.13.0</antlr4.version>
-        <postgresql.driver.version>42.7.10</postgresql.driver.version>
+        <postgresql.driver.version>42.7.11</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
         <solr.client.version>8.11.4</solr.client.version>
 
-        <ehcache.version>3.11.1</ehcache.version>
-        <errorprone.version>2.47.0</errorprone.version>
+        <ehcache.version>3.12.0</ehcache.version>
+        <errorprone.version>2.49.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
-        <jackson.version>2.21.1</jackson.version>
+        <jackson.version>2.21.3</jackson.version>
         <jackson-annotations.version>2.21</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.5</jaxb-api.version>
-        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.8</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.58.v20250814</jetty.version>
-        <log4j.version>2.25.3</log4j.version>
+        <log4j.version>2.25.4</log4j.version>
         <pdfbox-version>3.0.6</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
         <slf4j.version>2.0.17</slf4j.version>
-        <tika.version>3.2.3</tika.version>
+        <tika.version>3.3.0</tika.version>
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <!-- WARNING: BouncyCastle is also required by the maven-gpg-plugin to sign code during release. Do not update
              unless the new BouncyCastle version is compatible both with tika-parsers and maven-gpg-plugin. -->
@@ -136,7 +136,16 @@
                                 <rules>
                                     <bannedDependencies>
                                         <excludes>
+                                            <!-- Ban usage of Log4j v1 -->
                                             <exclude>log4j:log4j</exclude>
+                                            <!-- Ban usage of Javax dependencies. We use Jakarta equivalents -->
+                                            <exclude>javax.annotation:javax.annotation-api</exclude>
+                                            <exclude>javax.inject:javax.inject</exclude>
+                                            <exclude>javax.mail:mail</exclude>
+                                            <exclude>com.sun.mail:javax.mail</exclude>
+                                            <exclude>javax.persistence:javax.persistence-api</exclude>
+                                            <exclude>javax.servlet:servlet-api</exclude>
+                                            <exclude>javax.validation:validation-api</exclude>
                                         </excludes>
                                     </bannedDependencies>
                                 </rules>
@@ -324,7 +333,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.8.2</version>
+                    <version>4.9.8.3</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
@@ -374,7 +383,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <!-- Used to validate License Headers (see build process) -->
                 <plugin>
@@ -1138,7 +1147,7 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api-lang</artifactId>
-                <version>[9.0.0,10.0.0)</version>
+                <version>[10.0.0,11.0.0)</version>
             </dependency>
 
             <!-- DSpace third Party Dependencies -->
@@ -1276,17 +1285,19 @@
                 <groupId>org.springframework.ldap</groupId>
                 <artifactId>spring-ldap-core</artifactId>
                 <version>${spring-ldap.version}</version>
-	    </dependency>
-            <!-- Specify the version of micrometer to use. Solves dependency convergence issues in spring-ldap-core -->
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-core</artifactId>
-                <version>1.14.14</version>
-            </dependency>
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-observation</artifactId>
-                <version>1.14.14</version>
+                <exclusions>
+                    <!-- Ignore micrometer dependencies from spring-ldap-core because
+                         they cause convergence issues with the version pulled in by
+                         the main spring framework (spring.version) -->
+                    <exclusion>
+                        <groupId>io.micrometer</groupId>
+                        <artifactId>micrometer-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>io.micrometer</groupId>
+                        <artifactId>micrometer-observation</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1425,7 +1436,7 @@
             <dependency>
                 <groupId>org.apache.james</groupId>
                 <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.14</version>
             </dependency>
             <!-- Tika and solr-core disagree on versions of ASM -->
             <dependency>
@@ -1449,19 +1460,12 @@
                 <version>${asm.version}</version>
             </dependency>
 
-            <!-- Solr-core and Postgres disagree on versions of Checker Qual -->
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-qual</artifactId>
-                <version>3.53.1</version>
-            </dependency>
-
             <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
                  and OpenAIRE Broker-Client -->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.13.2</version>
+                <version>2.14.0</version>
             </dependency>
 
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
@@ -1489,7 +1493,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.10.15</version>
+                <version>1.10.17</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.jena</groupId>
@@ -1581,7 +1585,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.21.0</version>
+                <version>1.22.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1591,7 +1595,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.13.0</version>
+                <version>2.15.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1608,7 +1612,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.21.0</version>
+                <version>2.22.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1620,7 +1624,7 @@
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
-                <version>1.3.5</version>
+                <version>1.3.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1681,7 +1685,7 @@
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.jdom</groupId>
@@ -1802,13 +1806,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.21.0</version>
+                <version>5.23.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.26.3</version>
+                <version>3.27.7</version>
                 <scope>test</scope>
             </dependency>
             <!-- H2 is an in-memory database used for Unit/Integration tests -->
@@ -1865,9 +1869,9 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>32.1.3-jre</version>
+                <version>33.6.0-jre</version>
                 <exclusions>
-                    <!-- Use version provided by Solr / Postgres -->
+                    <!-- Use version provided by solr-core -->
                     <exclusion>
                         <groupId>org.checkerframework</groupId>
                         <artifactId>checker-qual</artifactId>
@@ -1878,7 +1882,7 @@
             <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
-                <version>1.3.9</version>
+                <version>1.4.1</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
