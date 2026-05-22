@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.ListUtils;
@@ -48,6 +49,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ClusteringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -85,6 +87,7 @@ public class ProcessServiceImpl implements ProcessService {
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(Instant.now());
+        process.setInstance(ClusteringUtil.createOrGetClusteringUuid());
         Optional.ofNullable(specialGroups)
             .ifPresent(sg -> {
                 // we use a set to be sure no duplicated special groups are stored with process
@@ -333,18 +336,31 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException {
-        List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
-                context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), Instant.now());
+    public List<Process> findByInstance(Context context, UUID instance, int limit, int offset) throws SQLException {
+        return processDAO.findByInstance(context, instance, limit, offset);
+    }
+
+    @Override
+    public void failProcessesOfInstance(Context context, UUID instance)
+        throws SQLException, IOException, AuthorizeException {
+        List<Process> processesToBeFailed = findByInstance(context, instance, -1, -1);
         for (Process process : processesToBeFailed) {
+            if (    process.getProcessStatus() == ProcessStatus.FAILED ||
+                    process.getProcessStatus() == ProcessStatus.COMPLETED) {
+                continue;
+            }
             context.setCurrentUser(process.getEPerson());
-            // Fail the process.
-            log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
+            // Fail the process
+            log.info("Process with ID {} has an instance uuid belonging to this tomcat: {}, failing it now.",
+                process.getID(),
+                process.getInstance());
             fail(context, process);
-            // But still attach its log to the process.
+            // But still attach its log to the process
             appendLog(process.getID(), process.getName(),
-                      "Process did not complete before tomcat shutdown.",
-                      ProcessLogLevel.ERROR);
+                String.format(
+                    "Process was killed because the process hosting the process went down, related to instance id: %s",
+                    process.getInstance()),
+                ProcessLogLevel.ERROR);
             createLogBitstream(context, process);
         }
     }

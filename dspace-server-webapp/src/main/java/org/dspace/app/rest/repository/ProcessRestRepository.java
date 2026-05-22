@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +37,10 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.Process_;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.util.ClusteringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -67,10 +69,12 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Autowired
     private EPersonService epersonService;
 
-    @PostConstruct
-    public void init() throws SQLException, AuthorizeException, IOException {
+    @EventListener(ApplicationReadyEvent.class)
+    public void failRunningProcesses() throws SQLException, AuthorizeException, IOException {
         Context context = new Context();
-        processService.failRunningProcesses(context);
+        context.turnOffAuthorisationSystem();
+        UUID uuid = ClusteringUtil.createOrGetClusteringUuid();
+        processService.failProcessesOfInstance(context, uuid);
         context.complete();
     }
 

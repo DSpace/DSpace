@@ -10,6 +10,7 @@ package org.dspace.scripts;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -75,6 +76,9 @@ public class Process implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "bitstream_id")}
     )
     private List<Bitstream> bitstreams;
+
+    @Column(name = "instance")
+    private UUID instance;
 
     /*
      * Special Groups associated with this Process
@@ -233,6 +237,18 @@ public class Process implements ReloadableEntity<Integer> {
      */
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    public UUID getInstance() {
+        return instance;
+    }
+
+    /**
+     * Sets the instance uuid that indicates which tomcat started this process.
+     * @param instance
+     */
+    public void setInstance(UUID instance) {
+        this.instance = instance;
     }
 
     /**
