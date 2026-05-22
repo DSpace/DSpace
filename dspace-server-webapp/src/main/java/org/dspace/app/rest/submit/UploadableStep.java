@@ -9,8 +9,10 @@ package org.dspace.app.rest.submit;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.Bitstream;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +42,8 @@ public interface UploadableStep extends RestProcessingStep {
      * @return the encountered error if any
      * @throws IOException
      */
-    public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-                            InProgressSubmission wsi, MultipartFile file) throws IOException;
+    Pair<Bitstream, ErrorRest> upload(Context context, SubmissionService submissionService,
+                                      SubmissionStepConfig stepConfig, InProgressSubmission wsi, MultipartFile file)
+        throws IOException;
 
 }

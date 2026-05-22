@@ -25,11 +25,11 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
+import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +71,10 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected ChecksumHistoryService checksumHistoryService;
+    @Autowired(required = true)
+    protected BitstreamLinkingService bitstreamLinkingService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     /**
      * asset stores
@@ -276,6 +280,13 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                         continue;
                     }
 
+                    // Check whether the bitstore file should be kept before
+                    // expunging the database record, because expunge() would
+                    // make the bitstream entity stale for subsequent queries.
+                    boolean isRegistered = isRegisteredBitstream(bitstream.getInternalId());
+                    boolean hasDuplicate = !bitstreamService
+                        .findDuplicateInternalIdentifier(context, bitstream).isEmpty();
+
                     if (deleteDbRecords) {
                         log.debug("deleting db record");
                         if (verbose) {
@@ -288,16 +299,15 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                         bitstreamService.expunge(context, bitstream);
                     }
 
-                    if (isRegisteredBitstream(bitstream.getInternalId())) {
+                    if (isRegistered) {
                         context.uncacheEntity(bitstream);
-                        continue; // do not delete registered bitstreams
+                        continue; // do not delete registered bitstreams from the bitstore
                     }
 
-
-                    // Since versioning allows for multiple bitstreams, check if the internal
-                    // identifier isn't used on
-                    // another place
-                    if (bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty()) {
+                    // Since versioning allows for multiple bitstreams, only
+                    // remove the file if no other bitstream shares this
+                    // internal identifier
+                    if (!hasDuplicate) {
                         this.getStore(bitstream.getStoreNumber()).remove(bitstream);
 
                         String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
@@ -350,43 +360,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             return null;
         }
         return Long.valueOf(metadata.get("modified").toString());
-    }
-
-    /**
-     * @param context   The relevant DSpace Context.
-     * @param bitstream the bitstream to be cloned
-     * @return id of the clone bitstream.
-     * A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    @Override
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
-        Bitstream clonedBitstream = null;
-        try {
-            // Update our bitstream but turn off the authorization system since permissions
-            // haven't been set at this point in time.
-            context.turnOffAuthorisationSystem();
-            clonedBitstream = bitstreamService.clone(context, bitstream);
-            clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
-
-            List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY,
-                    Item.ANY);
-
-            for (MetadataValue metadataValue : metadataValues) {
-                bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(),
-                        metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
-                        metadataValue.getConfidence());
-            }
-            bitstreamService.update(context, clonedBitstream);
-        } catch (AuthorizeException e) {
-            log.error(e);
-            // Can never happen since we turn off authorization before we update
-        } finally {
-            context.restoreAuthSystemState();
-        }
-        return clonedBitstream;
     }
 
     /**
@@ -491,7 +464,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         }
 
         // Less than one hour old
-        return (now - lastModified) < (1 * 60 * 1000);
+        return (now - lastModified) <
+                (configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L) * 60 * 1000);
     }
 
     protected BitStoreService getStore(int position) throws IOException {

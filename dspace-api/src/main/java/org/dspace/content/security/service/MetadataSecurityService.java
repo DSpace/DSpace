@@ -9,7 +9,7 @@ package org.dspace.content.security.service;
 
 import java.util.List;
 
-import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
@@ -21,18 +21,34 @@ import org.dspace.core.Context;
  */
 public interface MetadataSecurityService {
 
+
     /**
-     * Returns all the metadata values of the given item filtered by permission
+     * Return all the metadata values of the given item filtered by permission evaluations.
+     *
+     * @param context   DSpace Context
+     * @param dso       the dso
+     * @param schema    the metadata schema
+     * @param element   the metadata element
+     * @param qualifier the metadata qualifier, or null for unqualified metadata
+     * @param language  the metadata language, or null for any language
+     * @return the metadata values filtered by permissions
+     */
+    <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso,
+                                                                                     String schema,
+                                                            String element, String qualifier, String language);
+
+    /**
+     * Returns all the metadata values of the given dso filtered by permission
      * evaluations.
      *
      * @param  context the DSpace Context
-     * @param  item    the item
+     * @param  dso     the dso
      * @return         the metadata values
      */
-    List<MetadataValue> getPermissionFilteredMetadataValues(Context context, Item item);
+    <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso);
 
     /**
-     * Returns all the metadata values of the given item filtered by permission
+     * Returns all the metadata values of the given dso filtered by permission
      * evaluations and language preferences.
      * 
      * <p>This method applies the same security filtering as {@link #getPermissionFilteredMetadataValues}
@@ -41,8 +57,8 @@ public interface MetadataSecurityService {
      * in the result.</p>
      *
      * @param  context                 the DSpace Context
-     * @param  item                    the item
+     * @param  dso                     the dso
      * @return                         the metadata values filtered by both permissions and language
      */
-    List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context, Item item);
+    <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context, T dso);
 }

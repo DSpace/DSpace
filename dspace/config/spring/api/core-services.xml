@@ -33,7 +33,7 @@
     <bean class="org.dspace.authority.AuthorityServiceImpl"/>
 
     <bean class="org.dspace.browse.ItemCounter"/>
-    <bean id="itemCountDAO" class="org.dspace.browse.ItemCountDAOSolr" scope="prototype"/>
+    <bean id="itemCountDAO" class="org.dspace.browse.ItemCountDAOSolr"/>
 
     <bean class="org.dspace.checker.ChecksumHistoryServiceImpl"/>
     <bean class="org.dspace.checker.ChecksumResultServiceImpl"/>
@@ -185,5 +185,8 @@
           class="org.dspace.app.customurl.consumer.CustomUrlConsumerConfig"/>
 
     <context:component-scan base-package="org.dspace.identifier.doi.crossref" />
+
+    <bean class="org.dspace.content.BitstreamLinkingServiceImpl"/>
+
 </beans>
 

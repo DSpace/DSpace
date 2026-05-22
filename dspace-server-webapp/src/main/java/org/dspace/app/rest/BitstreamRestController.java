@@ -105,16 +105,21 @@ public class BitstreamRestController {
 
     /**
      * Retrieve bitstream. An access token (created by request a copy for some files, if enabled) can optionally
-     * be used for authorization instead of current user/group
+     * be used for authorization instead of current user/group.
+     * <P>
+     * Authorization behavior is controlled by the configuration property
+     * {@code core.authorization.bitstream.author.bypass-restrictions}. When enabled (true), authors/submitters
+     * can download restricted bitstreams even if they lack explicit READ permissions. When disabled (false - default),
+     * normal authorization rules apply to all users including authors.
      *
      * @param uuid bitstream ID
      * @param accessToken request-a-copy access token (optional)
      * @param response HTTP response
      * @param request HTTP request
      * @return response entity with bitstream content
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if an I/O error occurs
+     * @throws SQLException if database error occurs
+     * @throws AuthorizeException if user lacks permission and author bypass is disabled
      */
     @PreAuthorize("#accessToken != null|| hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
@@ -188,12 +193,13 @@ public class BitstreamRestController {
                                 context.getSpecialGroupUuids(), citationEnabledForBitstream, accessToken);
             } else {
                 // Get input stream using default user/group authorization
-                // skipAuth=true because @PreAuthorize already performed authorization security checks (allowing
-                // submitters and authors/owners to access embargoed bitstreams).
+                // Check configuration to determine if authors can bypass authorization for restricted bitstreams
+                boolean skipAuth = configurationService.getBooleanProperty(
+                        "core.authorization.bitstream.author.bypass-restrictions", false);
                 bitstreamResource =
                         new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
                                 currentUser != null ? currentUser.getID() : null,
-                                context.getSpecialGroupUuids(), citationEnabledForBitstream, true);
+                                context.getSpecialGroupUuids(), citationEnabledForBitstream, skipAuth);
             }
 
             // We have all the data we need, close the connection to the database so that it doesn't stay open during
@@ -243,8 +249,6 @@ public class BitstreamRestController {
         } catch (ClientAbortException ex) {
             log.debug("Client aborted the request before the download was completed. " +
                           "Client is probably switching to a Range request.", ex);
-        } catch (Exception e) {
-            throw e;
         }
         return null;
     }
