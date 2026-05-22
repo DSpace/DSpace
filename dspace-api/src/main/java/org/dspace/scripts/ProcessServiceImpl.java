@@ -346,7 +346,9 @@ public class ProcessServiceImpl implements ProcessService {
             fail(context, process);
             // But still attach its log to the process
             appendLog(process.getID(), process.getName(),
-                String.format("Process has an instance uuid belonging to this tomcat: %s", process.getInstance()),
+                String.format(
+                    "Process was killed because the process hosting the process went down, related to instance id: %s",
+                    process.getInstance()),
                 ProcessLogLevel.ERROR);
             createLogBitstream(context, process);
         }

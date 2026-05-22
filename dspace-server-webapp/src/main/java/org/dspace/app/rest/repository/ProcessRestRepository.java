@@ -69,7 +69,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     private EPersonService epersonService;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void initClusteringUuid() throws SQLException, AuthorizeException, IOException {
+    public void failRunningProcesses() throws SQLException, AuthorizeException, IOException {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
         UUID uuid = ClusteringUtil.createOrGetClusteringUuid();
