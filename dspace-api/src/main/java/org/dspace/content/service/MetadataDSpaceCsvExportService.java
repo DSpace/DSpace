@@ -37,6 +37,18 @@ public interface MetadataDSpaceCsvExportService {
                                   String identifier, DSpaceRunnableHandler dSpaceRunnableHandler) throws Exception;
 
     /**
+     * This method will export all the Items in the given toExport iterator to a DSpaceCSV
+     * @param context       The relevant DSpace context
+     * @param toExport      The iterator containing the items to export
+     * @param exportAll     Defines if all metadata should be exported or only the allowed ones
+     * @param handler       The handler to register the heartbeat with
+     * @return              A DSpaceCSV object containing the exported information
+     * @throws Exception    If something goes wrong
+     */
+    public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll,
+                                            DSpaceRunnableHandler handler) throws Exception;
+
+    /**
      * This method will export all the Items within the given Community to a DSpaceCSV
      * @param context       The relevant DSpace context
      * @param community     The Community that contains the Items to be exported
@@ -46,18 +58,6 @@ public interface MetadataDSpaceCsvExportService {
      */
     public DSpaceCSV export(Context context, Community community,
                             boolean exportAll, DSpaceRunnableHandler handler) throws Exception;
-    /**
-     * Exports the given items to a DSpaceCSV. Registers a heartbeat after every item exported.
-     *
-     * @param context       The relevant DSpace context
-     * @param toExport      Iterator over the items to export
-     * @param exportAll     Defines if all metadata should be exported or only the allowed ones
-     * @param handler       The handler to register the heartbeat with
-     * @return              A DSpaceCSV object containing the exported information
-     * @throws Exception    If something goes wrong
-     */
-    public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll,
-                                    DSpaceRunnableHandler handler) throws Exception;
 
     int getCsvExportLimit();
 

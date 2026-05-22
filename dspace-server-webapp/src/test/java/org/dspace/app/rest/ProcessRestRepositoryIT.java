@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -986,7 +987,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getProcessWithHeartbeat() throws Exception {
-        Instant heartbeat = Instant.now();
+        Instant heartbeat = Instant.now().truncatedTo(ChronoUnit.MICROS);
 
         Process processWithHeartbeat = ProcessBuilder
             .createProcess(context, admin, "mock-script", parameters)
