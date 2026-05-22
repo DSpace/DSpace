@@ -976,6 +976,6 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$", Matchers.is(
                 ProcessMatcher.matchProcess(process.getName(), String.valueOf(process.getEPerson().getID()),
                     process.getID(), new LinkedList<>(), ProcessStatus.SCHEDULED))))
-            .andExpect(jsonPath("$.uuid", is("04e7918f-ec0a-4d22-a765-0e28df041a7e")));
+            .andExpect(jsonPath("$.instance", is("04e7918f-ec0a-4d22-a765-0e28df041a7e")));
     }
 }
