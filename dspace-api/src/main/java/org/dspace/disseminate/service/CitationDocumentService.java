@@ -8,6 +8,7 @@
 package org.dspace.disseminate.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,6 +24,15 @@ import org.dspace.core.Context;
  * @author Peter Dietz (peter@longsight.com)
  */
 public interface CitationDocumentService {
+
+    interface CitedDocument extends AutoCloseable {
+        long length();
+
+        InputStream getInputStream() throws IOException;
+
+        @Override
+        void close() throws IOException;
+    }
 
     /**
      * Repository policy can specify to have a custom citation cover/tail page to the document, which embeds metadata.
@@ -80,6 +90,9 @@ public interface CitationDocumentService {
      * @throws AuthorizeException if authorization error
      */
     Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
+            throws IOException, SQLException, AuthorizeException;
+
+    CitedDocument makeCitedDocumentStream(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException;
 
 }

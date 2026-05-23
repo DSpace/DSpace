@@ -7,9 +7,10 @@
  */
 package org.dspace.disseminate;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -249,6 +250,16 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     @Override
     public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException {
+        try (var citedDocument = makeCitedDocumentStream(context, bitstream);
+             InputStream inputStream = citedDocument.getInputStream()) {
+            byte[] data = inputStream.readAllBytes();
+            return Pair.of(data, (long) data.length);
+        }
+    }
+
+    @Override
+    public CitedDocument makeCitedDocumentStream(Context context, Bitstream bitstream)
+            throws IOException, SQLException {
 
         try (
                 var result = new PDDocument();
@@ -258,8 +269,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
             try (var cover = coverPageService.renderCoverDocument(item)) {
                 addCoverPageToDocument(result, source, cover);
-
-                return documentAsBytes(result);
+                return documentAsTempFile(result);
             }
         }
     }
@@ -272,15 +282,36 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
     }
 
-    private static Pair<byte[], Long> documentAsBytes(PDDocument document) throws IOException {
-
+    private CitedDocument documentAsTempFile(PDDocument document) throws IOException {
         document.setAllSecurityToBeRemoved(true);
+        File tempFile = File.createTempFile("citation-document-", ".pdf", tempDir);
+        tempFile.deleteOnExit();
+        document.save(tempFile);
+        return new TempFileCitedDocument(tempFile);
+    }
 
-        //We already have the full PDF in memory, so keep it there
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            document.save(out);
-            byte[] data = out.toByteArray();
-            return Pair.of(data, (long) data.length);
+    private static final class TempFileCitedDocument implements CitedDocument {
+        private final File file;
+        private final long length;
+
+        private TempFileCitedDocument(File file) {
+            this.file = file;
+            this.length = file.length();
+        }
+
+        @Override
+        public long length() {
+            return length;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return Files.newInputStream(file.toPath());
+        }
+
+        @Override
+        public void close() throws IOException {
+            Files.deleteIfExists(file.toPath());
         }
     }
 
