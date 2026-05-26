@@ -8,11 +8,16 @@
 package org.dspace.content.authority.zdb;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,8 +53,58 @@ public class ZDBService {
 
     private static Logger log = LogManager.getLogger(ZDBService.class);
 
+    private static final Pattern SAFE_ID_PATTERN = Pattern.compile("^[\\w\\-.]+$");
+
     @Autowired
     private ConfigurationService configurationService;
+
+    /**
+     * Validate that the given URL uses HTTPS and does not resolve to a
+     * private or reserved IP address. This mitigates SSRF attacks.
+     *
+     * @param url the URL to validate
+     * @throws IOException if the URL is invalid, not HTTPS, or points to a
+     *                     private/reserved IP address
+     */
+    private void validateUrl(String url) throws IOException {
+        String searchBase = configurationService.getProperty("cris.zdb.search.url");
+        String detailBase = configurationService.getProperty("cris.zdb.detail.url");
+
+        // Clean up base URLs for prefix checking if they contain formatters or query parameters
+        String safeSearchPrefix = searchBase != null && searchBase.contains("?")
+            ? searchBase.substring(0, searchBase.indexOf("?")) : searchBase;
+        String safeDetailPrefix = detailBase != null && detailBase.contains("{0}")
+            ? detailBase.substring(0, detailBase.indexOf("{0}")) : detailBase;
+
+        boolean isAllowedPrefix = (safeSearchPrefix != null && url.startsWith(safeSearchPrefix)) ||
+            (safeDetailPrefix != null && url.startsWith(safeDetailPrefix));
+
+        if (!isAllowedPrefix) {
+            throw new IOException("URL is not targeting an allowed ZDB endpoint prefix.");
+        }
+
+        try {
+            URL parsedUrl = new URL(url);
+            String protocol = parsedUrl.getProtocol();
+            if (!"https".equalsIgnoreCase(protocol)) {
+                throw new IOException("Only HTTPS URLs are allowed");
+            }
+
+            String host = parsedUrl.getHost();
+            if (host == null || host.isEmpty()) {
+                throw new IOException("URL must have a host");
+            }
+            InetAddress address = InetAddress.getByName(host);
+            if (address.isSiteLocalAddress() || address.isLoopbackAddress()
+                || address.isAnyLocalAddress() || address.isLinkLocalAddress()) {
+                throw new IOException("URL points to a private or reserved IP address");
+            }
+        } catch (MalformedURLException e) {
+            throw new IOException("Invalid URL: " + url, e);
+        } catch (UnknownHostException e) {
+            throw new IOException("Cannot resolve host in URL: " + url, e);
+        }
+    }
 
     /**
      * Execute an HTTP GET against the given URL, parse the ZDB XML response,
@@ -62,6 +117,7 @@ public class ZDBService {
     private List<ZDBAuthorityValue> search(String requestURL) throws IOException {
 
         List<ZDBAuthorityValue> results = new ArrayList<ZDBAuthorityValue>();
+        validateUrl(requestURL);
 
         HttpGet method = null;
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
@@ -77,6 +133,9 @@ public class ZDBService {
             }
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             factory.setValidating(false);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);
@@ -183,6 +242,11 @@ public class ZDBService {
      */
     public AuthorityValue details(String id) throws IOException {
 
+        String baseUrl = configurationService.getProperty("cris.zdb.detail.url");
+        if (StringUtils.isEmpty(baseUrl)) {
+            throw new IllegalStateException("ZDB detail URL configuration is missing");
+        }
+
         String url = buildDetailsURL(id);
         List<ZDBAuthorityValue> results = search(url);
         if (!results.isEmpty()) {
@@ -206,15 +270,12 @@ public class ZDBService {
             throw new IllegalArgumentException("The query must not be empty");
         }
 
-        String queryURL = configurationService.getProperty("cris.zdb.search.url");
+        String baseUrl = configurationService.getProperty("cris.zdb.search.url");
+        if (StringUtils.isEmpty(baseUrl)) {
+            throw new IllegalStateException("ZDB search URL configuration is missing");
+        }
 
-        // TODO seems that numberOfRecords is not supported
-        // if (pagesize >= 0)
-        // {
-        // searchURL += "&numberOfRecords=" + Integer.toString(pagesize);
-        // }
-
-        queryURL += "&query=tit=" + URLEncoder.encode(query, Charset.defaultCharset());
+        String queryURL = baseUrl + "&query=tit=" + URLEncoder.encode(query, Charset.defaultCharset());
         return search(queryURL);
     }
 
@@ -225,6 +286,9 @@ public class ZDBService {
      * @return the formatted detail URL
      */
     public String buildDetailsURL(String id) {
+        if (id == null || !SAFE_ID_PATTERN.matcher(id).matches()) {
+            throw new IllegalArgumentException("Invalid ZDB record id: " + id);
+        }
         return MessageFormat.format(configurationService.getProperty("cris.zdb.detail.url"), id);
     }
 }
