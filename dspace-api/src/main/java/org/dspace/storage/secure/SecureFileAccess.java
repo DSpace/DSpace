@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -62,7 +61,7 @@ public final class SecureFileAccess {
      * More secure than the 'write' variant because we can explicitly resolve links as well.
      *
      * @param file the unvalidated file, usually derived from user input or configuration
-     * @param allowedBasePath the allowed base path for this use case as per system configuration
+     * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
@@ -72,9 +71,6 @@ public final class SecureFileAccess {
             Path basePath = Path.of(allowedBasePath)
                                 .toRealPath()
                                 .normalize();
-            if (basePath == null) {
-                throw new IOException("Null base path can not be provided for validation");
-            }
             Path resolvedPath = basePath.resolve(file).toRealPath().normalize();
             if (resolvedPath.startsWith(basePath)) {
                 return resolvedPath;
@@ -116,8 +112,8 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get an input stream after validating file path. Adds NOFOLLOW_LINKS link option to
-     * help ensure some extra safety since new files can't use toRealPath() for link calculation
+     * Get an output stream after validating file path. New files can't use toRealPath() for link calculation so
+     * there is a bit of a trade-off in allowing some symlink traversal to occur
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
@@ -126,6 +122,6 @@ public final class SecureFileAccess {
     public static OutputStream getOutputStream(String unvalidatedFile, List<String> allowedBasePaths, String purpose)
             throws IOException {
         Path validatedFile = validatePathForWrite(unvalidatedFile, allowedBasePaths, purpose);
-        return Files.newOutputStream(validatedFile, LinkOption.NOFOLLOW_LINKS);
+        return Files.newOutputStream(validatedFile);
     }
 }
