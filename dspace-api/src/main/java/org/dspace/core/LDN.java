@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
@@ -27,12 +26,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -59,18 +56,6 @@ public class LDN {
 
     /** Velocity template settings. */
     private static final String RESOURCE_REPOSITORY_NAME = "LDN";
-    private static final Properties VELOCITY_PROPERTIES = new Properties();
-    static {
-        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADERS, "string");
-        VELOCITY_PROPERTIES.put("resource.loader.string.description",
-                "Velocity StringResource loader");
-        VELOCITY_PROPERTIES.put("resource.loader.string.class",
-                StringResourceLoader.class.getName());
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.name",
-                RESOURCE_REPOSITORY_NAME);
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.static",
-                "false");
-    }
 
     /** Velocity template for the message*/
     private Template template;
@@ -79,7 +64,7 @@ public class LDN {
     private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
     private static final String dspaceDir = configurationService.getProperty("dspace.dir", "/dspace");
-    private static final String[] DEFAULT_TEMPLATE_PATHS = new String[]{ 
+    private static final String[] DEFAULT_TEMPLATE_PATHS = new String[]{
         dspaceDir + File.separatorChar + "config" + File.separatorChar + "ldn"};
 
     /**
@@ -121,9 +106,6 @@ public class LDN {
      * @throws IOException        if IO error
      */
     public String generateLDNMessage() {
-        ConfigurationService config
-            = DSpaceServicesFactory.getInstance().getConfigurationService();
-
         VelocityEngine templateEngine = new VelocityEngine();
         templateEngine.init(Utils.getSecureVelocityProperties(RESOURCE_REPOSITORY_NAME));
 
@@ -173,10 +155,16 @@ public class LDN {
     public static LDN getLDNMessage(String ldnMessageFile)
         throws IOException {
         StringBuilder contentBuffer = new StringBuilder();
-        List<String> allowedBasePaths = Arrays.stream(configurationService
-                .getArrayProperty("ldn.template.path", DEFAULT_TEMPLATE_PATHS)).toList();
+        List<String> allowedBasePaths = List.of(
+                Arrays.stream(configurationService
+                                .getArrayProperty("ldn.template.path", DEFAULT_TEMPLATE_PATHS))
+                        .findFirst()
+                        .orElseThrow(() -> new IOException("No LDN template path configured"))
+        );
+        String ldnFilePath = SecureFileAccess.calculateAbsolutePathUsingBaseDir(ldnMessageFile,
+                allowedBasePaths.getFirst());
         try (
-            InputStream is = SecureFileAccess.getInputStream(ldnMessageFile, allowedBasePaths, "ldn");
+            InputStream is = SecureFileAccess.getInputStream(ldnFilePath, allowedBasePaths, "ldn");
             InputStreamReader ir = new InputStreamReader(is, "UTF-8");
             BufferedReader reader = new BufferedReader(ir);
             ) {

@@ -32,12 +32,18 @@ public final class SecureFileAccess {
      * before validation, as this breaks for new files which don't yet exist. This can make the resulting
      * validation still vulnerable to symlink traversal in some cases
      * @param file the unvalidated file, usually derived from user input or configuration
+     *             This MUST be an absolute path, and the caller is expected to calculate it based on best
+     *             context (e.g. configured base path, CWD, dspace.dir, and so on)
      * @param allowedBasePaths list of allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
     public static Path validatePathForWrite(String file, List<String> allowedBasePaths, String purpose)
             throws IOException {
+        Path filePath = Path.of(file);
+        if (!filePath.isAbsolute()) {
+            throw new IOException("Absolute path required for I/O (%s): %s".formatted(purpose, file));
+        }
         for (String allowedBasePath : allowedBasePaths) {
             Path basePath = Path.of(allowedBasePath)
                                 .toRealPath()
@@ -50,7 +56,7 @@ public final class SecureFileAccess {
                 return resolvedPath;
             }
         }
-        
+
         // If no valid path was resolved and returned by now
         // we raise an exception and treat this as illegal access
         throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
@@ -61,12 +67,18 @@ public final class SecureFileAccess {
      * More secure than the 'write' variant because we can explicitly resolve links as well.
      *
      * @param file the unvalidated file, usually derived from user input or configuration
+     *             This MUST be an absolute path, and the caller is expected to calculate it based on best
+     *             context (e.g. configured base path, CWD, dspace.dir, and so on)
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
      * @throws IOException on validation failure
      */
     public static Path validatePathForRead(String file, List<String> allowedBasePaths, String purpose)
             throws IOException {
+        Path filePath = Path.of(file);
+        if (!filePath.isAbsolute()) {
+            throw new IOException("Absolute path required for I/O (%s): %s".formatted(purpose, file));
+        }
         for (String allowedBasePath : allowedBasePaths) {
             Path basePath = Path.of(allowedBasePath)
                                 .toRealPath()
@@ -123,5 +135,35 @@ public final class SecureFileAccess {
             throws IOException {
         Path validatedFile = validatePathForWrite(unvalidatedFile, allowedBasePaths, purpose);
         return Files.newOutputStream(validatedFile);
+    }
+
+    /**
+     * Calculate an absolute path (if not already absolute) using current working dir as a root
+     * for relative file paths
+     * @param file the relative or absolute file given as input
+     * @return absolute path calculated from file and cwd
+     */
+    public static String calculateAbsolutePathUsingCwd(String file) {
+        String filePath = file;
+        Path path = Path.of(filePath);
+        if (!path.isAbsolute()) {
+            filePath = Path.of("").toAbsolutePath().resolve(path).normalize().toString();
+        }
+        return filePath;
+    }
+
+    /**
+     * Calculate an absolute path (if not already absolute) using a given base dir as a root
+     * for relative file paths
+     * @param file the relative or absolute file given as input
+     * @return absolute path calculated from file and base dir
+     */
+    public static String calculateAbsolutePathUsingBaseDir(String file, String baseDir) {
+        String filePath = file;
+        Path path = Path.of(filePath);
+        if (!path.isAbsolute()) {
+            filePath = Path.of(baseDir).toAbsolutePath().resolve(path).normalize().toString();
+        }
+        return filePath;
     }
 }
