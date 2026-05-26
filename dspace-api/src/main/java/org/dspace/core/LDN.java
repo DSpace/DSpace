@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
@@ -156,10 +155,16 @@ public class LDN {
     public static LDN getLDNMessage(String ldnMessageFile)
         throws IOException {
         StringBuilder contentBuffer = new StringBuilder();
-        List<String> allowedBasePaths = Arrays.stream(configurationService
-                .getArrayProperty("ldn.template.path", DEFAULT_TEMPLATE_PATHS)).toList();
+        List<String> allowedBasePaths = List.of(
+                Arrays.stream(configurationService
+                                .getArrayProperty("ldn.template.path", DEFAULT_TEMPLATE_PATHS))
+                        .findFirst()
+                        .orElseThrow(() -> new IOException("No LDN template path configured"))
+        );
+        String ldnFilePath = SecureFileAccess.calculateAbsolutePathUsingBaseDir(ldnMessageFile,
+                allowedBasePaths.get(0));
         try (
-            InputStream is = SecureFileAccess.getInputStream(ldnMessageFile, allowedBasePaths, "ldn");
+            InputStream is = SecureFileAccess.getInputStream(ldnFilePath, allowedBasePaths, "ldn");
             InputStreamReader ir = new InputStreamReader(is, "UTF-8");
             BufferedReader reader = new BufferedReader(ir);
             ) {

@@ -17,6 +17,8 @@ import java.io.PrintStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -114,14 +116,15 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         } else if (commandLine.hasOption('T')) {
             // load taskFile
             BufferedReader reader = null;
+            // in this case, Curation CLI expects to calculate the -T parameter from the user's current working dir
+            String taskFilePath = SecureFileAccess.calculateAbsolutePathUsingCwd(this.taskFile);
             try {
                 String dspaceDir = DSpaceServicesFactory.getInstance()
                     .getConfigurationService().getProperty("dspace.dir");
-                List<String> allowedTaskFileBasePath = Arrays.stream(
-                        DSpaceServicesFactory.getInstance().getConfigurationService()
-                        .getArrayProperty("curate.taskfile.base", new String[]{dspaceDir})
-                        ).toList();
-                reader = SecureFileAccess.getBufferedReader(this.taskFile, allowedTaskFileBasePath,
+                List<String> allowedTaskFileBasePath = new ArrayList<>(
+                        Arrays.asList(DSpaceServicesFactory.getInstance().getConfigurationService()
+                        .getArrayProperty("curate.taskfile.base", new String[]{dspaceDir})));
+                reader = SecureFileAccess.getBufferedReader(taskFilePath, allowedTaskFileBasePath,
                         "curation-taskfile", StandardCharsets.UTF_8);
                 while ((taskName = reader.readLine()) != null) {
                     if (verbose) {
@@ -200,19 +203,20 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         OutputStream reporterStream;
         String dspaceDir = DSpaceServicesFactory.getInstance()
             .getConfigurationService().getProperty("dspace.dir");
-        List<String> allowedReporterBasePaths = Arrays.stream(
-            DSpaceServicesFactory.getInstance()
-            .getConfigurationService().getArrayProperty("curate.reporter.base",
-                    new String[]{dspaceDir + File.separatorChar + "log"})).toList();
+        List<String> allowedReporterBasePaths = new ArrayList<>(Arrays.asList(DSpaceServicesFactory.getInstance()
+                .getConfigurationService().getArrayProperty("curate.reporter.base",
+                        new String[]{dspaceDir + File.separatorChar + "log"})));
         if (null == this.reporter) {
             reporterStream = NullOutputStream.INSTANCE;
         } else if ("-".equals(this.reporter)) {
             reporterStream = System.out;
         } else {
+            // Reporter param comes from CLI execution. Calculate abs path from user's current working dir
+            String reporterFilePath = SecureFileAccess.calculateAbsolutePathUsingCwd(this.reporter);
             try {
                 reporterStream = new PrintStream(
                     SecureFileAccess.getOutputStream(
-                    this.reporter, allowedReporterBasePaths, "curation-reporter"));
+                    reporterFilePath, allowedReporterBasePaths, "curation-reporter"));
             } catch (IOException e) {
                 throw new FileNotFoundException(e.getLocalizedMessage());
             }
