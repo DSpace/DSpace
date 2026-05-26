@@ -59,9 +59,6 @@ public enum CurationClientOptions {
             "Id (handle) of object to perform task on, or 'all' to perform on whole repository");
         options.addOption("p", "parameter", true, "a task parameter 'NAME=VALUE'");
         options.addOption("q", "queue", true, "name of task queue to process");
-        options.addOption("r", "reporter", true,
-            "relative or absolute path to the desired report file. Use '-' to report to console. If absent, no " +
-            "reporting");
         options.addOption("s", "scope", true,
             "transaction scope to impose: use 'object', 'curation', or 'open'. If absent, 'open' applies");
         options.addOption("v", "verbose", false, "report activity to stdout");
