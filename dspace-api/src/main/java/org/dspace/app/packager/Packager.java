@@ -1065,8 +1065,7 @@ public class Packager {
                     + initUUID + ", skipping.");
             return;
         }
-        String parentEntityTypeLabel = itemService
-                .getMetadataFirstValue(parentItem, "dspace", "entity", "type", null);
+        String parentEntityTypeLabel = itemService.getEntityTypeLabel(parentItem);
 
         for (String key : relsMap.keySet()) {
             for (String childUUIDString : relsMap.get(key)) {
@@ -1083,8 +1082,7 @@ public class Packager {
                     continue;
                 }
 
-                String childEntityTypeLabel = itemService.getMetadataFirstValue(
-                        childItem, "dspace", "entity", "type", null);
+                String childEntityTypeLabel = itemService.getEntityTypeLabel(childItem);
 
                 List<RelationshipType> relTypes = relationshipTypeService
                         .findByLeftwardOrRightwardTypeName(context, key);
