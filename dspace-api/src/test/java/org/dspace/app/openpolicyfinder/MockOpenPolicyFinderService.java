@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderPublisherResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderResponse;
 
@@ -65,7 +67,15 @@ public class MockOpenPolicyFinderService extends OpenPolicyFinderService {
                 }
 
                 // Parse JSON input stream and return response for later evaluation
-                return new OpenPolicyFinderResponse(content, OpenPolicyFinderResponse.ResponseFormat.JSON);
+                OpenPolicyFinderResponse response =
+                    new OpenPolicyFinderResponse(content, OpenPolicyFinderResponse.ResponseFormat.JSON);
+
+                // Apply pagination to mock results
+                if (response.getJournals() != null) {
+                    applyStartAndLimit(response.getJournals(), start, limit);
+                }
+
+                return response;
 
             } catch (URISyntaxException e) {
                 // This object will be marked as having an error for later evaluation
@@ -118,9 +128,11 @@ public class MockOpenPolicyFinderService extends OpenPolicyFinderService {
                 content = getClass().getResourceAsStream("plos.json");
 
                 // Parse JSON input stream and return response for later evaluation
-                return new OpenPolicyFinderPublisherResponse(content,
-                    OpenPolicyFinderPublisherResponse.ResponseFormat.JSON);
+                OpenPolicyFinderPublisherResponse response = new OpenPolicyFinderPublisherResponse(content,
+                                                                 OpenPolicyFinderPublisherResponse.ResponseFormat.JSON);
 
+                applyStartAndLimit(response.getPublishers(), start, limit);
+                return response;
             } catch (URISyntaxException e) {
                 // This object will be marked as having an error for later evaluation
                 return new OpenPolicyFinderPublisherResponse(e.getMessage());
@@ -134,6 +146,32 @@ public class MockOpenPolicyFinderService extends OpenPolicyFinderService {
             // This object will be marked as having an error for later evaluation
             return new OpenPolicyFinderPublisherResponse(e.getMessage());
         }
+    }
+
+    @Override
+    public int performCountRequest(String type, String field, String predicate, String value) {
+        OpenPolicyFinderResponse opfResponse = performRequest(type, field, predicate, value, 0, 0);
+        if (opfResponse != null && CollectionUtils.isNotEmpty(opfResponse.getJournals())) {
+            return opfResponse.getJournals().size();
+        }
+        return 0;
+    }
+
+    private <T> void applyStartAndLimit(List<T> list, int start, int limit) {
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+
+        start = Math.max(start, 0);
+        limit = limit > 0 ? limit : Integer.MAX_VALUE;
+
+        List<T> subList = list.stream()
+                              .skip(start)
+                              .limit(limit)
+                              .toList();
+
+        list.clear();
+        list.addAll(subList);
     }
 
 }

@@ -63,4 +63,12 @@
     	class="org.dspace.content.authority.OpenAIRECodeExtraMetadataGenerator">
      </bean>
 
+     <bean id="org.dspace.content.authority.OpenPolicyFinderExtraPublisherMetadataGenerator"
+    	class="org.dspace.content.authority.OpenPolicyFinderExtraPublisherMetadataGenerator">
+    	<property name="relatedInputFormMetadata" value="dc_publisher"/>
+     </bean>
+     <bean id="org.dspace.content.authority.OpenPolicyFinderExtraISSNmetadataGenerator"
+    	class="org.dspace.content.authority.OpenPolicyFinderExtraISSNmetadataGenerator">
+    	<property name="relatedInputFormMetadata" value="dc_relation_issn"/>
+     </bean>
 </beans>

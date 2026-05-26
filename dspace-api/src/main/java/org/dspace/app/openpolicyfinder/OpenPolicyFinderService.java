@@ -26,6 +26,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderFormat;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderPublisherResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderUtils;
@@ -264,8 +265,7 @@ public class OpenPolicyFinderService {
                 try (CloseableHttpResponse response = client.execute(method)) {
                     int statusCode = response.getStatusLine().getStatusCode();
 
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
+                    log.debug("{}: {}", statusCode, response.getStatusLine().getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
                         opfResponse = new OpenPolicyFinderResponse(
@@ -330,6 +330,58 @@ public class OpenPolicyFinderService {
     }
 
     /**
+     * Perform an API request to the Open Policy Finder API to count the results related to the given parameters.
+     *
+     * @param type      entity type eg "publication" or "publisher"
+     * @param field     field eg "issn" or "title"
+     * @param predicate predicate eg "equals" or "contains-word"
+     * @param value     the actual value to search for (eg an ISSN or partial title)
+     * @return the count
+     */
+    public int performCountRequest(String type, String field, String predicate, String value) {
+        // API Key is *required* for v2 API calls
+        if (null == apiKey) {
+            log.error("Open Policy Finder API Key missing: " +
+                      "please register for an API key and set openpolicyfinder.apikey");
+            return 0;
+        }
+
+        HttpGet method = null;
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
+            Thread.sleep(sleepBetweenTimeouts);
+
+            method = constructHttpGet(type, field, predicate, value, OpenPolicyFinderFormat.IDS, 0, 0);
+
+            try (CloseableHttpResponse response = client.execute(method)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+
+                if (statusCode != HttpStatus.SC_OK) {
+                    String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                    log.error("Error from OpenPolicyFinder HTTP request: " + errorBody);
+                    return 0;
+                }
+
+                HttpEntity responseBody = response.getEntity();
+                if (responseBody == null) {
+                    log.debug("Empty OpenPolicyFinder response body for query on " + value);
+                    return 0;
+                }
+
+                String responseContent = IOUtils.toString(responseBody.getContent(), StandardCharsets.UTF_8);
+                return (int) responseContent.lines().count();
+            }
+
+        } catch (Exception ex) {
+            log.error("An error occurs counting the OpenPolicyFinder entries", ex);
+            return 0;
+        } finally {
+            if (method != null) {
+                method.releaseConnection();
+            }
+        }
+    }
+
+    /**
      * Construct HTTP GET object for a "field,predicate,value" query with default start, limit
      * eg. "title","contains-word","Lancet" or "issn","equals","1234-1234"
      * @param field the field (issn, title, etc)
@@ -356,6 +408,24 @@ public class OpenPolicyFinderService {
      */
     public HttpGet constructHttpGet(String type, String field, String predicate, String value, int start, int limit)
         throws URISyntaxException {
+        return constructHttpGet(type, field, predicate, value, OpenPolicyFinderFormat.JSON, start, limit);
+    }
+
+    /**
+     * Construct HTTP GET object for a "field,predicate,value" query
+     * eg. "title","contains-word","Lancet" or "issn","equals","1234-1234"
+     *
+     * @param field     the field (issn, title, etc)
+     * @param predicate the predicate (contains-word, equals, etc - see API docs)
+     * @param value     the query value itself
+     * @param format    the requested format
+     * @param start     row offset
+     * @param limit     number of results to return
+     * @return HttpGet object to be executed by the client
+     * @throws URISyntaxException
+     */
+    public HttpGet constructHttpGet(String type, String field, String predicate, String value,
+                                    OpenPolicyFinderFormat format, int start, int limit) throws URISyntaxException {
         // Sanitise query string (strip some characters) field, predicate and value
         if (null == type) {
             type = "publication";
@@ -369,7 +439,7 @@ public class OpenPolicyFinderService {
         URIBuilder uriBuilder = new URIBuilder(endpoint);
         uriBuilder.addParameter("item-type", type);
         uriBuilder.addParameter("filter", "[[\"" + field + "\",\"" + predicate + "\",\"" + value + "\"]]");
-        uriBuilder.addParameter("format", "Json");
+        uriBuilder.addParameter("format", format.getValue());
         // Set optional start (offset) and limit parameters
         if (start >= 0) {
             uriBuilder.addParameter("offset", String.valueOf(start));
@@ -378,7 +448,7 @@ public class OpenPolicyFinderService {
             uriBuilder.addParameter("limit", String.valueOf(limit));
         }
 
-        log.debug("Open Policy Finder API URL: " + uriBuilder.toString());
+        log.debug("Open Policy Finder API URL: {}", uriBuilder);
 
         // Create HTTP GET object
         HttpGet method = new HttpGet(uriBuilder.build());
@@ -422,8 +492,8 @@ public class OpenPolicyFinderService {
             log.warn("No ISSN supplied as query string for Open Policy Finder service search");
         }
         uriBuilder.addParameter("filter", "[[\"issn\",\"equals\",\"" + query + "\"]]");
-        uriBuilder.addParameter("format", "Json");
-        log.debug("Would search Open Policy Finder endpoint with " + uriBuilder.toString());
+        uriBuilder.addParameter("format", OpenPolicyFinderFormat.JSON.getValue());
+        log.debug("Would search Open Policy Finder endpoint with {}", uriBuilder);
 
         // Return final built URI
         return uriBuilder.build();
