@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -252,7 +253,11 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void testLDNIllegalPath() throws Exception {
         try {
-            LDN.getLDNMessage("../modules/dspace.cfg");
+            String badAbsolutePath = Path.of(configurationService.getProperty("dspace.dir"))
+                .resolve("config/dspace.cfg")
+                .toAbsolutePath()
+                .toString();
+            LDN.getLDNMessage(badAbsolutePath);
             fail("IOException should have been thrown for illegal template path");
         } catch (IOException e) {
             assertTrue(e.getMessage().contains("Illegal file path attempted for I/O (ldn):"));

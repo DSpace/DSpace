@@ -116,6 +116,8 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         } else if (commandLine.hasOption('T')) {
             // load taskFile
             BufferedReader reader = null;
+            // in this case, Curation CLI expects to calculate the -T parameter from the user's current working dir
+            String taskFilePath = SecureFileAccess.calculateAbsolutePathUsingCwd(this.taskFile);
             try {
                 String dspaceDir = DSpaceServicesFactory.getInstance()
                     .getConfigurationService().getProperty("dspace.dir");
@@ -123,7 +125,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
                         DSpaceServicesFactory.getInstance().getConfigurationService()
                         .getArrayProperty("curate.taskfile.base", new String[]{dspaceDir})
                         ).toList();
-                reader = SecureFileAccess.getBufferedReader(this.taskFile, allowedTaskFileBasePath,
+                reader = SecureFileAccess.getBufferedReader(taskFilePath, allowedTaskFileBasePath,
                         "curation-taskfile", StandardCharsets.UTF_8);
                 while ((taskName = reader.readLine()) != null) {
                     if (verbose) {
@@ -211,10 +213,12 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         } else if ("-".equals(this.reporter)) {
             reporterStream = System.out;
         } else {
+            // Reporter param comes from CLI execution. Calculate abs path from user's current working dir
+            String reporterFilePath = SecureFileAccess.calculateAbsolutePathUsingCwd(this.reporter);
             try {
                 reporterStream = new PrintStream(
                     SecureFileAccess.getOutputStream(
-                    this.reporter, allowedReporterBasePaths, "curation-reporter"));
+                    reporterFilePath, allowedReporterBasePaths, "curation-reporter"));
             } catch (IOException e) {
                 throw new FileNotFoundException(e.getLocalizedMessage());
             }
