@@ -569,7 +569,6 @@ public final class Utils {
                 "java.lang.Class,java.lang.Runtime,java.lang.System");
         secureVelocityProperties.setProperty( "introspector.restrict.packages",
                 "java.lang.reflect,java.io,java.nio");
-        secureVelocityProperties.setProperty("runtime.strict_mode.enable", "true");
 
         return secureVelocityProperties;
     }
