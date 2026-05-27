@@ -112,9 +112,6 @@ public final class Utils {
         "dspace.name", "dspace.shortname", "dspace.ui.url",
         "mail.helpdesk", "mail.message.helpdesk.telephone", "mail.admin", "mail.admin.name"};
 
-    private static final ConfigurationService configurationService =
-            DSpaceServicesFactory.getInstance().getConfigurationService();
-
     /**
      * Private constructor
      */
@@ -525,6 +522,8 @@ public final class Utils {
     public static Map<String, String> getAllowedTemplateConfig() {
         // Pass a restricted (via configuration) list of resolved Configuration keys and values, for
         // template lookup
+        ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
         List<String> allowedConfigurationKeys = List.of(configurationService.getArrayProperty(
                     "message.templates.allowed-config", DEFAULT_ALLOWED_TEMPLATE_CONFIGS));
         return allowedConfigurationKeys.stream()
