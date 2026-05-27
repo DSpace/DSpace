@@ -23,6 +23,7 @@ public class CurationCliScriptConfiguration extends CurationScriptConfiguration<
         options.addOption("r", "reporter", true,
             "relative or absolute path to the desired report file. Use '-' to report to console. If absent, no " +
             "reporting");
+        options.addOption("T", "taskfile", true, "file containing curation task names");
         return options;
     }
 }
