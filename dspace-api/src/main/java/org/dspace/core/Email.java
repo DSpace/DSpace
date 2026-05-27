@@ -596,7 +596,7 @@ public class Email {
             System.out.println(" - To: " + to);
             System.out.println(" - Subject: " + subject);
             System.out.println(" - Server: " + server);
-            boolean disabled = configurationService.getBooleanProperty("mail.server.disabled", false);
+            boolean disabled = getConfigurationService().getBooleanProperty("mail.server.disabled", false);
             if (disabled) {
                 System.err.println("\nError sending email:");
                 System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
