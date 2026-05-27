@@ -7,6 +7,7 @@
  */
 package org.dspace.license;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,11 +64,15 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
      */
     @Override
     public Map<String, CCLicense> retrieveLicenses(String language) {
+        List<String> excluded = Arrays.asList(configurationService.getArrayProperty("cc.license.classfilter "));
         Map<String, CCLicense> licenses = new LinkedHashMap<>();
 
         for (CCLicenseCSVRow row : csvRepo.getEntryPoints()) {
 
             if ("CC_GROUP".equals(row.getEntryPoint())) {
+                if (excluded.contains("standard")) {
+                    continue;
+                }
                 String id = "CC " + row.getVersion();
                 boolean includeJurisdiction = "3.0".equals(row.getVersion());
 
@@ -83,6 +88,12 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
                     );
                 }
             } else if ("DIRECT".equals(row.getEntryPoint())) {
+                if (excluded.contains("publicdomain") && "publicdomain".equalsIgnoreCase(row.getCategory())) {
+                    continue;
+                }
+                if (excluded.contains("mark") && "mark".equalsIgnoreCase(row.getUnit())) {
+                    continue;
+                }
                 licenses.put(
                         row.getId(),
                         new CCLicense(
@@ -109,22 +120,28 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
      */
     private CCLicense buildCCLicense(String id, String label, boolean includeJurisdiction) {
         CCLicenseField commercial = new CCLicenseField(
-                FIELD_COMMERCIAL, "Allow commercial uses of your work?", "",
-                List.of(new CCLicenseFieldEnum("y", "Yes (visitors may copy, distribute, display and perform your " +
-                                        "Submission for any purpose, including commercial purposes)", ""),
-                        new CCLicenseFieldEnum("n", "No (visitors may copy, distribute, display and perform your " +
-                                        "Submission, but only for non-commercial purposes)", "")
+                FIELD_COMMERCIAL,
+                "cc-license.commercial.label",
+                "cc-license.commercial.hint",
+                List.of(
+                    new CCLicenseFieldEnum("y", "cc-license.commercial.option.yes.label",
+                            "cc-license.commercial.option.yes.hint"),
+                    new CCLicenseFieldEnum("n", "cc-license.commercial.option.no.label",
+                            "cc-license.commercial.option.no.hint")
                 )
         );
 
-        CCLicenseField derivatives = new CCLicenseField(FIELD_DERIVATIVES, "Allow modifications of your work?", "",
+        CCLicenseField derivatives = new CCLicenseField(
+                FIELD_DERIVATIVES,
+                "cc-license.derivatives.label",
+                "cc-license.derivatives.hint",
                 List.of(
-                        new CCLicenseFieldEnum("y", "Yes", ""),
-                        new CCLicenseFieldEnum("sa", "ShareAlike (visitors are permitted to copy, display," +
-                                " perform and modify your Submission, as long as they distribute the modified" +
-                                " version on similar use terms)", ""),
-                        new CCLicenseFieldEnum("n", "No (visitors are only permitted to copy and distribute" +
-                                " unaltered versions of your Submission)", "")
+                    new CCLicenseFieldEnum("y", "cc-license.derivatives.option.yes.label",
+                            "cc-license.derivatives.option.yes.hint"),
+                    new CCLicenseFieldEnum("sa", "cc-license.derivatives.option.sharealike.label",
+                            "cc-license.derivatives.option.sharealike.hint"),
+                    new CCLicenseFieldEnum("n", "cc-license.derivatives.option.no.label",
+                            "cc-license.derivatives.option.no.hint")
                 )
         );
 
@@ -136,11 +153,10 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
         // codes that appear under version 3.0 in the CSV.
         CCLicenseField jurisdiction = new CCLicenseField(
                 FIELD_JURISDICTION,
-                "Jurisdiction",
-                "",
+                "cc-license.jurisdiction.label",
+                "cc-license.jurisdiction.hint",
                 buildJurisdictionEnums()
         );
-
 
         return new CCLicense(id, label, List.of(commercial, derivatives, jurisdiction));
     }
