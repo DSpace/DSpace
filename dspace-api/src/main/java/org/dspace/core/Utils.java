@@ -29,16 +29,23 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.coverity.security.Escape;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -100,6 +107,11 @@ public final class Utils {
             = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
 
     private static final Calendar outCal = GregorianCalendar.getInstance();
+
+    // Allowed configuration properties to pass to Velocity templates (Email, LDN)
+    private static final String[] DEFAULT_ALLOWED_TEMPLATE_CONFIGS = {
+        "dspace.name", "dspace.shortname", "dspace.ui.url",
+        "mail.helpdesk", "mail.message.helpdesk.telephone", "mail.admin", "mail.admin.name"};
 
     /**
      * Private constructor
@@ -505,6 +517,65 @@ public final class Utils {
     public static String interpolateConfigsInString(String string) {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
+    }
+
+    /**
+     * Get a list of allowed DSpace configuration property keys that will be exposed to Velocity templates
+     * (used in Email and LDN messages) as a simple Map of strings.
+     * @return Map of strings representing resolved configuration properties
+     */
+    public static Map<String, String> getAllowedTemplateConfig() {
+        // Pass a restricted (via configuration) list of resolved Configuration keys and values, for
+        // template lookup
+        ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+        List<String> allowedConfigurationKeys = List.of(configurationService.getArrayProperty(
+                    "message.templates.allowed-config", DEFAULT_ALLOWED_TEMPLATE_CONFIGS));
+        return allowedConfigurationKeys.stream()
+            .map(key -> {
+                String value = configurationService.getProperty(key);
+                return value != null ? Map.entry(key, value) : null;
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                        ));
+    }
+
+    /**
+     * Create and return a set of default, secure Velocity configuration properties.
+     * @see {@link LDN}, {@link Email}
+     *
+     * @param resourceRepositoryName the templating context e.g. "LDN", "Email"
+     * @returns secure Velocity configuration for use with templating
+     */
+    public static Properties getSecureVelocityProperties(String resourceRepositoryName) {
+        Properties secureVelocityProperties = new Properties();
+        // Basic Velocity configuration
+        secureVelocityProperties.setProperty(Velocity.RESOURCE_LOADERS, "string");
+        secureVelocityProperties.setProperty("resource.loader.string.description",
+                "Velocity StringResource loader");
+        secureVelocityProperties.setProperty("resource.loader.string.class",
+                StringResourceLoader.class.getName());
+        secureVelocityProperties.setProperty("resource.loader.string.repository.name",
+                resourceRepositoryName);
+        secureVelocityProperties.setProperty("resource.loader.string.repository.static",
+                "false");
+        // Set secure default introspection and class restriction handling in Velocity
+        secureVelocityProperties.setProperty("introspector.uberspect.class",
+                "org.apache.velocity.util.introspection.SecureUberspector");
+        secureVelocityProperties.setProperty("introspector.restrict.classes",
+                "java.lang.Class,java.lang.Runtime,java.lang.System");
+        secureVelocityProperties.setProperty( "introspector.restrict.packages",
+                "java.lang.reflect,java.io,java.nio");
+        // Set strict mode if configured (default: false, as we've always treated null values as blanks)
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getBooleanProperty("message.templates.strict_mode", false)) {
+            secureVelocityProperties.setProperty("runtime.strict_mode.enable", "true");
+        }
+
+        return secureVelocityProperties;
     }
 
 }
