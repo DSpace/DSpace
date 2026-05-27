@@ -336,7 +336,10 @@ public class Email {
     public void send() throws MessagingException, IOException {
         build();
 
-        if (isMailServerDisabled(configurationService)) {
+        ConfigurationService config
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
+        if (disabled) {
             LOG.info(format(message, body));
         } else {
             Transport.send(message);
