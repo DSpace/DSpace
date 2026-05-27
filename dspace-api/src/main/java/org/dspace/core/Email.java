@@ -175,9 +175,6 @@ public class Email {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    private static final ConfigurationService configurationService =
-            DSpaceServicesFactory.getInstance().getConfigurationService();
-
     /** Velocity template settings. */
     private static final String RESOURCE_REPOSITORY_NAME = "Email";
 
@@ -200,6 +197,13 @@ public class Email {
         template = null;
         replyTo = null;
         charset = null;
+    }
+
+    /**
+     * Get configuration service
+     */
+    private static ConfigurationService getConfigurationService() {
+        return DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
     /**
@@ -343,7 +347,7 @@ public class Email {
     public void send() throws MessagingException, IOException {
         build();
 
-        if (isMailServerDisabled(configurationService)) {
+        if (isMailServerDisabled(getConfigurationService())) {
             LOG.info(format(message, body));
         } else {
             Transport.send(message);
@@ -372,11 +376,11 @@ public class Email {
         }
 
         // Get the mail configuration properties
-        String from = configurationService.getProperty("mail.from.address");
+        String from = getConfigurationService().getProperty("mail.from.address");
 
         // If no character set specified, attempt to retrieve a default
         if (charset == null) {
-            charset = configurationService.getProperty("mail.charset");
+            charset = getConfigurationService().getProperty("mail.charset");
         }
 
         // Get session
@@ -386,10 +390,10 @@ public class Email {
         message = new MimeMessage(session);
 
         // Get the mail configuration properties for catchAllRecipient
-        String[] catchAllRecipient = getCatchAllRecipient(configurationService);
+        String[] catchAllRecipient = getCatchAllRecipient(getConfigurationService());
 
         // Get headers defined by the template.
-        String[] templateHeaders = configurationService.getArrayProperty("mail.message.headers");
+        String[] templateHeaders = getConfigurationService().getArrayProperty("mail.message.headers");
 
         // Format the mail message body
         VelocityContext vctx = new VelocityContext();
