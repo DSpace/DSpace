@@ -339,10 +339,7 @@ public class Email {
      */
     public void send() throws MessagingException, IOException {
         build();
-
-        ConfigurationService config
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-        boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
+        boolean disabled = getConfigurationService().getBooleanProperty("mail.server.disabled", false);
         if (disabled) {
             LOG.info(format(message, body));
         } else {
@@ -575,12 +572,10 @@ public class Email {
      *              message is sent.
      */
     public static void main(String[] args) {
-        ConfigurationService config
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String to = config.getProperty("mail.admin");
+        String to = getConfigurationService().getProperty("mail.admin");
         String subject = "DSpace test email";
-        String server = config.getProperty("mail.server");
-        String url = config.getProperty("dspace.ui.url");
+        String server = getConfigurationService().getProperty("mail.server");
+        String url = getConfigurationService().getProperty("dspace.ui.url");
         Email message;
         try {
             if (args.length <= 0) {
@@ -598,7 +593,7 @@ public class Email {
             System.out.println(" - To: " + to);
             System.out.println(" - Subject: " + subject);
             System.out.println(" - Server: " + server);
-            boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
+            boolean disabled = getConfigurationService().getBooleanProperty("mail.server.disabled", false);
             if (disabled) {
                 System.err.println("\nError sending email:");
                 System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
