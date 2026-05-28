@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
@@ -247,15 +246,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         return VALID_TYPES.contains(bitstream.getFormat(context).getMIMEType());
     }
 
-    @Override
-    public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
-            throws IOException, SQLException {
-        try (var citedDocument = makeCitedDocumentStream(context, bitstream);
-             InputStream inputStream = citedDocument.getInputStream()) {
-            byte[] data = inputStream.readAllBytes();
-            return Pair.of(data, (long) data.length);
-        }
-    }
 
     @Override
     public CitedDocument makeCitedDocumentStream(Context context, Bitstream bitstream)
@@ -284,10 +274,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     private CitedDocument documentAsTempFile(PDDocument document) throws IOException {
         document.setAllSecurityToBeRemoved(true);
-        File tempFile = File.createTempFile("citation-document-", ".pdf", tempDir);
-        tempFile.deleteOnExit();
-        document.save(tempFile);
-        return new TempFileCitedDocument(tempFile);
+        return TempFileCitedDocument.create(tempDir, document);
     }
 
     private static final class TempFileCitedDocument implements CitedDocument {
@@ -297,6 +284,13 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         private TempFileCitedDocument(File file) {
             this.file = file;
             this.length = file.length();
+        }
+
+        private static TempFileCitedDocument create(File tempDir, PDDocument document) throws IOException {
+            File tempFile = File.createTempFile("citation-document-", ".pdf", tempDir);
+            tempFile.deleteOnExit();
+            document.save(tempFile);
+            return new TempFileCitedDocument(tempFile);
         }
 
         @Override

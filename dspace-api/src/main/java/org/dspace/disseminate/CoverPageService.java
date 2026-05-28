@@ -7,6 +7,9 @@
  */
 package org.dspace.disseminate;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -62,9 +65,22 @@ public class CoverPageService {
 
         LOG.debug("Rendering cover document with params = {}", parameters);
 
-        var html = pdfGenerator.parseTemplate(coverTemplate, parameters);
-
-        return pdfGenerator.generate(html);
+        Path htmlTemplateFile = null;
+        try {
+            htmlTemplateFile = Files.createTempFile("citation-cover-template-", ".html");
+            pdfGenerator.parseTemplate(coverTemplate, parameters, htmlTemplateFile);
+            return pdfGenerator.generate(htmlTemplateFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (htmlTemplateFile != null) {
+                try {
+                    Files.deleteIfExists(htmlTemplateFile);
+                } catch (IOException e) {
+                    htmlTemplateFile.toFile().deleteOnExit();
+                }
+            }
+        }
     }
 
     protected Map<String, String> prepareParams(Item item) {
