@@ -2024,7 +2024,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>https://github.com/DSpace/DSpace</url>
-        <tag>HEAD</tag>
+        <tag>dspace-10_x</tag>
     </scm>
 
     <repositories>
