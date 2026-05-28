@@ -124,8 +124,8 @@ public class LiveImportDataProvider extends AbstractExternalDataProvider {
      * FIXME it would be useful to remove ImportRecord at all in favor of the
      * ExternalDataObject
      * 
-     * @param record
-     * @return
+     * @param record the ImportRecord to convert
+     * @return the converted ExternalDataObject
      */
     private ExternalDataObject getExternalDataObject(ImportRecord record) {
         //return 400 if no record were found
