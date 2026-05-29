@@ -26,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.io.ScratchFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.dspace.app.util.XMLUtils;
@@ -97,15 +98,8 @@ public class PdfGenerator {
         var context = new Context();
         context.setVariables(fixTypes(variables));
 
-        try (FileChannel channel = FileChannel.open(
-                outputFile,
-                StandardOpenOption.WRITE,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING
-        ); Writer writer = Channels.newWriter(channel, StandardCharsets.UTF_8.newEncoder(), -1)) {
+        try (var writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8)) {
             templateEngine.process(templateName, context, writer);
-            writer.flush();
-            channel.force(true);
         }
 
         return outputFile;
@@ -159,19 +153,33 @@ public class PdfGenerator {
      * @return resulting pdfbox PDDocument
      */
     public PDDocument generate(Path htmlFile) {
+        Path tempPdfFile = null;
+        DeleteOnCloseRandomAccessRead pdfSource = null;
         try {
-            Path tempPdfFile = Files.createTempFile("citation-cover-", ".pdf");
+            tempPdfFile = Files.createTempFile("citation-cover-", ".pdf");
             try (var out = Files.newOutputStream(tempPdfFile, StandardOpenOption.TRUNCATE_EXISTING,
                     StandardOpenOption.WRITE)) {
                 generate(htmlFile, out);
             }
-            try {
-                return Loader.loadPDF(tempPdfFile.toFile(),
-                        () -> new ScratchFile(MemoryUsageSetting.setupTempFileOnly()));
-            } finally {
-                Files.deleteIfExists(tempPdfFile);
-            }
+            pdfSource = new DeleteOnCloseRandomAccessRead(tempPdfFile);
+            PDDocument document = Loader.loadPDF(pdfSource,
+                    () -> new ScratchFile(MemoryUsageSetting.setupTempFileOnly()));
+            pdfSource = null;
+            return document;
         } catch (IOException e) {
+            if (pdfSource != null) {
+                try {
+                    pdfSource.close();
+                } catch (IOException closeException) {
+                    e.addSuppressed(closeException);
+                }
+            } else if (tempPdfFile != null) {
+                try {
+                    Files.deleteIfExists(tempPdfFile);
+                } catch (IOException deleteException) {
+                    e.addSuppressed(deleteException);
+                }
+            }
             throw new RuntimeException(e);
         }
     }
@@ -193,10 +201,12 @@ public class PdfGenerator {
         try {
             var renderer = new ITextRenderer();
             DocumentBuilder builder = XMLUtils.getDocumentBuilder();
-            Document doc = builder.parse(htmlFile.toFile());
-            renderer.setDocument(doc, null);
-            renderer.layout();
-            renderer.createPDF(out);
+            try (var in = Files.newInputStream(htmlFile)) {
+                Document doc = builder.parse(in);
+                renderer.setDocument(doc, null);
+                renderer.layout();
+                renderer.createPDF(out);
+            }
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new RuntimeException(e);
         }

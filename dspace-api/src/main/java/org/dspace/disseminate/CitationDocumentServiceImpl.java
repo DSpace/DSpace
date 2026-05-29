@@ -21,7 +21,6 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.dspace.authorize.AuthorizeException;
@@ -266,7 +265,22 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     private PDDocument loadDocumentFromDB(Context context, Bitstream bitstream) {
         try (var inputStream = bitstreamService.retrieve(context, bitstream)) {
-            return Loader.loadPDF(new RandomAccessReadBuffer(inputStream));
+            File tempFile = File.createTempFile("citation-source-", ".pdf", tempDir);
+            tempFile.deleteOnExit();
+            Files.copy(inputStream, tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            var randomAccess = new DeleteOnCloseRandomAccessRead(tempFile.toPath());
+            try {
+                return Loader.loadPDF(randomAccess,
+                        () -> new org.apache.pdfbox.io.ScratchFile(org.apache.pdfbox.io.MemoryUsageSetting.setupTempFileOnly()));
+            } catch (Exception e) {
+                try {
+                    randomAccess.close();
+                } catch (IOException closeException) {
+                    e.addSuppressed(closeException);
+                }
+                throw e;
+            }
         } catch (IOException | SQLException | AuthorizeException e) {
             throw new RuntimeException(e);
         }
@@ -309,7 +323,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
     }
 
-    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDDocument coverPage) {
+    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDDocument coverPage) throws IOException {
         var sourcePages = sourceDocument.getDocumentCatalog().getPages();
         var coverPages = coverPage.getDocumentCatalog().getPages();
 
@@ -317,20 +331,20 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             //citation as cover page
 
             for (var page: coverPages) {
-                document.addPage(page);
+                document.importPage(page);
             }
 
             for (PDPage sourcePage : sourcePages) {
-                document.addPage(sourcePage);
+                document.importPage(sourcePage);
             }
         } else {
             //citation as tail page
             for (PDPage sourcePage : sourcePages) {
-                document.addPage(sourcePage);
+                document.importPage(sourcePage);
             }
 
             for (var page: coverPages) {
-                document.addPage(page);
+                document.importPage(page);
             }
         }
     }
