@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.NumberFormat;
@@ -18,6 +20,8 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
@@ -34,6 +38,8 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -76,6 +82,7 @@ public class OREIngestionCrosswalk
                                                                                    .getBitstreamFormatService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
     @Override
@@ -173,9 +180,13 @@ public class OREIngestionCrosswalk
                 try {
                     // Make sure the url string escapes all the oddball characters
                     String processedURL = encodeForURL(href);
-                    // Generate a request for the aggregated resource
-                    ARurl = new URL(processedURL);
-                    in = ARurl.openStream();
+                    if (validResourceUri(entryId, processedURL)) {
+                        // Generate a request for the aggregated resource
+                        ARurl = new URL(processedURL);
+                        in = ARurl.openStream();
+                    } else {
+                        throw new FileNotFoundException("Failed to validate " + processedURL);
+                    }
                 } catch (FileNotFoundException fe) {
                     log.error("The provided URI failed to return a resource: " + href);
                 } catch (ConnectException fe) {
@@ -250,6 +261,63 @@ public class OREIngestionCrosswalk
         }
 
         return processedString.toString();
+    }
+
+    /**
+     * Validate a resource URI against the host and scheme of the remote OAI endpoint, or a configured
+     * list of allowed prefixes.
+     * This still implicitly "trusts" the remote OAI server, but will reject resource URIs with a totally
+     * different hostname to avoid downloading malicious resources from a compromised endpoint.
+     * Even if the URL prefix validation is disabled, schemes will still be enforced to http(s) so file:/// and
+     * other unwanted schemes cannot be used
+     * @param entryUrl the entryId of the parent ORE resource
+     * @param resourceUrl the resource URL of the aggregated ORE resource
+     * @return result of the validation
+     */
+    private boolean validResourceUri(String entryUrl, String resourceUrl) {
+        try {
+            Set<String> allowedSchemes = Set.of("http", "https");
+            URI entryUri = new URI(entryUrl).normalize();
+            URI resourceUri = new URI(resourceUrl).normalize();
+            String scheme = resourceUri.getScheme();
+
+            if (scheme == null ||
+                    !allowedSchemes.contains(scheme.toLowerCase(Locale.ROOT))) {
+                log.warn("Illegal scheme requested for ORE resource: {}", resourceUri);
+                return false;
+            }
+
+            if (configurationService.getBooleanProperty("oai.harvester.ore.file.validateUrlPrefix", false)) {
+                for (String allowedPrefix : configurationService
+                        .getArrayProperty("oai.harvester.ore.file.allowedUrlPrefix")) {
+                    URI allowedUri = new URI(allowedPrefix).normalize();
+                    // Return true on the first allowed prefix match
+                    if (Objects.equals(resourceUri.getScheme(), allowedUri.getScheme())
+                            && Objects.equals(resourceUri.getHost().toLowerCase(Locale.ROOT),
+                            allowedUri.getHost().toLowerCase(Locale.ROOT))) {
+                        return true;
+                    }
+                }
+
+                // If no allowed prefixes were matched, we require scheme + host to match the remote OAI server
+                if (!Objects.equals(entryUri.getScheme(), resourceUri.getScheme())) {
+                    log.warn("Illegal scheme requested for ORE resource: {}", resourceUri);
+                    return false;
+                }
+                if (!Objects.equals(
+                        entryUri.getHost().toLowerCase(Locale.ROOT),
+                        resourceUri.getHost().toLowerCase(Locale.ROOT))) {
+                    log.warn("Illegal host requested for ORE resource: {}", resourceUri);
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (URISyntaxException e) {
+            log.warn("Could not validate ORE resource URI: {}", resourceUrl);
+            return false;
+        }
     }
 
 }

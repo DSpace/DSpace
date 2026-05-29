@@ -69,6 +69,9 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Autowired
     private EPersonService epersonService;
 
+    /**
+     * Marks any processes left running before the previous shutdown as failed after the application is ready.
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void failRunningProcesses() throws SQLException, AuthorizeException, IOException {
         Context context = new Context();
