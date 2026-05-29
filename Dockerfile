@@ -3,9 +3,9 @@
 #
 # - note: default tag for branch: dspace/dspace: dspace/dspace:latest
 
-# This Dockerfile uses JDK17 by default.
+# This Dockerfile uses JDK21 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
-ARG JDK_VERSION=17
+ARG JDK_VERSION=21
 # The Docker version tag to build from
 ARG DSPACE_VERSION=latest
 # The Docker registry to use for DSpace images. Defaults to "docker.io"
@@ -17,12 +17,13 @@ FROM ${DOCKER_REGISTRY}/dspace/dspace-dependencies:${DSPACE_VERSION} AS build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
+USER root
 RUN mkdir /install \
     && chown -Rv dspace: /install \
     && chown -Rv dspace: /app
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
-ADD --chown=dspace . /app/
+COPY --chown=dspace . /app/
 # Build DSpace
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 # Maven flags here ensure that we skip building test environment and skip all code verification checks.
@@ -40,26 +41,23 @@ ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
-# Create the initial install deployment using ANT
-ENV ANT_VERSION=1.10.13
-ENV ANT_HOME=/tmp/ant-$ANT_VERSION
-ENV PATH=$ANT_HOME/bin:$PATH
-# Download and install 'ant'
-RUN mkdir $ANT_HOME && \
-    curl --silent --show-error --location --fail --retry 5 --output /tmp/apache-ant.tar.gz \
-      https://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
-    tar -zx --strip-components=1 -f /tmp/apache-ant.tar.gz -C $ANT_HOME && \
-    rm /tmp/apache-ant.tar.gz
+# Install Apache Ant
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ant \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Start up DSpace via Runnable JAR
 FROM docker.io/eclipse-temurin:${JDK_VERSION}
-# NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
-ENV DSPACE_INSTALL=/dspace
+# Below syntax may look odd, but it is how to override dspace.cfg settings via env variables.
+# See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
+# "dspace__P__dir" is setting the value of the "dspace.dir" configuration. This is our installation directory.
+ENV dspace__P__dir=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
-COPY --from=ant_build /dspace $DSPACE_INSTALL
-WORKDIR $DSPACE_INSTALL
+COPY --from=ant_build /dspace $dspace__P__dir
+WORKDIR $dspace__P__dir
 # Need host command for "[dspace]/bin/make-handle-config"
 RUN apt-get update \
     && apt-get install -y --no-install-recommends host \
@@ -69,5 +67,5 @@ RUN apt-get update \
 EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
-# On startup, run DSpace Runnable JAR
-ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]
+# On startup, run DSpace Runnable JAR (uses the "dspace.dir" setting defined in "dspace__P__dir" env variable)
+ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar"]

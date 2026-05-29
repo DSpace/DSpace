@@ -10,10 +10,11 @@ package org.dspace.app.ldn.service.impl;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,8 +23,8 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.LDNRouter;
@@ -44,6 +45,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableLDNNotification;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -145,6 +147,12 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         ldnMessage.setActivityStreamType(notificationTypeArrayList.get(0));
         if (notificationTypeArrayList.size() > 1) {
             ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
+        } else {
+            // The Notification's Type array does not include the CoarNotifyType information, e.g. ack notifications
+            // Attempt to find it via the inReplyTo if present
+            if (ldnMessage.getInReplyTo() != null) {
+                ldnMessage.setCoarNotifyType(ldnMessage.getInReplyTo().getCoarNotifyType());
+            }
         }
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         ldnMessage.setSourceIp(sourceIp);
@@ -157,7 +165,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                 ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
             }
         }
-        ldnMessage.setQueueTimeout(new Date());
+        ldnMessage.setQueueTimeout(Instant.now());
 
         update(context, ldnMessage);
         return ldnMessage;
@@ -208,23 +216,23 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         context.addEvent(
             new Event(Event.MODIFY, Constants.LDN_MESSAGE,
                 notificationUUID,
-                IndexableLDNNotification.TYPE, identifiersList));
+                IndexableLDNNotification.TYPE, DetailType.DSO_TYPE, identifiersList));
     }
 
     private DSpaceObject findDspaceObjectByUrl(Context context, String url) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/handle/";
 
-        if (StringUtils.startsWith(url, dspaceUrl)) {
+        if (Strings.CS.startsWith(url, dspaceUrl)) {
             return handleService.resolveToObject(context, url.substring(dspaceUrl.length()));
         }
 
         String handleResolver = configurationService.getProperty("handle.canonical.prefix", "https://hdl.handle.net/");
-        if (StringUtils.startsWith(url, handleResolver)) {
+        if (Strings.CS.startsWith(url, handleResolver)) {
             return handleService.resolveToObject(context, url.substring(handleResolver.length()));
         }
 
         dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/items/";
-        if (StringUtils.startsWith(url, dspaceUrl)) {
+        if (Strings.CS.startsWith(url, dspaceUrl)) {
             return itemService.find(context, UUID.fromString(url.substring(dspaceUrl.length())));
         }
 
@@ -282,9 +290,9 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     msg.setQueueAttempts(msg.getQueueAttempts() + 1);
                     update(context, msg);
                 } else {
-                    msg.setQueueLastStartTime(new Date());
+                    msg.setQueueLastStartTime(Instant.now());
                     msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSING);
-                    msg.setQueueTimeout(DateUtils.addMinutes(new Date(), timeoutInMinutes));
+                    msg.setQueueTimeout(Instant.now().plus(timeoutInMinutes, ChronoUnit.MINUTES));
                     update(context, msg);
                     ObjectMapper mapper = new ObjectMapper();
                     Notification notification = mapper.readValue(msg.getMessage(), Notification.class);
@@ -312,7 +320,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     private boolean isServiceEnabled(LDNMessageEntity msg) {
         String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
-        if (msg.getTarget() == null || StringUtils.equals(msg.getTarget().getLdnUrl(), localInboxUrl)) {
+        if (msg.getTarget() == null || Strings.CS.equals(msg.getTarget().getLdnUrl(), localInboxUrl)) {
             return msg.getOrigin().isEnabled();
         }
         return msg.getTarget().isEnabled();
@@ -368,18 +376,23 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                 offer.setServiceUrl(nse == null ? "" : nse.getUrl());
                 offer.setOfferType(LDNUtils.getNotifyType(msg.getCoarNotifyType()));
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
-                    context, msg, item, "Accept", "TentativeReject", "TentativeAccept", "Announce");
+                    context, msg, item, "Accept", "Reject", "TentativeReject", "TentativeAccept",
+                        "Announce");
                 if (acks == null || acks.isEmpty()) {
                     offer.setStatus(NotifyRequestStatusEnum.REQUESTED);
+                } else if (acks.stream()
+                        .filter(c -> (c.getActivityStreamType().equalsIgnoreCase("TentativeReject")))
+                        .findAny().isPresent()) {
+                    offer.setStatus(NotifyRequestStatusEnum.TENTATIVE_REJECT);
+                } else if (acks.stream()
+                        .filter(c -> (c.getActivityStreamType().equalsIgnoreCase("Reject")))
+                        .findAny().isPresent()) {
+                    offer.setStatus(NotifyRequestStatusEnum.REJECTED);
                 } else if (acks.stream()
                     .filter(c -> (c.getActivityStreamType().equalsIgnoreCase("TentativeAccept") ||
                         c.getActivityStreamType().equalsIgnoreCase("Accept")))
                     .findAny().isPresent()) {
                     offer.setStatus(NotifyRequestStatusEnum.ACCEPTED);
-                } else if (acks.stream()
-                    .filter(c -> c.getActivityStreamType().equalsIgnoreCase("TentativeReject"))
-                    .findAny().isPresent()) {
-                    offer.setStatus(NotifyRequestStatusEnum.REJECTED);
                 }
                 if (acks.stream().filter(
                     c -> c.getActivityStreamType().equalsIgnoreCase("Announce"))
@@ -391,6 +404,32 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         return result;
     }
 
+    @Override
+    public String findEndorsementOrReviewResubmissionIdByItem(Context context, Item item, NotifyServiceEntity service)
+            throws SQLException {
+        List<LDNMessageEntity> msgs = ldnMessageDao.findAllMessagesByItem(
+                context, item, "TentativeReject");
+
+        if (msgs != null && !msgs.isEmpty()) {
+            for (LDNMessageEntity msg : msgs) {
+                // Review and Endorsement are the only patterns supporting resubmissions at present
+                if (msg.getCoarNotifyType().contains("EndorsementAction")
+                        || msg.getCoarNotifyType().contains("ReviewAction")) {
+                    // Only provide the resubmissionReplyTo UUID if the pattern supports resubmission
+                    // Add an extra check to ensure that this is a resubmission: current notification service
+                    // matches the service associated with a previous tentativeReject response. This is to avoid a
+                    // case where a previous version of the item received a tentativeReject from one service
+                    // and the author decides to submit the version to a different service, instead of a resubmission
+                    if (msg.getOrigin() != null && msg.getOrigin().getID().equals(service.getID())) {
+                        // Return the first ID found that will be used in the inReplyTo for a resubmission notification
+                        return msg.getID();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException {
         ldnMessageDao.delete(context, ldnMessage);
     }
@@ -398,7 +437,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     @Override
     public boolean isTargetCurrent(Notification notification) {
         String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
-        return StringUtils.equals(notification.getTarget().getInbox(), localInboxUrl);
+        return Strings.CS.equals(notification.getTarget().getInbox(), localInboxUrl);
     }
 
 }

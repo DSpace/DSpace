@@ -8,12 +8,16 @@
 package org.dspace.app.rest.security.jwt;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-import java.util.Date;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -53,7 +57,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
 
     @Test
     public void testJWTNoEncryption() throws Exception {
-        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = shortLivedJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -64,7 +68,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
     @Test(expected = ParseException.class)
     public void testJWTEncrypted() throws Exception {
         when(shortLivedJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
-        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         StringKeyGenerator keyGenerator = KeyGenerators.string();
         when(configurationService.getProperty("jwt.shortLived.encryption.secret"))
             .thenReturn(keyGenerator.generateKey());
@@ -76,10 +80,9 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
     //temporary set a negative expiration time so the token is invalid immediately
     @Test
     public void testExpiredToken() throws Exception {
-        when(configurationService.getLongProperty("jwt.shortLived.token.expiration", 1800000))
-            .thenReturn(-99999999L);
+        when(shortLivedJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
-        Date previous = new Date(new Date().getTime() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = shortLivedJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         EPerson parsed = shortLivedJWTTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
@@ -87,16 +90,32 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
 
     }
 
+    // Verify that if no session salt is set, one is generated and saved for the user.
+    // This is important as the session salt is used to sign the JWT, so it must be set for the token to be valid.
+    @Test
+    public void testBlankSessionSaltIsGenerated() throws Exception {
+        when(context.getCurrentUser()).thenReturn(ePerson);
+        when(ePerson.getSessionSalt()).thenReturn("");
+        doAnswer(invocation -> invocation.getArgument(1))
+            .when(ePersonService).update(any(Context.class), any(EPerson.class));
+
+        EPerson updated = shortLivedJWTTokenHandler.updateSessionSalt(context, Instant.now());
+
+        assertEquals(ePerson, updated);
+        assertNotNull(updated.getSessionSalt());
+        verify(ePersonService).update(any(Context.class), any(EPerson.class));
+    }
+
     //Try if we can change the expiration date
     @Test
     public void testTokenTampering() throws Exception {
         when(shortLivedJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
-        Date previous = new Date(new Date().getTime() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = shortLivedJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().claim("eid", "epersonID").expirationTime(
-            new Date(System.currentTimeMillis() + 99999999)).build();
+            java.util.Date.from(Instant.now().plus(99999999, ChronoUnit.MILLIS))).build();
         String tamperedPayload = new String(Base64.getUrlEncoder().encode(jwtClaimsSet.toString().getBytes()));
         String[] splitToken = token.split("\\.");
         String tamperedToken = splitToken[0] + "." + tamperedPayload + "." + splitToken[2];
@@ -106,7 +125,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
 
     @Test
     public void testInvalidatedToken() throws Exception {
-        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         // create a new token
         String token = shortLivedJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous);

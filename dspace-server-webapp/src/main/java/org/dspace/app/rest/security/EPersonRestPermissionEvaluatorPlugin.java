@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.patch.Operation;
@@ -104,8 +105,8 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         if (currentRequest != null) {
             HttpServletRequest httpServletRequest = currentRequest.getHttpServletRequest();
             if (!operations.isEmpty()
-                && StringUtils.equalsIgnoreCase(operations.get(0).getOp(), PatchOperation.OPERATION_ADD)
-                && StringUtils.equalsIgnoreCase(operations.get(0).getPath(),
+                && Strings.CI.equals(operations.get(0).getOp(), PatchOperation.OPERATION_ADD)
+                && Strings.CI.equals(operations.get(0).getPath(),
                 EPersonPasswordAddOperation.OPERATION_PASSWORD_CHANGE)
                 && StringUtils.isNotBlank(httpServletRequest.getParameter("token"))) {
                 return true;

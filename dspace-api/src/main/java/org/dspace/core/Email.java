@@ -17,12 +17,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -44,18 +43,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Class representing an e-mail message.  The {@link send} method causes the
+ * Builder representing an e-mail message.  The {@link #send} method causes the
  * assembled message to be formatted and sent.
  * <p>
  * Typical use:
@@ -72,7 +69,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Apache Velocity</a>.  They may contain VTL directives and property
  * placeholders.
  * <p>
- * {@link addArgument(string)} adds a property to the {@code params} array
+ * {@link #addArgument(Object)} adds a property to the {@code params} array
  * in the Velocity context, which can be used to replace placeholder tokens
  * in the message.  These arguments are indexed by number in the order they were
  * added to the message.
@@ -80,9 +77,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * The DSpace configuration properties are also available to templates as the
  * array {@code config}, indexed by name.  Example:  {@code ${config.get('dspace.name')}}
  * <p>
- * Recipients and attachments may be added as needed.  See {@link addRecipient},
- * {@link addAttachment(File, String)}, and
- * {@link addAttachment(InputStream, String, String)}.
+ * Recipients and attachments may be added as needed.  See {@link #addRecipient},
+ * {@link #addAttachment(File, String)}, and
+ * {@link #addAttachment(InputStream, String, String)}.
  * <p>
  * Headers such as Subject may be supplied by the template, by defining them
  * using the VTL directive {@code #set()}.  Only headers named in the DSpace
@@ -125,8 +122,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * </pre>
  * <p>
  * There are two ways to load a message body.  One can create an instance of
- * {@link Email} and call {@link setContent} on it, passing the body as a String.  Or
- * one can use the static factory method {@link getEmail} to load a file by its
+ * {@link Email} and call {@link #setContent} on it, passing the body as a String.  Or
+ * one can use the static factory method {@link #getEmail} to load a file by its
  * complete filesystem path.  In either case the text will be loaded into a
  * Velocity template.
  *
@@ -156,6 +153,11 @@ public class Email {
     private final List<String> recipients;
 
     /**
+     * The CC recipients
+     */
+    private final List<String> ccAddresses;
+
+    /**
      * Reply to field, if any
      */
     private String replyTo;
@@ -168,25 +170,19 @@ public class Email {
      */
     private String charset;
 
+    /** The message being assembled. */
+    MimeMessage message;
+
     private static final Logger LOG = LogManager.getLogger();
 
     /** Velocity template settings. */
     private static final String RESOURCE_REPOSITORY_NAME = "Email";
-    private static final Properties VELOCITY_PROPERTIES = new Properties();
-    static {
-        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADERS, "string");
-        VELOCITY_PROPERTIES.put("resource.loader.string.description",
-                "Velocity StringResource loader");
-        VELOCITY_PROPERTIES.put("resource.loader.string.class",
-                StringResourceLoader.class.getName());
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.name",
-                RESOURCE_REPOSITORY_NAME);
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.static",
-                "false");
-    }
 
     /** Velocity template for a message body */
     private Template template;
+
+    /** The message text. */
+    private String body;
 
     /**
      * Create a new email message.
@@ -194,12 +190,20 @@ public class Email {
     public Email() {
         arguments = new ArrayList<>(50);
         recipients = new ArrayList<>(50);
+        ccAddresses = new ArrayList<>(50);
         attachments = new ArrayList<>(10);
         moreAttachments = new ArrayList<>(10);
         subject = "";
         template = null;
         replyTo = null;
         charset = null;
+    }
+
+    /**
+     * Get configuration service
+     */
+    private static ConfigurationService getConfigurationService() {
+        return DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
     /**
@@ -224,7 +228,7 @@ public class Email {
         arguments.clear();
 
         VelocityEngine templateEngine = new VelocityEngine();
-        templateEngine.init(VELOCITY_PROPERTIES);
+        templateEngine.init(Utils.getSecureVelocityProperties(RESOURCE_REPOSITORY_NAME));
 
         StringResourceRepository repo = (StringResourceRepository)
                 templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
@@ -254,9 +258,15 @@ public class Email {
     /**
      * Fill out the next argument in the template.
      *
-     * @param arg the value for the next argument
+     * @param arg the value for the next argument.  If {@code null},
+     *            a zero-length string is substituted.
      */
     public void addArgument(Object arg) {
+        if (null == arg) {
+            arg = "";
+            LOG.warn("Null argument {} to email template {} replaced with zero-length string",
+                    arguments.size(), contentName);
+        }
         arguments.add(arg);
     }
 
@@ -320,6 +330,7 @@ public class Email {
     public void reset() {
         arguments.clear();
         recipients.clear();
+        ccAddresses.clear();
         attachments.clear();
         moreAttachments.clear();
         replyTo = null;
@@ -327,54 +338,68 @@ public class Email {
     }
 
     /**
-     * Sends the email.  If the template defines a Velocity context property
-     * named among the values of DSpace configuration property
-     * {@code mail.message.headers} then that name and its value will be added
-     * to the message's headers.
-     *
-     * <p>"subject" is treated specially:  if {@link setSubject()} has not been
-     * called, the value of any "subject" property will be used as if setSubject
-     * had been called with that value.  Thus a template may define its subject,
-     * but the caller may override it.
+     * Sends the email.  If sending is disabled then the assembled message is
+     * logged instead.
      *
      * @throws MessagingException if there was a problem sending the mail.
      * @throws IOException        if IO error
      */
     public void send() throws MessagingException, IOException {
+        build();
+
+        if (isMailServerDisabled(getConfigurationService())) {
+            LOG.info(format(message, body));
+        } else {
+            Transport.send(message);
+        }
+    }
+
+    /**
+     * Build the message.  If the template defines a Velocity context property
+     * named among the values of DSpace configuration property
+     * {@code mail.message.headers} then that name and its value will be added
+     * to the message's headers.
+     *
+     * <p>"subject" is treated specially:  if {@link #setSubject} has not been
+     * called, the value of any "subject" property will be used as if setSubject
+     * had been called with that value.  Thus a template may define its subject,
+     * but the caller may override it.
+     * 
+     * @throws MessagingException if there is no template, or passed through.
+     * @throws IOException passed through.
+     */
+    void build()
+            throws MessagingException, IOException {
         if (null == template) {
             // No template -- no content -- PANIC!!!
             throw new MessagingException("Email has no body");
         }
 
-        ConfigurationService config
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-
         // Get the mail configuration properties
-        String from = config.getProperty("mail.from.address");
-        boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
+        String from = getConfigurationService().getProperty("mail.from.address");
 
         // If no character set specified, attempt to retrieve a default
         if (charset == null) {
-            charset = config.getProperty("mail.charset");
+            charset = getConfigurationService().getProperty("mail.charset");
         }
 
         // Get session
         Session session = DSpaceServicesFactory.getInstance().getEmailService().getSession();
 
         // Create message
-        MimeMessage message = new MimeMessage(session);
+        message = new MimeMessage(session);
 
-        // Set the recipients of the message
-        for (String recipient : recipients) {
-            message.addRecipient(Message.RecipientType.TO,
-                    new InternetAddress(recipient));
-        }
+        // Get the mail configuration properties for catchAllRecipient
+        String[] catchAllRecipient = getCatchAllRecipient(getConfigurationService());
+
         // Get headers defined by the template.
-        String[] templateHeaders = config.getArrayProperty("mail.message.headers");
+        String[] templateHeaders = getConfigurationService().getArrayProperty("mail.message.headers");
 
         // Format the mail message body
         VelocityContext vctx = new VelocityContext();
-        vctx.put("config", new UnmodifiableConfigurationService(config));
+        // Pass a restricted (via configuration) list of resolved Configuration keys and values, for
+        // template lookup
+        vctx.put("config", Utils.getAllowedTemplateConfig());
         vctx.put("params", Collections.unmodifiableList(arguments));
 
         StringWriter writer = new StringWriter();
@@ -385,11 +410,44 @@ public class Email {
             LOG.error("Template not merged:  {}", ex.getMessage());
             throw new MessagingException("Template not merged", ex);
         }
-        String fullMessage = writer.toString();
+        body = writer.toString();
+
+        // Set the recipients of the message
+        if (catchAllRecipient.length > 0) {
+            // Send to catchAllRecipients instead of original recipients
+            for (String recipient : catchAllRecipient) {
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            }
+            // Clear CC field when using catchAllRecipients
+            message.setRecipients(Message.RecipientType.CC, "");
+
+            // Enhance body with original recipient information
+            StringBuilder enhancedBody = new StringBuilder(body);
+            enhancedBody.append("\n===REAL RECIPIENT===\n");
+
+            for (String r : recipients) {
+                enhancedBody.append(r).append("\n");
+            }
+
+            if (!ccAddresses.isEmpty()) {
+                enhancedBody.append("\n===REAL RECIPIENT (cc)===\n");
+                for (String c : ccAddresses) {
+                    enhancedBody.append(c).append("\n");
+                }
+            }
+
+            // Update the body variable for logging purposes
+            body = enhancedBody.toString();
+        } else {
+            // Normal recipient handling
+            for (String recipient : recipients) {
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            }
+        }
 
         // Set some message header fields
-        Date date = new Date();
-        message.setSentDate(date);
+        Instant date = Instant.now();
+        message.setSentDate(java.util.Date.from(date));
         message.setFrom(new InternetAddress(from));
 
         for (String headerName : templateHeaders) {
@@ -412,20 +470,19 @@ public class Email {
             message.setSubject(subject);
         }
 
-        // Add attachments
-        if (attachments.isEmpty() && moreAttachments.isEmpty()) {
-            // If a character set has been specified, or a default exists
+        // Attach the body.
+        if (attachments.isEmpty() && moreAttachments.isEmpty()) { // Flat body.
             if (charset != null) {
-                message.setText(fullMessage, charset);
+                message.setText(body, charset);
             } else {
-                message.setText(fullMessage);
+                message.setText(body);
             }
-        } else {
+        } else { // Add attachments.
             Multipart multipart = new MimeMultipart();
 
             // create the first part of the email
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(fullMessage);
+            messageBodyPart.setText(body);
             multipart.addBodyPart(messageBodyPart);
 
             // Add file attachments
@@ -457,30 +514,62 @@ public class Email {
             replyToAddr[0] = new InternetAddress(replyTo);
             message.setReplyTo(replyToAddr);
         }
+    }
 
-        if (disabled) {
-            StringBuilder text = new StringBuilder(
-                "Message not sent due to mail.server.disabled:\n");
-
-            Enumeration<String> headers = message.getAllHeaderLines();
-            while (headers.hasMoreElements()) {
-                text.append(headers.nextElement()).append('\n');
-            }
-
-            if (!attachments.isEmpty()) {
-                text.append("\nAttachments:\n");
-                for (FileAttachment f : attachments) {
-                    text.append(f.name).append('\n');
-                }
-                text.append('\n');
-            }
-
-            text.append('\n').append(fullMessage);
-
-            LOG.info(text.toString());
-        } else {
-            Transport.send(message);
+    private static String[] getCatchAllRecipient(ConfigurationService config) {
+        if (!isCatchAllSystemEnabled(config)) {
+            return new String[]{};
         }
+        return config.getArrayProperty("mail.server.catchAll.recipient", new String[] {});
+    }
+
+    private static boolean isCatchAllSystemEnabled(ConfigurationService config) {
+        return config.getBooleanProperty("mail.server.catchAll.enabled", false);
+    }
+
+    private static boolean isMailServerDisabled(ConfigurationService config) {
+        return config.getBooleanProperty("mail.server.disabled", false);
+    }
+
+    /**
+     * Flatten the email into a string.
+     *
+     * @param message the message headers, attachments, etc.
+     * @param body the message body.
+     * @return stringified email message.
+     * @throws MessagingException passed through.
+     */
+    private String format(MimeMessage message, String body)
+            throws MessagingException {
+        StringBuilder text = new StringBuilder(
+            "Message not sent due to mail.server.disabled:\n");
+
+        Enumeration<String> headers = message.getAllHeaderLines();
+        while (headers.hasMoreElements()) {
+            text.append(headers.nextElement()).append('\n');
+        }
+
+        if (!attachments.isEmpty()) {
+            text.append("\nAttachments:\n");
+            for (FileAttachment f : attachments) {
+                text.append(f.name).append('\n');
+            }
+            text.append('\n');
+        }
+
+        text.append('\n').append(body);
+        return text.toString();
+    }
+
+    /**
+     * Get the formatted message for testing.
+     *
+     * @return the message flattened to a String.
+     * @throws MessagingException passed through.
+     */
+    String getMessage()
+            throws MessagingException {
+        return format(message, body);
     }
 
     /**
@@ -559,7 +648,7 @@ public class Email {
             System.out.println(" - To: " + to);
             System.out.println(" - Subject: " + subject);
             System.out.println(" - Server: " + server);
-            boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
+            boolean disabled = isMailServerDisabled(config);
             if (disabled) {
                 System.err.println("\nError sending email:");
                 System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
@@ -659,33 +748,6 @@ public class Email {
         @Override
         public OutputStream getOutputStream() throws IOException {
             throw new IOException("Cannot write to this read-only resource");
-        }
-    }
-
-    /**
-     * Wrap ConfigurationService to prevent templates from modifying
-     * the configuration.
-     */
-    public static class UnmodifiableConfigurationService {
-        private final ConfigurationService configurationService;
-
-        /**
-         * Swallow an instance of ConfigurationService.
-         *
-         * @param cs the real instance, to be wrapped.
-         */
-        public UnmodifiableConfigurationService(ConfigurationService cs) {
-            configurationService = cs;
-        }
-
-        /**
-         * Look up a key in the actual ConfigurationService.
-         *
-         * @param key to be looked up in the DSpace configuration.
-         * @return whatever value ConfigurationService associates with {@code key}.
-         */
-        public String get(String key) {
-            return configurationService.getProperty(key);
         }
     }
 }

@@ -12,80 +12,50 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
+import java.util.List;
+
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matcher;
 
 public class SearchFilterMatcher {
 
     private SearchFilterMatcher() { }
 
-    public static Matcher<? super Object> titleFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("title")),
-                hasJsonPath("$.hasFacets", is(false)),
-                hasJsonPath("$.type", is("text")),
-                hasJsonPath("$.openByDefault", is(true)),
-                checkOperators()
+    public static final DiscoveryConfiguration defaultConfig =
+            DSpaceServicesFactory.getInstance()
+                                 .getServiceManager()
+                                 .getServiceByName("defaultConfiguration", DiscoveryConfiguration.class);
+    public static final List<DiscoverySearchFilterFacet> sidebarFacets = defaultConfig.getSidebarFacets();
+    public static final List<DiscoverySearchFilter> searchFilters = defaultConfig.getSearchFilters();
+    public static final Matcher<? super Object>[] searchFilterMatchers = createSearchFilterMatchers(searchFilters);
 
+    public static Matcher<? super Object> matchSearchFilter(DiscoverySearchFilter searchFilter) {
+        return allOf(
+                hasJsonPath("$.filter", is(searchFilter.getIndexFieldName())),
+                hasJsonPath("$.hasFacets", is(isFacet(searchFilter))),
+                hasJsonPath("$.type", is(searchFilter.getType())),
+                hasJsonPath("$.openByDefault", is(searchFilter.isOpenByDefault())),
+                checkOperators()
         );
     }
 
-    public static Matcher<? super Object> authorFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("author")),
-                hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("text")),
-                hasJsonPath("$.openByDefault", is(true)),
-                checkOperators()
-
-        );
+    public static Matcher<? super Object>[] createSearchFilterMatchers(List<DiscoverySearchFilter> searchFilters) {
+        return searchFilters.stream()
+                            .map(SearchFilterMatcher::matchSearchFilter)
+                            .toArray(Matcher[]::new);
     }
 
-    public static Matcher<? super Object> subjectFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("subject")),
-                hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("hierarchical")),
-                hasJsonPath("$.openByDefault", is(false)),
-                checkOperators()
-
-        );
+    public static boolean isFacet(DiscoverySearchFilter sf) {
+        return sidebarFacets.stream().anyMatch(f -> f.equals(sf));
     }
 
-    public static Matcher<? super Object> dateIssuedFilter() {
+    public static Matcher<? super Object> hasGeospatialMetadataFilter() {
         return allOf(
-                hasJsonPath("$.filter", is("dateIssued")),
-                hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("date")),
-                hasJsonPath("$.openByDefault", is(false)),
+                hasJsonPath("$.filter", is("has_geospatial_metadata")),
                 checkOperators()
-
-        );
-    }
-
-    public static Matcher<? super Object> hasContentInOriginalBundleFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("has_content_in_original_bundle")),
-                hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("standard")),
-                hasJsonPath("$.openByDefault", is(false)),
-                checkOperators()
-
-        );
-    }
-
-    public static Matcher<? super Object> hasFileNameInOriginalBundleFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("original_bundle_filenames")),
-                checkOperators()
-
-        );
-    }
-
-    public static Matcher<? super Object> hasFileDescriptionInOriginalBundleFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("original_bundle_descriptions")),
-                checkOperators()
-
         );
     }
 
@@ -100,60 +70,6 @@ public class SearchFilterMatcher {
                         hasJsonPath("$.operator", is("notcontains")),
                         hasJsonPath("$.operator", is("query"))
                         ))
-        );
-    }
-    public static Matcher<? super Object> entityTypeFilter() {
-        return allOf(
-            hasJsonPath("$.filter", is("entityType")),
-            hasJsonPath("$.hasFacets", is(true)),
-            hasJsonPath("$.type", is("text")),
-            hasJsonPath("$.openByDefault", is(false)),
-            checkOperators()
-        );
-    }
-    public static Matcher<? super Object> isAuthorOfPublicationRelation() {
-        return allOf(
-            hasJsonPath("$.filter", is("isAuthorOfPublication")),
-            hasJsonPath("$.hasFacets", is(false)),
-            hasJsonPath("$.type", is("text")),
-            hasJsonPath("$.openByDefault", is(false)),
-            checkOperators()
-        );
-    }
-    public static Matcher<? super Object> isProjectOfPublicationRelation() {
-        return allOf(
-            hasJsonPath("$.filter", is("isProjectOfPublication")),
-            hasJsonPath("$.hasFacets", is(false)),
-            hasJsonPath("$.type", is("text")),
-            hasJsonPath("$.openByDefault", is(false)),
-            checkOperators()
-        );
-    }
-    public static Matcher<? super Object> isOrgUnitOfPublicationRelation() {
-        return allOf(
-            hasJsonPath("$.filter", is("isOrgUnitOfPublication")),
-            hasJsonPath("$.hasFacets", is(false)),
-            hasJsonPath("$.type", is("text")),
-            hasJsonPath("$.openByDefault", is(false)),
-            checkOperators()
-        );
-    }
-    public static Matcher<? super Object> isPublicationOfJournalIssueRelation() {
-        return allOf(
-            hasJsonPath("$.filter", is("isPublicationOfJournalIssue")),
-            hasJsonPath("$.hasFacets", is(false)),
-            hasJsonPath("$.type", is("text")),
-            hasJsonPath("$.openByDefault", is(false)),
-            checkOperators()
-        );
-    }
-    public static Matcher<? super Object> isJournalOfPublicationRelation() {
-        return allOf(
-            hasJsonPath("$.filter", is("isJournalOfPublication")),
-            hasJsonPath("$.hasFacets", is(false)),
-            hasJsonPath("$.type", is("text")),
-            hasJsonPath("$.openByDefault", is(false)),
-            checkOperators()
         );
     }
 }

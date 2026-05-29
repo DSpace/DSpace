@@ -8,13 +8,12 @@
 package org.dspace.authority;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.time.DateTimeException;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +23,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.authority.orcid.Orcidv3AuthorityValue;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.util.SolrUtils;
+import org.orcid.jaxb.model.v3.release.record.Person;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -56,7 +57,7 @@ public class AuthorityValue {
     /**
      * When this authority record has been created
      */
-    private Date creationDate;
+    private Instant creationDate;
 
     /**
      * If this authority has been removed
@@ -66,7 +67,15 @@ public class AuthorityValue {
     /**
      * represents the last time that DSpace got updated information from its external source
      */
-    private Date lastModified;
+    private Instant lastModified;
+
+    private String serviceId;
+
+    /*
+     * Map containing key-value pairs filled in by "setValues(Person person)".
+     * This represents all dynamic information of the object.
+     */
+    protected Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
 
     public AuthorityValue() {
     }
@@ -99,11 +108,11 @@ public class AuthorityValue {
         this.value = value;
     }
 
-    public Date getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -111,7 +120,7 @@ public class AuthorityValue {
         this.creationDate = stringToDate(creationDate);
     }
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
@@ -119,7 +128,7 @@ public class AuthorityValue {
         this.lastModified = stringToDate(lastModified);
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -132,7 +141,7 @@ public class AuthorityValue {
     }
 
     protected void updateLastModifiedDate() {
-        this.lastModified = new Date();
+        this.lastModified = Instant.now();
     }
 
     public void update() {
@@ -144,6 +153,61 @@ public class AuthorityValue {
         updateLastModifiedDate();
     }
 
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public Map<String, List<String>> getOtherMetadata() {
+        if (otherMetadata == null) {
+            otherMetadata = new HashMap<String, List<String>>();
+        }
+        return otherMetadata;
+    }
+
+    /**
+     * Adds additional metadata to this authority value.
+     * 
+     * <p>This method stores supplementary information that will be indexed in Solr
+     * using dynamic fields (with "label_" prefix) for enhanced authority searching.
+     * Multiple values can be added for the same label.</p>
+     * 
+     * <p><b>Example usage from ORCID integration:</b></p>
+     * <pre>
+     * // Store research keywords
+     * addOtherMetadata("keyword", "machine learning");
+     * addOtherMetadata("keyword", "neural networks");
+     * 
+     * // Store external identifiers
+     * addOtherMetadata("external_identifier", "ResearcherID: A-1234-2020");
+     * 
+     * // Store researcher URLs
+     * addOtherMetadata("researcher_url", "https://scholar.google.com/profile");
+     * 
+     * // Store biography
+     * addOtherMetadata("biography", "Professor of Computer Science...");
+     * </pre>
+     * 
+     * <p>These are indexed in Solr as {@code label_keyword}, {@code label_external_identifier}, etc.,
+     * and copied to {@code all_labels} for full-text searching across all additional metadata.</p>
+     * 
+     * @param label the category/type of additional metadata (e.g., "keyword", "external_identifier", "researcher_url")
+     * @param data the value to store for this metadata category
+     * @see #getOtherMetadata()
+     * @see Orcidv3AuthorityValue#setValues(Person) for real-world usage
+     */
+    public void addOtherMetadata(String label, String data) {
+        List<String> strings = otherMetadata.get(label);
+        if (strings == null) {
+            strings = new ArrayList<String>();
+        }
+        strings.add(data);
+        otherMetadata.put(label, strings);
+    }
+
     /**
      * Generate a solr record from this instance
      *
@@ -152,7 +216,7 @@ public class AuthorityValue {
     public SolrInputDocument getSolrInputDocument() {
 
         SolrInputDocument doc = new SolrInputDocument();
-        DateFormat solrDateFormatter = SolrUtils.getDateFormatter();
+        DateTimeFormatter solrDateFormatter = SolrUtils.getDateFormatter();
         doc.addField("id", getId());
         doc.addField("field", getField());
         doc.addField("value", getValue());
@@ -173,8 +237,8 @@ public class AuthorityValue {
         this.field = String.valueOf(document.getFieldValue("field"));
         this.value = String.valueOf(document.getFieldValue("value"));
         this.deleted = (Boolean) document.getFieldValue("deleted");
-        this.creationDate = (Date) document.getFieldValue("creation_date");
-        this.lastModified = (Date) document.getFieldValue("last_modified_date");
+        this.creationDate = ((java.util.Date) document.getFieldValue("creation_date")).toInstant();
+        this.lastModified = ((java.util.Date) document.getFieldValue("last_modified_date")).toInstant();
     }
 
     /**
@@ -206,7 +270,7 @@ public class AuthorityValue {
      * Build a list of ISO date formatters to parse various forms.
      *
      * <p><strong>Note:</strong>  any formatter which does not parse a zone or
-     * offset must have a default zone set.  See {@link stringToDate}.
+     * offset must have a default zone set.  See {@link #stringToDate(String)}.
      *
      * @return the formatters.
      */
@@ -224,13 +288,13 @@ public class AuthorityValue {
      * @param date serialized date to be converted.
      * @return converted date, or null if no parser accepted the input.
      */
-    static public Date stringToDate(String date) {
-        Date result = null;
+    static public Instant stringToDate(String date) {
+        Instant result = null;
         if (StringUtils.isNotBlank(date)) {
             for (DateTimeFormatter formatter : getDateFormatters()) {
                 try {
                     ZonedDateTime dateTime = ZonedDateTime.parse(date, formatter);
-                    result = Date.from(dateTime.toInstant());
+                    result = dateTime.toInstant();
                     break;
                 } catch (DateTimeException e) {
                     log.debug("Input '{}' did not match {}", date, formatter);

@@ -48,6 +48,7 @@ import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
@@ -308,25 +309,25 @@ public class Utils {
         if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "processes")) {
+        if (Strings.CS.equals(modelPlural, "processes")) {
             return ProcessRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "versionhistories")) {
+        if (Strings.CS.equals(modelPlural, "versionhistories")) {
             return VersionHistoryRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "properties")) {
+        if (Strings.CS.equals(modelPlural, "properties")) {
             return PropertyRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "vocabularies")) {
+        if (Strings.CS.equals(modelPlural, "vocabularies")) {
             return VocabularyRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
+        if (Strings.CS.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
             return OrcidQueueRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "orcidhistories")) {
+        if (Strings.CS.equals(modelPlural, "orcidhistories")) {
             return OrcidHistoryRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "supervisionorders")) {
+        if (Strings.CS.equals(modelPlural, "supervisionorders")) {
             return SupervisionOrderRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");

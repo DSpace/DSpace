@@ -30,18 +30,20 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Mutative;
@@ -63,7 +65,7 @@ import org.xml.sax.SAXException;
  * Intended use: cataloging tool in workflow and general curation.
  * The task uses a URL 'template' to compose the service call, e.g.
  *
- * <p>{@code http://www.sherpa.ac.uk/romeo/api29.php?issn=\{dc.identifier.issn\}}
+ * <p>{@code http://www.openpolicyfinder.jisc.ac.uk/api29.php?issn=\{dc.identifier.issn\}}
  *
  * <p>Task will substitute the value of the passed item's metadata field
  * in the {parameter} position. If multiple values are present in the
@@ -169,14 +171,14 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
      * @throws IOException if the parser could not be configured, or passed through.
      */
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         lang = configurationService.getProperty("default.language");
         String fldSep = taskProperty("separator");
         fieldSeparator = (fldSep != null) ? fldSep : " ";
         urlTemplate = taskProperty("template");
         templateParam = urlTemplate.substring(urlTemplate.indexOf("{") + 1,
-                                              urlTemplate.indexOf("}"));
+                urlTemplate.indexOf("}"));
         String[] parsed = parseTransform(templateParam);
         lookupField = parsed[0];
         lookupTransform = parsed[1];
@@ -204,13 +206,9 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             }
         }
         // initialize response document parser
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
         try {
-            // disallow DTD parsing to ensure no XXE attacks can occur
-            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setXIncludeAware(false);
+            DocumentBuilderFactory factory = XMLUtils.getDocumentBuilderFactory();
+            factory.setNamespaceAware(true);
             docBuilder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException pcE) {
             log.error("caught exception: " + pcE);
@@ -220,7 +218,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     }
 
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
 
         int status = Curator.CURATE_SKIP;
         StringBuilder resultSb = new StringBuilder();
@@ -241,7 +239,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             List<MetadataValue> dcVals = itemService.getMetadataByMetadataString(item, lookupField);
             if (dcVals.size() > 0 && dcVals.get(0).getValue().length() > 0) {
                 String value = transform(dcVals.get(0).getValue(), lookupTransform);
-                status = callService(value, item, resultSb);
+                status = callService(context, value, item, resultSb);
             } else {
                 resultSb.append(" lacks metadata value required for service: ").append(lookupField);
                 status = Curator.CURATE_FAIL;
@@ -254,57 +252,54 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         return status;
     }
 
-    protected int callService(String value, Item item, StringBuilder resultSb) throws IOException {
-
+    protected int callService(Context context, String value, Item item, StringBuilder resultSb) throws IOException {
         String callUrl = urlTemplate.replaceAll("\\{" + templateParam + "\\}", value);
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        HttpGet req = new HttpGet(callUrl);
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            req.addHeader(entry.getKey(), entry.getValue());
-        }
-        HttpResponse resp = client.execute(req);
-        int status = Curator.CURATE_ERROR;
-        int statusCode = resp.getStatusLine().getStatusCode();
-        if (statusCode == HttpStatus.SC_OK) {
-            HttpEntity entity = resp.getEntity();
-            if (entity != null) {
-                // boiler-plate handling taken from Apache 4.1 javadoc
-                InputStream instream = entity.getContent();
-                try {
-                    // This next line triggers a false-positive XXE warning from LGTM, even though we disallow DTD
-                    // parsing during initialization of docBuilder in init()
-                    Document doc = docBuilder.parse(instream);  // lgtm [java/xxe]
-                    status = processResponse(doc, item, resultSb);
-                } catch (SAXException saxE) {
-                    log.error("caught exception: " + saxE);
-                    resultSb.append(" unable to read response document");
-                } catch (RuntimeException ex) {
-                    // In case of an unexpected exception you may want to abort
-                    // the HTTP request in order to shut down the underlying
-                    // connection and release it back to the connection manager.
-                    req.abort();
-                    log.error("caught exception: " + ex);
-                    throw ex;
-                } finally {
-                    // Closing the input stream will trigger connection release
-                    instream.close();
-                }
-                // When HttpClient instance is no longer needed,
-                // shut down the connection manager to ensure
-                // immediate deallocation of all system resources
-                client.close();
-            } else {
-                log.error(" obtained no valid service response");
-                resultSb.append("no service response");
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            HttpGet req = new HttpGet(callUrl);
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                req.addHeader(entry.getKey(), entry.getValue());
             }
-        } else {
-            log.error("service returned non-OK status: " + statusCode);
-            resultSb.append("no service response");
+            try (CloseableHttpResponse resp = client.execute(req)) {
+                int status = Curator.CURATE_ERROR;
+                int statusCode = resp.getStatusLine().getStatusCode();
+                if (statusCode == HttpStatus.SC_OK) {
+                    HttpEntity entity = resp.getEntity();
+                    if (entity != null) {
+                        // boiler-plate handling taken from Apache 4.1 javadoc
+                        InputStream instream = entity.getContent();
+                        try {
+                            // This next line triggers a false-positive XXE warning from LGTM, even though
+                            // we disallow DTD parsing during initialization of docBuilder in init()
+                            Document doc = docBuilder.parse(instream);  // lgtm [java/xxe]
+                            status = processResponse(context, doc, item, resultSb);
+                        } catch (SAXException saxE) {
+                            log.error("caught exception: " + saxE);
+                            resultSb.append(" unable to read response document");
+                        } catch (RuntimeException ex) {
+                            // In case of an unexpected exception you may want to abort
+                            // the HTTP request in order to shut down the underlying
+                            // connection and release it back to the connection manager.
+                            req.abort();
+                            log.error("caught exception: " + ex);
+                            throw ex;
+                        } finally {
+                            // Closing the input stream will trigger connection release
+                            instream.close();
+                        }
+                    } else {
+                        log.error(" obtained no valid service response");
+                        resultSb.append("no service response");
+                    }
+                } else {
+                    log.error("service returned non-OK status: " + statusCode);
+                    resultSb.append("no service response");
+                }
+                return status;
+            }
         }
-        return status;
     }
 
-    protected int processResponse(Document doc, Item item, StringBuilder resultSb) throws IOException {
+    protected int processResponse(Context context, Document doc, Item item, StringBuilder resultSb) throws IOException {
         boolean update = false;
         int status = Curator.CURATE_ERROR;
         List<String> values = new ArrayList<>();
@@ -316,7 +311,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                 // if data found and we are mapping, check assignment policy
                 if (nodes.getLength() > 0 && info.getMapping() != null) {
                     if ("=>".equals(info.getMapping())) {
-                        itemService.clearMetadata(Curator.curationContext(), item, info.getSchema(), info.getElement(),
+                        itemService.clearMetadata(context, item, info.getSchema(), info.getElement(),
                                                   info.getQualifier(), Item.ANY);
                     } else if ("~>".equals(info.getMapping())) {
                         if (itemService
@@ -337,7 +332,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                     String tvalue = transform(node.getFirstChild().getNodeValue(), info.getTransform());
                     // assign to metadata field if mapped && not present
                     if (info.getMapping() != null && !values.contains(tvalue)) {
-                        itemService.addMetadata(Curator.curationContext(), item, info.getSchema(), info.getElement(),
+                        itemService.addMetadata(context, item, info.getSchema(), info.getElement(),
                                                 info.getQualifier(), lang, tvalue);
                         update = true;
                     }
@@ -347,7 +342,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             }
             // update Item if it has changed
             if (update) {
-                itemService.update(Curator.curationContext(), item);
+                itemService.update(context, item);
             }
             status = Curator.CURATE_SUCCESS;
         } catch (AuthorizeException authE) {

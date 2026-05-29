@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DuplicateDetectionServiceImpl;
 import org.dspace.content.Item;
+import org.dspace.content.duplicatedetection.DuplicateComparison;
 import org.dspace.content.virtual.PotentialDuplicate;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
@@ -77,9 +78,10 @@ public interface DuplicateDetectionService {
     /**
      * Build a comparison value string made up of values of configured fields, used when indexing and querying
      * items for deduplication
+     *
      * @param context DSpace context
-     * @param item The DSpace item
+     * @param item    The DSpace item
      * @return a constructed, normalised string
      */
-    String buildComparisonValue(Context context, Item item);
+    List<List<DuplicateComparison>> buildComparisonValueGroups(Context context, Item item);
 }

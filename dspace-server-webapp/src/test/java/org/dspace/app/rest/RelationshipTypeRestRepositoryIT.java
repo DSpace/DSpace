@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
@@ -169,7 +169,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
         RelationshipType foundRelationshipType = null;
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (StringUtils.equals(relationshipType.getLeftwardType(), "isAuthorOfPublication") && StringUtils
+            if (Strings.CS.equals(relationshipType.getLeftwardType(), "isAuthorOfPublication") && Strings.CS
                 .equals(relationshipType.getRightwardType(), "isPublicationOfAuthor")) {
                 foundRelationshipType = relationshipType;
                 break;
@@ -215,7 +215,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
         RelationshipType foundRelationshipType = null;
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (StringUtils.equals(relationshipType.getLeftwardType(), "isIssueOfJournalVolume") && StringUtils
+            if (Strings.CS.equals(relationshipType.getLeftwardType(), "isIssueOfJournalVolume") && Strings.CS
                 .equals(relationshipType.getRightwardType(), "isJournalVolumeOfIssue")) {
                 foundRelationshipType = relationshipType;
                 break;

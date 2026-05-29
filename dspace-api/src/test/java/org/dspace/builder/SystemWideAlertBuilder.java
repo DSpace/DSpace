@@ -8,7 +8,7 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.dspace.alerts.AllowSessionsEnum;
 import org.dspace.alerts.SystemWideAlert;
@@ -31,7 +31,7 @@ public class SystemWideAlertBuilder extends AbstractBuilder<SystemWideAlert, Sys
     }
 
     private SystemWideAlertBuilder create(Context context, String message, AllowSessionsEnum allowSessionsType,
-                                          Date countdownTo, boolean active)
+                                          ZonedDateTime countdownTo, boolean active)
             throws SQLException, AuthorizeException {
         this.context = context;
         this.systemWideAlert = systemWideAlertService.create(context, message, allowSessionsType, countdownTo, active);
@@ -43,7 +43,7 @@ public class SystemWideAlertBuilder extends AbstractBuilder<SystemWideAlert, Sys
         return this;
     }
 
-    public SystemWideAlertBuilder withCountdownDate(Date countdownTo) {
+    public SystemWideAlertBuilder withCountdownDate(ZonedDateTime countdownTo) {
         systemWideAlert.setCountdownTo(countdownTo);
         return this;
     }

@@ -8,11 +8,12 @@
 package org.dspace.app.ldn.model;
 /**
  * REQUESTED means acknowledgements not received yet
- * ACCEPTED means acknowledgements of "Accept" type received
- * REJECTED means ack of "TentativeReject" type received
+ * ACCEPTED means acknowledgements of "Accept" or "TentativeAccept" type received
+ * REJECTED means ack of "Reject" type received
+ * TENTATIVE_REJECT means ack of "TentativeReject" type received
  * 
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.com)
  */
 public enum NotifyRequestStatusEnum {
-    REJECTED, ACCEPTED, REQUESTED
+    REJECTED, ACCEPTED, REQUESTED, TENTATIVE_REJECT
 }

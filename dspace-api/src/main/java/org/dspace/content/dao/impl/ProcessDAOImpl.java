@@ -10,7 +10,7 @@ package org.dspace.content.dao.impl;
 import static org.dspace.scripts.Process_.CREATION_TIME;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.core.AbstractHibernateDAO;
@@ -108,10 +108,10 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
                                               CriteriaBuilder criteriaBuilder, CriteriaQuery criteriaQuery,
                                               Root<Process> processRoot) {
         addProcessQueryParameters(processQueryParameterContainer, criteriaBuilder, criteriaQuery, processRoot);
-        if (StringUtils.equalsIgnoreCase(processQueryParameterContainer.getSortOrder(), "asc")) {
+        if (Strings.CI.equals(processQueryParameterContainer.getSortOrder(), "asc")) {
             criteriaQuery
                 .orderBy(criteriaBuilder.asc(processRoot.get(processQueryParameterContainer.getSortProperty())));
-        } else if (StringUtils.equalsIgnoreCase(processQueryParameterContainer.getSortOrder(), "desc")) {
+        } else if (Strings.CI.equals(processQueryParameterContainer.getSortOrder(), "desc")) {
             criteriaQuery
                 .orderBy(criteriaBuilder.desc(processRoot.get(processQueryParameterContainer.getSortProperty())));
         }
@@ -154,7 +154,7 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
 
     @Override
     public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
-        Date date) throws SQLException {
+        Instant date) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);

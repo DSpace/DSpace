@@ -8,8 +8,8 @@
 package org.dspace.sword2;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +59,8 @@ public abstract class GenericStatementDisseminator
             .getResourceParts(context, item, includeBundles);
         statement.setResources(resources);
 
-        Date lastModified = this.getLastModified(context, item);
-        statement.setLastModified(lastModified);
+        Instant lastModified = this.getLastModified(context, item);
+        statement.setLastModified(java.util.Date.from(lastModified));
     }
 
     protected List<OriginalDeposit> getOriginalDeposits(Context context,
@@ -85,7 +85,7 @@ public abstract class GenericStatementDisseminator
                                 bitstream));
                         deposit.setMediaType(bitstream
                                                  .getFormat(context).getMIMEType());
-                        deposit.setDepositedOn(this.getDateOfDeposit(item));
+                        deposit.setDepositedOn(java.util.Date.from(this.getDateOfDeposit(item)));
                         originalDeposits.add(deposit);
                     }
                 }
@@ -153,7 +153,7 @@ public abstract class GenericStatementDisseminator
         }
     }
 
-    protected Date getLastModified(Context context, Item item) {
+    protected Instant getLastModified(Context context, Item item) {
         return item.getLastModified();
     }
 
@@ -182,12 +182,12 @@ public abstract class GenericStatementDisseminator
         return swordBundle;
     }
 
-    private Date getDateOfDeposit(Item item) {
+    private Instant getDateOfDeposit(Item item) {
         List<MetadataValue> values = itemService.getMetadata(item, "dc", "date", "accessioned", Item.ANY);
-        Date date = new Date();
+        Instant date = Instant.now();
         if (values != null && values.size() > 0) {
             String strDate = values.get(0).getValue();
-            date = new DCDate(strDate).toDate();
+            date = new DCDate(strDate).toDate().toInstant();
         }
         return date;
     }

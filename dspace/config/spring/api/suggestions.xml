@@ -19,9 +19,10 @@
 	 <util:map id="suggestionProviders" map-class="java.util.HashMap" 
 	          key-type="java.lang.String" value-type="org.dspace.app.suggestion.SuggestionProvider">
 	    <entry key="openaire" value-ref="OpenairePublicationLoader" />
+         <entry key="openalex" value-ref="OpenAlexPublicationLoader"/>
 	</util:map>
 
-    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.openaire.PublicationLoader">
+    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.loader.PublicationLoader">
         <property name="sourceName" value="openaire" />
         <property name="primaryProvider" ref="openaireLiveImportDataProviderByAuthor" />
         <property name="otherProviders">
@@ -37,7 +38,7 @@
         <property name="pipeline">
             <list>
                 <bean
-                    class="org.dspace.app.suggestion.openaire.AuthorNamesScorer">
+                        class="org.dspace.app.suggestion.scorer.AuthorNamesScorer">
                     <property name="contributorMetadata">
                         <list>
                             <value>dc.contributor.author</value>
@@ -50,7 +51,7 @@
                     </property>
                 </bean>
                 <bean
-                    class="org.dspace.app.suggestion.openaire.DateScorer">
+                        class="org.dspace.app.suggestion.scorer.DateScorer">
                     <property name="birthDateMetadata" value="person.birthDate" />
                     <property name="publicationDateMetadata" value="dc.date.issued" />
                 </bean>    
@@ -58,4 +59,39 @@
         </property>
     </bean>
 
- </beans>
+
+    <!-- OpenAlex -->
+    <bean id="OpenAlexPublicationLoader" class="org.dspace.app.suggestion.openalex.OpenAlexPublicationLoader">
+        <property name="sourceName" value="openalex"/>
+        <property name="primaryProvider" ref="openalexPublicationByAuthorIdLiveImportDataProvider"/>
+        <property name="otherProviders">
+            <list>
+                <ref bean="openalexPublicationLiveImportDataProvider"/>
+            </list>
+        </property>
+        <property name="names">
+            <list>
+                <value>dc.identifier.openalex</value>
+                <value>dc.title</value>
+            </list>
+        </property>
+        <property name="pipeline">
+            <list>
+                <bean class="org.dspace.app.suggestion.scorer.AuthorNamesScorer">
+                    <property name="contributorMetadata">
+                        <list>
+                            <value>dc.contributor.author</value>
+                        </list>
+                    </property>
+                    <property name="names">
+                        <list>
+                            <value>dc.title</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+
+</beans>

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -48,7 +48,7 @@ public class ItemRest extends DSpaceObjectRest {
     private boolean inArchive = false;
     private boolean discoverable = false;
     private boolean withdrawn = false;
-    private Date lastModified = new Date();
+    private Instant lastModified = Instant.now();
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String entityType = null;
 
@@ -92,11 +92,11 @@ public class ItemRest extends DSpaceObjectRest {
         this.withdrawn = withdrawn;
     }
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 

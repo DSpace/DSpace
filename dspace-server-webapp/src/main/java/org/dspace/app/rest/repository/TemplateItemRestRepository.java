@@ -49,6 +49,9 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
     @Autowired
     ResourcePatch<Item> resourcePatch;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("permitAll()")
     public TemplateItemRest findOne(Context context, UUID uuid) {
@@ -90,7 +93,6 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
      */
     public TemplateItemRest patchTemplateItem(TemplateItem templateItem, JsonNode jsonNode)
         throws SQLException, AuthorizeException {
-        ObjectMapper mapper = new ObjectMapper();
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
 

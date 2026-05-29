@@ -10,9 +10,6 @@ package org.dspace.license;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,9 +25,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.services.ConfigurationService;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -53,7 +51,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLicenseConnectorServiceImpl.class);
 
     private CloseableHttpClient client;
-    protected SAXBuilder parser = new SAXBuilder();
+    protected SAXBuilder parser = XMLUtils.getSAXBuilder();
 
     private String postArgument = "answers";
     private String postAnswerFormat =
@@ -70,12 +68,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        HttpClientBuilder builder = HttpClientBuilder.create();
-
-        client = builder
-                .disableAutomaticRetries()
-                .setMaxConnTotal(5)
-                .build();
+        client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
 
         // disallow DTD parsing to ensure no XXE attacks can occur.
         // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
@@ -333,23 +326,13 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     @Override
     public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
         String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
-
         String issueUrl = ccLicenseUrl + "/details?license-uri=" + licenseURI;
-
-        URL request_url;
-        try {
-            request_url = new URL(issueUrl);
-        } catch (MalformedURLException e) {
-            return null;
-        }
-        URLConnection connection = request_url.openConnection();
-        connection.setDoOutput(true);
-        try {
+        try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+            CloseableHttpResponse httpResponse = httpClient.execute(new HttpPost(issueUrl));
             // parsing document from input stream
-            InputStream stream = connection.getInputStream();
+            InputStream stream = httpResponse.getEntity().getContent();
             Document doc = parser.build(stream);
             return doc;
-
         } catch (Exception e) {
             log.error("Error while retrieving the license document for URI: " + licenseURI, e);
         }

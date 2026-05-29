@@ -26,10 +26,11 @@
     <luceneMatchVersion>8.8.1</luceneMatchVersion>
 
     <!-- Include contributed libraries that we use in DSpace. -->
-    <lib dir='${solr.install.dir}/contrib/analysis-extras/lib/'
-         regex='icu4j-.*\.jar'/>
-    <lib dir='${solr.install.dir}/contrib/analysis-extras/lucene-libs/'
-         regex='lucene-analyzers-icu-.*\.jar'/>
+    <!-- NOTE: When using Solr >=9.8, you MUST start Solr with `-Dsolr.config.lib.enabled=true` for this to work -->
+    <lib dir='${solr.install.dir}/modules/analysis-extras/lib/'
+         regex='icu4j-.*\.jar' />
+    <lib dir='${solr.install.dir}/modules/analysis-extras/lib/'
+         regex='lucene-analysis-icu-.*\.jar' />
 
     <dataDir>${solr.data.dir:}</dataDir>
 
@@ -146,6 +147,12 @@
           <str name="buildOnOptimize">true</str>
           <str name="spellcheck.onlyMorePopular">false</str>
         </lst>
+    </searchComponent>
+
+    <searchComponent class="solr.HighlightComponent" name="highlight">
+        <highlighting>
+            <encoder name="html" class="solr.highlight.HtmlEncoder"/>
+        </highlighting>
     </searchComponent>
 
     <requestHandler name="/spell" class="solr.SearchHandler" lazy="true">

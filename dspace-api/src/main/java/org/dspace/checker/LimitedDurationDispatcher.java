@@ -8,7 +8,7 @@
 package org.dspace.checker;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.content.Bitstream;
 
@@ -55,9 +55,9 @@ public class LimitedDurationDispatcher implements BitstreamDispatcher {
      * @param endTime    when this dispatcher will stop returning valid bitstream ids.
      */
     public LimitedDurationDispatcher(BitstreamDispatcher dispatcher,
-                                     Date endTime) {
+                                     Instant endTime) {
         delegate = dispatcher;
-        end = endTime.getTime();
+        end = endTime.toEpochMilli();
     }
 
     /**
@@ -66,6 +66,6 @@ public class LimitedDurationDispatcher implements BitstreamDispatcher {
      */
     @Override
     public Bitstream next() throws SQLException {
-        return (System.currentTimeMillis() > end) ? null : delegate.next();
+        return (Instant.now().toEpochMilli() > end) ? null : delegate.next();
     }
 }

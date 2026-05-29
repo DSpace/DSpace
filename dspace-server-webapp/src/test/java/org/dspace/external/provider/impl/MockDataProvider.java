@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
@@ -44,7 +44,7 @@ public class MockDataProvider extends AbstractExternalDataProvider {
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         List<ExternalDataObject> listToReturn = new LinkedList<>();
         for (Map.Entry<String, ExternalDataObject> entry : mockLookupMap.entrySet()) {
-            if (StringUtils.containsIgnoreCase(entry.getKey(), query)) {
+            if (Strings.CI.contains(entry.getKey(), query)) {
                 listToReturn.add(entry.getValue());
             }
 
@@ -54,7 +54,7 @@ public class MockDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+        return Strings.CI.equals(sourceIdentifier, source);
     }
 
     @Override

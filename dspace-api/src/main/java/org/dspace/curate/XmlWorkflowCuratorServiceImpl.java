@@ -139,7 +139,7 @@ public class XmlWorkflowCuratorServiceImpl
             Item item = wfi.getItem();
             item.setOwningCollection(wfi.getCollection());
             for (Task task : step.tasks) {
-                curator.addTask(task.name);
+                curator.addTask(c, task.name);
             }
 
             if (StringUtils.isNotEmpty(step.queue)) { // Step's tasks are to be queued.

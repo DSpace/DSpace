@@ -18,6 +18,10 @@
              Possible values (from most to least info):
 	     DEBUG, INFO, WARN, ERROR, FATAL -->
         <Property name='loglevel.other'>INFO</Property>
+        <!-- Dedicated level just for audit event emission lines;
+         set ALL log event lines
+         set OFF to log none -->
+        <Property name='loglevel.audit.events'>ALL</Property>
     </Properties>
 
     <Appenders>
@@ -44,6 +48,18 @@
             </DefaultRolloverStrategy>
             -->
         </Appender>
+
+        <!-- Dedicated audit event rolling file appender (daily) -->
+        <Appender name='AUDIT'
+                  filePattern='${log.dir}/audit.log-%d{yyyy-MM-dd}'
+                  type='RollingFile'
+                  fileName='${log.dir}/audit.log'>
+            <Layout type='PatternLayout'
+                    pattern='%d %-5p %c @ %m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+            </policies>
+        </Appender>
     </Appenders>
 
     <Loggers>
@@ -53,6 +69,13 @@
                 level='${loglevel.dspace}'
                 additivity='false'>
             <AppenderRef ref='A1'/>
+        </Logger>
+
+        <!-- Pure event emission logger: enable independently -->
+        <Logger name='org.dspace.app.audit.event'
+                level='${loglevel.audit.events}'
+                additivity='false'>
+            <AppenderRef ref='AUDIT'/>
         </Logger>
 
         <!-- Block services logging except on exceptions -->

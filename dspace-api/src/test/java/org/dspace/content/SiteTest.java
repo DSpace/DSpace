@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -159,7 +159,7 @@ public class SiteTest extends AbstractUnitTest {
         List<Group> groupList = authorizeService.getAuthorizedGroups(context, s, Constants.READ);
         boolean foundAnonInList = false;
         for (Group group : groupList) {
-            if (StringUtils.equalsIgnoreCase(group.getName(), "Anonymous")) {
+            if (Strings.CI.equals(group.getName(), "Anonymous")) {
                 foundAnonInList = true;
             }
         }

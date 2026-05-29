@@ -138,12 +138,18 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester {
             Enumeration zenum = zip.entries();
             while (zenum.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) zenum.nextElement();
+                String entryName = entry.getName();
+                java.nio.file.Path entryPath = java.nio.file.Paths.get(entryName).normalize();
+                if (entryPath.isAbsolute() || entryPath.startsWith("..")) {
+                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, "Invalid zip entry: " + entryName);
+                }
+
                 InputStream stream = zip.getInputStream(entry);
                 Bitstream bs = bitstreamService.create(context, target, stream);
                 BitstreamFormat format = this
-                    .getFormat(context, entry.getName());
+                    .getFormat(context, entryName);
                 bs.setFormat(context, format);
-                bs.setName(context, entry.getName());
+                bs.setName(context, entryName);
                 bitstreamService.update(context, bs);
                 derivedResources.add(bs);
             }

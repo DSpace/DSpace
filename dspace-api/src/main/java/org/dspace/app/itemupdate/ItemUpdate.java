@@ -14,9 +14,9 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -332,7 +332,7 @@ public class ItemUpdate {
                 }
             }
 
-            pr("ItemUpdate - initializing run on " + (new Date()).toString());
+            pr("ItemUpdate - initializing run on " + (Instant.now()).toString());
 
             context = new Context(Context.Mode.BATCH_EDIT);
             iu.setEPerson(context, iu.eperson);

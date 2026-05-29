@@ -7,18 +7,21 @@
  */
 package org.dspace.eperson;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemErrRule;
 
 /**
+ * Integration tests for EPersonCLITool.
+ *
+ * This test uses EPersonCLITool.runCLITool() which returns an exit code
+ * instead of calling System.exit(). This allows testing without SecurityManager
+ * which was removed in Java 21.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
@@ -26,14 +29,6 @@ public class EPersonCLIToolIT
         extends AbstractIntegrationTest {
     private static final String NEW_PASSWORD = "secret";
     private static final String BAD_PASSWORD = "not secret";
-
-    // Handle System.exit() from unit under test.
-    @Rule
-    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
-
-    // Capture System.err() output.
-    @Rule
-    public final SystemErrRule sysErr = new SystemErrRule().enableLog();
 
     /**
      * Test --modify --newPassword
@@ -43,7 +38,6 @@ public class EPersonCLIToolIT
     @SuppressWarnings("static-access")
     public void testSetPassword()
             throws Exception {
-        exit.expectSystemExitWithStatus(0);
         System.out.println("main");
 
         // Create a source of "console" input.
@@ -64,7 +58,9 @@ public class EPersonCLIToolIT
             "--email", email,
             "--newPassword"
         };
-        instance.main(argv);
+
+        int exitStatus = EPersonCLITool.runCLITool(argv);
+        assertEquals("Exit status should be 0", 0, exitStatus);
 
         String newPasswordHash = eperson.getPassword();
         assertNotEquals("Password hash did not change", oldPasswordHash, newPasswordHash);
@@ -78,7 +74,6 @@ public class EPersonCLIToolIT
     @SuppressWarnings("static-access")
     public void testSetEmptyPassword()
             throws Exception {
-        exit.expectSystemExitWithStatus(0);
         System.out.println("main");
 
         // Create a source of "console" input.
@@ -99,12 +94,15 @@ public class EPersonCLIToolIT
             "--email", email,
             "--newPassword"
         };
-        instance.main(argv);
+
+        String stderr = tapSystemErr(() -> {
+            int exitStatus = EPersonCLITool.runCLITool(argv);
+            assertEquals("Exit status should be 0", 0, exitStatus);
+        });
 
         String newPasswordHash = eperson.getPassword();
         assertEquals("Password hash changed", oldPasswordHash, newPasswordHash);
 
-        String stderr = sysErr.getLog();
         assertTrue("Standard error did not mention 'empty'",
                 stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY));
     }
@@ -119,7 +117,6 @@ public class EPersonCLIToolIT
     @SuppressWarnings("static-access")
     public void testSetMismatchedPassword()
             throws Exception {
-        exit.expectSystemExitWithStatus(0);
         System.out.println("main");
 
         // Create a source of "console" input.
@@ -141,12 +138,15 @@ public class EPersonCLIToolIT
             "--email", email,
             "--newPassword"
         };
-        instance.main(argv);
+
+        String stderr = tapSystemErr(() -> {
+            int exitStatus = EPersonCLITool.runCLITool(argv);
+            assertEquals("Exit status should be 0", 0, exitStatus);
+        });
 
         String newPasswordHash = eperson.getPassword();
         assertEquals("Password hash changed", oldPasswordHash, newPasswordHash);
 
-        String stderr = sysErr.getLog();
         assertTrue("Standard error did not indicate password mismatch",
                 stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH));
     }

@@ -7,6 +7,8 @@
  */
 package org.dspace.external;
 
+import java.time.Instant;
+
 /**
  * Openaire rest API token to be used when grabbing an accessToken.<br/>
  * Based on https://develop.openaire.eu/basic.html
@@ -29,8 +31,8 @@ public class OpenaireRestToken {
     /**
      * Stores the grabbed token
      * 
-     * @param accessToken
-     * @param expiresIn
+     * @param accessToken the access token string
+     * @param expiresIn   the token expiration period in seconds
      */
     public OpenaireRestToken(String accessToken, Long expiresIn) {
         this.accessToken = accessToken;
@@ -49,18 +51,18 @@ public class OpenaireRestToken {
     /**
      * If the existing token has an expiration date and if it is at a minute of
      * expiring
-     * 
-     * @return
+     *
+     * @return true if the token is present and not near expiration, false otherwise
      */
     public boolean isValidToken() {
         if (this.accessToken == null) {
             return false;
         }
 
-        return ((accessTokenExpiration - (60 * 1000)) > System.currentTimeMillis());
+        return ((accessTokenExpiration - (60 * 1000)) > Instant.now().toEpochMilli());
     }
 
     private void setExpirationDate(Long expiresIn) {
-        accessTokenExpiration = System.currentTimeMillis() + (expiresIn * 1000L);
+        accessTokenExpiration = Instant.now().toEpochMilli() + (expiresIn * 1000L);
     }
 }

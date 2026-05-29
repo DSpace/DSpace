@@ -131,6 +131,17 @@ public interface LDNMessageService {
     public NotifyRequestStatus findRequestsByItem(Context context, Item item) throws SQLException;
 
     /**
+     * find the UUID of a previous tentativeReject notification associated with a new resubmission (Endorsement or
+     * Review patterns only)
+     *
+     * @param context the context
+     * @param item the previousVersion item associated with a potential resubmission
+     * @return the UUID of a previous tentativeReject notification associated with a potential resubmission if found
+     */
+    public String findEndorsementOrReviewResubmissionIdByItem(Context context, Item item, NotifyServiceEntity service)
+            throws SQLException;
+
+    /**
      * delete the provided ldn message
      *
      * @param context the context

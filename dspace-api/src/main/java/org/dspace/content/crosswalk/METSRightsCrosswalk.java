@@ -9,16 +9,16 @@ package org.dspace.content.crosswalk;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -70,7 +70,7 @@ public class METSRightsCrosswalk
     private String schemaLocation =
         METSRights_NS.getURI() + " http://cosimo.stanford.edu/sdr/metsrights.xsd";
 
-    private static final Namespace namespaces[] = {METSRights_NS};
+    private static final Namespace[] namespaces = {METSRights_NS};
 
     private static final Map<Integer, String> otherTypesMapping = new HashMap<Integer, String>();
 
@@ -180,18 +180,18 @@ public class METSRightsCrosswalk
 
             // As of DSpace 3.0, policies may have an effective date range, check if a policy is effective
             rightsContext.setAttribute("in-effect", "true");
-            Date now = new Date();
-            SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd");
+            LocalDate now = LocalDate.now();
+            DateTimeFormatter iso8601 = DateTimeFormatter.ISO_LOCAL_DATE;
             if (policy.getStartDate() != null) {
                 rightsContext.setAttribute("start-date", iso8601.format(policy.getStartDate()));
-                if (policy.getStartDate().after(now)) {
+                if (policy.getStartDate().isAfter(now)) {
                     rightsContext.setAttribute("in-effect", "false");
                 }
             }
 
             if (policy.getEndDate() != null) {
                 rightsContext.setAttribute("end-date", iso8601.format(policy.getEndDate()));
-                if (policy.getEndDate().before(now)) {
+                if (policy.getEndDate().isBefore(now)) {
                     rightsContext.setAttribute("in-effect", "false");
                 }
             }
@@ -203,10 +203,10 @@ public class METSRightsCrosswalk
                 //Default all DSpace groups to have "MANAGED GRP" as the type
                 String contextClass = GROUP_CONTEXTCLASS;
 
-                if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+                if (Strings.CS.equals(group.getName(), Group.ANONYMOUS)) {
                     //DSpace Anonymous Group = 'GENERAL PUBLIC' type
                     contextClass = ANONYMOUS_CONTEXTCLASS;
-                } else if (StringUtils.equals(group.getName(), Group.ADMIN)) {
+                } else if (Strings.CS.equals(group.getName(), Group.ADMIN)) {
                     //DSpace Administrator Group = 'REPOSITORY MGR' type
                     contextClass = ADMIN_CONTEXTCLASS;
                 }
@@ -526,7 +526,7 @@ public class METSRightsCrosswalk
                         log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
                     }
                     if (rp != null) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        DateTimeFormatter iso8601 = DateTimeFormatter.ISO_LOCAL_DATE;
 
                         // get reference to the <Permissions> element
                         // Note: we are assuming here that there will only ever be ONE <Permissions>
@@ -542,12 +542,12 @@ public class METSRightsCrosswalk
                         }
                         try {
                             if (element.getAttributeValue("start-date") != null) {
-                                rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
+                                rp.setStartDate(LocalDate.parse(element.getAttributeValue("start-date"), iso8601));
                             }
                             if (element.getAttributeValue("end-date") != null) {
-                                rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
+                                rp.setEndDate(LocalDate.parse(element.getAttributeValue("end-date"), iso8601));
                             }
-                        } catch (ParseException ex) {
+                        } catch (DateTimeParseException ex) {
                             log.error("Failed to parse embargo date. The date needs to be in the format 'yyyy-MM-dd'.",
                                       ex);
                         }

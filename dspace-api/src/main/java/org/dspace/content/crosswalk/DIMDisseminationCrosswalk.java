@@ -45,7 +45,7 @@ public class DIMDisseminationCrosswalk
 
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
-    private static final Namespace namespaces[] = {DIM_NS};
+    private static final Namespace[] namespaces = {DIM_NS};
 
     @Override
     public Namespace[] getNamespaces() {

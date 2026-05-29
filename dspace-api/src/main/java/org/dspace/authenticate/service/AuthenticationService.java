@@ -29,11 +29,11 @@ import org.dspace.eperson.Group;
  * <b>Configuration</b><br>
  * The stack of authentication methods is defined by one property in the DSpace configuration:
  * <pre>
- *   plugin.sequence.org.dspace.eperson.AuthenticationMethod = <em>a list of method class names</em>
+ *   plugin.sequence.org.dspace.authenticate.AuthenticationMethod = <em>a list of method class names</em>
  *     <em>e.g.</em>
- *   plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
- *       org.dspace.eperson.X509Authentication, \
- *       org.dspace.eperson.PasswordAuthentication
+ *   plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
+ *       org.dspace.authenticate.IPAuthentication, \
+ *       org.dspace.authenticate.PasswordAuthentication
  * </pre>
  * <p>
  * The "stack" is always traversed in order, with the methods
@@ -64,7 +64,7 @@ public interface AuthenticationService {
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. password) don't match
-     * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
+     * <br>CERT_REQUIRED   - not allowed to login this way without a cert.
      * <br>NO_SUCH_USER    - user not found using this method.
      * <br>BAD_ARGS        - user/password not appropriate for this method
      */
@@ -91,7 +91,7 @@ public interface AuthenticationService {
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. password) don't match
-     * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
+     * <br>CERT_REQUIRED   - not allowed to login this way without a cert.
      * <br>NO_SUCH_USER    - user not found using this method.
      * <br>BAD_ARGS        - user/password not appropriate for this method
      */

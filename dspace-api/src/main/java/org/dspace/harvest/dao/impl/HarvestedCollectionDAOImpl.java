@@ -8,7 +8,7 @@
 package org.dspace.harvest.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -94,11 +94,11 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
     @Override
     public List<HarvestedCollection>
         findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(Context context,
-                                                                           Date startTime,
+                                                                           Instant startTime,
                                                                            int minimalType,
                                                                            int[] statuses,
                                                                            int expirationStatus,
-                                                                           Date expirationTime)
+                                                                           Instant expirationTime)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);

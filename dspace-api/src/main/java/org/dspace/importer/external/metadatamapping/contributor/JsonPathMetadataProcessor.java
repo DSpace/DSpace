@@ -18,6 +18,6 @@ import java.util.Collection;
  */
 public interface JsonPathMetadataProcessor {
 
-    public Collection<String> processMetadata(String json);
+    Collection<String> processMetadata(String json);
 
 }

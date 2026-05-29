@@ -935,9 +935,9 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     @Test
     public void replaceMultipleTraditionalPageOnePlainTextAuthorTest() throws Exception {
         final boolean virtualMetadataEnabled =
-            configurationService.getBooleanProperty("item.enable-virtual-metadata", false);
+            configurationService.getBooleanProperty("relationship.enable-virtual-metadata", false);
 
-        configurationService.setProperty("item.enable-virtual-metadata", false);
+        configurationService.setProperty("relationship.enable-virtual-metadata", false);
         try {
             initPlainTextPublicationWorkspace();
 
@@ -963,7 +963,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            configurationService.setProperty("item.enable-virtual-metadata", virtualMetadataEnabled);
+            configurationService.setProperty("relationship.enable-virtual-metadata", virtualMetadataEnabled);
         }
     }
 
@@ -1424,6 +1424,27 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         );
 
         moveMetadataAuthorTest(moves, expectedOrder);
+    }
+
+    @Test
+    public void replaceInvalidMetadataShouldFailTest() throws Exception {
+        initSimplePublicationItem();
+        assertEquals(11, publicationItem.getMetadata().size());
+
+        String patchBody = getPatchContent(List.of(
+            new ReplaceOperation("/metadata/dc.contributor.invalid/0", "some value")
+        ));
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/items/" + publicationItem.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnprocessableEntity());
+
+        publicationItem = context.reloadEntity(publicationItem);
+
+        assertEquals(11, publicationItem.getMetadata().size());
+        assertEquals(0,
+            itemService.getMetadata(publicationItem, "dc", "contributor", "invalid", Item.ANY, false).size());
     }
 
     /**

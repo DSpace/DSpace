@@ -7,6 +7,8 @@
  */
 package org.dspace.importer.external.ror.service;
 
+import static org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl.HEADER_PARAMETERS;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,9 +21,9 @@ import java.util.concurrent.Callable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.el.MethodNotFoundException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +34,7 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -44,10 +47,12 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     private final static Logger log = LogManager.getLogger();
     protected static final String ROR_IDENTIFIER_PREFIX = "https://ror.org/";
+    protected static final String ROR_CLIENT_ID_HEADER = "Client-Id";
+    protected static final String ROR_CLIENT_ID_PROP = "ror.client-id";
 
     private String url;
 
-    private int timeout = 1000;
+    private int timeout = 5000;
 
     @Autowired
     private LiveImportClient liveImportClient;
@@ -91,12 +96,12 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for ROR");
+        throw new UnsupportedOperationException("This method is not implemented for ROR");
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for ROR");
+        throw new UnsupportedOperationException("This method is not implemented for ROR");
     }
 
     @Override
@@ -161,7 +166,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      * ROR query. This Callable uses as query value to ROR the string queryString
      * passed to constructor. If the object will be construct through {@code Query}
      * instance, the value of the Query's map with the key "query" will be used.
-     * 
+     *
      * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
      */
     private class CountByQueryCallable implements Callable<Integer> {
@@ -190,7 +195,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
      */
     public Integer count(String query) {
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
+            Map<String, Map<String, String>> params = getBaseParams();
 
             URIBuilder uriBuilder = new URIBuilder(this.url);
             uriBuilder.addParameter("query", query);
@@ -211,10 +216,10 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
         List<ImportRecord> importResults = new ArrayList<>();
 
-        id = StringUtils.removeStart(id, ROR_IDENTIFIER_PREFIX);
+        id = Strings.CS.removeStart(id, ROR_IDENTIFIER_PREFIX);
 
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
+            Map<String, Map<String, String>> params = getBaseParams();
 
             URIBuilder uriBuilder = new URIBuilder(this.url + "/" + id);
 
@@ -235,7 +240,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private List<ImportRecord> search(String query) {
         List<ImportRecord> importResults = new ArrayList<>();
         try {
-            Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
+            Map<String, Map<String, String>> params = getBaseParams();
 
             URIBuilder uriBuilder = new URIBuilder(this.url);
             uriBuilder.addParameter("query", query);
@@ -260,6 +265,16 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             e.printStackTrace();
         }
         return importResults;
+    }
+
+    protected Map<String, Map<String, String>> getBaseParams() {
+        Map<String, Map<String, String>> params = new HashMap<>();
+        String rorClientId =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(ROR_CLIENT_ID_PROP);
+        if (StringUtils.isNotEmpty(rorClientId)) {
+            params.put(HEADER_PARAMETERS, Map.of(ROR_CLIENT_ID_HEADER, rorClientId));
+        }
+        return params;
     }
 
     private JsonNode convertStringJsonToJsonNode(String json) {

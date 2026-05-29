@@ -8,7 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -47,8 +47,8 @@ public class AccessConditionResourcePolicyUtils {
             String name = newAccessCondition.getName();
             String description = newAccessCondition.getDescription();
 
-            Date startDate = newAccessCondition.getStartDate();
-            Date endDate = newAccessCondition.getEndDate();
+            LocalDate startDate = newAccessCondition.getStartDate();
+            LocalDate endDate = newAccessCondition.getEndDate();
 
             findApplyResourcePolicy(context, accessConditionOptions, obj, name, description, startDate, endDate);
         }
@@ -72,8 +72,9 @@ public class AccessConditionResourcePolicyUtils {
      * @throws ParseException           if parser error
      */
     public static void findApplyResourcePolicy(Context context,
-            List<AccessConditionOption> accessConditionOptions, DSpaceObject obj, String name,
-            String description, Date startDate, Date endDate) throws SQLException, AuthorizeException, ParseException {
+                                               List<AccessConditionOption> accessConditionOptions, DSpaceObject obj,
+                                               String name, String description, LocalDate startDate, LocalDate endDate)
+        throws SQLException, AuthorizeException, ParseException {
         boolean found = false;
         for (AccessConditionOption accessConditionOption : accessConditionOptions) {
             if (!found && accessConditionOption.getName().equalsIgnoreCase(name)) {
@@ -100,7 +101,7 @@ public class AccessConditionResourcePolicyUtils {
      * @throws ParseException          if parser error
      */
     public static void canApplyResourcePolicy(Context context, List<AccessConditionOption> accessConditionOptions,
-            String name, Date startDate, Date endDate) throws SQLException, AuthorizeException, ParseException {
+                                              String name, LocalDate startDate, LocalDate endDate) {
         boolean found = false;
         for (AccessConditionOption ac : accessConditionOptions) {
             if (ac.getName().equalsIgnoreCase(name)) {

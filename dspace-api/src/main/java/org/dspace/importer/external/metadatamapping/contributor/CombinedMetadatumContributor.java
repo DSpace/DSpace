@@ -77,21 +77,31 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
         LinkedList<LinkedList<MetadatumDTO>> metadatumLists = new LinkedList<>();
 
         for (MetadataContributor metadatumContributor : metadatumContributors) {
-            LinkedList<MetadatumDTO> metadatums = (LinkedList<MetadatumDTO>) metadatumContributor.contributeMetadata(t);
-            metadatumLists.add(metadatums);
+            LinkedList<MetadatumDTO> metadatums = new LinkedList<>(metadatumContributor.contributeMetadata(t));
+            if (!metadatums.isEmpty()) {
+                metadatumLists.add(metadatums);
+            }
         }
 
-        for (int i = 0; i < metadatumLists.getFirst().size(); i++) {
+        if (metadatumLists.isEmpty()) {
+            return values;
+        }
 
+        int maxSize = metadatumLists.stream().mapToInt(List::size).max().orElse(0);
+
+        for (int i = 0; i < maxSize; i++) {
             StringBuilder value = new StringBuilder();
 
-            for (LinkedList<MetadatumDTO> metadatums : metadatumLists) {
-                value.append(metadatums.get(i).getValue());
+            for (List<MetadatumDTO> metadatums : metadatumLists) {
+                if (i < metadatums.size()) {
+                    value.append(metadatums.get(i).getValue());
+                }
 
-                if (!metadatums.equals(metadatumLists.getLast())) {
+                if (!metadatums.equals(metadatumLists.get(metadatumLists.size() - 1))) {
                     value.append(separator);
                 }
             }
+
             values.add(metadataFieldMapping.toDCValue(field, value.toString()));
         }
 

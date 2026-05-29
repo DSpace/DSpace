@@ -22,14 +22,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ConfigurationConverter;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.builder.ConfigurationBuilderEvent;
 import org.apache.commons.configuration2.builder.combined.ReloadingCombinedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.event.Event;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
@@ -57,7 +60,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     public static final String DEFAULT_CONFIG_DIR = "config";
     public static final String DEFAULT_CONFIG_DEFINITION_FILE = "config-definition.xml";
     public static final String DSPACE_CONFIG_DEFINITION_PATH = DEFAULT_CONFIG_DIR + File.separatorChar +
-        DEFAULT_CONFIG_DEFINITION_FILE;
+            DEFAULT_CONFIG_DEFINITION_FILE;
 
     public static final String DSPACE_CONFIG_PATH = DEFAULT_CONFIG_DIR + File.separatorChar + DSPACE + DOT_CONFIG;
 
@@ -160,6 +163,26 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
+     * Returns all loaded properties as a HierarchicalConfiguration object.
+     *
+     * @see org.dspace.services.ConfigurationService#getHierarchicalConfiguration()
+     */
+    @Override
+    public HierarchicalConfiguration<ImmutableNode> getHierarchicalConfiguration() {
+        return (CombinedConfiguration) getConfiguration();
+    }
+
+    /**
+     * Returns all child configurations of a property.
+     *
+     * @see org.dspace.services.ConfigurationService#getChildren()
+     */
+    @Override
+    public List<HierarchicalConfiguration<ImmutableNode>> getChildren(String name) {
+        return getHierarchicalConfiguration().childConfigurationsAt(name);
+    }
+
+    /**
      * Returns property value as an Object.
      * If property is not found, null is returned.
      *
@@ -180,6 +203,16 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     public synchronized String getProperty(String name) {
         return getProperty(name, null);
     }
+
+    /**
+     * Returns Properties configurations starting with prefix
+     *
+     */
+    @Override
+    public Properties getPropertiesWithPrefix(String name) {
+        return  ConfigurationConverter.getProperties(getConfiguration().subset(name));
+    }
+
 
     /**
      * Returns property value as a String.
@@ -239,7 +272,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     /**
      * Returns property value as an int value.
      * If property is not found, 0 is returned.
-     * <P>
+     * <p>
      * If you wish to avoid the 0 return value, you can use
      * hasProperty() to first determine whether the property
      * exits. Or, use getIntProperty(name,defaultValue).
@@ -444,7 +477,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
         // Check if the value has changed
         if (getConfiguration().containsKey(key) &&
-            getConfiguration().getProperty(key).equals(value)) {
+                getConfiguration().getProperty(key).equals(value)) {
             // no change to the value
             return false;
         } else {
@@ -476,7 +509,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     /**
      * Loads up the configuration from the DSpace configuration files.
-     * <P>
+     * <p>
      * Determines the home directory of DSpace, and then loads the configurations
      * based on the configuration definition file in that location
      * (using Apache Commons Configuration).
@@ -510,9 +543,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             // Load our configuration definition, which in turn loads all our config files/settings
             // See: http://commons.apache.org/proper/commons-configuration/userguide/howto_combinedbuilder.html
             this.configurationBuilder = new ReloadingCombinedConfigurationBuilder()
-                .configure(params.fileBased()
-                                 .setFile(new File(this.configDefinition))
-                                 .setListDelimiterHandler(listDelimiterHandler));
+                    .configure(params.fileBased()
+                            .setFile(new File(this.configDefinition))
+                            .setListDelimiterHandler(listDelimiterHandler));
 
             // Parse our configuration definition and initialize resulting Configuration
             this.configurationBuilder.getConfiguration();
@@ -525,7 +558,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
                 // Lambda which checks reloadable configurations for any updates.
                 // Auto-reloadable configs are ONLY those flagged config-reload="true" in the configuration definition
                 (Event e) -> this.configurationBuilder.getReloadingController()
-                                                      .checkForReloading(null));
+                        .checkForReloading(null));
         } catch (ConfigurationException ce) {
             log.error("Unable to load configurations based on definition at {}",
                     this.configDefinition);
@@ -541,7 +574,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     /**
      * Reload all configurations from the DSpace configuration definition.
-     * <P>
+     * <p>
      * This method invalidates the current Configuration object, and uses
      * the initialized ConfigurationBuilder to reload all configurations.
      */
@@ -589,7 +622,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
         // Return the configuration directory and number of configs loaded
         return "ConfigDir=" + getConfiguration().getString(DSPACE_HOME) + File.separatorChar
-            + DEFAULT_CONFIG_DIR + ", Size=" + size;
+                + DEFAULT_CONFIG_DIR + ", Size=" + size;
     }
 
     /**
@@ -654,9 +687,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
         // If none of the above worked, DSpace Kernel will fail to start.
         throw new RuntimeException("DSpace home directory could not be determined. It MUST include a subpath of " +
-                                       "'" + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH + "'. " +
-                                       "Please consider setting the '" + DSPACE_HOME + "' system property or ensure " +
-                                       "the dspace-api.jar is being run from [dspace]/lib/.");
+                "'" + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH + "'. " +
+                "Please consider setting the '" + DSPACE_HOME + "' system property or ensure " +
+                "the dspace-api.jar is being run from [dspace]/lib/.");
     }
 
     /**

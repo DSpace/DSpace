@@ -26,23 +26,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.NotifyServiceBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.matcher.QASourceMatcher;
 import org.dspace.matcher.QATopicMatcher;
 import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.service.VersioningService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +72,25 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private LDNMessageService ldnMessageService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private QAEventService qaEventService = new DSpace().getSingletonService(QAEventService.class);
+
+    @Autowired
+    private XmlWorkflowService workflowService;
+
+    @Autowired
+    private VersioningService versioningService;
+
+    @Autowired
+    private InstallItemService installItemService;
+
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private NotifyPatternToTriggerService notifyPatternToTriggerService;
 
     @Test
     public void ldnInboxAnnounceEndorsementTest() throws Exception {
@@ -88,7 +115,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = announceEndorsement.replaceAll("<<object>>", object);
         message = message.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -123,7 +149,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = announceReview.replaceAll("<<object>>", object);
         message = message.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -147,7 +172,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         InputStream offerEndorsementStream = getClass().getResourceAsStream("ldn_offer_endorsement_badrequest.json");
         String message = IOUtils.toString(offerEndorsementStream, Charset.defaultCharset());
         offerEndorsementStream.close();
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -178,7 +202,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         offerReviewStream.close();
         String message = announceReview.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -197,7 +220,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String ackMessage = ackReview.replaceAll("<<object_handle>>", object);
         ackMessage = ackMessage.replaceAll("<<ldn_offer_review_uuid>>",
             "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509de");
-        ObjectMapper ackMapper = new ObjectMapper();
         Notification ackNotification = mapper.readValue(ackMessage, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -211,6 +233,46 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         assertEquals(ackProcessed, 0);
 
 
+    }
+
+    @Test
+    public void ldnInboxOfferReviewAndTentativeRejectTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Test Item")
+                .build();
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
+                                .withDescription("service description")
+                                .withUrl("https://review-service.com/inbox/about/")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .withScore(BigDecimal.valueOf(0.6d))
+                                .withStatus(true)
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.3")
+                                .build();
+        InputStream ackReviewStream = getClass().getResourceAsStream("ldn_ack_review_reject.json");
+        String ackReview = IOUtils.toString(ackReviewStream, Charset.defaultCharset());
+        String ackMessage = ackReview.replaceAll("<<object_handle>>", object);
+        ackMessage = ackMessage.replaceAll("<<ldn_offer_endorsement_uuid>>",
+                "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509da");
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(ackMessage, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(ackMessage))
+            .andExpect(status().isAccepted());
+
+        int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 1);
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+        // check Tentative Reject is correctly received
     }
 
     @Test
@@ -236,7 +298,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = announceRelationship.replaceAll("<<object>>", object);
         message = message.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -257,7 +318,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
     private void checkStoredLDNMessage(Notification notification, LDNMessageEntity ldnMessage, String object)
         throws Exception {
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification storedMessage = mapper.readValue(ldnMessage.getMessage(), Notification.class);
 
         assertNotNull(ldnMessage);
@@ -300,7 +360,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = announceEndorsement.replaceAll("<<object>>", object);
         message = message.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox").with(remoteHost("mydocker.url", "172.23.0.1"))
@@ -337,7 +396,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = announceEndorsement.replaceAll("<<object>>", object);
         message = message.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox")
@@ -374,7 +432,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = announceEndorsement.replaceAll("<<object>>", object);
         message = message.replaceAll("<<object_handle>>", object);
 
-        ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
             .perform(post("/ldn/inbox").with(remoteHost("mydocker.url", "172.23.0.1"))
@@ -385,6 +442,80 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
         checkStoredLDNMessage(notification, ldnMessage, object);
         assertEquals(ldnMessage.getQueueStatus(), LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
+    }
+
+
+    @Test
+    public void testLDNMessageConsumerRequestEndorsementResubmission() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
+                                .withDescription("service description")
+                                .withUrl("https://review-service.com/inbox/about/")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .withScore(BigDecimal.valueOf(0.6d))
+                                .withStatus(true)
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.3")
+                                .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withTitle("Submission Item")
+                .withIssueDate("2023-11-20")
+                .withFulltext("test.txt", "test", InputStream.nullInputStream())
+                .grantLicense()
+                .withCOARNotifyService(notifyServiceEntity, "request-endorsement")
+                .build();
+        Item item = installItemService.installItem(context, workspaceItem);
+
+        context.commit();
+        int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 1);
+        List<LDNMessageEntity> messages = ldnMessageService.findAll(context);
+        String notificationId = messages.get(0).getID();
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        InputStream ackReviewStream = getClass().getResourceAsStream("ldn_ack_review_reject.json");
+        String ackReview = IOUtils.toString(ackReviewStream, Charset.defaultCharset());
+        String ackMessage = ackReview.replaceAll("<<object_handle>>", object);
+        ackMessage = ackMessage.replaceAll("<<ldn_offer_endorsement_uuid>>", notificationId);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(ackMessage, Notification.class);
+        getClient()
+                .perform(post("/ldn/inbox")
+                        .contentType("application/ld+json")
+                        .content(ackMessage))
+                .andExpect(status().isAccepted());
+
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 1);
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+
+        // We received a first notification for rejectance
+
+
+        Version version = versioningService.createNewVersion(context, context.reloadEntity(item));
+        WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());
+
+        NotifyPatternToTrigger notifyPatternToTrigger = notifyPatternToTriggerService.create(context);
+        notifyPatternToTrigger.setItem(wsi.getItem());
+        notifyPatternToTrigger.setNotifyService(notifyServiceEntity);
+        notifyPatternToTrigger.setPattern("request-endorsement");
+        notifyPatternToTriggerService.update(context, notifyPatternToTrigger);
+        installItemService.installItem(context, wsi);
+        context.commit();
+
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 1);
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+
     }
 
     private static RequestPostProcessor remoteHost(final String remoteHost, final String remoteAddr) {

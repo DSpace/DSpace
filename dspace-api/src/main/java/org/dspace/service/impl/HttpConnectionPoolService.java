@@ -19,11 +19,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.ConfigurationService;
 
 /**
@@ -112,7 +112,7 @@ public class HttpConnectionPoolService {
      * @return the client.
      */
     public CloseableHttpClient getClient() {
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
+        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().builder(true).create()
                 .setKeepAliveStrategy(keepAliveStrategy)
                 .setConnectionManager(connManager)
                 .build();

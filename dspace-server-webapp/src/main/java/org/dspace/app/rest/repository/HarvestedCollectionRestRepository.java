@@ -44,6 +44,9 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
     @Autowired
     HarvestedCollectionConverter harvestedCollectionConverter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     public HarvestedCollectionRest findOne(Collection collection) throws SQLException {
         Context context = obtainContext();
 
@@ -110,7 +113,6 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
     private HarvestedCollectionRest parseHarvestedCollectionRest(Context context,
                                                                  HttpServletRequest request,
                                                                  Collection collection) throws SQLException {
-        ObjectMapper mapper = new ObjectMapper();
         HarvestedCollectionRest harvestedCollectionRest;
 
         try {

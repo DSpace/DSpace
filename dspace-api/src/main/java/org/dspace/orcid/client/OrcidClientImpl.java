@@ -35,13 +35,15 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidEntityType;
@@ -58,6 +60,7 @@ import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
 /**
  * Implementation of {@link OrcidClient}.
@@ -180,6 +183,20 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public ExpandedSearch expandedSearch(String accessToken, String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
+    @Override
+    public ExpandedSearch expandedSearch(String query, int start, int rows) {
+        String queryParams = formatExpandedSearchParameters(query, start, rows);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/expanded-search" + queryParams);
+        return executeAndUnmarshall(httpUriRequest, false, ExpandedSearch.class);
+    }
+
+    @Override
     public void revokeToken(OrcidToken orcidToken) {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
@@ -253,11 +270,13 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
-    private void executeSuccessful(HttpUriRequest httpUriRequest) {
-        try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpResponse response = client.execute(httpUriRequest);
+    private String formatExpandedSearchParameters(String query, int start, int rows) {
+        return String.format("?q=%s&start=%s&rows=%s", query, start, rows);
+    }
 
+    private void executeSuccessful(HttpUriRequest httpUriRequest) {
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            CloseableHttpResponse response = client.execute(httpUriRequest);
             if (isNotSuccessfull(response)) {
                 throw new OrcidClientException(
                     getStatusCode(response),
@@ -272,21 +291,17 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     private <T> T executeAndParseJson(HttpUriRequest httpUriRequest, Class<T> clazz) {
-
-        HttpClient client = HttpClientBuilder.create().build();
-
-        return executeAndReturns(() -> {
-
-            HttpResponse response = client.execute(httpUriRequest);
-
-            if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
-            }
-
-            return objectMapper.readValue(response.getEntity().getContent(), clazz);
-
-        });
-
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            return executeAndReturns(() -> {
+                CloseableHttpResponse response = client.execute(httpUriRequest);
+                if (isNotSuccessfull(response)) {
+                    throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+                }
+                return objectMapper.readValue(response.getEntity().getContent(), clazz);
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -301,44 +316,37 @@ public class OrcidClientImpl implements OrcidClient {
      * @throws OrcidClientException if the incoming response is not successful
      */
     private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
-
-        HttpClient client = HttpClientBuilder.create().build();
-
-        return executeAndReturns(() -> {
-
-            HttpResponse response = client.execute(httpUriRequest);
-
-            if (handleNotFoundAsNull && isNotFound(response)) {
-                return null;
-            }
-
-            if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
-            }
-
-            return unmarshall(response.getEntity(), clazz);
-
-        });
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            return executeAndReturns(() -> {
+                CloseableHttpResponse response = client.execute(httpUriRequest);
+                if (handleNotFoundAsNull && isNotFound(response)) {
+                    return null;
+                }
+                if (isNotSuccessfull(response)) {
+                    throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+                }
+                return unmarshall(response.getEntity(), clazz);
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private OrcidResponse execute(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull) {
-        HttpClient client = HttpClientBuilder.create().build();
-
-        return executeAndReturns(() -> {
-
-            HttpResponse response = client.execute(httpUriRequest);
-
-            if (handleNotFoundAsNull && isNotFound(response)) {
-                return new OrcidResponse(getStatusCode(response), null, getContent(response));
-            }
-
-            if (isNotSuccessfull(response)) {
-                throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
-            }
-
-            return new OrcidResponse(getStatusCode(response), getPutCode(response), getContent(response));
-
-        });
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+            return executeAndReturns(() -> {
+                CloseableHttpResponse response = client.execute(httpUriRequest);
+                if (handleNotFoundAsNull && isNotFound(response)) {
+                    return new OrcidResponse(getStatusCode(response), null, getContent(response));
+                }
+                if (isNotSuccessfull(response)) {
+                    throw new OrcidClientException(getStatusCode(response), formatErrorMessage(response));
+                }
+                return new OrcidResponse(getStatusCode(response), getPutCode(response), getContent(response));
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <T> T executeAndReturns(ThrowingSupplier<T, Exception> supplier) {
@@ -363,8 +371,7 @@ public class OrcidClientImpl implements OrcidClient {
     @SuppressWarnings("unchecked")
     private <T> T unmarshall(HttpEntity entity, Class<T> clazz) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XMLInputFactory xmlInputFactory = XMLUtils.getXMLInputFactory();
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(entity.getContent());
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         return (T) unmarshaller.unmarshal(xmlStreamReader);

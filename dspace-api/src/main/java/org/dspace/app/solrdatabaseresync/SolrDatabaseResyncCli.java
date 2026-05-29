@@ -12,7 +12,8 @@ import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -98,7 +99,8 @@ public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliS
 
     private void performStatusUpdate(Context context) throws SearchServiceException, SolrServerException, IOException {
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery(STATUS_FIELD + ":" + STATUS_FIELD_PREDB);
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery(STATUS_FIELD + ":" + STATUS_FIELD_PREDB);
         solrQuery.addFilterQuery(SearchUtils.RESOURCE_TYPE_FIELD + ":" + IndexableItem.TYPE);
         String dateRangeFilter = SearchUtils.LAST_INDEXED_FIELD + ":[* TO " + maxTime + "]";
         logDebugAndOut("Date range filter used; " + dateRangeFilter);
@@ -166,11 +168,11 @@ public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliS
     }
 
     private String getMaxTime() {
-        Calendar cal = Calendar.getInstance();
+        Instant now = Instant.now();
         if (timeUntilReindex > 0) {
-            cal.add(Calendar.MILLISECOND, -timeUntilReindex);
+            now = now.minus(timeUntilReindex, ChronoUnit.MILLIS);
         }
-        return SolrUtils.getDateFormatter().format(cal.getTime());
+        return SolrUtils.getDateFormatter().format(now);
     }
 
     private int getTimeUntilReindex() {

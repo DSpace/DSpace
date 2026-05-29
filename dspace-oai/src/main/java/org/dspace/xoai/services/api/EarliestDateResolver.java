@@ -8,11 +8,11 @@
 package org.dspace.xoai.services.api;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 
 public interface EarliestDateResolver {
-    public Date getEarliestDate(Context context) throws InvalidMetadataFieldException, SQLException;
+    public Instant getEarliestDate(Context context) throws InvalidMetadataFieldException, SQLException;
 }

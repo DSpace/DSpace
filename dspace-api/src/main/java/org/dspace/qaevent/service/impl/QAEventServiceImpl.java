@@ -8,13 +8,12 @@
 package org.dspace.qaevent.service.impl;
 
 import static java.util.Comparator.comparing;
-import static org.apache.commons.lang3.StringUtils.endsWith;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -131,7 +131,7 @@ public class QAEventServiceImpl implements QAEventService {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("qaevents.solr.server", "http://localhost:8983/solr/qaevent");
-            return new HttpSolrClient.Builder(solrService).build();
+            solr = new HttpSolrClient.Builder(solrService).build();
         }
         return solr;
     }
@@ -207,7 +207,7 @@ public class QAEventServiceImpl implements QAEventService {
                     topic.setSource(sourceName);
                     topic.setKey(c.getName());
                     topic.setTotalEvents(c.getCount());
-                    topic.setLastEvent(new Date());
+                    topic.setLastEvent(Instant.now());
                     return topic;
                 }
             }
@@ -254,7 +254,7 @@ public class QAEventServiceImpl implements QAEventService {
                     QATopic topic = new QATopic();
                     topic.setKey(c.getName());
                     topic.setTotalEvents(c.getCount());
-                    topic.setLastEvent(new Date());
+                    topic.setLastEvent(Instant.now());
                     return topic;
                 }
             }
@@ -315,7 +315,7 @@ public class QAEventServiceImpl implements QAEventService {
                 topic.setKey(c.getName());
                 topic.setFocus(target);
                 topic.setTotalEvents(c.getCount());
-                topic.setLastEvent(new Date());
+                topic.setLastEvent(Instant.now());
                 topics.add(topic);
                 idx++;
             }
@@ -533,7 +533,7 @@ public class QAEventServiceImpl implements QAEventService {
                     source.setName(c.getName());
                     source.setFocus(target);
                     source.setTotalEvents(c.getCount());
-                    source.setLastEvent(new Date());
+                    source.setLastEvent(Instant.now());
                     return source;
                 }
             }
@@ -581,7 +581,7 @@ public class QAEventServiceImpl implements QAEventService {
     @Override
     public boolean isRelatedItemSupported(QAEvent qaevent) {
         // Currently only PROJECT topics related to OPENAIRE supports related items
-        return qaevent.getSource().equals(OPENAIRE_SOURCE) && endsWith(qaevent.getTopic(), "/PROJECT");
+        return qaevent.getSource().equals(OPENAIRE_SOURCE) && Strings.CS.endsWith(qaevent.getTopic(), "/PROJECT");
     }
 
     private SolrInputDocument createSolrDocument(Context context, QAEvent dto, String checksum) throws Exception {
@@ -593,7 +593,7 @@ public class QAEventServiceImpl implements QAEventService {
         doc.addField(TOPIC, dto.getTopic());
         doc.addField(TRUST, dto.getTrust());
         doc.addField(MESSAGE, dto.getMessage());
-        doc.addField(LAST_UPDATE, new Date());
+        doc.addField(LAST_UPDATE, Instant.now().toString());
         String resourceUUID = getResourceUUID(context, dto.getOriginalId());
         if (resourceUUID == null) {
             resourceUUID = dto.getTarget();
@@ -635,7 +635,7 @@ public class QAEventServiceImpl implements QAEventService {
         QAEvent item = new QAEvent();
         item.setSource((String) doc.get(SOURCE));
         item.setEventId((String) doc.get(EVENT_ID));
-        item.setLastUpdate((Date) doc.get(LAST_UPDATE));
+        item.setLastUpdate(((java.util.Date) doc.get(LAST_UPDATE)).toInstant());
         item.setMessage((String) doc.get(MESSAGE));
         item.setOriginalId((String) doc.get(ORIGINAL_ID));
         item.setTarget((String) doc.get(RESOURCE_UUID));

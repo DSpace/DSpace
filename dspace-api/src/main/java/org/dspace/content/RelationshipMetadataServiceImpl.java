@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.service.ItemService;
@@ -185,7 +186,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         Item otherItem;
         int place = 0;
         boolean isLeftwards;
-        if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType) &&
+        if (Strings.CS.equals(relationshipType.getLeftType().getLabel(), entityType) &&
                 item.getID().equals(relationship.getLeftItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getLeftwardType());
             otherItem = relationship.getRightItem();
@@ -193,7 +194,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             place = relationship.getLeftPlace();
             isLeftwards = false; //if the current item is stored on the left,
             // the name variant is retrieved from the rightwards label
-        } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType) &&
+        } else if (Strings.CS.equals(relationshipType.getRightType().getLabel(), entityType) &&
                 item.getID().equals(relationship.getRightItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightwardType());
             otherItem = relationship.getLeftItem();

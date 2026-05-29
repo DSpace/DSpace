@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -170,7 +170,7 @@ public class SuggestionUtilsIT extends AbstractIntegrationTestWithDatabase  {
         suggestion.getMetadata().add(
                 new MetadataValueDTO("dc", "title", null, null, "dcTitle"));
         suggestion.setDisplay(getFirstEntryByMetadatum(externalDataObject, "dc", "title", null));
-        suggestion.getMetadata().add(new MetadataValueDTO("dc", "date", "issued", null, new Date().toString()));
+        suggestion.getMetadata().add(new MetadataValueDTO("dc", "date", "issued", null, Instant.now().toString()));
         suggestion.getMetadata().add(new MetadataValueDTO("dc", "description", "abstract", null, "description"));
         suggestion.setExternalSourceUri(cfg.getProperty("dspace.server.url")
                 + "/api/integration/externalsources/" + primaryProvider.getSourceIdentifier() + "/entryValues/"

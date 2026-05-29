@@ -9,18 +9,29 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.matcher.ResourcePolicyMatcher.matches;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.SupervisionOrderMatcher.matchSuperVisionOrder;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
+import static org.dspace.authorize.ResourcePolicy.TYPE_SUBMISSION;
+import static org.dspace.content.BitstreamLinkingServiceImpl.BITSTREAM;
+import static org.dspace.content.BitstreamLinkingServiceImpl.DSPACE;
+import static org.dspace.content.BitstreamLinkingServiceImpl.IS_REPLACED_BY;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -37,10 +48,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,20 +62,27 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.ResourcePolicyMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -85,18 +104,29 @@ import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
+import org.dspace.validation.CclicenseValidator;
+import org.dspace.validation.LicenseValidator;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,14 +141,39 @@ import org.springframework.test.web.servlet.MvcResult;
  */
 public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    public static final String LICENSE_ERROR_MESSAGE_PATH =
+        "$.errors[?(@.message=='" + LicenseValidator.ERROR_VALIDATION_LICENSEREQUIRED + "')]";
+    public static final String CCLICENSE_ERROR_MESSAGE_PATH =
+        "$.errors[?(@.message=='" + CclicenseValidator.ERROR_VALIDATION_CCLICENSEREQUIRED + "')]";
     @Autowired
     private CollectionService cs;
     @Autowired
     private ItemService itemService;
     @Autowired
     private ConfigurationService configurationService;
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
+    @Autowired
+    private AuthorizeService authorizeService;
+    @Autowired
+    private PluginService pluginService;
+    @Autowired
+    private ChoiceAuthorityService choiceAuthorityService;
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
+    @Autowired
+    private ItemConverter itemConverter;
+    @Autowired
+    private Utils utils;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private GroupService groupService;
+
+    private BitstreamService bitstreamService;
+
+    private ResourcePolicyService resourcePolicyService;
 
     private Group embargoedGroups;
     private Group embargoedGroup1;
@@ -130,8 +185,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
         context.turnOffAuthorisationSystem();
         this.groupService = EPersonServiceFactory.getInstance().getGroupService();
+        this.bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        this.resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
 
         embargoedGroups = GroupBuilder.createGroup(context)
                 .withName("Embargoed Groups")
@@ -2269,6 +2327,78 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void patchUpdateNestedMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        eperson = context.reloadEntity(eperson);
+
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection nestedMetadataCollection =
+            CollectionBuilder.createCollection(context, parentCommunity, "123456789/nested-metadata-test")
+                             .withName("Nested Metadata Test Collection")
+                             .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        context.commit();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, nestedMetadataCollection)
+                                                  .withTitle("Workspace Item 1")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        // ** WHEN **
+        // Consolidate all operations into a single list for one PATCH call
+        List<Operation> patchOperations = new ArrayList<>();
+
+        // 1. Add Author
+        Map<String, String> authorValue = new HashMap<>();
+        authorValue.put("value", "Smith, John");
+        patchOperations.add(
+            new AddOperation("/sections/publicationStepGroup/dc.contributor.author", Arrays.asList(authorValue)));
+
+        // 2. Add Editor (required for validation)
+        Map<String, String> editorValue = new HashMap<>();
+        editorValue.put("value", "Doe, Jane");
+        patchOperations.add(
+            new AddOperation("/sections/publicationStepGroup/dc.contributor.editor", Arrays.asList(editorValue)));
+
+        // 3. Add Nested Affiliation (tests recursive resolution)
+        Map<String, String> affiliationValue = new HashMap<>();
+        affiliationValue.put("value", "University of Example");
+        patchOperations.add(new AddOperation("/sections/publicationStepGroup/oairecerif.author.affiliation",
+                                             Arrays.asList(affiliationValue)));
+
+        String patchBody = getPatchContent(patchOperations);
+
+        // Perform a single PATCH call
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                         .content(patchBody)
+                                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.errors").doesNotExist());
+
+        // ** THEN **
+        // Verify that all changes have been persisted correctly
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(
+                                jsonPath("$.sections.publicationStepGroup['dc.contributor.author'][0].value").value(
+                                    "Smith, John"))
+                            .andExpect(
+                                jsonPath("$.sections.publicationStepGroup['dc.contributor.editor'][0].value").value(
+                                    "Doe, Jane"))
+                            .andExpect(jsonPath(
+                                "$.sections.publicationStepGroup['oairecerif.author.affiliation'][0].value").value(
+                                "University of Example"));
+    }
+
+    @Test
     /**
      * Test the update of metadata for fields configured with type-bind
      *
@@ -2618,6 +2748,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                (witem, "Workspace Item 1", "2019-01-01", "ExtraEntry"))));
     }
 
+    @Test
     public void patchReplaceMetadataOnItemStillInSubmissionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -3794,9 +3925,18 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                contains( hasJsonPath("$.paths",
-                                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(
+                                jsonPath(
+
+                                    LICENSE_ERROR_MESSAGE_PATH,
+                                    contains(
+                                        hasJsonPath(
+                                            "$.paths",
+                                            contains(hasJsonPath("$", is("/sections/license")))
+                                        )
+                                    )
+                                )
+                            )
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3806,9 +3946,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3824,9 +3964,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                    contains( hasJsonPath("$.paths",
-                                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license"))))
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3836,9 +3979,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem2.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3854,9 +3997,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                contains( hasJsonPath("$.paths",
-                                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3866,9 +4013,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem3.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                    contains( hasJsonPath("$.paths",
-                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath("$.paths",
+                                                                contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3884,10 +4035,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(
-                                jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                                    contains( hasJsonPath("$.paths",
-                                        contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(
+                                                    hasJsonPath(
+                                                        "$.paths",
+                                                        contains(hasJsonPath("$", is("/sections/license")))
+                                                    )
+                                                )
+                            ))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3897,9 +4052,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem4.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
-                contains( hasJsonPath("$.paths",
-                    contains(hasJsonPath("$", is("/sections/license")))))))
+                            .andExpect(jsonPath(LICENSE_ERROR_MESSAGE_PATH,
+                                                contains(hasJsonPath("$.paths", contains(
+                                                    hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -4061,10 +4216,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // create a list of values to use in add operation
         List<Operation> addAccessCondition = new ArrayList<>();
@@ -4342,8 +4496,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Integer workspaceItemId = null;
         try {
-
-        ObjectMapper mapper = new ObjectMapper();
         // You have to be an admin to create an Item from an ExternalDataObject
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
@@ -4416,7 +4568,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
                                           + col1.getID().toString())
@@ -4886,7 +5037,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/extraction-test")
                 .withName("Collection 1").build();
-        String authToken = getAuthToken(admin.getEmail(), password);
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .build();
@@ -4894,6 +5044,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("This is a test title")
                 .build();
         context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         // try to add the pmid identifier
         List<Operation> addId = new ArrayList<Operation>();
@@ -5591,6 +5743,793 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void testWorkspaceItemPoliciesWithSharedWorkspace() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity,
+                                                             "123456789/collection-test-patch")
+                                           .withName("Collection")
+                                           .withEntityType("Publication")
+                                           .withSubmitterGroup(submitter1, submitter2)
+                                           .withSharedWorkspace()
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection",
+                                    col1.getID().toString())
+                             .param("embed", "collection")
+                             .contentType(
+                                 org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$._embedded.collection.id",
+                                    is(col1.getID().toString())))
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(),
+                         "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            List<ResourcePolicy> policies = authorizeService.getPolicies(context, workspaceItem.getItem());
+            assertThat(policies, hasSize(10));
+
+            assertThat(policies, hasItem(matches(Constants.READ, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.DELETE, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.REMOVE, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.ADD, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.READ, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.DELETE, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.REMOVE, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.ADD, col1.getSubmitters(), TYPE_SUBMISSION)));
+
+            Operation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                      List.of(Map.of("value", "White, Walter")));
+
+            String patchBody = getPatchContent(List.of(addOperation));
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                                    is("White, Walter")));
+
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isNoContent());
+
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isNotFound());
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testWorkspaceItemPoliciesWithoutSharedWorkspace() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection")
+                                           .withEntityType("Publication")
+                                           .withSubmitterGroup(submitter1, submitter2)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+
+
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection",
+                                    col1.getID().toString())
+                             .param("embed", "collection")
+                             .contentType(
+                                 org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$._embedded.collection.id",
+                                    is(col1.getID().toString())))
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(),
+                         "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            List<ResourcePolicy> policies = authorizeService.getPolicies(context, workspaceItem.getItem());
+            // Without shared workspace: only submitter1 has policies (5 policies)
+            assertThat(policies, hasSize(5));
+
+            assertThat(policies, hasItem(matches(Constants.READ, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.DELETE, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.REMOVE, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.ADD, submitter1, TYPE_SUBMISSION)));
+
+            Operation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                      List.of(Map.of("value", "White, Walter")));
+
+            String patchBody = getPatchContent(List.of(addOperation));
+            // Without shared workspace: submitter2 cannot modify submitter1's item
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isForbidden());
+
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isForbidden());
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testNonSubmitterCannotAccessWorkspaceItem() throws Exception {
+        // DSC-2728 - Case 3: User without role cannot modify any workspace item
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson nonSubmitter = EPersonBuilder.createEPerson(context)
+                                             .withEmail("nonsubmitter@test.com")
+                                             .withPassword(password)
+                                             .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection")
+                                           .withEntityType("Publication")
+                                           .withSubmitterGroup(submitter1)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", col1.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            Operation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                      List.of(Map.of("value", "White, Walter")));
+
+            String patchBody = getPatchContent(List.of(addOperation));
+            // nonSubmitter should not be able to modify the workspace item
+            getClient(getAuthToken(nonSubmitter.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isForbidden());
+
+            // nonSubmitter should not be able to delete the workspace item
+            getClient(getAuthToken(nonSubmitter.getEmail(), password))
+                .perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isForbidden());
+
+            // nonSubmitter should not be able to see the workspace item
+            getClient(getAuthToken(nonSubmitter.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isForbidden());
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testAuthorCanAccessSharedWorkspaceItem() throws Exception {
+
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.ItemAuthority = AuthorAuthority"
+                                         });
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson author = EPersonBuilder.createEPerson(context)
+                                       .withEmail("author@test.com")
+                                       .withPassword(password)
+                                       .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Person Collection")
+                                                       .withEntityType("Person")
+                                                       .build();
+
+        Collection pubCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withName("Publication Collection")
+                                                    .withEntityType("Publication")
+                                                    .withSubmitterGroup(submitter)
+                                                    .withSharedWorkspace()
+                                                    .build();
+
+        // Create author profile (Person entity) with owner metadata
+        Item authorProfile = ItemBuilder.createItem(context, personCollection)
+                                        .withTitle("Author Name")
+                                        .withIssueDate("2020-01-01")
+                                        .withDspaceObjectOwner(author)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Submitter creates a workspace item
+            getClient(getAuthToken(submitter.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            // Fetch item and force initialization while session is still active
+            Item item = workspaceItem.getItem();
+            item.getID(); // Force Hibernate to initialize the proxy
+            // Pre-compute URI while session is active
+            String itemUri = uri(item);
+
+            // Before adding author metadata, author should NOT be able to modify
+            Operation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                      List.of(Map.of("value", "Test Author")));
+            String patchBody = getPatchContent(List.of(addOperation));
+
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isForbidden());
+
+            // Use PATCH to add author metadata with authority pointing to author profile
+            // Following the real API format with all required fields
+            String submitterToken = getAuthToken(submitter.getEmail(), password);
+            Map<String, Object> authorValue = new HashMap<>();
+            authorValue.put("value", "Author Name");
+            authorValue.put("authority", authorProfile.getID().toString());
+            authorValue.put("display", "Author Name");
+            authorValue.put("confidence", Choices.CF_ACCEPTED);
+
+
+            Operation addAuthorWithAuthority = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                                List.of(authorValue));
+            String addAuthorPatchBody = getPatchContent(List.of(addAuthorWithAuthority));
+
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(addAuthorPatchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].authority",
+                                    is(authorProfile.getID().toString())));
+
+            // Author should now be able to access (Solr permissions are indexed based on metadata with authorities)
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isOk());
+
+            // Verify author can also PATCH (modify) the workspace item
+            List<Operation> ops = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title", List.of(Map.of("value", "Title by author"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued", List.of(Map.of("value", "2026")))
+            );
+            String authorPatchBody = getPatchContent(ops);
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(authorPatchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                                    is("Title by author")));
+
+            // only submitter can update license
+            List<Operation> addGrant = new ArrayList<Operation>();
+            addGrant.add(new AddOperation("/sections/license/granted", true));
+            String submitterPatchBody = getPatchContent(addGrant);
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(submitterPatchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // only submitter can upload a file
+            InputStream pdf = InputStream.nullInputStream();
+            final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                                    "application/pdf", pdf);
+            getClient(submitterToken)
+                .perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID()).file(pdfFile))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.sections.upload.files", hasSize(1)));
+
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID()).file(pdfFile))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.errors", hasSize(1)));
+
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(get("/api/discover/search/objects")
+                             .param("configuration", "otherWorkspace"))
+                .andExpect(status().isOk());
+
+
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(get("/api/authz/authorizations/search/object")
+                             .param("uri", itemUri)
+                             .param("feature", "canEditItem")
+                             .param("embed", "feature"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded").exists())
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+            context.commit();
+
+            // author cannot deposit
+            getClient(getAuthToken(author.getEmail(), password))
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .contentType(textUriContentType))
+                .andExpect(status().isForbidden());
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testOtherSubmitterCannotAccessNonSharedWorkspaceItem() throws Exception {
+        // DSC-2728 - Verify that without shared workspace, other submitters cannot access workspace items
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        // Collection WITHOUT shared workspace - both users are submitters
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection")
+                                           .withEntityType("Publication")
+                                           .withSubmitterGroup(submitter1, submitter2)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Submitter1 creates a workspace item
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", col1.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            // Verify only 5 policies (only for submitter1, not for submitters group)
+            context.turnOffAuthorisationSystem();
+            List<ResourcePolicy> policies = authorizeService.getPolicies(context, workspaceItem.getItem());
+            assertThat(policies, hasSize(5));
+            context.restoreAuthSystemState();
+
+            // Submitter2 (another submitter) should NOT be able to see the item
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isForbidden());
+
+            // Submitter2 should NOT be able to modify the item
+            Operation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                      List.of(Map.of("value", "Test Author")));
+            String patchBody = getPatchContent(List.of(addOperation));
+
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isForbidden());
+
+            // Submitter2 should NOT be able to delete the item
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isForbidden());
+
+            // Verify submitter1 (the owner) CAN still access and modify
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isOk());
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testOtherSubmitterCanDiscoverSharedWorkspaceItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1_discovery@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2_discovery@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community Discovery")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection Discovery")
+                                           .withEntityType("Publication")
+                                           .withSubmitterGroup(submitter1, submitter2)
+                                           .withSharedWorkspace()
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Submitter1 creates a workspace item
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", col1.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+            // Store the workspace item ID now while the session is still open
+            Integer workspaceItemId = workspaceItem.getID();
+
+            // Submitter2 (another submitter) should be able to discover the item
+            String tokenSubmitter2 = getAuthToken(submitter2.getEmail(), password);
+            getClient(tokenSubmitter2)
+                .perform(get("/api/discover/search/objects")
+                             .param("configuration", "otherWorkspace")
+                             .param("projection", "preventMetadataSecurity")
+                             .param("embed", "metrics"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)))
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects[0]._embedded.indexableObject.id",
+                                    is(workspaceItemId)));
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testOtherSubmitterCannotDiscoverNonSharedWorkspaceItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1_nodiscovery@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2_nodiscovery@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community No Discovery")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection No Discovery")
+                                           .withEntityType("Publication")
+                                           .withSubmitterGroup(submitter1, submitter2)
+                                           .build(); // No withSharedWorkspace()
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Submitter1 creates a workspace item
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", col1.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            // Submitter2 (another submitter) should NOT be able to discover the item
+            String tokenSubmitter2 = getAuthToken(submitter2.getEmail(), password);
+            getClient(tokenSubmitter2)
+                .perform(get("/api/discover/search/objects")
+                             .param("configuration", "otherWorkspace")
+                             .param("query", workspaceItem.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(0)));
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void testOtherSubmitterCanAccessSharedWorkspaceItem() throws Exception {
+        // DSC-2728 - Verify that with shared workspace, other submitters can access workspace items
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        // Collection WITH shared workspace - both users are submitters
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection")
+                                           .withEntityType("Publication")
+                                           .withSubmitterGroup(submitter1, submitter2)
+                                           .withSharedWorkspace()
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Submitter1 creates a workspace item
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", col1.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            WorkspaceItem workspaceItem = workspaceItemService.find(context, idRef.get());
+            assertThat(workspaceItem, notNullValue());
+
+            // Verify 10 policies (5 for submitter1 + 5 for submitters group)
+            context.turnOffAuthorisationSystem();
+            List<ResourcePolicy> policies = authorizeService.getPolicies(context, workspaceItem.getItem());
+            assertThat(policies, hasSize(10));
+            assertThat(policies, hasItem(matches(Constants.READ, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, submitter1, TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.READ, col1.getSubmitters(), TYPE_SUBMISSION)));
+            assertThat(policies, hasItem(matches(Constants.WRITE, col1.getSubmitters(), TYPE_SUBMISSION)));
+            context.restoreAuthSystemState();
+
+            // Submitter2 (another submitter) CAN see the item
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isOk());
+
+            // Submitter2 CAN modify the item
+            Operation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                      List.of(Map.of("value", "Modified by submitter2")));
+            String patchBody = getPatchContent(List.of(addOperation));
+
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                                    is("Modified by submitter2")));
+
+            // Submitter2 CAN delete the item
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isNoContent());
+
+            // Verify the item was deleted
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                .andExpect(status().isNotFound());
+
+        } finally {
+            if (idRef.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+            }
+        }
+    }
+
+    @Test
+    public void testCollectionAdminCanAccessAllWorkspaceItemsInSharedSubmissions() throws Exception {
+        // Verify that collection admins can see ALL workspace items (not just shared ones) in shared submissions view
+        // This is expected behavior - admins have broader permissions via authorizeActionBoolean with checkAdmin=true
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                       .withName("Parent Community")
+                                       .build();
+
+        // Collection WITHOUT shared workspace - submitter1 is admin
+        Collection nonSharedCol = CollectionBuilder.createCollection(context, parentCommunity)
+                                       .withName("Non-Shared Collection")
+                                       .withEntityType("Publication")
+                                       .withSubmitterGroup(submitter1, submitter2)
+                                       .withAdminGroup(submitter1)
+                                       .build();
+
+        // Collection WITH shared workspace
+        Collection sharedCol = CollectionBuilder.createCollection(context, parentCommunity)
+                                       .withName("Shared Collection")
+                                       .withEntityType("Publication")
+                                       .withSubmitterGroup(submitter1, submitter2)
+                                       .withSharedWorkspace()
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRefNonShared = new AtomicReference<>();
+        AtomicReference<Integer> idRefShared = new AtomicReference<>();
+        try {
+            // Submitter2 creates a workspace item in NON-SHARED collection
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", nonSharedCol.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRefNonShared.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter2 creates a workspace item in SHARED collection
+            getClient(getAuthToken(submitter2.getEmail(), password))
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", sharedCol.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRefShared.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter1 (collection admin of non-shared collection) can see BOTH workspace items
+            // This is expected behavior - admins have broader permissions
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + idRefNonShared.get()))
+                .andExpect(status().isOk());
+
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(get("/api/submission/workspaceitems/" + idRefShared.get()))
+                .andExpect(status().isOk());
+
+            // Collection Admin can also EDIT both workspace items (expected behavior)
+            Operation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                                  List.of(Map.of("value", "Modified by admin")));
+            String patchBody = getPatchContent(List.of(addOperation));
+
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + idRefNonShared.get())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            getClient(getAuthToken(submitter1.getEmail(), password))
+                .perform(patch("/api/submission/workspaceitems/" + idRefShared.get())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+        } finally {
+            if (idRefNonShared.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRefNonShared.get());
+            }
+            if (idRefShared.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRefShared.get());
+            }
+        }
+    }
+
+    @Test
     public void uploadBitstreamWithoutAccessConditions() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
@@ -5675,10 +6614,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date endDate = new Date();
-        String endDateStr = dateFmt.format(endDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String endDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5723,12 +6661,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date endDate = DateUtils.addDays(
-            // lease ends 1 day too late
-            DateUtils.addMonths(new Date(), 6), 1
-        );
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        // lease ends 1 day too late
+        LocalDate endDate = LocalDate.now().plusMonths(6).plusDays(1);
         String endDateStr = dateFmt.format(endDate);
 
         // prepare patch body
@@ -5769,10 +6705,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5817,12 +6752,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = DateUtils.addDays(
-            // embargo ends 1 day too late
-            DateUtils.addMonths(new Date(), 36), 1
-        );
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        // embargo ends 1 day too late
+        LocalDate startDate = LocalDate.now().plusMonths(36).plusDays(1);
         String startDateStr = dateFmt.format(startDate);
 
         // prepare patch body
@@ -5863,10 +6796,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5929,6 +6861,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
     }
 
+    @Test
     public void deleteWorkspaceItemWithMinRelationshipsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -6081,7 +7014,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         try {
             getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                                 .file(pdfFile))
-                                .andExpect(status().is(500));
+                                .andExpect(status().is(400));
         } finally {
             pdf.close();
         }
@@ -7151,19 +8084,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                      .withName("administrator")
                      .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2020);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DATE, 1);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2020, 2, 1);
 
         ResourcePolicyBuilder.createResourcePolicy(context, null, embargoedGroup1)
                              .withDspaceObject(witem.getItem())
                              .withPolicyType(TYPE_CUSTOM)
                              .withName("embargoed")
-                             .withStartDate(data)
+                             .withStartDate(date)
                              .build();
 
         context.restoreAuthSystemState();
@@ -7490,19 +8417,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .withName("openaccess")
                              .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2020);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DATE, 1);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2020, 2, 1);
 
         ResourcePolicyBuilder.createResourcePolicy(context, null, embargoedGroup1)
                              .withDspaceObject(witem.getItem())
                              .withPolicyType(TYPE_CUSTOM)
                              .withName("embargo")
-                             .withStartDate(data)
+                             .withStartDate(date)
                              .build();
 
         context.restoreAuthSystemState();
@@ -7983,6 +8904,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
             )));
     }
 
+    @Test
     public void verifyBitstreamPolicyNotDuplicatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -8130,10 +9052,8 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
     }
 
     @Test
-    public void sherpaPolicySectionCacheTest() throws Exception {
+    public void opfPolicySectionCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -8158,39 +9078,39 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(false)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].titles[0]",
                                          is("Nature Synthesis")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].issns[0]",
                                          is("2731-0582")))))
                         .andDo(result -> retrievalTime.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(false)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].titles[0]",
                                          is("Nature Synthesis")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].issns[0]",
                                          is("2731-0582")))))
                         .andDo(result -> retrievalTime2.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
 
         // create a list of values to use in add operation
         List<Operation> operations = new ArrayList<>();
-        operations.add(new RemoveOperation("/sections/sherpaPolicies/retrievalTime"));
+        operations.add(new RemoveOperation("/sections/opfPolicies/retrievalTime"));
 
         // empty the cache and verify the retrivatTime
         String patchBody = getPatchContent(operations);
@@ -8199,43 +9119,41 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(false)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].titles[0]",
                                          is("Nature Synthesis")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].issns[0]",
                                          is("2731-0582")))))
                         .andDo(result -> retrievalTime.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        date = Instant.parse(retrievalTime.get());
 
-        assertTrue(date.after(date2));
+        assertTrue(date.isAfter(date2));
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(false)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].titles[0]",
                                          is("Nature Synthesis")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals[0].issns[0]",
                                          is("2731-0582")))))
                         .andDo(result -> retrievalTime2.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
-        assertTrue(date.equals(date2));
+        date2 = Instant.parse(retrievalTime2.get());
+        assertEquals(date, date2);
     }
 
     @Test
-    public void sherpaPolicySectionWithWrongIssnCacheTest() throws Exception {
+    public void opfPolicySectionWithWrongIssnCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -8260,35 +9178,35 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(true)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                              hasJsonPath("$.sections.opfPolicies.opfResponse.message", is("No results found")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals", nullValue()))))
                         .andDo(result -> retrievalTime.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(true)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                              hasJsonPath("$.sections.opfPolicies.opfResponse.message", is("No results found")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals", nullValue()))))
                         .andDo(result -> retrievalTime2.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
-        assertTrue(date.equals(date2));
+        assertEquals(date, date2);
 
         // create a list of values to use in add operation
         List<Operation> operations = new ArrayList<>();
-        operations.add(new RemoveOperation("/sections/sherpaPolicies/retrievalTime"));
+        operations.add(new RemoveOperation("/sections/opfPolicies/retrievalTime"));
 
         // empty the cache and verify the retrivatTime
         String patchBody = getPatchContent(operations);
@@ -8297,32 +9215,32 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(true)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                              hasJsonPath("$.sections.opfPolicies.opfResponse.message", is("No results found")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals", nullValue()))))
                         .andDo(result -> retrievalTime.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        date = Instant.parse(retrievalTime.get());
 
-        assertTrue(date.after(date2));
+        assertTrue(date.isAfter(date2));
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.error", is(true)))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                              hasJsonPath("$.sections.opfPolicies.opfResponse.message", is("No results found")))))
                         .andExpect(jsonPath("$", Matchers.allOf(
-                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                                hasJsonPath("$.sections.opfPolicies.opfResponse.journals", nullValue()))))
                         .andDo(result -> retrievalTime2.set(read(
-                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+                               result.getResponse().getContentAsString(), "$.sections.opfPolicies.retrievalTime")));
 
-        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
-        assertTrue(date.equals(date2));
+        date2 = Instant.parse(retrievalTime2.get());
+        assertEquals(date, date2);
     }
 
     @Test
@@ -9818,6 +10736,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated())
                     // cclicense is required
+                                .andExpect(jsonPath(CCLICENSE_ERROR_MESSAGE_PATH,
+                                                    contains(hasJsonPath("$.paths", contains(
+                                                        hasJsonPath("$", is("/sections/cclicense")))))))
                     .andExpect(jsonPath("$.errors[?(@.message=='error.validation.cclicense.required')]",
                             contains(
                                     hasJsonPath("$.paths", contains(
@@ -9827,5 +10748,950 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
         } finally {
             WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
         }
+    }
+
+    @Test
+    public void enforceRequiredRelationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.NONE);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void enforceRequiredRelationTiltedRightTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.RIGHT);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void enforceRequiredRelationTiltedLeftTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                "isPublicationOfAuthor", 1, null, 0,
+                null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        isAuthorOfPublication.setTilted(RelationshipType.Tilted.LEFT);
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+            .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity, "123456789/enforced-relation")
+            .withName("Collection 2")
+            .withEntityType("Publication").build();
+
+        Item author = ItemBuilder.createItem(context, col1)
+            .withTitle("Author1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald")
+            .withPersonIdentifierLastName("Smith")
+            .withPersonIdentifierFirstName("Donald")
+            .build();
+
+        // two workspace items. Only one of them has the required relationship.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        Relationship relationship1 = relationshipService.create(
+            context,
+            workspaceItem.getItem(),
+            author,
+            isAuthorOfPublication,
+            0, 0,
+            "isAuthorOfPublication",
+            "isPublicationOfAuthor"
+        );
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        // try to deposit the items. One should fail
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isCreated());
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem2.getID())
+                .contentType(textUriContentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void uploadAndReplaceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("replace-bitstream.enabled", true);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        Bitstream originalBitstream;
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            originalBitstream = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream.txt")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        // Set access conditions on the old file; they should be copied to the new one
+        LocalDate startDate = LocalDate.now();
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
+
+        ResourcePolicyBuilder.createResourcePolicy(context, null, anonymousGroup)
+                             .withDspaceObject(originalBitstream)
+                             .withAction(Constants.READ)
+                             .withPolicyType(TYPE_CUSTOM)
+                             .withName("embargo")
+                             .withStartDate(startDate);
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+
+        // Upload new file, to replace old one
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", originalBitstream.getID().toString())
+                .param("replaceName", "true"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
+                is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dspace.bitstream.isReplacementOf'][0].value",
+                    is(originalBitstream.getName())))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dspace.bitstream.isReplacementOf'][0].authority",
+                    is(originalBitstream.getID().toString())))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                is("/local/path/simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("embargo")))
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate", is(startDateStr)))
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+        // Check new file metadata and access conditions
+        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
+                is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                is("/local/path/simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("embargo")))
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate", is(startDateStr)))
+            .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+        originalBitstream = bitstreamService.find(context, originalBitstream.getID());
+        List<MetadataValue> originalMetadata = bitstreamService.getMetadata(originalBitstream, DSPACE,
+                BITSTREAM, IS_REPLACED_BY, null);
+        assertEquals(1, originalMetadata.size());
+        assertNotNull(bitstreamService.find(context, originalBitstream.getID()));
+        assertTrue(bitstreamService.find(context, originalBitstream.getID()).isDeleted());
+    }
+
+    @Test
+    public void uploadAndReplaceBadParamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        // Parameter cannot be empty
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", ""))
+            .andExpect(status().isBadRequest());
+        // String names are not supported
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", bitstream.getName()))
+            .andExpect(status().isBadRequest());
+        // Integer is not supported
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", "0"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void uploadAndReplaceUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        int oldFileIndex = 0;
+        // Upload new file, to replace old one
+        getClient().perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", Integer.toString(oldFileIndex)))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void uploadAndReplaceForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        context.setCurrentUser(admin);
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        Bitstream originalFile;
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            originalFile = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        // Upload new file, to replace old one
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", originalFile.getID().toString()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void uploadAndReplaceNoWriteRightsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("replace-bitstream.enabled", true);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test Collection")
+            .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+        // Create file that will be replaced
+        Bitstream originalFile;
+        try (InputStream is = IOUtils.toInputStream("Test", CharEncoding.UTF_8)) {
+            originalFile = BitstreamBuilder.createBitstream(context, workspaceItem.getItem(), is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .build();
+            resourcePolicyService.removeAllPolicies(context, originalFile);
+        }
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile newFile =
+            new MockMultipartFile("file", "/local/path/simple-article.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        // Upload new file, to replace old one
+        getClient(token).perform(multipart("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .file(newFile)
+                .param("replaceFile", originalFile.getID().toString()))
+            .andExpect(status().isForbidden());
+    }
+
+
+    /**
+     * Scenario 1: Any submitter of a shared-workspace collection can View, Edit, Delete, and Deposit
+     * workspace items created by other submitters.
+     */
+    @Test
+    public void testSubmitterCanViewEditDeleteDepositInSharedWorkspace() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter1@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                                           .withEmail("submitter2@test.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection pubCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withName("Publication Collection")
+                                                    .withEntityType("Publication")
+                                                    .withSubmitterGroup(submitter1, submitter2)
+                                                    .withSharedWorkspace()
+                                                    .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String submitter1Token = getAuthToken(submitter1.getEmail(), password);
+            String submitter2Token = getAuthToken(submitter2.getEmail(), password);
+
+            // Submitter1 creates workspace item for view/edit/deposit test
+            getClient(submitter1Token)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef1.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter1 creates another workspace item for delete test
+            getClient(submitter1Token)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef2.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter2 CAN view
+            getClient(submitter2Token)
+                .perform(get("/api/submission/workspaceitems/" + idRef1.get()))
+                .andExpect(status().isOk());
+
+            // Submitter2 CAN edit (add title and date for deposit validation)
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by submitter2"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued",
+                                  List.of(Map.of("value", "2026")))
+            );
+            getClient(submitter2Token)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Grant license (needed for deposit validation)
+            List<Operation> licenseOps = List.of(
+                new AddOperation("/sections/license/granted", true));
+            getClient(submitter1Token)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(licenseOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Upload a file (needed for deposit validation)
+            InputStream pdf = InputStream.nullInputStream();
+            MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                              "application/pdf", pdf);
+            getClient(submitter1Token)
+                .perform(multipart("/api/submission/workspaceitems/" + idRef1.get()).file(pdfFile))
+                .andExpect(status().isCreated());
+
+            // Submitter2 CAN deposit
+            getClient(submitter2Token)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef1.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().is2xxSuccessful());
+
+            // Submitter2 CAN delete (using second workspace item)
+            getClient(submitter2Token)
+                .perform(delete("/api/submission/workspaceitems/" + idRef2.get()))
+                .andExpect(status().isNoContent());
+
+        } finally {
+            if (idRef1.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef2.get());
+            }
+        }
+    }
+
+    /**
+     * Scenario 2: Authors/Co-authors who are also in the Submitter group of the same collection
+     * can View, Edit, Delete, and Deposit.
+     */
+    @Test
+    public void testAuthorSubmitterSameCollectionCanViewEditDeleteDeposit() throws Exception {
+        // Configure authority control for dc.contributor.author
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        // Clear authority caches BEFORE entity creation (required for authority-controlled fields)
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson authorSubmitter = EPersonBuilder.createEPerson(context)
+                                                .withEmail("authorsubmitter@test.com")
+                                                .withPassword(password)
+                                                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        // Person collection for researcher profiles
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Person Collection")
+                                                       .withEntityType("Person")
+                                                       .build();
+
+        // Publication collection with BOTH submitter AND authorSubmitter in submitter group
+        Collection pubCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withName("Publication Collection")
+                                                    .withEntityType("Publication")
+                                                    .withSubmitterGroup(submitter, authorSubmitter)
+                                                    .withSharedWorkspace()
+                                                    .build();
+
+        // Create a researcher profile (Person entity) owned by authorSubmitter
+        Item authorProfile = ItemBuilder.createItem(context, personCollection)
+                                        .withTitle("Author Submitter")
+                                        .withIssueDate("2020-01-01")
+                                        .withDspaceObjectOwner(authorSubmitter)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String submitterToken = getAuthToken(submitter.getEmail(), password);
+            String authorSubmitterToken = getAuthToken(authorSubmitter.getEmail(), password);
+
+            // Submitter creates workspace item for view/edit/deposit test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef1.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Submitter creates another workspace item for delete test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef2.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Add author metadata pointing to authorSubmitter's profile
+            Map<String, String> authorValue = new HashMap<>();
+            authorValue.put("value", "Author Submitter");
+            authorValue.put("authority", authorProfile.getID().toString());
+            authorValue.put("display", "Author Submitter");
+            authorValue.put("confidence", String.valueOf(Choices.CF_ACCEPTED));
+
+            List<Operation> addAuthorOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                  List.of(authorValue)));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(addAuthorOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Also add author to workspace item 2 for delete test
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef2.get())
+                             .content(getPatchContent(addAuthorOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // AuthorSubmitter CAN view
+            getClient(authorSubmitterToken)
+                .perform(get("/api/submission/workspaceitems/" + idRef1.get()))
+                .andExpect(status().isOk());
+
+            // AuthorSubmitter CAN edit (add title and date for deposit)
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by author-submitter"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued",
+                                  List.of(Map.of("value", "2026")))
+            );
+            getClient(authorSubmitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Grant license
+            List<Operation> licenseOps = List.of(
+                new AddOperation("/sections/license/granted", true));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(licenseOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Upload a file (needed for deposit validation)
+            InputStream pdf = InputStream.nullInputStream();
+            MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                              "application/pdf", pdf);
+            getClient(submitterToken)
+                .perform(multipart("/api/submission/workspaceitems/" + idRef1.get()).file(pdfFile))
+                .andExpect(status().isCreated());
+
+            // AuthorSubmitter CAN deposit (is author BUT also submitter of same collection)
+            getClient(authorSubmitterToken)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef1.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().is2xxSuccessful());
+
+            // AuthorSubmitter CAN delete (using second workspace item)
+            getClient(authorSubmitterToken)
+                .perform(delete("/api/submission/workspaceitems/" + idRef2.get()))
+                .andExpect(status().isNoContent());
+
+        } finally {
+            if (idRef1.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef2.get());
+            }
+        }
+    }
+
+    /**
+     * Scenario 3: Authors/Co-authors in a different collection's submitter group
+     * can View and Edit, but CANNOT Deposit.
+     */
+    @Test
+    public void testAuthorSubmitterDifferentCollectionCannotDeposit() throws Exception {
+        // Configure authority control for dc.contributor.author
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        // Clear authority caches BEFORE entity creation (required for authority-controlled fields)
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson author = EPersonBuilder.createEPerson(context)
+                                       .withEmail("author@test.com")
+                                       .withPassword(password)
+                                       .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        // Person collection for researcher profiles
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Person Collection")
+                                                       .withEntityType("Person")
+                                                       .build();
+
+        // Publication collection 1: submitter only (author is NOT in this submitter group)
+        Collection pubCollection1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                     .withName("Publication Collection 1")
+                                                     .withEntityType("Publication")
+                                                     .withSubmitterGroup(submitter)
+                                                     .withSharedWorkspace()
+                                                     .build();
+
+        // Publication collection 2: author is in THIS submitter group (different collection)
+        Collection pubCollection2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                     .withName("Publication Collection 2")
+                                                     .withEntityType("Publication")
+                                                     .withSubmitterGroup(author)
+                                                     .withSharedWorkspace()
+                                                     .build();
+
+        // Create researcher profile for author
+        Item authorProfile = ItemBuilder.createItem(context, personCollection)
+                                        .withTitle("Author Person")
+                                        .withIssueDate("2020-01-01")
+                                        .withDspaceObjectOwner(author)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            String submitterToken = getAuthToken(submitter.getEmail(), password);
+            String authorToken = getAuthToken(author.getEmail(), password);
+
+            // Submitter creates workspace item in pubCollection1
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection1.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Add author metadata pointing to author's profile
+            Map<String, String> authorValue = new HashMap<>();
+            authorValue.put("value", "Author Person");
+            authorValue.put("authority", authorProfile.getID().toString());
+            authorValue.put("display", "Author Person");
+            authorValue.put("confidence", String.valueOf(Choices.CF_ACCEPTED));
+
+            List<Operation> addAuthorOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.contributor.author",
+                                  List.of(authorValue)));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef.get())
+                             .content(getPatchContent(addAuthorOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Author CAN view (is co-author, shared workspace grants access)
+            getClient(authorToken)
+                .perform(get("/api/submission/workspaceitems/" + idRef.get()))
+                .andExpect(status().isOk());
+
+            // Author CAN edit
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by author"))));
+            getClient(authorToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Author CANNOT deposit (submitter of DIFFERENT collection, not this one)
+            getClient(authorToken)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().isForbidden());
+
+        } finally {
+            if (idRef.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+            }
+        }
+    }
+
+    /**
+     * Scenario 5: The specific submitter who started the item submission
+     * can View, Edit, Delete, and Deposit.
+     */
+    @Test
+    public void testOriginalSubmitterCanViewEditDeleteDepositInSharedWorkspace() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection pubCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                    .withName("Publication Collection")
+                                                    .withEntityType("Publication")
+                                                    .withSubmitterGroup(submitter)
+                                                    .withSharedWorkspace()
+                                                    .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String submitterToken = getAuthToken(submitter.getEmail(), password);
+
+            // Original submitter creates workspace item for view/edit/deposit test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef1.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Original submitter creates another workspace item for delete test
+            getClient(submitterToken)
+                .perform(post("/api/submission/workspaceitems")
+                             .param("owningCollection", pubCollection.getID().toString())
+                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef2.set(
+                    read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Original submitter CAN view
+            getClient(submitterToken)
+                .perform(get("/api/submission/workspaceitems/" + idRef1.get()))
+                .andExpect(status().isOk());
+
+            // Original submitter CAN edit (add title and date for deposit)
+            List<Operation> editOps = List.of(
+                new AddOperation("/sections/traditionalpageone/dc.title",
+                                  List.of(Map.of("value", "Title by original submitter"))),
+                new AddOperation("/sections/traditionalpageone/dc.date.issued",
+                                  List.of(Map.of("value", "2026")))
+            );
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(editOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Grant license
+            List<Operation> licenseOps = List.of(
+                new AddOperation("/sections/license/granted", true));
+            getClient(submitterToken)
+                .perform(patch("/api/submission/workspaceitems/" + idRef1.get())
+                             .content(getPatchContent(licenseOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+            // Upload a file (needed for deposit validation)
+            InputStream pdf = InputStream.nullInputStream();
+            MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                                                              "application/pdf", pdf);
+            getClient(submitterToken)
+                .perform(multipart("/api/submission/workspaceitems/" + idRef1.get()).file(pdfFile))
+                .andExpect(status().isCreated());
+
+            // Original submitter CAN deposit
+            getClient(submitterToken)
+                .perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef1.get())
+                             .contentType(textUriContentType))
+                .andExpect(status().is2xxSuccessful());
+
+            // Original submitter CAN delete (using second workspace item)
+            getClient(submitterToken)
+                .perform(delete("/api/submission/workspaceitems/" + idRef2.get()))
+                .andExpect(status().isNoContent());
+
+        } finally {
+            if (idRef1.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                WorkspaceItemBuilder.deleteWorkspaceItem(idRef2.get());
+            }
+        }
+    }
+
+    private String uri(Item item) {
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
+        return utils.linkToSingleResource(itemRest, "self").getHref();
     }
 }

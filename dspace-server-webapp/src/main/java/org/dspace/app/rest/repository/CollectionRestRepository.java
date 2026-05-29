@@ -122,6 +122,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Autowired
     SearchService searchService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService);
     }
@@ -185,7 +188,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, com);
+            int tot = cs.countCollectionsWithSubmit(context, q, com);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -200,7 +203,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, null);
+            int tot = cs.countCollectionsWithSubmit(context, q, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -211,14 +214,33 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CollectionRest> findAdminAuthorized (
         Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.ADMIN, query);
+    }
+
+    /**
+     * Returns Collections for which the current user has 'edit' privileges.
+     *
+     * @param pageable              The pagination information
+     * @param query                 The query used in the lookup
+     * @return
+     */
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findEditAuthorized")
+    public Page<CollectionRest> findEditAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        return findAuthorized(pageable, Constants.WRITE, query);
+    }
+
+    private Page<CollectionRest> findAuthorized(Pageable pageable, int action, String query) {
         try {
             Context context = obtainContext();
-            List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
+            List<Collection> collections = authorizeService.findAuthorizedCollectionByAction(context, query,
+                action,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
-            long tot = authorizeService.countAdminAuthorizedCollection(context, query);
-            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
-        } catch (SearchServiceException | SQLException e) {
+            long tot = authorizeService.countAuthorizedCollectionByAction(context, query, action);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
+        } catch (SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -245,10 +267,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             if (entityType == null) {
                 throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, null, entityTypeLabel,
+            List<Collection> collections = cs.findCollectionsWithSubmit(context, query,null, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(query, context, null, entityTypeLabel);
+            int tot = cs.countCollectionsWithSubmit(context, query,null, entityTypeLabel);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -282,10 +304,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 throw new ResourceNotFoundException(
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid + " not found");
             }
-            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, community, entityTypeLabel,
+            List<Collection> collections = cs.findCollectionsWithSubmit(context, query, community, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
-            int total = cs.countCollectionsWithSubmit(query, context, community, entityTypeLabel);
+            int total = cs.countCollectionsWithSubmit(context, query, community, entityTypeLabel);
             return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -319,7 +341,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest;
         try {
             ServletInputStream input = req.getInputStream();
@@ -352,7 +373,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         CollectionRest collectionRest;
         try {
-            collectionRest = new ObjectMapper().readValue(jsonNode.toString(), CollectionRest.class);
+            collectionRest = mapper.readValue(jsonNode.toString(), CollectionRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }
@@ -603,7 +624,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     private GroupRest populateGroupInformation(Context context, HttpServletRequest request, Group group)
         throws SQLException, AuthorizeException {
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         try {
             ServletInputStream input = request.getInputStream();

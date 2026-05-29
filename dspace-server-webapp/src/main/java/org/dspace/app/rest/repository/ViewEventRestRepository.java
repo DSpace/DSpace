@@ -37,13 +37,15 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private final List<String> typeList = Arrays.asList(Constants.typeText);
 
     public ViewEventRest createViewEvent() throws AuthorizeException, SQLException {
 
         Context context = obtainContext();
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         ViewEventRest viewEventRest = null;
         try {
             ServletInputStream input = req.getInputStream();

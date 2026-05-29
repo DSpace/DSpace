@@ -126,7 +126,7 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
         final Community target = indexableDSpaceObject.getIndexedObject();
         List<String> locations = new ArrayList<>();
         // build list of community ids
-        List<Community> communities = target.getParentCommunities();
+        List<Community> communities = communityService.getAllParents(context, target);
 
         // now put those into strings
         for (Community community : communities) {

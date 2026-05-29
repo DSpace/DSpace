@@ -8,9 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -95,18 +96,18 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
             optionRest.setHasEndDate(option.getHasEndDate());
             if (StringUtils.isNotBlank(option.getStartDateLimit())) {
                 try {
-                    Date requested = dateMathParser.parseMath(option.getStartDateLimit());
-                    optionRest.setMaxStartDate(TimeHelpers.toMidnightUTC(requested));
-                } catch (ParseException e) {
+                    LocalDateTime requested = dateMathParser.parseMath(option.getStartDateLimit());
+                    optionRest.setMaxStartDate(TimeHelpers.toMidnightUTC(requested).toLocalDate());
+                } catch (DateTimeParseException | ParseException e) {
                     throw new IllegalStateException("Wrong start date limit configuration for the access condition "
                             + "option named  " + option.getName());
                 }
             }
             if (StringUtils.isNotBlank(option.getEndDateLimit())) {
                 try {
-                    Date requested = dateMathParser.parseMath(option.getEndDateLimit());
-                    optionRest.setMaxEndDate(TimeHelpers.toMidnightUTC(requested));
-                } catch (ParseException e) {
+                    LocalDateTime requested = dateMathParser.parseMath(option.getEndDateLimit());
+                    optionRest.setMaxEndDate(TimeHelpers.toMidnightUTC(requested).toLocalDate());
+                } catch (DateTimeParseException | ParseException e) {
                     throw new IllegalStateException("Wrong end date limit configuration for the access condition "
                             + "option named  " + option.getName());
                 }

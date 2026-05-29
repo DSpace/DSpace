@@ -10,6 +10,7 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -94,7 +95,14 @@ public class NotifyServiceAddPatchOperation extends AddPatchOperation<Integer> {
 
     private void createNotifyPattern(Context context, Item item, NotifyServiceEntity service, String pattern) {
         try {
-            NotifyPatternToTrigger notifyPatternToTrigger = notifyPatternToTriggerService.create(context);
+            // Check first whether the given pattern, for the current object already exists in the DB
+            // This accounts for multiple updates via the UI
+            Optional<NotifyPatternToTrigger> existingNotifyPatternToTrigger = notifyPatternToTriggerService
+                    .findByItemAndPattern(context, item, pattern).stream()
+                    .filter(obj -> obj.getNotifyService().getID().equals(service.getID())).findFirst();
+
+            NotifyPatternToTrigger notifyPatternToTrigger = existingNotifyPatternToTrigger.isPresent()
+                    ? existingNotifyPatternToTrigger.get() : notifyPatternToTriggerService.create(context);
             notifyPatternToTrigger.setItem(item);
             notifyPatternToTrigger.setNotifyService(service);
             notifyPatternToTrigger.setPattern(pattern);

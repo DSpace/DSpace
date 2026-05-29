@@ -7,9 +7,7 @@
  */
 package org.dspace.app.mediafilter;
 
-import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import javax.imageio.ImageIO;
 
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
@@ -63,27 +61,20 @@ public class BrandedPreviewJPEGFilter extends MediaFilter {
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
         throws Exception {
-        // read in bitstream's image
-        BufferedImage buf = ImageIO.read(source);
-
         // get config params
         ConfigurationService configurationService
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
-        float xmax = (float) configurationService
-            .getIntProperty("webui.preview.maxwidth");
-        float ymax = (float) configurationService
-            .getIntProperty("webui.preview.maxheight");
-        boolean blurring = (boolean) configurationService
-            .getBooleanProperty("webui.preview.blurring");
-        boolean hqscaling = (boolean) configurationService
-            .getBooleanProperty("webui.preview.hqscaling");
+        int xmax = configurationService.getIntProperty("webui.preview.maxwidth");
+        int ymax = configurationService.getIntProperty("webui.preview.maxheight");
+        boolean blurring = configurationService.getBooleanProperty("webui.preview.blurring");
+        boolean hqscaling = configurationService.getBooleanProperty("webui.preview.hqscaling");
         int brandHeight = configurationService.getIntProperty("webui.preview.brand.height");
         String brandFont = configurationService.getProperty("webui.preview.brand.font");
         int brandFontPoint = configurationService.getIntProperty("webui.preview.brand.fontpoint");
 
         JPEGFilter jpegFilter = new JPEGFilter();
-        return jpegFilter
-            .getThumbDim(currentItem, buf, verbose, xmax, ymax, blurring, hqscaling, brandHeight, brandFontPoint,
-                         brandFont);
+        return jpegFilter.getThumb(
+                currentItem, source, verbose, xmax, ymax, blurring, hqscaling, brandHeight, brandFontPoint, brandFont
+        );
     }
 }

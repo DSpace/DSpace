@@ -10,7 +10,7 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.QAEventRest;
@@ -54,7 +54,7 @@ public class QAEventRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
             DSpaceRestPermission restPermission) {
-        if (StringUtils.equalsIgnoreCase(QAEventRest.NAME, targetType)) {
+        if (Strings.CI.equals(QAEventRest.NAME, targetType)) {
             log.debug("Checking permission for targetId {}", targetId);
             Request request = requestService.getCurrentRequest();
             Context context = ContextUtil.obtainContext(request.getHttpServletRequest());

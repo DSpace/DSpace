@@ -8,7 +8,7 @@
 package org.dspace.discovery;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.core.Constants;
 import org.dspace.core.ReloadableEntity;
@@ -62,10 +62,10 @@ public interface IndexableObject<T extends ReloadableEntity<PK>, PK extends Seri
     String getTypeText();
 
     /**
-     * Return the last modified date of an of an object, or if no modification dates are stored, return NUll
+     * Return the last modified date of an object, or if no modification dates are stored, return NUll
      * @return the last modified date
      */
-    default Date getLastModified() {
+    default Instant getLastModified() {
         return null;
     }
 }

@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -23,22 +24,31 @@ import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.coverity.security.Escape;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -75,31 +85,32 @@ public final class Utils {
     private static final VMID vmid = new VMID();
 
     // for parseISO8601Date
-    private static final SimpleDateFormat[] parseFmt = {
-        // first try at parsing, has milliseconds (note General time zone)
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
+    private static final DateTimeFormatter[] parseFmt = {
+        // First try a standard Instant format
+        DateTimeFormatter.ISO_INSTANT,
 
-        // second try at parsing, no milliseconds (note General time zone)
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssz"),
+        // then try at parsing, has milliseconds (note General time zone)
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
+
+        // then try at parsing, no milliseconds (note General time zone)
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ssz"),
 
         // finally, try without any timezone (defaults to current TZ)
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd")
+        DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd")
     };
 
     // for formatISO8601Date
-    // output canonical format (note RFC22 time zone, easier to hack)
-    private static final SimpleDateFormat outFmtSecond
-            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
+    // output canonical format
+    private static final DateTimeFormatter outFmt = DateTimeFormatter.ISO_INSTANT;
 
-    // output format with millisecond precision
-    private static final SimpleDateFormat outFmtMillisec
-            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
-
-    private static final Calendar outCal = GregorianCalendar.getInstance();
+    // Allowed configuration properties to pass to Velocity templates (Email, LDN)
+    private static final String[] DEFAULT_ALLOWED_TEMPLATE_CONFIGS = {
+        "dspace.name", "dspace.shortname", "dspace.ui.url",
+        "mail.helpdesk", "mail.message.helpdesk.telephone", "mail.admin", "mail.admin.name"};
 
     /**
      * Private constructor
@@ -199,7 +210,7 @@ public final class Utils {
         byte[] junk = new byte[16];
 
         random.nextBytes(junk);
-        String input = String.valueOf(vmid) + new Date() + Arrays.toString(junk) + counter++;
+        String input = String.valueOf(vmid) + Instant.now().toEpochMilli() + Arrays.toString(junk) + counter++;
 
         return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
     }
@@ -316,29 +327,16 @@ public final class Utils {
     /**
      * Translates timestamp from an ISO 8601-standard format, which
      * is commonly used in XML and RDF documents.
-     * This method is synchronized because it depends on a non-reentrant
-     * static DateFormat (more efficient than creating a new one each call).
      *
      * @param s the input string
-     * @return Date object, or null if there is a problem translating.
+     * @return Instant object, or null if there is a problem translating.
      */
-    public static synchronized Date parseISO8601Date(String s) {
-        // attempt to normalize the timezone to something we can parse;
-        // SimpleDateFormat can't handle "Z"
-        char tzSign = s.charAt(s.length() - 6);
-        if (s.endsWith("Z")) {
-            s = s.substring(0, s.length() - 1) + "GMT+00:00";
-        } else if ((tzSign == '-' || tzSign == '+') && s.length() > 10) {
-            // check for trailing timezone
-            s = s.substring(0, s.length() - 6) + "GMT" + s.substring(s.length() - 6);
-        }
-
-        // try to parse without milliseconds
-        ParseException lastError = null;
-        for (SimpleDateFormat simpleDateFormat : parseFmt) {
+    public static Instant parseISO8601Date(String s) {
+        DateTimeParseException lastError = null;
+        for (DateTimeFormatter formatter : parseFmt) {
             try {
-                return simpleDateFormat.parse(s);
-            } catch (ParseException e) {
+                return formatter.parse(s, Instant::from);
+            } catch (DateTimeParseException e) {
                 lastError = e;
             }
         }
@@ -349,24 +347,13 @@ public final class Utils {
     }
 
     /**
-     * Convert a Date to String in the ISO 8601 standard format.
-     * The RFC822 timezone is almost right, still need to insert ":".
-     * This method is synchronized because it depends on a non-reentrant
-     * static DateFormat (more efficient than creating a new one each call).
+     * Convert a date to String in the ISO 8601 standard format.
      *
-     * @param d the input Date
+     * @param date the input TemporalAccessor (e.g. LocalDate, LocalDateTime, Instant)
      * @return String containing formatted date.
      */
-    public static synchronized String formatISO8601Date(Date d) {
-        String result;
-        outCal.setTime(d);
-        if (outCal.get(Calendar.MILLISECOND) == 0) {
-            result = outFmtSecond.format(d);
-        } else {
-            result = outFmtMillisec.format(d);
-        }
-        int rl = result.length();
-        return result.substring(0, rl - 2) + ":" + result.substring(rl - 2);
+    public static String formatISO8601Date(TemporalAccessor date) {
+        return outFmt.format(date);
     }
 
     public static <E> java.util.Collection<E> emptyIfNull(java.util.Collection<E> collection) {
@@ -429,13 +416,13 @@ public final class Utils {
      */
     public static String getBaseUrl(String urlString) {
         try {
-            URL url = new URL(urlString);
+            URL url = URI.create(urlString).toURL();
             String baseUrl = url.getProtocol() + "://" + url.getHost();
             if (url.getPort() != -1) {
                 baseUrl += (":" + url.getPort());
             }
             return baseUrl;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return null;
         }
     }
@@ -447,14 +434,14 @@ public final class Utils {
      */
     public static String getHostName(String uriString) {
         try {
-            URL url = new URL(uriString);
+            URL url = URI.create(uriString).toURL();
             String hostname = url.getHost();
             // remove the "www." from hostname, if it exists
             if (hostname != null) {
                 return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             }
             return null;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
             return null;
         }
     }
@@ -506,4 +493,84 @@ public final class Utils {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
     }
+
+    /**
+     * Get the maximum timestamp that can be stored in a PostgreSQL database with hibernate,
+     * for our "distant future" access expiry date.
+     * @return the maximum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMaxTimestamp() {
+        return LocalDateTime.of(294276, 12, 31, 23, 59, 59)
+                .toInstant(ZoneOffset.UTC);
+    }
+
+    /**
+     * Get the minimum timestamp that can be stored in a PostgreSQL database, for date validation or any other
+     * purpose to ensure we don't try to store a date before the epoch.
+     * @return the minimum timestamp that can be stored with Postgres + Hibernate
+     */
+    public static Instant getMinTimestamp() {
+        return LocalDateTime.of(-4713, 11, 12, 0, 0, 0)
+                .toInstant(ZoneOffset.UTC);
+    }
+
+    /**
+     * Get a list of allowed DSpace configuration property keys that will be exposed to Velocity templates
+     * (used in Email and LDN messages) as a simple Map of strings.
+     * @return Map of strings representing resolved configuration properties
+     */
+    public static Map<String, String> getAllowedTemplateConfig() {
+        // Pass a restricted (via configuration) list of resolved Configuration keys and values, for
+        // template lookup
+        ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+        List<String> allowedConfigurationKeys = List.of(configurationService.getArrayProperty(
+                    "message.templates.allowed-config", DEFAULT_ALLOWED_TEMPLATE_CONFIGS));
+        return allowedConfigurationKeys.stream()
+            .map(key -> {
+                String value = configurationService.getProperty(key);
+                return value != null ? Map.entry(key, value) : null;
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                        ));
+    }
+
+    /**
+     * Create and return a set of default, secure Velocity configuration properties.
+     * @see {@link LDN}, {@link Email}
+     *
+     * @param resourceRepositoryName the templating context e.g. "LDN", "Email"
+     * @returns secure Velocity configuration for use with templating
+     */
+    public static Properties getSecureVelocityProperties(String resourceRepositoryName) {
+        Properties secureVelocityProperties = new Properties();
+        // Basic Velocity configuration
+        secureVelocityProperties.setProperty(Velocity.RESOURCE_LOADERS, "string");
+        secureVelocityProperties.setProperty("resource.loader.string.description",
+                "Velocity StringResource loader");
+        secureVelocityProperties.setProperty("resource.loader.string.class",
+                StringResourceLoader.class.getName());
+        secureVelocityProperties.setProperty("resource.loader.string.repository.name",
+                resourceRepositoryName);
+        secureVelocityProperties.setProperty("resource.loader.string.repository.static",
+                "false");
+        // Set secure default introspection and class restriction handling in Velocity
+        secureVelocityProperties.setProperty("introspector.uberspect.class",
+                "org.apache.velocity.util.introspection.SecureUberspector");
+        secureVelocityProperties.setProperty("introspector.restrict.classes",
+                "java.lang.Class,java.lang.Runtime,java.lang.System");
+        secureVelocityProperties.setProperty( "introspector.restrict.packages",
+                "java.lang.reflect,java.io,java.nio");
+        // Set strict mode if configured (default: false, as we've always treated null values as blanks)
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getBooleanProperty("message.templates.strict_mode", false)) {
+            secureVelocityProperties.setProperty("runtime.strict_mode.enable", "true");
+        }
+
+        return secureVelocityProperties;
+    }
+
 }

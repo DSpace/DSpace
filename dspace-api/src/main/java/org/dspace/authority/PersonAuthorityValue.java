@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 
@@ -62,7 +63,7 @@ public class PersonAuthorityValue extends AuthorityValue {
                 }
             }
         }
-        if (!StringUtils.equals(getValue(), name)) {
+        if (!Strings.CS.equals(getValue(), name)) {
             setValue(name);
         }
     }

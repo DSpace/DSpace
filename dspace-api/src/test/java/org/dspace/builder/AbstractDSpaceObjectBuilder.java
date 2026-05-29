@@ -7,17 +7,17 @@
  */
 package org.dspace.builder;
 
+import static org.dspace.content.authority.Choices.CF_UNSET;
+
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
-import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -53,7 +53,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     @Override
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
-        return null;
+        throw new RuntimeException(e);
     }
 
 
@@ -61,12 +61,15 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final String element,
                                                                             final String qualifier,
                                                                             final String value) {
-        try {
-            getService().addMetadata(context, dso, schema, element, qualifier, null, value);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-        return (B) this;
+        return addMetadataValue(dso, schema, element, qualifier, null, value, null, Choices.CF_UNSET);
+    }
+
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B addSecuredMetadataValue(final T dso, final String schema,
+                                                                                   final String element,
+                                                                                   final String qualifier,
+                                                                                   final String value,
+                                                                                   final Integer securityLevel) {
+        return addSecuredMetadataValue(dso, schema, element, qualifier, null, value, null, CF_UNSET, securityLevel);
     }
 
     protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
@@ -74,12 +77,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final String qualifier,
                                                                             final String language,
                                                                             final String value) {
-        try {
-            getService().addMetadata(context, dso, schema, element, qualifier, language, value);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-        return (B) this;
+        return addMetadataValue(dso, schema, element, qualifier, language, value, null, Choices.CF_UNSET);
     }
 
     protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
@@ -91,6 +89,23 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final int confidence) {
         try {
             getService().addMetadata(context, dso, schema, element, qualifier, language, value, authority, confidence);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+    }
+
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B addSecuredMetadataValue(final T dso, final String schema,
+                                                                                   final String element,
+                                                                                   final String qualifier,
+                                                                                   final String language,
+                                                                                   final String value,
+                                                                                   final String authority,
+                                                                                   final int confidence,
+                                                                                   final Integer securityLevel) {
+        try {
+            getService().addSecuredMetadata(context, dso, schema, element, qualifier, language, value, authority,
+                confidence, securityLevel);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -126,12 +141,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setEmbargo(Period embargoPeriod, DSpaceObject dso) {
         // add policy just for anonymous
         try {
-            Instant embargoInstant = LocalDate.now()
-                    .plus(embargoPeriod)
-                    .atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant();
-            Date embargoDate = Date.from(embargoInstant);
+            LocalDate embargoDate = LocalDate.now().plus(embargoPeriod);
 
             return setOnlyReadPermission(dso, groupService.findByName(context, Group.ANONYMOUS), embargoDate);
         } catch (Exception e) {
@@ -155,7 +165,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      *            object only for the specified group.
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setOnlyReadPermission(DSpaceObject dso, Group group,
-                                                                                 Date startDate) {
+                                                                                 LocalDate startDate) {
         // add policy just for anonymous
         try {
             authorizeService.removeAllPolicies(context, dso);
@@ -187,7 +197,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      *            additional admin permission.
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setAdminPermission(DSpaceObject dso, EPerson eperson,
-                                                                                 Date startDate) {
+                                                                              LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
@@ -217,7 +227,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setRemovePermissionForEperson(DSpaceObject dso,
                                                                                          EPerson eperson,
-                                                                                         Date startDate) {
+                                                                                         LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
@@ -247,7 +257,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setAddPermissionForEperson(DSpaceObject dso,
                                                                                       EPerson eperson,
-                                                                                      Date startDate) {
+                                                                                      LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
@@ -277,7 +287,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setWritePermissionForEperson(DSpaceObject dso,
                                                                                         EPerson eperson,
-                                                                                        Date startDate) {
+                                                                                        LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,

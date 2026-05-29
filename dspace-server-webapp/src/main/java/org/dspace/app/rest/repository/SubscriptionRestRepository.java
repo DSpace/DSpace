@@ -27,6 +27,7 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -79,6 +80,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     private DiscoverableEndpointsService discoverableEndpointsService;
     @Autowired
     private SubscriptionEmailNotificationService subscriptionEmailNotificationService;
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'subscription', 'READ')")
@@ -180,7 +183,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             if (dSpaceObject.getType() == COMMUNITY || dSpaceObject.getType() == COLLECTION) {
                 Subscription subscription = null;
                 ServletInputStream input = req.getInputStream();
-                SubscriptionRest subscriptionRest = new ObjectMapper().readValue(input, SubscriptionRest.class);
+                SubscriptionRest subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
                 List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest
                         .getSubscriptionParameterList();
                 if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
@@ -209,7 +212,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
             var name = subscriptionParameterRest.getName();
             var value = subscriptionParameterRest.getValue();
-            if (!StringUtils.equals("frequency", name) || !FrequencyType.isSupportedFrequencyType(value)) {
+            if (!Strings.CS.equals("frequency", name) || !FrequencyType.isSupportedFrequencyType(value)) {
                 throw new UnprocessableEntityException("Provided SubscriptionParameter name:" + name +
                                                        " or value: " + value + " is not supported!");
             }
@@ -232,7 +235,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
 
         SubscriptionRest subscriptionRest;
         try {
-            subscriptionRest = new ObjectMapper().readValue(jsonNode.toString(), SubscriptionRest.class);
+            subscriptionRest = mapper.readValue(jsonNode.toString(), SubscriptionRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing subscription json: " + e.getMessage(), e);
         }

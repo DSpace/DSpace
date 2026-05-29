@@ -25,6 +25,7 @@ import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.MetadataFieldService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -99,7 +100,7 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
             throw new UnprocessableEntityException(collectionUuid + " is not a valid collection");
         }
 
-        String authorityName = cas.getChoiceAuthorityName(tokens[0], tokens[1], tokens[2], collection);
+        String authorityName = cas.getChoiceAuthorityName(tokens[0], tokens[1], tokens[2], Constants.ITEM, collection);
         if (authorityName == null) {
             return null;
         }

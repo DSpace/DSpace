@@ -8,7 +8,7 @@
 package org.dspace.checker.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.dspace.checker.ChecksumResultCode;
@@ -27,17 +27,19 @@ import org.dspace.core.GenericDAO;
  */
 public interface MostRecentChecksumDAO extends GenericDAO<MostRecentChecksum> {
 
-    public List<MostRecentChecksum> findByNotProcessedInDateRange(Context context, Date startDate, Date endDate)
+    public List<MostRecentChecksum> findByNotProcessedInDateRange(Context context, Instant startDate, Instant endDate)
         throws SQLException;
 
-    public List<MostRecentChecksum> findByResultTypeInDateRange(Context context, Date startDate, Date endDate,
+    public List<MostRecentChecksum> findByResultTypeInDateRange(Context context, Instant startDate, Instant endDate,
                                                                 ChecksumResultCode resultCode) throws SQLException;
+
+    public int updateMissingBitstreams(Context context) throws SQLException;
 
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException;
 
     public MostRecentChecksum getOldestRecord(Context context) throws SQLException;
 
-    public MostRecentChecksum getOldestRecord(Context context, Date lessThanDate) throws SQLException;
+    public MostRecentChecksum getOldestRecord(Context context, Instant lessThanDate) throws SQLException;
 
     public List<MostRecentChecksum> findNotInHistory(Context context) throws SQLException;
 

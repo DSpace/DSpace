@@ -21,7 +21,7 @@
     "type": "Offer"
   },
   "origin": {
-    "id": "https://generic-service.com/system",
+    "id": "https://review-service.com/inbox/about/",
     "inbox": "https://review-service.com/inbox/",
     "type": "Service"
   },

@@ -7,8 +7,10 @@
  */
 package org.dspace.servicemanager;
 
-import java.util.Date;
+import java.lang.ref.Cleaner;
+import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -53,6 +55,24 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
     private static final Logger log = LogManager.getLogger();
 
     /**
+     * Cleaner for Java 21+ compatibility (replaces deprecated finalize() method).
+     * Used to clean up kernel resources if DSpaceKernelImpl is garbage-collected without being properly destroyed.
+     */
+    private static final Cleaner cleaner = Cleaner.create();
+
+    /**
+     * Handle to the registered cleanup action. Used to prevent double-cleanup when destroy() is called normally.
+     */
+    private Cleaner.Cleanable cleanable;
+
+    /**
+     * Holder for the kernel reference, used by the Cleaner.
+     * Using AtomicReference allows the cleanup action to safely access the kernel
+     * without preventing GC of the DSpaceKernelImpl object.
+     */
+    private final AtomicReference<DSpaceKernelImpl> kernelHolder = new AtomicReference<>();
+
+    /**
      * Creates a DSpace Kernel, does not do any checks though.
      * Do not call this; use {@link DSpaceKernelInit#getKernel(String)}.
      *
@@ -60,6 +80,9 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
      */
     protected DSpaceKernelImpl(String name) {
         this.mBeanName = DSpaceKernelManager.checkName(name);
+        // Register this kernel with the Cleaner for cleanup if GC'd without proper destruction
+        kernelHolder.set(this);
+        cleanable = cleaner.register(this, new KernelCleanup(kernelHolder));
     }
 
     private String mBeanName = MBEAN_NAME;
@@ -147,8 +170,8 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
         }
 
         synchronized (lock) {
-            lastLoadDate = new Date();
-            long startTime = System.currentTimeMillis();
+            lastLoadDate = Instant.now();
+            long startTime = lastLoadDate.toEpochMilli();
 
             // create the configuration service and get the configuration
             DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService(dspaceHome);
@@ -161,7 +184,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
             // initialize the static
 //            DSpace.initialize(serviceManagerSystem);
 
-            loadTime = System.currentTimeMillis() - startTime;
+            loadTime = Instant.now().toEpochMilli() - startTime;
 
             kernel = this;
             running = true;
@@ -242,6 +265,12 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
             }
 
             this.destroyed = true;
+
+            // Clear the holder and unregister the Cleaner to prevent double-cleanup
+            kernelHolder.set(null);
+            if (cleanable != null) {
+                cleanable.clean();
+            }
         }
     }
 
@@ -254,15 +283,35 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            doDestroy();
-        } catch (Exception e) {
-            log.error("WARN Failure attempting to cleanup the DSpace kernel: {}",
-                    e.getMessage(), e);
+    /**
+     * Static cleanup class for use with java.lang.ref.Cleaner (Java 21+ replacement for finalize()).
+     * This class must be static to avoid preventing garbage collection of the DSpaceKernelImpl object.
+     * It holds a reference to the AtomicReference containing the kernel, which is cleared
+     * when destroy() is called normally, preventing double-cleanup.
+     */
+    private static class KernelCleanup implements Runnable {
+        private static final Logger cleanupLog = LogManager.getLogger(KernelCleanup.class);
+        private final AtomicReference<DSpaceKernelImpl> kernelRef;
+
+        KernelCleanup(AtomicReference<DSpaceKernelImpl> kernelRef) {
+            this.kernelRef = kernelRef;
         }
-        super.finalize();
+
+        @Override
+        public void run() {
+            // Get and clear the reference atomically
+            DSpaceKernelImpl kernel = kernelRef.getAndSet(null);
+            if (kernel != null && !kernel.destroyed) {
+                cleanupLog.warn("DSpaceKernelImpl was garbage-collected without being properly destroyed. " +
+                    "Attempting cleanup.");
+                try {
+                    kernel.doDestroy();
+                } catch (Exception e) {
+                    cleanupLog.error("Failure attempting to cleanup the DSpace kernel during GC: {}",
+                        e.getMessage(), e);
+                }
+            }
+        }
     }
 
     @Override
@@ -274,15 +323,15 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
 
     // MBEAN methods
 
-    private Date lastLoadDate;
+    private Instant lastLoadDate;
 
     /**
-     * Time that this kernel was started, as a java.util.Date.
+     * Time that this kernel was started, as an Instant
      *
      * @return date object
      **/
-    public Date getLastLoadDate() {
-        return new Date(lastLoadDate.getTime());
+    public Instant getLastLoadDate() {
+        return lastLoadDate;
     }
 
     private long loadTime;
@@ -312,7 +361,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
             "getMethod=getLoadTime"});
 
         ModelMBeanAttributeInfo[] mmbai = new ModelMBeanAttributeInfo[2];
-        mmbai[0] = new ModelMBeanAttributeInfo("LastLoadDate", "java.util.Date", "Last Load Date",
+        mmbai[0] = new ModelMBeanAttributeInfo("LastLoadDate", "java.time.Instant", "Last Load Date",
                                                true, false, false, lastLoadDateDesc);
 
         mmbai[1] = new ModelMBeanAttributeInfo("LastLoadTime", "java.lang.Long", "Last Load Time",

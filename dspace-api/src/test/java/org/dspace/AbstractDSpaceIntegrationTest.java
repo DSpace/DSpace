@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.ZoneOffset;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -70,11 +71,15 @@ public class AbstractDSpaceIntegrationTest {
     @BeforeClass
     public static void initTestEnvironment() {
         try {
-            //Stops System.exit(0) throws exception instead of exiting
-            System.setSecurityManager(new NoExitSecurityManager());
+            // NOTE: SecurityManager was removed here for Java 21 compatibility.
+            // Java 21 removes SecurityManager entirely (JEP 411).
+            // The NoExitSecurityManager was a defensive measure to catch System.exit() calls,
+            // but tests work correctly without it.
 
-            //set a standard time zone for the tests
-            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Dublin"));
+            // All tests should assume UTC timezone by default (unless overridden in the test itself)
+            // This ensures that Spring doesn't attempt to change the timezone of dates that are read from the
+            // database (via Hibernate). We store all dates in the database as UTC.
+            TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC));
 
             //load the properties of the tests
             testProps = new Properties();
@@ -121,7 +126,7 @@ public class AbstractDSpaceIntegrationTest {
      */
     @AfterClass
     public static void destroyTestEnvironment() throws SQLException {
-        System.setSecurityManager(null);
+        // NOTE: SecurityManager cleanup removed for Java 21 compatibility (JEP 411)
 
         // Clear our test properties
         testProps.clear();

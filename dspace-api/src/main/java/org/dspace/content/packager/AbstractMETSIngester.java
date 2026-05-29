@@ -11,8 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -21,8 +19,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.input.NullInputStream;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -124,6 +130,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                                                                                      .getWorkspaceItemService();
     protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+
+    protected final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
 
     /**
      * <p>
@@ -496,8 +506,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 // Finish creating the item. This actually assigns the handle,
                 // and will either install item immediately or start a workflow, based on params
                 PackageUtils.finishCreateItem(context, wsi, handle, params);
+            } else {
+                // We should have a workspace item during ingest, so this code is only here for safety.
+                // Update the object to make sure all changes are committed
+                PackageUtils.updateDSpaceObject(context, dso);
             }
-
         } else if (type == Constants.COLLECTION || type == Constants.COMMUNITY) {
             // Add logo if one is referenced from manifest
             addContainerLogo(context, dso, manifest, pkgFile, params);
@@ -511,6 +524,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // (this allows subclasses to do some final validation / changes as
             // necessary)
             finishObject(context, dso, params);
+
+            // Update the object to make sure all changes are committed
+            PackageUtils.updateDSpaceObject(context, dso);
         } else if (type == Constants.SITE) {
             // Do nothing by default -- Crosswalks will handle anything necessary to ingest at Site-level
 
@@ -518,17 +534,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // (this allows subclasses to do some final validation / changes as
             // necessary)
             finishObject(context, dso, params);
+
+            // Update the object to make sure all changes are committed
+            PackageUtils.updateDSpaceObject(context, dso);
         } else {
             throw new PackageValidationException(
                 "Unknown DSpace Object type in package, type="
                     + String.valueOf(type));
         }
-
-        // -- Step 6 --
-        // Finish things up!
-
-        // Update the object to make sure all changes are committed
-        PackageUtils.updateDSpaceObject(context, dso);
 
         return dso;
     }
@@ -736,6 +749,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // externally, if it is an externally referenced file)
             InputStream fileStream = getFileInputStream(pkgFile, params, path);
 
+            // Before proceeding we must ensure we have a non-empty input stream
+            // NOTE: If getFileInputStream encounters a zero-sized file, then it returns NullInputStream
+            if (fileStream == null || fileStream instanceof NullInputStream) {
+                log.warn("Empty InputStream encountered for Bitstream with ID={} in zip file={}. " +
+                             "Skipping adding this empty bitstream to Item={}", mfileID, pkgFile, item.getID());
+                continue;
+            }
+
             // retrieve bundle name from manifest
             String bundleName = METSManifest.getBundleName(mfile);
 
@@ -758,10 +779,23 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 bitstream.setSequenceID(Integer.parseInt(seqID));
             }
 
+            // Get TYPE_SUBMISSION policies before removing them in the `manifest.crosswalkBitstream` method.
+            List<ResourcePolicy> bitstreamPolicies =
+                authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
+
             // crosswalk this bitstream's administrative metadata located in
             // METS manifest (or referenced externally)
             manifest.crosswalkBitstream(context, params, bitstream, mfileID,
                                         mdRefCallback);
+
+            // Only add the saved TYPE_SUBMISSION policies if the crosswalk actually removed them to prevent duplicates.
+            if (!bitstreamPolicies.isEmpty()) {
+                List<ResourcePolicy> remainingSubmissionPolicies =
+                    authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
+                if (remainingSubmissionPolicies.isEmpty()) {
+                    authorizeService.addPolicies(context, bitstreamPolicies, bitstream);
+                }
+            }
 
             // is this the primary bitstream?
             if (primaryID != null && mfileID.equals(primaryID)) {
@@ -1299,7 +1333,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
      *                zip)
      * @param params  Parameters passed to METSIngester
      * @param path    the File path (either path in Zip package or a URL)
-     * @return the InputStream for the file
+     * @return the InputStream for the file, or NullInputStream if a zero-sized entry is encountered
      * @throws MetadataValidationException if validation error
      * @throws IOException                 if IO error
      */
@@ -1310,13 +1344,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         if (params.getBooleanProperty("manifestOnly", false)) {
             // NOTE: since we are only dealing with a METS manifest,
             // we will assume all external files are available via URLs.
-            try {
+            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
                 // attempt to open a connection to given URL
-                URL fileURL = new URL(path);
-                URLConnection connection = fileURL.openConnection();
-
-                // open stream to access file contents
-                return connection.getInputStream();
+                try (CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(path))) {
+                    // open stream to access file contents
+                    return httpResponse.getEntity().getContent();
+                }
             } catch (IOException io) {
                 log
                     .error("Unable to retrieve external file from URL '"
@@ -1333,12 +1366,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // Retrieve the manifest file entry by name
             ZipEntry manifestEntry = zipPackage.getEntry(path);
 
-            // Get inputStream associated with this file
-            if (manifestEntry != null) {
+            if (manifestEntry.getSize() > 0) {
+                // Get inputStream associated with this file
                 return zipPackage.getInputStream(manifestEntry);
             } else {
-                throw new MetadataValidationException("Manifest file references file '"
-                                                          + path + "' not included in the zip.");
+                log.warn("Zero-sized file entry={} found in zip file={}. Returning empty InputStream.",
+                         path, pkgFile);
+                return new NullInputStream();
             }
         }
     }
@@ -1418,7 +1452,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
      * @throws AuthorizeException         if authorization error
      */
     public abstract void crosswalkObjectDmd(Context context, DSpaceObject dso,
-                                            METSManifest manifest, MdrefManager callback, Element dmds[],
+                                            METSManifest manifest, MdrefManager callback, Element[] dmds,
                                             PackageParameters params) throws CrosswalkException,
         PackageValidationException, AuthorizeException, SQLException,
         IOException;

@@ -8,8 +8,8 @@
 package org.dspace.authorize;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +19,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -40,7 +41,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ResourcePolicyServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ResourcePolicyServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -50,6 +51,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     protected ResourcePolicyServiceImpl() {
     }
@@ -109,6 +113,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId) throws SQLException {
         return resourcePolicyDAO.findByDSoAndAction(c, o, actionId);
+    }
+
+    @Override
+    public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId, String type) throws SQLException {
+        return resourcePolicyDAO.findByDSoAndActionAndType(c, o, actionId, type);
     }
 
     @Override
@@ -183,8 +192,8 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
      */
     @Override
     public boolean isDateValid(ResourcePolicy resourcePolicy) {
-        Date sd = resourcePolicy.getStartDate();
-        Date ed = resourcePolicy.getEndDate();
+        LocalDate sd = resourcePolicy.getStartDate();
+        LocalDate ed = resourcePolicy.getEndDate();
 
         // if no dates set, return true (most common case)
         if ((sd == null) && (ed == null)) {
@@ -192,32 +201,30 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         }
 
         // one is set, now need to do some date math
-        Date now = new Date();
+        LocalDate now = LocalDate.now();
 
         // check start date first
-        if (sd != null && now.before(sd)) {
+        if (sd != null && now.isBefore(sd)) {
             // start date is set, return false if we're before it
             return false;
         }
 
         // now expiration date
-        if (ed != null && now.after(ed)) {
-            // end date is set, return false if we're after it
-            return false;
-        }
+        // end date is set, return false if we're after it
+        return ed == null || !now.isAfter(ed);
 
         // if we made it this far, start < now < end
-        return true; // date must be okay
+        // date must be okay
     }
 
     @Override
     public ResourcePolicy clone(Context context, ResourcePolicy resourcePolicy)
         throws SQLException, AuthorizeException {
         ResourcePolicy clone = create(context, resourcePolicy.getEPerson(), resourcePolicy.getGroup());
-        clone.setStartDate((Date) ObjectUtils.clone(resourcePolicy.getStartDate()));
-        clone.setEndDate((Date) ObjectUtils.clone(resourcePolicy.getEndDate()));
-        clone.setRpType((String) ObjectUtils.clone(resourcePolicy.getRpType()));
-        clone.setRpDescription((String) ObjectUtils.clone(resourcePolicy.getRpDescription()));
+        clone.setStartDate(ObjectUtils.clone(resourcePolicy.getStartDate()));
+        clone.setEndDate(ObjectUtils.clone(resourcePolicy.getEndDate()));
+        clone.setRpType(ObjectUtils.clone(resourcePolicy.getRpType()));
+        clone.setRpDescription(ObjectUtils.clone(resourcePolicy.getRpDescription()));
         update(context, clone);
         return clone;
     }
@@ -357,7 +364,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid,
-        int offset, int limit) throws SQLException {
+                                                             int offset, int limit) throws SQLException {
         return resourcePolicyDAO.findByEPersonAndResourceUuid(context, eperson, resourceUuid, offset, limit);
     }
 
@@ -369,7 +376,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
-        int offset, int limit) throws SQLException {
+                                                             int offset, int limit) throws SQLException {
         return resourcePolicyDAO.findByResouceUuidAndActionId(context, resourceUuid, actionId, offset, limit);
     }
 
@@ -401,7 +408,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
-        int offset, int limit) throws SQLException {
+                                                           int offset, int limit) throws SQLException {
         return resourcePolicyDAO.findByGroupAndResourceUuid(context, group, resourceUuid, offset, limit);
     }
 
@@ -422,6 +429,6 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         } else if (group != null && groupService.isMember(context, eperson, group)) {
             isMy = true;
         }
-        return isMy;
+        return isMy || authorizeService.isAdmin(context, eperson, resourcePolicy.getdSpaceObject());
     }
 }

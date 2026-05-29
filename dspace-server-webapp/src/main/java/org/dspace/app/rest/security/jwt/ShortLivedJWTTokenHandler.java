@@ -7,7 +7,8 @@
  */
 package org.dspace.app.rest.security.jwt;
 
-import java.util.Date;
+import java.sql.SQLException;
+import java.time.Instant;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
@@ -17,8 +18,13 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +33,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
+
+    @Autowired
+    private EPersonService ePersonService;
+
+    private static final Logger log = LogManager.getLogger(ShortLivedJWTTokenHandler.class);
+
+    /**
+     * Default expiration period for short-lived tokens in milliseconds
+     */
+    private static final long DEFAULT_EXPIRATION_PERIOD = 2000;
 
     /**
      * Determine if current JWT is valid for the given EPerson object.
@@ -48,23 +64,40 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
             JWSVerifier verifier = new MACVerifier(buildSigningKey(ePerson));
 
             //If token is valid and not expired return eperson in token
-            Date expirationTime = jwtClaimsSet.getExpirationTime();
+            java.util.Date expirationTime = jwtClaimsSet.getExpirationTime();
             return signedJWT.verify(verifier)
                 && expirationTime != null
                 //Ensure expiration timestamp is after the current time
-                && DateUtils.isAfter(expirationTime, new Date(), 0);
+                && DateUtils.isAfter(expirationTime, java.util.Date.from(Instant.now()), 0);
         }
     }
 
     /**
      * The session salt doesn't need to be updated for short lived tokens.
+     * Unless no session salt is set, in which case it will be generated.
+     * As the salt is used to sign the JWT, it is important that it is set
+     *
      * @param context current DSpace Context
      * @param previousLoginDate date of last login (prior to this one)
      * @return EPerson object of current user, with an updated session salt
      */
     @Override
-    protected EPerson updateSessionSalt(final Context context, final Date previousLoginDate) {
-        return context.getCurrentUser();
+    protected EPerson updateSessionSalt(final Context context, final Instant previousLoginDate) {
+        EPerson ePerson = context.getCurrentUser();
+        if (ePerson != null && StringUtils.isBlank(ePerson.getSessionSalt())) {
+            try {
+                ePerson.setSessionSalt(generateRandomKey());
+                ePersonService.update(context, ePerson);
+            } catch (SQLException | AuthorizeException e) {
+                log.warn("Failed to update session salt for EPerson: {}", ePerson.getID(), e);
+            }
+        }
+        return ePerson;
+    }
+
+    @Override
+    public long getExpirationPeriod() {
+        return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), DEFAULT_EXPIRATION_PERIOD);
     }
 
     @Override

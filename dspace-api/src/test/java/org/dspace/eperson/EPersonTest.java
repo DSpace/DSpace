@@ -25,7 +25,7 @@ import java.util.Set;
 import jakarta.mail.MessagingException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -985,7 +985,7 @@ public class EPersonTest extends AbstractUnitTest {
         Iterator<String> iterator = tableList.iterator();
         while (iterator.hasNext()) {
             String tableName = iterator.next();
-            if (StringUtils.equalsIgnoreCase(tableName, "item")) {
+            if (Strings.CI.equals(tableName, "item")) {
                 return;
             }
         }

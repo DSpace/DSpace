@@ -8,7 +8,7 @@
 package org.dspace.eperson.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -121,7 +121,7 @@ public interface EPersonDAO extends DSpaceObjectDAO<EPerson>, DSpaceObjectLegacy
 
     public List<EPerson> findWithPasswordWithoutDigestAlgorithm(Context context) throws SQLException;
 
-    public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException;
+    public List<EPerson> findNotActiveSince(Context context, Instant date) throws SQLException;
 
     public List<EPerson> findAll(Context context, MetadataField metadataFieldSort, String sortColumn, int pageSize,
                                  int offset) throws SQLException;

@@ -120,7 +120,7 @@ public class LDNInboxController {
                 }
             } catch (SQLException sqle) {
                 throw new DSpaceBadRequestException("Notify Service [" + notification.getOrigin()
-                + "] unknown. LDN message can not be received.");
+                    + "] unknown. LDN message can not be received.");
             }
         }
         if (configurationService.getBooleanProperty("ldn.notify.inbox.block-untrusted-ip", true)) {
@@ -138,7 +138,7 @@ public class LDNInboxController {
                 }
             } catch (SQLException sqle) {
                 throw new DSpaceBadRequestException("Notify Service [" + notification.getOrigin()
-                + "] unknown. LDN message can not be received.");
+                    + "] unknown. LDN message can not be received.");
             }
         }
     }

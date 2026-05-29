@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;

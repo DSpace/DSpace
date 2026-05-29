@@ -8,7 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +56,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    Iterator<Item> findByLastModifiedSince(Context context, Instant since)
         throws SQLException;
 
     Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
@@ -78,7 +78,40 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
         throws SQLException;
 
     Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value,
-                                              boolean inArchive) throws SQLException;
+                                               boolean inArchive) throws SQLException;
+
+    /**
+     * Find items by metadata field value, excluding items that are not the latest version
+     * in their version history. This method returns only items that are either:
+     * - Not versioned at all, OR
+     * - The latest version in their version history
+     *
+     * @param context        DSpace context object
+     * @param metadataField  metadata field to search
+     * @param value          field value to match (if null, matches any value)
+     * @param inArchive      whether to search in archived items only
+     * @return iterator over items matching the criteria, excluding old versions
+     * @throws SQLException if database error
+     */
+    Iterator<Item> findByMetadataFieldExcludingOldVersions(Context context, MetadataField metadataField, String value,
+                                                           boolean inArchive) throws SQLException;
+
+    /**
+     * Find all items that have a specific metadata field with an optional value match.
+     * If value is null, returns all items with the field regardless of value.
+     * If value is provided, returns only items where the field value exactly matches (case-sensitive).
+     * <p>
+     * To filter by archive status, use {@link #findByMetadataField(Context, MetadataField, String, boolean)}.
+     * </p>
+     *
+     * @param context       DSpace context object
+     * @param metadataField metadata field to search
+     * @param value         field value to match (if null, matches any value)
+     * @return              iterator over all items matching the criteria
+     * @throws SQLException if database error
+     */
+    Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value)
+        throws SQLException;
 
     /**
      * Returns all the Items that belong to the specified aollections (if any)
@@ -103,6 +136,20 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
 
     Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
                                                boolean inArchive) throws SQLException;
+
+    /**
+     * Find all the items in the archive or not with a given authority key value in LIKE format.
+     *
+     * @param context       DSpace context object
+     * @param likeAuthority value that will be used with operator LIKE on field
+     *                      authority, it's possible to enter '%' to improve
+     *                      searching
+     * @param inArchive     true for archived items, null for all items (archived and not)
+     * @return
+     * @throws SQLException if database error
+     */
+    Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
+                                            Boolean inArchive) throws SQLException;
 
     Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException;
@@ -177,7 +224,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @throws SQLException if database error
      */
     Iterator<Item> findAll(Context context, boolean archived,
-                                  boolean withdrawn, boolean discoverable, Date lastModified)
+                                  boolean withdrawn, boolean discoverable, Instant lastModified)
         throws SQLException;
 
     /**
@@ -214,5 +261,15 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn,
                    boolean discoverable)
         throws SQLException;
+
+    /**
+     * Get all Items matching the given ids.
+     * @param context          context
+     * @param ids              the list of ids
+     * @return result list of items
+     * @throws SQLException
+     */
+    Iterator<Item> findByIds(Context context, List<UUID> ids) throws SQLException;
+
 
 }

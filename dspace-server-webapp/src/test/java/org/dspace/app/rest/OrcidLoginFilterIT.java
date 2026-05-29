@@ -10,9 +10,11 @@ package org.dspace.app.rest;
 import static java.util.Arrays.asList;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -29,11 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.jayway.jsonpath.JsonPath;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.Cookie;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.security.OrcidLoginFilter;
 import org.dspace.app.rest.security.jwt.EPersonClaimProvider;
@@ -46,14 +52,16 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.RegistrationTypeEnum;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.client.OrcidClient;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.util.UUIDUtils;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,6 +112,9 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     @Autowired
     private OrcidTokenService orcidTokenService;
 
+    @Autowired
+    private RegistrationDataService registrationDataService;
+
     @Before
     public void setup() {
         originalOrcidClient = orcidAuthentication.getOrcidClient();
@@ -137,45 +148,76 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     @Test
     public void testEPersonCreationViaOrcidLogin() throws Exception {
 
-        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
-        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User", "test@email.it"));
+        String defaultProp = configurationService.getProperty("orcid.registration-data.url");
+        configurationService.setProperty("orcid.registration-data.url", "/test-redirect?random-token={0}");
+        try {
+            when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+            when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(
+                buildPerson("Test", "User", "test@email.it"));
 
-        MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-            .param("code", CODE))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
-            .andExpect(cookie().exists("Authorization-cookie"))
-            .andReturn();
+            MvcResult mvcResult =
+                getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid").param("code", CODE))
+                           .andExpect(status().is3xxRedirection())
+                           .andReturn();
 
-        verify(orcidClientMock).getAccessToken(CODE);
-        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
-        verifyNoMoreInteractions(orcidClientMock);
+            String redirectedUrl = mvcResult.getResponse().getRedirectedUrl();
+            assertThat(redirectedUrl, not(emptyString()));
 
-        String ePersonId = getEPersonIdFromAuthorizationCookie(mvcResult);
+            verify(orcidClientMock).getAccessToken(CODE);
+            verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+            verifyNoMoreInteractions(orcidClientMock);
 
-        createdEperson = ePersonService.find(context, UUIDUtils.fromString(ePersonId));
-        assertThat(createdEperson, notNullValue());
-        assertThat(createdEperson.getEmail(), equalTo("test@email.it"));
-        assertThat(createdEperson.getFullName(), equalTo("Test User"));
-        assertThat(createdEperson.getNetid(), equalTo(ORCID));
-        assertThat(createdEperson.canLogIn(), equalTo(true));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid", ORCID)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.scope", ORCID_SCOPES[0], 0)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.scope", ORCID_SCOPES[1], 1)));
+            final Pattern pattern = Pattern.compile("test-redirect\\?random-token=([a-zA-Z0-9]+)");
+            final Matcher matcher = pattern.matcher(redirectedUrl);
+            matcher.find();
 
-        assertThat(getOrcidAccessToken(createdEperson), is(ACCESS_TOKEN));
+            assertThat(matcher.groupCount(), is(1));
+            assertThat(matcher.group(1), not(emptyString()));
+
+            String rdToken = matcher.group(1);
+
+            getClient().perform(get("/api/eperson/registrations/search/findByToken")
+                                    .param("token", rdToken))
+                       .andExpect(status().is2xxSuccessful())
+                       .andExpect(content().contentType(contentType))
+                       .andExpect(jsonPath("$.netId", equalTo(ORCID)))
+                       .andExpect(jsonPath("$.registrationType", equalTo(RegistrationTypeEnum.ORCID.toString())))
+                       .andExpect(jsonPath("$.email", equalTo("test@email.it")))
+                       .andExpect(
+                           jsonPath("$.registrationMetadata",
+                                    Matchers.allOf(
+                                        MetadataMatcher.matchMetadata("eperson.orcid", ORCID),
+                                        MetadataMatcher.matchMetadata("eperson.firstname", "Test"),
+                                        MetadataMatcher.matchMetadata("eperson.lastname", "User")
+                                    )
+                           )
+                       );
+        } finally {
+            configurationService.setProperty("orcid.registration-data.url", defaultProp);
+        }
     }
 
     @Test
-    public void testEPersonCreationViaOrcidLoginWithoutEmail() throws Exception {
+    public void testRedirectiViaOrcidLoginWithoutEmail() throws Exception {
 
         when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
         when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User"));
 
-        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-            .param("code", CODE))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"));
+        MvcResult orcidLogin =
+            getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid").param("code", CODE))
+                       .andExpect(status().is3xxRedirection())
+                       .andReturn();
+
+        String redirectedUrl = orcidLogin.getResponse().getRedirectedUrl();
+
+        assertThat(redirectedUrl, notNullValue());
+
+        final Pattern pattern = Pattern.compile("external-login/([a-zA-Z0-9]+)");
+        final Matcher matcher = pattern.matcher(redirectedUrl);
+        matcher.find();
+
+        assertThat(matcher.groupCount(), is(1));
+        assertThat(matcher.group(1), not(emptyString()));
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);

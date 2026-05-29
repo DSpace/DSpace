@@ -9,7 +9,7 @@ package org.dspace.app.ldn.action;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,8 +75,7 @@ public class LDNRelationCorrectionAction implements LDNAction {
             qaEvent = new QAEvent(QAEvent.COAR_NOTIFY_SOURCE,
                 handleService.findHandle(context, item), item.getID().toString(), itemName,
                 this.getQaEventTopic(), doubleScoreValue,
-                mapper.writeValueAsString(message),
-                new Date());
+                mapper.writeValueAsString(message), Instant.now());
             qaEventService.store(context, qaEvent);
             result = LDNActionStatus.CONTINUE;
         }

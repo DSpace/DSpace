@@ -62,6 +62,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         configurationService.setProperty("irus.statistics.tracker.enabled", true);
         configurationService.setProperty("irus.statistics.tracker.type-field", "dc.type");
         configurationService.setProperty("irus.statistics.tracker.type-value", "Excluded type");
+        configurationService.setProperty("oai.identifier.prefix", "localhost");
 
         context.turnOffAuthorisationSystem();
         publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();

@@ -9,10 +9,8 @@ package org.dspace.xoai.services.impl.cache;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 
 import org.apache.commons.io.FileUtils;
 import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
@@ -22,12 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class DSpaceXOAILastCompilationCacheService implements XOAILastCompilationCacheService {
 
-    private static final ThreadLocal<DateFormat> format = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat();
-        }
-    };
     private static final String DATEFILE = File.separator + "date.file";
 
     private static File file = null;
@@ -51,16 +43,16 @@ public class DSpaceXOAILastCompilationCacheService implements XOAILastCompilatio
 
 
     @Override
-    public void put(Date date) throws IOException {
-        FileUtils.write(getFile(), format.get().format(date));
+    public void put(Instant date) throws IOException {
+        FileUtils.write(getFile(),date.toString());
     }
 
 
     @Override
-    public Date get() throws IOException {
+    public Instant get() throws IOException {
         try {
-            return format.get().parse(FileUtils.readFileToString(getFile()).trim());
-        } catch (ParseException e) {
+            return Instant.parse(FileUtils.readFileToString(getFile()).trim());
+        } catch (DateTimeParseException e) {
             throw new IOException(e);
         }
     }

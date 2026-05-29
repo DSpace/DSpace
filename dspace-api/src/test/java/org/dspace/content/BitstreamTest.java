@@ -12,19 +12,25 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +44,7 @@ import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -58,7 +65,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     /**
      * BitStream instance for the tests
      */
-    private Bitstream bs;
+    protected Bitstream bs;
 
     /**
      * Spy of AuthorizeService to use for tests
@@ -87,7 +94,9 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
+            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
+            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
+                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
             // "Wire" our spy to be used by the current loaded bitstreamService
             // (To ensure it uses the spy instead of the real service)
             ReflectionTestUtils.setField(bitstreamService, "authorizeService", authorizeServiceSpy);
@@ -146,6 +155,44 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
             }
         }
         assertTrue("testFindAll 2", added);
+    }
+
+    @Test
+    public void testFindAllBatches() throws Exception {
+        //Adding some data for processing and cleaning this up at the end
+        context.turnOffAuthorisationSystem();
+        File f = new File(testProps.get("test.bitstream").toString());
+        List<Bitstream> inserted = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+            inserted.add(bs);
+        }
+        context.restoreAuthSystemState();
+
+        // sorted list of all bitstreams
+        List<Bitstream> all = bitstreamService.findAll(context);
+        List<Bitstream> expected = new ArrayList<>(all);
+        expected.sort(Comparator.comparing(bs -> bs.getID().toString()));
+
+        int total = bitstreamService.countTotal(context);
+        int batchSize = 2;
+        int numberOfBatches = (int) Math.ceil((double) total / batchSize);
+
+        //collect in batches
+        List<Bitstream> collected = new ArrayList<>();
+        for (int i = 0; i < numberOfBatches; i++) {
+            Iterator<Bitstream> it = bitstreamService.findAll(context, batchSize, i * batchSize);
+            it.forEachRemaining(collected::add);
+        }
+
+        assertEquals("Batched results should match sorted findAll", expected, collected);
+
+        // Cleanup
+        context.turnOffAuthorisationSystem();
+        for (Bitstream b : inserted) {
+            bitstreamService.delete(context, b);
+        }
+        context.restoreAuthSystemState();
     }
 
     /**

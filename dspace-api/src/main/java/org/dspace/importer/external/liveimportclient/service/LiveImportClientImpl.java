@@ -17,19 +17,16 @@ import java.util.Optional;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -53,16 +50,15 @@ public class LiveImportClientImpl implements LiveImportClient {
     @Override
     public String executeHttpGetRequest(int timeout, String URL, Map<String, Map<String, String>> params) {
         HttpGet method = null;
+        RequestConfig config = RequestConfig.custom()
+            .setConnectionRequestTimeout(timeout)
+            .setConnectTimeout(timeout)
+            .setSocketTimeout(timeout)
+            .build();
         try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
-                                                      .orElseGet(HttpClients::createDefault)) {
-
-            Builder requestConfigBuilder = RequestConfig.custom();
-            requestConfigBuilder.setConnectionRequestTimeout(timeout);
-            RequestConfig defaultRequestConfig = requestConfigBuilder.build();
-
+                                        .orElse(DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config))) {
             String uri = buildUrl(URL, params.get(URI_PARAMETERS));
             method = new HttpGet(uri);
-            method.setConfig(defaultRequestConfig);
 
             Map<String, String> headerParams = params.get(HEADER_PARAMETERS);
             if (MapUtils.isNotEmpty(headerParams)) {
@@ -71,7 +67,6 @@ public class LiveImportClientImpl implements LiveImportClient {
                 }
             }
 
-            configureProxy(method, defaultRequestConfig);
             if (log.isDebugEnabled()) {
                 log.debug("Performing GET request to \"" + uri + "\"...");
             }
@@ -95,21 +90,17 @@ public class LiveImportClientImpl implements LiveImportClient {
     @Override
     public String executeHttpPostRequest(String URL, Map<String, Map<String, String>> params, String entry) {
         HttpPost method = null;
+        RequestConfig config = RequestConfig.custom().build();
         try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
-                                                      .orElseGet(HttpClients::createDefault)) {
-
-            Builder requestConfigBuilder = RequestConfig.custom();
-            RequestConfig defaultRequestConfig = requestConfigBuilder.build();
+                .orElse(DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config))) {
 
             String uri = buildUrl(URL, params.get(URI_PARAMETERS));
             method = new HttpPost(uri);
-            method.setConfig(defaultRequestConfig);
             if (StringUtils.isNotBlank(entry)) {
                 method.setEntity(new StringEntity(entry));
             }
             setHeaderParams(method, params);
 
-            configureProxy(method, defaultRequestConfig);
             if (log.isDebugEnabled()) {
                 log.debug("Performing POST request to \"" + uri + "\"..." );
             }
@@ -127,17 +118,6 @@ public class LiveImportClientImpl implements LiveImportClient {
             }
         }
         return StringUtils.EMPTY;
-    }
-
-    private void configureProxy(HttpRequestBase method, RequestConfig defaultRequestConfig) {
-        String proxyHost = configurationService.getProperty("http.proxy.host");
-        String proxyPort = configurationService.getProperty("http.proxy.port");
-        if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
-            RequestConfig requestConfig = RequestConfig.copy(defaultRequestConfig)
-                    .setProxy(new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http"))
-                    .build();
-            method.setConfig(requestConfig);
-        }
     }
 
     /**

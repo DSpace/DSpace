@@ -69,6 +69,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     @Autowired
     private MetadataFieldServiceImpl metadataFieldService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Before
     public void setup() throws Exception {
         metadataSchema = metadataSchemaService.findAll(context).get(0);
@@ -78,24 +81,29 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     public void findAll() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        MetadataField metadataField = MetadataFieldBuilder
-            .createMetadataField(context, "AnElement", "AQualifier", "AScopeNote").build();
-        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/metadatafields")
-            .param("size", String.valueOf(100)))
+            .param("size", String.valueOf(9999)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "title", null),
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "date", "issued"))
-                                      ))
+                                      ));
+    }
+
+    @Test
+    public void findAllPaginated() throws Exception {
+        getClient().perform(get("/api/core/metadatafields")
+                           .param("size", String.valueOf(2)))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.notNullValue()))
                    .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/core/metadatafields")))
                    .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")))
-
-                   .andExpect(jsonPath("$.page.size", is(100)));
+                   .andExpect(jsonPath("$.page.size", is(2)));
     }
 
     @Test
@@ -647,7 +655,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                 .perform(post("/api/core/metadatafields")
                     .param("schemaId", metadataSchema.getID() + "")
                     .param("projection", "full")
-                    .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                    .content(mapper.writeValueAsBytes(metadataFieldRest))
                     .contentType(contentType))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
@@ -679,7 +687,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                     getClient(authToken)
                             .perform(post("/api/core/metadatafields")
                                     .param("schemaId", metadataSchema.getID() + "")
-                                    .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                                    .content(mapper.writeValueAsBytes(metadataFieldRest))
                                     .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andReturn().getResponse().getContentAsString(),
@@ -715,7 +723,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                 .perform(post("/api/core/metadatafields")
                     .param("schemaId", metadataSchema.getID() + "")
                     .param("projection", "full")
-                    .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                    .content(mapper.writeValueAsBytes(metadataFieldRest))
                     .contentType(contentType))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
@@ -752,7 +760,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         getClient()
             .perform(post("/api/core/metadatafields")
                 .param("schemaId", metadataSchema.getID() + "")
-                .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                .content(mapper.writeValueAsBytes(metadataFieldRest))
                 .contentType(contentType))
             .andExpect(status().isUnauthorized());
     }
@@ -772,7 +780,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(post("/api/core/metadatafields")
                          .param("schemaId", String.valueOf(metadataSchema.getID()))
                          .param("projection", "full")
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
 
@@ -784,7 +792,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(post("/api/core/metadatafields")
                          .param("schemaId", String.valueOf(metadataSchema.getID()))
                          .param("projection", "full")
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
 
@@ -796,7 +804,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(post("/api/core/metadatafields")
                          .param("schemaId", String.valueOf(metadataSchema.getID()))
                          .param("projection", "full")
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
     }
@@ -816,7 +824,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(post("/api/core/metadatafields")
                          .param("schemaId", String.valueOf(metadataSchema.getID()))
                          .param("projection", "full")
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
 
@@ -828,7 +836,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(post("/api/core/metadatafields")
                          .param("schemaId", String.valueOf(metadataSchema.getID()))
                          .param("projection", "full")
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
 
@@ -840,7 +848,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(post("/api/core/metadatafields")
                          .param("schemaId", String.valueOf(metadataSchema.getID()))
                          .param("projection", "full")
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
     }
@@ -858,7 +866,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         getClient(token)
             .perform(post("/api/core/metadatafields")
                 .param("schemaId", metadataSchema.getID() + "")
-                .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                .content(mapper.writeValueAsBytes(metadataFieldRest))
                 .contentType(contentType))
             .andExpect(status().isForbidden());
     }
@@ -1000,7 +1008,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isOk());
     }
@@ -1022,7 +1030,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
 
@@ -1050,7 +1058,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .content(mapper.writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
 
@@ -1089,7 +1097,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                .content(mapper.writeValueAsBytes(metadataFieldRest))
                 .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
 
@@ -1131,7 +1139,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient()
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                .content(mapper.writeValueAsBytes(metadataFieldRest))
                 .contentType(contentType))
             .andExpect(status().isUnauthorized());
 
@@ -1161,7 +1169,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(getAuthToken(eperson.getEmail(), password))
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                .content(mapper.writeValueAsBytes(metadataFieldRest))
                 .contentType(contentType))
             .andExpect(status().isForbidden());
 

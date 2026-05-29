@@ -33,7 +33,14 @@ if [ "$1" = "classpath" ]; then
   exit 0
 fi
 
-#Allow user to specify java options through JAVA_OPTS variable
+# Unset JAVA_TOOL_OPTIONS (exported by Dockerfile) so that any debug ports don't conflict
+unset JAVA_TOOL_OPTIONS
+# Note, if you wish to also debug the CLI launcher, the following line is an
+# example of how to do so - note the different port number and 'suspend=y' which
+# means the JVM will not begin execution until a debugger is attached.
+#JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:1043"
+
+# Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
   #Default Java to use 256MB of memory
   JAVA_OPTS="-Xmx256m -Dfile.encoding=UTF-8"

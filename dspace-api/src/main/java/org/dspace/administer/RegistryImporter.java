@@ -10,7 +10,6 @@ package org.dspace.administer;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
@@ -18,6 +17,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,8 +49,9 @@ public class RegistryImporter {
      */
     public static Document loadXML(String filename)
         throws IOException, ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
+        // This XML builder will *not* disable external entities as XML
+        // registries are considered trusted content
+        DocumentBuilder builder = XMLUtils.getTrustedDocumentBuilder();
 
         Document document = builder.parse(new File(filename));
 

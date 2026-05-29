@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -84,8 +84,8 @@ public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOp
 
                             String name = newAccessCondition.getName();
                             String description = newAccessCondition.getDescription();
-                            Date startDate = newAccessCondition.getStartDate();
-                            Date endDate = newAccessCondition.getEndDate();
+                            LocalDate startDate = newAccessCondition.getStartDate();
+                            LocalDate endDate = newAccessCondition.getEndDate();
                             // TODO manage duplicate policy
                             BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfigs.next(), b, name,
                                     description, startDate, endDate);

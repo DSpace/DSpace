@@ -52,4 +52,28 @@ public class DSpaceObjectUtils {
         return null;
     }
 
+    /**
+     * Retrieve a DSpaceObject from its uuid and type in order to improve performance.
+     *
+     * @param context
+     *            DSpace context
+     * @param uuid
+     *            the uuid to lookup
+     * @param type
+     *            the type of the DSpaceObject to lookup
+     * @return the DSpaceObject if any with the supplied uuid
+     * @throws SQLException
+     */
+    public DSpaceObject findDSpaceObject(Context context, UUID uuid, String type) throws SQLException {
+        return switch (type) {
+            case "ITEM" -> contentServiceFactory.getItemService().find(context, uuid);
+            case "COLLECTION" -> contentServiceFactory.getCollectionService().find(context, uuid);
+            case "COMMUNITY" -> contentServiceFactory.getCommunityService().find(context, uuid);
+            case "BITSTREAM" -> contentServiceFactory.getBitstreamService().find(context, uuid);
+            case "SITE" -> contentServiceFactory.getSiteService().find(context, uuid);
+            case "BUNDLE" -> contentServiceFactory.getBundleService().find(context, uuid);
+            default -> findDSpaceObject(context, uuid);
+        };
+    }
+
 }

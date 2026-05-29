@@ -8,7 +8,7 @@
 package org.dspace.checker;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.MostRecentChecksumService;
@@ -33,7 +33,7 @@ public class SimpleDispatcher implements BitstreamDispatcher {
     /**
      * Date this dispatcher started dispatching.
      */
-    protected Date processStartTime = null;
+    protected Instant processStartTime = null;
 
     /**
      * Access for bitstream information
@@ -50,10 +50,10 @@ public class SimpleDispatcher implements BitstreamDispatcher {
      * @param looping   indicates whether checker should loop infinitely through
      *                  most_recent_checksum table
      */
-    public SimpleDispatcher(Context context, Date startTime, boolean looping) {
+    public SimpleDispatcher(Context context, Instant startTime, boolean looping) {
         checksumService = CheckerServiceFactory.getInstance().getMostRecentChecksumService();
         this.context = context;
-        this.processStartTime = (startTime == null ? null : new Date(startTime.getTime()));
+        this.processStartTime = startTime;
         this.loopContinuously = looping;
     }
 

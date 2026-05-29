@@ -209,7 +209,7 @@ public class StatisticsDataSearches extends StatisticsData {
     protected String getQuery() {
         String query;
         if (currentDso != null) {
-            query = "scopeType: " + currentDso.getType() + " AND ";
+            query = "scopeType:" + currentDso.getType() + " AND ";
             if (currentDso instanceof DSpaceObjectLegacySupport) {
                 query += " (scopeId:" + currentDso.getID() + " OR scopeId:" + ((DSpaceObjectLegacySupport) currentDso)
                     .getLegacyId() + ")";
