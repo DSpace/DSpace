@@ -21,6 +21,8 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.io.ScratchFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.dspace.authorize.AuthorizeException;
@@ -272,7 +274,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             var randomAccess = new DeleteOnCloseRandomAccessRead(tempFile.toPath());
             try {
                 return Loader.loadPDF(randomAccess,
-                        () -> new org.apache.pdfbox.io.ScratchFile(org.apache.pdfbox.io.MemoryUsageSetting.setupTempFileOnly()));
+                        () -> new ScratchFile(MemoryUsageSetting.setupTempFileOnly()));
             } catch (Exception e) {
                 try {
                     randomAccess.close();
@@ -323,7 +325,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
     }
 
-    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDDocument coverPage) throws IOException {
+    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument,
+                                        PDDocument coverPage) throws IOException {
         var sourcePages = sourceDocument.getDocumentCatalog().getPages();
         var coverPages = coverPage.getDocumentCatalog().getPages();
 

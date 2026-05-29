@@ -12,9 +12,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +23,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.io.ScratchFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.dspace.app.util.XMLUtils;
