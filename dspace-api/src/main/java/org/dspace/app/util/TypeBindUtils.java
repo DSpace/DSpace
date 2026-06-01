@@ -9,7 +9,6 @@ package org.dspace.app.util;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
@@ -47,22 +46,13 @@ public class TypeBindUtils {
     }
 
     /**
-     * Gets the value of the type-bind field from the current item in the submission.
+     * Gets all metadata values of the type-bind field from the current item in the submission.
      *
      * @param obj the in-progress submission
-     * @return the value of the type-bind field, or null if not set
+     * @return the list of MetadataValue objects of the type-bind field
      */
-    public static String getTypeBindValue(InProgressSubmission<?> obj) {
-        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(
-            obj.getItem(), getTypeBindField());
-
-        // check empty type-bind field
-        if (documentType == null || documentType.isEmpty()
-            || StringUtils.isBlank(documentType.get(0).getValue())) {
-            return null;
-        }
-
-        return documentType.get(0).getValue();
+    public static List<MetadataValue> getTypeBindMetadataValues(InProgressSubmission<?> obj) {
+        return itemService.getMetadataByMetadataString(obj.getItem(), getTypeBindField());
     }
 
 }

@@ -8,7 +8,6 @@
 package org.dspace.content;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -93,7 +92,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     @Column(name = "security_level")
     private Integer securityLevel;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dspace_object_id")
     protected DSpaceObject dSpaceObject;
 

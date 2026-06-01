@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Distributive;
@@ -49,8 +50,8 @@ public abstract class AbstractTranslator extends AbstractCurationTask {
 
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
 
         // Load configuration
         authLang = configurationService.getProperty("default.locale");
@@ -72,7 +73,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask {
     }
 
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
 
         if (dso instanceof Item) {
             Item item = (Item) dso;
@@ -145,15 +146,15 @@ public abstract class AbstractTranslator extends AbstractCurationTask {
                                 try {
                                     // Add the new metadata
                                     if (fieldSegments.length > 2) {
-                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0],
+                                        itemService.addMetadata(context, item, fieldSegments[0],
                                                                 fieldSegments[1], fieldSegments[2], lang,
                                                                 translatedText);
                                     } else {
-                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0],
+                                        itemService.addMetadata(context, item, fieldSegments[0],
                                                                 fieldSegments[1], null, lang, translatedText);
                                     }
 
-                                    itemService.update(Curator.curationContext(), item);
+                                    itemService.update(context, item);
                                     results
                                         .add(handle + ": Translated " + authLang + " -> " + lang + " (" + field + ")");
                                 } catch (Exception e) {

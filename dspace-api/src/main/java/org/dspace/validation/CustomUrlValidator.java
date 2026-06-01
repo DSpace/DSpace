@@ -15,7 +15,6 @@ import static org.dspace.validation.service.ValidationService.OPERATION_PATH_SEC
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections4.iterators.IteratorChain;
@@ -27,6 +26,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.validation.model.ValidationError;
+import org.dspace.validation.util.CustomUrlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -43,8 +43,6 @@ public class CustomUrlValidator implements SubmissionStepValidator {
     private static final String ERROR_VALIDATION_INVALID_CHARS = "error.validation.custom-url.invalid-characters";
 
     private static final String ERROR_VALIDATION_CONFLICT = "error.validation.custom-url.conflict";
-
-    private static final Pattern URL_PATH_PATTERN = Pattern.compile("^[.a-zA-Z0-9-_]+$");
 
     @Autowired
     private ItemService itemService;
@@ -80,8 +78,15 @@ public class CustomUrlValidator implements SubmissionStepValidator {
         return List.of();
     }
 
+    /**
+     * Checks if the custom URL contains invalid characters.
+     * Delegates to {@link CustomUrlUtils#hasInvalidCharacters(String)}.
+     *
+     * @param customUrl the custom URL to check
+     * @return true if the URL contains invalid characters, false otherwise
+     */
     private boolean hasInvalidCharacters(String customUrl) {
-        return !URL_PATH_PATTERN.matcher(customUrl).matches();
+        return CustomUrlUtils.hasInvalidCharacters(customUrl);
     }
 
     private boolean existsAnotherItemWithSameCustomUrl(Context context, Item item, String customUrl) {

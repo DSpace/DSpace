@@ -8,7 +8,6 @@
 package org.dspace.ctask.general;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
@@ -16,6 +15,7 @@ import org.dspace.content.Item;
 import org.dspace.content.logic.Filter;
 import org.dspace.content.logic.FilterUtils;
 import org.dspace.content.logic.TrueFilter;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -49,8 +49,8 @@ public class RegisterDOI extends AbstractCurationTask {
      * Initialise the curation task and read configuration, instantiate the DOI provider
      */
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         // Get distribution behaviour from configuration, with a default value of 'false'
         distributed = configurationService.getBooleanProperty(PLUGIN_PREFIX + ".distributed", false);
         log.debug("PLUGIN_PREFIX = " + PLUGIN_PREFIX + ", skipFilter = " + skipFilter +
@@ -70,17 +70,17 @@ public class RegisterDOI extends AbstractCurationTask {
      * @throws IOException if IO error
      */
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
         // Check distribution configuration
         if (distributed) {
             // This task is configured for distributed use. Call distribute() and let performItem handle
             // the main processing.
-            distribute(dso);
+            distribute(context, dso);
         } else {
             // This task is NOT configured for distributed use (default). Instead process a single item directly
             if (dso instanceof Item) {
                 Item item = (Item) dso;
-                performRegistration(item);
+                performRegistration(context, item);
             } else {
                 log.warn("DOI registration attempted on non-item DSpace Object: " + dso.getID());
             }
@@ -94,17 +94,17 @@ public class RegisterDOI extends AbstractCurationTask {
      * @param item the DSpace Item
      */
     @Override
-    protected void performItem(Item item) {
-        performRegistration(item);
+    protected void performItem(Context context, Item item) {
+        performRegistration(context, item);
     }
 
     /**
      * Shared 'perform' code between perform() and performItem() - a curation wrapper for the register() method
      * @param item the item for which to register a DOI
      */
-    private void performRegistration(Item item) {
+    private void performRegistration(Context context, Item item) {
         // Request DOI registration and report results
-        String doi = register(item);
+        String doi = register(context, item);
         String result = "DOI registration task performed on " + item.getHandle() + ".";
         if (doi != null) {
             result += " DOI: (" + doi + ")";
@@ -119,13 +119,13 @@ public class RegisterDOI extends AbstractCurationTask {
      * Perform the DOIIdentifierProvider.register call, with skipFilter passed as per config and defaults
      * @param item The item for which to register a DOI
      */
-    private String register(Item item) {
+    private String register(Context context, Item item) {
         String doi = null;
         // Attempt DOI registration and report successes and failures
         try {
             Filter filter = FilterUtils.getFilterFromConfiguration("identifiers.submission.filter.curation",
                     trueFilter);
-            doi = provider.register(Curator.curationContext(), item, filter);
+            doi = provider.register(context, item, filter);
             if (doi != null) {
                 String message = "New DOI minted in database for item " + item.getHandle() + ": " + doi
                     + ". This DOI will be registered online with the DOI provider when the queue is next run";
@@ -133,10 +133,6 @@ public class RegisterDOI extends AbstractCurationTask {
             } else {
                 log.error("Got a null DOI after registering...");
             }
-        } catch (SQLException e) {
-            // Exception obtaining context
-            log.error("Error obtaining curator context: " + e.getMessage());
-            status = Curator.CURATE_ERROR;
         } catch (DOIIdentifierNotApplicableException e) {
             // Filter returned 'false' so DOI was not registered. This is normal behaviour when filter is running.
             log.info("Item was filtered from DOI registration: " + e.getMessage());

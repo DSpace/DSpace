@@ -7,7 +7,12 @@
  */
 package org.dspace.deletion.process;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.commons.cli.Options;
+import org.dspace.core.Context;
+import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
@@ -20,7 +25,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObjectDeletionProcess>
-        extends ScriptConfiguration<T> {
+    extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 
@@ -60,4 +65,33 @@ public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObje
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
 
+    /**
+     * Determines if the current user is allowed to execute the deletion script.
+     *
+     * This method implements a granular permission model that allows execution by:
+     * <ul>
+     *   <li>Repository administrators (full admin rights)</li>
+     *   <li>Community or Collection administrators (can delete objects they administer)</li>
+     *   <li>Item administrators (can delete items they administer)</li>
+     * </ul>
+     *
+     * Note: This method checks if the user has ANY of these admin roles. The actual
+     * authorization to delete a specific object is verified separately in the deletion
+     * process based on the user's permissions for that particular object.
+     *
+     * @param context               the DSpace context containing the current user
+     * @param commandLineParameters the command line parameters (not used in this implementation)
+     * @return true if the current user is a repository admin, community/collection admin,
+     * or item admin; false otherwise
+     * @throws RuntimeException if a SQLException occurs during permission checking
+     */
+    @Override
+    public boolean isAllowedToExecute(Context context, List<DSpaceCommandLineParameter> commandLineParameters) {
+        try {
+            return authorizeService.isAdmin(context) || authorizeService.isComColAdmin(context)
+                || authorizeService.isItemAdmin(context);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
+        }
+    }
 }

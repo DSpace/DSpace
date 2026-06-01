@@ -15,6 +15,17 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LoginJWTTokenHandler extends JWTTokenHandler {
+
+    /**
+     * Default expiration period for login tokens in milliseconds
+     */
+    private static final long DEFAULT_EXPIRATION_PERIOD = 1800000;
+
+    @Override
+    public long getExpirationPeriod() {
+        return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), DEFAULT_EXPIRATION_PERIOD);
+    }
+
     @Override
     protected String getTokenSecretConfigurationKey() {
         return "jwt.login.token.secret";

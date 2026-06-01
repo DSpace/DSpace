@@ -177,8 +177,8 @@ public class DOIMigrator {
     }
 
     public Stream<Item> migrationItems(MetadataFieldName fromFieldName)
-        throws SQLException, IOException, AuthorizeException {
-        Iterator<Item> itemsIterator = itemService.findByMetadataField(context,
+        throws SQLException, AuthorizeException {
+        Iterator<Item> itemsIterator = itemService.findArchivedByMetadataField(context,
                 fromFieldName.schema,
                 fromFieldName.element,
                 fromFieldName.qualifier,
