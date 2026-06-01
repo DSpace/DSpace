@@ -1859,7 +1859,7 @@
             <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
-                <version>1.4.1</version>
+                <version>1.4.4</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
