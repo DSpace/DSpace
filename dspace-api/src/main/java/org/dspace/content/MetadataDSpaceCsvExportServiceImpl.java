@@ -99,7 +99,9 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             Item item = toExport.next();
             csv.addItem(item);
             context.uncacheEntity(item);
-            handler.registerHeartbeat();
+            if (handler != null) {
+                handler.registerHeartbeat();
+            }
         }
 
         context.setMode(originalMode);

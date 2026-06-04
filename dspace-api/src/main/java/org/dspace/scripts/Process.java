@@ -93,6 +93,7 @@ public class Process implements ReloadableEntity<Integer> {
     @Column(name = "heartbeat")
     private Instant heartbeat;
 
+
     public static final String BITSTREAM_TYPE_METADATAFIELD = "dspace.process.filetype";
     public static final String OUTPUT_TYPE = "script_output";
 
