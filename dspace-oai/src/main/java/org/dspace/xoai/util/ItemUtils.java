@@ -18,7 +18,6 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
@@ -160,7 +159,7 @@ public class ItemUtils {
 
     /**
      * Sanitizes a string to remove characters that are invalid
-     * in XML 1.0 using the Apache Commons Text library.
+     * in XML 1.0 using a hardcoded regex to avoid escaping special characters twice.
      * @param value The string to sanitize.
      * @return A sanitized string, or null if the input was null.
      */
@@ -168,7 +167,7 @@ public class ItemUtils {
         if (value == null) {
             return null;
         }
-        return StringEscapeUtils.escapeXml10(value);
+        return value.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD]", "");
     }
 
     /**
