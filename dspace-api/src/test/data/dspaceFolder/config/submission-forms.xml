@@ -293,11 +293,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>contributor</dc-element>
          <dc-qualifier>author</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Author</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required>You must enter at least the author.</required>
          <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+         <required>You must enter at least the author.</required>
        </field>
      </row>
      <row>
@@ -305,11 +305,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>oairecerif</dc-schema>
          <dc-element>author</dc-element>
          <dc-qualifier>affiliation</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Affiliation</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>Enter the affiliation of the author as stated on the publication.</hint>
+         <required />
        </field>
      </row>
    </form>
@@ -319,21 +319,21 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>contributor</dc-element>
          <dc-qualifier>editor</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Editor</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required>You must enter at least the author.</required>
          <hint>The editors of this publication.</hint>
+         <required>You must enter at least the author.</required>
        </field>
        <field>
          <dc-schema>oairecerif</dc-schema>
          <dc-element>editor</dc-element>
          <dc-qualifier>affiliation</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Affiliation</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>Enter the affiliation of the editor as stated on the publication.</hint>
+         <required />
        </field>
      </row>
    </form>
@@ -429,11 +429,11 @@ it, please enter the types and the actual numbers or codes.</hint>
           <dc-schema>dc</dc-schema>
           <dc-element>contributor</dc-element>
           <dc-qualifier>author</dc-qualifier>
+          <repeatable>false</repeatable>
           <label>Author</label>
           <input-type>name</input-type>
-          <repeatable>false</repeatable>
-          <required>You must enter at least the author.</required>
           <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+          <required>You must enter at least the author.</required>
         </field>
       </row>
       <row>
@@ -441,11 +441,11 @@ it, please enter the types and the actual numbers or codes.</hint>
           <dc-schema>person</dc-schema>
           <dc-element>affiliation</dc-element>
           <dc-qualifier>name</dc-qualifier>
+          <repeatable>false</repeatable>
           <label>Affiliation</label>
           <input-type>onebox</input-type>
-          <repeatable>false</repeatable>
-          <required />
           <hint>Enter the affiliation of the author as stated on the publication.</hint>
+          <required />
         </field>
       </row>
    </form>
@@ -497,6 +497,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Title</label>
          <input-type>onebox</input-type>
+         <hint/>
          <required>Field required</required>
        </field>
      </row>
@@ -511,6 +512,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Type</label>
          <input-type>onebox</input-type>
+         <hint/>
          <required>Field required</required>
        </field>
      </row>
@@ -571,11 +573,11 @@ it, please enter the types and the actual numbers or codes.</hint>
              <field>
                  <dc-schema>dc</dc-schema>
                  <dc-element>title</dc-element>
+                 <repeatable>false</repeatable>
                  <label>Organization name</label>
                  <input-type>onebox</input-type>
-                 <repeatable>false</repeatable>
-                 <required>You must enter the oganization name.</required>
                  <hint />
+                 <required>You must enter the oganization name.</required>
              </field>
          </row>
      </form>
@@ -586,23 +588,23 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
+         <repeatable>false</repeatable>
          <label>Title</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required>You must specify a title for the patent</required>
          <hint>The title of the patent</hint>
+         <required>You must specify a title for the patent</required>
        </field>
      </row>
      <row>
        <field>
          <dc-schema>dcterms</dc-schema>
          <dc-element>dateAccepted</dc-element>
+         <repeatable>false</repeatable>
          <label>Approval Date</label>
          <input-type>date</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>The Approval date.
     You can leave out the day and/or month if they aren't applicable.</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -610,12 +612,12 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>date</dc-element>
          <dc-qualifier>issued</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Registration Date</label>
          <input-type>date</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>The registration date of the patent.
     You can leave out the day and/or month if they aren't applicable.</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -623,33 +625,33 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>contributor</dc-element>
          <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
          <label>Inventor(s)</label>
          <input-type>name</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint>The inventor: The actual devisor of an invention that is the subject of a patent.</hint>
+         <required />
        </field>
      </row>
      <row>
        <field>
          <dc-schema>dcterms</dc-schema>
          <dc-element>rightsHolder</dc-element>
+         <repeatable>true</repeatable>
          <label>Holder</label>
          <input-type>onebox</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint>The holders of this patent</hint>
+         <required />
        </field>
      </row>
      <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>publisher</dc-element>
+         <repeatable>true</repeatable>
          <label>Issuer</label>
          <input-type>onebox</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint>The issuer of the patent: the patent office</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -657,11 +659,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
          <dc-qualifier>patentno</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Patent Number</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>The patent number.</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -669,22 +671,22 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
          <dc-qualifier>patentnumber</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Patent Number</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>The patent number.</hint>
+         <required />
        </field>
      </row>
      <row>
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>type</dc-element>
+          <repeatable>false</repeatable>
           <label>Type</label>
           <input-type>onebox</input-type>
-          <repeatable>false</repeatable>
-          <required>You must select a patent type</required>
           <hint>Select the type of content of the patent.</hint>
+          <required>You must select a patent type</required>
         </field>
      </row>
      <row>
@@ -692,11 +694,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
          <dc-qualifier>applicationnumber</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Application Number</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>The Application number.</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -704,11 +706,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>date</dc-element>
          <dc-qualifier>filled</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Date filled</label>
          <input-type>date</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>The date Filled.</hint>
+         <required />
        </field>
      </row>
     </form>
@@ -718,22 +720,22 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>language</dc-element>
          <dc-qualifier>iso</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Language</label>
          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>Select the country and its language.</hint>
+         <required />
        </field>
      </row>
      <row>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>subject</dc-element>
+         <repeatable>true</repeatable>
          <label>Subject Keyword(s)</label>
          <input-type>onebox</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint>Enter appropriate subject keywords or phrases.</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -741,11 +743,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
          <dc-qualifier>abstract</dc-qualifier>
+         <repeatable>false</repeatable>
          <label>Abstract</label>
          <input-type>textarea</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint>Enter the description of the patent.</hint>
+         <required />
        </field>
      </row>
     </form>
@@ -754,11 +756,11 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>relation</dc-element>
+         <repeatable>true</repeatable>
          <label>Originates From</label>
          <input-type>onebox</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint>Enter the name of project, if any, that has produced this patent.</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -766,11 +768,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>relation</dc-element>
          <dc-qualifier>patent</dc-qualifier>
+         <repeatable>true</repeatable>
          <label>Predecessor</label>
          <input-type>onebox</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint>Patents that precede (i.e., have priority over) this patent</hint>
+         <required />
        </field>
      </row>
      <row>
@@ -778,11 +780,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>dc</dc-schema>
          <dc-element>relation</dc-element>
          <dc-qualifier>references</dc-qualifier>
+         <repeatable>true</repeatable>
          <label>References</label>
          <input-type>onebox</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint>Result outputs that are referenced by this patent</hint>
+         <required />
        </field>
      </row>
     </form>
@@ -792,33 +794,33 @@ it, please enter the types and the actual numbers or codes.</hint>
              <field>
                  <dc-schema>dc</dc-schema>
                  <dc-element>title</dc-element>
+                 <repeatable>false</repeatable>
                  <label>Title</label>
                  <input-type>onebox</input-type>
-                 <repeatable>false</repeatable>
-                 <required>You must enter the project title</required>
                  <hint />
+                 <required>You must enter the project title</required>
              </field>
          </row>
          <row>
              <field>
                  <dc-schema>oairecerif</dc-schema>
                  <dc-element>funder</dc-element>
+                 <repeatable>true</repeatable>
                  <label>Financing</label>
                  <input-type>inline-group</input-type>
-                 <repeatable>true</repeatable>
-                 <required>You must enter financing information</required>
                  <hint />
+                 <required>You must enter financing information</required>
              </field>
          </row>
          <row>
              <field>
                  <dc-schema>dc</dc-schema>
                  <dc-element>type</dc-element>
+                 <repeatable>false</repeatable>
                  <label>Type</label>
                  <input-type value-pairs-name="funding_types">dropdown</input-type>
-                 <repeatable>false</repeatable>
-                 <required />
                  <hint />
+                 <required />
              </field>
          </row>
      </form>
@@ -828,31 +830,31 @@ it, please enter the types and the actual numbers or codes.</hint>
              <field>
                  <dc-schema>oairecerif</dc-schema>
                  <dc-element>funder</dc-element>
-                 <label>Funder</label>
-                 <input-type>onebox</input-type>
                  <repeatable>false</repeatable>
-                 <required>You must enter the funder</required>
+                 <label>Funder</label>
                  <style>col-xs-12 col-md-6 col-lg-3</style>
+                 <input-type>onebox</input-type>
                  <hint />
+                 <required>You must enter the funder</required>
              </field>
              <field>
                  <dc-schema>oairecerif</dc-schema>
                  <dc-element>amount</dc-element>
+                 <repeatable>false</repeatable>
                  <label>Amount</label>
                  <input-type>onebox</input-type>
-                 <repeatable>false</repeatable>
-                 <required />
                  <hint />
+                 <required />
              </field>
              <field>
                  <dc-schema>oairecerif</dc-schema>
                  <dc-element>amount</dc-element>
                  <dc-qualifier>currency</dc-qualifier>
+                 <repeatable>false</repeatable>
                  <label>Currency</label>
                  <input-type value-pairs-name="currency">dropdown</input-type>
-                 <repeatable>false</repeatable>
-                 <required />
                  <hint />
+                 <required />
              </field>
          </row>
      </form>
@@ -862,31 +864,31 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
+         <repeatable>false</repeatable>
          <label>Preferred Name</label>
          <input-type>name</input-type>
-         <repeatable>false</repeatable>
-         <required>You must enter least at the Surname.</required>
          <hint />
+         <required>You must enter least at the Surname.</required>
        </field>
      </row>
      <row>
        <field>
          <dc-schema>person</dc-schema>
          <dc-element>givenName</dc-element>
+         <repeatable>false</repeatable>
          <label>First name</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint />
+         <required />
        </field>
        <field>
          <dc-schema>person</dc-schema>
          <dc-element>familyName</dc-element>
+         <repeatable>false</repeatable>
          <label>Family name</label>
          <input-type>onebox</input-type>
-         <repeatable>false</repeatable>
-         <required />
          <hint />
+         <required />
        </field>
      </row>
      <row>
@@ -894,11 +896,11 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-schema>oairecerif</dc-schema>
          <dc-element>identifier</dc-element>
          <dc-qualifier>url</dc-qualifier>
+         <repeatable>true</repeatable>
          <label>Personal Site(s)</label>
          <input-type>link</input-type>
-         <repeatable>true</repeatable>
-         <required />
          <hint />
+         <required />
        </field>
      </row>
    </form>
