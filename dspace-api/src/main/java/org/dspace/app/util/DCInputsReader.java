@@ -404,6 +404,17 @@ public class DCInputsReader {
                 field.put(tagName, value);
                 if (tagName.equals("input-type")) {
                     handleInputTypeTagName(formName, field, nd, value);
+                } else if (tagName.equals("type-bind")) {
+                    String typeBindSeparator = getAttribute(nd, "separator");
+                    if (StringUtils.isBlank(typeBindSeparator)) {
+                        typeBindSeparator = TypeBindUtils.getTypeBindValueSeparator();
+                    }
+                    field.put("type-bind-separator", typeBindSeparator);
+
+                    String typeBindToField = getAttribute(nd, "to-field");
+                    if (StringUtils.isNotBlank(typeBindToField)) {
+                        field.put("type-bind-to-field", typeBindToField);
+                    }
                 } else if (tagName.equals("vocabulary")) {
                     String closedVocabularyString = getAttribute(nd, "closed");
                     field.put("closedVocabulary", closedVocabularyString);

@@ -145,6 +145,7 @@ public class DCInput {
      * allowed document types
      */
     private List<String> typeBind = null;
+    private String typeBindToField = null;
 
     private boolean isRelationshipField = false;
     private boolean isMetadataField = false;
@@ -221,12 +222,14 @@ public class DCInput {
         // parsing of the <type-bind> element (using the colon as split separator)
         typeBind = new ArrayList<>();
         String typeBindDef = fieldMap.get("type-bind");
+        String typeBindSeparator = fieldMap.get("type-bind-separator");
         if (typeBindDef != null && typeBindDef.trim().length() > 0) {
-            String[] types = typeBindDef.split(",");
+            String[] types = typeBindDef.split(typeBindSeparator);
             for (String type : types) {
                 typeBind.add(type.trim());
             }
         }
+        typeBindToField = fieldMap.get("type-bind-to-field");
         style = fieldMap.get("style");
         isRelationshipField = fieldMap.containsKey("relationship-type");
         isMetadataField = fieldMap.containsKey("dc-schema");
@@ -417,6 +420,15 @@ public class DCInput {
      */
     public String getPairsType() {
         return valueListName;
+    }
+
+    /**
+     * Get fieldname to bind to
+     *
+     * @return fieldname
+     */
+    public String getTypeBindToField() {
+        return typeBindToField;
     }
 
     /**

@@ -184,6 +184,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         if (dcinput.isMetadataField()) {
             inputField.setSelectableMetadata(selectableMetadata);
             inputField.setTypeBind(dcinput.getTypeBindList());
+            inputField.setTypeBindToField(dcinput.getTypeBindToField());
         }
         if (dcinput.isRelationshipField()) {
             selectableRelationship = getSelectableRelationships(dcinput);
