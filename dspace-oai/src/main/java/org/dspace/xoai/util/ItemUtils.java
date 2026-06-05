@@ -18,7 +18,6 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
@@ -160,7 +159,7 @@ public class ItemUtils {
 
     /**
      * Sanitizes a string to remove characters that are invalid
-     * in XML 1.0 using the Apache Commons Text library.
+     * in XML 1.0 using a hardcoded regex to avoid escaping special characters twice.
      * @param value The string to sanitize.
      * @return A sanitized string, or null if the input was null.
      */
@@ -168,7 +167,15 @@ public class ItemUtils {
         if (value == null) {
             return null;
         }
-        return StringEscapeUtils.escapeXml10(value);
+
+        // Strips characters that are illegal in XML 1.0 (per the XML spec, https://www.w3.org/TR/xml/#charsets)
+        // The allowed character set is: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        // This regex matches everything OUTSIDE that allowed set, i.e. it removes:
+        //   - C0 control characters other than tab (\x09), LF (\x0A), and CR (\x0D)
+        //   (i.e. \x00-\x08, \x0B, \x0C, \x0E-\x1F)
+        //   - The UTF-16 surrogate range \uD800-\uDFFF
+        //   - The non-characters \uFFFE and \uFFFF
+        return value.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD]", "");
     }
 
     /**
