@@ -1138,7 +1138,17 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             return metadataValues;
         }
 
-        return matchedValues;
+//        a localized match was found. Values without a language are language-neutral (e.g.
+//        dc.description.provenance, identifiers, dates, or any value added via the REST API without
+//        a language) and are not translations of the localized values, so they must remain visible
+//        alongside the localized matches. Preserve the original order/places.
+        List<MetadataValue> result = new ArrayList<>();
+        for (MetadataValue value : metadataValues) {
+            if (value.getLanguage() == null || matchedValues.contains(value)) {
+                result.add(value);
+            }
+        }
+        return result;
     }
 
     private List<MetadataValue> filterByLanguageInSupportedLocales(List<MetadataValue> metadataValues,
