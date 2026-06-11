@@ -26,6 +26,7 @@ import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,9 +35,19 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     @Autowired
     private ExternalDataService externalDataService;
 
+    String token;
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        // All tests just require basic authentication privileges
+        token = getAuthToken(eperson.getEmail(), password);
+    }
+
     @Test
     public void findAllExternalSources() throws Exception {
-        getClient().perform(get("/api/integration/externalsources"))
+        getClient(token).perform(get("/api/integration/externalsources"))
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
@@ -74,22 +85,35 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     }
 
     @Test
+    public void findAllExternalSourcesAnonymous() throws Exception {
+        getClient().perform(get("/api/integration/externalsources").param("size", "21"))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findOneExternalSourcesExistingSources() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock"))
+        getClient(token).perform(get("/api/integration/externalsources/mock"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.is(
                        ExternalSourceMatcher.matchExternalSource("mock", "mock", false)
                    )));
     }
+
+    @Test
+    public void findOneExternalSourcesExistingSourcesAnonymous() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/mock"))
+                        .andExpect(status().isUnauthorized());
+    }
+
     @Test
     public void findOneExternalSourcesNotExistingSources() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock2"))
+        getClient(token).perform(get("/api/integration/externalsources/mock2"))
                    .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneExternalSourceEntryValue() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock/entryValues/one"))
+        getClient(token).perform(get("/api/integration/externalsources/mock/entryValues/one"))
                    .andExpect(status().isOk())
                     .andExpect(jsonPath("$", Matchers.is(
                         ExternalSourceEntryMatcher.matchExternalSourceEntry("one", "one", "one", "mock")
@@ -97,27 +121,33 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     }
 
     @Test
+    public void findOneExternalSourceEntryValueAnonymous() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/mock/entryValues/one"))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findOneExternalSourceEntryValueInvalidEntryId() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock/entryValues/entryIdInvalid"))
+        getClient(token).perform(get("/api/integration/externalsources/mock/entryValues/entryIdInvalid"))
                    .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneExternalSourceEntryValueInvalidSource() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mocktwo/entryValues/one"))
+        getClient(token).perform(get("/api/integration/externalsources/mocktwo/entryValues/one"))
                    .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneExternalSourceEntriesInvalidSource() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mocktwo/entries")
+        getClient(token).perform(get("/api/integration/externalsources/mocktwo/entries")
                                 .param("query", "test"))
                    .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneExternalSourceEntriesApplicableQuery() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock/entries")
+        getClient(token).perform(get("/api/integration/externalsources/mock/entries")
                                 .param("query", "one"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.containsInAnyOrder(
@@ -128,8 +158,15 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     }
 
     @Test
-    public void findOneExternalSourceEntriesApplicableQueryPagination() throws Exception {
+    public void findOneExternalSourceEntriesApplicableQueryAnonymous() throws Exception {
         getClient().perform(get("/api/integration/externalsources/mock/entries")
+                                     .param("query", "one"))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneExternalSourceEntriesApplicableQueryPagination() throws Exception {
+        getClient(token).perform(get("/api/integration/externalsources/mock/entries")
                                 .param("query", "one").param("size", "1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasItem(
@@ -137,7 +174,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                    )))
                    .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 1, 2, 2)));
 
-        getClient().perform(get("/api/integration/externalsources/mock/entries")
+        getClient(token).perform(get("/api/integration/externalsources/mock/entries")
                                 .param("query", "one").param("size", "1").param("page", "1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasItem(
@@ -148,7 +185,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void findOneExternalSourceEntriesNoReturnQuery() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock/entries")
+        getClient(token).perform(get("/api/integration/externalsources/mock/entries")
                                 .param("query", "randomqueryfornoresults"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded").doesNotExist());
@@ -156,7 +193,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void findOneExternalSourceEntriesNoQuery() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/mock/entries"))
+        getClient(token).perform(get("/api/integration/externalsources/mock/entries"))
                    .andExpect(status().isBadRequest());
     }
 
@@ -167,7 +204,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
         List<ExternalDataProvider> journalProviders =
                 externalDataService.getExternalDataProvidersForEntityType("Journal");
 
-        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+        getClient(token).perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Publication"))
                    .andExpect(status().isOk())
                    // Expect that Publication sources match (check a max of 20 as that is default page size)
@@ -176,7 +213,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                               ))
                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(publicationProviders.size())));
 
-        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+        getClient(token).perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Journal"))
                    .andExpect(status().isOk())
                    // Check that Journal sources match (check a max of 20 as that is default page size)
@@ -187,8 +224,15 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     }
 
     @Test
+    public void findExternalSourcesByEntityTypeAnonymousTest() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+                        .param("entityType", "Publication"))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findExternalSourcesByEntityTypeBadRequestTest() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/search/findByEntityType"))
+        getClient(token).perform(get("/api/integration/externalsources/search/findByEntityType"))
                    .andExpect(status().isBadRequest());
     }
 
@@ -202,7 +246,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
         int pageSize = 2;
         int numberOfPages = (int) Math.ceil((double) numJournalProviders / pageSize);
 
-        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+        getClient(token).perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Journal")
                    .param("size", String.valueOf(pageSize)))
                    .andExpect(status().isOk())
@@ -212,7 +256,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                    .andExpect(jsonPath("$.page.totalPages", Matchers.is(numberOfPages)))
                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(numJournalProviders)));
 
-        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+        getClient(token).perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Journal")
                    .param("page", "1")
                    .param("size", String.valueOf(pageSize)))
