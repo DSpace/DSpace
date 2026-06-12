@@ -56,21 +56,6 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     /**
      * Adds metadata to the dso (appending if index is 0 or left out, prepending if -)
      *
-     * @param context       context patch is being performed in
-     * @param dso           dso being patched
-     * @param dsoService    service doing the patch in db
-     * @param metadataField md field being patched
-     * @param metadataValue value of md element
-     * @param index         determines whether we're prepending (-) or appending (0) md value
-     */
-    private void add(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
-                     MetadataValueRest metadataValue, String index) {
-        add(context, dso, dsoService, metadataField, List.of(metadataValue), index);
-    }
-
-    /**
-     * Adds metadata to the dso (appending if index is 0 or left out, prepending if -)
-     *
      * @param context           context patch is being performed in
      * @param dso               dso being patched
      * @param dsoService        service doing the patch in db
@@ -81,24 +66,25 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     private void add(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
                      List<MetadataValueRest> metadataValueList, String index) {
         metadataPatchUtils.checkMetadataFieldNotNull(metadataField);
-        int indexInt = 0;
+        int indexInt = -1; // -1 is used if no index is provided, or if index is "-" (meaning last)
         if (index != null && metadataValueList.size() > 1) {
             throw new DSpaceBadRequestException("Cannot add multiple metadata values with an index in the path.");
         }
-        if (index != null && index.equals("-")) {
-            indexInt = -1;
-        } else if (index != null) {
+        if ((index != null) && !index.equals("-")) {
             try {
                 indexInt = Integer.parseInt(index);
             } catch (NumberFormatException e) {
                 throw new DSpaceBadRequestException("Invalid index to add metadata value");
+            }
+            if (indexInt < 0) {
+                throw new DSpaceBadRequestException("Negative index to add metadata value cannot be used");
             }
             // Check that index is within bounds of existing metadata values
             List<MetadataValue> metadataValues = dsoService.getMetadata(dso,
                     metadataField.getMetadataSchema().getName(), metadataField.getElement(),
                     metadataField.getQualifier(), Item.ANY);
             if (indexInt > metadataValues.size()) {
-                throw new UnprocessableEntityException("There is no metadata of this type at that index");
+                throw new UnprocessableEntityException("Index out of bounds for this metadata field");
             }
         }
         try {
