@@ -271,6 +271,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      *            is the *required* email address
      * @return a Page of EPersonRest instances matching the user query
      */
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('MANAGE_ACCESS_GROUP')")
     @SearchRestMethod(name = "byEmail")
     public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
         EPerson eperson = null;
