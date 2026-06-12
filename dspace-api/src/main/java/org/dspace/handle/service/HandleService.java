@@ -188,8 +188,8 @@ public interface HandleService {
      *   - info:hdl/123456789/1                -> 123456789/1
      *   - https://hdl.handle.net/123456789/1  -> 123456789/1
      *
-     * @param identifier
-     * @return
+     * @param identifier the handle identifier to parse
+     * @return The canonical form of the handle
      */
     String parseHandle(String identifier);
 

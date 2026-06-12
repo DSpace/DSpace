@@ -470,4 +470,18 @@
         <scope_note>Stores the UUID of the bitstream this replaced</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>bitstream</element>
+        <qualifier>transcript</qualifier>
+        <scope_note>Transcript for associated audio/video content.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>bitstream</element>
+        <qualifier>textalternative</qualifier>
+        <scope_note>Text alternative for associated image/video content.</scope_note>
+    </dc-type>
+
 </dspace-dc-types>
