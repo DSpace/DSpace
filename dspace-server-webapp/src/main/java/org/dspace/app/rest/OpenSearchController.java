@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -26,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.util.SyndicationFeed;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.core.Context;
@@ -205,7 +205,7 @@ public class OpenSearchController {
                 (int) qResults.getTotalSearchResults(), qResults.getStart(),
                 qResults.getMaxResults(), container, dsoResults, labelMap);
             try {
-                Transformer xf = TransformerFactory.newInstance().newTransformer();
+                Transformer xf = XMLUtils.getTransformerFactory().newTransformer();
                 response.setContentType(openSearchService.getContentType(format));
                 xf.transform(new DOMSource(resultsDoc),
                     new StreamResult(response.getWriter()));
