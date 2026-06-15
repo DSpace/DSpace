@@ -242,7 +242,7 @@ public class XMLUtils {
         factory.setIgnoringElementContentWhitespace(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         builder.setEntityResolver(new PathRestrictedEntityResolver(allowedPaths));
-        return factory.newDocumentBuilder();
+        return builder;
     }
 
     /**
