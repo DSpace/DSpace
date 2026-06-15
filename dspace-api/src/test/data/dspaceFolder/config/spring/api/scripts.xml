@@ -123,6 +123,14 @@
                   value="org.dspace.content.migration.RelationshipToAuthorityMigrationScript"/>
     </bean>
 
+    <bean id="metadata-field-move"
+          class="org.dspace.content.migration.MetadataFieldMoveCliScriptConfiguration">
+        <property name="description"
+                  value="Move metadata values from a source field (regex) to a target field (template), DB-level"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.content.migration.MetadataFieldMoveScript"/>
+    </bean>
+
     <!-- ============================================================ -->
     <!-- Directional migration definitions                             -->
     <!-- ============================================================ -->
