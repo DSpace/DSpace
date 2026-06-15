@@ -51,10 +51,17 @@ rebel.xml
 ## Ignore jenv configuration
 .java-version
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 ## Ignore DSpace runtime directories and user uploads
 /dspace/assetstore/
 /dspace/solr/
 /dspace/log/
 /dspace/handle-server/
+<<<<<<< Updated upstream
 /dspace/reports/ 
+=======
+/dspace/reports/
+>>>>>>> Stashed changes
