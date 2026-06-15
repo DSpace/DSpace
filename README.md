@@ -3,6 +3,13 @@
 
 Changes try
 
+## Ignore DSpace runtime directories and user uploads
+<!-- /dspace/assetstore/
+/dspace/solr/
+/dspace/log/
+/dspace/handle-server/
+/dspace/reports/ -->
+
 [![Build Status](https://github.com/DSpace/DSpace/workflows/Build/badge.svg)](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild)
 
 [DSpace Documentation](https://wiki.lyrasis.org/display/DSDOC/) |
