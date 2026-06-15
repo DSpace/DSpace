@@ -50,3 +50,11 @@ rebel.xml
 
 ## Ignore jenv configuration
 .java-version
+
+
+## Ignore DSpace runtime directories and user uploads
+/dspace/assetstore/
+/dspace/solr/
+/dspace/log/
+/dspace/handle-server/
+/dspace/reports/ 
