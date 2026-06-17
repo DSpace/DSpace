@@ -7,6 +7,9 @@
  */
 package org.dspace.content.migration;
 
+import jakarta.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Configuration bean describing a single directional migration of a
  * relationship type.
@@ -82,5 +85,30 @@ public class DirectionalMigrationDefinition {
 
     public void setQualifier(String qualifier) {
         this.qualifier = qualifier;
+    }
+
+    /**
+     * Validates the bean configuration at Spring context startup.
+     *
+     * @throws IllegalStateException if a required property is missing or invalid
+     */
+    @PostConstruct
+    public void validateConfiguration() {
+        if (StringUtils.isBlank(ownerSide)) {
+            throw new IllegalStateException("DirectionalMigrationDefinition: ownerSide is required"
+                + " (value \"LEFT\" or \"RIGHT\")");
+        }
+        if (!"LEFT".equalsIgnoreCase(ownerSide) && !"RIGHT".equalsIgnoreCase(ownerSide)) {
+            throw new IllegalStateException("DirectionalMigrationDefinition: ownerSide must be"
+                + " \"LEFT\" or \"RIGHT\" (case-insensitive), got: '" + ownerSide + "'");
+        }
+        if (StringUtils.isBlank(schema)) {
+            throw new IllegalStateException("DirectionalMigrationDefinition: schema is required"
+                + " (e.g. \"dc\")");
+        }
+        if (StringUtils.isBlank(element)) {
+            throw new IllegalStateException("DirectionalMigrationDefinition: element is required"
+                + " (e.g. \"contributor\")");
+        }
     }
 }

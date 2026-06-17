@@ -42,17 +42,30 @@ import org.dspace.scripts.handler.DSpaceRunnableHandler;
 public interface RelationshipMigrationStrategy {
 
     /**
-     * @return the leftward type label of the RelationshipType this strategy handles
+     * Returns the leftward type label of the relationship type this strategy handles.
+     * This label matches {@link org.dspace.content.RelationshipType#getLeftwardType()}
+     * and is used by the migration script to match strategies to relationship types.
+     *
+     * @return the leftward type label (never null)
      */
     String getLeftwardType();
 
     /**
-     * @return the rightward type label of the RelationshipType this strategy handles
+     * Returns the rightward type label of the relationship type this strategy handles.
+     * This label matches {@link org.dspace.content.RelationshipType#getRightwardType()}
+     * and is used by the migration script to match strategies to relationship types.
+     *
+     * @return the rightward type label (never null)
      */
     String getRightwardType();
 
     /**
-     * @return a human-readable description of this strategy (for logging)
+     * Returns a human-readable description of this migration strategy, used in
+     * log messages during migration. Implementations should return a
+     * non-null, non-blank string; if no description is configured, a default
+     * derived from the type labels is acceptable.
+     *
+     * @return a human-readable description (never null)
      */
     String getDescription();
 

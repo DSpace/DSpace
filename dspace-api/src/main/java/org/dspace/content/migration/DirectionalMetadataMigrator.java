@@ -19,6 +19,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -53,8 +55,6 @@ public class DirectionalMetadataMigrator {
      * @param def the directional migration definition
      * @param handler the script handler for logging
      * @throws SQLException if a database error occurs
-     * @throws IllegalArgumentException if the definition's ownerSide is null or
-     *         not "LEFT"/"RIGHT" (case-insensitive)
      */
     public void migrate(Context context, Relationship relationship,
                         DirectionalMigrationDefinition def,
@@ -66,21 +66,9 @@ public class DirectionalMetadataMigrator {
         int place;
         String directionalValue;
 
-        // Validate the configured ownerSide up front: only "LEFT" or "RIGHT"
-        // (case-insensitive) are acceptable. Anything else (null, a typo, an
-        // unexpected value) is a configuration error and must fail fast rather
-        // than being silently treated as LEFT.
+        // ownerSide is validated at bean-init time by DirectionalMigrationDefinition.
         String ownerSide = def.getOwnerSide();
-        boolean isRight;
-        if ("RIGHT".equalsIgnoreCase(ownerSide)) {
-            isRight = true;
-        } else if ("LEFT".equalsIgnoreCase(ownerSide)) {
-            isRight = false;
-        } else {
-            throw new IllegalArgumentException("Invalid ownerSide '" + ownerSide
-                + "' for relationship id=" + relationship.getID()
-                + "; expected \"LEFT\" or \"RIGHT\" (case-insensitive)");
-        }
+        boolean isRight = "RIGHT".equalsIgnoreCase(ownerSide);
 
         if (isRight) {
             ownerItem = relationship.getRightItem();
@@ -128,6 +116,23 @@ public class DirectionalMetadataMigrator {
 
         String fieldLabel = def.getSchema() + "." + def.getElement()
             + (def.getQualifier() != null ? "." + def.getQualifier() : "");
+
+        // Ensure the target metadata field is configured for authority control.
+        // Without authority.controlled.<schema>.<element>.<qualifier> = true,
+        // the UI will not recognise authority values on this field.
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+            .getConfigurationService();
+        String authorityControlledKey = "authority.controlled."
+            + def.getSchema() + "." + def.getElement();
+        if (def.getQualifier() != null) {
+            authorityControlledKey += "." + def.getQualifier();
+        }
+        if (!configurationService.getBooleanProperty(authorityControlledKey, false)) {
+            handler.logWarning("Relationship id=" + relationship.getID()
+                + ": target field " + fieldLabel + " is not configured for authority control"
+                + " (" + authorityControlledKey + " not set to true)."
+                + " Authority metadata will be written but may not be recognised by the UI.");
+        }
 
         if (toUpdate != null) {
             toUpdate.setValue(value);

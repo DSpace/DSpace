@@ -11,6 +11,7 @@ import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -45,6 +46,7 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -125,6 +127,17 @@ public class RelationshipToAuthorityMigrationScriptIT extends AbstractIntegratio
 
     }
 
+    /**
+     * Restore default authority configuration after each test so failures
+     * in one test do not leave virtual-metadata/authority settings for the next.
+     */
+    @After
+    public void tearDown() throws Exception {
+        configurationService.setProperty("item.enable-virtual-metadata", savedVirtualMetadata);
+        restoreAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+    }
+
     @Before
     public void setup() {
         choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
@@ -138,71 +151,32 @@ public class RelationshipToAuthorityMigrationScriptIT extends AbstractIntegratio
      */
     @Test
     public void testMigrateAuthorRelationshipToAuthority() throws Exception {
-        // Disable authority plugins and enable virtual metadata for relationship creation
-        configurationService.setProperty("item.enable-virtual-metadata", true);
-        configurationService.setProperty(
-            "plugin.named.org.dspace.content.authority.ChoiceAuthority", null);
-        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
-        configurationService.setProperty("choices.presentation.dc.contributor.author", null);
-        configurationService.setProperty("authority.controlled.dc.contributor.author", null);
-
+        disableAuthorAuthorityConfig();
         clearAllAuthorityCaches();
 
-        context.turnOffAuthorisationSystem();
+        TestScenario scenario = createAuthorScenario();
 
-        // Create entity types
-        EntityType publicationEntityType =
-            EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
-        EntityType personEntityType =
-            EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-
-        // Create community and collections
-        parentCommunity = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
-
-        personCollection = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Persons")
-            .withEntityType("Person")
-            .build();
-
-        publicationCollection = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Publications")
-            .withEntityType("Publication")
-            .build();
-
-        // Create relationship type: isAuthorOfPublication
-        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
-            .createRelationshipTypeBuilder(context, publicationEntityType, personEntityType,
-                "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null)
-            .withCopyToLeft(false)
-            .withCopyToRight(false)
-            .build();
-
-        // Create person items
-        Item author1 = ItemBuilder.createItem(context, personCollection)
+        Item author1 = ItemBuilder.createItem(context, scenario.personCollection)
             .withTitle("Walter White")
             .build();
 
-        Item author2 = ItemBuilder.createItem(context, personCollection)
+        Item author2 = ItemBuilder.createItem(context, scenario.personCollection)
             .withTitle("Jesse Pinkman")
             .build();
 
-        // Create publication item
-        Item publication = ItemBuilder.createItem(context, publicationCollection)
+        Item publication = ItemBuilder.createItem(context, scenario.publicationCollection)
             .withTitle("Test Publication")
             .withAuthor("Saul Goodman")
             .withAuthor("Jesse Pinkman")
             .build();
 
-        // Create relationships between publication and persons
         RelationshipBuilder.createRelationshipBuilder(
-                context, publication, author1, isAuthorOfPublication, 1, -1)
+                context, publication, author1, scenario.relationshipType, 1, -1)
             .withLeftwardValue("Walter White")
             .build();
 
         RelationshipBuilder.createRelationshipBuilder(
-                context, publication, author2, isAuthorOfPublication, 2, -1)
+                context, publication, author2, scenario.relationshipType, 2, -1)
             .withLeftwardValue("Jesse Pinkman")
             .build();
 
@@ -218,23 +192,12 @@ public class RelationshipToAuthorityMigrationScriptIT extends AbstractIntegratio
             assertThat("Authority should be null before migration", mv.getAuthority(), nullValue());
         }
 
-        // Disable virtual metadata and restore authority config before running the migration
-        configurationService.setProperty("item.enable-virtual-metadata", false);
-        configurationService.setProperty(
-            "plugin.named.org.dspace.content.authority.ChoiceAuthority", savedAuthorityPlugins);
-        configurationService.setProperty("choices.plugin.dc.contributor.author", savedChoicesPlugin);
-        configurationService.setProperty("choices.presentation.dc.contributor.author", savedChoicesPresentation);
-        configurationService.setProperty("authority.controlled.dc.contributor.author", savedAuthorityControlled);
-
+        enableAuthorAuthorityConfig();
         clearAllAuthorityCaches();
 
-        // Run the migration script
-        TestDSpaceRunnableHandler runnableHandler = new TestDSpaceRunnableHandler();
-        String[] args = new String[] {
+        TestDSpaceRunnableHandler runnableHandler = runMigration(
             "relationship-to-authority-migrate", "-t",
-            String.valueOf(isAuthorOfPublication.getID())
-        };
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), runnableHandler, kernelImpl);
+            String.valueOf(scenario.relationshipType.getID()));
 
         // Verify no errors
         assertThat("Migration should complete without errors",
@@ -277,7 +240,7 @@ public class RelationshipToAuthorityMigrationScriptIT extends AbstractIntegratio
 
         // Verify relationships still exist (no -d flag)
         List<Relationship> remaining = relationshipService.findByRelationshipType(
-            context, isAuthorOfPublication);
+            context, scenario.relationshipType);
         assertThat("Relationships should still exist without -d flag", remaining, hasSize(2));
     }
 
@@ -286,83 +249,33 @@ public class RelationshipToAuthorityMigrationScriptIT extends AbstractIntegratio
      */
     @Test
     public void testMigrateWithDelete() throws Exception {
-        // Disable authority plugins and enable virtual metadata for relationship creation
-        configurationService.setProperty("item.enable-virtual-metadata", true);
-        configurationService.setProperty(
-            "plugin.named.org.dspace.content.authority.ChoiceAuthority", null);
-        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
-        configurationService.setProperty("choices.presentation.dc.contributor.author", null);
-        configurationService.setProperty("authority.controlled.dc.contributor.author", null);
-
+        disableAuthorAuthorityConfig();
         clearAllAuthorityCaches();
 
-        context.turnOffAuthorisationSystem();
+        TestScenario scenario = createAuthorScenario();
 
-        // Create entity types
-        EntityType publicationEntityType =
-            EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
-        EntityType personEntityType =
-            EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-
-        // Create community and collections
-        parentCommunity = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
-
-        personCollection = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Persons")
-            .withEntityType("Person")
-            .build();
-
-        publicationCollection = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Publications")
-            .withEntityType("Publication")
-            .build();
-
-        // Create relationship type
-        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
-            .createRelationshipTypeBuilder(context, publicationEntityType, personEntityType,
-                "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null)
-            .withCopyToLeft(false)
-            .withCopyToRight(false)
-            .build();
-
-        // Create person item
-        Item author1 = ItemBuilder.createItem(context, personCollection)
+        Item author1 = ItemBuilder.createItem(context, scenario.personCollection)
             .withTitle("Heisenberg")
             .build();
 
-        // Create publication item
-        Item publication = ItemBuilder.createItem(context, publicationCollection)
+        Item publication = ItemBuilder.createItem(context, scenario.publicationCollection)
             .withTitle("Blue Sky Paper")
             .build();
 
-        // Create relationship
         RelationshipBuilder.createRelationshipBuilder(
-                context, publication, author1, isAuthorOfPublication, 0, -1)
+                context, publication, author1, scenario.relationshipType, 0, -1)
             .withLeftwardValue("Heisenberg")
             .build();
 
         context.commit();
         context.restoreAuthSystemState();
 
-        // Disable virtual metadata before running the migration
-        configurationService.setProperty("item.enable-virtual-metadata", false);
-        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
-            new String[] { "org.dspace.content.authority.ItemAuthority = PersonAuthority" });
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "PersonAuthority");
-        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-
+        enableAuthorAuthorityConfig();
         clearAllAuthorityCaches();
 
-        // Run the migration with -d flag
-        TestDSpaceRunnableHandler runnableHandler = new TestDSpaceRunnableHandler();
-        String[] args = new String[] {
+        TestDSpaceRunnableHandler runnableHandler = runMigration(
             "relationship-to-authority-migrate", "-t",
-            String.valueOf(isAuthorOfPublication.getID()), "-d"
-        };
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), runnableHandler, kernelImpl);
+            String.valueOf(scenario.relationshipType.getID()), "-d");
 
         // Verify no errors
         assertThat("Migration should complete without errors",
@@ -379,7 +292,7 @@ public class RelationshipToAuthorityMigrationScriptIT extends AbstractIntegratio
 
         // Verify relationships are deleted
         List<Relationship> remaining = relationshipService.findByRelationshipType(
-            context, isAuthorOfPublication);
+            context, scenario.relationshipType);
         assertThat("Relationships should be deleted with -d flag", remaining, empty());
     }
 
@@ -2056,6 +1969,336 @@ public class RelationshipToAuthorityMigrationScriptIT extends AbstractIntegratio
         configurationService.setProperty("choices.plugin.dc.relation.ispartof", savedPlugin);
         configurationService.setProperty("choices.presentation.dc.relation.ispartof", savedPres);
         configurationService.setProperty("authority.controlled.dc.relation.ispartof", savedCtrl);
+    }
+
+    /**
+     * Test that an unknown relationship type id is reported cleanly.
+     */
+    @Test
+    public void testMigrateWithInvalidTypeId() throws Exception {
+        enableAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+
+        TestDSpaceRunnableHandler handler = runMigration(
+            "relationship-to-authority-migrate", "-t", "999999");
+
+        assertThat("Should fail with IllegalArgumentException for unknown type id",
+            handler.getException(), instanceOf(IllegalArgumentException.class));
+        assertThat("Error message should mention missing relationship type",
+            handler.getErrorMessages().stream()
+                .anyMatch(m -> m.contains("not found")), is(true));
+    }
+
+    /**
+     * Test that a relationship type with no registered migration strategy is rejected.
+     */
+    @Test
+    public void testMigrateTypeWithNoStrategy() throws Exception {
+        disableAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+
+        TestScenario scenario = createAuthorScenario();
+
+        Item author = ItemBuilder.createItem(context, scenario.personCollection)
+            .withTitle("Mike Ehrmantraut")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, scenario.publicationCollection)
+            .withTitle("Security Consulting")
+            .build();
+
+        RelationshipType unconfiguredType = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, scenario.publicationEntityType, scenario.personEntityType,
+                "isEditorOfPublication", "isPublicationOfEditor", 0, null, 0, null)
+            .withCopyToLeft(false)
+            .withCopyToRight(false)
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(
+                context, publication, author, unconfiguredType, 0, -1)
+            .withLeftwardValue("Mike Ehrmantraut")
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        enableAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+
+        TestDSpaceRunnableHandler handler = runMigration(
+            "relationship-to-authority-migrate", "-t",
+            String.valueOf(unconfiguredType.getID()));
+
+        assertThat("Should fail with IllegalArgumentException for unconfigured type",
+            handler.getException(), instanceOf(IllegalArgumentException.class));
+        assertThat("Error message should mention no migration definition",
+            handler.getErrorMessages().stream()
+                .anyMatch(m -> m.contains("No migration definition")), is(true));
+
+        // Relationships must remain untouched.
+        List<Relationship> remaining = relationshipService.findByRelationshipType(
+            context, unconfiguredType);
+        assertThat("Relationships should not be changed", remaining, hasSize(1));
+    }
+
+    /**
+     * Test that combining delete ({@code -d}) and dry-run ({@code -n}) does not
+     * delete relationships.
+     */
+    @Test
+    public void testMigrateDryRunWithDeleteDoesNotDelete() throws Exception {
+        disableAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+
+        TestScenario scenario = createAuthorScenario();
+
+        Item author = ItemBuilder.createItem(context, scenario.personCollection)
+            .withTitle("Hank Schrader")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, scenario.publicationCollection)
+            .withTitle("Minerals")
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(
+                context, publication, author, scenario.relationshipType, 0, -1)
+            .withLeftwardValue("Hank Schrader")
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        enableAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+
+        TestDSpaceRunnableHandler handler = runMigration(
+            "relationship-to-authority-migrate", "-t",
+            String.valueOf(scenario.relationshipType.getID()), "-d", "-n");
+
+        assertThat("Dry-run with delete should complete without errors",
+            handler.getErrorMessages(), empty());
+
+        publication = reload(publication);
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(
+            publication, "dc.contributor.author");
+        assertThat("No authority metadata should be added in dry-run", authors, empty());
+
+        List<Relationship> remaining = relationshipService.findByRelationshipType(
+            context, scenario.relationshipType);
+        assertThat("Relationships should still exist in dry-run", remaining, hasSize(1));
+    }
+
+    /**
+     * Test that a withdrawn target item is processed without error.
+     */
+    @Test
+    public void testMigrateWithdrawnItem() throws Exception {
+        disableAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+
+        TestScenario scenario = createAuthorScenario();
+
+        Item author = ItemBuilder.createItem(context, scenario.personCollection)
+            .withTitle("Skyler White")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, scenario.publicationCollection)
+            .withTitle("Beneke Accounts")
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(
+                context, publication, author, scenario.relationshipType, 0, -1)
+            .withLeftwardValue("Skyler White")
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        context.turnOffAuthorisationSystem();
+        itemService.withdraw(context, publication);
+        context.commit();
+        context.restoreAuthSystemState();
+
+        enableAuthorAuthorityConfig();
+        clearAllAuthorityCaches();
+
+        TestDSpaceRunnableHandler handler = runMigration(
+            "relationship-to-authority-migrate", "-t",
+            String.valueOf(scenario.relationshipType.getID()));
+
+        assertThat("Migration should complete without errors for withdrawn item",
+            handler.getErrorMessages(), empty());
+
+        publication = reload(publication);
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(
+            publication, "dc.contributor.author");
+        assertThat("Should have 1 author metadata value", authors, hasSize(1));
+        assertEquals("Skyler White", authors.get(0).getValue());
+        assertEquals(author.getID().toString(), authors.get(0).getAuthority());
+        assertEquals(CF_ACCEPTED, authors.get(0).getConfidence());
+    }
+
+    /**
+     * Holder for the immutable data created by {@link #createAuthorScenario()}.
+     */
+    private static final class TestScenario {
+        final EntityType publicationEntityType;
+        final EntityType personEntityType;
+        final Collection personCollection;
+        final Collection publicationCollection;
+        final RelationshipType relationshipType;
+
+        TestScenario(EntityType publicationEntityType, EntityType personEntityType,
+                     Collection personCollection, Collection publicationCollection,
+                     RelationshipType relationshipType) {
+            this.publicationEntityType = publicationEntityType;
+            this.personEntityType = personEntityType;
+            this.personCollection = personCollection;
+            this.publicationCollection = publicationCollection;
+            this.relationshipType = relationshipType;
+        }
+    }
+
+    /**
+     * Immutable snapshot of an authority configuration for a single metadata field.
+     */
+    private static final class SavedAuthorityConfig {
+        final String plugin;
+        final String presentation;
+        final String controlled;
+
+        SavedAuthorityConfig(String plugin, String presentation, String controlled) {
+            this.plugin = plugin;
+            this.presentation = presentation;
+            this.controlled = controlled;
+        }
+    }
+
+    /**
+     * Read the current authority configuration for a single metadata field.
+     *
+     * @param pluginProperty the choices.plugin property name
+     * @param presentationProperty the choices.presentation property name
+     * @param controlledProperty the authority.controlled property name
+     * @return the saved configuration snapshot
+     */
+    private SavedAuthorityConfig saveAuthorityConfig(String pluginProperty,
+                                                     String presentationProperty,
+                                                     String controlledProperty) {
+        return new SavedAuthorityConfig(
+            configurationService.getProperty(pluginProperty),
+            configurationService.getProperty(presentationProperty),
+            configurationService.getProperty(controlledProperty));
+    }
+
+    /**
+     * Restore the authority configuration for a single metadata field.
+     *
+     * @param pluginProperty the choices.plugin property name
+     * @param presentationProperty the choices.presentation property name
+     * @param controlledProperty the authority.controlled property name
+     * @param saved the saved configuration snapshot
+     */
+    private void restoreRelationAuthorityConfig(String pluginProperty,
+                                                String presentationProperty,
+                                                String controlledProperty,
+                                                SavedAuthorityConfig saved) {
+        configurationService.setProperty(pluginProperty, saved.plugin);
+        configurationService.setProperty(presentationProperty, saved.presentation);
+        configurationService.setProperty(controlledProperty, saved.controlled);
+    }
+
+    /**
+     * Disable authority plugins for {@code dc.contributor.author} and enable
+     * virtual metadata so relationships can be created without authority
+     * interference.
+     */
+    private void disableAuthorAuthorityConfig() {
+        configurationService.setProperty("item.enable-virtual-metadata", true);
+        configurationService.setProperty(
+            "plugin.named.org.dspace.content.authority.ChoiceAuthority", (String[]) null);
+        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
+        configurationService.setProperty("choices.presentation.dc.contributor.author", null);
+        configurationService.setProperty("authority.controlled.dc.contributor.author", null);
+    }
+
+    /**
+     * Restore the {@code dc.contributor.author} authority configuration to
+     * the values captured in {@link #saveConfiguration()}.
+     */
+    private void restoreAuthorAuthorityConfig() {
+        configurationService.setProperty(
+            "plugin.named.org.dspace.content.authority.ChoiceAuthority", savedAuthorityPlugins);
+        configurationService.setProperty("choices.plugin.dc.contributor.author", savedChoicesPlugin);
+        configurationService.setProperty("choices.presentation.dc.contributor.author", savedChoicesPresentation);
+        configurationService.setProperty("authority.controlled.dc.contributor.author", savedAuthorityControlled);
+    }
+
+    /**
+     * Enable the {@code dc.contributor.author} authority configuration for
+     * migration (PersonAuthority / suggest / true).
+     */
+    private void enableAuthorAuthorityConfig() {
+        configurationService.setProperty("item.enable-virtual-metadata", false);
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+            new String[] { "org.dspace.content.authority.ItemAuthority = PersonAuthority" });
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "PersonAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+    }
+
+    /**
+     * Create the common entity types, collections and relationship type used
+     * by the author-migration tests.
+     *
+     * @return the populated test scenario
+     * @throws SQLException if a database error occurs
+     */
+    private TestScenario createAuthorScenario() throws SQLException {
+        context.turnOffAuthorisationSystem();
+
+        EntityType publicationEntityType =
+            EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personEntityType =
+            EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Persons")
+            .withEntityType("Person")
+            .build();
+
+        Collection publicationCollection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Publications")
+            .withEntityType("Publication")
+            .build();
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publicationEntityType, personEntityType,
+                "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null)
+            .withCopyToLeft(false)
+            .withCopyToRight(false)
+            .build();
+
+        return new TestScenario(publicationEntityType, personEntityType,
+            personCollection, publicationCollection, isAuthorOfPublication);
+    }
+
+    /**
+     * Run the migration script with the supplied CLI arguments and return the
+     * captured handler for assertions.
+     *
+     * @param args the script arguments (including the script name)
+     * @return the handler capturing logs, errors and exceptions
+     * @throws Exception if script launch fails
+     */
+    private TestDSpaceRunnableHandler runMigration(String... args) throws Exception {
+        TestDSpaceRunnableHandler runnableHandler = new TestDSpaceRunnableHandler();
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), runnableHandler, kernelImpl);
+        return runnableHandler;
     }
 
     @SuppressWarnings("rawtypes")

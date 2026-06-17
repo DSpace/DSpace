@@ -10,10 +10,12 @@ package org.dspace.content.migration;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.cli.ParseException;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
@@ -56,17 +58,33 @@ import org.dspace.utils.DSpace;
  *       migrated.</li>
  *   <li>{@code -d}: (optional) delete relationships after migration</li>
  *   <li>{@code -n}: (optional) dry-run mode, do not commit changes</li>
- *   <li>{@code -b}: (optional) number of relationships to process per batch
+ * <li>{@code -b}: (optional) number of relationships to process per batch
  *       (default {@value #DEFAULT_BATCH_SIZE})</li>
  * </ul>
+ *
+ * <p>The {@code -d} (delete) option is <strong>destructive</strong>: relationships
+ * are permanently removed with {@code forceDelete}. This bypasses standard
+ * authorization checks because the script operates with the authorization
+ * system turned off. Use with caution and only after verifying the migration
+ * output in a dry-run ({@code -n}).</p>
  *
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  * */
 public class RelationshipToAuthorityMigrationScript
     extends DSpaceRunnable<RelationshipToAuthorityMigrationScriptConfiguration> {
 
-    /** Default batch size used when the {@code -b} option is not provided. */
+    /**
+     * Default batch size (1000 relationships per database page).
+     * Chosen to balance memory usage against database round-trips:
+     * each batch loads related items into the Hibernate session and
+     * uncaches them afterwards to prevent OutOfMemoryError on large
+     * datasets. 1000 is a safe default that works well with H2
+     * (tests) and PostgreSQL (production).
+     */
     protected static final int DEFAULT_BATCH_SIZE = 1000;
+
+    /** Separator used to build composite strategy lookup keys. */
+    private static final String STRATEGY_KEY_SEPARATOR = "::";
 
     private boolean migrateAll;
     private int relationshipTypeId;
@@ -77,6 +95,8 @@ public class RelationshipToAuthorityMigrationScript
     private RelationshipService relationshipService;
     private RelationshipTypeService relationshipTypeService;
     private Map<String, RelationshipMigrationStrategy> strategies;
+
+    private volatile RelationshipToAuthorityMigrationScriptConfiguration scriptConfiguration;
 
     @Override
     public void setup() throws ParseException {
@@ -149,9 +169,10 @@ public class RelationshipToAuthorityMigrationScript
         handler.logInfo("Batch size: " + batchSize);
 
         Context context = new Context(Context.Mode.READ_WRITE);
-        context.turnOffAuthorisationSystem();
-
+        boolean succeeded = false;
         try {
+            context.turnOffAuthorisationSystem();
+
             MigrationResult totals = new MigrationResult();
             int typesProcessed;
 
@@ -171,18 +192,23 @@ public class RelationshipToAuthorityMigrationScript
                 handler.logInfo("DRY RUN: no changes committed.");
             } else {
                 context.complete();
+                succeeded = true;
             }
 
             handler.logInfo("=== Migration Complete ===");
             handler.logInfo("Relationship types processed: " + typesProcessed);
-            handler.logInfo("Total migrated: " + totals.migrated);
-            handler.logInfo("Total errors: " + totals.errors);
+            handler.logInfo("Total migrated: " + totals.migrated.get());
+            handler.logInfo("Total errors: " + totals.errors.get());
 
         } catch (SQLException e) {
-            context.abort();
             handler.logError("Database error during migration: " + e.getMessage());
             throw e;
         } finally {
+            if (!succeeded && !dryRun) {
+                // Ensure abort is called if complete() was never reached
+                // (e.g. exception from migrateAllTypes/migrateSingleType before dryRun check)
+                context.abort();
+            }
             context.restoreAuthSystemState();
         }
     }
@@ -196,8 +222,10 @@ public class RelationshipToAuthorityMigrationScript
      * @param totals accumulator updated with migrated/error counts
      * @return the number of relationship types processed
      * @throws SQLException if a database error occurs
+     * @throws AuthorizeException if an authorization error occurs
      */
-    private int migrateAllTypes(Context context, int batchSize, MigrationResult totals) throws SQLException {
+    private int migrateAllTypes(Context context, int batchSize, MigrationResult totals)
+        throws SQLException, AuthorizeException {
         int typesProcessed = 0;
         for (RelationshipType relationshipType : relationshipTypeService.findAll(context)) {
             RelationshipMigrationStrategy strategy = strategies.get(
@@ -218,8 +246,10 @@ public class RelationshipToAuthorityMigrationScript
      * @param batchSize the relationship paging batch size
      * @param totals accumulator updated with migrated/error counts
      * @throws SQLException if a database error occurs
+     * @throws AuthorizeException if an authorization error occurs
      */
-    private void migrateSingleType(Context context, int batchSize, MigrationResult totals) throws SQLException {
+    private void migrateSingleType(Context context, int batchSize, MigrationResult totals)
+        throws SQLException, AuthorizeException {
         RelationshipType relationshipType = relationshipTypeService.find(context, relationshipTypeId);
         if (relationshipType == null) {
             context.abort();
@@ -254,10 +284,11 @@ public class RelationshipToAuthorityMigrationScript
      * @param batchSize the relationship paging batch size
      * @param totals accumulator updated with migrated/error counts
      * @throws SQLException if a database error occurs
+     * @throws AuthorizeException if an authorization error occurs
      */
     private void migrateRelationshipType(Context context, RelationshipType relationshipType,
                                          RelationshipMigrationStrategy strategy, int batchSize,
-                                         MigrationResult totals) throws SQLException {
+                                         MigrationResult totals) throws SQLException, AuthorizeException {
 
         int total = relationshipService.countByRelationshipType(context, relationshipType);
         handler.logInfo("--- " + strategy.getDescription() + " ["
@@ -283,19 +314,22 @@ public class RelationshipToAuthorityMigrationScript
 
             // Advance the cursor to the highest id in this page (the list is ordered by
             // ascending id) before the entities are committed/uncached.
-            lastId = batch.get(batch.size() - 1).getID();
+            lastId = batch.getLast().getID();
 
             for (Relationship relationship : batch) {
                 try {
                     strategy.migrate(context, relationship, handler);
 
                     if (deleteAfterMigration && !dryRun) {
+                        // forceDelete bypasses authorization checks. This is intentional:
+                        // the script runs with auth disabled (turnOffAuthorisationSystem)
+                        // and the -d option is a deliberate, documented destructive action.
                         relationshipService.forceDelete(context, relationship, false, false);
                     }
 
-                    totals.migrated++;
-                } catch (Exception e) {
-                    totals.errors++;
+                    totals.migrated.incrementAndGet();
+                } catch (RuntimeException e) {
+                    totals.errors.incrementAndGet();
                     handler.logError("Error migrating relationship id=" + relationship.getID()
                         + ": " + e.getMessage(), e);
                 }
@@ -321,35 +355,37 @@ public class RelationshipToAuthorityMigrationScript
                         context.uncacheEntity(rightItem);
                     }
                     context.uncacheEntity(relationship);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     handler.logError("Error uncaching relationship id=" + relationship.getID()
                         + ": " + e.getMessage(), e);
                 }
             }
 
-            handler.logInfo("Progress: " + totals.migrated + " migrated, " + totals.errors + " errors");
+            handler.logInfo("Progress: " + totals.migrated.get() + " migrated, " + totals.errors.get() + " errors");
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public RelationshipToAuthorityMigrationScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName(
-            "relationship-to-authority-migrate",
-            RelationshipToAuthorityMigrationScriptConfiguration.class);
+        if (scriptConfiguration == null) {
+            scriptConfiguration = new DSpace().getServiceManager().getServiceByName(
+                "relationship-to-authority-migrate",
+                RelationshipToAuthorityMigrationScriptConfiguration.class);
+        }
+        return scriptConfiguration;
     }
 
     /**
      * Build the composite lookup key that uniquely identifies a relationship
-     * type by its leftward and rightward type labels. A NUL delimiter is used
-     * so the two labels cannot collide with each other.
+     * type by its leftward and rightward type labels, separated by {@code ::}.
      *
      * @param leftwardType the leftward type label
      * @param rightwardType the rightward type label
      * @return the composite key
      */
     private static String strategyKey(String leftwardType, String rightwardType) {
-        return leftwardType + '\u0000' + rightwardType;
+        return leftwardType + STRATEGY_KEY_SEPARATOR + rightwardType;
     }
 
     /**
@@ -367,7 +403,7 @@ public class RelationshipToAuthorityMigrationScript
      * relationship types.
      */
     private static final class MigrationResult {
-        private int migrated;
-        private int errors;
+        private final AtomicInteger migrated = new AtomicInteger(0);
+        private final AtomicInteger errors = new AtomicInteger(0);
     }
 }
