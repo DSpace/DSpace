@@ -554,6 +554,88 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void registrationWithInvalidEmailFormatTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("invalid-email!!!!");
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithEmptyEmailTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("");
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithNullEmailTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(null);
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithValidEmailAndTooLongNetidTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("test@dspace.local");
+        registrationRest.setNetId("n".repeat(65)); // 65 characters, exceeds the max of 64
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithValidEmailAndNetidTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("test@dspace.local");
+        registrationRest.setNetId("n".repeat(64)); // 64 characters, within the max of 64
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isCreated());
+    }
+
+    @Test
     public void givenRegistrationData_whenPatchInvalidValue_thenUnprocessableEntityResponse()
         throws Exception {
 
