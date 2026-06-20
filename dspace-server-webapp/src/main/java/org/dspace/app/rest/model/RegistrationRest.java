@@ -11,6 +11,11 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 import org.dspace.app.rest.RestResourceController;
 
 
@@ -26,10 +31,16 @@ public class RegistrationRest extends RestAddressableModel {
     public static final String CATEGORY = EPERSON;
 
     private Integer id;
+
+    @Email
+    @NotEmpty
     private String email;
+
     private UUID user;
-    private String registrationType;
+
+    @Size(max = 64)
     private String netId;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MetadataRest<RegistrationMetadataRest> registrationMetadata;
 
@@ -75,14 +86,6 @@ public class RegistrationRest extends RestAddressableModel {
      */
     public void setUser(UUID user) {
         this.user = user;
-    }
-
-    public String getRegistrationType() {
-        return registrationType;
-    }
-
-    public void setRegistrationType(String registrationType) {
-        this.registrationType = registrationType;
     }
 
     public String getNetId() {

@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import java.util.Set;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -96,6 +99,9 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private Validator validator;
+
     @Override
     @PreAuthorize("permitAll()")
     public RegistrationRest findOne(Context context, Integer integer) {
@@ -110,7 +116,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Override
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        RegistrationRest registrationRest;
         String accountType = request.getParameter(TYPE_QUERY_PARAM);
         if (StringUtils.isBlank(accountType) ||
             (!accountType.equalsIgnoreCase(TYPE_FORGOT) && !accountType.equalsIgnoreCase(TYPE_REGISTER))) {
@@ -128,66 +133,102 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             }
         }
 
+        RegistrationRest registrationRest;
         try {
             ServletInputStream input = request.getInputStream();
             registrationRest = mapper.readValue(input, RegistrationRest.class);
         } catch (IOException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
-        if (StringUtils.isBlank(registrationRest.getEmail())) {
-            throw new UnprocessableEntityException("The email cannot be omitted from the Registration endpoint");
+
+        // Validation of deserialized object
+        Set<ConstraintViolation<RegistrationRest>> violations = validator.validate(registrationRest);
+        if (violations != null && !violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<RegistrationRest> v : violations) {
+                sb.append(v.getPropertyPath())
+                    .append(": ")
+                    .append(v.getMessage())
+                    .append("; ");
+            }
+            throw new UnprocessableEntityException("Validation error: " + sb.toString());
         }
+
         EPerson eperson = null;
         try {
             eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
         } catch (SQLException e) {
             log.error("Something went wrong retrieving EPerson for email: " + registrationRest.getEmail(), e);
         }
+
         if (eperson != null && accountType.equalsIgnoreCase(TYPE_FORGOT)) {
-            try {
-                if (!AuthorizeUtil.authorizeForgotPassword()) {
-                    throw new AccessDeniedException("Password reset is not allowed!");
-                }
-                if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
-                    throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: "
-                                                            + eperson.getEmail());
-                }
-                accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
-            } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
-                log.error("Something went wrong with sending forgot password info email: "
-                              + registrationRest.getEmail(), e);
-            }
+            resetPassword(context, registrationRest, eperson);
         } else if (accountType.equalsIgnoreCase(TYPE_REGISTER)) {
             if (eperson == null) {
-                try {
-                    String email = registrationRest.getEmail();
-                    if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
-                        throw new AccessDeniedException(
-                                "Registration is disabled, you are not authorized to create a new Authorization");
-                    }
-
-                    if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
-                        throw new UnprocessableEntityException(
-                                String.format("Registration is not allowed with email address" +
-                                        " %s", email));
-                    }
-
-                    accountService.sendRegistrationInfo(context, registrationRest.getEmail());
-                } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
-                    log.error("Something went wrong with sending registration info email: "
-                            + registrationRest.getEmail(), e);
-                }
+                registerEperson(context, request, registrationRest);
             } else {
                 // if an eperson with this email already exists then send "forgot password" email instead
-                try {
-                    accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
-                }  catch (SQLException | IOException | MessagingException | AuthorizeException e) {
-                    log.error("Something went wrong with sending forgot password info email: "
-                            + registrationRest.getEmail(), e);
-                }
+                resetPassword(context, registrationRest, eperson);
             }
         }
         return null;
+    }
+
+    /**
+     * This method will register a new eperson with the email given in the registrationRest object, and send an
+     * registration email to that email address.
+     * @param context
+     * @param request
+     * @param registrationRest
+     * @throws UnprocessableEntityException If self registration is not allowed.
+     * @throws AccessDeniedException If the user is not authorized to register a new eperson
+     */
+    private void registerEperson(Context context, HttpServletRequest request, RegistrationRest registrationRest)
+        throws UnprocessableEntityException, AccessDeniedException {
+        try {
+            if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
+                throw new AccessDeniedException(
+                        "Registration is disabled, you are not authorized to create a new Authorization");
+            }
+
+            if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
+                throw new UnprocessableEntityException(
+                        String.format("Registration is not allowed with email address" +
+                                " %s", registrationRest.getEmail()));
+            }
+
+            accountService.sendRegistrationInfo(context, registrationRest.getEmail());
+        } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
+            log.error("Something went wrong with sending registration info email: "
+                    + registrationRest.getEmail(), e);
+        }
+    }
+
+    /**
+     * This method will send a forgot password email to the email address given in the registrationRest object, if the
+     * email address belongs to an existing eperson. If the email address doesn't belong to any existing eperson,
+     * nothing will happen.
+     * @param context
+     * @param registrationRest
+     * @param eperson
+     * @throws AccessDeniedException If the user is not authorized to reset the password for the given eperson
+     * @throws DSpaceBadRequestException If the password cannot be updated for the given eperson
+     */
+    private void resetPassword(Context context, RegistrationRest registrationRest, EPerson eperson)
+        throws AccessDeniedException, DSpaceBadRequestException {
+        try {
+            if (!AuthorizeUtil.authorizeForgotPassword()) {
+                throw new AccessDeniedException("Password reset is not allowed!");
+            }
+            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
+                throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: "
+                                                        + eperson.getEmail());
+            }
+            accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
+        } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
+            log.error("Something went wrong with sending forgot password info email: "
+                          + registrationRest.getEmail(), e);
+        }
     }
 
     /**
