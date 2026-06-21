@@ -283,8 +283,11 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             throw new DSpaceBadRequestException("Patch request is incomplete: cannot find operations");
         }
         String token = request.getParameter("token");
-        if (token == null || token.trim().isBlank()) {
-            throw new AccessDeniedException("The token is required");
+        if (StringUtils.isBlank(token)) {
+            throw new DSpaceBadRequestException("Missing or empty token query parameter");
+        }
+        if (StringUtils.length(token) > 48) {
+            throw new DSpaceBadRequestException("Token length cannot be longer than 48 characters");
         }
         Context context = obtainContext();
 
