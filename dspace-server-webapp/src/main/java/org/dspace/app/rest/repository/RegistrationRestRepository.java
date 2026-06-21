@@ -241,6 +241,9 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @SearchRestMethod(name = "findByToken")
     public RegistrationRest findByToken(@Parameter(value = "token", required = true) String token)
         throws SQLException, AuthorizeException, DSpaceBadRequestException {
+        if (StringUtils.isBlank(token)) {
+            throw new DSpaceBadRequestException("Missing or empty token query parameter");
+        }
         if (StringUtils.length(token) > 48) {
             throw new DSpaceBadRequestException("Token length cannot be longer than 48 characters");
         }

@@ -54,6 +54,7 @@ public class RegistrationDataConverter implements DSpaceConverter<RegistrationDa
         registrationRest.setId(registrationData.getID());
         registrationRest.setEmail(registrationData.getEmail());
         registrationRest.setNetId(registrationData.getNetId());
+        registrationRest.setRegistrationType(registrationData.getRegistrationType());
 
         EPerson ePerson = null;
         try {

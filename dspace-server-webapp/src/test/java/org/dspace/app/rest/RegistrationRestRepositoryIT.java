@@ -178,6 +178,13 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     public void findByTokenWithEmptyToken() throws Exception {
         getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", ""))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithBlankToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
             .param("token", "  "))
             .andExpect(status().isBadRequest());
     }
@@ -693,7 +700,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
                    .andExpect(status().isBadRequest());
 
         newMail = "test@email.com";
@@ -705,7 +711,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
                    .andExpect(status().isUnprocessableEntity());
 
         newMail = "invalidemail!!!!";
@@ -717,7 +722,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
                    .andExpect(status().isUnprocessableEntity());
     }
 
@@ -749,29 +753,42 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(registrationData, notNullValue());
         assertThat(registrationData.getToken(), not(emptyOrNullString()));
 
-        String token = null;
         String newMail = "validemail@email.com";
         String patchContent = getPatchContent(
             List.of(new ReplaceOperation("/email", newMail))
         );
 
-        // when patch for replace email
+        // patch for replace email with null token
+        String token = null;
         getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
-                   .andExpect(status().isUnauthorized());
+                   .andExpect(status().isBadRequest());
 
+        // patch for replace email with empty token
+        token = "";
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+        // patch for replace email with not existing token
         token = "notexistingtoken";
-
-        // when patch for replace email
         getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
                    .andExpect(status().isUnauthorized());
+
+        // when patch for replace email with too long token
+        token = "t".repeat(49); // token length cannot be longer than 48 characters
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isBadRequest());
 
         context.turnOffAuthorisationSystem();
         registrationData = context.reloadEntity(registrationData);
@@ -789,12 +806,10 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             List.of(new ReplaceOperation("/email", newMail))
         );
 
-        // when patch for replace email
         getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
                    .andExpect(status().isUnauthorized());
     }
 
@@ -831,7 +846,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
+                   // then successful response returned
                    .andExpect(status().is2xxSuccessful());
     }
 
@@ -856,7 +871,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
-                   // then succesful response returned
+                   // then successful response returned
                    .andExpect(status().is2xxSuccessful());
     }
 
@@ -893,6 +908,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
+                   // then successful response returned
                    .andExpect(status().is2xxSuccessful());
 
         // then email updated with new registration
@@ -927,6 +943,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
+                   // then successful response returned
                    .andExpect(status().is2xxSuccessful());
 
         // then email updated with new registration
@@ -966,6 +983,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .param(TOKEN_QUERY_PARAM, token)
                                 .content(patchContent)
                                 .contentType(contentType))
+                   // then successful response returned
                    .andExpect(status().is2xxSuccessful());
 
         // then verification email sent
