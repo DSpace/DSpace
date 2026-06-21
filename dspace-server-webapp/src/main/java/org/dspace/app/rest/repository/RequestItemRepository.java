@@ -30,6 +30,7 @@ import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.RequestItemConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.IncompleteItemRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -90,24 +91,21 @@ public class RequestItemRepository
     // TODO: Work towards full coverage of captcha, so we can use getCaptchaService() instead
     private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getAltchaCaptchaService();
 
-    private static final Logger log = LogManager.getLogger();
-
-    @Autowired
-    private ObjectMapper mapper;
-
-    /*
-     * DSpaceRestRepository
-     */
-
     @PreAuthorize("permitAll()")
     @Override
     public RequestItemRest findOne(Context context, String token) {
+        if (StringUtils.isBlank(token)) {
+            throw new DSpaceBadRequestException("Token is required and cannot be blank");
+        }
+        if (StringUtils.length(token) > 48) {
+            throw new DSpaceBadRequestException("Token is too long");
+        }
         RequestItem requestItem = requestItemService.findByToken(context, token);
         if (null == requestItem) {
-            return null;
-        } else {
-            return requestItemConverter.convert(requestItem, Projection.DEFAULT);
+            throw new ResourceNotFoundException("Token not found: " + token);
         }
+
+        return requestItemConverter.convert(requestItem, Projection.DEFAULT);
     }
 
     @Override
@@ -337,9 +335,12 @@ public class RequestItemRepository
     @SearchRestMethod(name = "byAccessToken")
     public RequestItemRest findByAccessToken(@Parameter(value = "accessToken", required = true) String accessToken) {
 
-        // Send 404 NOT FOUND if access token is null
+        // Send 404 NOT FOUND if access token is blank
         if (StringUtils.isBlank(accessToken)) {
-            throw new ResourceNotFoundException("No such accessToken=" + accessToken);
+            throw new ResourceNotFoundException("Token is blank and cannot be blank");
+        }
+        if (StringUtils.length(accessToken) > 48) {
+            throw new DSpaceBadRequestException("Token is too long");
         }
 
         // Get the current context and request item
@@ -347,7 +348,7 @@ public class RequestItemRepository
         RequestItem requestItem = requestItemService.findByAccessToken(context, accessToken);
 
         // Previously, a 404 was thrown if the request item was not found, and a 401 or 403 was thrown depending
-        // on authorization and validity checks. These checks are still strictly enforced in the BitstreamContoller
+        // on authorization and validity checks. These checks are still strictly enforced in the BitstreamController
         // and BitstreamResourceAccessByToken classes for actual downloads, but here we continue to pass a 200 OK
         // response so that we can display more meaningful alerts to users in the item page rather than serve hard
         // redirects or lose information like expiry dates and access status

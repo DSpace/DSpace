@@ -706,4 +706,47 @@ public class RequestItemRepositoryIT
         Iterator<RequestItem> randomResults = requestItemService.findByBitstreamId(context, UUID.randomUUID());
         assertFalse("Should find no request items for nonexistent bitstream", randomResults.hasNext());
     }
+
+    @Test
+    public void testFindOneWithEmptyToken() throws Exception {
+        final String uri = URI_ROOT + "/%20";
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFindOneWithTooLongToken() throws Exception {
+        final String uri = URI_ROOT + '/' + "t".repeat(49); // maximum token length is 48 characters
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithMissingToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken";
+        getClient().perform(get(uri))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithEmptyToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=%20";
+        getClient().perform(get(uri))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithTooLongToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=" + "t".repeat(49); // maximum token length is 48 characters
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithInvalidToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=foo";
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
 }
