@@ -8,6 +8,7 @@
 package org.dspace.authorize.dao.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,8 +31,6 @@ import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ResourcePolicy object.
@@ -272,22 +271,26 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     @Override
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException {
-        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
-        // Use FlushMode.MANUAL to prevent auto-flush during the find query.
-        // During cascading DSO deletions, previously-removed DSOs may still have
-        // ResourcePolicies in the session that reference them, which would cause
-        // TransientPropertyValueException during auto-flush.
-        Session session = getHibernateSession(context);
-        FlushMode previousFlushMode = session.getHibernateFlushMode();
-        session.setHibernateFlushMode(FlushMode.MANUAL);
-        List<ResourcePolicy> policies;
-        try {
-            policies = findByDso(context, dso);
-        } finally {
-            session.setHibernateFlushMode(previousFlushMode);
+        // For Hibernate 7 compatibility: use entity-based deletion instead of a bulk HQL delete.
+        // removeAllPolicies must delete EVERY policy of the DSO. We query the DB (findByDso) AND also
+        // collect any policy still attached to the DSO only in memory. The DB query must run with the
+        // session's normal (auto) flush mode so that not-yet-flushed pending policy inserts are flushed
+        // and therefore visible/deletable: e.g. when a bitstream is replaced, the new bitstream inherits a
+        // (nameless) default policy whose dSpaceObject is set but which is neither added to the DSO's
+        // in-memory resourcePolicies collection nor yet flushed. Main's bulk "delete ... where
+        // dSpaceObject = ?" deleted such rows because executeUpdate auto-flushes first; skipping that flush
+        // here silently leaves a stray policy behind (it then sorts ahead of the real ones). Clearing the
+        // in-memory collection also prevents a later REMOVE cascade from re-deleting an already-gone policy
+        // (Hibernate 7 StaleObjectStateException). delete() is idempotent for already-removed entities.
+        List<ResourcePolicy> policies = findByDso(context, dso);
+        List<ResourcePolicy> toDelete = new ArrayList<>(policies);
+        for (ResourcePolicy inMemory : dso.getResourcePolicies()) {
+            if (!toDelete.contains(inMemory)) {
+                toDelete.add(inMemory);
+            }
         }
-        dso.getResourcePolicies().removeAll(policies);
-        for (ResourcePolicy policy : policies) {
+        dso.getResourcePolicies().clear();
+        for (ResourcePolicy policy : toDelete) {
             delete(context, policy);
         }
     }
