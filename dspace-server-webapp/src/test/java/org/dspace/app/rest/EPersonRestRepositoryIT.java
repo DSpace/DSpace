@@ -207,7 +207,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .andExpect(status().isUnauthorized());
         getClient().perform(get("/api/eperson/epersons/search/byEmail")
                                 .param("email", data.getEmail()))
-                   .andExpect(status().isNoContent());
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
