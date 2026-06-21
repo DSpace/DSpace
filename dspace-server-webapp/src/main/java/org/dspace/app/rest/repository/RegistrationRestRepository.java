@@ -11,14 +11,14 @@ import static org.dspace.eperson.service.CaptchaService.REGISTER_ACTION;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-import java.util.Set;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

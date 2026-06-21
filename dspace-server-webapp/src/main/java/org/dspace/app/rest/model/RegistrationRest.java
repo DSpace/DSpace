@@ -11,15 +11,11 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.eperson.RegistrationTypeEnum;
-
-
 /**
  * This class acts as the REST representation of the RegistrationData model class.
  * This class acts as a data holder for the RegistrationResource
