@@ -170,6 +170,26 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void findByTokenWithoutToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithEmptyToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", "  "))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithTooLongToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", "t".repeat(49))) // token length cannot be longer than 48 characters
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void registrationFlowTest() throws Exception {
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         assertEquals(0, registrationDataList.size());
