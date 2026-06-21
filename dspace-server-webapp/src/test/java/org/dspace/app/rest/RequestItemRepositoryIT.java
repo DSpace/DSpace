@@ -722,6 +722,13 @@ public class RequestItemRepositoryIT
     }
 
     @Test
+    public void testFindOneWithInvalidToken() throws Exception {
+        final String uri = URI_ROOT + "/foo";
+        getClient().perform(get(uri))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testFindByAccessTokenWithMissingToken() throws Exception {
         final String uri = URI_ROOT + "/search/byAccessToken";
         getClient().perform(get(uri))
