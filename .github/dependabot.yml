@@ -148,6 +148,8 @@ updates:
       # used by Hibernate and Solr. The version is pinned in pom.xml and should
       # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
       - dependency-name: "org.antlr:antlr4-runtime"
+      # The HAL Browser cannot be upgraded automatically as it uses a hash code for versioning.
+      - dependency-name: "org.webjars:hal-browser"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -162,6 +164,20 @@ updates:
     # some classes of supply chain attacks
     cooldown:
       default-days: 7
+    groups:
+      # Group together all GitHub official actions into a single PR
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "actions/*"
+          - "github/*"
+    ignore:
+        # For official GitHub actions, ignore minor & patch releases because we reference these actions
+        # via a major version tag which automatically uses the latest minor/patch version (e.g. "actions/checkout@v6")
+        - dependency-name: "actions/*"
+          update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
+        - dependency-name: "github/*"
+          update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
   ######################
   ## dspace-10_x branch
   ######################
@@ -305,6 +321,8 @@ updates:
       # used by Hibernate and Solr. The version is pinned in pom.xml and should
       # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
       - dependency-name: "org.antlr:antlr4-runtime"
+      # The HAL Browser cannot be upgraded automatically as it uses a hash code for versioning.
+      - dependency-name: "org.webjars:hal-browser"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -320,6 +338,20 @@ updates:
     # some classes of supply chain attacks
     cooldown:
       default-days: 7
+    groups:
+      # Group together all GitHub official actions into a single PR
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "actions/*"
+          - "github/*"
+    ignore:
+      # For official GitHub actions, ignore minor & patch releases because we reference these actions
+      # via a major version tag which automatically uses the latest minor/patch version (e.g. "actions/checkout@v6")
+      - dependency-name: "actions/*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
+      - dependency-name: "github/*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
   ######################
   ## dspace-9_x branch
   ######################
@@ -465,6 +497,8 @@ updates:
       # used by Hibernate and Solr. The version is pinned in pom.xml and should
       # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
       - dependency-name: "org.antlr:antlr4-runtime"
+      # The HAL Browser cannot be upgraded automatically as it uses a hash code for versioning.
+      - dependency-name: "org.webjars:hal-browser"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -480,6 +514,20 @@ updates:
     # some classes of supply chain attacks
     cooldown:
       default-days: 7
+    groups:
+      # Group together all GitHub official actions into a single PR
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "actions/*"
+          - "github/*"
+    ignore:
+      # For official GitHub actions, ignore minor & patch releases because we reference these actions
+      # via a major version tag which automatically uses the latest minor/patch version (e.g. "actions/checkout@v6")
+      - dependency-name: "actions/*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
+      - dependency-name: "github/*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
   ######################
   ## dspace-8_x branch
   ######################
@@ -625,6 +673,8 @@ updates:
       # used by Hibernate and Solr. The version is pinned in pom.xml and should
       # only be updated when required. See: https://github.com/DSpace/DSpace/pull/11989
       - dependency-name: "org.antlr:antlr4-runtime"
+      # The HAL Browser cannot be upgraded automatically as it uses a hash code for versioning.
+      - dependency-name: "org.webjars:hal-browser"
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
@@ -640,3 +690,17 @@ updates:
     # some classes of supply chain attacks
     cooldown:
       default-days: 7
+    groups:
+      # Group together all GitHub official actions into a single PR
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "actions/*"
+          - "github/*"
+    ignore:
+      # For official GitHub actions, ignore minor & patch releases because we reference these actions
+      # via a major version tag which automatically uses the latest minor/patch version (e.g. "actions/checkout@v6")
+      - dependency-name: "actions/*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]
+      - dependency-name: "github/*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-patch" ]

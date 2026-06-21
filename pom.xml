@@ -34,25 +34,25 @@
         <ehcache.version>3.12.0</ehcache.version>
         <errorprone.version>2.49.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
-        <jackson.version>2.21.3</jackson.version>
-        <jackson-annotations.version>2.21</jackson-annotations.version>
+        <jackson.version>2.22.0</jackson.version>
+        <jackson-annotations.version>2.22</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.5</jaxb-api.version>
-        <jaxb-runtime.version>4.0.8</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.58.v20250814</jetty.version>
-        <log4j.version>2.25.4</log4j.version>
+        <log4j.version>2.26.0</log4j.version>
         <pdfbox-version>3.0.6</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
-        <slf4j.version>2.0.17</slf4j.version>
-        <tika.version>3.3.0</tika.version>
+        <slf4j.version>2.0.18</slf4j.version>
+        <tika.version>3.3.1</tika.version>
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <!-- WARNING: BouncyCastle is also required by the maven-gpg-plugin to sign code during release. Do not update
              unless the new BouncyCastle version is compatible both with tika-parsers and maven-gpg-plugin. -->
         <bouncycastle.version>1.81</bouncycastle.version>
-        <asm.version>9.9.1</asm.version>
+        <asm.version>9.10.1</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
         <jersey.version>3.1.11</jersey.version>
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
@@ -97,7 +97,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.2</version>
+                    <version>3.6.3</version>
                     <executions>
                         <execution>
                             <id>enforce-java</id>
@@ -238,7 +238,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>3.5.6</version>
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -265,7 +265,7 @@
                 <!-- Used to run Integration tests (when enabled by -DskipIntegrationTests=false) -->
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>3.5.6</version>
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -378,7 +378,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.10.0</version>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -446,7 +446,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.21.0</version>
+                    <version>3.22.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1595,7 +1595,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.15.0</version>
+                <version>2.15.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1685,7 +1685,7 @@
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
-                <version>2.0.1</version>
+                <version>2.0.5</version>
             </dependency>
             <dependency>
                 <groupId>org.jdom</groupId>
@@ -1882,7 +1882,7 @@
             <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
-                <version>1.4.1</version>
+                <version>1.4.4</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
