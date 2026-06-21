@@ -159,6 +159,13 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     public void findByTokenWithEmptyToken() throws Exception {
         getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", ""))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithBlankToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
             .param("token", "  "))
             .andExpect(status().isBadRequest());
     }
