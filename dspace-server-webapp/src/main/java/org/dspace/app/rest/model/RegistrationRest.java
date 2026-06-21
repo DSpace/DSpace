@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.eperson.RegistrationTypeEnum;
 
 
 /**
@@ -37,6 +38,8 @@ public class RegistrationRest extends RestAddressableModel {
     private String email;
 
     private UUID user;
+
+    private RegistrationTypeEnum registrationType;
 
     @Size(max = 64)
     private String netId;
@@ -86,6 +89,14 @@ public class RegistrationRest extends RestAddressableModel {
      */
     public void setUser(UUID user) {
         this.user = user;
+    }
+
+    public RegistrationTypeEnum getRegistrationType() {
+        return registrationType;
+    }
+
+    public void setRegistrationType(RegistrationTypeEnum registrationType) {
+        this.registrationType = registrationType;
     }
 
     public String getNetId() {
