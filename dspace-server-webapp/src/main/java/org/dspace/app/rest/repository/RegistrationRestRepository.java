@@ -19,7 +19,6 @@ import java.util.Set;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -241,7 +240,11 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
      */
     @SearchRestMethod(name = "findByToken")
     public RegistrationRest findByToken(@Parameter(value = "token", required = true) String token)
-        throws SQLException, AuthorizeException {
+        throws SQLException, AuthorizeException, DSpaceBadRequestException {
+        if (StringUtils.length(token) > 48) {
+            throw new DSpaceBadRequestException("Token length cannot be longer than 48 characters");
+        }
+
         Context context = obtainContext();
         RegistrationData registrationData = registrationDataService.findByToken(context, token);
         if (registrationData == null) {
@@ -274,10 +277,10 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch
     ) throws UnprocessableEntityException, DSpaceBadRequestException {
         if (id == null || id <= 0) {
-            throw new BadRequestException("The id of the registration cannot be null or negative");
+            throw new DSpaceBadRequestException("The id of the registration cannot be null or negative");
         }
         if (patch == null || patch.getOperations() == null || patch.getOperations().isEmpty()) {
-            throw new BadRequestException("Patch request is incomplete: cannot find operations");
+            throw new DSpaceBadRequestException("Patch request is incomplete: cannot find operations");
         }
         String token = request.getParameter("token");
         if (token == null || token.trim().isBlank()) {
