@@ -86,6 +86,15 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     @Override
     public void delete(Context context, T t) throws SQLException {
+        // Skip entities that are already scheduled for removal (or already removed) in this session.
+        // Hibernate 7 may return such entities from criteria/HQL queries even after they have been
+        // scheduled for removal, so entity-based deletion loops (e.g. ResourcePolicyDAOImpl.deleteByGroup
+        // followed by deleteByDso for an overlapping policy) can re-issue remove() for the same row. The
+        // second flush then deletes 0 rows and Hibernate raises a StaleObjectStateException. Making delete()
+        // idempotent against the persistence-context state prevents that double-delete.
+        if (isEntityRemoved(context, t)) {
+            return;
+        }
         // Track the deleted entity's UUID in the context for Hibernate 7 compatibility.
         // This is needed because Hibernate 7 may return deleted entities from session.get()
         // even after they've been scheduled for removal.
