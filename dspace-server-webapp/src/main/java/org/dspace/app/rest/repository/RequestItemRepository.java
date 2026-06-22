@@ -254,6 +254,15 @@ public class RequestItemRepository
     public RequestItemRest put(Context context, HttpServletRequest request,
             String apiCategory, String model, String token, JsonNode requestBody)
             throws AuthorizeException {
+
+        if (StringUtils.isBlank(token)) {
+            throw new DSpaceBadRequestException("Token is required and cannot be blank");
+        }
+
+        if (StringUtils.length(token) > 48) {
+            throw new DSpaceBadRequestException("Token is too long");
+        }
+
         RequestItem ri = requestItemService.findByToken(context, token);
         if (null == ri) {
             throw new UnprocessableEntityException("Item request not found");
@@ -282,6 +291,11 @@ public class RequestItemRepository
         String message = null;
         if (responseMessageNode != null && !responseMessageNode.isNull()) {
             message = responseMessageNode.asText();
+            // Strip length of message to a maximum of request.item.email.message.maxlength characters to avoid excessively long emails
+            int maxLength = configurationService.getIntProperty("request.item.email.message.maxlength", 1000);
+            if (message.length() > maxLength) {
+                message = message.substring(0, maxLength);
+            }
         }
 
         // Set the decision date (now)`
@@ -300,6 +314,11 @@ public class RequestItemRepository
         String subject = null;
         if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
             subject = responseSubjectNode.asText();
+            // Strip length of subject to a maximum of request.item.email.subject.maxlength characters
+            int maxLength = configurationService.getIntProperty("request.item.email.subject.maxlength", 200);
+            if (subject.length() > maxLength) {
+                subject = subject.substring(0, maxLength);
+            }
         }
         requestItemService.update(context, ri);
 
@@ -307,16 +326,16 @@ public class RequestItemRepository
         try {
             requestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
-            LOG.warn("Response not sent:  {}", ex::getMessage);
+            LOG.warn("Response not sent: {}", ex::getMessage);
             throw new RuntimeException("Response not sent", ex);
         }
 
         // Perhaps send Open Access request to admin.s.
-        if (requestBody.findValue("suggestOpenAccess").asBoolean(false)) {
+        if (requestBody.findValue("suggestOpenAccess").asBoolean()) {
             try {
                 requestItemEmailNotifier.requestOpenAccess(context, ri);
             } catch (IOException ex) {
-                LOG.warn("Open access request not sent:  {}", ex::getMessage);
+                LOG.warn("Open access request not sent: {}", ex::getMessage);
                 throw new RuntimeException("Open access request not sent", ex);
             }
         }
