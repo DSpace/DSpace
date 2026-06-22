@@ -57,31 +57,37 @@ Documentation for all Dockerfiles used by these compose scripts can be found in 
 
 
 ## To refresh / pull DSpace images from Dockerhub
-```
+
+```sh
 docker compose -f docker-compose.yml -f docker-compose-cli.yml pull
 ```
 
 ## To build DSpace images using code in your branch
-```
+
+```sh
 docker compose -f docker-compose.yml -f docker-compose-cli.yml build
 ```
 
-OPTIONALLY, you can build DSpace images using a different JDK_VERSION like this:
-```
-docker compose -f docker-compose.yml -f docker-compose-cli.yml build --build-arg JDK_VERSION=17
-```
-Default is Java 11, but other LTS releases (e.g. 17) are also supported.
+OPTIONALLY, you can build DSpace images using a different JDK version like this:
 
-## Run DSpace 9 REST from your current branch
+```sh
+docker compose -f docker-compose.yml -f docker-compose-cli.yml build --build-arg JDK_VERSION=25
 ```
+
+The default JDK version is 21.
+
+## Run DSpace REST from your current branch
+
+```sh
 docker compose -p d10 up -d
 ```
 
-## Run DSpace 9 REST and Angular from your branch
+## Run DSpace REST and Angular from your branch
 
-```
+```sh
 docker compose -p d10 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
+
 NOTE: This starts the UI in development mode. It will take a few minutes to see the UI as the Angular code needs to be compiled.
 
 ## Run DSpace REST and DSpace Angular from local branches
@@ -90,19 +96,21 @@ NOTE: This starts the UI in development mode. It will take a few minutes to see 
 
 See documentation in [DSpace User Interface Docker instructions](https://github.com/DSpace/dspace-angular/blob/main/docker/README.md#run-dspace-rest-and-dspace-angular-from-local-branches).
 
-## Run DSpace 9 REST with a IIIF Image Server from your branch
-*Only useful for testing IIIF support in a development environment*
+## Run DSpace REST with a IIIF Image Server from your branch
+
+_Only useful for testing IIIF support in a development environment._
 
 This command starts our `dspace-iiif` container alongside the REST API.
 That container provides a [Cantaloupe image server](https://cantaloupe-project.github.io/),
 which can be used when IIIF support is enabled in DSpace (`iiif.enabled=true`).
 
-```
+```sh
 docker compose -p d10 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-iiif.yml up -d
 ```
 
-## Run DSpace 9 REST and Shibboleth SP (in Apache) from your branch
-*Only useful for testing Shibboleth in a development environment*
+## Run DSpace REST and Shibboleth SP (in Apache) from your branch
+
+_Only useful for testing Shibboleth in a development environment._
 
 This Shibboleth container uses https://samltest.id/ as an IdP (see `../docker/dspace-shibboleth/`).
 Therefore, for Shibboleth login to work properly, you MUST make your DSpace site available to the external web.
@@ -176,9 +184,9 @@ The remainder of these instructions assume you are using ngrok (though other pro
         ```
         DSPACE_HOSTNAME=[subdomain].ngrok.io docker compose -p d10 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
         ```
-## Run DSpace 9 REST and Matomo from your branch
+## Run DSpace REST and Matomo from your branch
 
-_Only useful for testing Matomo in a development environment_
+_Only useful for testing Matomo in a development environment._
 
 This Matomo container uses the port 8081 to expose its API and User Interface.
 
