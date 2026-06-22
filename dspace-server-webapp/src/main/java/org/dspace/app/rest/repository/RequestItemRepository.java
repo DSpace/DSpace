@@ -337,7 +337,7 @@ public class RequestItemRepository
 
         // Send 404 NOT FOUND if access token is blank
         if (StringUtils.isBlank(accessToken)) {
-            throw new ResourceNotFoundException("Token is blank and cannot be blank");
+            throw new ResourceNotFoundException("Token is required and cannot be blank");
         }
         if (StringUtils.length(accessToken) > 48) {
             throw new DSpaceBadRequestException("Token is too long");
@@ -346,6 +346,9 @@ public class RequestItemRepository
         // Get the current context and request item
         Context context = obtainContext();
         RequestItem requestItem = requestItemService.findByAccessToken(context, accessToken);
+        if (requestItem == null) {
+            throw new ResourceNotFoundException("Token not found: " + accessToken);
+        }
 
         // Previously, a 404 was thrown if the request item was not found, and a 401 or 403 was thrown depending
         // on authorization and validity checks. These checks are still strictly enforced in the BitstreamController

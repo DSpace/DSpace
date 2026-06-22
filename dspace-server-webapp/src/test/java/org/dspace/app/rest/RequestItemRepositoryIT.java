@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -133,7 +134,8 @@ public class RequestItemRepositoryIT
                 .withTitle("Item")
                 .build();
 
-        InputStream is = new ByteArrayInputStream(new byte[0]);
+        String content = "RequestItemRepositoryIT test content";
+        InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         bitstream = BitstreamBuilder
                 .createBitstream(context, item, is)
                 .withName("Bitstream")
@@ -708,8 +710,15 @@ public class RequestItemRepositoryIT
     }
 
     @Test
+    public void testFindOneWithMissingToken() throws Exception {
+        final String uri = URI_ROOT + "/";
+        getClient().perform(get(uri))
+                   .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
     public void testFindOneWithEmptyToken() throws Exception {
-        final String uri = URI_ROOT + "/%20";
+        final String uri = URI_ROOT + "/  ";
         getClient().perform(get(uri))
                    .andExpect(status().isBadRequest());
     }
@@ -732,12 +741,12 @@ public class RequestItemRepositoryIT
     public void testFindByAccessTokenWithMissingToken() throws Exception {
         final String uri = URI_ROOT + "/search/byAccessToken";
         getClient().perform(get(uri))
-                   .andExpect(status().isNotFound());
+                   .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testFindByAccessTokenWithEmptyToken() throws Exception {
-        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=%20";
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=  ";
         getClient().perform(get(uri))
                    .andExpect(status().isNotFound());
     }
@@ -753,7 +762,7 @@ public class RequestItemRepositoryIT
     public void testFindByAccessTokenWithInvalidToken() throws Exception {
         final String uri = URI_ROOT + "/search/byAccessToken?accessToken=foo";
         getClient().perform(get(uri))
-                   .andExpect(status().isBadRequest());
+                   .andExpect(status().isNotFound());
     }
 
 }
