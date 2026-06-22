@@ -144,6 +144,7 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null, "Educational strategies");
         MetadatumDTO subject5 = createMetadatumDTO("dc", "subject", null, "Nursing education");
         MetadatumDTO subject6 = createMetadatumDTO("dc", "subject", null, "Teaching methodology");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1016/j.nepr.2023.103548");
 
         metadatums.add(title);
         metadatums.add(description1);
@@ -162,6 +163,7 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(subject4);
         metadatums.add(subject5);
         metadatums.add(subject6);
+        metadatums.add(doi);
         ImportRecord record = new ImportRecord(metadatums);
 
         records.add(record);
@@ -190,6 +192,7 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Baxevanis, Andreas D");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2011-10");
         MetadatumDTO language = createMetadatumDTO("dc", "language", "iso", "en");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1002/0471142905.hg0610s71");
 
         metadatums.add(title);
         metadatums.add(description);
@@ -198,6 +201,7 @@ public class PubmedImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(author2);
         metadatums.add(date);
         metadatums.add(language);
+        metadatums.add(doi);
         ImportRecord record = new ImportRecord(metadatums);
 
         records.add(record);
