@@ -456,10 +456,7 @@ public class RequestItemRepositoryIT
     }
 
     @Test
-    public void testDelete()
-            throws Exception {
-        System.out.println("delete");
-
+    public void testDelete() throws Exception {
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
@@ -473,9 +470,7 @@ public class RequestItemRepositoryIT
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testUntrustedOrigin()
-            throws Exception {
-        System.out.println("testUntrustedOrigin");
+    public void testUntrustedOrigin() throws Exception {
 
         // First, get a valid login token
         String token = getAuthToken(eperson.getEmail(), password);
@@ -505,10 +500,7 @@ public class RequestItemRepositoryIT
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testPut()
-            throws Exception {
-        System.out.println("put");
-
+    public void testPut() throws Exception {
         // Create an item request to approve.
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -544,9 +536,7 @@ public class RequestItemRepositoryIT
     }
 
     @Test
-    public void testPutUnauthenticated()
-            throws Exception {
-        System.out.println("put unauthenticated request");
+    public void testPutUnauthenticated() throws Exception {
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
