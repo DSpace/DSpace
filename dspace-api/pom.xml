@@ -741,6 +741,14 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>apache-client</artifactId>
               </exclusion>
+              <!-- Exclude apache5-client (Apache HttpClient 5): added transitively by the AWS SDK
+                   from v2.46.x onward. DSpace uses the CRT based client (S3AsyncClient.crtBuilder()),
+                   so this client is unused, and it drags in conflicting httpcore5 versions that break
+                   dependency convergence. See https://github.com/DSpace/DSpace/issues/12690 -->
+              <exclusion>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>apache5-client</artifactId>
+              </exclusion>
             </exclusions>
         </dependency>
 
