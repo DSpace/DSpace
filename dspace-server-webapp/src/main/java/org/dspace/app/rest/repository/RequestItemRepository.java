@@ -15,11 +15,15 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
@@ -85,8 +89,12 @@ public class RequestItemRepository
 
     @Autowired(required = true)
     protected RequestItemEmailNotifier requestItemEmailNotifier;
+
     @Autowired
     protected AuthorizeService authorizeService;
+
+    @Autowired
+    private Validator validator;
 
     // TODO: Work towards full coverage of captcha, so we can use getCaptchaService() instead
     private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getAltchaCaptchaService();
@@ -144,6 +152,19 @@ public class RequestItemRepository
             rir = mapper.readValue(req.getInputStream(), RequestItemRest.class);
         } catch (IOException ex) {
             throw new UnprocessableEntityException("error parsing the body", ex);
+        }
+
+        // Validation of deserialized RequestItemRest object
+        Set<ConstraintViolation<RequestItemRest>> violations = validator.validate(rir);
+        if (violations != null && !violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<RequestItemRest> v : violations) {
+                sb.append(v.getPropertyPath())
+                    .append(": ")
+                    .append(v.getMessage())
+                    .append("; ");
+            }
+            throw new UnprocessableEntityException("Validation error: " + sb.toString());
         }
 
         // Check request.item.type:
