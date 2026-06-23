@@ -255,13 +255,8 @@ public class RequestItemRepository
             String apiCategory, String model, String token, JsonNode requestBody)
             throws AuthorizeException {
 
-        if (StringUtils.isBlank(token)) {
-            throw new DSpaceBadRequestException("Token is required and cannot be blank");
-        }
-
-        if (StringUtils.length(token) > 48) {
-            throw new DSpaceBadRequestException("Token is too long");
-        }
+        // validation of token is not required here, because request mappings of PUT methods in RestResourceController
+        // will not allow a request to reach this method if the token is blank or too long
 
         RequestItem ri = requestItemService.findByToken(context, token);
         if (null == ri) {
