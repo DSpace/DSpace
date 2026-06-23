@@ -266,11 +266,17 @@ public class RegistryLoader {
      */
     private static Document loadXML(String filename) throws IOException,
         ParserConfigurationException, SAXException {
-        // This XML builder will *not* disable external entities as XML
-        // registries are considered trusted content
-        DocumentBuilder builder = XMLUtils.getTrustedDocumentBuilder();
 
-        return builder.parse(new File(filename));
+        File inputFile = new File(filename);
+        String inputFileDir = inputFile.toPath().normalize().getParent().toString();
+
+        // This XML builder will *not* disable external entities as XML
+        // registries are considered trusted content. However, it will
+        // restrict them to be within the directory that the
+        // current input form XML file exists (or a sub-directory)
+        DocumentBuilder builder = XMLUtils.getTrustedDocumentBuilder(inputFileDir);
+
+        return builder.parse(inputFile);
     }
 
     /**
