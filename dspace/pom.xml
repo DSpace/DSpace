@@ -243,12 +243,6 @@
             <artifactId>additions</artifactId>
             <scope>provided</scope>
         </dependency>
-  <dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-junit</artifactId>
-   <version>2.0.0.0</version>
-   <scope>test</scope>
-  </dependency>
     	<!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,
              so that the 'dspace oai' launcher.xml command works.  -->
     	<dependency>
