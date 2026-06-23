@@ -7,24 +7,17 @@
  */
 package org.dspace.authority.util;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -134,24 +127,5 @@ public class XMLUtils {
                 //                lastNode.drop();
             }
         };
-    }
-
-    public static Document convertStreamToXML(InputStream is) {
-        Document result = null;
-        if (is != null) {
-            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-            try {
-                DocumentBuilder builder = domFactory.newDocumentBuilder();
-                result = builder.parse(is);
-            } catch (ParserConfigurationException e) {
-                log.error("Error", e);
-            } catch (SAXException e) {
-                log.error("Error", e);
-            } catch (IOException e) {
-                log.error("Error", e);
-            }
-        }
-        return result;
-
     }
 }
