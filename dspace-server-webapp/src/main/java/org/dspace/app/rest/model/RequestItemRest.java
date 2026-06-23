@@ -44,7 +44,7 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
     protected String item_id;
 
     @Email
-    @Size(max = 254)
+    @Size(max = 64)
     protected String reqEmail;
 
     @Size(max = 1000)
