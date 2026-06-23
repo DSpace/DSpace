@@ -625,7 +625,7 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <scope>test</scope>
-            <version>${solr.client.version}</version>
+            <version>${test.solr.server.version}</version>
             <exclusions>
                 <!-- Later version provided by Hibernate -->
                 <exclusion>

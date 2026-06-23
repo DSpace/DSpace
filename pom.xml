@@ -28,7 +28,13 @@
         <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.11</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
+        <!-- SolrJ client version: what the DSpace backend uses to talk to a Solr server. -->
         <solr.client.version>10.0.0</solr.client.version>
+        <!-- Solr server version used ONLY by the embedded Solr in integration tests (solr-core etc.).
+             Kept separate from solr.client.version so the SolrJ client and the test/server Solr can be
+             versioned independently (resolves #12688). Lucene (lucene.version) is pinned by this server
+             version (Solr 10.0.0 ships Lucene 10.3.x). -->
+        <test.solr.server.version>10.0.0</test.solr.server.version>
         <lucene.version>10.3.2</lucene.version>
         <!-- ZooKeeper version matching Solr 10.0.0 -->
         <zookeeper.version>3.9.5</zookeeper.version>
