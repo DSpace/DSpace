@@ -16,7 +16,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,6 +40,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -71,6 +74,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -704,6 +708,66 @@ public class RequestItemRepositoryIT
         getClient().perform(put(URI_ROOT + "/" + "a".repeat(33)) // maximum token length is 32 hex characters
                 .contentType(contentType))
                 .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithLongSubjectAndResponseMessage() throws Exception {
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        Email emailSpy = Mockito.spy(Email.class);
+        doNothing().when(emailSpy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
+
+        Map<String, String> parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "s".repeat(200), // maximum subject length is 200 characters
+                "responseMessage", "m".repeat(1000), // maximum responseMessage length is 1000 characters
+                "suggestOpenAccess", "true");
+        String content = mapper
+                .writer()
+                .writeValueAsString(parameters);
+
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testPutWithTooLongSubjectAndTooLongResponseMessage() throws Exception {
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        Email emailSpy = Mockito.spy(Email.class);
+        doNothing().when(emailSpy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
+
+        Map<String, String> parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "s".repeat(201), // maximum subject length is 200 characters
+                "responseMessage", "m".repeat(1001), // maximum responseMessage length is 1000 characters
+                "suggestOpenAccess", "false");
+        String content = mapper
+                .writer()
+                .writeValueAsString(parameters);
+
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
+        verify(emailSpy).setSubject(subjectCaptor.capture());
+        assertEquals(200, subjectCaptor.getValue().length());
+
+        ArgumentCaptor<Object> argumentCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(emailSpy, atLeastOnce()).addArgument(argumentCaptor.capture());
+        List<Object> args = argumentCaptor.getAllValues();
+        assertEquals(6, args.size());
+        assertEquals("m".repeat(1000), args.get(5));
     }
 
     /**
