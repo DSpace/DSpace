@@ -15,6 +15,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -60,14 +62,21 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.Email;
 import org.dspace.services.ConfigurationService;
 import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
  *
@@ -107,9 +116,21 @@ public class RequestItemRepositoryIT
 
     private Map<String, Object> altchaPayload;
 
+    private static MockedStatic<Email> emailMockedStatic;
+
     @After
     public void tearDown() {
         configurationService.setProperty("captcha.provider", "google");
+    }
+
+    @BeforeClass
+    public static void initClass() throws Exception {
+        emailMockedStatic = Mockito.mockStatic(Email.class);
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        emailMockedStatic.close();
     }
 
     @Before
@@ -506,6 +527,10 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
+        Email emailSpy = Mockito.spy(Email.class);
+        doNothing().when(emailSpy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
+
         // Create the HTTP request body.
         Map<String, String> parameters = Map.of(
                 "acceptRequest", "true",
@@ -541,6 +566,10 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
+        Email emailSpy = Mockito.spy(Email.class);
+        doNothing().when(emailSpy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
+
         Map<String, String> parameters;
         String content;
 
@@ -568,7 +597,6 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
-        String authToken;
         Map<String, String> parameters;
         String content;
 
@@ -579,8 +607,7 @@ public class RequestItemRepositoryIT
                 "subject", "subject",
                 "responseMessage", "Request accepted");
         content = mapperWriter.writeValueAsString(parameters);
-        authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isUnprocessableEntity());
@@ -603,11 +630,82 @@ public class RequestItemRepositoryIT
                 "responseMessage", "Request accepted");
         ObjectWriter mapperWriter = mapper.writer();
         String content = mapperWriter.writeValueAsString(parameters);
-        String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testPutWithoutToken() throws Exception {
+        getClient().perform(put(URI_ROOT + '/')
+                .contentType(contentType))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithoutTokenAndMissingContentType() throws Exception {
+        getClient().perform(put(URI_ROOT + '/'))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithInvalidFormatToken() throws Exception {
+        getClient().perform(put(URI_ROOT + "/invalid-token-format")
+                .contentType(contentType))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithInvalidFormatTokenAndMissingContentType() throws Exception {
+        getClient().perform(put(URI_ROOT + "/invalid-token-format"))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithTokenUUID() throws Exception {
+        // passing UUIDs is not supported
+        getClient().perform(put(URI_ROOT + "/" + "1".repeat(8) + "-1111-1111-1111-" + "1".repeat(12))
+                .contentType(contentType)
+                .content("{}"))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void testPutWithTokenUUIDWithoutJsonPayload() throws Exception {
+        // passing UUIDs is not supported, but we should return a 500 error rather than a 405 error
+        getClient().perform(put(URI_ROOT + "/" + "1".repeat(8) + "-1111-1111-1111-" + "1".repeat(12)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPutWithUnknownTokenHex32() throws Exception {
+        getClient().perform(put(URI_ROOT + "/" + "f".repeat(32)) // maximum token length is 32 hex characters
+                .contentType(contentType)
+                .content("{}"))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testPutWithUnknownTokenHex32AndMissingContent() throws Exception {
+        getClient().perform(put(URI_ROOT + "/" + "f".repeat(32)) // maximum token length is 32 hex characters
+                .contentType(contentType))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPutWithUnknownTokenInteger() throws Exception {
+        getClient().perform(put(URI_ROOT + "/1234567890")
+                .contentType(contentType)
+                .content("{}"))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void testPutWithTooLongToken() throws Exception {
+        getClient().perform(put(URI_ROOT + "/" + "a".repeat(33)) // maximum token length is 32 hex characters
+                .contentType(contentType))
+                .andExpect(status().isMethodNotAllowed());
     }
 
     /**
