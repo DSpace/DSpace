@@ -17,18 +17,20 @@ import org.dspace.core.Utils;
  * of type ADD and other of type REMOVE.
  */
 public class MetadataReplaceUtils {
+    private MetadataReplaceUtils() {}
+
     /**
-     * Replaces information in a metadata value.
+     * Replaces a(all) property(ies) in a metadata value.
      * @param context DSpace context.
      * @param dsoService Service of the DSO type having the metadata modified.
-     * @param dso DSO of the metadata being modifid.
+     * @param dso DSO of the metadata being modified.
      * @param mdField Qualified name of the metadata field being modified.
      * @param existingMdv Current metadata value that will be modified.
      * @param newMdv REST object representing the modified version of the metadata.
-     * @param index Place of the metadata value being modified.
+     * @param index Place of the metadata value being modified in {@code existingMdv}.
      * @param propertyOfMd Name of the metadata value property to modify. All properties if null.
      * @param <DSO> Type of the DSO having the metadata modified.
-     * @throws SQLException
+     * @throws SQLException If replacement fails.
      */
     public static <DSO extends DSpaceObject> void replaceValue(
         Context context,
@@ -73,8 +75,16 @@ public class MetadataReplaceUtils {
     }
 
     /**
-     * Replaces information in a metadata value.
-     * @see MetadataReplaceUtils#replaceValue(Context, DSpaceObjectService, DSpaceObject, String, MetadataValue, MetadataValueRest, int, String) Same as this method, with propertyOfMd null.
+     * Replaces all properties in a metadata value.
+     * @param context DSpace context.
+     * @param dsoService Service of the DSO type having the metadata modified.
+     * @param dso DSO of the metadata being modified.
+     * @param mdField Qualified name of the metadata field being modified.
+     * @param existingMdv Current metadata value that will be modified.
+     * @param newMdv REST object representing the modified version of the metadata.
+     * @param index Place of the metadata value being modified in {@code existingMdv}.
+     * @param <DSO> Type of the DSO having the metadata modified.
+     * @throws SQLException If replacement fails.
      */
     public static <DSO extends DSpaceObject> void replaceValue(
         Context context,
