@@ -94,15 +94,6 @@
                      as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
- <dependencies>
-  <dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-junit</artifactId>
-   <version>2.0.0.0</version>
-   <scope>test</scope>
-  </dependency>
- </dependencies>
-
     <build>
         <!-- Define Maven Plugin Settings that should be inherited to ALL submodule POMs.
              (NOTE: individual POMs can override specific settings). -->
@@ -591,7 +582,14 @@
         <!-- Profile which sets our default system properties for all Unit/Integration tests.
              By default, this sets UTF-8 encoding for all tests and gives tests 1GB of memory max.
              Both m-surefire-p and m-failsafe-p are unable to use MAVEN_OPTS because they fork a new JVM for testing.
-             These default settings may be overridden via the commandline (e.g. "-Dtest.argLine=-Xmx512m"). -->
+             These default settings may be overridden via the commandline (e.g. "-Dtest.argLine=-Xmx512m").
+             Two additional flags tune the embedded Solr used by tests:
+             * -Dsolr.directoryFactory=solr.NIOFSDirectoryFactory : use the NIO filesystem Directory instead of
+               Solr's default mmap-based factory. This avoids exhausting mmap/virtual-memory limits when many test
+               classes each start their own embedded Solr cores, and is measurably faster in CI.
+             * -Dlucene.cms.override_core_count=1 : cap Lucene's ConcurrentMergeScheduler to a single merge thread.
+               Test indexes are tiny, so the default (which scales merge threads to the host CPU count) only adds
+               thread-scheduling overhead and noise. -->
         <profile>
             <id>test-argLine</id>
             <activation>
@@ -2168,19 +2166,6 @@
             <url>https://handle.net/maven</url>
             <snapshots>
                 <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <!-- Apache Snapshot Repository for Solr 10.0.0-SNAPSHOT
-             NOTE: Track Solr 10 GA release progress and update to stable version before DSpace 10 release (May/June 2026) -->
-        <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>https://repository.apache.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>
