@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.input.SAXBuilder;
@@ -510,5 +511,22 @@ public class XMLUtils {
                 throw new TransformerException("Unable to stream file at: " + resolvedPath);
             }
         }
+    }
+
+    /**
+     * Initialize and return the javax SchemaFactory with some basic security
+     * applied to avoid XXE attacks and other unwanted content inclusion
+     * @param schemaLanguage locates an implementation of SchemaFactory that supports the specified schema language
+     * @return schema factory to generate new schema
+     * @throws SAXException
+     */
+    public static SchemaFactory getSchemaFactory(String schemaLanguage) throws SAXException {
+        SchemaFactory factory = SchemaFactory.newInstance(schemaLanguage);
+
+        // No external DTDs or Schema
+        factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+        return factory;
     }
 }
