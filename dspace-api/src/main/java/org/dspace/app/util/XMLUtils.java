@@ -198,6 +198,7 @@ public class XMLUtils {
      * @return document builder factory to generate new builders
      * @throws ParserConfigurationException
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static DocumentBuilderFactory getTrustedDocumentBuilderFactory()
             throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -210,6 +211,7 @@ public class XMLUtils {
      * @return document builder factory to generate new builders
      * @throws ParserConfigurationException
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static DocumentBuilderFactory getDocumentBuilderFactory()
             throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -281,6 +283,7 @@ public class XMLUtils {
      * @param validate whether to use JDOM XSD validation
      * @return SAX document builder for use in XML parsing
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static SAXBuilder getSAXBuilder(boolean validate) {
         SAXBuilder saxBuilder = new SAXBuilder();
         if (validate) {
@@ -305,6 +308,7 @@ public class XMLUtils {
      * to avoid XXE attacks and other unwanted content inclusion
      * @return XML input factory for use in XML parsing
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static XMLInputFactory getXMLInputFactory() {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
@@ -381,6 +385,7 @@ public class XMLUtils {
      * @return transformer factory to generate new transformers
      * @throws TransformerConfigurationException
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static TransformerFactory getTransformerFactory() throws TransformerConfigurationException {
         TransformerFactory factory = TransformerFactory.newInstance();
 
@@ -426,6 +431,7 @@ public class XMLUtils {
      * @return TransformerFactory that allows references to external stylesheets but only for the given base Paths.
      * @throws TransformerConfigurationException
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static TransformerFactory getTrustedTransformerFactory(String factoryClassName, String... allowedBasePaths)
         throws TransformerConfigurationException {
         // If not null, use the passed in factoryClassName. Otherwise, initialize a default TransformerFactory
@@ -520,6 +526,7 @@ public class XMLUtils {
      * @return schema factory to generate new schema
      * @throws SAXException
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static SchemaFactory getSchemaFactory(String schemaLanguage) throws SAXException {
         SchemaFactory factory = SchemaFactory.newInstance(schemaLanguage);
 
