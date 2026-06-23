@@ -54,7 +54,11 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
         MetadataValueRest metadataValueToReplace = metadataPatchUtils.extractMetadataValueFromOperation(operation);
         // Property of md being altered
         String propertyOfMd = metadataPatchUtils.extractPropertyOfMdFromPath(partsOfPath);
-        replace(context, resource, dsoService, metadataField, metadataValueToReplace, indexInPath, propertyOfMd);
+        String newValueMdAttribute = metadataPatchUtils.extractNewValueOfMd(operation);
+        replace(
+            context, resource, dsoService, metadataField, metadataValueToReplace, indexInPath,
+            propertyOfMd, newValueMdAttribute
+        );
         return resource;
     }
 
@@ -77,13 +81,15 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param metadataValue     value of md element
      * @param index             possible index of md being replaced
      * @param propertyOfMd      possible property of md being replaced
+     * @param newPropertyValue  value for the possible property of md being replaced (when propertyOfMd != null)
      */
     private void replace(Context context,
                          R dso, DSpaceObjectService<R> dsoService,
                          MetadataField metadataField,
                          MetadataValueRest metadataValue,
                          String index,
-                         String propertyOfMd
+                         String propertyOfMd,
+                         String newPropertyValue
     ) {
         if (metadataField == null) {
             // Case 1 - replace entire set of metadata
@@ -92,8 +98,10 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
             // Case 2 - replace all metadata for existing key
             this.replaceMetadataFieldMetadata(context, dso, dsoService, metadataField, metadataValue);
         } else {
-            // Case 3 and 4 - replace single existing metadata value or single property
-            this.replaceMetadataValue(context, dso, dsoService, metadataField, metadataValue, index, propertyOfMd);
+            // Case 3 and 4 - replace single existing metadata
+            this.replaceMetadataValue(
+                context, dso, dsoService, metadataField, metadataValue, index, propertyOfMd, newPropertyValue
+            );
         }
     }
 
@@ -147,6 +155,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param metadataValue     new value of md element
      * @param index             index of md being replaced
      * @param propertyOfMd      property of md being replaced
+     * @param newPropertyValue  new value for the property being replaced
      */
     private void replaceMetadataValue(Context context,
                                       R dso,
@@ -154,7 +163,8 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                                       MetadataField metadataField,
                                       MetadataValueRest metadataValue,
                                       String index,
-                                      @Nullable String propertyOfMd
+                                      @Nullable String propertyOfMd,
+                                      @Nullable String newPropertyValue
     ) {
         try {
             List<MetadataValue> metadataValues = dsoService.getMetadata(
@@ -175,7 +185,8 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                     existingMdv,
                     metadataValue,
                     indexInt,
-                    propertyOfMd
+                    propertyOfMd,
+                    newPropertyValue
                 );
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");

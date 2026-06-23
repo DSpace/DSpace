@@ -36,6 +36,7 @@ public class MetadataReplaceUtils {
      * @param newMdv REST object representing the modified version of the metadata.
      * @param index Place of the metadata value being modified in {@code existingMdv}.
      * @param propertyOfMd Name of the metadata value property to modify. All properties if null.
+     * @param newPropertyValue Value of the specific property to modify. Only meaningful if propertyOfMd != null.
      * @param <DSO> Type of the DSO having the metadata modified.
      * @throws SQLException If replacement fails.
      */
@@ -47,24 +48,29 @@ public class MetadataReplaceUtils {
         MetadataValue existingMdv,
         MetadataValueRest newMdv,
         int index,
-        @Nullable String propertyOfMd
+        @Nullable String propertyOfMd,
+        @Nullable String newPropertyValue
     ) throws SQLException {
         String[] metadata = Utils.tokenize(mdField);
 
         // Gets the value of each property.
         // Keeps the old one when just a single property is being modified (when 'propertyOfMd' is not null).
-        String authority = propertyOfMd == null || "authority".equals(propertyOfMd)
+        String authority = propertyOfMd == null
             ? newMdv.getAuthority()
-            : existingMdv.getAuthority();
-        int confidence = propertyOfMd == null || "confidence".equals(propertyOfMd)
+            : ("authority".equals(propertyOfMd) ? newPropertyValue : existingMdv.getAuthority());
+        int confidence = propertyOfMd == null
             ? newMdv.getConfidence()
-            : existingMdv.getConfidence();
-        String language = propertyOfMd == null || "language".equals(propertyOfMd)
+            : (
+            "confidence".equals(propertyOfMd) && newPropertyValue != null
+            ? Integer.parseInt(newPropertyValue)
+            : existingMdv.getConfidence()
+        );
+        String language = propertyOfMd == null
             ? newMdv.getLanguage()
-            : existingMdv.getLanguage();
-        String value = propertyOfMd == null || "value".equals(propertyOfMd)
+            : ("language".equals(propertyOfMd) ? newPropertyValue : existingMdv.getLanguage());
+        String value = propertyOfMd == null
             ? newMdv.getValue()
-            : existingMdv.getValue();
+            : ("value".equals(propertyOfMd) ? newPropertyValue : existingMdv.getValue());
 
         if (newMdv.getSecurityLevel() == null) {
             dsoService.replaceMetadata(
@@ -102,6 +108,6 @@ public class MetadataReplaceUtils {
         MetadataValueRest newMdv,
         int index
     ) throws SQLException {
-        replaceValue(context, dsoService, dso, mdField, existingMdv, newMdv, index, null);
+        replaceValue(context, dsoService, dso, mdField, existingMdv, newMdv, index, null, null);
     }
 }
