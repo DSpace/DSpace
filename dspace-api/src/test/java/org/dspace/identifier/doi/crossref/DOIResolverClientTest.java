@@ -11,16 +11,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import mockwebserver3.MockResponse;
 import mockwebserver3.MockWebServer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DOIResolverClientTest {
 
     private MockWebServer server;
     private DOIResolverClient client;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         server = new MockWebServer();
         server.start();
@@ -30,7 +30,7 @@ public class DOIResolverClientTest {
         client = new DOIResolverClient("http", server.getHostName(), server.getPort(), baseClient);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         server.close();
     }

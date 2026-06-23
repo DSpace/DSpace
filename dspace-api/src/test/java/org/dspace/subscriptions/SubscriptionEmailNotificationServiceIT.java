@@ -8,8 +8,8 @@
 package org.dspace.subscriptions;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.time.ZoneOffset;
@@ -21,7 +21,7 @@ import java.util.UUID;
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 
-import com.icegreen.greenmail.junit.GreenMailRule;
+import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -44,10 +44,9 @@ import org.dspace.eperson.service.SubscribeService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.email.EmailServiceImpl;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link SubscriptionEmailNotificationService}.
@@ -68,8 +67,7 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
                                                             .getServiceByName(null, MockSolrSearchCore.class);
     ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @Rule
-    public final GreenMailRule greenMail = new GreenMailRule(ServerSetupTest.SMTP);
+    private GreenMail greenMail;
 
     private Collection col;
     private Community com;
@@ -83,10 +81,13 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
     private String originalMailFromAddress;
     private Boolean originalMailServerDisabled;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        // Start an embedded SMTP server for the duration of this test (replaces the JUnit 4 GreenMailRule)
+        greenMail = new GreenMail(ServerSetupTest.SMTP);
+        greenMail.start();
         context.turnOffAuthorisationSystem();
 
         com = CommunityBuilder.createCommunity(context)
@@ -113,8 +114,11 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void restoreMailConfig() {
+        if (greenMail != null) {
+            greenMail.stop();
+        }
         configurationService.setProperty("mail.server", originalMailServer);
         configurationService.setProperty("mail.server.port", originalMailServerPort);
         configurationService.setProperty("mail.from.address", originalMailFromAddress);

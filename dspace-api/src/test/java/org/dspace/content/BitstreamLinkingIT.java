@@ -31,8 +31,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 /**
  * Integration Tests for BitstreamLinkingService
  *
@@ -56,15 +56,15 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
     Bitstream secondCopy;
 
     /**
-     * This method will be run before every test as per @Before. It will
+     * This method will be run before every test as per @BeforeEach. It will
      * initialize resources required for the tests.
      *
-     * Other methods can be annotated with @Before here or in subclasses
+     * Other methods can be annotated with @BeforeEach here or in subclasses
      * but no execution order is guaranteed.
      *
      * @throws Exception passed through.
      */
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
