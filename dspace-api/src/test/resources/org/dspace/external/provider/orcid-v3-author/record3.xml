@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<person:person path="/0000-0000-0000-0003/person" xmlns:internal="http://www.orcid.org/ns/internal"
+<record:record path="/0000-0000-0000-0003" xmlns:internal="http://www.orcid.org/ns/internal"
                xmlns:education="http://www.orcid.org/ns/education"
                xmlns:distinction="http://www.orcid.org/ns/distinction"
                xmlns:deprecated="http://www.orcid.org/ns/deprecated"
@@ -20,16 +20,26 @@
                xmlns:researcher-url="http://www.orcid.org/ns/researcher-url"
                xmlns:peer-review="http://www.orcid.org/ns/peer-review" xmlns:bulk="http://www.orcid.org/ns/bulk"
                xmlns:research-resource="http://www.orcid.org/ns/research-resource">
-    <person:name visibility="public" path="0000-0000-0000-0003">
+    <common:orcid-identifier>
+        <common:uri>https://sandbox.orcid.org/0000-0000-0000-0003</common:uri>
+        <common:path>0000-0000-0000-0003</common:path>
+        <common:host>sandbox.orcid.org</common:host>
+    </common:orcid-identifier>
+    <person:person visibility="public" path="/0000-0000-0000-0003/person">
         <common:created-date>2024-06-11T20:01:28.538Z</common:created-date>
         <common:last-modified-date>2024-06-11T20:01:28.538Z</common:last-modified-date>
-        <personal-details:given-names>GivenNames3</personal-details:given-names>
-        <personal-details:family-name>FamilyName3</personal-details:family-name>
-    </person:name>
-    <other-name:other-names path="/0000-0000-0000-0003/other-names"/>
-    <researcher-url:researcher-urls path="/0000-0000-0000-0003/researcher-urls"/>
-    <email:emails path="/0000-0000-0000-0003/email"/>
-    <address:addresses path="/0000-0000-0000-0003/address"/>
-    <keyword:keywords path="/0000-0000-0000-0003/keywords"/>
-    <external-identifier:external-identifiers path="/0000-0000-0000-0003/external-identifiers"/>
-</person:person>
+        <person:name visibility="public" path="0000-0000-0000-0003">
+            <common:created-date>2024-06-11T20:01:28.538Z</common:created-date>
+            <common:last-modified-date>2024-06-11T20:01:28.538Z</common:last-modified-date>
+            <personal-details:given-names>GivenNames3</personal-details:given-names>
+            <personal-details:family-name>FamilyName3</personal-details:family-name>
+        </person:name>
+        <other-name:other-names path="/0000-0000-0000-0003/other-names"/>
+        <researcher-url:researcher-urls path="/0000-0000-0000-0003/researcher-urls"/>
+        <email:emails path="/0000-0000-0000-0003/email"/>
+        <address:addresses path="/0000-0000-0000-0003/address"/>
+        <keyword:keywords path="/0000-0000-0000-0003/keywords"/>
+        <external-identifier:external-identifiers path="/0000-0000-0000-0003/external-identifiers"/>
+    </person:person>
+    <activities:activities-summary path="/0000-0000-0000-0003/activities"/>
+</record:record>

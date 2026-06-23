@@ -150,7 +150,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
         OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
         orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
-        when(orcidConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
+        when(orcidConnector.get(ArgumentMatchers.eq("0000-0002-9029-1854"), ArgumentMatchers.any()))
                 .thenAnswer(new Answer<InputStream>() {
                     public InputStream answer(InvocationOnMock invocation) {
                         return getClass().getResourceAsStream("orcid-person-record.xml");
@@ -193,7 +193,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                             return getClass().getResourceAsStream("orcid-search.xml");
                         }
                     });
-            when(orcidConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
+            when(orcidConnector.get(ArgumentMatchers.eq("0000-0002-9029-1854"), ArgumentMatchers.any()))
                     .thenAnswer(new Answer<InputStream>() {
                         public InputStream answer(InvocationOnMock invocation) {
                             return getClass().getResourceAsStream("orcid-person-record.xml");
@@ -246,7 +246,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                             return getClass().getResourceAsStream("orcid-search.xml");
                         }
                     });
-            when(orcidConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
+            when(orcidConnector.get(ArgumentMatchers.eq("0000-0002-9029-1854"), ArgumentMatchers.any()))
                     .thenAnswer(new Answer<InputStream>() {
                         public InputStream answer(InvocationOnMock invocation) {
                             return getClass().getResourceAsStream("orcid-person-record.xml");
