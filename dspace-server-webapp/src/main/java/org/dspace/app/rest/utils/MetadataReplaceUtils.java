@@ -55,7 +55,7 @@ public class MetadataReplaceUtils {
         String language = propertyOfMd == null || "language".equals(propertyOfMd)
             ? newMdv.getLanguage()
             : existingMdv.getLanguage();
-        final var value = propertyOfMd == null || "value".equals(propertyOfMd)
+        String value = propertyOfMd == null || "value".equals(propertyOfMd)
             ? newMdv.getValue()
             : existingMdv.getValue();
 
