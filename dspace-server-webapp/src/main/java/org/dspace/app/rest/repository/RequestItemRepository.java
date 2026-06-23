@@ -286,7 +286,8 @@ public class RequestItemRepository
         String message = null;
         if (responseMessageNode != null && !responseMessageNode.isNull()) {
             message = responseMessageNode.asText();
-            // Strip length of message to a maximum of request.item.email.message.maxlength characters to avoid excessively long emails
+            // Strip length of message to a maximum of request.item.email.message.maxlength characters to avoid
+            // excessively long emails
             int maxLength = configurationService.getIntProperty("request.item.email.message.maxlength", 1000);
             if (message.length() > maxLength) {
                 message = message.substring(0, maxLength);

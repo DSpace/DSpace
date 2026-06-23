@@ -903,7 +903,7 @@ public class RequestItemRepositoryIT
 
     @Test
     public void testFindByAccessTokenWithTooLongToken() throws Exception {
-        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=" + "t".repeat(49); // maximum token length is 48 characters
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=" + "t".repeat(49); // max token length is 48
         getClient().perform(get(uri))
                    .andExpect(status().isBadRequest());
     }
