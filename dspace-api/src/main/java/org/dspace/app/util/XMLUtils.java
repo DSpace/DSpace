@@ -9,16 +9,25 @@ package org.dspace.app.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.input.SAXBuilder;
@@ -365,5 +374,141 @@ public class XMLUtils {
         }
     }
 
+    /**
+     * Initialize and return the javax TransformerFactory with some basic security
+     * applied to avoid XXE attacks and other unwanted content inclusion
+     * @return transformer factory to generate new transformers
+     * @throws TransformerConfigurationException
+     */
+    public static TransformerFactory getTransformerFactory() throws TransformerConfigurationException {
+        TransformerFactory factory = TransformerFactory.newInstance();
 
+        // Process XML securely
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        // No external DTDs or Stylesheets
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+        return factory;
+    }
+
+    /**
+     * Initialize and return the javax TransformerFactory with less security applied.  This is intended only for
+     * internal or configuration use where external stylesheets and other dangerous features are purposefully
+     * included, but are only allowed from specific paths, e.g. ${dspace.dir}/config or some other path specified
+     * by the java caller.
+     * <p>
+     * If no allowedPaths are passed, then all external stylesheets are rejected.
+     * @param allowedBasePaths path(s) where all stylesheets should be located. Only these path will be "trusted"
+     *                         for externally referenced stylesheets.
+     * @return TransformerFactory that allows references to external stylesheets but only for the given base Paths.
+     * @throws TransformerConfigurationException
+     */
+    public static TransformerFactory getTrustedTransformerFactory(String... allowedBasePaths)
+        throws TransformerConfigurationException {
+        // Initialize a default trusted TransformerFactory by specifying "null" as the factoryClassName
+        return getTrustedTransformerFactory(null, allowedBasePaths);
+    }
+
+    /**
+     * Initialize and return the javax TransformerFactory with less security applied.  This is intended only for
+     * internal or configuration use where external stylesheets and other dangerous features are purposefully
+     * included, but are only allowed from specific paths, e.g. ${dspace.dir}/config or some other path specified
+     * by the java caller.
+     * <p>
+     * If no allowedPaths are passed, then all external stylesheets are rejected.
+     * @param factoryClassName optional factory class to use to initialize TransformerFactory. If `null` a default
+     *                         TransformerFactory will be initialized
+     * @param allowedBasePaths path(s) where all stylesheets should be located. Only these path will be "trusted"
+     *                         for externally referenced stylesheets.
+     * @return TransformerFactory that allows references to external stylesheets but only for the given base Paths.
+     * @throws TransformerConfigurationException
+     */
+    public static TransformerFactory getTrustedTransformerFactory(String factoryClassName, String... allowedBasePaths)
+        throws TransformerConfigurationException {
+        // If not null, use the passed in factoryClassName. Otherwise, initialize a default TransformerFactory
+        TransformerFactory factory = factoryClassName != null ?
+            TransformerFactory.newInstance(factoryClassName, null) : TransformerFactory.newInstance();
+
+        // Process XML securely
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        // No external DTDs
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+
+        // NOTE: We cannot disable XMLConstants.ACCESS_EXTERNAL_STYLESHEETS because OAI-PMH references some external
+        // stylesheets during XOAI transformations. Therefore, we set a custom URIResolver to ensure all external
+        // stylesheets come from trusted directories.
+        factory.setURIResolver(new PathRestrictedURIResolver(allowedBasePaths));
+
+        return factory;
+    }
+
+
+    /**
+     * This URIResolver accepts one or more path strings in its
+     * constructor and throws a TransformerException if the entity systemID
+     * is not within the allowed path (or a subdirectory).
+     * If no parameters are passed, then this effectively disallows
+     * any external entity resolution.
+     */
+    public static class PathRestrictedURIResolver implements URIResolver {
+
+        private final List<String> allowedBasePaths;
+
+        public PathRestrictedURIResolver(String... allowedBasePaths) {
+            this.allowedBasePaths = Arrays.asList(allowedBasePaths);
+        }
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            final URI uri;
+            // Base path is optional, as the "href" might already be an absolute path
+            if (base == null || base.isEmpty()) {
+                uri = URI.create(href);
+            } else {
+                uri = URI.create(base).resolve(href);
+            }
+
+            // Only allow for "file" scheme or empty scheme
+            String scheme = uri.getScheme();
+            if (scheme != null && !"file".equalsIgnoreCase(scheme)) {
+                throw new TransformerException("External resources not allowed: " + uri +
+                                           ". Only local file paths are permitted.");
+            }
+
+            Path resolvedPath;
+            try {
+                // Resolve to an absolute path
+                resolvedPath = Paths.get(uri).toAbsolutePath().normalize();
+            } catch (Exception e) {
+                throw new TransformerException("Invalid path: " + uri, e);
+            }
+
+            boolean isAllowed = false;
+            for (String basePath : allowedBasePaths) {
+                Path allowedPath = Paths.get(basePath).toAbsolutePath().normalize();
+                if (resolvedPath.startsWith(allowedPath)) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+
+            if (!isAllowed) {
+                throw new TransformerException("Access denied to path: " + resolvedPath);
+            }
+
+            File file = resolvedPath.toFile();
+            if (!file.exists() || !file.canRead()) {
+                throw new TransformerException("File not found or not readable: " + resolvedPath);
+            }
+
+            try {
+                return new StreamSource(new FileInputStream(file));
+            } catch (FileNotFoundException e) {
+                throw new TransformerException("Unable to stream file at: " + resolvedPath);
+            }
+        }
+    }
 }
