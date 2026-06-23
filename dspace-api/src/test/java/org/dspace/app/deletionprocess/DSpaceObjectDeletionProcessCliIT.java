@@ -12,10 +12,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.InputStream;
 import java.util.List;
@@ -47,8 +47,8 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link org.dspace.deletion.process.DSpaceObjectDeletionProcessCli}.
@@ -80,7 +80,7 @@ public class DSpaceObjectDeletionProcessCliIT extends AbstractIntegrationTestWit
     private EPerson itemAdmin;
     private EPerson regularUser;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -516,8 +516,8 @@ public class DSpaceObjectDeletionProcessCliIT extends AbstractIntegrationTestWit
         List<MetadataValue> physicalAuthorMetadata = itemService.getMetadata(
             publicationItem, "dc", "contributor", "author", Item.ANY, false
         );
-        assertTrue("Publication should have NO physical dc.contributor.author metadata initially",
-                   physicalAuthorMetadata.isEmpty());
+        assertTrue(physicalAuthorMetadata.isEmpty(),
+            "Publication should have NO physical dc.contributor.author metadata initially");
         context.restoreAuthSystemState();
 
         // Delete person item with -c all option
@@ -539,12 +539,12 @@ public class DSpaceObjectDeletionProcessCliIT extends AbstractIntegrationTestWit
         List<MetadataValue> physicalAuthorMetadataAfter = itemService.getMetadata(
             publicationItem, "dc", "contributor", "author", Item.ANY, false
         );
-        assertFalse("Publication should have physical dc.contributor.author metadata after deletion with -c all",
-                    physicalAuthorMetadataAfter.isEmpty());
-        assertEquals("Physical metadata should contain the copied author name", 1, physicalAuthorMetadataAfter.size());
+        assertFalse(physicalAuthorMetadataAfter.isEmpty(),
+            "Publication should have physical dc.contributor.author metadata after deletion with -c all");
+        assertEquals(1, physicalAuthorMetadataAfter.size(), "Physical metadata should contain the copied author name");
         String authorValue = physicalAuthorMetadataAfter.get(0).getValue();
-        assertTrue("Author metadata should contain 'Smith'", authorValue.contains("Smith"));
-        assertTrue("Author metadata should contain 'John'", authorValue.contains("John"));
+        assertTrue(authorValue.contains("Smith"), "Author metadata should contain 'Smith'");
+        assertTrue(authorValue.contains("John"), "Author metadata should contain 'John'");
         context.restoreAuthSystemState();
     }
 
@@ -635,16 +635,16 @@ public class DSpaceObjectDeletionProcessCliIT extends AbstractIntegrationTestWit
         List<MetadataValue> personPhysicalMetadata = itemService.getMetadata(
             personItem, "relation", "isPublicationOfAuthor", null, Item.ANY, false
         );
-        assertTrue("Person should have NO physical relation.isPublicationOfAuthor metadata initially",
-                   personPhysicalMetadata.isEmpty());
+        assertTrue(personPhysicalMetadata.isEmpty(),
+            "Person should have NO physical relation.isPublicationOfAuthor metadata initially");
 
         // Check that project has NO physical relation.isPublicationOfProject metadata
         projectItem = context.reloadEntity(projectItem);
         List<MetadataValue> projectPhysicalMetadata = itemService.getMetadata(
             projectItem, "relation", "isPublicationOfProject", null, Item.ANY, false
         );
-        assertTrue("Project should have NO physical relation.isPublicationOfProject metadata initially",
-                   projectPhysicalMetadata.isEmpty());
+        assertTrue(projectPhysicalMetadata.isEmpty(),
+            "Project should have NO physical relation.isPublicationOfProject metadata initially");
         context.restoreAuthSystemState();
 
         // Delete publication item with -c configured option
@@ -662,22 +662,21 @@ public class DSpaceObjectDeletionProcessCliIT extends AbstractIntegrationTestWit
         List<MetadataValue> personPhysicalMetadataAfter = itemService.getMetadata(
             personItem, "relation", "isPublicationOfAuthor", null, Item.ANY, false
         );
-        assertFalse("Person should have physical relation.isPublicationOfAuthor metadata after deletion with " +
-                        "-c configured (copyToRight=true)",
-                    personPhysicalMetadataAfter.isEmpty());
-        assertEquals("Person should have one relation metadata value", 1, personPhysicalMetadataAfter.size());
-        assertEquals("Person metadata should reference the deleted publication UUID",
-                     publicationItem.getID().toString(),
-                     personPhysicalMetadataAfter.get(0).getValue());
+        assertFalse(personPhysicalMetadataAfter.isEmpty(),
+            "Person should have physical relation.isPublicationOfAuthor metadata after deletion with " +
+                        "-c configured (copyToRight=true)");
+        assertEquals(1, personPhysicalMetadataAfter.size(), "Person should have one relation metadata value");
+        assertEquals(publicationItem.getID().toString(), personPhysicalMetadataAfter.get(0).getValue(),
+            "Person metadata should reference the deleted publication UUID");
 
         // Check that project STILL HAS NO physical relation.isPublicationOfProject metadata (copyToRight=false)
         projectItem = context.reloadEntity(projectItem);
         List<MetadataValue> projectPhysicalMetadataAfter = itemService.getMetadata(
             projectItem, "relation", "isPublicationOfProject", null, Item.ANY, false
         );
-        assertTrue("Project should NOT have physical relation.isPublicationOfProject metadata after deletion " +
-                       "with -c configured (copyToRight=false)",
-                   projectPhysicalMetadataAfter.isEmpty());
+        assertTrue(projectPhysicalMetadataAfter.isEmpty(),
+            "Project should NOT have physical relation.isPublicationOfProject metadata after deletion " +
+                       "with -c configured (copyToRight=false)");
         context.restoreAuthSystemState();
     }
 
@@ -780,24 +779,24 @@ public class DSpaceObjectDeletionProcessCliIT extends AbstractIntegrationTestWit
         List<MetadataValue> personPhysicalMetadata = itemService.getMetadata(
             personItem, "relation", "isPublicationOfAuthor", null, Item.ANY, false
         );
-        assertTrue("Person should have NO physical relation.isPublicationOfAuthor metadata initially",
-                   personPhysicalMetadata.isEmpty());
+        assertTrue(personPhysicalMetadata.isEmpty(),
+            "Person should have NO physical relation.isPublicationOfAuthor metadata initially");
 
         // Check that project has NO physical relation.isPublicationOfProject metadata
         projectItem = context.reloadEntity(projectItem);
         List<MetadataValue> projectPhysicalMetadata = itemService.getMetadata(
             projectItem, "relation", "isPublicationOfProject", null, Item.ANY, false
         );
-        assertTrue("Project should have NO physical relation.isPublicationOfProject metadata initially",
-                   projectPhysicalMetadata.isEmpty());
+        assertTrue(projectPhysicalMetadata.isEmpty(),
+            "Project should have NO physical relation.isPublicationOfProject metadata initially");
 
         // Check that orgUnit has NO physical relation.isPublicationOfOrgUnit metadata
         orgUnitItem = context.reloadEntity(orgUnitItem);
         List<MetadataValue> orgUnitPhysicalMetadata = itemService.getMetadata(
             orgUnitItem, "relation", "isPublicationOfOrgUnit", null, Item.ANY, false
         );
-        assertTrue("OrgUnit should have NO physical relation.isPublicationOfOrgUnit metadata initially",
-                   orgUnitPhysicalMetadata.isEmpty());
+        assertTrue(orgUnitPhysicalMetadata.isEmpty(),
+            "OrgUnit should have NO physical relation.isPublicationOfOrgUnit metadata initially");
         context.restoreAuthSystemState();
 
         // Delete publication item with -c specifying only Person and OrgUnit relationship type IDs
@@ -817,35 +816,33 @@ public class DSpaceObjectDeletionProcessCliIT extends AbstractIntegrationTestWit
         List<MetadataValue> personPhysicalMetadataAfter = itemService.getMetadata(
             personItem, "relation", "isPublicationOfAuthor", null, Item.ANY, false
         );
-        assertFalse("Person should have physical relation.isPublicationOfAuthor metadata after deletion " +
-                        "with -c using its relationship type ID",
-                    personPhysicalMetadataAfter.isEmpty());
-        assertEquals("Person should have one relation metadata value", 1, personPhysicalMetadataAfter.size());
-        assertEquals("Person metadata should reference the deleted publication UUID",
-                     publicationItem.getID().toString(),
-                     personPhysicalMetadataAfter.get(0).getValue());
+        assertFalse(personPhysicalMetadataAfter.isEmpty(),
+            "Person should have physical relation.isPublicationOfAuthor metadata after deletion " +
+                        "with -c using its relationship type ID");
+        assertEquals(1, personPhysicalMetadataAfter.size(), "Person should have one relation metadata value");
+        assertEquals(publicationItem.getID().toString(), personPhysicalMetadataAfter.get(0).getValue(),
+            "Person metadata should reference the deleted publication UUID");
 
         // Check that orgUnit NOW HAS physical relation.isPublicationOfOrgUnit metadata (ID was specified)
         orgUnitItem = context.reloadEntity(orgUnitItem);
         List<MetadataValue> orgUnitPhysicalMetadataAfter = itemService.getMetadata(
             orgUnitItem, "relation", "isPublicationOfOrgUnit", null, Item.ANY, false
         );
-        assertFalse("OrgUnit should have physical relation.isPublicationOfOrgUnit metadata after deletion " +
-                        "with -c using its relationship type ID",
-                    orgUnitPhysicalMetadataAfter.isEmpty());
-        assertEquals("OrgUnit should have one relation metadata value", 1, orgUnitPhysicalMetadataAfter.size());
-        assertEquals("OrgUnit metadata should reference the deleted publication UUID",
-                     publicationItem.getID().toString(),
-                     orgUnitPhysicalMetadataAfter.get(0).getValue());
+        assertFalse(orgUnitPhysicalMetadataAfter.isEmpty(),
+            "OrgUnit should have physical relation.isPublicationOfOrgUnit metadata after deletion " +
+                        "with -c using its relationship type ID");
+        assertEquals(1, orgUnitPhysicalMetadataAfter.size(), "OrgUnit should have one relation metadata value");
+        assertEquals(publicationItem.getID().toString(), orgUnitPhysicalMetadataAfter.get(0).getValue(),
+            "OrgUnit metadata should reference the deleted publication UUID");
 
         // Check that project STILL HAS NO physical relation.isPublicationOfProject metadata (ID was NOT specified)
         projectItem = context.reloadEntity(projectItem);
         List<MetadataValue> projectPhysicalMetadataAfter = itemService.getMetadata(
             projectItem, "relation", "isPublicationOfProject", null, Item.ANY, false
         );
-        assertTrue("Project should NOT have physical relation.isPublicationOfProject metadata after deletion " +
-                       "because its relationship type ID was not included in -c parameter",
-                   projectPhysicalMetadataAfter.isEmpty());
+        assertTrue(projectPhysicalMetadataAfter.isEmpty(),
+            "Project should NOT have physical relation.isPublicationOfProject metadata after deletion " +
+                       "because its relationship type ID was not included in -c parameter");
         context.restoreAuthSystemState();
     }
 

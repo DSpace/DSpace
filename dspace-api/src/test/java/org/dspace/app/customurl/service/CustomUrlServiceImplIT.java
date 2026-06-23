@@ -134,7 +134,8 @@ public class CustomUrlServiceImplIT extends AbstractIntegrationTestWithDatabase 
     public void testGenerateUniqueCustomUrl_ThrowsExceptionOnPureNonLatin() {
         // This string contains ONLY Cyrillic characters
         // After normalization, all non-Latin characters are stripped, resulting in empty string
-        customUrlService.generateUniqueCustomUrl(context, "Тестовая статья");
+        assertThrows(IllegalArgumentException.class, () ->
+            customUrlService.generateUniqueCustomUrl(context, "Тестовая статья"));
     }
 
     @Test

@@ -139,25 +139,25 @@ public class SubmissionConfigIT extends AbstractIntegrationTestWithDatabase {
         // Test Case 1: Metadata should override handle mapping
         SubmissionConfig config1 = submissionConfigService.getSubmissionConfigByCollection(
             colWithMetadataOverridesHandle);
-        assertEquals("Metadata should override handle mapping",
-                     "modeC", config1.getSubmissionName());
+        assertEquals("modeC", config1.getSubmissionName(),
+                     "Metadata should override handle mapping");
 
         // Test Case 2: Metadata should override entity type mapping
         SubmissionConfig config2 = submissionConfigService.getSubmissionConfigByCollection(
             colWithMetadataOverridesEntityType);
-        assertEquals("Metadata should override entity type mapping",
-                     "funding", config2.getSubmissionName());
+        assertEquals("funding", config2.getSubmissionName(),
+                     "Metadata should override entity type mapping");
 
         // Test Case 3: Metadata should override community mapping
         SubmissionConfig config3 = submissionConfigService.getSubmissionConfigByCollection(
             colWithMetadataOverridesCommunity);
-        assertEquals("Metadata should override community mapping",
-                     "orgunit", config3.getSubmissionName());
+        assertEquals("orgunit", config3.getSubmissionName(),
+                     "Metadata should override community mapping");
 
         // Test Case 4: Without metadata, should fall back to entity type mapping
         SubmissionConfig config4 = submissionConfigService.getSubmissionConfigByCollection(colWithoutMetadata);
-        assertEquals("Without metadata, should use entity type mapping",
-                     "entitytypetest", config4.getSubmissionName());
+        assertEquals("entitytypetest", config4.getSubmissionName(),
+                     "Without metadata, should use entity type mapping");
     }
 
     @Test
@@ -196,14 +196,14 @@ public class SubmissionConfigIT extends AbstractIntegrationTestWithDatabase {
         // Test Case 1: Should fall back to handle mapping when metadata value is invalid
         SubmissionConfig config1 = submissionConfigService.getSubmissionConfigByCollection(
             colWithInvalidMetadataHasHandle);
-        assertEquals("Invalid metadata should fall back to handle mapping",
-                     "collectiontest", config1.getSubmissionName());
+        assertEquals("collectiontest", config1.getSubmissionName(),
+                     "Invalid metadata should fall back to handle mapping");
 
         // Test Case 2: Should fall back to entity type mapping when metadata is invalid and no handle mapping
         SubmissionConfig config2 = submissionConfigService.getSubmissionConfigByCollection(
             colWithInvalidMetadataHasEntityType);
-        assertEquals("Invalid metadata should fall back to entity type mapping",
-                     "entitytypetest", config2.getSubmissionName());
+        assertEquals("entitytypetest", config2.getSubmissionName(),
+                     "Invalid metadata should fall back to entity type mapping");
     }
 
     @Test
@@ -242,7 +242,7 @@ public class SubmissionConfigIT extends AbstractIntegrationTestWithDatabase {
         // - entity type: "CustomEntityType" -> "entitytypetest"
         // - subcommunity: "123456789/subcommunity-test" -> "subcommunitytest"
         SubmissionConfig config = submissionConfigService.getSubmissionConfigByCollection(colWithAllMappings);
-        assertEquals("dspace.submission.definition metadata should have highest priority",
-                     "patent", config.getSubmissionName());
+        assertEquals("patent", config.getSubmissionName(),
+                     "dspace.submission.definition metadata should have highest priority");
     }
 }
