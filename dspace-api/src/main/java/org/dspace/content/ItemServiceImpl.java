@@ -1759,10 +1759,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Build up list of matching values based on the cache
         List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : item.getCachedMetadata()) {
-            if (match(schema, element, qualifier, lang, dcv)) {
+            if (match(schema, element, qualifier, Item.ANY, dcv)) {
                 values.add(dcv);
             }
         }
+
+        // Apply language filtering (matches a specific locale while always retaining
+        // language-neutral / null-language values), consistent with main.
+        values = getFilteredMetadataValuesByLanguage(values, lang);
 
         // Create an array of matching values
         return values;

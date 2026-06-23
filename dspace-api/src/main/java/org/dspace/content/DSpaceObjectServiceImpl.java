@@ -129,10 +129,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         // Build up list of matching values
         List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : dso.getMetadata()) {
-            if (match(schema, element, qualifier, lang, dcv)) {
+            if (match(schema, element, qualifier, Item.ANY, dcv)) {
                 values.add(dcv);
             }
         }
+
+        // Apply language filtering (matches a specific locale while always retaining
+        // language-neutral / null-language values), consistent with main.
+        values = getFilteredMetadataValuesByLanguage(values, lang);
 
         // Sort the metadataValues if they have been modified,
         // is used to preserve the default order.
