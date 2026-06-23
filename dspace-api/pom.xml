@@ -369,7 +369,7 @@
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>3.0.3</version>
+            <version>${jackson.version}</version>
         </dependency>
         <!-- Jackson 2 annotations - required for Jackson 3 backwards compatibility -->
         <dependency>
@@ -581,7 +581,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.6</version>
+            <version>5.6.1</version>
         </dependency>
 
         <!-- SolrJ is used to communicate with Solr throughout the dspace-api -->

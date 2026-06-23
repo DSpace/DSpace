@@ -553,7 +553,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.6</version>
+            <version>5.6.1</version>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -562,7 +562,7 @@
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-   <version>3.0.3</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
@@ -621,13 +621,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- Required for ITs to ensure they use Apache HttpClient in AbstractWebClientIntegrationTest -->
-        <dependency>
-            <groupId>org.apache.httpcomponents.client5</groupId>
-            <artifactId>httpclient5</artifactId>
-            <version>5.6.1</version>
             <scope>test</scope>
         </dependency>
         <!-- Required by Spring Boot 4's TransactionAutoConfiguration (AspectJ mode) -->

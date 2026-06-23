@@ -19,10 +19,10 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>21</java.version>
-        <spring.version>7.0.6</spring.version>
+        <spring.version>7.0.8</spring.version>
         <spring-ldap.version>4.0.2</spring-ldap.version>
-        <spring-boot.version>4.0.4</spring-boot.version>
-        <spring-security.version>7.0.4</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring-boot.version>4.1.0</spring-boot.version>
+        <spring-security.version>7.1.0</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>7.2.7.Final</hibernate.version>
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
         <expressly.version>6.0.0</expressly.version>
@@ -31,7 +31,7 @@
         <solr.client.version>10.0.0</solr.client.version>
         <lucene.version>10.3.2</lucene.version>
         <!-- ZooKeeper version matching Solr 10.0.0 -->
-        <zookeeper.version>3.9.4</zookeeper.version>
+        <zookeeper.version>3.9.5</zookeeper.version>
 
         <ehcache.version>3.12.0</ehcache.version>
         <errorprone.version>2.49.0</errorprone.version>
@@ -43,7 +43,7 @@
         <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>12.0.31</jetty.version>
+        <jetty.version>12.1.10</jetty.version>
         <log4j.version>2.26.0</log4j.version>
         <pdfbox-version>3.0.6</pdfbox-version>
         <rome.version>1.19.0</rome.version>
@@ -53,7 +53,7 @@
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <!-- WARNING: BouncyCastle is also required by the maven-gpg-plugin to sign code during release. Do not update
              unless the new BouncyCastle version is compatible both with tika-parsers and maven-gpg-plugin. -->
-        <bouncycastle.version>1.81</bouncycastle.version>
+        <bouncycastle.version>1.84</bouncycastle.version>
         <asm.version>9.10.1</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
         <jersey.version>3.1.11</jersey.version>
@@ -1081,6 +1081,19 @@
     -->
     <dependencyManagement>
         <dependencies>
+            <!-- Pin Micrometer to the higher version to resolve a convergence conflict from the Spring upgrades:
+                 Spring Security 7.1.0 pulls micrometer 1.17.0 while Spring Framework 7.0.8 pulls 1.16.6. Micrometer
+                 is backward-compatible within a minor line, so pin to 1.17.0. -->
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-observation</artifactId>
+                <version>1.17.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-commons</artifactId>
+                <version>1.17.0</version>
+            </dependency>
             <!-- Pin Thymeleaf to the version required by dspace-api (frontpage generation).
                  Spring Boot 4's spring-boot-starter-thymeleaf pulls an older Thymeleaf (via
                  thymeleaf-spring6), which otherwise breaks dependency convergence. The Spring
