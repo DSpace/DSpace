@@ -7,7 +7,7 @@
  */
 package org.dspace.external;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -23,7 +23,7 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.dspace.app.client.DSpaceHttpClientFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
@@ -34,6 +34,7 @@ public class OpenAIRERestConnectorTest {
     public void searchProjectByKeywords() throws IOException {
         try (InputStream is = this.getClass().getResourceAsStream("openaire-projects.xml");
                MockWebServer mockServer = new MockWebServer()) {
+            mockServer.start();
             String projects = new String(is.readAllBytes(), StandardCharsets.UTF_8)
                     .replaceAll("( mushroom)", "( DEADBEEF)");
             mockServer.enqueue(new MockResponse.Builder().code(200).body(projects).build());
@@ -53,8 +54,8 @@ public class OpenAIRERestConnectorTest {
                 OpenaireRestConnector connector = new OpenaireRestConnector(mockServer.url("").toString());
                 Response response = connector.searchProjectByKeywords(0, 10, "keyword");
                 // Basically check it doesn't throw UnmarshallerException and that we are getting our mocked response
-                assertTrue("Expected the query to contain the replaced keyword",
-                        response.getHeader().getQuery().contains("DEADBEEF"));
+                assertTrue(response.getHeader().getQuery().contains("DEADBEEF"),
+                    "Expected the query to contain the replaced keyword");
             }
         }
     }

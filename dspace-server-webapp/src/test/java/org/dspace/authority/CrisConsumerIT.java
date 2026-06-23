@@ -69,6 +69,7 @@ import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -161,6 +162,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         poolTaskService.findAll(context).forEach(this::deletePoolTask);

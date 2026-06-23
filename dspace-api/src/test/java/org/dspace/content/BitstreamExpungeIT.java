@@ -7,10 +7,10 @@
  */
 package org.dspace.content;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -31,8 +31,8 @@ import org.dspace.builder.RequestItemBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link BitstreamServiceImpl#expunge}.
@@ -56,7 +56,7 @@ public class BitstreamExpungeIT extends AbstractIntegrationTestWithDatabase {
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).build();
@@ -83,13 +83,12 @@ public class BitstreamExpungeIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
 
         bitstream = bitstreamService.find(context, bitstreamId);
-        assertTrue("Bitstream should be marked as deleted", bitstream.isDeleted());
+        assertTrue(bitstream.isDeleted(), "Bitstream should be marked as deleted");
 
         bitstreamService.expunge(context, bitstream);
         context.commit();
 
-        assertNull("Bitstream should not exist after expunge",
-            bitstreamService.find(context, bitstreamId));
+        assertNull(bitstreamService.find(context, bitstreamId), "Bitstream should not exist after expunge");
 
         context.restoreAuthSystemState();
     }
@@ -119,18 +118,16 @@ public class BitstreamExpungeIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
 
         bitstream = bitstreamService.find(context, bitstreamId);
-        assertEquals("Bundle association should still exist before expunge",
-            1, bitstream.getBundles().size());
+        assertEquals(1, bitstream.getBundles().size(), "Bundle association should still exist before expunge");
 
         bitstreamService.expunge(context, bitstream);
         context.commit();
 
-        assertNull("Bitstream should be removed after expunge",
-            bitstreamService.find(context, bitstreamId));
+        assertNull(bitstreamService.find(context, bitstreamId), "Bitstream should be removed after expunge");
 
         Bundle bundle = bundleService.find(context, bundleId);
-        assertFalse("Bundle should no longer reference the bitstream",
-            bundle.getBitstreams().stream().anyMatch(b -> b.getID().equals(bitstreamId)));
+        assertFalse(bundle.getBitstreams().stream().anyMatch(b -> b.getID().equals(bitstreamId)),
+            "Bundle should no longer reference the bitstream");
 
         context.restoreAuthSystemState();
     }
@@ -166,10 +163,9 @@ public class BitstreamExpungeIT extends AbstractIntegrationTestWithDatabase {
         bitstreamService.expunge(context, bitstream);
         context.commit();
 
-        assertNull("Bitstream should be removed after expunge",
-            bitstreamService.find(context, bitstreamId));
-        assertNull("Bundle should no longer have a primary bitstream",
-            bundleService.find(context, bundleId).getPrimaryBitstream());
+        assertNull(bitstreamService.find(context, bitstreamId), "Bitstream should be removed after expunge");
+        assertNull(bundleService.find(context, bundleId).getPrimaryBitstream(),
+            "Bundle should no longer have a primary bitstream");
 
         context.restoreAuthSystemState();
     }
@@ -196,16 +192,15 @@ public class BitstreamExpungeIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
 
         Iterator<RequestItem> before = requestItemService.findByBitstreamId(context, bitstreamId);
-        assertTrue("RequestItem should exist before expunge", before.hasNext());
+        assertTrue(before.hasNext(), "RequestItem should exist before expunge");
 
         bitstream = bitstreamService.find(context, bitstreamId);
         bitstreamService.expunge(context, bitstream);
         context.commit();
 
-        assertNull("Bitstream should be removed after expunge",
-            bitstreamService.find(context, bitstreamId));
-        assertFalse("RequestItem should be removed after expunge",
-            requestItemService.findByBitstreamId(context, bitstreamId).hasNext());
+        assertNull(bitstreamService.find(context, bitstreamId), "Bitstream should be removed after expunge");
+        assertFalse(requestItemService.findByBitstreamId(context, bitstreamId).hasNext(),
+            "RequestItem should be removed after expunge");
 
         context.restoreAuthSystemState();
     }
@@ -224,8 +219,8 @@ public class BitstreamExpungeIT extends AbstractIntegrationTestWithDatabase {
             .build();
         UUID bitstreamId = bitstream.getID();
 
-        assertFalse("Bitstream should have inherited policies",
-            authorizeService.getPolicies(context, bitstream).isEmpty());
+        assertFalse(authorizeService.getPolicies(context, bitstream).isEmpty(),
+            "Bitstream should have inherited policies");
 
         bitstream.setDeleted(true);
         bitstreamService.update(context, bitstream);
@@ -235,8 +230,7 @@ public class BitstreamExpungeIT extends AbstractIntegrationTestWithDatabase {
         bitstreamService.expunge(context, bitstream);
         context.commit();
 
-        assertNull("Bitstream should be removed after expunge",
-            bitstreamService.find(context, bitstreamId));
+        assertNull(bitstreamService.find(context, bitstreamId), "Bitstream should be removed after expunge");
 
         context.restoreAuthSystemState();
     }

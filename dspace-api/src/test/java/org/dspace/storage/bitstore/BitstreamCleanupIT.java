@@ -31,6 +31,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -71,6 +72,7 @@ public class BitstreamCleanupIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
     }
 
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         super.destroy();
