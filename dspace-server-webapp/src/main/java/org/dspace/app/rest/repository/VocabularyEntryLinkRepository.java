@@ -51,7 +51,7 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("@vocabularySecurity.isVocabularyPublic(#name) || hasAuthority('AUTHENTICATED')")
     public Page<VocabularyEntryRest> filter(@Nullable HttpServletRequest request, String name,
                                           @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();
