@@ -15,10 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,6 +43,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import jakarta.mail.Message;
+import jakarta.mail.Transport;
 import jakarta.servlet.http.Cookie;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -70,9 +69,7 @@ import org.dspace.services.ConfigurationService;
 import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -118,21 +115,12 @@ public class RequestItemRepositoryIT
 
     private Map<String, Object> altchaPayload;
 
-    private static MockedStatic<Email> emailMockedStatic;
+    private static MockedStatic<Transport> transportMock;
 
     @After
     public void tearDown() {
         configurationService.setProperty("captcha.provider", "google");
-    }
-
-    @BeforeClass
-    public static void initClass() throws Exception {
-        emailMockedStatic = Mockito.mockStatic(Email.class);
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        emailMockedStatic.close();
+        transportMock.close();
     }
 
     @Before
@@ -177,6 +165,9 @@ public class RequestItemRepositoryIT
         configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
 
         context.restoreAuthSystemState();
+
+        transportMock = Mockito.mockStatic(Transport.class);
+        transportMock.when(() -> Transport.send(Mockito.any(Message.class))).thenAnswer(inv -> null);
     }
 
     /**
@@ -429,6 +420,90 @@ public class RequestItemRepositoryIT
                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void testCreateAndReturnWithInvalidBitstreamId() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId("1".repeat(33));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidItemId() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId("2".repeat(33));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidEmailAddress() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(65 - hostPart.length()) + hostPart);
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidRequesterMessage() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(64 - hostPart.length()) + hostPart);
+        rir.setRequestMessage("m".repeat(1001));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidRequesterName() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(64 - hostPart.length()) + hostPart);
+        rir.setRequestMessage("m".repeat(1000));
+        rir.setRequestName("n".repeat(65));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithValidMaximumPayload() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(64 - hostPart.length()) + hostPart);
+        rir.setRequestMessage("m".repeat(1000));
+        rir.setRequestName("n".repeat(64));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+    }
+
     /**
      * Verify that Spring Security's CSRF protection is working as we expect.
      * We must test this using a simple non-GET request, as CSRF Tokens are not
@@ -529,10 +604,6 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
-        Email emailSpy = Mockito.spy(Email.class);
-        doNothing().when(emailSpy).send();
-        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
-
         // Create the HTTP request body.
         Map<String, String> parameters = Map.of(
                 "acceptRequest", "true",
@@ -567,10 +638,6 @@ public class RequestItemRepositoryIT
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
-
-        Email emailSpy = Mockito.spy(Email.class);
-        doNothing().when(emailSpy).send();
-        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
 
         Map<String, String> parameters;
         String content;
@@ -716,10 +783,6 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
-        Email emailSpy = Mockito.spy(Email.class);
-        doNothing().when(emailSpy).send();
-        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
-
         Map<String, String> parameters = Map.of(
                 "acceptRequest", "true",
                 "subject", "s".repeat(200), // maximum subject length is 200 characters
@@ -739,11 +802,11 @@ public class RequestItemRepositoryIT
     public void testPutWithTooLongSubjectAndTooLongResponseMessage() throws Exception {
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
+                .withAccessToken("12345")
                 .build();
 
-        Email emailSpy = Mockito.spy(Email.class);
-        doNothing().when(emailSpy).send();
-        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
+        ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
+        transportMock.when(() -> Transport.send(messageCaptor.capture())).thenAnswer(inv -> null);
 
         Map<String, String> parameters = Map.of(
                 "acceptRequest", "true",
@@ -759,15 +822,13 @@ public class RequestItemRepositoryIT
                 .content(content))
                 .andExpect(status().isOk());
 
-        ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
-        verify(emailSpy).setSubject(subjectCaptor.capture());
-        assertEquals(200, subjectCaptor.getValue().length());
+        Message message = messageCaptor.getValue();
 
-        ArgumentCaptor<Object> argumentCaptor = ArgumentCaptor.forClass(Object.class);
-        verify(emailSpy, atLeastOnce()).addArgument(argumentCaptor.capture());
-        List<Object> args = argumentCaptor.getAllValues();
-        assertEquals(6, args.size());
-        assertEquals("m".repeat(1000), args.get(5));
+        assertEquals(200, message.getSubject().length());
+
+        String messageBody = message.getContent().toString();
+        assertTrue(messageBody.contains("m".repeat(1000)));
+        assertFalse(messageBody.contains("m".repeat(1001)));
     }
 
     /**
