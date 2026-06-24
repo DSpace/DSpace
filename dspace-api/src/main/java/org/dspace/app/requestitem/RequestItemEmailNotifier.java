@@ -88,8 +88,9 @@ public class RequestItemEmailNotifier {
                 .getRequestItemAuthor(context, ri.getItem());
 
         // Build an email to the approver.
-        Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
-                "request_item.author"));
+        String emailTemplateFilename = I18nUtil.getEmailFilename(context.getCurrentLocale(),
+                "request_item.author");
+        Email email = Email.getEmail(emailTemplateFilename);
 
         setRequestRecipients(ri, authors, email);
 
@@ -231,7 +232,7 @@ public class RequestItemEmailNotifier {
         email.addArgument(ri.getItem().getName()); // {2} title of the requested Item
         email.addArgument(grantorName);     // {3} name of the grantor
         email.addArgument(grantorAddress);  // {4} email of the grantor
-        email.addArgument(message); //         {5} grantor's optional message
+        email.addArgument(message);         // {5} grantor's optional message
         email.setSubject(subject);
         email.addRecipient(ri.getReqEmail());
         // Attach bitstreams.
