@@ -278,4 +278,46 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         }
     }
 
+    protected WorkflowItemBuilder addMetadataValue(final String schema, final String element, final String qualifier,
+                                                   final String language, final String value) {
+        try {
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, language, value);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
+    protected WorkflowItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
+                                                   String value, String authority, int confidence) {
+        try {
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, language,
+                                    value, authority, confidence);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
+    public WorkflowItemBuilder withTitleForLanguage(final String title, final String language) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "title", null, language, title);
+    }
+
+    public WorkflowItemBuilder withSubjectForLanguage(final String subject, final String language) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, language, subject);
+    }
+
+    public WorkflowItemBuilder withAuthor(String authorName, String authority) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", null, authorName, authority,
+                                600);
+    }
+
+    public WorkflowItemBuilder withAuthorAffiliation(final String affilation) {
+        return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
+    }
+
+    public WorkflowItemBuilder withEntityType(String entityType) {
+        return addMetadataValue("dspace", "entity", "type", entityType);
+    }
+
 }
