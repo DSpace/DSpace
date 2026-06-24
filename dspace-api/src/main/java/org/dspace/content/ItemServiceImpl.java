@@ -7,11 +7,19 @@
  */
 package org.dspace.content;
 
+import static org.dspace.authority.service.AuthorityValueService.AUTHORITY_CLEANUP_BUSINESS_MODE;
+import static org.dspace.authority.service.AuthorityValueService.AUTHORITY_CLEANUP_CLEAN_ALL_MODE;
+import static org.dspace.authority.service.AuthorityValueService.AUTHORITY_CLEANUP_PROPERTY_PREFIX;
+import static org.dspace.authority.service.AuthorityValueService.REFERENCE;
+import static org.dspace.authority.service.AuthorityValueService.SPLIT;
+import static org.dspace.content.authority.Choices.CF_UNSET;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -32,6 +41,7 @@ import org.dspace.app.ldn.dao.LDNMessageDao;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authority.service.impl.ItemSearcherByMetadata;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -202,6 +212,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired
     private VersionHistoryService versionHistoryService;
 
+    @Autowired
+    private List<ItemSearcherByMetadata> itemSearcherByMetadata;
+
     protected ItemServiceImpl() {
     }
 
@@ -315,14 +328,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
         Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
 
-        if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
+        if (colEntityType.isPresent() && templateItemEntityType.isPresent() &&
             !Strings.CS.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
             throw new IllegalStateException("The template item has entity type : (" +
                 templateItemEntityType.get().getValue() + ") different than collection entity type : " +
                 colEntityType.get().getValue());
         }
 
-        if (template && colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
+        if (colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
             MetadataValue original = colEntityType.get();
             MetadataField metadataField = original.getMetadataField();
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
@@ -954,6 +967,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         item.clearCollections();
         item.setOwningCollection(null);
 
+        // remove authority references
+        if (configurationService.getBooleanProperty("item-deletion.authority-cleanup.enabled", false)) {
+            removeAuthorityReferences(context, item);
+        }
+
         // Remove all resource policies right before removing the item entity.
         // Must happen after all authorization checks but before itemDAO.delete() to prevent
         // Hibernate 7 TransientPropertyValueException when managed ResourcePolicies reference
@@ -962,6 +980,106 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Finally remove item row
         itemDAO.delete(context, item);
+    }
+
+    private void removeAuthorityReferences(Context context, Item deletedItem) throws SQLException, AuthorizeException {
+        String uuidOfDeletedItem = deletedItem.getID().toString();
+        List<String> controlledFields = getAuthorityControlledFieldsByItemEntityType(deletedItem);
+
+        Iterator<Item> itemsToFixAuthority =
+            this.findRelatedItemsByAuthorityControlledFields(context, deletedItem, Arrays.asList(uuidOfDeletedItem));
+
+        while (itemsToFixAuthority.hasNext()) {
+            Item itemToProcess = itemsToFixAuthority.next();
+
+            for (String controlledField : controlledFields) {
+                List<MetadataValue> metadataValuesWithAuthorityToUpdate = getMetadataWithAuthority(itemToProcess,
+                                                                                                   controlledField,
+                                                                                                   uuidOfDeletedItem);
+
+                if (CollectionUtils.isEmpty(metadataValuesWithAuthorityToUpdate)) {
+                    continue;
+                }
+
+                String cleanUpMode = getCleanUpMode(controlledField);
+
+                for (MetadataValue metadataValue : metadataValuesWithAuthorityToUpdate) {
+                    applyCleanUpMode(context, deletedItem, itemToProcess, metadataValue, cleanUpMode);
+                }
+            }
+            update(context, itemToProcess);
+            context.uncacheEntity(itemToProcess);
+        }
+    }
+
+    private List<MetadataValue> getMetadataWithAuthority(Item item, String metadataField, String authority) {
+        if (isValidMetadata(metadataField)) {
+            return getMetadataByMetadataString(item, metadataField).stream()
+                                                                   .filter(metadataValue -> StringUtils.equals(
+                                                                       metadataValue.getAuthority(), authority))
+                                                                   .collect(Collectors.toList());
+        }
+        return List.of();
+    }
+
+    public boolean isValidMetadata(String metadataField) {
+        if (metadataField.split(Pattern.quote(".")).length > 3) {
+            return false;
+        }
+        return true;
+    }
+
+    private void applyCleanUpMode(Context context, Item deletedItem, Item itemToProcess,
+                                  MetadataValue metadataValueWithAuthorityToUpdate, String cleanUpMode)
+        throws SQLException {
+
+        switch (cleanUpMode) {
+            case AUTHORITY_CLEANUP_BUSINESS_MODE:
+                replaceAuthorityWithItemBusinessIdentifier(deletedItem, metadataValueWithAuthorityToUpdate);
+                break;
+            case AUTHORITY_CLEANUP_CLEAN_ALL_MODE:
+                removeMetadataValues(context, itemToProcess, Arrays.asList(metadataValueWithAuthorityToUpdate));
+                break;
+            default:
+                log.error("The configured mode:" + cleanUpMode + " for metadata:"
+                              + metadataValueWithAuthorityToUpdate.getMetadataField().toString() + " is not supported");
+        }
+    }
+
+    private void replaceAuthorityWithItemBusinessIdentifier(Item deletedItem, MetadataValue mvWithAuthorityToUpdate) {
+        String authority = getBusinesIdentifier(deletedItem)
+            .map(businessId -> REFERENCE + businessId)
+            .orElse(null);
+
+        mvWithAuthorityToUpdate.setAuthority(authority);
+        mvWithAuthorityToUpdate.setConfidence(CF_UNSET);
+    }
+
+    private String getCleanUpMode(String metadataField) {
+        String mode = configurationService.getProperty(AUTHORITY_CLEANUP_PROPERTY_PREFIX + metadataField);
+        if (StringUtils.isBlank(mode)) {
+            mode = configurationService.getProperty(AUTHORITY_CLEANUP_PROPERTY_PREFIX + "default");
+        }
+        return mode;
+    }
+
+    private List<String> getAuthorityControlledFieldsByItemEntityType(Item item) {
+        String entityType = this.getEntityType(item);
+        return choiceAuthorityService.getAuthorityControlledFieldsByEntityType(entityType)
+                                     .stream()
+                                     .filter(field -> isValidMetadata(field))
+                                     .map(field -> field.replaceAll("_", "."))
+                                     .collect(Collectors.toList());
+    }
+
+    private Optional<String> getBusinesIdentifier(Item item) {
+        for (ItemSearcherByMetadata itemSearcherByMetadata : itemSearcherByMetadata) {
+            String businessIdentifier = getMetadata(item, itemSearcherByMetadata.getMetadata());
+            if (StringUtils.isNotBlank(businessIdentifier)) {
+                return Optional.of(itemSearcherByMetadata.getAuthorityPrefix() + SPLIT + businessIdentifier);
+            }
+        }
+        return Optional.empty();
     }
 
     protected void removeRequest(Context context, Item item) throws SQLException {

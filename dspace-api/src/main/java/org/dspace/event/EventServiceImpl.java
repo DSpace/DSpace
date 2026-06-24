@@ -39,7 +39,7 @@ public class EventServiceImpl implements EventService {
     /**
      * log4j category
      */
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(EventServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(EventServiceImpl.class);
 
 
     protected DispatcherPoolFactory dispatcherFactory = null;
@@ -52,9 +52,6 @@ public class EventServiceImpl implements EventService {
     protected Map<String, Integer> consumerIndicies = null;
 
     protected String CONSUMER_PFX = "event.consumer";
-
-    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
-                                                                                          .getConfigurationService();
 
 
     protected EventServiceImpl() {
@@ -107,7 +104,7 @@ public class EventServiceImpl implements EventService {
         try {
             return (Dispatcher) dispatcherPool.borrowObject(name);
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to acquire dispatcher named " + name, e);
+            throw new IllegalStateException("Unable to aquire dispatcher named " + name, e);
         }
 
     }
@@ -123,14 +120,21 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public int getConsumerIndex(String consumerClass) {
-        Integer index = (Integer) consumerIndicies.get(consumerClass);
+        Integer index = consumerIndicies.get(consumerClass);
         return index != null ? index.intValue() : -1;
 
     }
 
+    @Override
+    public void reloadConfiguration() {
+        dispatcherPool = null;
+        initPool();
+    }
+
     protected void enumerateConsumers() {
         // Get all configs starting with CONSUMER_PFX
-        List<String> propertyNames = configurationService.getPropertyKeys(CONSUMER_PFX);
+        List<String> propertyNames = DSpaceServicesFactory.getInstance()
+                                                          .getConfigurationService().getPropertyKeys(CONSUMER_PFX);
         int bitSetIndex = 0;
 
         if (consumerIndicies == null) {
@@ -142,7 +146,7 @@ public class EventServiceImpl implements EventService {
                 String consumerName = ckey.substring(CONSUMER_PFX.length() + 1,
                                                      ckey.length() - 6);
 
-                consumerIndicies.put(consumerName, (Integer) bitSetIndex);
+                consumerIndicies.put(consumerName, bitSetIndex);
                 bitSetIndex++;
             }
         }
@@ -153,7 +157,7 @@ public class EventServiceImpl implements EventService {
         // Prefix of keys in DSpace Configuration
         private static final String PROP_PFX = "event.dispatcher";
 
-        // Cache of event dispatchers, keyed by name, for reuse.
+        // Cache of event dispatchers, keyed by name, for re-use.
         protected Map<String, String> dispatchers = new HashMap<String, String>();
 
         public DispatcherPoolFactory() {
@@ -182,8 +186,9 @@ public class EventServiceImpl implements EventService {
                     // OK, now get its list of consumers/filters
                     String consumerKey = PROP_PFX + "." + dispatcherName
                         + ".consumers";
-                    String[] consumers = configurationService
-                        .getArrayProperty(consumerKey);
+                    String[] consumers = DSpaceServicesFactory.getInstance()
+                                                              .getConfigurationService()
+                                                              .getArrayProperty(consumerKey);
                     if (ArrayUtils.isEmpty(consumers)) {
                         throw new IllegalStateException(
                             "No Configuration entry found for consumer list of event Dispatcher: \""
@@ -232,7 +237,6 @@ public class EventServiceImpl implements EventService {
         @Override
         public void activateObject(String arg0, PooledObject<Dispatcher> arg1) throws Exception {
             // No-op
-            return;
 
         }
 
@@ -260,7 +264,6 @@ public class EventServiceImpl implements EventService {
         @Override
         public void passivateObject(String arg0, PooledObject<Dispatcher> arg1) throws Exception {
             // No-op
-            return;
 
         }
 
@@ -284,6 +287,7 @@ public class EventServiceImpl implements EventService {
          */
         private void parseEventConfig() {
             // Get all configs starting with PROP_PFX
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
             List<String> propertyNames = configurationService.getPropertyKeys(PROP_PFX);
 
             for (String ckey : propertyNames) {
@@ -291,8 +295,7 @@ public class EventServiceImpl implements EventService {
                 if (ckey.endsWith(".class")) {
                     String name = ckey.substring(PROP_PFX.length() + 1, ckey
                         .length() - 6);
-                    String dispatcherClass = configurationService
-                        .getProperty(ckey);
+                    String dispatcherClass = configurationService.getProperty(ckey);
 
                     dispatchers.put(name, dispatcherClass);
 
