@@ -273,7 +273,7 @@ public class RequestItemRepository
             }
         }
 
-        // (optional)Requester's human-readable name.
+        // (optional) Requester's human-readable name.
         String username;
         if (null != user) { // Prefer authenticated user's name.
             username = user.getFullName();
