@@ -18,12 +18,23 @@
            <!-- Default Item Versioning Provider, defines behavior for replicating
                 Item, Metadata, Budles and Bitstreams. Autowired at this time. -->
            <bean class="org.dspace.versioning.DefaultItemVersionProvider">
-               <property name="ignoredMetadataFields">
-                   <set>
-                       <value>dc.date.accessioned</value>
-                       <value>dc.description.provenance</value>
-                   </set>
-               </property>
+                <property name="ignoredMetadataFields">
+                    <set>
+                        <value>dc.date.accessioned</value>
+                        <value>dc.description.provenance</value>
+                        <!-- 
+                        dspace.entity.type is ignored during versioning to prevent duplication.
+                        
+                        When creating a new version, the entity type is automatically inherited
+                        from the target collection's item metadata during workspace item
+                        creation (see DefaultItemVersionProvider.java). Since all items
+                        now have a default entity type ("none" for non-CRIS items),
+                        copying this field would create duplicate metadata values that cause
+                        indexing issues in Solr.
+                        -->
+                        <value>dspace.entity.type</value>
+                    </set>
+                </property>
                
            </bean>
        </property>
