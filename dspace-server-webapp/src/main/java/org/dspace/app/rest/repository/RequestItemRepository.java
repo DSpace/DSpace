@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,16 +41,21 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.CaptchaService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -91,6 +97,9 @@ public class RequestItemRepository
 
     @Autowired
     protected AuthorizeService authorizeService;
+
+    @Autowired
+    protected GroupService groupService;
 
     @Autowired
     private Validator validator;
@@ -191,6 +200,20 @@ public class RequestItemRepository
             if (null == bitstream) {
                 throw new IncompleteItemRequestException("That bitstream does not exist");
             }
+
+            // Check that the bitstream is not public, otherwise it does not require a request
+            Group anonymous = groupService.findByName(ctx, Group.ANONYMOUS);
+            List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(ctx, bitstream, Constants.READ);
+            boolean isPublicAndWithoutEmbargo = policies.stream().anyMatch(policy ->
+                policy.getGroup() != null &&
+                policy.getGroup().getID().equals(anonymous.getID()) &&
+                policy.getEPerson() == null &&
+                policy.getStartDate() == null &&
+                policy.getEndDate() == null
+            );
+            if (isPublicAndWithoutEmbargo) {
+                throw new IncompleteItemRequestException("That bitstream is public and does not require a request");
+            }
         } else {
             bitstream = null;
         }
@@ -203,6 +226,36 @@ public class RequestItemRepository
         Item item = itemService.find(ctx, UUID.fromString(itemId));
         if (null == item) {
             throw new IncompleteItemRequestException("That item does not exist");
+        }
+        if (!item.isArchived()) {
+            throw new IncompleteItemRequestException("That item is not archived");
+        }
+        if (item.isWithdrawn()) {
+            throw new IncompleteItemRequestException("That item is withdrawn");
+        }
+
+        // check that the bitstream is part of bundle ORIGINAL of the item, otherwise it is not a valid request
+        if (bitstream != null) {
+            Bundle originalBundle = bitstream.getBundles().stream()
+                    .filter(bundle -> "ORIGINAL".equals(bundle.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new IncompleteItemRequestException(
+                        "That bitstream is not in the ORIGINAL bundle of the item"));
+            if (!originalBundle.getItems().contains(item)) {
+                throw new IncompleteItemRequestException(
+                    "That bitstream is not part of the item");
+            }
+        }
+        if (allFiles) {
+            // If all files are requested, check that the item has at least one bitstream in its ORIGINAL bundle
+            Bundle originalBundle = item.getBundles().stream()
+                    .filter(bundle -> "ORIGINAL".equals(bundle.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new IncompleteItemRequestException("That item has no ORIGINAL bundle"));
+
+            if (originalBundle.getBitstreams().isEmpty()) {
+                throw new IncompleteItemRequestException("That item has no bitstreams in the ORIGINAL bundle");
+            }
         }
 
         // Requester's email address.
@@ -220,17 +273,25 @@ public class RequestItemRepository
             }
         }
 
-        // Requester's human-readable name.
+        // (optional)Requester's human-readable name.
         String username;
         if (null != user) { // Prefer authenticated user's name.
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
+            if (isBlank(rir.getRequestName())) {
+                username = email; // Fallback to email if no name provided
+            }
+            else {
+                username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
+            }
         }
 
-        // Requester's message text, escaped to evade nasty XSS attempts
-        String message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
+        // (optional) Requester's message text, escaped to evade nasty XSS attempts
+        String message = "";
+        if (!isBlank(rir.getRequestMessage())) {
+            message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
+        }
 
         // Create the request.
         String token;

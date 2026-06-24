@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ import org.dspace.app.rest.repository.RequestItemRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -140,6 +142,7 @@ public class RequestItemRepositoryIT
         item = ItemBuilder
                 .createItem(context, collection)
                 .withTitle("Item")
+                .inArchive()
                 .build();
 
         String content = "RequestItemRepositoryIT test content";
@@ -499,6 +502,184 @@ public class RequestItemRepositoryIT
                         .content(mapper.writeValueAsBytes(rir))
                         .contentType(contentType))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testCreateAndReturnWithNotArchivedItemId() throws Exception {
+        item = ItemBuilder
+                .createItem(context, collection)
+                .build();
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithWithdrawnItemId() throws Exception {
+        item = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .withdrawn()
+                .build();
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithBitstreamNotInOriginalBundle() throws Exception {
+        String content = "RequestItemRepositoryIT test content";
+        InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        bitstream = BitstreamBuilder
+                .createBitstream(context, item, is, "TEXT")
+                .withName("Bitstream")
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithPublicBitstream() throws Exception {
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithEmbargoedBitstream() throws Exception {
+        bitstream = BitstreamBuilder
+                .createBitstream(context, item, new ByteArrayInputStream("Embargoed content".getBytes(StandardCharsets.UTF_8)))
+                .withName("Embargoed Bitstream")
+                .withEmbargoPeriod(Period.ofYears(1))
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        rir.setRequestEmail("doe@example.org");
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testCreateAndReturnWithBitstreamNotInOriginalBundleOfItem() throws Exception {
+        Item anotherItem = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, anotherItem, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(anotherItem.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithAllItemsAndItemWithoutOriginalBundle() throws Exception {
+        Item anotherItem = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, anotherItem, bitstream)
+                .withAllFiles(true)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setItemId(anotherItem.getID().toString());
+        rir.setAllfiles(true);
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithAllItemsAndItemWithEmptyOriginalBundle() throws Exception {
+        Item anotherItem = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .build();
+        BundleBuilder.createBundle(context, anotherItem)
+                .withName("ORIGINAL")
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, anotherItem, bitstream)
+                .withAllFiles(true)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setItemId(anotherItem.getID().toString());
+        rir.setAllfiles(true);
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     /**
