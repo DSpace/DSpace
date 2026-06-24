@@ -20,7 +20,6 @@ import jakarta.annotation.ManagedBean;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.mail.MessagingException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -157,7 +156,8 @@ public class RequestItemEmailNotifier {
      * @param email the email to be sent
      * @throws IOException if no approvers have email addresses
      */
-    private void setRequestRecipients(RequestItem ri, List<RequestItemAuthor> approvers, Email email) throws IOException {
+    private void setRequestRecipients(RequestItem ri, List<RequestItemAuthor> approvers, Email email)
+        throws IOException {
         boolean hasRecipients = false;
         for (RequestItemAuthor author : approvers) {
             if (StringUtils.isBlank(author.getEmail())) {
