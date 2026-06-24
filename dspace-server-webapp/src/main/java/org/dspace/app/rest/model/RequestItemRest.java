@@ -10,11 +10,9 @@ package org.dspace.app.rest.model;
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-
 import org.dspace.app.rest.RestResourceController;
 
 /**
