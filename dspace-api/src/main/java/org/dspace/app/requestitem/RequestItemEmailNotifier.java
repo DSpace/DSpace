@@ -20,6 +20,8 @@ import jakarta.annotation.ManagedBean;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.mail.MessagingException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -88,9 +90,9 @@ public class RequestItemEmailNotifier {
         // Build an email to the approver.
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
                 "request_item.author"));
-        for (RequestItemAuthor author : authors) {
-            email.addRecipient(author.getEmail());
-        }
+
+        setRequestRecipients(ri, authors, email);
+
         email.setReplyTo(ri.getReqEmail()); // Requester's address
 
         email.addArgument(ri.getReqName()); // {0} Requester's name
@@ -143,6 +145,34 @@ public class RequestItemEmailNotifier {
             LOG.warn(LogHelper.getHeader(context,
                     "error_mailing_requestItem", e.getMessage()));
             throw new IOException("Request not sent:  " + e.getMessage());
+        }
+    }
+
+    /**
+     * Set recipients of the request email to the approvers in case they have email addresses.
+     * If no approvers have email addresses, throw an exception.
+     * @param ri the request item
+     * @param authors the list of approvers
+     * @param email the email to be sent
+     * @throws IOException if no approvers have email addresses
+     */
+    private void setRequestRecipients(RequestItem ri, List<RequestItemAuthor> approvers, Email email) throws IOException {
+        boolean hasRecipients = false;
+        for (RequestItemAuthor author : approvers) {
+            if (StringUtils.isBlank(author.getEmail())) {
+                LOG.info("Request item approver '{}'' has no email address", author.getFullName());
+                continue;
+            }
+            email.addRecipient(author.getEmail());
+            hasRecipients = true;
+        }
+
+        // we can't send the request if there are no approvers with email addresses, so throw an exception
+        if (!hasRecipients) {
+            String errorMessage = "No approvers with email addresses found for request to item "
+                + ri.getItem().getID() + "";
+            LOG.warn(errorMessage);
+            throw new IOException(errorMessage);
         }
     }
 
