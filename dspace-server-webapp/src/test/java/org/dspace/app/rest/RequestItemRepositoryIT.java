@@ -590,7 +590,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnWithEmbargoedBitstream() throws Exception {
         bitstream = BitstreamBuilder
-                .createBitstream(context, item, new ByteArrayInputStream("Embargoed content".getBytes(StandardCharsets.UTF_8)))
+                .createBitstream(context, item,
+                        new ByteArrayInputStream("Embargoed content".getBytes(StandardCharsets.UTF_8)))
                 .withName("Embargoed Bitstream")
                 .withEmbargoPeriod(Period.ofYears(1))
                 .build();

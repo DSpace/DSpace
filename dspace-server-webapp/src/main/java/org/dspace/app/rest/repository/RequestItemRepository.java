@@ -281,8 +281,7 @@ public class RequestItemRepository
             // Escape username to evade nasty XSS attempts
             if (isBlank(rir.getRequestName())) {
                 username = email; // Fallback to email if no name provided
-            }
-            else {
+            } else {
                 username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
             }
         }
