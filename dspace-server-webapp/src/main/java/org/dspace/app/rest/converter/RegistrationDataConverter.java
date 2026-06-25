@@ -8,7 +8,6 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
-import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -21,7 +20,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.RegistrationData;
-import org.dspace.eperson.RegistrationTypeEnum;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.RegistrationDataService;
@@ -56,11 +54,7 @@ public class RegistrationDataConverter implements DSpaceConverter<RegistrationDa
         registrationRest.setId(registrationData.getID());
         registrationRest.setEmail(registrationData.getEmail());
         registrationRest.setNetId(registrationData.getNetId());
-        registrationRest.setRegistrationType(
-            Optional.ofNullable(registrationData.getRegistrationType())
-                    .map(RegistrationTypeEnum::toString)
-                    .orElse(null)
-        );
+        registrationRest.setRegistrationType(registrationData.getRegistrationType());
 
         EPerson ePerson = null;
         try {
