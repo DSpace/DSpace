@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.xoai.tests.data;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,11 +16,8 @@ import com.lyncode.xoai.dataprovider.core.ItemMetadata;
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
-
 import org.dspace.xoai.data.DSpaceItem;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-
 public class DSpaceItemGetMetadataTest {
 
     private static Element.Field value(String v) {
@@ -61,12 +59,24 @@ public class DSpaceItemGetMetadataTest {
 
     private static class TestItem extends DSpaceItem {
         private final ItemMetadata im;
-        TestItem(Metadata m) { im = new ItemMetadata(m); }
-        @Override public ItemMetadata getMetadata() { return im; }
-        @Override protected String getHandle() { return "123/1"; }
-        @Override public Date getDatestamp() { return new Date(); }
-        @Override public List<ReferenceSet> getSets() { return new ArrayList<>(); }
-        @Override public boolean isDeleted() { return false; }
+        TestItem(Metadata m) {
+            im = new ItemMetadata(m);
+        }
+        @Override public ItemMetadata getMetadata() {
+            return im;
+        }
+        @Override protected String getHandle() {
+            return "123/1";
+        }
+        @Override public Date getDatestamp() {
+            return new Date();
+        }
+        @Override public List<ReferenceSet> getSets() {
+            return new ArrayList<>();
+        }
+        @Override public boolean isDeleted() {
+            return false;
+        }
     }
 
     @Test

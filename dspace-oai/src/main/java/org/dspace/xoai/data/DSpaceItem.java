@@ -77,7 +77,7 @@ public abstract class DSpaceItem implements Item {
         List<Element> metadata = this.getMetadata().getMetadata().getElement();
         return noQualifierValues(filter(flat(filter(metadata, schema)), element));
     }
-    
+
     private List<String> getMetadata(String schema, String element, String qualifier) {
         List<Element> metadata = this.getMetadata().getMetadata().getElement();
         return values(filter(flat(filter(flat(filter(metadata, schema)), element)), qualifier));
