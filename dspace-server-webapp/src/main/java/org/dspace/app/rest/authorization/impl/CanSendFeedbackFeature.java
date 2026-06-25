@@ -38,7 +38,15 @@ public class CanSendFeedbackFeature implements AuthorizationFeature {
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         String recipientEmail = configurationService.getProperty("feedback.recipient");
-        return StringUtils.isNotBlank(recipientEmail);
+        if (StringUtils.isBlank(recipientEmail)) {
+            return false;
+        }
+        // When anonymous submission is disabled, only authenticated users can send feedback
+        if (context.getCurrentUser() == null
+                && !configurationService.getBooleanProperty("feedback.allow-anonymous", false)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
