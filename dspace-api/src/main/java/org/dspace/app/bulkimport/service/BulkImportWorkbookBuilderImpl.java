@@ -20,7 +20,6 @@ import static org.dspace.app.bulkedit.BulkImport.ID_HEADER;
 import static org.dspace.app.bulkedit.BulkImport.LANGUAGE_SEPARATOR_PREFIX;
 import static org.dspace.app.bulkedit.BulkImport.LANGUAGE_SEPARATOR_SUFFIX;
 import static org.dspace.app.bulkedit.BulkImport.METADATA_ATTRIBUTES_SEPARATOR;
-import static org.dspace.app.bulkedit.BulkImport.METADATA_SEPARATOR;
 import static org.dspace.app.bulkedit.BulkImport.PARENT_ID_HEADER;
 
 import java.sql.SQLException;
@@ -60,6 +59,7 @@ import org.dspace.content.dto.ResourcePolicyDTO;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.core.CrisConstants;
 import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
@@ -92,6 +92,8 @@ public class BulkImportWorkbookBuilderImpl implements BulkImportWorkbookBuilder 
     @Autowired
     private CollectionService collectionService;
 
+    private String metadataSeparator;
+
     private DCInputsReader reader;
     private DSpaceRunnableHandler handler;
 
@@ -102,6 +104,7 @@ public class BulkImportWorkbookBuilderImpl implements BulkImportWorkbookBuilder 
         } catch (DCInputsReaderException e) {
             throw new RuntimeException(e);
         }
+        this.metadataSeparator = new DSpaceCSV(true).getValueSeparator();
     }
 
     @Override
@@ -314,7 +317,7 @@ public class BulkImportWorkbookBuilderImpl implements BulkImportWorkbookBuilder 
     private String composeResourcePolicies(List<ResourcePolicyDTO> policies, List<AccessConditionOption> options) {
         return policies.stream()
             .flatMap(resourcePolicy -> formatResourcePolicy(resourcePolicy, options).stream())
-            .collect(Collectors.joining(BulkImport.METADATA_SEPARATOR));
+            .collect(Collectors.joining(metadataSeparator));
     }
 
     private Optional<String> formatResourcePolicy(ResourcePolicyDTO policy, List<AccessConditionOption> options) {
@@ -354,14 +357,14 @@ public class BulkImportWorkbookBuilderImpl implements BulkImportWorkbookBuilder 
 
         String language = metadataValue.getLanguage();
         if (StringUtils.isBlank(language)) {
-            sheet.appendValueOnLastRow(header, formatMetadataValue(metadataValue), METADATA_SEPARATOR);
+            sheet.appendValueOnLastRow(header, formatMetadataValue(metadataValue), metadataSeparator);
             return;
         }
 
         if (isLanguageSupported(sheet.getCollection(), language, header, sheet.isNestedMetadata())) {
             String headerWithLanguage = header + LANGUAGE_SEPARATOR_PREFIX + language + LANGUAGE_SEPARATOR_SUFFIX;
             sheet.appendHeaderIfNotPresent(headerWithLanguage);
-            sheet.appendValueOnLastRow(headerWithLanguage, formatMetadataValue(metadataValue), METADATA_SEPARATOR);
+            sheet.appendValueOnLastRow(headerWithLanguage, formatMetadataValue(metadataValue), metadataSeparator);
         }
 
     }

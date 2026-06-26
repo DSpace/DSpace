@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import java.util.UUID;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -134,13 +135,9 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     public static final String METADATA_ATTRIBUTES_SEPARATOR = "$$";
 
-    public static final String METADATA_SEPARATOR = "||";
-
     public static final String LANGUAGE_SEPARATOR_PREFIX = "[";
 
     public static final String LANGUAGE_SEPARATOR_SUFFIX = "]";
-
-    public static final String ID_SEPARATOR = "::";
 
     public static final String SECURITY_LEVEL_PREFIX = "sl-";
 
@@ -225,6 +222,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private Map<String, AccessConditionOption> uploadAccessConditions;
 
+    private String metadataSeparator;
+
+    private String idSeparator;
+
     @Override
     @SuppressWarnings("unchecked")
     public void setup() throws ParseException {
@@ -251,6 +252,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         this.uploadConfigurationService = AuthorizeServiceFactory.getInstance().getUploadConfigurationService();
         this.resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+        DSpaceCSV csvHelper = new DSpaceCSV(true);
+        this.metadataSeparator = csvHelper.getValueSeparator();
+        this.idSeparator = csvHelper.getAuthoritySeparator();
 
         try {
             this.reader = new DCInputsReader();
@@ -625,7 +630,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         for (int index = firstMetadataIndex; index < row.getLastCellNum(); index++) {
 
             String cellValue = WorkbookUtils.getCellValue(row, index);
-            String[] values = isNotBlank(cellValue) ? splitByWholeSeparator(cellValue, METADATA_SEPARATOR)
+            String[] values = isNotBlank(cellValue) ? splitByWholeSeparator(cellValue, metadataSeparator)
                 : new String[] { "" };
             if (values.length > 1 && !manyMetadataValuesAllowed) {
                 handleValidationErrorOnRow(row, "Multiple metadata value on the same cell not allowed "
@@ -821,7 +826,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private String[] getAccessConditionValues(Row row) {
         String accessConditionCellValue = getCellValue(row, ACCESS_CONDITION_HEADER);
-        return splitByWholeSeparator(accessConditionCellValue, METADATA_SEPARATOR);
+        return splitByWholeSeparator(accessConditionCellValue, metadataSeparator);
     }
 
     private AccessCondition buildAccessCondition(String[] accessCondition) {
@@ -1397,7 +1402,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             if (index >= firstMetadataIndex) {
 
                 String cellValue = WorkbookUtils.getCellValue(row, index);
-                String[] values = isNotBlank(cellValue) ? splitByWholeSeparator(cellValue, METADATA_SEPARATOR)
+                String[] values = isNotBlank(cellValue) ? splitByWholeSeparator(cellValue, metadataSeparator)
                     : new String[] { "" };
 
                 List<MetadataValueVO> metadataValues = Arrays.stream(values)
@@ -1551,7 +1556,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         String id = getIdFromRow(row);
         int rowIndex = row.getRowNum() + 1;
         return childRows.stream()
-            .filter(g -> g.getParentId().equals(id) || g.getParentId().equals(ROW_ID + ID_SEPARATOR + rowIndex))
+            .filter(g -> g.getParentId().equals(id) || g.getParentId().equals(ROW_ID + idSeparator + rowIndex))
             .collect(Collectors.toList());
     }
 
@@ -1591,7 +1596,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             return true;
         }
 
-        String[] idSections = id.split(ID_SEPARATOR);
+        String[] idSections = id.split(idSeparator);
         if (idSections.length != 2) {
             return false;
         }
