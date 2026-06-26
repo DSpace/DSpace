@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import java.util.UUID;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -1646,8 +1645,15 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     }
 
     private boolean isSecurityLevelNotValid(String securityLevel) {
-        return !Strings.CS.startsWith(securityLevel, SECURITY_LEVEL_PREFIX)
-            || !isCreatable(removeSecurityLevelPrefix(securityLevel));
+        if (!Strings.CS.startsWith(securityLevel, SECURITY_LEVEL_PREFIX)) {
+            return true;
+        }
+        try {
+            Integer.valueOf(removeSecurityLevelPrefix(securityLevel));
+            return false;
+        } catch (NumberFormatException e) {
+            return true;
+        }
     }
 
     private String removeSecurityLevelPrefix(String str) {
