@@ -31,6 +31,7 @@
                 <ref bean="tsvImportService" />
                 <ref bean="endnoteImportService" />
                 <ref bean="DoiImportService" />
+                <ref bean="grobidImportMetadataSourceService" />
             </list>
          </property>
     </bean>
@@ -320,6 +321,31 @@
 
     <bean class="java.lang.Integer" id="maxRetry">
         <constructor-arg value="3"/>
+    </bean>
+
+    <bean class='org.dspace.service.impl.HttpConnectionPoolService'
+          id='grobidHttpConnectionPoolService'
+          scope='singleton'
+          autowire-candidate='true'>
+        <constructor-arg name='configPrefix' value='grobid'/>
+    </bean>
+
+    <bean id="grobidImportMetadataSourceService" class="org.dspace.submit.extraction.grobid.GrobidImportMetadataSourceServiceImpl">
+        <property name="grobidClient">
+            <bean class="org.dspace.submit.extraction.grobid.client.GrobidClientImpl">
+                <constructor-arg name="baseUrl" value="${metadata.extraction.grobid.url}" />
+            </bean>
+        </property>
+        <property name="supportedExtensions">
+            <list>
+                <value>pdf</value>
+            </list>
+        </property>
+        <property name="metadataFieldMapping">
+            <bean class="org.dspace.importer.external.tei.TEIFieldMapping">
+                <property name="metadataFieldMap" ref="grobidMetadataFieldMap"/>
+            </bean>
+        </property>
     </bean>
 
 </beans>
