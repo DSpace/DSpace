@@ -1,0 +1,151 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+
+    <util:map id="grobidMetadataFieldMap"
+              key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <entry key-ref="grobid.title"             value-ref="grobidTitleContrib"/>
+        <entry key-ref="grobid.date.issued"        value-ref="grobidDateContrib"/>
+        <entry key-ref="grobid.contributor.author" value-ref="grobidAuthorContrib"/>
+        <entry key-ref="grobid.source"             value-ref="grobidJournalContrib"/>
+        <entry key-ref="grobid.issn"               value-ref="grobidIssnContrib"/>
+        <entry key-ref="grobid.identifier.doi"     value-ref="grobidDoiContrib"/>
+        <entry key-ref="grobid.identifier.isbn"    value-ref="grobidIsbnContrib"/>
+        <entry key-ref="grobid.description.abstract" value-ref="grobidAbstractContrib"/>
+        <entry key-ref="grobid.language"           value-ref="grobidLanguageContrib"/>
+        <entry key-ref="grobid.subject"            value-ref="grobidSubjectContrib"/>
+    </util:map>
+
+    <!-- See the TEI documentation when constructing / modifying XPath queries -->
+    <!-- https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html -->
+    <util:map id="grobidPrefixToNamespaceMapping" map-class="java.util.HashMap"
+              key-type="java.lang.String" value-type="java.lang.String">
+        <entry key="http://www.tei-c.org/ns/1.0" value="tei"/>
+    </util:map>
+
+    <bean id="grobidTitleContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="grobid.title"/>
+        <property name="query" value="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title[@type='main']"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.title"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="grobidDateContrib"
+          class="org.dspace.importer.external.tei.TEIDateMetadataContributor">
+        <property name="field" ref="grobid.date.issued"/>
+        <property name="query"
+                  value="//tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:date[@type='published']/@when"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.date.issued"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="grobidAuthorContrib"
+          class="org.dspace.importer.external.tei.TEIAuthorMetadataContributor">
+        <property name="field" ref="grobid.contributor.author"/>
+        <property name="query" value="//tei:analytic/tei:author"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.contributor.author"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="grobidJournalContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="grobid.source"/>
+        <property name="query"
+                  value="//tei:biblStruct/tei:monogr/tei:title[@level='j'][@type='main']"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.source"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.source"/>
+    </bean>
+
+    <bean id="grobidIssnContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="grobid.issn"/>
+        <property name="query" value="//tei:biblStruct/tei:idno[@type='ISSN']"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.issn"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.issn"/>
+    </bean>
+
+    <bean id="grobidDoiContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="grobid.identifier.doi"/>
+        <property name="query" value="//tei:biblStruct/tei:idno[@type='DOI']"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.identifier.doi"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean id="grobidIsbnContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="grobid.identifier.isbn"/>
+        <property name="query" value="//tei:biblStruct/tei:idno[@type='ISBN']"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.identifier.isbn"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.isbn"/>
+    </bean>
+
+    <bean id="grobidAbstractContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="grobid.description.abstract"/>
+        <property name="query" value="//tei:profileDesc/tei:abstract/tei:p"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.description.abstract"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean id="grobidLanguageContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumAndAttributeContributor">
+        <property name="field" ref="grobid.language"/>
+        <property name="query" value="//tei:text"/>
+        <property name="attribute" value="xml:lang"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.language"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.language.iso"/>
+    </bean>
+
+    <bean id="grobidSubjectContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="grobid.subject"/>
+        <property name="query"
+                  value="//tei:profileDesc/tei:textClass/tei:keywords/tei:term"/>
+        <property name="prefixToNamespaceMapping" ref="grobidPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="grobid.subject"
+          class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+</beans>
