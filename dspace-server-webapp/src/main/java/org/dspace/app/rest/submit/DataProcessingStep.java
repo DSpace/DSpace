@@ -58,6 +58,20 @@ public interface DataProcessingStep extends RestProcessingStep {
     <T extends Serializable> T getData(SubmissionService submissionService, InProgressSubmission obj,
                                        SubmissionStepConfig config) throws Exception;
 
+
+    /**
+     * Method to inform the converter that this step has it own section data. This
+     * can be overriden by step that only process/validate data in other section. In
+     * such case the @link
+     * {@link #getData(SubmissionService, InProgressSubmission, SubmissionStepConfig)}
+     * method should return null as it will be ignored
+     *
+     * @return true by default to indicate that the step has it own section data
+     */
+    default public boolean hasDataSection() {
+        return true;
+    }
+
     /**
      * Method to react to a patch request against the step managed section data
      * 
