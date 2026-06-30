@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+
+    <bean class="org.dspace.layout.service.impl.CrisLayoutSectionServiceImpl" >
+        <property name="components">
+            <list>
+                <ref bean="sectionresearchoutputs" />
+                <ref bean="sectionfundings_and_projects" />
+                <ref bean="sectionresearcherprofiles" />
+                <ref bean="sectionsite" />
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.layout.CrisLayoutSection" id="sectionresearchoutputs">
+        <constructor-arg name="id" value="researchoutputs"/>
+        <constructor-arg name="visible" value="true"/>
+        <constructor-arg name="sectionComponents">
+            <list>
+                <list>
+                    <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
+                        <property name="browseNames">
+                            <list>
+                                <value>rodept</value>
+                                <value>author</value>
+                                <value>rsoTitle</value>
+                                <value>type</value>
+                                <value>dateissued</value>
+                                <value>subject</value>
+                            </list>
+                        </property>
+                        <property name="style" value="col-md-4"/>
+                    </bean>
+                    <bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                        <property name="discoveryConfigurationName" value="researchoutputs" />
+                        <property name="style" value="col-md-8"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                        <property name="discoveryConfigurationName" value="researchoutputs" />
+                        <property name="sortField" value="dc.date.accessioned" />
+                        <property name="order" value="desc" />
+                        <property name="style" value="col-md-6"/>
+                        <property name="numberOfItems" value="5"/>
+                    </bean>
+                    <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                        <property name="discoveryConfigurationName" value="researchoutputs" />
+                        <property name="sortField" value="metric.view" />
+                        <property name="order" value="desc" />
+                        <property name="style" value="col-md-6"/>
+                        <property name="numberOfItems" value="5"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.CrisLayoutFacetComponent">
+                        <property name="discoveryConfigurationName" value="researchoutputs" />
+                        <property name="style" value="col-md-12"/>
+                    </bean>
+                </list>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean class="org.dspace.layout.CrisLayoutSection" id="sectionfundings_and_projects">
+        <constructor-arg name="id" value="fundings_and_projects"/>
+        <constructor-arg name="visible" value="true"/>
+        <constructor-arg name="sectionComponents">
+            <list>
+                <list>
+                    <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
+                        <property name="browseNames">
+                            <list>
+                                <value>pjtitle</value>
+                            </list>
+                        </property>
+                        <property name="style" value="col-md-4"/>
+                    </bean>
+                    <bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                        <property name="discoveryConfigurationName" value="project_funding" />
+                        <property name="style" value="col-md-8"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.CrisLayoutFacetComponent">
+                        <property name="discoveryConfigurationName" value="project_funding" />
+                        <property name="style" value="col-md-12"/>
+                    </bean>
+                </list>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean class="org.dspace.layout.CrisLayoutSection" id="sectionresearcherprofiles">
+        <constructor-arg name="id" value="researcherprofiles"/>
+        <constructor-arg name="visible" value="true"/>
+        <constructor-arg name="sectionComponents">
+            <list>
+                <list>
+                    <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
+                        <property name="browseNames">
+                            <list>
+                                <value>rpname</value>
+                                <value>rpdept</value>
+                            </list>
+                        </property>
+                        <property name="style" value="col-md-4"/>
+                    </bean>
+                    <bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                        <property name="discoveryConfigurationName" value="person" />
+                        <property name="style" value="col-md-8"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.CrisLayoutFacetComponent">
+                        <property name="discoveryConfigurationName" value="person" />
+                        <property name="style" value="col-md-12"/>
+                    </bean>
+                </list>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean class="org.dspace.layout.CrisLayoutSection" id="sectionsite">
+        <constructor-arg name="id" value="site"/>
+        <constructor-arg name="visible" value="false"/>
+        <constructor-arg name="sectionComponents">
+          <list>
+            <list>
+                <bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                    <property name="style" value="col-md-12"/>
+                    <property name="searchType" value="basic"/>
+                    <property name="displayTitle" value="false"/>
+                </bean>
+            </list>
+            <list>
+                <bean class="org.dspace.layout.CrisLayoutCountersComponent">
+                    <property name="style" value="col-md-12 py-4"/>
+                    <property name="counterSettingsList">
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutCountersComponent.CounterSettings">
+                                <property name="discoveryConfigurationName" value="researchoutputs"/>
+                                <property name="label" value="publications"/>
+                                <property name="icon" value="fas fa-file-alt fa-3x"/>
+                                <property name="link" value="/explore/researchoutputs"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutCountersComponent.CounterSettings">
+                                <property name="discoveryConfigurationName" value="project_funding"/>
+                                <property name="label" value="project_funding"/>
+                                <property name="icon" value="fas fa-cogs fa-3x"/>
+                                <property name="link" value="/explore/fundings_and_projects"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutCountersComponent.CounterSettings">
+                                <property name="discoveryConfigurationName" value="person"/>
+                                <property name="label" value="rprofiles"/>
+                                <property name="icon" value="fas fa-users fa-3x"/>
+                                <property name="link" value="/explore/researcherprofiles"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+            <list>
+                <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                    <property name="discoveryConfigurationName" value="homePageTopItems" />
+                    <property name="sortField" value="dc.date.accessioned" />
+                    <property name="order" value="desc" />
+                    <property name="style" value="col-md-6"/>
+                    <property name="numberOfItems" value="5"/>
+                </bean>
+                <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                    <property name="discoveryConfigurationName" value="homePageTopItems" />
+                    <property name="sortField" value="metric.view" />
+                    <property name="order" value="desc" />
+                    <property name="style" value="col-md-6"/>
+                    <property name="numberOfItems" value="5"/>
+                </bean>
+            </list>
+          </list>
+        </constructor-arg>
+    </bean>
+                
+</beans>

@@ -40,6 +40,15 @@ public class DiscoverQuery {
 
     private int start = 0;
     private int maxResults = -1;
+    private IndexableObject scopeObject;
+
+    public IndexableObject getScopeObject() {
+        return scopeObject;
+    }
+
+    public void setScopeObject(final IndexableObject scopeObject) {
+        this.scopeObject = scopeObject;
+    }
 
     /**
      * Attributes used for sorting of results

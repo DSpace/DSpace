@@ -2181,6 +2181,20 @@
             </pair>
         </value-pairs>
 
+        <value-pairs value-pairs-name="event_types" dc-term="event_types">
+            <pair>
+                <displayed-value>Unspecified</displayed-value>
+                <stored-value />
+            </pair>
+            <pair>
+                <displayed-value>Conference</displayed-value>
+                <stored-value>Conference</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Workshop</displayed-value>
+                <stored-value>Workshop</stored-value>
+            </pair>
+        </value-pairs>
     </form-value-pairs>
 
 </input-forms>
