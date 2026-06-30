@@ -210,6 +210,30 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
+    @SearchRestMethod(name = "findAllVisibleSectionsInTopBar")
+    public Page<CollectionRest> findAllVisibleSectionsInTopBar(
+        @Parameter(value = "query") String query,
+        @Parameter(value = "entityType", required = true) String entityTypeLabel,
+        Pageable pageable)
+        throws SearchServiceException, SQLException {
+        try {
+            Context context = obtainContext();
+            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
+            if (entityType == null) {
+                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
+            }
+            List<Collection> collections = cs.findCollectionsAdministeredByEntityType(
+                query, entityTypeLabel, context,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            int tot = cs.countCollectionsAdministeredByEntityType(query, entityTypeLabel, context);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage(), e);
+        } catch (SearchServiceException e) {
+            throw new SearchServiceException(e.getMessage(), e);
+        }
+    }
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CollectionRest> findAdminAuthorized (

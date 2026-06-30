@@ -1842,21 +1842,70 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
-   <form name="onlyTitle">
-     <row>
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>title</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Title</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the main title of the item.</hint>
-         <required>You must enter a main title for this item.</required>
-         <!--    <language value-pairs-name="common_iso_languages">true</language> -->
-       </field>
-     </row>
-   </form>
+    <form name="onlyTitle">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Title</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the main title of the item.</hint>
+          <required>You must enter a main title for this item.</required>
+          <!--    <language value-pairs-name="common_iso_languages">true</language> -->
+        </field>
+      </row>
+    </form>
+
+    <form name="cris-layout-test">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <label>Event type</label>
+          <input-type value-pairs-name="event_types">dropdown</input-type>
+          <repeatable>false</repeatable>
+          <required />
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <label>Type</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must select a patent type</required>
+          <hint>Select the type of content of the patent.</hint>
+          <vocabulary>patent-coar-types</vocabulary>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <label>Type</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Nothing to do here. Note for administrators, this metadata could be completely hide using template item</hint>
+          <vocabulary>product-coar-types</vocabulary>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <label>Type</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must select a publication type</required>
+          <hint>Select the type(s) of content of the item.</hint>
+          <vocabulary>publication-coar-types</vocabulary>
+        </field>
+      </row>
+    </form>
 
  </form-definitions>
 
@@ -2323,6 +2372,21 @@ it, please enter the types and the actual numbers or codes.</hint>
            <displayed-value>Armenian dram</displayed-value>
            <stored-value>Armenian dram</stored-value>
        </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="event_types" dc-term="event_types">
+     <pair>
+       <displayed-value>Unspecified</displayed-value>
+       <stored-value />
+     </pair>
+     <pair>
+       <displayed-value>Conference</displayed-value>
+       <stored-value>Conference</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Workshop</displayed-value>
+       <stored-value>Workshop</stored-value>
+     </pair>
    </value-pairs>
 
  </form-value-pairs>

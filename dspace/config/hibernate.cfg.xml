@@ -96,6 +96,18 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
+        <!-- Configurable Layout -->
+        <mapping class="org.dspace.layout.CrisLayoutTab" />
+        <mapping class="org.dspace.layout.CrisLayoutBox" />
+        <mapping class="org.dspace.layout.CrisLayoutField" />
+        <mapping class="org.dspace.layout.CrisLayoutFieldMetadata" />
+        <mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
+        <mapping class="org.dspace.layout.CrisLayoutRow" />
+        <mapping class="org.dspace.layout.CrisLayoutCell" />
+        <mapping class="org.dspace.layout.CrisMetadataGroup" />
+        <mapping class="org.dspace.layout.CrisLayoutBox2SecurityGroup" />
+        <mapping class="org.dspace.layout.CrisLayoutTab2SecurityGroup" />
+
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
         
         <mapping class="org.dspace.orcid.OrcidQueue" />

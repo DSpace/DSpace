@@ -73,7 +73,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(content().contentType(contentType))
                         //The configuration file for the test env includes 6 forms
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(35)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(36)))
                         .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(
@@ -91,7 +91,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(35)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(36)))
                         .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
@@ -686,7 +686,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void findAllPaginationTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         int pageSize = 2;
-        int totalElements = 35;
+        int totalElements = 36;
         int totalPages = 18;
 
         List<String> expectedIds = Arrays.asList(
@@ -699,10 +699,19 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
             "publication_references-dc-relation-project",
             "publication_bibliographic_details",
             "typebindtest",
+            "cris-layout-test",
             "bitstream-metadata",
             "titleAndIssuedDate",
             "test-outside-workflow-hidden",
             "onlyTitle",
+            "publicationStep",
+            "orgunit",
+            "test-outside-submission-hidden",
+            "qualdroptest",
+            "traditionalpagetwo",
+            "sampleauthority",
+            "traditionalpageone",
+            "funding-oairecerif-funder"
             "orgunit",
             "publication",
             "test-outside-submission-hidden",

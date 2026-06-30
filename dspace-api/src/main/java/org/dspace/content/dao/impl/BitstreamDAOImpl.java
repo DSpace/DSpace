@@ -145,6 +145,47 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
     }
 
     @Override
+    public Iterator<Bitstream> findShowableByItem(Context context, UUID itemId, String bundleName) throws SQLException {
+        Query query = createQuery(
+            context,
+            "select b.id from Bitstream b " +
+            "join b.bundles bitBundle " +
+            "join bitBundle.items item " +
+            "WHERE item.id = :itemId " +
+            "and NOT EXISTS( " +
+            "  select 1 from MetadataValue mv " +
+            "  join mv.metadataField mf " +
+            "  join mf.metadataSchema ms " +
+            "  where mv.dSpaceObject = b and " +
+            "  ms.name = 'bitstream' and " +
+            "  mf.element = 'hide' and " +
+            "  mf.qualifier is null and " +
+            "  (mv.value = 'true' or mv.value = 'yes') " +
+            ")" +
+            " AND (" +
+            "  :bundleName is null OR " +
+            "  EXISTS ( " +
+            "    select 1 " +
+            "    from MetadataValue mvB " +
+            "    join mvB.metadataField mfB " +
+            "    join mfB.metadataSchema msB " +
+            "    where mvB.dSpaceObject = bitBundle and " +
+            "    msB.name = 'dc' and " +
+            "    mfB.element = 'title' and " +
+            "    mfB.qualifier is null and " +
+            "    mvB.value = :bundleName " +
+            "  )" +
+            ")"
+        );
+
+        query.setParameter("itemId", itemId);
+        query.setParameter("bundleName", bundleName);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
+    }
+
+    @Override
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
         Query query = createQuery(context, "select b.id from Bitstream b where b.storeNumber = :storeNumber");
         query.setParameter("storeNumber", storeNumber);

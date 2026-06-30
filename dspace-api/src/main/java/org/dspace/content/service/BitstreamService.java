@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -226,6 +227,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public Bitstream getThumbnail(Context context, Bitstream bitstream) throws SQLException;
 
+    public boolean isValidThumbnail(Context context, Bitstream thumbnail) throws SQLException;
+
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException;
 
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
@@ -259,4 +262,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @throws SQLException
      */
     boolean isInBundle(Bitstream bitstream, java.util.Collection<String> bundleNames) throws SQLException;
+
+    List<Bitstream> findShowableByItem(Context context, UUID itemId, String bundleName,
+                                       Map<String, String> filterMetadata) throws SQLException;
+
 }

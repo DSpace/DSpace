@@ -7,10 +7,13 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.Optional;
+
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -58,12 +61,23 @@ public class ItemConverter
      */
     @Override
     public MetadataValueList getPermissionFilteredMetadata(Context context, Item item, Projection projection) {
+        boolean preventSecurityCheck = preventSecurityCheck(projection);
         if (projection.isAllLanguages()) {
             return new MetadataValueList(
-                metadataSecurityService.getPermissionFilteredMetadataValues(context, item));
+                metadataSecurityService.getPermissionFilteredMetadataValues(context, item, preventSecurityCheck));
         }
         return new MetadataValueList(
-            metadataSecurityService.getPermissionAndLangFilteredMetadataFields(context, item));
+            metadataSecurityService.getPermissionAndLangFilteredMetadataFields(context, item, preventSecurityCheck));
+    }
+
+    public boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField) {
+        return metadataSecurityService.checkMetadataFieldVisibility(context, item, metadataField);
+    }
+
+    private boolean preventSecurityCheck(Projection projection) {
+        return Optional.ofNullable(projection)
+                       .map(Projection::preventMetadataLevelSecurity)
+                       .orElse(false);
     }
 
     @Override
