@@ -65,6 +65,11 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
     <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
 
+    <!-- Configurable layout DAO -->
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutMetadataGroupDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
 

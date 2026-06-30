@@ -8,6 +8,8 @@
 package org.dspace.util;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -56,6 +58,32 @@ public class FunctionalUtils {
             return defaultValue;
         }
         return builder.get();
+    }
+
+    public static <T> Consumer<T> throwingConsumerWrapper(
+            ThrowingConsumer<T, Exception> throwingConsumer) {
+        return i -> {
+            try {
+                throwingConsumer.accept(i);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    public static <T, R> Function<T, R> throwingMapperWrapper(
+            ThrowingMapper<T, R, Exception> throwingConsumer,
+            R defaultValue
+    ) {
+        return i -> {
+            R value = defaultValue;
+            try {
+                value = throwingConsumer.accept(i);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return value;
+        };
     }
 
 }

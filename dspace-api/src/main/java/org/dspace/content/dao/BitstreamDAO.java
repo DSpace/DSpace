@@ -10,6 +10,7 @@ package org.dspace.content.dao;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -27,23 +28,23 @@ import org.dspace.core.Context;
  */
 public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
 
-    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
+    Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
 
-    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException;
+    List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException;
 
-    public List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException;
+    List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException;
 
-    public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException;
+    List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException;
 
-    public Iterator<Bitstream> findByCommunity(Context context, Community community) throws SQLException;
+    Iterator<Bitstream> findByCommunity(Context context, Community community) throws SQLException;
 
-    public Iterator<Bitstream> findByCollection(Context context, Collection collection) throws SQLException;
+    Iterator<Bitstream> findByCollection(Context context, Collection collection) throws SQLException;
 
-    public Iterator<Bitstream> findByItem(Context context, Item item) throws SQLException;
+    Iterator<Bitstream> findByItem(Context context, Item item) throws SQLException;
 
-    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+    Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
-    public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+    Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
     int countRows(Context context) throws SQLException;
 
@@ -52,4 +53,6 @@ public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
     int countWithNoPolicy(Context context) throws SQLException;
 
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
+
+    Iterator<Bitstream> findShowableByItem(Context context, UUID itemId, String bundleName) throws SQLException;
 }

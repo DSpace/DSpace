@@ -158,7 +158,22 @@
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.LDNMessageEntityIndexFactoryImpl" autowire-candidate="true"/>
+
+    <!-- Configurable layout services -->
+    <bean class="org.dspace.layout.service.impl.CrisLayoutTabServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutBoxServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutMetadataGroupServiceImpl"/>
+
+    <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutBoxAccessServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutTabAccessServiceImpl"/>
     <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
+
+    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolValidatorImpl"/>
+    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolParserImpl"/>
+    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolConverterImpl"/>
+
 
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
@@ -187,6 +202,8 @@
     <context:component-scan base-package="org.dspace.identifier.doi.crossref" />
 
     <bean class="org.dspace.content.BitstreamLinkingServiceImpl"/>
+
+    <bean class="org.dspace.discovery.configuration.DiscoveryConfigurationUtilsService"/>
 
 </beans>
 

@@ -10,11 +10,15 @@ package org.dspace.content.security;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +38,13 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSecurityEvaluation;
 import org.dspace.core.Context;
 import org.dspace.core.exception.SQLRuntimeException;
+import org.dspace.eperson.EPerson;
+import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.CrisLayoutFieldMetadata;
+import org.dspace.layout.CrisMetadataGroup;
+import org.dspace.layout.service.CrisLayoutBoxAccessService;
+import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +132,13 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     private AuthorizeService authorizeService;
 
     @Autowired
+    private CrisLayoutBoxService crisLayoutBoxService;
+
+    @Autowired
     private MetadataExposureService metadataExposureService;
+
+    @Autowired
+    private CrisLayoutBoxAccessService crisLayoutBoxAccessService;
 
     @Autowired
     private RequestService requestService;
@@ -144,8 +161,9 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         List<MetadataValue> values =
             dSpaceObjectService.getMetadata(dso, schema, element, qualifier, language);
-        return getPermissionFilteredMetadata(context, dso, values);
+        return getPermissionFilteredMetadata(context, dso, values, false);
     }
+
 
     @Override
     public <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso) {
@@ -153,12 +171,51 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     }
 
     @Override
-    public <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context,
-                                                                                                   T dso) {
+    public <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(
+        Context context,
+        T dso,
+        boolean preventBoxSecurityCheck) {
+        List<MetadataValue> values =
+            ContentServiceFactory.getInstance()
+                                 .getDSpaceObjectService(dso.getType())
+                                 .getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        return getPermissionFilteredMetadata(context, dso, values, preventBoxSecurityCheck);
+    }
+
+    @Override
+    public <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context,
+                                                                                            T dso,
+                                                                                            String metadataField) {
+        return getPermissionFilteredMetadataValues(context, dso, metadataField, false);
+    }
+
+    private <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(
+        Context context,
+        T dso,
+        String metadataField,
+        boolean preventBoxSecurityCheck) {
+
+        List<MetadataValue> metadataValues = ContentServiceFactory.getInstance()
+                             .getDSpaceObjectService(dso.getType()).getMetadataByMetadataString(dso, metadataField);
+
+        return this.getPermissionFilteredMetadata(context, dso, metadataValues, preventBoxSecurityCheck);
+    }
+
+    @Override
+    public <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(
+        Context context,
+        T dso,
+        boolean preventBoxSecurityCheck) {
         String language = context != null ? context.getCurrentLocale().getLanguage() : Item.ANY;
         DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         List<MetadataValue> values = dSpaceObjectService.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, language);
-        return getPermissionFilteredMetadata(context, dso, values);
+        return getPermissionFilteredMetadata(context, dso, values, preventBoxSecurityCheck);
+    }
+
+    @Override
+    public boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField) {
+        List<CrisLayoutBox> boxes = findBoxes(context, item, false);
+        return isMetadataFieldVisible(context, boxes, item, metadataField, false);
     }
 
     /**
@@ -185,20 +242,25 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * @param metadataValues the complete list of metadata values to filter
      * @return filtered list containing only metadata values the user can access
      */
-    private <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadata(Context context, T dso,
-                                                              List<MetadataValue> metadataValues) {
+    private <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadata(
+        Context context,
+        T dso,
+        List<MetadataValue> metadataValues,
+        boolean preventBoxSecurityCheck) {
 
         if ((dso instanceof Item item) && item.isWithdrawn() && isNotAdmin(context, dso)) {
             return List.of();
         }
+        List<CrisLayoutBox> boxes = findBoxes(context, dso, preventBoxSecurityCheck);
 
         Optional<List<DCInputSet>> inputs = submissionDefinitionInputs();
         if (inputs.isPresent()) {
-            return getFromSubmission(context, dso, inputs.get(), metadataValues);
+            return getFromSubmission(context, boxes, dso, inputs.get(), metadataValues, preventBoxSecurityCheck);
         }
 
         return metadataValues.stream()
-                             .filter(value -> isMetadataValueVisible(context, dso, value))
+                             .filter(value -> isMetadataValueVisible(context, boxes, dso, value,
+                                                                     preventBoxSecurityCheck))
                              .filter(value -> isMetadataValueReturnAllowed(context, dso, value))
                                 .collect(Collectors.toList());
 
@@ -215,45 +277,81 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         }
     }
 
-    private <T extends DSpaceObject> boolean isMetadataValueVisible(Context context, T dso, MetadataValue value) {
-        return isMetadataFieldVisible(context, dso, value.getMetadataField());
+    private <T extends DSpaceObject> List<CrisLayoutBox> findBoxes(Context context,
+                                                                   T dso,
+                                                                   boolean preventBoxSecurityCheck) {
+        if (!(dso instanceof Item) || context == null || preventBoxSecurityCheck) {
+            // the context could be null if the converter is used to prepare test data or in a batch script
+            return List.of();
+        }
+
+        String entityType = itemService.getEntityTypeLabel((Item) dso);
+        try {
+            return crisLayoutBoxService.findByEntityType(context, entityType, 1000, 0);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    private <T extends DSpaceObject> boolean isMetadataValueVisible(Context context, List<CrisLayoutBox> boxes, T dso,
+                                                                    MetadataValue value,
+                                                                    boolean preventBoxSecurityCheck) {
+        return isMetadataFieldVisible(context, boxes, dso, value.getMetadataField(), preventBoxSecurityCheck);
     }
 
     /**
      * Determines if a metadata field is visible to the current user based on permission rules.
-     * 
+     *
      * <p><strong>Visibility Rules (in order of precedence):</strong></p>
      * <ol>
      *   <li><strong>Public Field:</strong> Always visible if configured in {@code metadata.publicField}</li>
      *   <li><strong>Permission Check:</strong> Visible if user can edit dso OR field is not hidden</li>
      * </ol>
-     * 
+     *
      * <p><strong>Configuration Examples:</strong></p>
      * <pre>
      * # Always public fields
      * metadata.publicField = dc.title, dc.date.issued, dc.identifier.uri
-     * 
+     *
      * # Wildcard patterns
      * metadata.publicField = dc.title.*, person.identifier.*
      * </pre>
-     * 
+     *
      * @param context the DSpace context for permission checking
      * @param dso the dso containing the metadata field
      * @param metadataField the metadata field to check for visibility
      * @return true if the field should be visible to the current user, false otherwise
      */
-    private <T extends DSpaceObject> boolean isMetadataFieldVisible(Context context, T dso,
-                                           MetadataField metadataField) {
+    private <T extends DSpaceObject> boolean isMetadataFieldVisible(Context context,
+                                                                    List<CrisLayoutBox> boxes,
+                                                                    T dso,
+                                                                    MetadataField metadataField,
+                                                                    boolean preventBoxSecurityCheck) {
 
-        if (isPublicMetadataField(metadataField)) {
+        if (isPublicMetadataField(metadataField, boxes, preventBoxSecurityCheck)) {
             return true;
         }
 
-        if (isMetadataFieldVisibleFor(context, dso, metadataField)) {
-            return true;
+        // stop any further costly check if the converter request the fastest strategy
+        if (preventBoxSecurityCheck) {
+            return false;
         }
 
-        return false;
+        EPerson currentUser = context != null ? context.getCurrentUser() : null;
+        List<CrisLayoutBox> notPublicBoxes = getNotPublicBoxes(metadataField, boxes);
+
+        if (Objects.nonNull(currentUser)) {
+
+            for (CrisLayoutBox box : notPublicBoxes) {
+                if (dso instanceof Item && crisLayoutBoxAccessService.hasAccess(context, currentUser, box,
+                                                                                (Item )dso)) {
+                    return true;
+                }
+            }
+        }
+
+        // the metadata is not included in any box so use the default dspace security
+        return notPublicBoxes.isEmpty() && isMetadataFieldVisibleFor(context, dso, metadataField);
     }
 
     /**
@@ -297,9 +395,13 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
         }
     }
 
-    private boolean isPublicMetadataField(MetadataField metadataField) {
+    private boolean isPublicMetadataField(MetadataField metadataField, List<CrisLayoutBox> boxes,
+                                          boolean preventBoxSecurityCheck) {
 
-        return getPublicMetadataFromConfig().stream()
+        List<String> publicFields = preventBoxSecurityCheck || boxes.isEmpty() ?
+            getPublicMetadataFromConfig() : getPublicMetadata(boxes);
+
+        return publicFields.stream()
                            .anyMatch(publicField -> metadataMatch(metadataField, publicField));
     }
 
@@ -344,6 +446,38 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
 
     private List<String> getPublicMetadataFromConfig() {
         return List.of(configurationService.getArrayProperty("metadata.publicField"));
+    }
+
+    private List<String> getPublicMetadata(List<CrisLayoutBox> boxes) {
+        return boxes.stream()
+            .filter(box -> box.isPublic())
+            .flatMap(box -> getAllMetadataFields(box).stream())
+            .map(metadataField -> metadataField.toString('.'))
+            .collect(Collectors.toList());
+    }
+
+    private List<CrisLayoutBox> getNotPublicBoxes(MetadataField metadataField, List<CrisLayoutBox> boxes) {
+        return boxes.stream()
+            .filter(box -> box.isNotPublic())
+            .filter(box -> boxContainsMetadataField(box, metadataField))
+            .collect(Collectors.toList());
+    }
+
+    private boolean boxContainsMetadataField(CrisLayoutBox box, MetadataField metadataField) {
+        return getAllMetadataFields(box).contains(metadataField);
+    }
+
+    private Set<MetadataField> getAllMetadataFields(CrisLayoutBox box) {
+        Set<MetadataField> metadataFields = new HashSet<>();
+        for (CrisLayoutField field : box.getLayoutFields()) {
+            if (field instanceof CrisLayoutFieldMetadata) {
+                metadataFields.add(field.getMetadataField());
+                for (CrisMetadataGroup metadataGroup : field.getCrisMetadataGroupList()) {
+                    metadataFields.add(metadataGroup.getMetadataField());
+                }
+            }
+        }
+        return metadataFields;
     }
 
     private Optional<List<DCInputSet>> submissionDefinitionInputs() {
@@ -398,16 +532,19 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * @param metadataValues the metadata values to filter
      * @return filtered list containing only submission-relevant and permission-allowed metadata
      */
-    private <T extends DSpaceObject> List<MetadataValue> getFromSubmission(Context context, T dso,
-                                                  final List<DCInputSet> dcInputSets,
-                                                  final List<MetadataValue> metadataValues) {
+    private <T extends DSpaceObject> List<MetadataValue> getFromSubmission(Context context,
+                                                                           @Nullable List<CrisLayoutBox> boxes,
+                                                                           T dso,
+                                                                           final List<DCInputSet> dcInputSets,
+                                                                           final List<MetadataValue> metadataValues,
+                                                                           boolean preventBoxSecurityCheck) {
 
         List<MetadataValue> filteredMetadataValues = new ArrayList<>();
 
         for (MetadataValue metadataValue : metadataValues) {
             MetadataField field = metadataValue.getMetadataField();
             if (dcInputsContainsField(dcInputSets, field)
-                || isMetadataFieldVisible(context, dso, field)) {
+                || isMetadataFieldVisible(context, boxes, dso, field, preventBoxSecurityCheck)) {
                 filteredMetadataValues.add(metadataValue);
             }
         }
