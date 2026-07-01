@@ -24,7 +24,7 @@
         <spring-boot.version>3.5.14</spring-boot.version>
         <spring-security.version>6.5.10</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.10.Final</hibernate.version>
-        <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
+        <hibernate-validator.version>8.0.4.Final</hibernate-validator.version>
         <!-- Pin antlr4-runtime to the version required by Hibernate (compiled with ANTLR tool 4.13.0) -->
         <antlr4.version>4.13.0</antlr4.version>
         <postgresql.driver.version>42.7.11</postgresql.driver.version>
