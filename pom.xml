@@ -32,7 +32,7 @@
         <solr.client.version>8.11.4</solr.client.version>
 
         <ehcache.version>3.12.0</ehcache.version>
-        <errorprone.version>2.49.0</errorprone.version>
+        <errorprone.version>2.50.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
         <jackson.version>2.22.0</jackson.version>
         <jackson-annotations.version>2.22</jackson-annotations.version>
@@ -333,7 +333,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.8.3</version>
+                    <version>4.10.2.0</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
@@ -343,7 +343,7 @@
                         <dependency>
                             <groupId>com.github.spotbugs</groupId>
                             <artifactId>spotbugs</artifactId>
-                            <version>4.9.8</version>
+                            <version>4.10.2</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -395,7 +395,7 @@
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.10.0</version>
+                    <version>0.11.0</version>
                 </plugin>
                 <!-- Used to generate JavaDocs for new releases (see release profile). -->
                 <plugin>
@@ -435,7 +435,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.14</version>
+                    <version>0.8.15</version>
                 </plugin>
                 <!-- Freeze versions of the remaining compiler plugins for reproducible builds -->
                 <plugin>
