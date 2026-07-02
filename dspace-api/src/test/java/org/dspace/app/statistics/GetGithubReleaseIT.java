@@ -29,26 +29,20 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(
-        initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class },
+        initializers = {
+            DSpaceKernelInitializer.class,
+            DSpaceConfigurationInitializer.class
+        },
         locations = { "classpath:spring/*.xml" }
 )
 public class GetGithubReleaseIT
         extends AbstractIntegrationTest {
-    /**
-     * Test of getScriptConfiguration method, of class GetGithubRelease.
-     */
-    @Ignore
-    @Test
-    public void testGetScriptConfiguration() {
-    }
-
-    /**
-     * Test of setup method, of class GetGithubRelease.
-     */
-    @Ignore
-    @Test
-    public void testSetup() {
-    }
+    /* Use these after Project-Counter has a release. */
+//    private static final String OWNER = "Project-Counter";
+//    private static final String REPO = "counter-bots";
+    /* Stop using these after Project-Counter has a release. */
+    private static final String OWNER = "atmire";
+    private static final String REPO = "COUNTER-Robots";
 
     /**
      * Test fetching the zip archive.
@@ -60,24 +54,33 @@ public class GetGithubReleaseIT
             throws Exception {
         // Test with this repository
         final String[] args = {
-            "-" + GetGithubReleaseOptions.OPT_OWNER, "atmire",
-            "-" + GetGithubReleaseOptions.OPT_REPO, "COUNTER-Robots",
+            "-" + GetGithubReleaseOptions.OPT_OWNER, OWNER,
+            "-" + GetGithubReleaseOptions.OPT_REPO, REPO,
         };
 
         // Create and configure the test instance.
         GetGithubRelease instance = new GetGithubRelease();
         instance.configuration = new GetGithubReleaseScriptConfiguration();
-        instance.initialize(args, new TestDSpaceRunnableHandler(), eperson);
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        instance.initialize(args, handler, eperson);
 
         // Test!
         instance.run();
 
         // Interpret results.
         Path archiveFilePath = instance.getArchiveFilePath();
-        if (Files.exists(archiveFilePath)) {
-            Files.delete(archiveFilePath); // Clean up our mess.
-        } else {
-            fail("Archive file should have been created at " + archiveFilePath.toString());
+        if (null != archiveFilePath) {
+            if (Files.exists(archiveFilePath)) {
+                Files.delete(archiveFilePath); // Clean up our mess.
+            } else {
+                fail("Archive file should have been created at "
+                        + archiveFilePath.toString());
+            }
+        }
+
+        Exception e = handler.getException();
+        if (null != e) {
+            fail(e.toString());
         }
     }
 }
