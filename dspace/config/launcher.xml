@@ -102,9 +102,9 @@
         <step>
             <class>org.dspace.app.statistics.GetGithubRelease</class>
             <argument>--owner</argument>
-            <argument>atmire</argument>
+            <argument>Project-Counter</argument>
             <argument>--repository</argument>
-            <argument>COUNTER-Robots</argument>
+            <argument>counter-bots</argument>
             <argument>--file</argument>
             <argument>generated/COUNTER_Robots_list.txt</argument>
         </step>
