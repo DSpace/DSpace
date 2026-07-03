@@ -758,17 +758,22 @@
             <version>0.47.0</version>
         </dependency>
 
-        <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
-             https://github.com/ORCID/orcid-model/issues/50 -->
-        <!-- Maintained at https://github.com/DSpace/orcid-model -->
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>orcid-model-jakarta</artifactId>
-            <version>3.3.0</version>
+            <groupId>org.orcid</groupId>
+            <artifactId>orcid-model</artifactId>
+            <version>4.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
                 </exclusion>
                 <!-- Exclude snakeyaml as a newer version is brought in by Spring Boot -->
                 <exclusion>
