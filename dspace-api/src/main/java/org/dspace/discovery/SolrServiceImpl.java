@@ -39,6 +39,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
 import org.apache.solr.client.solrj.response.json.BucketJsonFacet;
 import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
@@ -1004,6 +1005,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             List<String> zombieDocs = new ArrayList<>();
             QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
                           solrSearchCore.REQUEST_METHOD);
+            SpellCheckResponse spellCheckResponse = solrQueryResponse.getSpellCheckResponse();
+            if (spellCheckResponse != null) {
+                List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
+                if (collations != null && !collations.isEmpty()) {
+                    result.setSpellCheckSuggestion(collations.get(0).getCollationQueryString());
+                }
+            }
             if (solrQueryResponse != null) {
                 result.setSearchTime(solrQueryResponse.getQTime());
                 result.setStart(query.getStart());

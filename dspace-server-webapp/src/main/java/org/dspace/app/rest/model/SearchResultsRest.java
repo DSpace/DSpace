@@ -28,6 +28,8 @@ public class SearchResultsRest extends DiscoveryResultsRest {
     @JsonIgnore
     List<SearchFacetEntryRest> facets;
 
+    private String spellCheckSuggestion;
+
     public List<SearchResultEntryRest> getSearchResults() {
         return searchResults;
     }
@@ -63,6 +65,14 @@ public class SearchResultsRest extends DiscoveryResultsRest {
 
     public List<SearchFacetEntryRest> getFacets() {
         return facets;
+    }
+
+    public String getSpellCheckSuggestion() {
+        return spellCheckSuggestion;
+    }
+
+    public void setSpellCheckSuggestion(String spellCheckSuggestion) {
+        this.spellCheckSuggestion = spellCheckSuggestion;
     }
 
     public static class AppliedFilter {

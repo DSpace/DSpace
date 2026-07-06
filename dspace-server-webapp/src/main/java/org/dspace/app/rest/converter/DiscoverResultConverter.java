@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
@@ -63,9 +64,16 @@ public class DiscoverResultConverter {
 
         addFacetValues(context, searchResult, resultsRest, configuration, projection);
 
+        addSpellCheckValue(searchResult, resultsRest);
+
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
         return resultsRest;
+    }
+
+    private void addSpellCheckValue(DiscoverResult searchResult, SearchResultsRest resultsRest) {
+        String spellCheckResult = searchResult.getSpellCheckSuggestion();
+        resultsRest.setSpellCheckSuggestion(StringUtils.isNotBlank(spellCheckResult) ? spellCheckResult.trim() : null);
     }
 
     private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
