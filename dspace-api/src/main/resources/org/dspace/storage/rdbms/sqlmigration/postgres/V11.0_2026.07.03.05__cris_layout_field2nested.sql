@@ -31,6 +31,3 @@ CREATE TABLE IF NOT EXISTS cris_layout_field2nested
     CONSTRAINT cris_layout_field2nested_cris_layout_field_fkey
         FOREIGN KEY (field_id) REFERENCES cris_layout_field (field_id)
 );
-
-ALTER TABLE cris_layout_field2nested DROP COLUMN IF EXISTS label_as_heading;
-ALTER TABLE cris_layout_field2nested DROP COLUMN IF EXISTS values_inline;

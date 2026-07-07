@@ -21,15 +21,10 @@ CREATE TABLE IF NOT EXISTS cris_layout_box2securitygroup
     CONSTRAINT cris_layout_box2securitygroup_box_id
         FOREIGN KEY (box_id) REFERENCES cris_layout_box (id),
     CONSTRAINT cris_layout_box2securitygroup_group_id
-        FOREIGN KEY (group_id) REFERENCES epersongroup (uuid)
+        FOREIGN KEY (group_id) REFERENCES epersongroup (uuid),
+    CONSTRAINT cris_layout_box2securitygroup_box_id2
+        FOREIGN KEY (alternative_box_id) REFERENCES cris_layout_box (id) ON DELETE SET NULL
 );
-
-ALTER TABLE cris_layout_box2securitygroup ADD COLUMN IF NOT EXISTS alternative_box_id INTEGER;
-
-ALTER TABLE cris_layout_box2securitygroup DROP CONSTRAINT IF EXISTS cris_layout_box2securitygroup_box_id2;
-ALTER TABLE cris_layout_box2securitygroup
-    ADD CONSTRAINT cris_layout_box2securitygroup_box_id2
-    FOREIGN KEY (alternative_box_id) REFERENCES cris_layout_box (id) ON DELETE SET NULL;
 
 CREATE TABLE IF NOT EXISTS cris_layout_tab2securitygroup
 (
@@ -40,12 +35,7 @@ CREATE TABLE IF NOT EXISTS cris_layout_tab2securitygroup
     CONSTRAINT cris_layout_tab2securitygroup_tab_id
         FOREIGN KEY (tab_id) REFERENCES cris_layout_tab (id),
     CONSTRAINT cris_layout_tab2securitygroup_group_id
-        FOREIGN KEY (group_id) REFERENCES epersongroup (uuid)
+        FOREIGN KEY (group_id) REFERENCES epersongroup (uuid),
+    CONSTRAINT cris_layout_tab2securitygroup_tab_id2
+        FOREIGN KEY (alternative_tab_id) REFERENCES cris_layout_tab (id) ON DELETE SET NULL
 );
-
-ALTER TABLE cris_layout_tab2securitygroup ADD COLUMN IF NOT EXISTS alternative_tab_id INTEGER;
-
-ALTER TABLE cris_layout_tab2securitygroup DROP CONSTRAINT IF EXISTS cris_layout_tab2securitygroup_tab_id2;
-ALTER TABLE cris_layout_tab2securitygroup
-    ADD CONSTRAINT cris_layout_tab2securitygroup_tab_id2
-    FOREIGN KEY (alternative_tab_id) REFERENCES cris_layout_tab (id) ON DELETE SET NULL;
