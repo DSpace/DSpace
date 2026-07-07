@@ -31,26 +31,7 @@ CREATE TABLE IF NOT EXISTS cris_layout_box
     container   BOOLEAN,
     CONSTRAINT cris_layout_box_pkey PRIMARY KEY (id),
     CONSTRAINT cris_layout_box_entity_id_fkey FOREIGN KEY (entity_id)
-        REFERENCES entity_type (id)
+        REFERENCES entity_type (id),
+    CONSTRAINT cris_layout_cell_id_fk FOREIGN KEY (cell)
+        REFERENCES cris_layout_cell
 );
-
-ALTER TABLE cris_layout_box ADD COLUMN IF NOT EXISTS max_columns INTEGER;
-ALTER TABLE cris_layout_box ADD COLUMN IF NOT EXISTS cell INTEGER;
-ALTER TABLE cris_layout_box ADD COLUMN IF NOT EXISTS position INTEGER;
-ALTER TABLE cris_layout_box ADD COLUMN IF NOT EXISTS container BOOLEAN;
-
-ALTER TABLE cris_layout_box DROP COLUMN IF EXISTS clear;
-ALTER TABLE cris_layout_box DROP COLUMN IF EXISTS priority;
-
-ALTER TABLE cris_layout_box DROP CONSTRAINT IF EXISTS cris_layout_box_shortname_key;
-ALTER TABLE cris_layout_box DROP CONSTRAINT IF EXISTS cris_layout_box_entity_shortname_unique;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint WHERE conname = 'cris_layout_cell_id_fk'
-    ) THEN
-        ALTER TABLE cris_layout_box ADD CONSTRAINT cris_layout_cell_id_fk
-            FOREIGN KEY (cell) REFERENCES cris_layout_cell;
-    END IF;
-END $$;

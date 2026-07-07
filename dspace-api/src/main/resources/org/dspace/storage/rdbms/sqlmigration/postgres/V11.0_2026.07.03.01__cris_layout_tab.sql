@@ -26,15 +26,7 @@ CREATE TABLE IF NOT EXISTS cris_layout_tab
     custom_filter VARCHAR(255),
     CONSTRAINT cris_layout_tab_pkey PRIMARY KEY (id),
     CONSTRAINT cris_layout_tab_entity_id_fkey FOREIGN KEY (entity_id)
-        REFERENCES entity_type (id)
-);
-
-ALTER TABLE cris_layout_tab ADD COLUMN IF NOT EXISTS is_leading BOOLEAN;
-ALTER TABLE cris_layout_tab ADD COLUMN IF NOT EXISTS custom_filter VARCHAR(255);
-
-ALTER TABLE cris_layout_tab DROP CONSTRAINT IF EXISTS cris_layout_tab_shortname_key;
-ALTER TABLE cris_layout_tab DROP CONSTRAINT IF EXISTS cris_layout_tab_entity_shortname_unique;
-ALTER TABLE cris_layout_tab DROP CONSTRAINT IF EXISTS cris_layout_tab_entity_shortname_custom_filter_unique;
-
-ALTER TABLE cris_layout_tab ADD CONSTRAINT cris_layout_tab_entity_shortname_custom_filter_unique
-    UNIQUE (entity_id, shortname, custom_filter);
+    REFERENCES entity_type (id),
+    CONSTRAINT cris_layout_tab_entity_shortname_custom_filter_unique
+    UNIQUE (entity_id, shortname, custom_filter)
+    );
