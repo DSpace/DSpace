@@ -31,7 +31,7 @@ public class DiscoverResult {
     private int start;
     private List<IndexableObject> indexableObjects;
     private Map<String, List<FacetResult>> facetResults;
-    private List<String> spellCheckSuggestion;
+    private List<String> spellCheckSuggestions;
 
     // Total count of facet entries calculated for a metadata browsing query
     private long totalEntries;
@@ -96,12 +96,12 @@ public class DiscoverResult {
         return searchTime;
     }
 
-    public List<String> getSpellCheckSuggestion() {
-        return spellCheckSuggestion;
+    public List<String> getSpellCheckSuggestions() {
+        return spellCheckSuggestions;
     }
 
-    public void setSpellCheckSuggestion(List<String> spellCheckSuggestion) {
-        this.spellCheckSuggestion = spellCheckSuggestion;
+    public void setSpellCheckSuggestions(List<String> spellCheckSuggestions) {
+        this.spellCheckSuggestions = spellCheckSuggestions;
     }
 
     public void setSearchTime(int searchTime) {

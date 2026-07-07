@@ -73,20 +73,20 @@ public class DiscoverResultConverterTest {
 
     @Test
     public void testSpellCheckSuggestionIsSetWhenPresent() {
-        discoverResult.setSpellCheckSuggestion(List.of("java"));
+        discoverResult.setSpellCheckSuggestions(List.of("java"));
 
         SearchResultsRest result = convert("jav");
 
-        assertEquals("java", result.getSpellCheckSuggestion());
+        assertEquals("java", result.getSpellCheckSuggestions());
     }
 
     @Test
     public void testSpellCheckSuggestionIsTrimmed() {
-        discoverResult.setSpellCheckSuggestion(List.of("  java  "));
+        discoverResult.setSpellCheckSuggestions(List.of("  java  "));
 
         SearchResultsRest result = convert("jav");
 
-        assertEquals("java", result.getSpellCheckSuggestion());
+        assertEquals("java", result.getSpellCheckSuggestions());
     }
 
     // -----------------------------------------------------------------------
@@ -98,25 +98,25 @@ public class DiscoverResultConverterTest {
         // nessuna suggestion impostata sul DiscoverResult
         SearchResultsRest result = convert("anyquery");
 
-        assertNull(result.getSpellCheckSuggestion());
+        assertNull(result.getSpellCheckSuggestions());
     }
 
     @Test
     public void testSpellCheckSuggestionIsNullWhenEmpty() {
-        discoverResult.setSpellCheckSuggestion(List.of(""));
+        discoverResult.setSpellCheckSuggestions(List.of(""));
 
         SearchResultsRest result = convert("anyquery");
 
-        assertNull(result.getSpellCheckSuggestion());
+        assertNull(result.getSpellCheckSuggestions());
     }
 
     @Test
     public void testSpellCheckSuggestionIsNullWhenBlank() {
-        discoverResult.setSpellCheckSuggestion(List.of("   "));
+        discoverResult.setSpellCheckSuggestions(List.of("   "));
 
         SearchResultsRest result = convert("anyquery");
 
-        assertNull(result.getSpellCheckSuggestion());
+        assertNull(result.getSpellCheckSuggestions());
     }
 
     // -----------------------------------------------------------------------

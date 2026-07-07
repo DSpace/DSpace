@@ -71,7 +71,7 @@ public class DiscoverResultConverter {
     }
 
     private void addSpellCheckValue(DiscoverResult searchResult, SearchResultsRest resultsRest) {
-        resultsRest.setSpellCheckSuggestion(searchResult.getSpellCheckSuggestion());
+        resultsRest.setSpellCheckSuggestions(searchResult.getSpellCheckSuggestions());
     }
 
     private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
