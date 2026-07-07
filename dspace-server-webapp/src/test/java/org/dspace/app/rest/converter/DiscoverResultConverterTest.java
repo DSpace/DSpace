@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
@@ -72,7 +73,7 @@ public class DiscoverResultConverterTest {
 
     @Test
     public void testSpellCheckSuggestionIsSetWhenPresent() {
-        discoverResult.setSpellCheckSuggestion("java");
+        discoverResult.setSpellCheckSuggestion(List.of("java"));
 
         SearchResultsRest result = convert("jav");
 
@@ -81,7 +82,7 @@ public class DiscoverResultConverterTest {
 
     @Test
     public void testSpellCheckSuggestionIsTrimmed() {
-        discoverResult.setSpellCheckSuggestion("  java  ");
+        discoverResult.setSpellCheckSuggestion(List.of("  java  "));
 
         SearchResultsRest result = convert("jav");
 
@@ -102,7 +103,7 @@ public class DiscoverResultConverterTest {
 
     @Test
     public void testSpellCheckSuggestionIsNullWhenEmpty() {
-        discoverResult.setSpellCheckSuggestion("");
+        discoverResult.setSpellCheckSuggestion(List.of(""));
 
         SearchResultsRest result = convert("anyquery");
 
@@ -111,7 +112,7 @@ public class DiscoverResultConverterTest {
 
     @Test
     public void testSpellCheckSuggestionIsNullWhenBlank() {
-        discoverResult.setSpellCheckSuggestion("   ");
+        discoverResult.setSpellCheckSuggestion(List.of("   "));
 
         SearchResultsRest result = convert("anyquery");
 

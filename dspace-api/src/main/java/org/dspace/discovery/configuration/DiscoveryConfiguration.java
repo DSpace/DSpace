@@ -51,6 +51,7 @@ public class DiscoveryConfiguration implements InitializingBean {
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
     private boolean spellCheckEnabled;
+    private int spellCheckCount = 3;
     private boolean indexAlways = false;
 
     /**
@@ -221,5 +222,13 @@ public class DiscoveryConfiguration implements InitializingBean {
             }
         }
         return null;
+    }
+
+    public int getSpellcheckCount() {
+        return spellCheckCount;
+    }
+
+    public void setSpellcheckCount(int spellCheckCount) {
+        this.spellCheckCount = spellCheckCount;
     }
 }

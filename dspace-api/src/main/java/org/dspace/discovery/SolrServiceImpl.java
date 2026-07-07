@@ -1009,7 +1009,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (spellCheckResponse != null) {
                 List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
                 if (collations != null && !collations.isEmpty()) {
-                    result.setSpellCheckSuggestion(collations.get(0).getCollationQueryString());
+                    result.setSpellCheckSuggestion(collations.stream()
+                            .map(SpellCheckResponse.Collation::getCollationQueryString)
+                            .toList());
                 }
             }
             if (solrQueryResponse != null) {
