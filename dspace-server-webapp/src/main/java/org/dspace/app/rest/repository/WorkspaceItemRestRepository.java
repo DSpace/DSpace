@@ -84,6 +84,14 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemRestRepository.class);
 
+    /**
+     * Files larger than this are not copied into a second temp file to probe them for bibliographic
+     * metadata. Import formats (BibTeX, RIS, PDF, XML, ...) are always small text/document files, so
+     * large binaries (video, datasets, disk images, ...) can skip straight to being stored as a plain
+     * bitstream instead of paying for an extra full-file copy first.
+     */
+    private static final long IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE = 100L * 1024 * 1024;
+
     @Autowired
     WorkspaceItemService wis;
 
@@ -266,6 +274,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         List<ImportRecord> records = new ArrayList<>();
         try {
             for (MultipartFile mpFile : uploadfiles) {
+                if (mpFile.getSize() > IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE) {
+                    continue;
+                }
                 File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
                 try {
                     ImportRecord record = importService.getRecord(file, mpFile.getOriginalFilename());
