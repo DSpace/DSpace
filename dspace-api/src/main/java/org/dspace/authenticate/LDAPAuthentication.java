@@ -465,7 +465,8 @@ public class LDAPAuthentication implements AuthenticationMethod {
             ldap_surname_field = configurationService.getProperty("authentication-ldap.surname_field");
             ldap_phone_field = configurationService.getProperty("authentication-ldap.phone_field");
             ldap_group_field = configurationService.getProperty("authentication-ldap.login.groupmap.attribute");
-            includeMailFilter = configurationService.getBooleanProperty("authentication-ldap.include_mail_filter", false);
+            includeMailFilter =
+                configurationService.getBooleanProperty("authentication-ldap.include_mail_filter", false);
             useTLS = configurationService.getBooleanProperty("authentication-ldap.starttls", false);
 
             setupSpringLdap(configurationService);
