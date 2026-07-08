@@ -85,12 +85,21 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemRestRepository.class);
 
     /**
-     * Files larger than this are not copied into a second temp file to probe them for bibliographic
-     * metadata. Import formats (BibTeX, RIS, PDF, XML, ...) are always small text/document files, so
-     * large binaries (video, datasets, disk images, ...) can skip straight to being stored as a plain
-     * bitstream instead of paying for an extra full-file copy first.
+     * Configuration key for the maximum size (in bytes) of an uploaded file that is still copied into
+     * a second temp file to probe it for bibliographic metadata. Import formats (BibTeX, RIS, PDF,
+     * XML, ...) are always small text/document files, so larger binaries (video, datasets, disk
+     * images, ...) can skip the probe and be stored directly as a plain bitstream, avoiding an extra
+     * full-file copy. Configurable via local.cfg; defaults to
+     * {@link #IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_DEFAULT}.
      */
-    private static final long IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE = 100L * 1024 * 1024;
+    private static final String IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_PROPERTY =
+        "submission.import.metadata-lookup.max-file-size";
+
+    /**
+     * Default value (100 MB, in bytes) for {@link #IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_PROPERTY}
+     * when the property is not configured.
+     */
+    private static final long IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_DEFAULT = 100L * 1024 * 1024;
 
     @Autowired
     WorkspaceItemService wis;
@@ -272,9 +281,11 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             submissionConfigService.getSubmissionConfigByCollection(collection);
         List<WorkspaceItem> result = null;
         List<ImportRecord> records = new ArrayList<>();
+        long importMetadataLookupMaxFileSize = configurationService.getLongProperty(
+            IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_PROPERTY, IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_DEFAULT);
         try {
             for (MultipartFile mpFile : uploadfiles) {
-                if (mpFile.getSize() > IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE) {
+                if (mpFile.getSize() > importMetadataLookupMaxFileSize) {
                     continue;
                 }
                 File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
