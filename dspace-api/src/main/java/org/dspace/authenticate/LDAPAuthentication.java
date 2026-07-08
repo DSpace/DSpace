@@ -500,7 +500,9 @@ public class LDAPAuthentication implements AuthenticationMethod {
             try {
                 Filter filter;
                 if (includeMailFilter) {
-                    filter = new OrFilter().or(new EqualsFilter(ldap_id_field, netid)).or(new EqualsFilter(ldap_email_field, netid));
+                    filter = new OrFilter().or(
+                        new EqualsFilter(ldap_id_field, netid)).or(new EqualsFilter(ldap_email_field, netid)
+                    );
                 } else {
                     filter = new EqualsFilter(ldap_id_field, netid);
                 }
