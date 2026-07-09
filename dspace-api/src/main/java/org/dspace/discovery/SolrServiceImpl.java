@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -1007,12 +1008,29 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                           solrSearchCore.REQUEST_METHOD);
             SpellCheckResponse spellCheckResponse = solrQueryResponse.getSpellCheckResponse();
             if (spellCheckResponse != null) {
+                List<String> suggestions = new ArrayList<>();
                 List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
                 if (collations != null && !collations.isEmpty()) {
-                    result.setSpellCheckSuggestions(collations.stream()
+                    suggestions.addAll(collations.stream()
                             .map(collation -> collation.getCollationQueryString().trim())
                             .toList());
                 }
+
+                List<SpellCheckResponse.Suggestion> alternatives = spellCheckResponse.getSuggestions();
+                if (alternatives != null && !alternatives.isEmpty()) {
+                    alternatives.stream()
+                            .flatMap(s -> IntStream.range(0, s.getAlternatives().size())
+                                    .mapToObj(i -> Map.entry(
+                                            s.getAlternatives().get(i),
+                                            s.getAlternativeFrequencies().get(i))))
+                            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                            .forEach(e -> {
+                                if (!suggestions.contains(e.getKey())) {
+                                    suggestions.add(e.getKey());
+                                }
+                            });
+                }
+                result.setSpellCheckSuggestions(suggestions);
             }
             if (solrQueryResponse != null) {
                 result.setSearchTime(solrQueryResponse.getQTime());

@@ -51,7 +51,7 @@ public class DiscoveryConfiguration implements InitializingBean {
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
     private boolean spellCheckEnabled;
-    private int spellCheckCount = 3;
+    private int spellCheckCount = 2;
     private boolean indexAlways = false;
 
     /**
