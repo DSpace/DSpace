@@ -49,6 +49,12 @@
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleaner"/>
     </bean>
 
+    <bean id="identify-formats" class="org.dspace.ctask.general.IdentifyFormatsScriptConfiguration" primary="true">
+        <property name="description"
+                  value="Re-identify bitstream formats and correct those stored as Unknown"/>
+        <property name="dspaceRunnableClass" value="org.dspace.ctask.general.IdentifyFormatsScript"/>
+    </bean>
+
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration" primary="true">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
