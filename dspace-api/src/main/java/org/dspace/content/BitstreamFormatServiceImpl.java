@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.logging.log4j.Logger;
 import org.apache.tika.Tika;
 import org.apache.tika.io.TikaInputStream;
@@ -49,6 +50,17 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      * identification is used. Defaults to {@code true}.
      */
     protected static final String CFG_IDENTIFY_BY_CONTENT = "bitstream.format.identification.by-content.enabled";
+
+    /**
+     * Configuration property bounding how many bytes of a bitstream's content are read for
+     * content-based identification. This keeps identification cheap for very large files
+     * (especially container formats such as ZIP/OOXML which Tika would otherwise spool to a
+     * temporary file in full). A value of {@code 0} or less means "read the whole file".
+     */
+    protected static final String CFG_MAX_BYTES = "bitstream.format.identification.by-content.max-bytes";
+
+    /** Default byte bound for content-based identification (32 MiB). */
+    protected static final long DEFAULT_MAX_BYTES = 32L * 1024 * 1024;
 
     /**
      * MIME type Apache Tika returns when it cannot recognise the content. It is
@@ -303,9 +315,22 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      */
     protected BitstreamFormat guessFormatByContent(Context context, Bitstream bitstream) throws SQLException {
         String mimeType;
+        long maxBytes = configurationService.getLongProperty(CFG_MAX_BYTES, DEFAULT_MAX_BYTES);
         try (InputStream inputStream = bitstreamStorageService.retrieve(context, bitstream)) {
             if (inputStream == null) {
                 return null;
+            }
+            // Bound how many bytes Tika may read/spool so that identifying a very large file
+            // (in particular container formats, which Tika spools to a temporary file to
+            // inspect) stays cheap. Type signatures sit at the start of the file, so a
+            // bounded prefix is enough for the common cases; anything not identified within
+            // the bound falls back to extension-based identification.
+            InputStream boundedStream = inputStream;
+            if (maxBytes > 0) {
+                boundedStream = BoundedInputStream.builder()
+                                                  .setInputStream(inputStream)
+                                                  .setMaxCount(maxBytes)
+                                                  .get();
             }
             Metadata metadata = new Metadata();
             String name = bitstream.getName();
@@ -315,7 +340,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
             }
             // Wrap in a TikaInputStream so container-aware detectors (e.g. OLE2/OOXML for
             // legacy and modern Office documents) can inspect the file properly.
-            try (TikaInputStream tikaStream = TikaInputStream.get(inputStream)) {
+            try (TikaInputStream tikaStream = TikaInputStream.get(boundedStream)) {
                 mimeType = tika.detect(tikaStream, metadata);
             }
         } catch (IOException e) {
