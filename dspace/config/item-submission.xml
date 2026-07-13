@@ -228,10 +228,10 @@
             <type>sample</type>
         </step-definition>
 
-        <step-definition id="sherpaPolicies" mandatory="true">
-            <heading>submit.progressbar.sherpapolicy</heading>
-            <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
-            <type>sherpaPolicy</type>
+        <step-definition id="opfPolicies" mandatory="true">
+            <heading>submit.progressbar.opfpolicy</heading>
+            <processing-class>org.dspace.app.rest.submit.step.OpenPolicyFinderPolicyStep</processing-class>
+            <type>opfPolicy</type>
         </step-definition>
 
         <!-- New step for show / mint identifiers -->
@@ -288,8 +288,8 @@
             <!-- Uncomment this step to allow the user to embargo or access restrict the entire item -->
             <!-- <step id="itemAccessConditions"/> -->
 
-            <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
-            <!-- <step id="sherpaPolicies"/> -->
+            <!-- Uncomment this step to show when appropriate publisher policies retrieved from Open Policy Finder -->
+            <!-- <step id="opfPolicies"/> -->
 
             <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
                  that duplicate-detection.cfg is properly configured and items have been reindexed since
