@@ -26,6 +26,8 @@
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
         <property name="metadataAuthorityService" ref="org.dspace.content.authority.MetadataAuthorityServiceImpl"/>
         <property name="typeBindUtils" ref="org.dspace.app.util.TypeBindUtils"/>
+        <property name="relationshipTypeService" ref="org.dspace.content.RelationshipTypeServiceImpl"/>
+        <property name="relationshipService" ref="org.dspace.content.RelationshipServiceImpl"/>
     </bean>
 
     <bean name="uploadValidation" class="org.dspace.validation.UploadValidator">

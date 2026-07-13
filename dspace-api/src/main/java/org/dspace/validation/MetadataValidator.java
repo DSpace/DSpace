@@ -70,11 +70,9 @@ public class MetadataValidator implements SubmissionStepValidator {
 
     private String name;
 
-    private final RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
-                                                                                         .getRelationshipTypeService();
+    private RelationshipTypeService relationshipTypeService;
 
-    private final RelationshipService relationshipService = ContentServiceFactory.getInstance()
-                                                                                 .getRelationshipService();
+    private RelationshipService relationshipService;
 
     @Override
     public List<ValidationError> validate(Context context, InProgressSubmission<?> obj, SubmissionStepConfig config) {
@@ -312,4 +310,11 @@ public class MetadataValidator implements SubmissionStepValidator {
         this.name = name;
     }
 
+    public void setRelationshipTypeService(RelationshipTypeService relationshipTypeService) {
+        this.relationshipTypeService = relationshipTypeService;
+    }
+
+    public void setRelationshipService(RelationshipService relationshipService) {
+        this.relationshipService = relationshipService;
+    }
 }
