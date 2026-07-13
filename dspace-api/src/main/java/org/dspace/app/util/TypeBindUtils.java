@@ -11,12 +11,12 @@ import java.util.List;
 
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.MetadataAuthorityService;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Utility methods for the type bind functionality.
@@ -24,24 +24,22 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  *
  */
+@Component
 public class TypeBindUtils {
 
-    private static final ConfigurationService configurationService = DSpaceServicesFactory
-        .getInstance().getConfigurationService();
-    private static final ItemService itemService = ContentServiceFactory
-        .getInstance().getItemService();
-    private static final MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
-        .getInstance().getMetadataAuthorityService();
-
-    private TypeBindUtils() {
-    }
+    @Autowired
+    protected ConfigurationService configurationService;
+    @Autowired
+    protected ItemService itemService;
+    @Autowired
+    protected MetadataAuthorityService metadataAuthorityService;
 
     /**
      * This method gets the field used for type-bind.
      *
      * @return the field used for type-bind.
      */
-    public static String getTypeBindField() {
+    public String getTypeBindField() {
         return configurationService.getProperty("submit.type-bind.field", "dc.type");
     }
 
@@ -51,7 +49,7 @@ public class TypeBindUtils {
      * @param obj the in-progress submission
      * @return the list of MetadataValue objects of the type-bind field
      */
-    public static List<MetadataValue> getTypeBindMetadataValues(InProgressSubmission<?> obj) {
+    public List<MetadataValue> getTypeBindMetadataValues(InProgressSubmission<?> obj) {
         return itemService.getMetadataByMetadataString(obj.getItem(), getTypeBindField());
     }
 

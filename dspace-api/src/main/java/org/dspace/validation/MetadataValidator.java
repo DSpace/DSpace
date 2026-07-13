@@ -66,6 +66,8 @@ public class MetadataValidator implements SubmissionStepValidator {
 
     private MetadataAuthorityService metadataAuthorityService;
 
+    private TypeBindUtils typeBindUtils;
+
     private String name;
 
     private final RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
@@ -80,7 +82,7 @@ public class MetadataValidator implements SubmissionStepValidator {
         List<ValidationError> errors = new ArrayList<>();
 
         DCInputSet inputConfig = getDCInputSet(config);
-        List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj);
+        List<MetadataValue> documentTypes = typeBindUtils.getTypeBindMetadataValues(obj);
 
         // Get list of all field names (including qualdrop names) allowed for this dc.type
         List<String> allowedFieldNames =
@@ -276,6 +278,10 @@ public class MetadataValidator implements SubmissionStepValidator {
 
     public void setMetadataAuthorityService(MetadataAuthorityService metadataAuthorityService) {
         this.metadataAuthorityService = metadataAuthorityService;
+    }
+
+    public void setTypeBindUtils(TypeBindUtils typeBindUtils) {
+        this.typeBindUtils = typeBindUtils;
     }
 
     public void setConfigurationService(ConfigurationService configurationService) {
