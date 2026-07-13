@@ -109,10 +109,11 @@ public class MetadataValidator implements SubmissionStepValidator {
                             (!allowedFieldNames.contains(fullFieldname) &&
                                 !allowedFieldNames.contains(input.getFieldName()))) {
                             removeMetadataValues(context, obj.getItem(), mdv);
-                        } else {
-                            validateMetadataValues(obj.getCollection(), mdv, input, config, isAuthorityControlled,
-                                                   fieldKey, errors);
-                            if (mdv.size() > 0 && (input.isVisible(DCInput.SUBMISSION_SCOPE) ||
+                        } else if (isInputAllowedForDocumentType(documentTypes, input)) {
+                            validateMetadataValues(
+                                obj.getCollection(), mdv, input, config, isAuthorityControlled, fieldKey, errors
+                            );
+                            if (!mdv.isEmpty() && (input.isVisible(DCInput.SUBMISSION_SCOPE) ||
                                 input.isVisible(DCInput.WORKFLOW_SCOPE))) {
                                 foundResult = true;
                             }
@@ -151,16 +152,18 @@ public class MetadataValidator implements SubmissionStepValidator {
                                           " allowed by another input of the same field name");
                         }
                     }
-                    validateMetadataValues(obj.getCollection(), mdv, input, config,
-                                           isAuthorityControlled, fieldKey, errors);
-                    if ((input.isRequired() && mdv.size() == 0)
+                    if (isInputAllowedForDocumentType(documentTypes, input)) {
+                        validateMetadataValues(
+                            obj.getCollection(), mdv, input, config, isAuthorityControlled, fieldKey, errors
+                        );
+                    }
+                    if ((input.isRequired() && mdv.isEmpty())
                         && (input.isVisible(DCInput.SUBMISSION_SCOPE)
                         || (obj instanceof WorkflowItem && input.isVisible(DCInput.WORKFLOW_SCOPE)))
                         && !valuesRemoved) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
-                        if ((documentTypes.isEmpty() && input.isAllowedFor("")) ||
-                            documentTypes.stream().anyMatch(dt -> input.isAllowedFor(dt.getValue()))) {
+                        if (isInputAllowedForDocumentType(documentTypes, input)) {
                             // since this field is missing add to list of error
                             // fields
                             addError(errors, ERROR_VALIDATION_REQUIRED,
@@ -174,6 +177,18 @@ public class MetadataValidator implements SubmissionStepValidator {
             }
         }
         return errors;
+    }
+
+    /**
+     * Checks if a form input is allowed considering the type-binds and document type.
+     *
+     * @param documentTypes document types of current submission
+     * @param input input field
+     * @return if input field is allowed or not for the current document types
+     */
+    private boolean isInputAllowedForDocumentType(List<MetadataValue> documentTypes, DCInput input) {
+        return (documentTypes.isEmpty() && input.isAllowedFor("")) ||
+            documentTypes.stream().anyMatch(dt -> input.isAllowedFor(dt.getValue()));
     }
 
     /**
