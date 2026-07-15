@@ -85,14 +85,14 @@
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
     </bean>
 
-    <bean id="cris-layout-tool" class="org.dspace.layout.script.CrisLayoutToolScriptConfiguration">
+    <bean id="dynamic-layout-tool" class="org.dspace.layout.script.DynamicLayoutToolScriptConfiguration">
         <property name="description" value="Script to import CRIS layout configuration from excel file"/>
-        <property name="dspaceRunnableClass" value="org.dspace.layout.script.CrisLayoutToolScript"/>
+        <property name="dspaceRunnableClass" value="org.dspace.layout.script.DynamicLayoutToolScript"/>
     </bean>
 
-    <bean id="export-cris-layout-tool" class="org.dspace.layout.script.ExportCrisLayoutToolCliScriptConfiguration">
+    <bean id="export-dynamic-layout-tool" class="org.dspace.layout.script.ExportDynamicLayoutToolCliScriptConfiguration">
         <property name="description" value="Script to export CRIS layout configuration into excel file"/>
-        <property name="dspaceRunnableClass" value="org.dspace.layout.script.ExportCrisLayoutToolScriptCli"/>
+        <property name="dspaceRunnableClass" value="org.dspace.layout.script.ExportDynamicLayoutToolScriptCli"/>
     </bean>
 
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->

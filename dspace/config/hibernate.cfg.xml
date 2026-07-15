@@ -97,16 +97,16 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
         <!-- Configurable Layout -->
-        <mapping class="org.dspace.layout.CrisLayoutTab" />
-        <mapping class="org.dspace.layout.CrisLayoutBox" />
-        <mapping class="org.dspace.layout.CrisLayoutField" />
-        <mapping class="org.dspace.layout.CrisLayoutFieldMetadata" />
-        <mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
-        <mapping class="org.dspace.layout.CrisLayoutRow" />
-        <mapping class="org.dspace.layout.CrisLayoutCell" />
-        <mapping class="org.dspace.layout.CrisMetadataGroup" />
-        <mapping class="org.dspace.layout.CrisLayoutBox2SecurityGroup" />
-        <mapping class="org.dspace.layout.CrisLayoutTab2SecurityGroup" />
+        <mapping class="org.dspace.layout.DynamicLayoutTab" />
+        <mapping class="org.dspace.layout.DynamicLayoutBox" />
+        <mapping class="org.dspace.layout.DynamicLayoutField" />
+        <mapping class="org.dspace.layout.DynamicLayoutFieldMetadata" />
+        <mapping class="org.dspace.layout.DynamicLayoutFieldBitstream" />
+        <mapping class="org.dspace.layout.DynamicLayoutRow" />
+        <mapping class="org.dspace.layout.DynamicLayoutCell" />
+        <mapping class="org.dspace.layout.DynamicMetadataGroup" />
+        <mapping class="org.dspace.layout.DynamicLayoutBox2SecurityGroup" />
+        <mapping class="org.dspace.layout.DynamicLayoutTab2SecurityGroup" />
 
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
         

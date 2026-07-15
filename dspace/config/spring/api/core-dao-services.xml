@@ -66,10 +66,10 @@
     <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
 
     <!-- Configurable layout DAO -->
-    <bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
-    <bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
-    <bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
-    <bean class="org.dspace.layout.dao.impl.CrisLayoutMetadataGroupDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.DynamicLayoutTabDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.DynamicLayoutBoxDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.DynamicLayoutFieldDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.DynamicLayoutMetadataGroupDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
 

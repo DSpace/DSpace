@@ -87,11 +87,11 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
-import org.dspace.layout.CrisLayoutBox;
-import org.dspace.layout.CrisLayoutField;
-import org.dspace.layout.CrisLayoutFieldBitstream;
-import org.dspace.layout.CrisLayoutTab;
-import org.dspace.layout.service.CrisLayoutTabService;
+import org.dspace.layout.DynamicLayoutBox;
+import org.dspace.layout.DynamicLayoutField;
+import org.dspace.layout.DynamicLayoutFieldBitstream;
+import org.dspace.layout.DynamicLayoutTab;
+import org.dspace.layout.service.DynamicLayoutTabService;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.OrcidToken;
@@ -206,7 +206,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     private VersionHistoryService versionHistoryService;
 
     @Autowired
-    private CrisLayoutTabService crisLayoutTabService;
+    private DynamicLayoutTabService dynamicLayoutTabService;
 
     @Autowired
     private List<ItemSearcherByMetadata> itemSearcherByMetadata;
@@ -228,9 +228,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      */
     private Thumbnail thumbnailLayoutTabConfigurationStrategy(Context context, Item item, boolean requireOriginal)
         throws SQLException {
-        List<CrisLayoutTab> crisLayoutTabs = crisLayoutTabService.findByItem(context, String.valueOf(item.getID()));
+        List<DynamicLayoutTab> dynamicLayoutTabs =
+            dynamicLayoutTabService.findByItem(context, String.valueOf(item.getID()));
 
-        List<CrisLayoutField> thumbFields = getThumbnailFields(crisLayoutTabs);
+        List<DynamicLayoutField> thumbFields = getThumbnailFields(dynamicLayoutTabs);
         if (CollectionUtils.isEmpty(thumbFields)) {
             // If no thumbnail is retrieved by the first strategy
             // then use the fallback strategy
@@ -271,9 +272,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      * @throws SQLException
      */
     private Thumbnail retrieveThumbnailFromFields(Context context, Item item,
-                                                  List<CrisLayoutField> thumbFields) throws SQLException {
-        for (CrisLayoutField thumbField : thumbFields) {
-            if (!(thumbField instanceof CrisLayoutFieldBitstream thumbFieldBitstream)) {
+                                                  List<DynamicLayoutField> thumbFields) throws SQLException {
+        for (DynamicLayoutField thumbField : thumbFields) {
+            if (!(thumbField instanceof DynamicLayoutFieldBitstream thumbFieldBitstream)) {
                 continue;
             }
             String bundle = thumbFieldBitstream.getBundle();
@@ -288,13 +289,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     /**
-     * @param crisLayoutTabs
-     * @return List<CrisLayoutField>
+     * @param dynamicLayoutTabs
+     * @return List<DynamicLayoutField>
      */
-    private List<CrisLayoutField> getThumbnailFields(List<CrisLayoutTab> crisLayoutTabs) {
-        List<CrisLayoutField> thumbFields = new LinkedList<>();
-        for (CrisLayoutTab tab : crisLayoutTabs) {
-            for (CrisLayoutBox box : tab.getBoxes()) {
+    private List<DynamicLayoutField> getThumbnailFields(List<DynamicLayoutTab> dynamicLayoutTabs) {
+        List<DynamicLayoutField> thumbFields = new LinkedList<>();
+        for (DynamicLayoutTab tab : dynamicLayoutTabs) {
+            for (DynamicLayoutBox box : tab.getBoxes()) {
                 thumbFields.addAll(box.getLayoutFields().stream()
                                       .filter(field -> field.getRendering() != null &&
                                           field.getRendering().equals("thumbnail"))
