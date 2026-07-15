@@ -45,10 +45,19 @@ public class DynamicLayoutSection {
         this.sectionComponents = sectionComponents;
     }
 
+    /**
+     * Creates a section with the given id and visibility and no components.
+     *
+     * @param id the section identifier
+     * @param visible whether the section is visible
+     */
     public DynamicLayoutSection(String id, boolean visible) {
         this(id, visible, Collections.emptyList());
     }
 
+    /**
+     * Returns the id.
+     */
     public String getId() {
         return id;
     }
@@ -60,10 +69,16 @@ public class DynamicLayoutSection {
         return visible;
     }
 
+    /**
+     * Returns the section components.
+     */
     public List<List<DynamicLayoutSectionComponent>> getSectionComponents() {
         return sectionComponents;
     }
 
+    /**
+     * Sets the nested sections.
+     */
     public void setNestedSections(List<DynamicLayoutSection> nestedSections) {
         if (CollectionUtils.isNotEmpty(this.sectionComponents)) {
             throw new IllegalArgumentException(
@@ -72,6 +87,9 @@ public class DynamicLayoutSection {
         this.nestedSections.addAll(nestedSections);
     }
 
+    /**
+     * Returns the nested sections.
+     */
     public List<DynamicLayoutSection> getNestedSections() {
         return nestedSections;
     }

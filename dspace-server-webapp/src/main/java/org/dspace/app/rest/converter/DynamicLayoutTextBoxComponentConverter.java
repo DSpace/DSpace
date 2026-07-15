@@ -24,6 +24,11 @@ public class DynamicLayoutTextBoxComponentConverter implements DynamicLayoutSect
 
     private final DynamicLayoutTextRowComponentConverter textKeyComponentConverter;
 
+    /**
+     * Creates the converter with the given text row component converter.
+     *
+     * @param textKeyComponentConverter the text row component converter
+     */
     @Autowired
     public DynamicLayoutTextBoxComponentConverter(
         DynamicLayoutTextRowComponentConverter textKeyComponentConverter) {

@@ -21,6 +21,12 @@ import org.dspace.app.rest.utils.Utils;
 @RelNameDSpaceResource(DynamicLayoutTabRest.NAME)
 public class DynamicLayoutTabResource extends DSpaceResource<DynamicLayoutTabRest> {
 
+    /**
+     * Creates the HAL resource wrapping the given tab representation.
+     *
+     * @param data the tab representation
+     * @param utils the REST utilities
+     */
     public DynamicLayoutTabResource(DynamicLayoutTabRest data, Utils utils) {
         super(data, utils);
     }

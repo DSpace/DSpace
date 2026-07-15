@@ -23,18 +23,30 @@ public class DynamicLayoutBoxRelationConfigurationRest implements DynamicLayoutB
 
     private String type = NAME;
 
+    /**
+     * Returns the type.
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Sets the type.
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Returns the discovery configuration.
+     */
     public String getDiscoveryConfiguration() {
         return discoveryConfiguration;
     }
 
+    /**
+     * Sets the discovery configuration.
+     */
     public void setDiscoveryConfiguration(String configuration) {
         this.discoveryConfiguration = configuration;
     }

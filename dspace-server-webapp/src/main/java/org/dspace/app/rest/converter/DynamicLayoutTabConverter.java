@@ -114,6 +114,13 @@ public class DynamicLayoutTabConverter implements DSpaceConverter<DynamicLayoutT
         return DynamicLayoutTab.class;
     }
 
+    /**
+     * Converts the given REST representation into a layout tab model.
+     *
+     * @param context the DSpace context
+     * @param rest the REST representation
+     * @return the corresponding layout tab model
+     */
     public DynamicLayoutTab toModel(Context context, DynamicLayoutTabRest rest) {
         DynamicLayoutTab tab = new DynamicLayoutTab();
         tab.setHeader(rest.getHeader());

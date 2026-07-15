@@ -8,5 +8,12 @@
 package org.dspace.util;
 
 public interface ThrowingMapper<T, R, E extends Exception> {
+    /**
+     * Applies this function to the given input, possibly throwing a checked exception.
+     *
+     * @param t the input argument
+     * @return the mapped result
+     * @throws E if the mapping fails
+     */
     R accept(T t) throws E;
 }

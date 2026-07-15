@@ -76,10 +76,16 @@ public class DynamicLayoutTabRest extends BaseObjectRest<Integer> {
         return RestResourceController.class;
     }
 
+    /**
+     * Returns the shortname.
+     */
     public String getShortname() {
         return shortname;
     }
 
+    /**
+     * Sets the shortname.
+     */
     public void setShortname(String shortname) {
         this.shortname = shortname;
     }
@@ -100,26 +106,44 @@ public class DynamicLayoutTabRest extends BaseObjectRest<Integer> {
         this.header = header;
     }
 
+    /**
+     * Returns the entity type.
+     */
     public String getEntityType() {
         return entityType;
     }
 
+    /**
+     * Sets the entity type.
+     */
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
 
+    /**
+     * Returns the custom filter.
+     */
     public String getCustomFilter() {
         return customFilter;
     }
 
+    /**
+     * Sets the custom filter.
+     */
     public void setCustomFilter(String customFilter) {
         this.customFilter = customFilter;
     }
 
+    /**
+     * Returns the priority.
+     */
     public Integer getPriority() {
         return priority;
     }
 
+    /**
+     * Sets the priority.
+     */
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
@@ -152,11 +176,17 @@ public class DynamicLayoutTabRest extends BaseObjectRest<Integer> {
         this.security = security;
     }
 
+    /**
+     * Returns the rows.
+     */
     @JsonInclude(Include.NON_NULL)
     public List<DynamicLayoutRowRest> getRows() {
         return rows;
     }
 
+    /**
+     * Sets the rows.
+     */
     public void setRows(List<DynamicLayoutRowRest> rows) {
         this.rows = rows;
     }

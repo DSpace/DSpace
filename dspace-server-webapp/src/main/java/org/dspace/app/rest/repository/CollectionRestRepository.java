@@ -210,6 +210,16 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
+    /**
+     * Returns the collections administered for the given entity type.
+     *
+     * @param query an optional query used to filter the collections
+     * @param entityTypeLabel the entity type label
+     * @param pageable the pagination information
+     * @return a page of matching collections
+     * @throws SearchServiceException if the search fails
+     * @throws SQLException if a database error occurs
+     */
     @SearchRestMethod(name = "findAllVisibleSectionsInTopBar")
     public Page<CollectionRest> findAllVisibleSectionsInTopBar(
         @Parameter(value = "query") String query,

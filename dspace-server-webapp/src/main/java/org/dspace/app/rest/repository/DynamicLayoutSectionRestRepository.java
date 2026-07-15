@@ -52,6 +52,14 @@ public class DynamicLayoutSectionRestRepository extends DSpaceRestRepository<Dyn
         return converter.toRestPage(layoutSections, pageable, total, utils.obtainProjection());
     }
 
+    /**
+     * Returns the layout sections that are visible in the top bar.
+     *
+     * @param q an optional query used to filter the sections
+     * @param pageable the pagination information
+     * @return a page of visible top-bar sections
+     * @throws SearchServiceException if the search fails
+     */
     @SearchRestMethod(name = "visibleTopBarSections")
     @PreAuthorize("permitAll()")
     public Page<DynamicLayoutSectionRest> searchVisibleTopBarSections(@Parameter(value = "query") String q,

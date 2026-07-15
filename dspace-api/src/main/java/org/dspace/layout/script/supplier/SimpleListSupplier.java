@@ -15,6 +15,11 @@ import java.util.function.Supplier;
  */
 public class SimpleListSupplier implements Supplier<List<String>> {
     private final List<String> subTypes;
+    /**
+     * Creates a supplier returning the given list of values.
+     *
+     * @param subTypes the values to supply
+     */
     public SimpleListSupplier(List<String> subTypes) {
         this.subTypes = subTypes;
     }

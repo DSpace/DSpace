@@ -51,10 +51,16 @@ public class DynamicLayoutBoxRest implements Serializable {
 
     private Boolean container = true;
 
+    /**
+     * Returns the shortname.
+     */
     public String getShortname() {
         return shortname;
     }
 
+    /**
+     * Sets the shortname.
+     */
     public void setShortname(String shortname) {
         this.shortname = shortname;
     }
@@ -75,18 +81,30 @@ public class DynamicLayoutBoxRest implements Serializable {
         this.header = header;
     }
 
+    /**
+     * Returns the entity type.
+     */
     public String getEntityType() {
         return entityType;
     }
 
+    /**
+     * Sets the entity type.
+     */
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
 
+    /**
+     * Returns the collapsed.
+     */
     public Boolean getCollapsed() {
         return collapsed;
     }
 
+    /**
+     * Sets the collapsed.
+     */
     public void setCollapsed(Boolean collapsed) {
         this.collapsed = collapsed;
     }
@@ -107,10 +125,16 @@ public class DynamicLayoutBoxRest implements Serializable {
         this.minor = minor;
     }
 
+    /**
+     * Returns the style.
+     */
     public String getStyle() {
         return style;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }
@@ -159,34 +183,58 @@ public class DynamicLayoutBoxRest implements Serializable {
         this.boxType = boxType;
     }
 
+    /**
+     * Returns the max columns.
+     */
     public Integer getMaxColumns() {
         return maxColumns;
     }
 
+    /**
+     * Sets the max columns.
+     */
     public void setMaxColumns(Integer maxColumns) {
         this.maxColumns = maxColumns;
     }
 
+    /**
+     * Returns the metadata security fields.
+     */
     public List<String> getMetadataSecurityFields() {
         return metadataSecurityFields;
     }
 
+    /**
+     * Sets the metadata security fields.
+     */
     public void setMetadataSecurityFields(List<String> metadataSecurityFields) {
         this.metadataSecurityFields = metadataSecurityFields;
     }
 
+    /**
+     * Returns the configuration.
+     */
     public DynamicLayoutBoxConfigurationRest getConfiguration() {
         return configuration;
     }
 
+    /**
+     * Sets the configuration.
+     */
     public void setConfiguration(DynamicLayoutBoxConfigurationRest configuration) {
         this.configuration = configuration;
     }
 
+    /**
+     * Returns the id.
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * Sets the id.
+     */
     public void setId(Integer id) {
         this.id = id;
     }

@@ -51,6 +51,9 @@ public class DynamicLayoutSearchComponent implements DynamicLayoutSectionCompone
         this.style = style;
     }
 
+    /**
+     * Returns the search type.
+     */
     public String getSearchType() {
         return searchType;
     }
@@ -65,10 +68,16 @@ public class DynamicLayoutSearchComponent implements DynamicLayoutSectionCompone
         this.searchType = searchType;
     }
 
+    /**
+     * Returns the initial statements.
+     */
     public Integer getInitialStatements() {
         return initialStatements;
     }
 
+    /**
+     * Returns whether display title.
+     */
     public boolean isDisplayTitle() {
         return displayTitle;
     }

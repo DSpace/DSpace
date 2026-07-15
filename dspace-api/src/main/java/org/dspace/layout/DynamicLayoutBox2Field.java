@@ -48,8 +48,18 @@ public class DynamicLayoutBox2Field {
     @Column(name = "position")
     private Integer position;
 
+    /**
+     * Default constructor.
+     */
     public DynamicLayoutBox2Field() {}
 
+    /**
+     * Creates a box-to-field association for the given box, field and position.
+     *
+     * @param box the layout box
+     * @param field the layout field
+     * @param position the position of the field within the box
+     */
     public DynamicLayoutBox2Field(DynamicLayoutBox box, DynamicLayoutField field, int position) {
         this.box = box;
         this.field = field;
@@ -57,34 +67,58 @@ public class DynamicLayoutBox2Field {
         this.id = new DynamicLayoutBox2FieldId(box.getID(), field.getID());
     }
 
+    /**
+     * Returns the id.
+     */
     public DynamicLayoutBox2FieldId getId() {
         return id;
     }
 
+    /**
+     * Sets the id.
+     */
     public void setId(DynamicLayoutBox2FieldId id) {
         this.id = id;
     }
 
+    /**
+     * Returns the box.
+     */
     public DynamicLayoutBox getBox() {
         return box;
     }
 
+    /**
+     * Sets the box.
+     */
     public void setBox(DynamicLayoutBox box) {
         this.box = box;
     }
 
+    /**
+     * Returns the field.
+     */
     public DynamicLayoutField getField() {
         return field;
     }
 
+    /**
+     * Sets the field.
+     */
     public void setField(DynamicLayoutField field) {
         this.field = field;
     }
 
+    /**
+     * Returns the position.
+     */
     public Integer getPosition() {
         return position;
     }
 
+    /**
+     * Sets the position.
+     */
     public void setPosition(Integer position) {
         this.position = position;
     }

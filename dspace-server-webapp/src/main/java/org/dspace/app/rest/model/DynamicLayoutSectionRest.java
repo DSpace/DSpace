@@ -54,18 +54,30 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
         return RestResourceController.class;
     }
 
+    /**
+     * Returns the component rows.
+     */
     public List<List<DynamicLayoutSectionComponentRest>> getComponentRows() {
         return componentRows;
     }
 
+    /**
+     * Sets the component rows.
+     */
     public void setComponentRows(List<List<DynamicLayoutSectionComponentRest>> componentRows) {
         this.componentRows = componentRows;
     }
 
+    /**
+     * Returns the nested sections.
+     */
     public List<DynamicLayoutSectionRest> getNestedSections() {
         return nestedSections;
     }
 
+    /**
+     * Sets the nested sections.
+     */
     public void setNestedSections(List<DynamicLayoutSectionRest> nestedSections) {
         this.nestedSections = nestedSections;
     }
@@ -104,10 +116,16 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             return "browse";
         }
 
+        /**
+         * Returns the browse names.
+         */
         public List<String> getBrowseNames() {
             return browseNames;
         }
 
+        /**
+         * Sets the browse names.
+         */
         public void setBrowseNames(List<String> browseNames) {
             this.browseNames = browseNames;
         }
@@ -142,26 +160,44 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
 
         private boolean showThumbnails;
 
+        /**
+         * Returns the discovery configuration name.
+         */
         public String getDiscoveryConfigurationName() {
             return discoveryConfigurationName;
         }
 
+        /**
+         * Sets the discovery configuration name.
+         */
         public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
             this.discoveryConfigurationName = discoveryConfigurationName;
         }
 
+        /**
+         * Returns the sort field.
+         */
         public String getSortField() {
             return sortField;
         }
 
+        /**
+         * Sets the sort field.
+         */
         public void setSortField(String sortField) {
             this.sortField = sortField;
         }
 
+        /**
+         * Returns the order.
+         */
         public String getOrder() {
             return order;
         }
 
+        /**
+         * Sets the order.
+         */
         public void setOrder(String order) {
             this.order = order;
         }
@@ -183,14 +219,23 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             this.style = style;
         }
 
+        /**
+         * Returns the title key.
+         */
         public String getTitleKey() {
             return titleKey;
         }
 
+        /**
+         * Sets the title key.
+         */
         public void setTitleKey(String titleKey) {
             this.titleKey = titleKey;
         }
 
+        /**
+         * Sets the number of items.
+         */
         public void setNumberOfItems(Integer numberOfItems) {
             this.numberOfItems = numberOfItems;
         }
@@ -203,10 +248,16 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             return numberOfItems;
         }
 
+        /**
+         * Returns whether show thumbnails.
+         */
         public boolean isShowThumbnails() {
             return showThumbnails;
         }
 
+        /**
+         * Sets the show thumbnails.
+         */
         public void setShowThumbnails(boolean showThumbnails) {
             this.showThumbnails = showThumbnails;
         }
@@ -220,10 +271,16 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
 
         private Integer facetsPerRow;
 
+        /**
+         * Returns the discovery configuration name.
+         */
         public String getDiscoveryConfigurationName() {
             return discoveryConfigurationName;
         }
 
+        /**
+         * Sets the discovery configuration name.
+         */
         public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
             this.discoveryConfigurationName = discoveryConfigurationName;
         }
@@ -245,10 +302,16 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             this.style = style;
         }
 
+        /**
+         * Sets the facets per row.
+         */
         public void setFacetsPerRow(Integer facetsPerRow) {
             this.facetsPerRow = facetsPerRow;
         }
 
+        /**
+         * Returns the facets per row.
+         */
         public Integer getFacetsPerRow() {
             return facetsPerRow;
         }
@@ -266,10 +329,16 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
 
         private boolean displayTitle;
 
+        /**
+         * Returns the discovery configuration name.
+         */
         public String getDiscoveryConfigurationName() {
             return discoveryConfigurationName;
         }
 
+        /**
+         * Sets the discovery configuration name.
+         */
         public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
             this.discoveryConfigurationName = discoveryConfigurationName;
         }
@@ -291,26 +360,44 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             this.style = style;
         }
 
+        /**
+         * Returns the search type.
+         */
         public String getSearchType() {
             return searchType;
         }
 
+        /**
+         * Sets the search type.
+         */
         public void setSearchType(String searchType) {
             this.searchType = searchType;
         }
 
+        /**
+         * Sets the initial statements.
+         */
         public void setInitialStatements(Integer initialStatements) {
             this.initialStatements = initialStatements;
         }
 
+        /**
+         * Returns the initial statements.
+         */
         public Integer getInitialStatements() {
             return initialStatements;
         }
 
+        /**
+         * Sets the display title.
+         */
         public void setDisplayTitle(boolean displayTitle) {
             this.displayTitle = displayTitle;
         }
 
+        /**
+         * Returns the display title.
+         */
         public boolean getDisplayTitle() {
             return displayTitle;
         }
@@ -324,6 +411,14 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
         private final String content;
         private final String contentType;
 
+        /**
+         * Creates a text row component with the given attributes.
+         *
+         * @param order the display order
+         * @param style the CSS style
+         * @param content the text content
+         * @param contentType the type of content
+         */
         public DynamicLayoutTextRowComponentRest(Integer order, String style, String content, String contentType) {
             this.order = order;
             this.style = style;
@@ -341,10 +436,16 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             return style;
         }
 
+        /**
+         * Returns the content.
+         */
         public String getContent() {
             return content;
         }
 
+        /**
+         * Returns the content type.
+         */
         public String getContentType() {
             return contentType;
         }
@@ -360,6 +461,12 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
         private final List<DynamicLayoutTextRowComponentRest> textRows;
         private final String style;
 
+        /**
+         * Creates a text box component with the given rows and style.
+         *
+         * @param textRows the text rows of the component
+         * @param style the CSS style of the component
+         */
         public DynamicLayoutTextBoxComponentRest(
             List<DynamicLayoutTextRowComponentRest> textRows, String style) {
             this.textRows = textRows;
@@ -377,6 +484,9 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             return style;
         }
 
+        /**
+         * Returns the text rows.
+         */
         public List<DynamicLayoutTextRowComponentRest> getTextRows() {
             return textRows;
         }
@@ -387,6 +497,12 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
         private final String style;
         private final List<CounterSettingsRest> counterSettingsList;
 
+        /**
+         * Creates a REST representation from the given counters component.
+         *
+         * @param source the counters component to convert
+         * @return the REST representation
+         */
         public static DynamicLayoutCountersComponentRest from (DynamicLayoutCountersComponent source) {
             return new DynamicLayoutCountersComponentRest(source.getStyle(),
                 source.getCounterSettingsList().stream()
@@ -400,10 +516,16 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             return "counters";
         }
 
+        /**
+         * Returns the style.
+         */
         public String getStyle() {
             return style;
         }
 
+        /**
+         * Returns the counter settings list.
+         */
         public List<CounterSettingsRest> getCounterSettingsList() {
             return counterSettingsList;
         }
@@ -437,18 +559,30 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
                 this.link = link;
             }
 
+            /**
+             * Returns the discovery configuration name.
+             */
             public String getDiscoveryConfigurationName() {
                 return discoveryConfigurationName;
             }
 
+            /**
+             * Returns the icon.
+             */
             public String getIcon() {
                 return icon;
             }
 
+            /**
+             * Returns the entity name.
+             */
             public String getEntityName() {
                 return entityName;
             }
 
+            /**
+             * Returns the link.
+             */
             public String getLink() {
                 return link;
             }
@@ -471,11 +605,17 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
         private List<Column> columnList = new ArrayList<>();
         private Integer numberOfItems;
 
+        /**
+         * Sets the column list.
+         */
         public void setColumnList(
             List<Column> columnList) {
             this.columnList = columnList;
         }
 
+        /**
+         * Returns the column list.
+         */
         public List<Column> getColumnList() {
             return columnList;
         }
@@ -490,42 +630,72 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             return this.style;
         }
 
+        /**
+         * Returns the discovery configuration name.
+         */
         public String getDiscoveryConfigurationName() {
             return discoveryConfigurationName;
         }
 
+        /**
+         * Sets the discovery configuration name.
+         */
         public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
             this.discoveryConfigurationName = discoveryConfigurationName;
         }
 
+        /**
+         * Returns the sort field.
+         */
         public String getSortField() {
             return sortField;
         }
 
+        /**
+         * Sets the sort field.
+         */
         public void setSortField(String sortField) {
             this.sortField = sortField;
         }
 
+        /**
+         * Returns the order.
+         */
         public String getOrder() {
             return order;
         }
 
+        /**
+         * Sets the order.
+         */
         public void setOrder(String order) {
             this.order = order;
         }
 
+        /**
+         * Sets the style.
+         */
         public void setStyle(String style) {
             this.style = style;
         }
 
+        /**
+         * Returns the title key.
+         */
         public String getTitleKey() {
             return titleKey;
         }
 
+        /**
+         * Sets the title key.
+         */
         public void setTitleKey(String titleKey) {
             this.titleKey = titleKey;
         }
 
+        /**
+         * Sets the number of items.
+         */
         public void setNumberOfItems(Integer numberOfItems) {
             this.numberOfItems = numberOfItems;
         }
@@ -543,6 +713,12 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
             private final String metadataField;
             private final String titleKey;
 
+            /**
+             * Creates a REST representation from the given column.
+             *
+             * @param column the column to convert
+             * @return the REST representation
+             */
             public static Column from (DynamicLayoutMultiColumnTopComponent.Column column) {
                 return new Column(column.getStyle(), column.getMetadataField(),
                     column.getTitleKey());
@@ -554,14 +730,23 @@ public class DynamicLayoutSectionRest extends BaseObjectRest<String> {
                 this.titleKey = titleKey;
             }
 
+            /**
+             * Returns the style.
+             */
             public String getStyle() {
                 return style;
             }
 
+            /**
+             * Returns the metadata field.
+             */
             public String getMetadataField() {
                 return metadataField;
             }
 
+            /**
+             * Returns the title key.
+             */
             public String getTitleKey() {
                 return titleKey;
             }

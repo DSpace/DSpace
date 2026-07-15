@@ -84,30 +84,51 @@ public class DynamicLayoutToolRenderValidatorImpl implements DynamicLayoutToolRe
         return name;
     }
 
+    /**
+     * Sets the name.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the field types.
+     */
     public List<String> getFieldTypes() {
         return fieldTypes;
     }
 
+    /**
+     * Sets the field type.
+     */
     public void setFieldType(String fieldType) {
         this.fieldTypes = fieldType != null ? asList(fieldType.split(FIELD_TYPE_SEPARATOR)) : List.of();
     }
 
+    /**
+     * Returns the sub type validation rule.
+     */
     public RenderingSubTypeValidationRule getSubTypeValidationRule() {
         return subTypeValidationRule;
     }
 
+    /**
+     * Sets the sub type validation rule.
+     */
     public void setSubTypeValidationRule(RenderingSubTypeValidationRule subTypeValidationRule) {
         this.subTypeValidationRule = subTypeValidationRule;
     }
 
+    /**
+     * Returns the sub types.
+     */
     public List<String> getSubTypes() {
         return subTypes;
     }
 
+    /**
+     * Sets the sub types.
+     */
     public void setSubTypes(Supplier<List<String>> supplier) {
         if (isSubTypeNotAllowed()) {
             throw new IllegalStateException("Subtypes is not allowed for RENDERING " + getName());

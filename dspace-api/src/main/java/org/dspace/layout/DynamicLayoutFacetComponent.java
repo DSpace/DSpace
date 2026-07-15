@@ -55,6 +55,9 @@ public class DynamicLayoutFacetComponent implements DynamicLayoutSectionComponen
         this.facetsPerRow = facetsPerRow;
     }
 
+    /**
+     * Returns the facets per row.
+     */
     public Integer getFacetsPerRow() {
         return facetsPerRow;
     }
