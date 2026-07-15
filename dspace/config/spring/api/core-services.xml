@@ -160,19 +160,19 @@
     <bean class="org.dspace.discovery.indexobject.LDNMessageEntityIndexFactoryImpl" autowire-candidate="true"/>
 
     <!-- Configurable layout services -->
-    <bean class="org.dspace.layout.service.impl.CrisLayoutTabServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutBoxServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutMetadataGroupServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutTabServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutBoxServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutFieldServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutMetadataGroupServiceImpl"/>
 
     <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutBoxAccessServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutTabAccessServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutBoxAccessServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutTabAccessServiceImpl"/>
     <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
 
-    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolValidatorImpl"/>
-    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolParserImpl"/>
-    <bean class="org.dspace.layout.script.service.impl.CrisLayoutToolConverterImpl"/>
+    <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolValidatorImpl"/>
+    <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolParserImpl"/>
+    <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolConverterImpl"/>
 
 
     <!-- OIDC Authentication -->
