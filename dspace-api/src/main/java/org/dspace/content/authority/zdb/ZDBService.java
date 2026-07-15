@@ -23,9 +23,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
@@ -119,26 +118,15 @@ public class ZDBService {
         List<ZDBAuthorityValue> results = new ArrayList<ZDBAuthorityValue>();
         validateUrl(requestURL);
 
-        HttpGet method = null;
-        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build()) {
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build();
+             CloseableHttpResponse response = client.execute(new HttpGet(requestURL))) {
 
-            method = new HttpGet(requestURL);
-            // Execute the method.
-            HttpResponse response = client.execute(method);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-
+            int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
                 throw new RuntimeException("WS call failed: " + statusCode);
             }
 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setValidating(false);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilderFactory factory = XMLUtils.getDocumentBuilderFactory();
             DocumentBuilder builder;
             try {
                 builder = factory.newDocumentBuilder();
@@ -178,10 +166,6 @@ public class ZDBService {
             }
         } catch (Exception e1) {
             log.error(e1.getMessage(), e1);
-        } finally {
-            if (method != null) {
-                method.releaseConnection();
-            }
         }
 
         return results;
