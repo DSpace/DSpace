@@ -35,6 +35,14 @@ public class DiscoveryConfigurationUtilsService {
     @Autowired
     private DiscoveryConfigurationService searchConfigurationService;
 
+    /**
+     * Returns the items related to the given item through the named relation.
+     *
+     * @param context the DSpace context
+     * @param item the item whose related items are searched
+     * @param relationName the name of the relation
+     * @return an iterator over the related items, empty if none is found
+     */
     public Iterator<Item> findByRelation(Context context, Item item, String relationName) {
         String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         if (entityType == null) {

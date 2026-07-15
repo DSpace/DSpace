@@ -86,6 +86,14 @@ public class DynamicLayoutTabRestRepository extends DSpaceRestRepository<Dynamic
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
+    /**
+     * Returns the layout tabs applicable to the given item.
+     *
+     * @param itemUuid the item UUID
+     * @param pageable the pagination information
+     * @return a page of layout tabs for the item
+     * @throws SQLException if a database error occurs
+     */
     @SearchRestMethod(name = "findByItem")
     public Page<DynamicLayoutTabRest> findByItem(
         @Parameter(value = "uuid", required = true) String itemUuid, Pageable pageable) throws SQLException {
@@ -98,6 +106,13 @@ public class DynamicLayoutTabRestRepository extends DSpaceRestRepository<Dynamic
         return utils.getPage(restTabs.toList(), restTabs.getPageable());
     }
 
+    /**
+     * Returns the layout tabs configured for the given entity type.
+     *
+     * @param type the entity type
+     * @param pageable the pagination information
+     * @return a page of layout tabs for the entity type
+     */
     @SearchRestMethod(name = "findByEntityType")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<DynamicLayoutTabRest> findByEntityType(

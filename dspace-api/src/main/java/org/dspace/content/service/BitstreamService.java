@@ -37,8 +37,24 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     @Override
     public Bitstream find(Context context, UUID id) throws SQLException;
 
+    /**
+     * Returns all bitstreams stored in the system.
+     *
+     * @param context the DSpace context
+     * @return the list of all bitstreams
+     * @throws SQLException if a database error occurs
+     */
     public List<Bitstream> findAll(Context context) throws SQLException;
 
+    /**
+     * Returns a paginated iterator over all bitstreams.
+     *
+     * @param context the DSpace context
+     * @param limit the maximum number of results to return
+     * @param offset the index of the first result to return
+     * @return an iterator over the requested bitstreams
+     * @throws SQLException if a database error occurs
+     */
     public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
 
     /**
@@ -227,6 +243,9 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public Bitstream getThumbnail(Context context, Bitstream bitstream) throws SQLException;
 
+    /**
+     * Returns whether valid thumbnail.
+     */
     public boolean isValidThumbnail(Context context, Bitstream thumbnail) throws SQLException;
 
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException;
@@ -263,6 +282,16 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      */
     boolean isInBundle(Bitstream bitstream, java.util.Collection<String> bundleNames) throws SQLException;
 
+    /**
+     * Returns the showable bitstreams of the given item and bundle matching the given metadata filters.
+     *
+     * @param context the DSpace context
+     * @param itemId the identifier of the item
+     * @param bundleName the name of the bundle
+     * @param filterMetadata the metadata filters that a bitstream must match to be shown
+     * @return the list of matching showable bitstreams
+     * @throws SQLException if a database error occurs
+     */
     List<Bitstream> findShowableByItem(Context context, UUID itemId, String bundleName,
                                        Map<String, String> filterMetadata) throws SQLException;
 

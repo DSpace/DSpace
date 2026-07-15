@@ -25,18 +25,30 @@ public class DynamicLayoutRowRest {
 
     private List<DynamicLayoutCellRest> cells = new ArrayList<>();
 
+    /**
+     * Returns the style.
+     */
     public String getStyle() {
         return style;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }
 
+    /**
+     * Returns the cells.
+     */
     public List<DynamicLayoutCellRest> getCells() {
         return cells;
     }
 
+    /**
+     * Sets the cells.
+     */
     public void setCells(List<DynamicLayoutCellRest> cells) {
         this.cells = cells;
     }

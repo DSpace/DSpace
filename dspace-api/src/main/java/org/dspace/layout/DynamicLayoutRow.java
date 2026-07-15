@@ -52,39 +52,68 @@ public class DynamicLayoutRow implements ReloadableEntity<Integer> {
         return id;
     }
 
+    /**
+     * Returns the style.
+     */
     public String getStyle() {
         return style;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }
 
+    /**
+     * Returns the id.
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * Sets the id.
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
+    /**
+     * Returns the cells.
+     */
     public List<DynamicLayoutCell> getCells() {
         return cells;
     }
 
+    /**
+     * Adds a cell to this row.
+     *
+     * @param cell the cell to add
+     */
     public void addCell(DynamicLayoutCell cell) {
         getCells().add(cell);
         cell.setRow(this);
     }
 
+    /**
+     * Returns the tab.
+     */
     public DynamicLayoutTab getTab() {
         return tab;
     }
 
+    /**
+     * Sets the tab.
+     */
     public void setTab(DynamicLayoutTab tab) {
         this.tab = tab;
     }
 
+    /**
+     * Sets the cells.
+     */
     public void setCells(List<DynamicLayoutCell> cells) {
         this.cells = cells;
     }

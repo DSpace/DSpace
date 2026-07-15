@@ -72,6 +72,13 @@ public class DynamicLayoutBoxConverter implements DSpaceConverter<DynamicLayoutB
         return DynamicLayoutBox.class;
     }
 
+    /**
+     * Converts the given REST representation into a layout box model.
+     *
+     * @param context the DSpace context
+     * @param rest the REST representation
+     * @return the corresponding layout box model
+     */
     public DynamicLayoutBox toModel(Context context, DynamicLayoutBoxRest rest) {
         DynamicLayoutBox box = new DynamicLayoutBox();
         box.setEntitytype(findEntityType(context, rest));

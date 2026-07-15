@@ -25,25 +25,52 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public abstract class DynamicLayoutServiceFactory {
 
+    /**
+     * Returns the instance.
+     */
     public static DynamicLayoutServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName("dynamicLayoutServiceFactory", DynamicLayoutServiceFactory.class);
     }
 
+    /**
+     * Returns the tab service.
+     */
     public abstract DynamicLayoutTabService getTabService();
 
+    /**
+     * Returns the box service.
+     */
     public abstract DynamicLayoutBoxService getBoxService();
 
+    /**
+     * Returns the field service.
+     */
     public abstract DynamicLayoutFieldService getFieldService();
 
+    /**
+     * Returns the section service.
+     */
     public abstract DynamicLayoutSectionService getSectionService();
 
+    /**
+     * Returns the metadata group service.
+     */
     public abstract DynamicLayoutMetadataGroupService getMetadataGroupService();
 
+    /**
+     * Returns the dynamic layout tool validator.
+     */
     public abstract DynamicLayoutToolValidator getDynamicLayoutToolValidator();
 
+    /**
+     * Returns the dynamic layout tool parser.
+     */
     public abstract DynamicLayoutToolParser getDynamicLayoutToolParser();
 
+    /**
+     * Returns the dynamic layout tool converter.
+     */
     public abstract DynamicLayoutToolConverter getDynamicLayoutToolConverter();
 
 }

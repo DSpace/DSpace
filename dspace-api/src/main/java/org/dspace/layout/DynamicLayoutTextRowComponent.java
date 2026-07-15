@@ -26,30 +26,51 @@ public class DynamicLayoutTextRowComponent implements DynamicLayoutSectionCompon
         return style;
     }
 
+    /**
+     * Returns the content.
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * Returns the content type.
+     */
     public String getContentType() {
         return contentType;
     }
 
+    /**
+     * Returns the order.
+     */
     public Integer getOrder() {
         return order;
     }
 
+    /**
+     * Sets the order.
+     */
     public void setOrder(Integer order) {
         this.order = order;
     }
 
+    /**
+     * Sets the content type.
+     */
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
 
+    /**
+     * Sets the content.
+     */
     public void setContent(String content) {
         this.content = content;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }

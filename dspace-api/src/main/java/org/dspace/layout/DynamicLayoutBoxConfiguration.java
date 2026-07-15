@@ -17,10 +17,18 @@ package org.dspace.layout;
 public class DynamicLayoutBoxConfiguration {
     private DynamicLayoutBox box;
 
+    /**
+     * Creates a configuration wrapper for the given layout box.
+     *
+     * @param box the layout box
+     */
     public DynamicLayoutBoxConfiguration(DynamicLayoutBox box) {
         this.box = box;
     }
 
+    /**
+     * Returns the layout box.
+     */
     public DynamicLayoutBox getLayoutBox() {
         return box;
     }

@@ -69,6 +69,9 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
     @Autowired
     private VersionHistoryService versionHistoryService;
 
+    /**
+     * Default constructor.
+     */
     public DynamicLayoutBoxServiceImpl() {
     }
 
@@ -253,6 +256,14 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
         }
     }
 
+    /**
+     * Returns the layout boxes for the given entity type and box type.
+     *
+     * @param context the DSpace context
+     * @param entity the entity type
+     * @param type the box type
+     * @return the list of matching layout boxes
+     */
     public List<DynamicLayoutBox> findByEntityAndType(Context context,String entity, String type) {
 
         try {

@@ -103,38 +103,65 @@ public class DynamicLayoutBox implements ReloadableEntity<Integer> {
         return id;
     }
 
+    /**
+     * Sets the id.
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
+    /**
+     * Returns the entitytype.
+     */
     public EntityType getEntitytype() {
         return entitytype;
     }
 
+    /**
+     * Sets the entitytype.
+     */
     public void setEntitytype(EntityType entitytype) {
         this.entitytype = entitytype;
     }
 
+    /**
+     * Returns the type.
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Sets the type.
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Returns the collapsed.
+     */
     public Boolean getCollapsed() {
         return collapsed;
     }
 
+    /**
+     * Sets the collapsed.
+     */
     public void setCollapsed(Boolean collapsed) {
         this.collapsed = collapsed;
     }
 
+    /**
+     * Returns the shortname.
+     */
     public String getShortname() {
         return shortname;
     }
 
+    /**
+     * Sets the shortname.
+     */
     public void setShortname(String shortname) {
         this.shortname = shortname;
     }
@@ -199,47 +226,86 @@ public class DynamicLayoutBox implements ReloadableEntity<Integer> {
         this.security = security.getValue();
     }
 
+    /**
+     * Sets the security.
+     */
     public void setSecurity(Integer security) {
         this.security = security;
     }
 
+    /**
+     * Returns whether public.
+     */
     public boolean isPublic() {
         return getSecurity() == LayoutSecurity.PUBLIC.getValue();
     }
 
+    /**
+     * Returns whether not public.
+     */
     public boolean isNotPublic() {
         return !isPublic();
     }
 
 
+    /**
+     * Returns the style.
+     */
     public String getStyle() {
         return style;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }
 
+    /**
+     * Returns the metadata security fields.
+     */
     public Set<MetadataField> getMetadataSecurityFields() {
         return metadataSecurityFields;
     }
 
+    /**
+     * Sets the metadata security fields.
+     */
     public void setMetadataSecurityFields(Set<MetadataField> metadataFields) {
         this.metadataSecurityFields = metadataFields;
     }
 
+    /**
+     * Adds the given metadata fields to the box metadata security configuration.
+     *
+     * @param metadataFields the metadata fields to add
+     */
     public void addMetadataSecurityFields(Set<MetadataField> metadataFields) {
         this.metadataSecurityFields.addAll(metadataFields);
     }
 
+    /**
+     * Adds the given metadata field to the box metadata security configuration.
+     *
+     * @param metadataField the metadata field to add
+     */
     public void addMetadataSecurityFields(MetadataField metadataField) {
         this.metadataSecurityFields.add(metadataField);
     }
 
+    /**
+     * Returns the layout fields.
+     */
     public List<DynamicLayoutField> getLayoutFields() {
         return layoutFields;
     }
 
+    /**
+     * Adds a layout field to this box.
+     *
+     * @param layoutField the layout field to add
+     */
     public void addLayoutField(DynamicLayoutField layoutField) {
         if (this.layoutFields == null) {
             this.layoutFields = new ArrayList<>();
@@ -248,30 +314,51 @@ public class DynamicLayoutBox implements ReloadableEntity<Integer> {
         layoutField.setBox(this);
     }
 
+    /**
+     * Returns the max columns.
+     */
     public Integer getMaxColumns() {
         return maxColumns;
     }
 
+    /**
+     * Sets the max columns.
+     */
     public void setMaxColumns(Integer maxColumns) {
         this.maxColumns = maxColumns;
     }
 
+    /**
+     * Returns the cell.
+     */
     public DynamicLayoutCell getCell() {
         return cell;
     }
 
+    /**
+     * Sets the cell.
+     */
     public void setCell(DynamicLayoutCell cell) {
         this.cell = cell;
     }
 
+    /**
+     * Returns whether container.
+     */
     public Boolean isContainer() {
         return container;
     }
 
+    /**
+     * Sets the container.
+     */
     public void setContainer(Boolean container) {
         this.container = container;
     }
 
+    /**
+     * Returns the group security fields.
+     */
     public Set<Group> getGroupSecurityFields() {
         return box2SecurityGroups.stream()
                                  .map(dynamicLayoutBox2SecurityGroup ->
@@ -279,10 +366,16 @@ public class DynamicLayoutBox implements ReloadableEntity<Integer> {
                                  .collect(Collectors.toSet());
     }
 
+    /**
+     * Returns the box2 security groups.
+     */
     public Set<DynamicLayoutBox2SecurityGroup> getBox2SecurityGroups() {
         return box2SecurityGroups;
     }
 
+    /**
+     * Sets the box2 security groups.
+     */
     public void setBox2SecurityGroups(Set<DynamicLayoutBox2SecurityGroup> box2SecurityGroups) {
         this.box2SecurityGroups = box2SecurityGroups;
     }

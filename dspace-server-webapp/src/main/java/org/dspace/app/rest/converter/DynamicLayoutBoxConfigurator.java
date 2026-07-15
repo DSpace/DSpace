@@ -20,10 +20,26 @@ import org.dspace.layout.DynamicLayoutBox;
  */
 public interface DynamicLayoutBoxConfigurator {
 
+    /**
+     * Returns whether this configurator supports the given box.
+     *
+     * @param box the layout box
+     * @return true if this configurator supports the box
+     */
     public boolean support(DynamicLayoutBox box);
 
+    /**
+     * Returns the configuration.
+     */
     public DynamicLayoutBoxConfigurationRest getConfiguration(DynamicLayoutBox box);
 
+    /**
+     * Populates the given box configuration for the given box.
+     *
+     * @param context the DSpace context
+     * @param box the layout box
+     * @param rest the box configuration to populate
+     */
     public void configure(Context context, DynamicLayoutBox box, DynamicLayoutBoxConfigurationRest rest);
 
 }

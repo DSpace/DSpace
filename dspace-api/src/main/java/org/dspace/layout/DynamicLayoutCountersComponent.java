@@ -28,14 +28,23 @@ public class DynamicLayoutCountersComponent implements DynamicLayoutSectionCompo
         return style;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }
 
+    /**
+     * Returns the counter settings list.
+     */
     public List<CounterSettings> getCounterSettingsList() {
         return counterSettingsList;
     }
 
+    /**
+     * Sets the counter settings list.
+     */
     public void setCounterSettingsList(
         List<CounterSettings> counterSettingsList) {
         this.counterSettingsList = counterSettingsList;
@@ -52,34 +61,58 @@ public class DynamicLayoutCountersComponent implements DynamicLayoutSectionCompo
         private String label;
         private String link;
 
+        /**
+         * Returns the discovery configuration name.
+         */
         public String getDiscoveryConfigurationName() {
             return discoveryConfigurationName;
         }
 
+        /**
+         * Sets the discovery configuration name.
+         */
         public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
             this.discoveryConfigurationName = discoveryConfigurationName;
         }
 
+        /**
+         * Returns the icon.
+         */
         public String getIcon() {
             return icon;
         }
 
+        /**
+         * Sets the icon.
+         */
         public void setIcon(String icon) {
             this.icon = icon;
         }
 
+        /**
+         * Returns the label.
+         */
         public String getLabel() {
             return label;
         }
 
+        /**
+         * Sets the label.
+         */
         public void setLabel(String label) {
             this.label = label;
         }
 
+        /**
+         * Returns the link.
+         */
         public String getLink() {
             return link;
         }
 
+        /**
+         * Sets the link.
+         */
         public void setLink(String link) {
             this.link = link;
         }

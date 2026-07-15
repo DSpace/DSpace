@@ -31,25 +31,46 @@ public class DynamicLayoutBox2FieldId implements Serializable {
     @Column(name = "dynamic_layout_field_id")
     private Integer dynamicLayoutFieldId;
 
+    /**
+     * Default constructor.
+     */
     public DynamicLayoutBox2FieldId() {}
 
+    /**
+     * Creates a composite identifier for the given box and field ids.
+     *
+     * @param boxId the box identifier
+     * @param fieldId the field identifier
+     */
     public DynamicLayoutBox2FieldId(Integer boxId, Integer fieldId) {
         this.dynamicLayoutFieldId = fieldId;
         this.dynamicLayoutBoxId = boxId;
     }
 
+    /**
+     * Returns the dynamic layout box id.
+     */
     public Integer getDynamicLayoutBoxId() {
         return dynamicLayoutBoxId;
     }
 
+    /**
+     * Sets the dynamic layout box id.
+     */
     public void setDynamicLayoutBoxId(Integer boxId) {
         this.dynamicLayoutBoxId = boxId;
     }
 
+    /**
+     * Returns the dynamic layout field id.
+     */
     public Integer getDynamicLayoutFieldId() {
         return dynamicLayoutFieldId;
     }
 
+    /**
+     * Sets the dynamic layout field id.
+     */
     public void setDynamicLayoutFieldId(Integer fieldId) {
         this.dynamicLayoutFieldId = fieldId;
     }

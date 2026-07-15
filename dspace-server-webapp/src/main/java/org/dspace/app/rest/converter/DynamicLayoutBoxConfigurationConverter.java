@@ -48,6 +48,13 @@ public class DynamicLayoutBoxConfigurationConverter
         return null;
     }
 
+    /**
+     * Applies the matching configurators to populate the given box configuration.
+     *
+     * @param context the DSpace context
+     * @param box the layout box
+     * @param rest the box configuration to populate
+     */
     public void configure(Context context, DynamicLayoutBox box, DynamicLayoutBoxConfigurationRest rest) {
         for (DynamicLayoutBoxConfigurator configurator : configurators) {
             if (configurator.support(box)) {

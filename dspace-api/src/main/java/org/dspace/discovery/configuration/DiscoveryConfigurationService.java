@@ -192,6 +192,9 @@ public class DiscoveryConfigurationService {
         }
     }
 
+    /**
+     * Returns the discovery configuration by name.
+     */
     public DiscoveryConfiguration getDiscoveryConfigurationByName(String name) {
         return this.getDiscoveryConfiguration(name, false);
     }

@@ -25,6 +25,9 @@ public enum LayoutSecurity {
     private LayoutSecurity(int value) {
         this.value = value;
     }
+    /**
+     * Returns the value.
+     */
     public int getValue() {
         return this.value;
     }

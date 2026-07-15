@@ -52,31 +52,54 @@ public class DynamicLayoutCell implements ReloadableEntity<Integer> {
         return id;
     }
 
+    /**
+     * Returns the style.
+     */
     public String getStyle() {
         return style;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }
 
+    /**
+     * Returns the boxes.
+     */
     public List<DynamicLayoutBox> getBoxes() {
         return boxes;
     }
 
+    /**
+     * Adds a box to this cell.
+     *
+     * @param box the box to add
+     */
     public void addBox(DynamicLayoutBox box) {
         getBoxes().add(box);
         box.setCell(this);
     }
 
+    /**
+     * Returns the row.
+     */
     public DynamicLayoutRow getRow() {
         return row;
     }
 
+    /**
+     * Sets the row.
+     */
     public void setRow(DynamicLayoutRow row) {
         this.row = row;
     }
 
+    /**
+     * Sets the boxex.
+     */
     public void setBoxex(List<DynamicLayoutBox> boxes) {
         this.boxes = boxes;
     }

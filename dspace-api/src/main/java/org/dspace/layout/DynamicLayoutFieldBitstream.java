@@ -26,18 +26,30 @@ public class DynamicLayoutFieldBitstream extends DynamicLayoutField {
     @Column(name = "metadata_value")
     private String metadataValue;
 
+    /**
+     * Returns the bundle.
+     */
     public String getBundle() {
         return bundle;
     }
 
+    /**
+     * Sets the bundle.
+     */
     public void setBundle(String bundle) {
         this.bundle = bundle;
     }
 
+    /**
+     * Returns the metadata value.
+     */
     public String getMetadataValue() {
         return metadataValue;
     }
 
+    /**
+     * Sets the metadata value.
+     */
     public void setMetadataValue(String metadataValue) {
         this.metadataValue = metadataValue;
     }

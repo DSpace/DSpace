@@ -108,14 +108,23 @@ public class DynamicLayoutTopComponent implements DynamicLayoutSectionComponent 
         return numberOfItems;
     }
 
+    /**
+     * Sets the number of items.
+     */
     public void setNumberOfItems(Integer numberOfItems) {
         this.numberOfItems = numberOfItems;
     }
 
+    /**
+     * Returns the show thumbnails.
+     */
     public Boolean getShowThumbnails() {
         return showThumbnails;
     }
 
+    /**
+     * Sets the show thumbnails.
+     */
     public void setShowThumbnails(Boolean showThumbnails) {
         this.showThumbnails = showThumbnails;
     }
