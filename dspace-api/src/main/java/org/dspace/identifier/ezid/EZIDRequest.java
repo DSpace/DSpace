@@ -14,18 +14,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsStore;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
@@ -44,7 +45,7 @@ public class EZIDRequest {
 
     private static final String SHOULDER_PATH = "/shoulder/" + DOI.SCHEME;
 
-    private static final String UTF_8 = "UTF-8";
+    private static final ContentType TEXT_PLAIN_UTF8 = ContentType.create("text/plain", "UTF-8");
 
     private static final String MD_KEY_STATUS = "_status";
 
@@ -91,9 +92,9 @@ public class EZIDRequest {
         httpContext = HttpClientContext.create();
         if (null != username) {
             URI uri = new URI(scheme, host, path, null);
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            CredentialsStore credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()),
-                    new UsernamePasswordCredentials(username, password));
+                    new UsernamePasswordCredentials(username, password.toCharArray()));
         }
     }
 
@@ -127,10 +128,10 @@ public class EZIDRequest {
         client = DSpaceHttpClientFactory.getInstance().build();
         httpContext = HttpClientContext.create();
         if (null != username) {
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            CredentialsStore credentialsProvider = new BasicCredentialsProvider();
             URI uri = new URI(scheme, host, path, null);
             credentialsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()),
-                    new UsernamePasswordCredentials(username, password));
+                    new UsernamePasswordCredentials(username, password.toCharArray()));
             httpContext.setCredentialsProvider(credentialsProvider);
         }
     }
@@ -151,7 +152,7 @@ public class EZIDRequest {
         URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
         log.debug("EZID lookup {}", uri::toASCIIString);
         request = new HttpGet(uri);
-        HttpResponse response = client.execute(request, httpContext);
+        ClassicHttpResponse response = client.execute(request, httpContext);
         return new EZIDResponse(response);
     }
 
@@ -175,9 +176,9 @@ public class EZIDRequest {
         log.debug("EZID create {}", uri::toASCIIString);
         request = new HttpPut(uri);
         if (null != metadata) {
-            request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
+            request.setEntity(new StringEntity(formatMetadata(metadata), TEXT_PLAIN_UTF8));
         }
-        HttpResponse response = client.execute(request, httpContext);
+        ClassicHttpResponse response = client.execute(request, httpContext);
         return new EZIDResponse(response);
     }
 
@@ -199,9 +200,9 @@ public class EZIDRequest {
         log.debug("EZID mint {}", uri::toASCIIString);
         request = new HttpPost(uri);
         if (null != metadata) {
-            request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
+            request.setEntity(new StringEntity(formatMetadata(metadata), TEXT_PLAIN_UTF8));
         }
-        HttpResponse response = client.execute(request, httpContext);
+        ClassicHttpResponse response = client.execute(request, httpContext);
         EZIDResponse myResponse = new EZIDResponse(response);
         return myResponse;
     }
@@ -227,8 +228,8 @@ public class EZIDRequest {
         URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
         log.debug("EZID modify {}", uri::toASCIIString);
         request = new HttpPost(uri);
-        request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
-        HttpResponse response = client.execute(request, httpContext);
+        request.setEntity(new StringEntity(formatMetadata(metadata), TEXT_PLAIN_UTF8));
+        ClassicHttpResponse response = client.execute(request, httpContext);
         return new EZIDResponse(response);
     }
 
@@ -248,7 +249,7 @@ public class EZIDRequest {
         URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
         log.debug("EZID delete {}", uri::toASCIIString);
         request = new HttpDelete(uri);
-        HttpResponse response = client.execute(request, httpContext);
+        ClassicHttpResponse response = client.execute(request, httpContext);
         return new EZIDResponse(response);
     }
 

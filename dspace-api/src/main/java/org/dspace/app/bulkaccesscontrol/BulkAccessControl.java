@@ -13,7 +13,6 @@ import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.dspace.authorize.ResourcePolicy.TYPE_INHERITED;
 import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -30,7 +29,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -69,6 +67,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.model.AccessConditionOption;
 import org.dspace.utils.DSpace;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Implementation of {@link DSpaceRunnable} to perform a bulk access control via json file.
@@ -154,8 +153,9 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             return;
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+        JsonMapper mapper = JsonMapper.builder()
+                .defaultTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC))
+                .build();
         BulkAccessControlInput accessControl;
         context = new Context(Context.Mode.BATCH_EDIT);
         setEPerson(context);
@@ -176,7 +176,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
         try {
             accessControl = mapper.readValue(inputStream, BulkAccessControlInput.class);
-        } catch (IOException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             handler.logError("Error parsing json file " + e.getMessage());
             throw new IllegalArgumentException("Error parsing json file", e);
         }

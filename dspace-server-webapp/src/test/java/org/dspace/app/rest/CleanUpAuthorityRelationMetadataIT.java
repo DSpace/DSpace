@@ -29,8 +29,8 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,7 +51,7 @@ public class CleanUpAuthorityRelationMetadataIT extends AbstractControllerIntegr
     private MetadataAuthorityService metadataAuthorityService;
 
 
-    @Before
+    @BeforeEach
     public void setupAuthorityConfiguration() throws Exception {
         // Common authority configuration for all tests
         choiceAuthorityService.getChoiceAuthoritiesNames();

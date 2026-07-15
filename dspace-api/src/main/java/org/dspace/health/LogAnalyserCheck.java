@@ -54,11 +54,11 @@ public class LogAnalyserCheck extends Check {
 
             // create report
             for (String[] info : interesting_fields) {
-                sb.append(String.format("%-20s: %s\n", info[1], info_map.get(info[0])));
+                sb.append("%-20s: %s\n".formatted(info[1], info_map.get(info[0])));
             }
-            sb.append(String.format("Items added since [%s] (db): %s\n",
-                                    DateTimeFormatter.ISO_LOCAL_DATE.format(ri.from()),
-                                    LogAnalyser.getNumItems(c)));
+            sb.append("Items added since [%s] (db): %s\n".formatted(
+                DateTimeFormatter.ISO_LOCAL_DATE.format(ri.from()),
+                LogAnalyser.getNumItems(c)));
 
             c.complete();
 

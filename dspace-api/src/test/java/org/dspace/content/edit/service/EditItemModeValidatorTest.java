@@ -10,7 +10,7 @@ package org.dspace.content.edit.service;
 import static java.util.List.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.dspace.content.edit.EditItemMode;
 import org.dspace.content.edit.service.impl.EditItemModeValidatorImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link EditItemModeValidatorImpl}.

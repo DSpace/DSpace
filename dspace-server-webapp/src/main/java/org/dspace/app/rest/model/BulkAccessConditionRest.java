@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.model;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +21,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class BulkAccessConditionRest extends BaseObjectRest<String> {
 
+    @Serial
     private static final long serialVersionUID = -7708437586052984082L;
 
     public static final String NAME = "bulkaccessconditionoption";

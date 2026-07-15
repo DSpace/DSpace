@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration Tests against the /api/config/properties/[property] endpoint

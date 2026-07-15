@@ -42,11 +42,11 @@ public enum DSpaceRestPermission {
     public static DSpaceRestPermission convert(Object object) {
         if (object == null) {
             return null;
-        } else if (object instanceof DSpaceRestPermission) {
-            return (DSpaceRestPermission) object;
-        } else if (object instanceof String) {
+        } else if (object instanceof DSpaceRestPermission permission) {
+            return permission;
+        } else if (object instanceof String string) {
             try {
-                return DSpaceRestPermission.valueOf((String) object);
+                return DSpaceRestPermission.valueOf(string);
             } catch (IllegalArgumentException ex) {
                 return null;
             }

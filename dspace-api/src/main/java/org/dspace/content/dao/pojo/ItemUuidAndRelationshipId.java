@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import org.dspace.content.Relationship;
 import org.dspace.content.dao.RelationshipDAO;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Used by {@link RelationshipDAO#findByLatestItemAndRelationshipType} to avoid creating {@link Relationship}s.

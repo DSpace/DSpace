@@ -75,14 +75,14 @@ public class DepositManager {
 
         swordService.message("Performing deposit using location: " + loc);
 
-        if (dso instanceof Collection) {
+        if (dso instanceof Collection collection) {
             CollectionService collectionService = ContentServiceFactory
                 .getInstance().getCollectionService();
             swordService.message(
                 "Location resolves to collection with handle: " +
                     dso.getHandle() +
                     " and name: " +
-                    collectionService.getName((Collection) dso));
+                    collectionService.getName(collection));
         } else if (dso instanceof Item) {
             swordService.message("Location resolves to item with handle: " +
                                      dso.getHandle());

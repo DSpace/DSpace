@@ -10,9 +10,9 @@ package org.dspace.app.sword;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -22,10 +22,9 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.services.ConfigurationService;
-import org.hamcrest.MatcherAssert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ContentDisposition;
@@ -62,7 +61,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
     // ATOM Content type returned by SWORDv1
     private final String ATOM_CONTENT_TYPE = "application/atom+xml;charset=UTF-8";
 
-    @Before
+    @BeforeEach
     public void onlyRunIfConfigExists() {
         // These integration tests REQUIRE that SWORDWebConfig is found/available (as this class deploys SWORD)
         // If this class is not available, the below "Assume" will cause all tests to be SKIPPED
@@ -70,7 +69,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
         try {
             Class.forName("org.dspace.app.configuration.SWORDWebConfig");
         } catch (ClassNotFoundException ce) {
-            Assume.assumeNoException(ce);
+            Assumptions.assumeTrue(false, "Required class not available: " + ce.getMessage());
         }
 
         // Ensure SWORD URL configurations are set correctly (based on our integration test server's paths)
@@ -156,11 +155,11 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
         String mediaLink = response.getHeaders().getLocation().toString();
 
         // Body should include the SWORD version in generator tag
-        MatcherAssert.assertThat(response.getBody(),
+        assertThat(response.getBody(),
                                  containsString("<atom:generator uri=\"http://www.dspace.org/ns/sword/1.3.1\"" +
                                                     " version=\"1.3\"/>"));
         // Verify Item title also is returned in the body
-        MatcherAssert.assertThat(response.getBody(), containsString("Attempts to detect retrotransposition"));
+        assertThat(response.getBody(), containsString("Attempts to detect retrotransposition"));
 
         //----
         // STEP 2: Verify /media-link access works
@@ -179,7 +178,7 @@ public class Swordv1IT extends AbstractWebClientIntegrationTest {
         assertEquals(ATOM_CONTENT_TYPE, response.getHeaders().getContentType().toString());
         // Body should include a link to the zip bitstream in the newly created Item
         // This just verifies "example.zip" exists in the body.
-        MatcherAssert.assertThat(response.getBody(), containsString("example.zip"));
+        assertThat(response.getBody(), containsString("example.zip"));
     }
 
     @Test

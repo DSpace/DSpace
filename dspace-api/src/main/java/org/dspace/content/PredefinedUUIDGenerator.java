@@ -7,26 +7,51 @@
  */
 package org.dspace.content;
 
+import java.lang.reflect.Member;
+import java.util.EnumSet;
 import java.util.UUID;
 
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.id.UUIDGenerator;
+import org.hibernate.generator.BeforeExecutionGenerator;
+import org.hibernate.generator.EventType;
+import org.hibernate.generator.GeneratorCreationContext;
 
 /**
- * Allows DSpaceObjects to provide a pre-determined UUID
+ * UUID generator that allows DSpaceObjects to provide a pre-determined UUID.
+ * If no predefined UUID is set, a random UUID is generated.
  *
  * @author April Herron
  */
-public class PredefinedUUIDGenerator extends UUIDGenerator {
+public class PredefinedUUIDGenerator implements BeforeExecutionGenerator {
+
+    /**
+     * Constructor required by {@link org.hibernate.annotations.IdGeneratorType}.
+     *
+     * @param annotation the {@link PredefinedUUID} annotation instance
+     * @param member the annotated member (field or method)
+     * @param context the generator creation context
+     */
+    public PredefinedUUIDGenerator(PredefinedUUID annotation, Member member,
+                                   GeneratorCreationContext context) {
+        // no configuration needed
+    }
 
     @Override
-    public Object generate(SharedSessionContractImplementor session, Object object) {
-        if (object instanceof DSpaceObject) {
-            UUID uuid = ((DSpaceObject) object).getPredefinedUUID();
+    public Object generate(
+        SharedSessionContractImplementor session, Object owner,
+        Object currentValue, EventType eventType
+    ) {
+        if (owner instanceof DSpaceObject spaceObject) {
+            UUID uuid = spaceObject.getPredefinedUUID();
             if (uuid != null) {
                 return uuid;
             }
         }
-        return super.generate(session, object);
+        return UUID.randomUUID();
+    }
+
+    @Override
+    public EnumSet<EventType> getEventTypes() {
+        return EnumSet.of(EventType.INSERT);
     }
 }

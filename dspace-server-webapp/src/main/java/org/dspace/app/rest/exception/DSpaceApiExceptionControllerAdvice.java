@@ -199,7 +199,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         }
         log.warn("{} (status:{} exception: {} at: {})", "unprocessable edit item", HttpStatus.UNPROCESSABLE_ENTITY,
                 exceptionMessage, location);
-        return new ResponseEntity<>(ex.getErrors(), null, HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(ex.getErrors(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(QueryMethodParameterConversionException.class)

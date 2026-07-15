@@ -12,15 +12,16 @@ import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,7 +84,7 @@ public class GenerateSitemaps {
         final String usage = GenerateSitemaps.class.getCanonicalName();
 
         CommandLineParser parser = new DefaultParser();
-        HelpFormatter hf = new HelpFormatter();
+        HelpFormatter hf = HelpFormatter.builder().get();
 
         Options options = new Options();
 
@@ -101,17 +102,17 @@ public class GenerateSitemaps {
         try {
             line = parser.parse(options, args);
         } catch (ParseException pe) {
-            hf.printHelp(usage, options);
+            printHelp(hf, usage, options);
             return;
         }
 
         if (line.hasOption('h')) {
-            hf.printHelp(usage, options);
+            printHelp(hf, usage, options);
             return;
         }
 
         if (line.getArgs().length != 0) {
-            hf.printHelp(usage, options);
+            printHelp(hf, usage, options);
             return;
         }
 
@@ -123,7 +124,7 @@ public class GenerateSitemaps {
             && !line.hasOption('m') && !line.hasOption('y')) {
             System.err
                 .println("Nothing to do (no sitemap to generate)");
-            hf.printHelp(usage, options);
+            printHelp(hf, usage, options);
             return;
         }
 
@@ -307,6 +308,21 @@ public class GenerateSitemaps {
             throw new RuntimeException(e);
         } finally {
             c.abort();
+        }
+    }
+
+    /**
+     * Print help for the given options.
+     *
+     * @param hf      the help formatter
+     * @param usage   the usage string
+     * @param options the options
+     */
+    private static void printHelp(HelpFormatter hf, String usage, Options options) {
+        try {
+            hf.printHelp(usage, null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

@@ -182,7 +182,7 @@ public class OREIngestionCrosswalk
                     String processedURL = encodeForURL(href);
                     if (validResourceUri(entryId, processedURL)) {
                         // Generate a request for the aggregated resource
-                        ARurl = new URL(processedURL);
+                        ARurl = URI.create(processedURL).toURL();
                         in = ARurl.openStream();
                     } else {
                         throw new FileNotFoundException("Failed to validate " + processedURL);

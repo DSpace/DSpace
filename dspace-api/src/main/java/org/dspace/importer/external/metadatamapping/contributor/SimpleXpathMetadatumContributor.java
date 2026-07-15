@@ -157,14 +157,14 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         XPathExpression<Object> xpath = XPathFactory.instance().compile(query, Filters.fpassthrough(), null,namespaces);
         List<Object> nodes = xpath.evaluate(t);
         for (Object el : nodes) {
-            if (el instanceof Element) {
-                values.add(metadataFieldMapping.toDCValue(field, ((Element) el).getText()));
-            } else if (el instanceof Attribute) {
-                values.add(metadataFieldMapping.toDCValue(field, ((Attribute) el).getValue()));
-            } else if (el instanceof String) {
-                values.add(metadataFieldMapping.toDCValue(field, (String) el));
-            } else if (el instanceof Text) {
-                values.add(metadataFieldMapping.toDCValue(field, ((Text) el).getText()));
+            if (el instanceof Element element) {
+                values.add(metadataFieldMapping.toDCValue(field, element.getText()));
+            } else if (el instanceof Attribute attribute) {
+                values.add(metadataFieldMapping.toDCValue(field, attribute.getValue()));
+            } else if (el instanceof String string) {
+                values.add(metadataFieldMapping.toDCValue(field, string));
+            } else if (el instanceof Text text) {
+                values.add(metadataFieldMapping.toDCValue(field, text.getText()));
             } else {
                 log.error("Encountered unsupported XML node of type: {}. Skipped that node.", el.getClass());
             }

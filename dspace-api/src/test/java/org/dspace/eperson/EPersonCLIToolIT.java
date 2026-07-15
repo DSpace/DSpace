@@ -8,13 +8,13 @@
 package org.dspace.eperson;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for EPersonCLITool.
@@ -60,7 +60,7 @@ public class EPersonCLIToolIT
         };
 
         int exitStatus = EPersonCLITool.runCLITool(argv);
-        assertEquals("Exit status should be 0", 0, exitStatus);
+        assertEquals(0, exitStatus, "Exit status should be 0");
 
         String newPasswordHash = eperson.getPassword();
         assertNotEquals("Password hash did not change", oldPasswordHash, newPasswordHash);
@@ -97,14 +97,14 @@ public class EPersonCLIToolIT
 
         String stderr = tapSystemErr(() -> {
             int exitStatus = EPersonCLITool.runCLITool(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String newPasswordHash = eperson.getPassword();
-        assertEquals("Password hash changed", oldPasswordHash, newPasswordHash);
+        assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
 
-        assertTrue("Standard error did not mention 'empty'",
-                stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY));
+        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_EMPTY),
+                "Standard error did not mention 'empty'");
     }
 
     /**
@@ -141,13 +141,13 @@ public class EPersonCLIToolIT
 
         String stderr = tapSystemErr(() -> {
             int exitStatus = EPersonCLITool.runCLITool(argv);
-            assertEquals("Exit status should be 0", 0, exitStatus);
+            assertEquals(0, exitStatus, "Exit status should be 0");
         });
 
         String newPasswordHash = eperson.getPassword();
-        assertEquals("Password hash changed", oldPasswordHash, newPasswordHash);
+        assertEquals(oldPasswordHash, newPasswordHash, "Password hash changed");
 
-        assertTrue("Standard error did not indicate password mismatch",
-                stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH));
+        assertTrue(stderr.contains(EPersonCLITool.ERR_PASSWORD_NOMATCH),
+                "Standard error did not indicate password mismatch");
     }
 }

@@ -97,7 +97,7 @@ public class SolrServiceBestMatchIndexingPlugin implements SolrServiceIndexPlugi
     }
 
     private boolean isPersonItem(Item item) {
-        return "Person".equals(itemService.getEntityType(item));
+        return "Person".equals(itemService.getEntityTypeLabel(item));
     }
 
 }

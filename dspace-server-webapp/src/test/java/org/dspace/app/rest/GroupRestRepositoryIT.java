@@ -14,9 +14,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -34,7 +34,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.matcher.EPersonMatcher;
@@ -67,9 +66,10 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)
@@ -89,7 +89,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
@@ -630,7 +630,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withWorkflowGroup(1, admin, reviewer1)
+                .withWorkflowGroup("reviewer", admin, reviewer1)
                 .build();
 
         final Group workflowGroup = col1.getWorkflowStep1(context);
@@ -1407,7 +1407,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withWorkflowGroup(1, admin, reviewer1)
+                .withWorkflowGroup("reviewer", admin, reviewer1)
                 .build();
         Group workflowGroup = col1.getWorkflowStep1(context);
 
@@ -1510,7 +1510,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection collection = CollectionBuilder.createCollection(context, community)
                 .withName("Collection")
                 .withAdminGroup(admin)
-                .withWorkflowGroup(1, admin)
+                .withWorkflowGroup("reviewer", admin)
                 .withSubmitterGroup(admin)
                 .build();
         Group adminGroup = collection.getAdministrators();
@@ -2274,8 +2274,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
                                            .withAdminGroup(adminCol1)
-                                           .withWorkflowGroup(1, eperson)
-                                           .withWorkflowGroup(2, eperson)
+                                           .withWorkflowGroup("reviewer", eperson)
+                                           .withWorkflowGroup("editor", eperson)
                                            .build();
 
         Group workflowGroupStep1 = col1.getWorkflowStep1(context);

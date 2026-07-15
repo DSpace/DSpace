@@ -45,8 +45,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithDatabase {
@@ -57,7 +57,7 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
     private RelatedItemEnhancerUpdatePoller poller = new RelatedItemEnhancerUpdatePoller();
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         final DSpace dspace = new DSpace();
         ConfigurationService configurationService = dspace.getConfigurationService();

@@ -8,7 +8,8 @@
 
 package org.dspace.rdf;
 
-import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -19,10 +20,11 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
+import org.apache.commons.cli.help.TextHelpAppendable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.jena.rdf.model.Model;
@@ -405,19 +407,19 @@ public class RDFizer {
 
         }
 
-        if (dso instanceof Community) {
-            List<Community> subcommunities = ((Community) dso).getSubcommunities();
+        if (dso instanceof Community community) {
+            List<Community> subcommunities = community.getSubcommunities();
             for (Community sub : subcommunities) {
                 this.dspaceDFS(sub, callback, check, false);
             }
-            List<Collection> collections = ((Community) dso).getCollections();
+            List<Collection> collections = community.getCollections();
             for (Collection collection : collections) {
                 this.dspaceDFS(collection, callback, check, false);
             }
         }
 
-        if (dso instanceof Collection) {
-            Iterator<Item> items = itemService.findAllByCollection(context, (Collection) dso);
+        if (dso instanceof Collection collection) {
+            Iterator<Item> items = itemService.findAllByCollection(context, collection);
             while (items.hasNext()) {
                 Item item = items.next();
                 this.dspaceDFS(item, callback, check, false);
@@ -522,30 +524,42 @@ public class RDFizer {
         // check mutual exclusive arguments
         if (line.hasOption("delete") && line.hasOption("delete-all")) {
             usage(options);
-            System.err.println("\n\nYou cannot use the options --delete <handle> "
-                                   + "and --delete-all together.");
+            System.err.println("""
+
+
+                                   You cannot use the options --delete <handle> \
+                                   and --delete-all together.""");
             System.exit(1);
         }
 
         if (line.hasOption("convert-all")
             && (line.hasOption("delete") || line.hasOption("delete-all"))) {
             usage(options);
-            System.err.println("\n\nYou cannot use the option --convert-all "
-                                   + "together with --delete or --delete-all.");
+            System.err.println("""
+
+
+                                   You cannot use the option --convert-all \
+                                   together with --delete or --delete-all.""");
             System.exit(1);
         }
         if (line.hasOption("identifiers")
             && (line.hasOption("delete") || line.hasOption("delete-all"))) {
             usage(options);
-            System.err.println("\n\nYou cannot use the option --identifiers <handle> "
-                                   + "together with --delete or --delete-all.");
+            System.err.println("""
+
+
+                                   You cannot use the option --identifiers <handle> \
+                                   together with --delete or --delete-all.""");
             System.exit(1);
         }
         if (line.hasOption("stdout")
             && (line.hasOption("delete") || line.hasOption("delete-all"))) {
             usage(options);
-            System.err.println("\n\nYou cannot use the option --stdout together "
-                                   + "with --delete or --deleta-all.");
+            System.err.println("""
+
+
+                                   You cannot use the option --stdout together \
+                                   with --delete or --deleta-all.""");
             System.exit(1);
         }
 
@@ -718,7 +732,7 @@ public class RDFizer {
                         + "will be "
                         + "converted as well. Separate multiple identifiers"
                         + " with a space.")
-                .build();
+                .get();
         options.addOption(optIdentifiers);
 
         Option optDelete = Option.builder()
@@ -735,13 +749,13 @@ public class RDFizer {
                         + "Collections, Items, Bundles and Bitstreams will be "
                         + "deleted as well. Separate multiple identifiers with "
                         + "a space.")
-                .build();
+                .get();
         options.addOption(optDelete);
 
         Option optDeleteAll = Option.builder()
                 .longOpt("delete-all")
                 .desc("Delete all converted data from the triplestore.")
-                .build();
+                .get();
         options.addOption(optDeleteAll);
 
         return options;
@@ -750,16 +764,22 @@ public class RDFizer {
     protected static void usage(Options options) {
         String cliSyntax = "[dspace-bin]/bin/dspace rdfizer [OPTIONS...]";
         String header = "";
-        String footer = "\nYou cannot use the options --convert-all, --identifiers " +
-            "or --stdout together with --delete or --delete-all.\n" +
-            "Please use at least one option out of --convert-all, --delete, " +
-            "--delete-all or --identifiers.\n";
+        String footer = """
 
-        PrintWriter err = new PrintWriter(System.err);
-        HelpFormatter helpformater = new HelpFormatter();
-        helpformater.printHelp(err, 79, cliSyntax, header, options, 2, 2, footer);
-        err.flush();
-        // don't close PrintWriter err, as it would close System.err!
+            You cannot use the options --convert-all, --identifiers \
+            or --stdout together with --delete or --delete-all.
+            Please use at least one option out of --convert-all, --delete, \
+            --delete-all or --identifiers.
+            """;
+
+        HelpFormatter helpformater = HelpFormatter.builder()
+            .setHelpAppendable(new TextHelpAppendable(System.err))
+            .get();
+        try {
+            helpformater.printHelp(cliSyntax, header, options, footer, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public static void main(String[] args) {

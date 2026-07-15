@@ -18,7 +18,6 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -49,7 +48,6 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
                 delete(c, resourcePolicy);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -67,14 +65,8 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
             resourcePolicyService.update(context, resourcePolicy);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException e) {
+        } catch (Exception e) {
             log.error(e);
-        } catch (SQLException e) {
-            log.error(e);
-        } catch (AuthorizeException e) {
-            log.error(e);
-            ;
         }
         return resourcePolicy;
     }
@@ -90,11 +82,10 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     public static void delete(Integer id)
-            throws SQLException, IOException, SearchServiceException {
+            throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             ResourcePolicy rp = resourcePolicyService.find(c, id);
@@ -107,7 +98,6 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
             }
             c.complete();
         }
-        indexingService.commit();
     }
 
     public static ResourcePolicyBuilder createResourcePolicy(Context context, EPerson ePerson,

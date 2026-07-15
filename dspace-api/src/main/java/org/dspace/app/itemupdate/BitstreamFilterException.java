@@ -7,11 +7,14 @@
  */
 package org.dspace.app.itemupdate;
 
+import java.io.Serial;
+
 /**
  * Exception class for BitstreamFilters
  */
 public class BitstreamFilterException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public BitstreamFilterException() {

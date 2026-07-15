@@ -8,7 +8,7 @@
 
 package org.dspace.identifier.doi.crossref;
 
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.mockito.Mockito;
 

@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
@@ -30,7 +29,7 @@ import org.dspace.core.Constants;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -412,14 +411,6 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                                         EntityTypeMatcher.matchEntityTypeEntry(publication))))
                              .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
 
-        // Save original supported entity types to restore them later (for test isolation)
-        List<String> originalMockSupportedTypes = ((AbstractExternalDataProvider) externalDataService
-            .getExternalDataProvider("mock")).getSupportedEntityTypes();
-        List<String> originalPubmedSupportedTypes = ((AbstractExternalDataProvider) externalDataService
-            .getExternalDataProvider("pubmed")).getSupportedEntityTypes();
-        List<String> originalSuggestionSupportedTypes = ((AbstractExternalDataProvider) externalDataService
-            .getExternalDataProvider("suggestion")).getSupportedEntityTypes();
-
         try {
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
@@ -446,13 +437,12 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                                  .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
 
         } finally {
-            // Restore original supported entity types to avoid affecting other tests
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
-                    .setSupportedEntityTypes(originalMockSupportedTypes);
+                    .setSupportedEntityTypes(null);
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("pubmed"))
-                    .setSupportedEntityTypes(originalPubmedSupportedTypes);
+                    .setSupportedEntityTypes(null);
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("suggestion"))
-                    .setSupportedEntityTypes(originalSuggestionSupportedTypes);
+                    .setSupportedEntityTypes(null);
         }
 
     }

@@ -24,7 +24,8 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -47,6 +48,7 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
     @Autowired
     PluginService pluginService;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -147,8 +149,6 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testEPersonAuthorityWithAnonymousUser() throws Exception {
-
-        configurationService.setProperty("authority.EPersonAuthority.public", true);
 
         context.turnOffAuthorisationSystem();
         createEPerson("Luca", "Giamminonni");

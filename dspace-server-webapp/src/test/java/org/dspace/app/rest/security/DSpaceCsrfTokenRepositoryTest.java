@@ -15,10 +15,12 @@ import static org.mockito.Mockito.verify;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.ws.rs.core.HttpHeaders;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -32,13 +34,14 @@ import org.springframework.security.web.csrf.DeferredCsrfToken;
  *   - Updating these tests to use our custom DSpaceCsrfTokenRepository
  *   - Updating the saveTokenSecure() test, where we check for our custom SameSite attribute.
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class DSpaceCsrfTokenRepositoryTest {
     DSpaceCsrfTokenRepository repository;
     MockHttpServletResponse response;
     MockHttpServletRequest request;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.repository = new DSpaceCsrfTokenRepository();
         this.request = new MockHttpServletRequest();

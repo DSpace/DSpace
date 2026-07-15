@@ -7,7 +7,6 @@
  */
 package org.dspace.core;
 
-import java.lang.ref.Cleaner;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -20,7 +19,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
@@ -56,24 +54,6 @@ import org.springframework.util.CollectionUtils;
 public class Context implements AutoCloseable {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Context.class);
     protected static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
-
-    /**
-     * Cleaner for Java 21+ compatibility (replaces deprecated finalize() method).
-     * Used to clean up database connections if Context is garbage-collected without being properly closed.
-     */
-    private static final Cleaner cleaner = Cleaner.create();
-
-    /**
-     * Handle to the registered cleanup action. Used to prevent double-cleanup when close() is called normally.
-     */
-    private Cleaner.Cleanable cleanable;
-
-    /**
-     * Holder for the database connection reference, used by the Cleaner.
-     * Using AtomicReference allows the cleanup action to safely access the connection
-     * without preventing GC of the Context object.
-     */
-    private final AtomicReference<DBConnection> dbConnectionHolder = new AtomicReference<>();
 
     /**
      * Current user - null means anonymous access
@@ -146,6 +126,13 @@ public class Context implements AutoCloseable {
      */
     private final ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
 
+    /**
+     * Track entity UUIDs that have been deleted in this context.
+     * In Hibernate 7, session.get() may return deleted entities from the persistence context
+     * even after they've been removed. This Set allows us to filter them out.
+     */
+    private final Set<UUID> deletedEntityIds = new HashSet<>();
+
     protected EventService eventService;
 
     private DBConnection dbConnection;
@@ -205,10 +192,6 @@ public class Context implements AutoCloseable {
                               "Check previous entries in the dspace.log to find why the db failed to initialize.");
             }
         }
-
-        // Store reference for the Cleaner and register cleanup action
-        dbConnectionHolder.set(dbConnection);
-        cleanable = cleaner.register(this, new ContextCleanup(dbConnectionHolder));
 
         currentUser = null;
         currentLocale = I18nUtil.getDefaultLocale();
@@ -470,7 +453,8 @@ public class Context implements AutoCloseable {
             }
 
             if (dbConnection != null) {
-                // Commit our changes (this closes the transaction but leaves database connection open)
+                // Commit our changes (this closes the transaction but
+                // leaves database connection open)
                 dbConnection.commit();
                 reloadContextBoundEntities();
             }
@@ -478,16 +462,8 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Clears the Hibernate session persistence context, causing all managed entities
-     * to become detached, then reloads context-bound entities.
-     *
-     * <p><strong>Key differences from other Context methods:</strong></p>
-     * <ul>
-     *   <li><strong>vs. rollback():</strong> Preserves the transaction; only clears the session cache</li>
-     *   <li><strong>vs. close()/abort():</strong> Keeps the Context and connection open; only clears entities</li>
-     * </ul>
-     *
-     * <p>Useful for memory management during batch processing while maintaining transactional integrity.</p>
+     * Clear the Hibernate session cache and reload context-bound entities. Useful for memory
+     * management during batch processing while maintaining transactional integrity.
      *
      * @throws SQLRuntimeException if reloading context-bound entities fails
      * @see org.hibernate.Session#clear()
@@ -505,6 +481,21 @@ public class Context implements AutoCloseable {
             reloadContextBoundEntities();
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
+        }
+    }
+
+
+    /**
+     * Flush pending changes to the database without committing the transaction.
+     * This ensures that pending deletes are executed in the correct order for
+     * foreign key constraint compliance, especially important in Hibernate 7
+     * which may not always auto-flush in the correct order.
+     *
+     * @throws SQLException if a database access error occurs
+     */
+    public void flush() throws SQLException {
+        if (dbConnection != null) {
+            dbConnection.flushSession();
         }
     }
 
@@ -664,12 +655,6 @@ public class Context implements AutoCloseable {
                 log.error("Error closing the database connection", ex);
             }
             events = null;
-
-            // Clear the holder and unregister the Cleaner to prevent double-cleanup
-            dbConnectionHolder.set(null);
-            if (cleanable != null) {
-                cleanable.clean();
-            }
         }
     }
 
@@ -755,6 +740,37 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Mark an entity UUID as deleted in this context.
+     * This is used to track deleted entities for Hibernate 7 compatibility,
+     * where session.get() may return deleted entities from the persistence context.
+     *
+     * @param entityId the UUID of the deleted entity
+     */
+    public void markEntityDeleted(UUID entityId) {
+        if (entityId != null) {
+            deletedEntityIds.add(entityId);
+        }
+    }
+
+    /**
+     * Check if an entity UUID has been marked as deleted in this context.
+     *
+     * @param entityId the UUID to check
+     * @return true if the entity was deleted in this context, false otherwise
+     */
+    public boolean isEntityDeleted(UUID entityId) {
+        return entityId != null && deletedEntityIds.contains(entityId);
+    }
+
+    /**
+     * Clear the set of deleted entity IDs.
+     * This should be called after a successful commit.
+     */
+    public void clearDeletedEntityIds() {
+        deletedEntityIds.clear();
+    }
+
+    /**
      * Get a set of all of the special groups uuids that current user is a member of.
      *
      * @return list of special groups uuids
@@ -799,40 +815,9 @@ public class Context implements AutoCloseable {
         currentUserPreviousState = null;
     }
 
-    /**
-     * Static cleanup class for use with java.lang.ref.Cleaner (Java 21+ replacement for finalize()).
-     * This class must be static to avoid preventing garbage collection of the Context object.
-     * It holds a reference to the AtomicReference containing the DBConnection, which is cleared
-     * when abort() is called normally, preventing double-cleanup.
-     */
-    private static class ContextCleanup implements Runnable {
-        private static final Logger cleanupLog = org.apache.logging.log4j.LogManager.getLogger(ContextCleanup.class);
-        private final AtomicReference<DBConnection> dbConnectionRef;
-
-        ContextCleanup(AtomicReference<DBConnection> dbConnectionRef) {
-            this.dbConnectionRef = dbConnectionRef;
-        }
-
-        @Override
-        public void run() {
-            // Get and clear the reference atomically
-            DBConnection connection = dbConnectionRef.getAndSet(null);
-            if (connection != null && connection.isTransActionAlive()) {
-                cleanupLog.warn("Context was garbage-collected without being properly closed. " +
-                    "Rolling back uncommitted transaction and closing database connection.");
-                try {
-                    connection.rollback();
-                } catch (SQLException e) {
-                    cleanupLog.error("Error rolling back transaction during cleanup", e);
-                }
-                try {
-                    connection.closeDBConnection();
-                } catch (SQLException e) {
-                    cleanupLog.error("Error closing database connection during cleanup", e);
-                }
-            }
-        }
-    }
+    // Note: finalize() method removed for Java 21 compatibility.
+    // Context implements AutoCloseable, so cleanup should be done via close() or try-with-resources.
+    // If a Context is not properly closed, the database connection will be released by the connection pool.
 
     public void shutDownDatabase() throws SQLException {
         dbConnection.shutdown();

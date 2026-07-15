@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.repository.ItemFilterRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for {@link ItemFilterRestRepository}

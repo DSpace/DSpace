@@ -116,7 +116,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     public Options getHelpOptions() {
         Options options = new Options();
 
-        options.addOption(Option.builder("h").longOpt("help").desc("help").hasArg(false).required(false).build());
+        options.addOption(Option.builder("h").longOpt("help").desc("help").hasArg(false).required(false).get());
 
         return options;
     }

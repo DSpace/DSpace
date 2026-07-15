@@ -35,8 +35,8 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -68,7 +68,7 @@ public class ItemReferenceResolverConsumerIT extends AbstractControllerIntegrati
     @Autowired
     private MetadataAuthorityService metadataAuthorityService;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
         installItemService = ContentServiceFactory.getInstance().getInstallItemService();

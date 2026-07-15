@@ -87,7 +87,7 @@ public class ScoreReviewAction extends ProcessingAction {
             String.valueOf(score));
         if (StringUtils.isNotBlank(review)) {
             itemService.addMetadata(c, wfi.getItem(), REVIEW_FIELD.schema, REVIEW_FIELD.element,
-                REVIEW_FIELD.qualifier, null, String.format("%s - %s", score, review));
+                REVIEW_FIELD.qualifier, null, "%s - %s".formatted(score, review));
         }
         itemService.update(c, wfi.getItem());
 

@@ -11,8 +11,6 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +26,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This controller is public and is useful for handle resolving,
@@ -191,7 +191,7 @@ public class HdlResolverRestController {
         if (jsonList != null && !jsonList.isEmpty()) {
             try {
                 json = mapper.writeValueAsString(jsonList);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 log.error("Error during conversion of response!", e);
             }
         }

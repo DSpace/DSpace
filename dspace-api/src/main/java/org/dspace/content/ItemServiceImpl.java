@@ -36,10 +36,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.dao.LDNMessageDao;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.impl.ItemSearcherByMetadata;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -120,6 +121,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
+    /**
+     * Tracks items currently being deleted by rawDelete to prevent re-entrant deletion.
+     * versioningService.removeVersion() → delete() calls itemService.delete() recursively,
+     * which in Hibernate 7 causes StaleStateException due to double session.remove().
+     */
+    private static final ThreadLocal<java.util.Set<java.util.UUID>> deletingItems =
+        ThreadLocal.withInitial(java.util.HashSet::new);
+
     @Autowired(required = true)
     protected ItemDAO itemDAO;
 
@@ -196,6 +205,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired
     private QAEventsDAO qaEventsDao;
+
+    @Autowired
+    private LDNMessageDao ldnMessageDao;
 
     @Autowired
     private VersionHistoryService versionHistoryService;
@@ -451,7 +463,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         item.setLastModified(Instant.now());
         update(context, item);
         //Also fire a modified event since the item HAS been modified
-        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null, getIdentifiers(context, item)));
+        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null, DetailType.INFO,
+                                   getIdentifiers(context, item)));
     }
 
     @Override
@@ -724,7 +737,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             }
 
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
-                                       null, getIdentifiers(context, item)));
+                                       null, DetailType.INFO, getIdentifiers(context, item)));
             item.clearModified();
             item.clearDetails();
         }
@@ -863,6 +876,22 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {
+        // Reentrancy guard: versioningService.removeVersion() calls versioningService.delete()
+        // which recursively calls itemService.delete() for the same item. In Hibernate 7,
+        // the second session.remove() causes StaleStateException because the item was already
+        // deleted by the inner call. Skip the recursive call — the outer rawDelete handles it.
+        if (!deletingItems.get().add(item.getID())) {
+            return;
+        }
+        try {
+            rawDeleteInternal(context, item);
+        } finally {
+            deletingItems.get().remove(item.getID());
+        }
+    }
+
+    private void rawDeleteInternal(Context context, Item item)
+        throws AuthorizeException, SQLException, IOException {
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
@@ -876,6 +905,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
         }
+        // Flush after relationship deletions to synchronize the persistence context.
+        // forceDelete() calls itemService.update() which may modify metadata values on related items.
+        // Without flushing, a subsequent query's auto-flush may try to delete metadata values
+        // that were already removed, causing StaleStateException in Hibernate 7.
+        context.flush();
 
         // Remove bundles
         removeAllBundles(context, item);
@@ -918,6 +952,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             qaEventsDao.delete(context, qaEvent);
         }
 
+        // Nullify LDN message references to this item to prevent
+        // TransientPropertyValueException in Hibernate 7 during flush.
+        for (LDNMessageEntity ldnMsg : ldnMessageDao.findByDSpaceObject(context, item)) {
+            if (item.equals(ldnMsg.getObject())) {
+                ldnMsg.setObject(null);
+            }
+            if (item.equals(ldnMsg.getContext())) {
+                ldnMsg.setContext(null);
+            }
+        }
+
         //Only clear collections after we have removed everything else from the item
         item.clearCollections();
         item.setOwningCollection(null);
@@ -927,58 +972,16 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             removeAuthorityReferences(context, item);
         }
 
+        // Remove all resource policies right before removing the item entity.
+        // Must happen after all authorization checks but before itemDAO.delete() to prevent
+        // Hibernate 7 TransientPropertyValueException when managed ResourcePolicies reference
+        // a removed Item entity during auto-flush.
+        authorizeService.removeAllPolicies(context, item);
+
         // Finally remove item row
         itemDAO.delete(context, item);
     }
 
-    /**
-     * Performs authority reference cleanup when an item is deleted and the
-     * {@code item-deletion.authority-cleanup.enabled} configuration is set to {@code true}.
-     *
-     * <p><strong>Purpose:</strong></p>
-     * <p>When an entity item (Person, Organization, Project, etc.) is deleted, other items
-     * throughout the repository may still have metadata fields that reference the deleted
-     * entity through authority control values. This method systematically locates and
-     * handles these orphaned authority references to maintain data integrity.</p>
-     *
-     * <p><strong>Configuration-Driven Behavior:</strong></p>
-     * <p>This method only executes when {@code item-deletion.authority-cleanup.enabled} is
-     * {@code true}. The cleanup behavior for each metadata field is controlled by
-     * configuration properties:</p>
-     * <ul>
-     *   <li><strong>{@code authority.cleanup.<metadata-field>}</strong> - Field-specific cleanup mode</li>
-     *   <li><strong>{@code authority.cleanup.default}</strong> - Default cleanup mode for unspecified fields</li>
-     * </ul>
-     *
-     * <p><strong>Cleanup Process:</strong></p>
-     * <ol>
-     *   <li><strong>Identify Authority-Controlled Fields:</strong> Determines which metadata fields
-     *       are authority-controlled based on the deleted item's entity type</li>
-     *   <li><strong>Find Related Items:</strong> Searches for all items containing authority references
-     *       to the deleted item's UUID in their metadata fields</li>
-     *   <li><strong>Apply Cleanup Strategy:</strong> For each affected metadata field, applies the
-     *       configured cleanup mode to handle the orphaned authority reference</li>
-     *   <li><strong>Update and Uncache:</strong> Persists changes and clears Hibernate cache to
-     *       ensure immediate visibility of updates</li>
-     * </ol>
-     *
-     * <p><strong>Cleanup Modes:</strong></p>
-     * <ul>
-     *   <li><strong>{@code BUSINESS}</strong> - Replaces the UUID authority with the deleted item's
-     *       business identifier (e.g., DOI, ORCID, handle) prefixed with {@code REFERENCE::}.
-     *       This preserves the metadata value while indicating the source entity is no longer active.</li>
-     *   <li><strong>{@code CLEAN_ALL}</strong> - Completely removes the metadata value and its
-     *       authority reference. Use this for metadata that becomes meaningless without the entity.</li>
-     * </ul>
-     *
-     * @param context     the DSpace context for database operations and authorization
-     * @param deletedItem the item being deleted that may be referenced by authority values in other items
-     * @throws SQLException       if database operations fail during authority cleanup
-     * @throws AuthorizeException if the current user lacks permission to modify related items
-     * @see AuthorityValueService#AUTHORITY_CLEANUP_BUSINESS_MODE
-     * @see AuthorityValueService#AUTHORITY_CLEANUP_CLEAN_ALL_MODE
-     * @see org.dspace.content.authority.service.ChoiceAuthorityService#getAuthorityControlledFieldsByEntityType
-     */
     private void removeAuthorityReferences(Context context, Item deletedItem) throws SQLException, AuthorizeException {
         String uuidOfDeletedItem = deletedItem.getID().toString();
         List<String> controlledFields = getAuthorityControlledFieldsByItemEntityType(deletedItem);
@@ -1345,11 +1348,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void move(Context context, Item item, Collection from, Collection to)
         throws SQLException, AuthorizeException, IOException {
 
-        // If the two collections are the same, do nothing.
-        if (from.equals(to)) {
-            return;
-        }
-
         // Use the normal move method, and default to not inherit permissions
         this.move(context, item, from, to, false);
     }
@@ -1402,7 +1400,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // so we only do this here if the owning collection hasn't changed.
 
             context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
-                                       null, getIdentifiers(context, item)));
+                                       null, DetailType.INFO, getIdentifiers(context, item)));
         }
     }
 
@@ -1476,9 +1474,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery, String q)
         throws SearchServiceException {
         if (StringUtils.isNotBlank(q)) {
-            // Although not all items will have a metadata dc.title, we use it for autocomplete because it is the
-            // most common. Ideally, we should use a field that all indexed items have
-            q = searchService.formatAutoCompleteQuery(q, "dc.title_sort");
             discoverQuery.setQuery(q);
         }
         discoverQuery.addRequiredAuthorization(Constants.WRITE);
@@ -1531,30 +1526,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
-                                                        String qualifier, String value)
-        throws SQLException, AuthorizeException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
-        if (mds == null) {
-            throw new IllegalArgumentException("No such metadata schema: " + schema);
-        }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
-        if (mdf == null) {
-            throw new IllegalArgumentException(
-                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
-        }
-
-        if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(context, mdf, null);
-        }
-        return itemDAO.findByMetadataField(context, mdf, value);
-    }
-
-    @Override
     public Iterator<Item> findArchivedByMetadataFieldExcludingOldVersions(Context context, String schema,
                                                                           String element, String qualifier,
                                                                           String value)
-        throws SQLException, AuthorizeException {
+            throws SQLException, AuthorizeException {
         MetadataSchema mds = metadataSchemaService.find(context, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
@@ -1562,7 +1537,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
-                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
         if (Item.ANY.equals(value)) {
@@ -1716,12 +1691,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
-                                                   Boolean inArchive) throws SQLException {
-        return itemDAO.findByLikeAuthorityValue(context, likeAuthority, inArchive);
-    }
-
-    @Override
     public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)
         throws SQLException, AuthorizeException {
         String[] elements = getElementsFilled(mdString);
@@ -1790,10 +1759,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    protected void getAuthoritiesAndConfidences(String fieldKey, int dsoType, Collection collection,
-                                                List<String> values, List<String> authorities,
-                                                List<Integer> confidences, int i) {
-        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), dsoType, collection, null);
+    protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values,
+                                                List<String> authorities, List<Integer> confidences, int i) {
+        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, null);
         authorities.add(c.values.length > 0 && c.values[0] != null ? c.values[0].authority : null);
         confidences.add(c.confidence);
     }
@@ -1889,10 +1857,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
                                            boolean enableVirtualMetadata) {
-
-        enableVirtualMetadata = enableVirtualMetadata
-            && configurationService.getBooleanProperty("relationship.enable-virtual-metadata", true);
-
         if (!enableVirtualMetadata) {
             log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
             return super.getMetadata(item, schema, element, qualifier, lang);
@@ -1903,9 +1867,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             List<MetadataValue> dbMetadataValues = item.getMetadata();
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
-            if (configurationService.getBooleanProperty("relationship.enable-virtual-metadata", true)) {
-                fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
-            }
+            fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
             fullMetadataValueList.addAll(dbMetadataValues);
 
             item.setCachedMetadata(MetadataValueComparators.sort(fullMetadataValueList));
@@ -1915,29 +1877,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Build up list of matching values based on the cache
         List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : item.getCachedMetadata()) {
-            if (match(schema, element, qualifier, dcv)) {
+            if (match(schema, element, qualifier, Item.ANY, dcv)) {
                 values.add(dcv);
             }
         }
 
+        // Apply language filtering (matches a specific locale while always retaining
+        // language-neutral / null-language values), consistent with main.
         values = getFilteredMetadataValuesByLanguage(values, lang);
 
         // Create an array of matching values
         return values;
-    }
-
-    @Override
-    public String getEntityType(Item item) {
-        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
-    }
-
-    @Override
-    public void setEntityType(Context context, Item item, String entityType) {
-        try {
-            setMetadataSingleValue(context, item, new MetadataFieldName("dspace.entity.type"), null, entityType);
-        } catch (SQLException e) {
-            throw new SQLRuntimeException(e);
-        }
     }
 
     /**
@@ -1947,12 +1897,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
         // If this is a (virtual) metadata value representing a relationship,
         // then we must also update the corresponding Relationship with the new place
-        if (rr instanceof RelationshipMetadataValue) {
+        if (rr instanceof RelationshipMetadataValue value) {
             try {
                 //Retrieve the applicable relationship
                 Relationship rs = relationshipService.find(context,
-                        ((RelationshipMetadataValue) rr).getRelationshipId());
-                if (rs.getLeftItem().getID().equals(dso.getID())) {
+                        value.getRelationshipId());
+                if (rs.getLeftItem().equals(dso)) {
                     rs.setLeftPlace(place);
                 } else {
                     rs.setRightPlace(place);
@@ -1981,7 +1931,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                 "exist!");
         }
 
-        final Supplier<Integer> placeSupplier = () -> place;
+        final Supplier<Integer> placeSupplier =  () -> place;
 
         return addMetadata(context, dso, metadataField, lang, Collections.singletonList(value),
                            Collections.singletonList(authority), List.of(confidence), placeSupplier)
@@ -2155,32 +2105,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findRelatedItemsByAuthorityControlledFields(Context c, Item item, List<String> authorities) {
-        String entityType = this.getEntityType(item);
-        String query = choiceAuthorityService.getAuthorityControlledFieldsByEntityType(entityType).stream()
-                                             .map(field -> getFieldFilter(field, authorities))
-                                             .collect(Collectors.joining(" OR "));
-
-        if (StringUtils.isEmpty(query)) {
-            return Collections.emptyIterator();
-        }
-
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
-        discoverQuery.addDSpaceObjectFilter(IndexableWorkspaceItem.TYPE);
-        discoverQuery.addDSpaceObjectFilter(IndexableWorkflowItem.TYPE);
-        discoverQuery.addFilterQueries(query);
-
-        return new DiscoverResultItemIterator(c, discoverQuery, false);
-    }
-
-    private String getFieldFilter(String field, List<String> authorities) {
-        return authorities.stream()
-                          .map(authority -> field.replaceAll("_", ".") + "_allauthority: \"" + authority + "\"")
-                          .collect(Collectors.joining(" OR "));
-    }
-
-    @Override
     public boolean isLatestVersion(Context context, Item item) throws SQLException {
 
         VersionHistory history = versionHistoryService.findByItem(context, item);
@@ -2214,6 +2138,72 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         return item.equals(latestVersion.getItem());
 
+    }
+
+    @Override
+    public String getEntityType(Item item) {
+        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
+
+    @Override
+    public Iterator<Item> findByLikeAuthorityValue(Context context, String likeAuthority,
+                                                   Boolean inArchive) throws SQLException {
+        return itemDAO.findByLikeAuthorityValue(context, likeAuthority, inArchive);
+    }
+
+    @Override
+    public void setEntityType(Context context, Item item, String entityType) {
+        try {
+            setMetadataSingleValue(context, item, new MetadataFieldName("dspace.entity.type"), null, entityType);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    @Override
+    public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
+                                                        String qualifier, String value)
+        throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataField(context, mdf, null);
+        }
+        return itemDAO.findByMetadataField(context, mdf, value);
+    }
+
+    @Override
+    public Iterator<Item> findRelatedItemsByAuthorityControlledFields(Context c, Item item, List<String> authorities) {
+        String entityType = this.getEntityType(item);
+        String query = choiceAuthorityService.getAuthorityControlledFieldsByEntityType(entityType).stream()
+                                             .map(field -> getFieldFilter(field, authorities))
+                                             .collect(Collectors.joining(" OR "));
+
+        if (StringUtils.isEmpty(query)) {
+            return Collections.emptyIterator();
+        }
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkspaceItem.TYPE);
+        discoverQuery.addDSpaceObjectFilter(IndexableWorkflowItem.TYPE);
+        discoverQuery.addFilterQueries(query);
+
+        return new DiscoverResultItemIterator(c, discoverQuery, false);
+    }
+
+    private String getFieldFilter(String field, List<String> authorities) {
+        return authorities.stream()
+                          .map(authority -> field.replaceAll("_", ".") + "_allauthority: \"" + authority + "\"")
+                          .collect(Collectors.joining(" OR "));
     }
 
 }

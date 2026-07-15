@@ -13,9 +13,9 @@ import org.dspace.core.Context;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +48,7 @@ public class IIIFController {
      * @param id DSpace Item uuid
      * @return manifest as JSON
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest", produces = "application/json")
+    @GetMapping( value = "/{id}/manifest", produces = "application/json")
     public String findOne(@PathVariable UUID id) {
         Context context = ContextUtil.obtainCurrentRequestContext();
         return iiifFacade.getManifest(context, id);
@@ -70,7 +70,7 @@ public class IIIFController {
      * @param query query terms
      * @return AnnotationList as JSON
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/search")
+    @GetMapping("/{id}/manifest/search")
     public String searchInManifest(@PathVariable UUID id,
                                    @RequestParam(name = "q") String query) {
         Context context = ContextUtil.obtainCurrentRequestContext();
@@ -88,7 +88,7 @@ public class IIIFController {
      * @param id DSpace Item uuid
      * @return AnnotationList as JSON
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/seeAlso")
+    @GetMapping("/{id}/manifest/seeAlso")
     public String findSeeAlsoList(@PathVariable UUID id) {
         Context context = ContextUtil.obtainCurrentRequestContext();
         return iiifFacade.getSeeAlsoAnnotations(context, id);
@@ -106,7 +106,7 @@ public class IIIFController {
      * @param cid canvas identifier
      * @return canvas as JSON
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}/canvas/{cid}")
+    @GetMapping("/{id}/canvas/{cid}")
     public String findCanvas(@PathVariable UUID id, @PathVariable String cid) {
         Context context = ContextUtil.obtainCurrentRequestContext();
         return iiifFacade.getCanvas(context, id, cid);

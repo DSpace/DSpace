@@ -123,10 +123,12 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 
     @Override
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException {
-        String hql = "delete from MostRecentChecksum WHERE bitstream=:bitstream";
-        Query query = createQuery(context, hql);
-        query.setParameter("bitstream", bitstream);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        // Bulk HQL deletes don't update the persistence context, causing TransientPropertyValueException.
+        MostRecentChecksum checksum = findByBitstream(context, bitstream);
+        if (checksum != null) {
+            delete(context, checksum);
+        }
     }
 
     @Override

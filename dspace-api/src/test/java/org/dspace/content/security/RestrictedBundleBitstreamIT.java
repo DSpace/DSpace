@@ -29,9 +29,9 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.InstallItemService;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests of the requirement that some bundles and bitstreams should not inherit parent container
@@ -48,7 +48,7 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
 
     Collection collection;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -83,10 +83,10 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
         Bitstream reloadedBitstream = context.reloadEntity(licenseBitstream);
 
         // Expect license bundle and bitstream to have NO policies
-        Assert.assertTrue("Installed license bundle should have NO policies",
-                reloadedLicenseBundle.getResourcePolicies().isEmpty());
-        Assert.assertTrue("Installed license bitstream should have NO policies",
-                reloadedBitstream.getResourcePolicies().isEmpty());
+        Assertions.assertTrue(reloadedLicenseBundle.getResourcePolicies().isEmpty(),
+            "Installed license bundle should have NO policies");
+        Assertions.assertTrue(reloadedBitstream.getResourcePolicies().isEmpty(),
+            "Installed license bitstream should have NO policies");
 
     }
 
@@ -108,10 +108,10 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
         // Expect NO policies on bundle or bitstream
         Bundle reloadedSwordBundle = context.reloadEntity(swordBundle);
         Bitstream reloadedSwordBitstream = context.reloadEntity(bitstream);
-        Assert.assertTrue("SWORD bundle should contain no resource policies",
-                reloadedSwordBundle.getResourcePolicies().isEmpty());
-        Assert.assertTrue("SWORD bitstream should contain no resource policies",
-                reloadedSwordBitstream.getResourcePolicies().isEmpty());
+        Assertions.assertTrue(reloadedSwordBundle.getResourcePolicies().isEmpty(),
+            "SWORD bundle should contain no resource policies");
+        Assertions.assertTrue(reloadedSwordBitstream.getResourcePolicies().isEmpty(),
+            "SWORD bitstream should contain no resource policies");
     }
 
     @Test
@@ -134,9 +134,9 @@ public class RestrictedBundleBitstreamIT extends AbstractIntegrationTestWithData
         // Expect NO policies on bundle or bitstream
         Bundle reloadedSwordBundle = context.reloadEntity(textBundle);
         Bitstream reloadedSwordBitstream = context.reloadEntity(bitstream);
-        Assert.assertTrue("TEXT bundle should contain no resource policies",
-                reloadedSwordBundle.getResourcePolicies().isEmpty());
-        Assert.assertTrue("TEXT bitstream should contain no resource policies",
-                reloadedSwordBitstream.getResourcePolicies().isEmpty());
+        Assertions.assertTrue(reloadedSwordBundle.getResourcePolicies().isEmpty(),
+            "TEXT bundle should contain no resource policies");
+        Assertions.assertTrue(reloadedSwordBitstream.getResourcePolicies().isEmpty(),
+            "TEXT bitstream should contain no resource policies");
     }
 }

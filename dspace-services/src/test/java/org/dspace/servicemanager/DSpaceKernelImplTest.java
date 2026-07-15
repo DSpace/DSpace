@@ -7,17 +7,17 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.dspace.kernel.DSpaceKernel;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -29,12 +29,12 @@ public class DSpaceKernelImplTest {
 
     DSpaceKernelImpl kernelImpl;
 
-    @Before
+    @BeforeEach
     public void init() {
         kernelImpl = DSpaceKernelInit.getKernel(null); // checks for the existing kernel but does not init
     }
 
-    @After
+    @AfterEach
     public void destroy() {
         if (kernelImpl != null) {
             kernelImpl.destroy();

@@ -20,8 +20,8 @@ import org.dspace.xoai.services.api.HandleResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.dspace.xoai.tests.DSpaceBasicTestConfiguration;
 import org.dspace.xoai.tests.helpers.stubs.StubbedFieldResolver;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -31,12 +31,12 @@ public abstract class AbstractQueryResolverTest {
     protected CollectionsService collectionsService = mock(CollectionsService.class);
     private ApplicationContext applicationContext;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         applicationContext = new AnnotationConfigApplicationContext(DSpaceBasicTestConfiguration.class);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         //Nullify all resources so that JUnit cleans them up
         applicationContext = null;

@@ -24,9 +24,9 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -43,7 +43,7 @@ public class SolrSuggestAuthorityIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ChoiceAuthorityService choiceAuthorityService;
 
-    @Before
+    @BeforeEach
     public void setup() throws SubmissionConfigReaderException {
         choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
         context.turnOffAuthorisationSystem();
@@ -59,7 +59,7 @@ public class SolrSuggestAuthorityIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void teardown() throws SubmissionConfigReaderException {
         context.turnOffAuthorisationSystem();
         pluginService.clearNamedPluginClasses();

@@ -7,8 +7,8 @@
  */
 package org.dspace.app.itemimport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -35,9 +35,9 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.flywaydb.core.internal.util.ExceptionUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic integration testing for the SAF Import feature via CLI {@link ItemImportCLI}.
@@ -60,7 +60,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private Path workDir;
     private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -90,7 +90,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         workDir = Path.of(file.getAbsolutePath());
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         PathUtils.deleteOnExit(tempDir);
@@ -607,5 +607,26 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private void perfomImportScript(String[] args)
             throws Exception {
         runDSpaceScript(args);
+
+        // Debug: Check database directly via JDBC
+        System.out.println("DEBUG: Checking database via JDBC after script...");
+        javax.sql.DataSource ds = DSpaceServicesFactory.getInstance()
+            .getServiceManager()
+            .getServiceByName("dataSource", javax.sql.DataSource.class);
+        try (java.sql.Connection conn = ds.getConnection()) {
+            System.out.println("DEBUG JDBC: Connection URL: " + conn.getMetaData().getURL());
+            System.out.println("DEBUG JDBC: autocommit: " + conn.getAutoCommit());
+            try (java.sql.Statement stmt = conn.createStatement();
+                 java.sql.ResultSet rs = stmt.executeQuery("SELECT uuid, in_archive, withdrawn FROM item")) {
+                int count = 0;
+                while (rs.next()) {
+                    System.out.println("DEBUG JDBC: Item UUID=" + rs.getString("uuid") +
+                        ", in_archive=" + rs.getBoolean("in_archive") +
+                        ", withdrawn=" + rs.getBoolean("withdrawn"));
+                    count++;
+                }
+                System.out.println("DEBUG JDBC: Total items in database: " + count);
+            }
+        }
     }
 }

@@ -30,8 +30,8 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link org.dspace.app.rest.submit.step.CustomUrlStep}.
@@ -43,7 +43,7 @@ public class CustomUrlStepIT extends AbstractControllerIntegrationTest {
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.turnOffAuthorisationSystem();
 

@@ -8,12 +8,15 @@
 
 package org.dspace.app.util;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -82,12 +85,17 @@ public class Configuration {
 
         // Give help if asked
         if (cmd.hasOption('?') || cmd.hasOption('h')) {
-            new HelpFormatter().printHelp("dsprop [options]",
-                                          "Display the value of a DSpace configuration property",
-                                          options,
-                                          "If --module is omitted, then --property gives the entire" +
-                                              " name of the property.  Otherwise the name is" +
-                                              " composed of module.property.");
+            try {
+                HelpFormatter.builder().get().printHelp("dsprop [options]",
+                    "Display the value of a DSpace configuration property",
+                    options,
+                    "If --module is omitted, then --property gives the entire" +
+                        " name of the property.  Otherwise the name is" +
+                        " composed of module.property.",
+                    false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
             return 0;
         }
 

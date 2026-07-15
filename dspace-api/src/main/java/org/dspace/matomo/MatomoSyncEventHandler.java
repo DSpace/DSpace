@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.matomo.client.MatomoClient;
 import org.dspace.matomo.model.MatomoRequestDetailsBuilder;
 import org.dspace.usage.UsageEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class represents a sync event handler that will send details one by one using the {@code MatomoClient}
@@ -24,8 +23,8 @@ public class MatomoSyncEventHandler extends MatomoAbstractHandler {
     private static final Logger log = LogManager.getLogger(MatomoSyncEventHandler.class);
 
     public MatomoSyncEventHandler(
-        @Autowired MatomoClient matomoClient,
-        @Autowired MatomoRequestDetailsBuilder builder
+        MatomoClient matomoClient,
+        MatomoRequestDetailsBuilder builder
     ) {
         super(matomoClient, builder);
     }

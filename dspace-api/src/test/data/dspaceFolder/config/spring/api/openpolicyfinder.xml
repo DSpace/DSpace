@@ -14,7 +14,7 @@
 		id="org.dspace.app.openpolicyfinder.submit.OpenPolicyFinderSubmitConfigurationService">
 		<property name="issnItemExtractors">
 			<list>
-				<bean class="org.dspace.app.openpolicyfinder.submit.MetadataValueISSNExtractor">
+				<bean class="org.dspace.app.openpolicyfinder.submit.MetadataValueISSNExtractor" autowire="byType">
 					<property name="metadataList">
 						<list>
 							<value>dc.identifier.issn</value>
@@ -22,7 +22,7 @@
 					</property>
 				</bean>
 				<!-- Uncomment this bean if you have OpenPolicyFinderJournalTitle enabled
-				<bean class="org.dspace.app.openpolicyfinder.submit.MetadataAuthorityISSNExtractor">
+				<bean class="org.dspace.app.openpolicyfinder.submit.MetadataAuthorityISSNExtractor" autowire="byType">
 					<property name="metadataList">
 						<list>
 							<value>dc.title.alternative</value>

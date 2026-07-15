@@ -12,11 +12,10 @@ import java.util.Arrays;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.impl.conn.DefaultRoutePlanner;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.impl.routing.DefaultRoutePlanner;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.dspace.services.ConfigurationService;
 
 /**
@@ -36,7 +35,7 @@ public class DSpaceProxyRoutePlanner extends DefaultRoutePlanner {
     }
 
     @Override
-    protected HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
+    protected HttpHost determineProxy(HttpHost target, HttpContext context) throws HttpException {
         if (isTargetHostConfiguredToBeIgnored(target)) {
             return null;
         }
@@ -46,7 +45,7 @@ public class DSpaceProxyRoutePlanner extends DefaultRoutePlanner {
             return null;
         }
         try {
-            return new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+            return new HttpHost("http", proxyHost, Integer.parseInt(proxyPort));
         } catch (NumberFormatException e) {
             throw new RuntimeException("Invalid proxy port configuration: " + proxyPort);
         }
