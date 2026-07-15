@@ -12,9 +12,9 @@
 --   V7.0_2021.11.26 (nested)
 -------------------------------------------------------
 
-CREATE SEQUENCE IF NOT EXISTS cris_layout_field_nested_id_seq;
+CREATE SEQUENCE IF NOT EXISTS dynamic_layout_field_nested_id_seq;
 
-CREATE TABLE IF NOT EXISTS cris_layout_field2nested
+CREATE TABLE IF NOT EXISTS dynamic_layout_field2nested
 (
     nested_field_id  INTEGER NOT NULL,
     rendering        VARCHAR(255),
@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS cris_layout_field2nested
     style_value      VARCHAR(255),
     metadata_field_id INTEGER NOT NULL,
     field_id         INTEGER NOT NULL,
-    CONSTRAINT cris_layout_field2nested_pkey PRIMARY KEY (nested_field_id),
-    CONSTRAINT cris_layout_field2nested_metadatafieldregistry_fkey
+    CONSTRAINT dynamic_layout_field2nested_pkey PRIMARY KEY (nested_field_id),
+    CONSTRAINT dynamic_layout_field2nested_metadatafieldregistry_fkey
         FOREIGN KEY (metadata_field_id) REFERENCES metadatafieldregistry (metadata_field_id),
-    CONSTRAINT cris_layout_field2nested_cris_layout_field_fkey
-        FOREIGN KEY (field_id) REFERENCES cris_layout_field (field_id)
+    CONSTRAINT dynamic_layout_field2nested_dynamic_layout_field_fkey
+        FOREIGN KEY (field_id) REFERENCES dynamic_layout_field (field_id)
 );

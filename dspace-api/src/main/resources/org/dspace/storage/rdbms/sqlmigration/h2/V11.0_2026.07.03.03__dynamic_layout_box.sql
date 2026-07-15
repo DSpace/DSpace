@@ -12,9 +12,9 @@
 --   V7.0_2020.12.08 (box), V7.0_2021.11.05 (box), V7.0_2021.11.17
 -------------------------------------------------------
 
-CREATE SEQUENCE IF NOT EXISTS cris_layout_box_id_seq;
+CREATE SEQUENCE IF NOT EXISTS dynamic_layout_box_id_seq;
 
-CREATE TABLE IF NOT EXISTS cris_layout_box
+CREATE TABLE IF NOT EXISTS dynamic_layout_box
 (
     id          INTEGER NOT NULL,
     entity_id   INTEGER NOT NULL,
@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS cris_layout_box
     cell        INTEGER,
     position    INTEGER,
     container   BOOLEAN,
-    CONSTRAINT cris_layout_box_pkey PRIMARY KEY (id),
-    CONSTRAINT cris_layout_box_entity_id_fkey FOREIGN KEY (entity_id)
+    CONSTRAINT dynamic_layout_box_pkey PRIMARY KEY (id),
+    CONSTRAINT dynamic_layout_box_entity_id_fkey FOREIGN KEY (entity_id)
         REFERENCES entity_type (id),
-    CONSTRAINT cris_layout_cell_id_fk FOREIGN KEY (cell)
-        REFERENCES cris_layout_cell
+    CONSTRAINT dynamic_layout_cell_id_fk FOREIGN KEY (cell)
+        REFERENCES dynamic_layout_cell
 );
