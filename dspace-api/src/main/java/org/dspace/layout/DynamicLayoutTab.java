@@ -98,34 +98,58 @@ public class DynamicLayoutTab implements ReloadableEntity<Integer> {
     @OrderColumn(name = "position")
     private List<DynamicLayoutRow> rows = new ArrayList<>();
 
+    /**
+     * Returns the i d.
+     */
     public Integer getID() {
         return id;
     }
 
+    /**
+     * Sets the id.
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
+    /**
+     * Returns the entity.
+     */
     public EntityType getEntity() {
         return entity;
     }
 
+    /**
+     * Sets the entity.
+     */
     public void setEntity(EntityType entity) {
         this.entity = entity;
     }
 
+    /**
+     * Returns the priority.
+     */
     public Integer getPriority() {
         return priority;
     }
 
+    /**
+     * Sets the priority.
+     */
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
 
+    /**
+     * Returns the short name.
+     */
     public String getShortName() {
         return shortName;
     }
 
+    /**
+     * Sets the short name.
+     */
     public void setShortName(String shortName) {
         this.shortName = shortName;
     }
@@ -174,26 +198,46 @@ public class DynamicLayoutTab implements ReloadableEntity<Integer> {
         this.security = security.getValue();
     }
 
+    /**
+     * Sets the security.
+     */
     public void setSecurity(Integer security) {
         this.security = security;
     }
 
+    /**
+     * Returns the custom filter.
+     */
     public String getCustomFilter() {
         return customFilter;
     }
 
+    /**
+     * Sets the custom filter.
+     */
     public void setCustomFilter(String customFilter) {
         this.customFilter = customFilter;
     }
 
+    /**
+     * Returns the metadata security fields.
+     */
     public Set<MetadataField> getMetadataSecurityFields() {
         return metadataSecurityFields;
     }
 
+    /**
+     * Sets the metadata security fields.
+     */
     public void setMetadataSecurityFields(Set<MetadataField> metadataFields) {
         this.metadataSecurityFields = metadataFields;
     }
 
+    /**
+     * Adds the given metadata fields to the tab metadata security configuration.
+     *
+     * @param metadataFields the metadata fields to add
+     */
     public void addMetadataSecurityFields(Set<MetadataField> metadataFields) {
         if (this.metadataSecurityFields == null) {
             this.metadataSecurityFields = new HashSet<>();
@@ -201,23 +245,40 @@ public class DynamicLayoutTab implements ReloadableEntity<Integer> {
         this.metadataSecurityFields.addAll(metadataFields);
     }
 
+    /**
+     * Returns whether leading.
+     */
     public Boolean isLeading() {
         return leading;
     }
 
+    /**
+     * Sets the leading.
+     */
     public void setLeading(Boolean leading) {
         this.leading = leading;
     }
 
+    /**
+     * Adds a row to this tab.
+     *
+     * @param row the row to add
+     */
     public void addRow(DynamicLayoutRow row) {
         getRows().add(row);
         row.setTab(this);
     }
 
+    /**
+     * Returns the rows.
+     */
     public List<DynamicLayoutRow> getRows() {
         return rows;
     }
 
+    /**
+     * Returns the boxes.
+     */
     public List<DynamicLayoutBox> getBoxes() {
         return this.rows.stream()
             .flatMap(row -> row.getCells().stream())
@@ -225,6 +286,9 @@ public class DynamicLayoutTab implements ReloadableEntity<Integer> {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the group security fields.
+     */
     public Set<Group> getGroupSecurityFields() {
         return tab2SecurityGroups.stream()
                                  .map(dynamicLayoutTab2SecurityGroup ->
@@ -232,10 +296,16 @@ public class DynamicLayoutTab implements ReloadableEntity<Integer> {
                                  .collect(Collectors.toSet());
     }
 
+    /**
+     * Returns the tab2 security groups.
+     */
     public Set<DynamicLayoutTab2SecurityGroup> getTab2SecurityGroups() {
         return tab2SecurityGroups;
     }
 
+    /**
+     * Sets the tab2 security groups.
+     */
     public void setTab2SecurityGroups(Set<DynamicLayoutTab2SecurityGroup> tab2SecurityGroups) {
         this.tab2SecurityGroups = tab2SecurityGroups;
     }

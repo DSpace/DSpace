@@ -47,6 +47,15 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
     private final EPersonService ePersonService;
     private final ChoiceAuthorityService choiceAuthorityService;
 
+    /**
+     * Creates the service with its collaborating services.
+     *
+     * @param authorizeService the authorize service
+     * @param itemService the item service
+     * @param groupService the group service
+     * @param ePersonService the ePerson service
+     * @param choiceAuthorityService the choice authority service
+     */
     @Autowired
     public LayoutSecurityServiceImpl(AuthorizeService authorizeService,
                                      ItemService itemService,

@@ -8,5 +8,11 @@
 package org.dspace.util;
 
 public interface ThrowingConsumer<T, E extends Exception> {
+    /**
+     * Performs this operation on the given input, possibly throwing a checked exception.
+     *
+     * @param t the input argument
+     * @throws E if the operation fails
+     */
     void accept(T t) throws E;
 }

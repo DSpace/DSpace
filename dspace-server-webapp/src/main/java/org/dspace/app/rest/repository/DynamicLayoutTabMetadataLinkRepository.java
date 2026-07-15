@@ -39,6 +39,9 @@ public class DynamicLayoutTabMetadataLinkRepository extends AbstractDSpaceRestRe
     @Autowired
     private DynamicLayoutServiceFactory serviceFactory;
 
+    /**
+     * Returns the security metadata.
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<MetadataFieldRest> getSecurityMetadata(
             @Nullable HttpServletRequest request,

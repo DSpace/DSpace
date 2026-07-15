@@ -20,6 +20,12 @@ import org.dspace.app.rest.utils.Utils;
 @RelNameDSpaceResource(DynamicLayoutSectionRest.NAME)
 public class DynamicLayoutSectionResource extends DSpaceResource<DynamicLayoutSectionRest> {
 
+    /**
+     * Creates the HAL resource wrapping the given section representation.
+     *
+     * @param data the section representation
+     * @param utils the REST utilities
+     */
     public DynamicLayoutSectionResource(DynamicLayoutSectionRest data, Utils utils) {
         super(data, utils);
     }

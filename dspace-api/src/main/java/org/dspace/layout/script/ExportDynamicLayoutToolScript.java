@@ -110,6 +110,9 @@ public class ExportDynamicLayoutToolScript
         return "dynamic-layout-tool-exported.xls";
     }
 
+    /**
+     * Returns the mime type.
+     */
     public String getMIMEType() {
         return "application/vnd.ms-excel";
     }

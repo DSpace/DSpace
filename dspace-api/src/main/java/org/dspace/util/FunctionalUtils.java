@@ -60,6 +60,12 @@ public class FunctionalUtils {
         return builder.get();
     }
 
+    /**
+     * Wraps a consumer that may throw a checked exception into a standard consumer.
+     *
+     * @param throwingConsumer the consumer that may throw a checked exception
+     * @return a consumer that rethrows checked exceptions as runtime exceptions
+     */
     public static <T> Consumer<T> throwingConsumerWrapper(
             ThrowingConsumer<T, Exception> throwingConsumer) {
         return i -> {
@@ -71,6 +77,13 @@ public class FunctionalUtils {
         };
     }
 
+    /**
+     * Wraps a mapping function that may throw a checked exception into a standard function.
+     *
+     * @param throwingConsumer the mapper that may throw a checked exception
+     * @param defaultValue the value returned when the mapper throws
+     * @return a function that returns the default value on failure
+     */
     public static <T, R> Function<T, R> throwingMapperWrapper(
             ThrowingMapper<T, R, Exception> throwingConsumer,
             R defaultValue

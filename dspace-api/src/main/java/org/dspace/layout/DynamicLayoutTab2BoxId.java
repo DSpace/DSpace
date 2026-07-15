@@ -29,21 +29,42 @@ public class DynamicLayoutTab2BoxId implements Serializable {
     @Column(name = "dynamic_layout_box_id")
     private Integer dynamicLayoutBoxId;
 
+    /**
+     * Default constructor.
+     */
     public DynamicLayoutTab2BoxId() {}
 
+    /**
+     * Creates a composite identifier for the given tab and box ids.
+     *
+     * @param tabId the tab identifier
+     * @param boxId the box identifier
+     */
     public DynamicLayoutTab2BoxId(Integer tabId, Integer boxId) {
         this.dynamicLayoutTabId = tabId;
         this.dynamicLayoutBoxId = boxId;
     }
+    /**
+     * Returns the dynamic layout tab id.
+     */
     public Integer getDynamicLayoutTabId() {
         return dynamicLayoutTabId;
     }
+    /**
+     * Sets the dynamic layout tab id.
+     */
     public void setDynamicLayoutTabId(Integer tabId) {
         this.dynamicLayoutTabId = tabId;
     }
+    /**
+     * Returns the dynamic layout box id.
+     */
     public Integer getDynamicLayoutBoxId() {
         return dynamicLayoutBoxId;
     }
+    /**
+     * Sets the dynamic layout box id.
+     */
     public void setDynamicLayoutBoxId(Integer boxId) {
         this.dynamicLayoutBoxId = boxId;
     }

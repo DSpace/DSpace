@@ -25,6 +25,11 @@ public class DynamicLayoutTabAccessServiceImpl implements DynamicLayoutTabAccess
 
     private final LayoutSecurityService layoutSecurityService;
 
+    /**
+     * Creates the service with the given layout security service.
+     *
+     * @param layoutSecurityService the layout security service
+     */
     @Autowired
     public DynamicLayoutTabAccessServiceImpl(LayoutSecurityService layoutSecurityService) {
         this.layoutSecurityService = layoutSecurityService;

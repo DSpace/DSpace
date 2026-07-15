@@ -33,42 +33,72 @@ public class DynamicLayoutMultiColumnTopComponent implements DynamicLayoutSectio
 
     private List<Column> columns = new ArrayList<>();
 
+    /**
+     * Returns the discovery configuration name.
+     */
     public String getDiscoveryConfigurationName() {
         return discoveryConfigurationName;
     }
 
+    /**
+     * Sets the discovery configuration name.
+     */
     public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
         this.discoveryConfigurationName = discoveryConfigurationName;
     }
 
+    /**
+     * Returns the sort field.
+     */
     public String getSortField() {
         return sortField;
     }
 
+    /**
+     * Sets the sort field.
+     */
     public void setSortField(String sortField) {
         this.sortField = sortField;
     }
 
+    /**
+     * Returns the order.
+     */
     public String getOrder() {
         return order;
     }
 
+    /**
+     * Sets the order.
+     */
     public void setOrder(String order) {
         this.order = order;
     }
 
+    /**
+     * Returns the title key.
+     */
     public String getTitleKey() {
         return titleKey;
     }
 
+    /**
+     * Sets the title key.
+     */
     public void setTitleKey(String titleKey) {
         this.titleKey = titleKey;
     }
 
+    /**
+     * Sets the columns.
+     */
     public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
+    /**
+     * Returns the columns.
+     */
     public List<Column> getColumns() {
         return columns;
     }
@@ -78,11 +108,17 @@ public class DynamicLayoutMultiColumnTopComponent implements DynamicLayoutSectio
         return style;
     }
 
+    /**
+     * Sets the style.
+     */
     public void setStyle(String style) {
         this.style = style;
     }
 
 
+    /**
+     * Sets the number of items.
+     */
     public void setNumberOfItems(Integer numberOfItems) {
         this.numberOfItems = numberOfItems;
     }
@@ -100,6 +136,9 @@ public class DynamicLayoutMultiColumnTopComponent implements DynamicLayoutSectio
         private String metadataField;
         private String titleKey;
 
+        /**
+         * Returns the style.
+         */
         public String getStyle() {
             return style;
         }
@@ -112,6 +151,9 @@ public class DynamicLayoutMultiColumnTopComponent implements DynamicLayoutSectio
             this.style = style;
         }
 
+        /**
+         * Returns the metadata field.
+         */
         public String getMetadataField() {
             return metadataField;
         }
@@ -124,6 +166,9 @@ public class DynamicLayoutMultiColumnTopComponent implements DynamicLayoutSectio
             this.metadataField = metadataField;
         }
 
+        /**
+         * Returns the title key.
+         */
         public String getTitleKey() {
             return titleKey;
         }

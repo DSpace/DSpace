@@ -39,8 +39,16 @@ public interface RestModel extends Serializable {
     public static final String LDN = "ldn";
     public static final String PID = "pid";
 
+    /**
+     * Returns the type.
+     */
     public String getType();
 
+    /**
+     * Returns the plural form of the REST type name.
+     *
+     * @return the plural type name
+     */
     @JsonIgnore
     String getTypePlural();
 }

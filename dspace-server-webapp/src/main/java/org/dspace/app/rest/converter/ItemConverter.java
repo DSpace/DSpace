@@ -70,6 +70,14 @@ public class ItemConverter
             metadataSecurityService.getPermissionAndLangFilteredMetadataFields(context, item, preventSecurityCheck));
     }
 
+    /**
+     * Returns whether the given metadata field is visible for the given item.
+     *
+     * @param context the DSpace context
+     * @param item the item
+     * @param metadataField the metadata field
+     * @return true if the metadata field is visible
+     */
     public boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField) {
         return metadataSecurityService.checkMetadataFieldVisibility(context, item, metadataField);
     }

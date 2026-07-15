@@ -23,6 +23,12 @@ public class DynamicLayoutTextBoxComponent implements DynamicLayoutSectionCompon
     private final List<DynamicLayoutTextRowComponent> textRows;
     private final String style;
 
+    /**
+     * Creates a text box component with the given rows and style.
+     *
+     * @param textRows the text rows of the component
+     * @param style the CSS style of the component
+     */
     public DynamicLayoutTextBoxComponent(List<DynamicLayoutTextRowComponent> textRows, String style) {
         this.textRows = textRows;
         this.style = style;
@@ -33,6 +39,9 @@ public class DynamicLayoutTextBoxComponent implements DynamicLayoutSectionCompon
         return style;
     }
 
+    /**
+     * Returns the text rows.
+     */
     public List<DynamicLayoutTextRowComponent> getTextRows() {
         return textRows;
     }

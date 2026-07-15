@@ -21,10 +21,16 @@ public class DynamicLayoutBrowseComponent implements DynamicLayoutSectionCompone
 
     private String style;
 
+    /**
+     * Returns the browse names.
+     */
     public List<String> getBrowseNames() {
         return browseNames;
     }
 
+    /**
+     * Sets the browse names.
+     */
     public void setBrowseNames(List<String> browseNames) {
         this.browseNames = browseNames;
     }

@@ -64,6 +64,14 @@ public interface DynamicLayoutMetadataGroupService extends DSpaceCRUDService<Dyn
     public List<DynamicMetadataGroup> findNestedFieldByFieldId(
             Context context, Integer field_id, Integer limit, Integer offset) throws SQLException;
 
+    /**
+     * Returns all metadata groups nested under the layout field with the given id.
+     *
+     * @param context the DSpace context
+     * @param field_id the layout field id
+     * @return the list of nested metadata groups
+     * @throws SQLException if a database error occurs
+     */
     public List<DynamicMetadataGroup> findNestedFieldByFieldId(
             Context context, Integer field_id) throws SQLException;
 }

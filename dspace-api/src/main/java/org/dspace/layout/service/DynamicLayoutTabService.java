@@ -153,5 +153,8 @@ public interface DynamicLayoutTabService extends DSpaceCRUDService<DynamicLayout
      */
     public List<DynamicLayoutTab> findByItem(Context context, String itemUuid) throws SQLException;
 
+    /**
+     * Returns whether access.
+     */
     public boolean hasAccess(Context context, DynamicLayoutTab tab, Item item);
 }

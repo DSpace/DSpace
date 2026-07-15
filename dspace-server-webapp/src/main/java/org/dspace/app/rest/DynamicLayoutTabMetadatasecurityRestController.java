@@ -52,9 +52,20 @@ public class DynamicLayoutTabMetadatasecurityRestController {
     @Autowired
     private MetadataFieldService mfService;
 
+    /**
+     * Associates the metadata security fields referenced in the request with the given tab.
+     *
+     * @param idTab the identifier of the tab
+     * @param position the optional position of the association
+     * @param response the HTTP response
+     * @param request the HTTP request carrying the metadata field URIs
+     */
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = {"text/uri-list"})
+    /**
+     * Adds the metadatasecurity.
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void addMetadatasecurity(
             @PathVariable(name = "id", required = true) Integer idTab,
@@ -90,6 +101,14 @@ public class DynamicLayoutTabMetadatasecurityRestController {
         }
     }
 
+    /**
+     * Removes the association between the given metadata security field and the tab.
+     *
+     * @param idTab the identifier of the tab
+     * @param metadatafieldId the identifier of the metadata field to remove
+     * @param response the HTTP response
+     * @param request the HTTP request
+     */
     @RequestMapping(
             method = RequestMethod.DELETE,
             value = "/{mf_id:\\d+}" )
