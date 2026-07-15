@@ -8,11 +8,7 @@
 package org.dspace.content.authority.zdb;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -52,58 +48,10 @@ public class ZDBService {
 
     private static Logger log = LogManager.getLogger(ZDBService.class);
 
-    private static final Pattern SAFE_ID_PATTERN = Pattern.compile("^[\\w\\-.]+$");
+    private static final Pattern SAFE_ID_PATTERN = Pattern.compile("^\\d{1,7}-[0-9Xx]$");
 
     @Autowired
     private ConfigurationService configurationService;
-
-    /**
-     * Validate that the given URL uses HTTPS and does not resolve to a
-     * private or reserved IP address. This mitigates SSRF attacks.
-     *
-     * @param url the URL to validate
-     * @throws IOException if the URL is invalid, not HTTPS, or points to a
-     *                     private/reserved IP address
-     */
-    private void validateUrl(String url) throws IOException {
-        String searchBase = configurationService.getProperty("cris.zdb.search.url");
-        String detailBase = configurationService.getProperty("cris.zdb.detail.url");
-
-        // Clean up base URLs for prefix checking if they contain formatters or query parameters
-        String safeSearchPrefix = searchBase != null && searchBase.contains("?")
-            ? searchBase.substring(0, searchBase.indexOf("?")) : searchBase;
-        String safeDetailPrefix = detailBase != null && detailBase.contains("{0}")
-            ? detailBase.substring(0, detailBase.indexOf("{0}")) : detailBase;
-
-        boolean isAllowedPrefix = (safeSearchPrefix != null && url.startsWith(safeSearchPrefix)) ||
-            (safeDetailPrefix != null && url.startsWith(safeDetailPrefix));
-
-        if (!isAllowedPrefix) {
-            throw new IOException("URL is not targeting an allowed ZDB endpoint prefix.");
-        }
-
-        try {
-            URL parsedUrl = new URL(url);
-            String protocol = parsedUrl.getProtocol();
-            if (!"https".equalsIgnoreCase(protocol)) {
-                throw new IOException("Only HTTPS URLs are allowed");
-            }
-
-            String host = parsedUrl.getHost();
-            if (host == null || host.isEmpty()) {
-                throw new IOException("URL must have a host");
-            }
-            InetAddress address = InetAddress.getByName(host);
-            if (address.isSiteLocalAddress() || address.isLoopbackAddress()
-                || address.isAnyLocalAddress() || address.isLinkLocalAddress()) {
-                throw new IOException("URL points to a private or reserved IP address");
-            }
-        } catch (MalformedURLException e) {
-            throw new IOException("Invalid URL: " + url, e);
-        } catch (UnknownHostException e) {
-            throw new IOException("Cannot resolve host in URL: " + url, e);
-        }
-    }
 
     /**
      * Execute an HTTP GET against the given URL, parse the ZDB XML response,
@@ -116,7 +64,6 @@ public class ZDBService {
     private List<ZDBAuthorityValue> search(String requestURL) throws IOException {
 
         List<ZDBAuthorityValue> results = new ArrayList<ZDBAuthorityValue>();
-        validateUrl(requestURL);
 
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build();
              CloseableHttpResponse response = client.execute(new HttpGet(requestURL))) {
