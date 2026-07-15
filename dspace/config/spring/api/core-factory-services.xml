@@ -52,7 +52,7 @@
     <bean id="indexObjectFactoryFactory" class="org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactoryImpl"/>
 
 	<!-- Configurable layout service factory -->
-	<bean id="crisLayoutServiceFactory" class="org.dspace.layout.factory.impl.CrisLayoutServiceFactoryImpl"/>
+	<bean id="dynamicLayoutServiceFactory" class="org.dspace.layout.factory.impl.DynamicLayoutServiceFactoryImpl"/>
 
     <bean id="openURLTrackerLoggerServiceFactory" class="org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
 

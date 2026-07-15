@@ -28,8 +28,8 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
-import org.dspace.builder.CrisLayoutBoxBuilder;
-import org.dspace.builder.CrisLayoutFieldBuilder;
+import org.dspace.builder.DynamicLayoutBoxBuilder;
+import org.dspace.builder.DynamicLayoutFieldBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
@@ -55,8 +55,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
-import org.dspace.layout.CrisLayoutBox;
-import org.dspace.layout.CrisLayoutBox2SecurityGroup;
+import org.dspace.layout.DynamicLayoutBox;
+import org.dspace.layout.DynamicLayoutBox2SecurityGroup;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -118,24 +118,24 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.PUBLIC)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -201,24 +201,24 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.OWNER_ONLY)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.PUBLIC)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -292,24 +292,24 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.OWNER_AND_ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.PUBLIC)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -418,26 +418,26 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.PUBLIC)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -514,28 +514,28 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
 
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
             .withShortname("box-shortname-one")
             .withSecurity(LayoutSecurity.CUSTOM_DATA)
             .build();
 
         // Create Group with member userA
-        Set<CrisLayoutBox2SecurityGroup> box2SecurityGroups = new HashSet<>();
+        Set<DynamicLayoutBox2SecurityGroup> box2SecurityGroups = new HashSet<>();
         Group testGroup = GroupBuilder.createGroup(context)
                 .withName("testGroup")
                 .addMember(userA)
                 .build();
 
-        new CrisLayoutBox2SecurityGroup(
-            new CrisLayoutBox2SecurityGroup.CrisLayoutBox2SecurityGroupId(box1, testGroup),
+        new DynamicLayoutBox2SecurityGroup(
+            new DynamicLayoutBox2SecurityGroup.DynamicLayoutBox2SecurityGroupId(box1, testGroup),
             box1, testGroup, null);
 
-        box2SecurityGroups.add(new CrisLayoutBox2SecurityGroup(
-            new CrisLayoutBox2SecurityGroup.CrisLayoutBox2SecurityGroupId(box1, testGroup),
+        box2SecurityGroups.add(new DynamicLayoutBox2SecurityGroup(
+            new DynamicLayoutBox2SecurityGroup.DynamicLayoutBox2SecurityGroupId(box1, testGroup),
             box1, testGroup, null));
         box1.setBox2SecurityGroups(box2SecurityGroups);
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
             .withLabel("LABEL ABS")
             .withRendering("RENDERIGN ABS")
             .withRowStyle("STYLE")
@@ -606,13 +606,13 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
 
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
             .withShortname("box-shortname-one")
             .withSecurity(LayoutSecurity.CUSTOM_DATA)
             .build();
 
         // Create Group with member userA
-        Set<CrisLayoutBox2SecurityGroup> boxGroups = new HashSet<>();
+        Set<DynamicLayoutBox2SecurityGroup> boxGroups = new HashSet<>();
 
         Group testGroup = GroupBuilder.createGroup(context)
             .withName("testGroup")
@@ -624,16 +624,16 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
             .addMember(userB)
             .build();
 
-        boxGroups.add(new CrisLayoutBox2SecurityGroup(
-            new CrisLayoutBox2SecurityGroup.CrisLayoutBox2SecurityGroupId(box1, testGroup),
+        boxGroups.add(new DynamicLayoutBox2SecurityGroup(
+            new DynamicLayoutBox2SecurityGroup.DynamicLayoutBox2SecurityGroupId(box1, testGroup),
             box1, testGroup, null));
-        boxGroups.add(new CrisLayoutBox2SecurityGroup(
-            new CrisLayoutBox2SecurityGroup.CrisLayoutBox2SecurityGroupId(box1, testGroup1),
+        boxGroups.add(new DynamicLayoutBox2SecurityGroup(
+            new DynamicLayoutBox2SecurityGroup.DynamicLayoutBox2SecurityGroupId(box1, testGroup1),
             box1, testGroup, null));
 
         box1.setBox2SecurityGroups(boxGroups);
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
             .withLabel("LABEL ABS")
             .withRendering("RENDERIGN ABS")
             .withRowStyle("STYLE")
@@ -724,57 +724,57 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField issueDate = mfss.findByElement(context, "dc", "date", "issued");
         MetadataField author = mfss.findByElement(context, "dc", "contributor", "author");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.PUBLIC)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box2)
                               .build();
 
-        CrisLayoutBox box3 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box3 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-three")
                                                  .withSecurity(LayoutSecurity.ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, issueDate, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, issueDate, 0, 0)
                               .withLabel("LABEL IssueDate")
                               .withRendering("RENDERIGN IssueDate")
                               .withRowStyle("STYLE")
                               .withBox(box3)
                               .build();
 
-        CrisLayoutBox box4 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box4 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-four")
                                                  .withSecurity(LayoutSecurity.OWNER_ONLY)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
                               .withLabel("LABEL AUTHOR")
                               .withRendering("RENDERIGN AUTHOR")
                               .withRowStyle("STYLE")
@@ -855,24 +855,24 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
@@ -945,36 +945,36 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.OWNER_AND_ADMINISTRATOR)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.OWNER_ONLY)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2)
                               .build();
 
-        CrisLayoutBox box3 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box3 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-three")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
@@ -1059,24 +1059,24 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
@@ -1156,24 +1156,24 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.OWNER_ONLY)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
@@ -1267,32 +1267,32 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
         MetadataField author = mfss.findByElement(context, "dc", "contributor", "author");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2)
                               .build();
-        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
                               .withLabel("LABEL AUTOR")
                               .withRendering("RENDERIGN AUTOR")
                               .withRowStyle("STYLE")
@@ -1365,29 +1365,29 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1).build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2).build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -1495,38 +1495,38 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
         MetadataField author = mfss.findByElement(context, "dc", "contributor", "author");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2).build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
                               .withLabel("LABEL AUTOR")
                               .withRendering("RENDERIGN AUTOR")
                               .withRowStyle("STYLE")
                               .withBox(box2).build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -1630,29 +1630,29 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.PUBLIC)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
                               .withBox(box1).build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.OWNER_ONLY)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2).build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -1738,31 +1738,31 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField author = mfss.findByElement(context, "dc", "contributor", "author");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2)
                               .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
                               .withLabel("LABEL AUTHOR")
                               .withRendering("RENDERIGN AUTHOR")
                               .withRowStyle("STYLE")
@@ -1849,31 +1849,31 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField author = mfss.findByElement(context, "dc", "contributor", "author");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.OWNER_ONLY)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2)
                               .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
                               .withLabel("LABEL AUTHOR")
                               .withRendering("RENDERIGN AUTHOR")
                               .withRowStyle("STYLE")
@@ -1992,33 +1992,33 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField author = mfss.findByElement(context, "dc", "contributor", "author");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-one")
                                                 .withSecurity(LayoutSecurity.PUBLIC)
                                                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box2)
                               .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, author, 0, 0)
                               .withLabel("LABEL AUTHOR")
                               .withRendering("RENDERIGN AUTHOR")
                               .withRowStyle("STYLE")
@@ -2125,14 +2125,14 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
 
         MetadataField dateIssued = mfss.findByElement(context, "dc", "date", "issued");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
                               .withLabel("LABEL DATE")
                               .withRendering("RENDERIGN DATE")
                               .withRowStyle("STYLE")
@@ -2200,14 +2200,14 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
 
         MetadataField dateIssued = mfss.findByElement(context, "dc", "date", "issued");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
                               .withLabel("LABEL DATE")
                               .withRendering("RENDERIGN DATE")
                               .withRowStyle("STYLE")
@@ -2276,14 +2276,14 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
 
         MetadataField dateIssued = mfss.findByElement(context, "dc", "date", "issued");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.CUSTOM_DATA)
                                                  .addMetadataSecurityField(policyEperson)
                                                  .addMetadataSecurityField(policyGroup)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
                               .withLabel("LABEL DATE")
                               .withRendering("RENDERIGN DATE")
                               .withRowStyle("STYLE")
@@ -2343,36 +2343,36 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField educationStart = mfss.findByElement(context, "crisrp", "education", "start");
         MetadataField educationEnd = mfss.findByElement(context, "crisrp", "education", "end");
 
-        List<MetadataField> crisMetadataGroup = new ArrayList<MetadataField>();
-        crisMetadataGroup.add(educationStart);
-        crisMetadataGroup.add(educationEnd);
+        List<MetadataField> dynamicMetadataGroup = new ArrayList<MetadataField>();
+        dynamicMetadataGroup.add(educationStart);
+        dynamicMetadataGroup.add(educationEnd);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-one")
                                                  .withSecurity(LayoutSecurity.ADMINISTRATOR)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
                               .withLabel("LABEL ABS")
                               .withRendering("RENDERIGN ABS")
                               .withRowStyle("STYLE")
                               .withBox(box1)
                               .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, education, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, education, 0, 0)
                               .withLabel("LABEL Education")
                               .withRendering("RENDERIGN Education")
                               .withRowStyle("STYLE")
                               .withBox(box1)
-                              .withNestedField(crisMetadataGroup)
+                              .withNestedField(dynamicMetadataGroup)
                               .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                  .withShortname("box-shortname-two")
                                                  .withSecurity(LayoutSecurity.PUBLIC)
                                                  .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
                               .withLabel("LABEL TITLE")
                               .withRendering("RENDERIGN TITLE")
                               .withRowStyle("STYLE")
@@ -2430,12 +2430,12 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
             admin.getID().toString(), 0, 1);
         MetadataField description = mfss.findByElement(context, "dc", "description", "abstract");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-one")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
                 .withLabel("LABEL ABS")
                 .withRendering("RENDERIGN ABS")
                 .withRowStyle("STYLE")
@@ -2483,12 +2483,12 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
             admin.getID().toString(), 0, 1);
         MetadataField description = mfss.findByElement(context, "dc", "description", "provenance");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-one")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
                 .withLabel("LABEL ABS")
                 .withRendering("RENDERIGN ABS")
                 .withRowStyle("STYLE")
@@ -2547,12 +2547,12 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
             admin.getID().toString(), 0, 1);
         MetadataField description = mfss.findByElement(context, "dc", "description", "provenance");
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-one")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
                 .withLabel("LABEL ABS")
                 .withRendering("RENDERIGN ABS")
                 .withRowStyle("STYLE")
@@ -2642,26 +2642,26 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
         MetadataField title = mfss.findByElement(context, "dc", "title", null);
 
-        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
             .withShortname("box-shortname-one")
             .withSecurity(LayoutSecurity.CUSTOM_DATA_AND_ADMINISTRATOR)
             .addMetadataSecurityField(policyEperson)
             .addMetadataSecurityField(policyGroup)
             .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
             .withLabel("LABEL ABS")
             .withRendering("RENDERIGN ABS")
             .withRowStyle("STYLE")
             .withBox(box1)
             .build();
 
-        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+        DynamicLayoutBox box2 = DynamicLayoutBoxBuilder.createBuilder(context, eType, true, true)
             .withShortname("box-shortname-two")
             .withSecurity(LayoutSecurity.PUBLIC)
             .build();
 
-        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+        DynamicLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
             .withLabel("LABEL TITLE")
             .withRendering("RENDERIGN TITLE")
             .withRowStyle("STYLE")
