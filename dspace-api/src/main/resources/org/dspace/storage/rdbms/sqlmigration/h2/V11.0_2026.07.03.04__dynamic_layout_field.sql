@@ -13,9 +13,9 @@
 --   V7.0_2021.11.26
 -------------------------------------------------------
 
-CREATE SEQUENCE IF NOT EXISTS cris_layout_field_field_id_seq;
+CREATE SEQUENCE IF NOT EXISTS dynamic_layout_field_field_id_seq;
 
-CREATE TABLE IF NOT EXISTS cris_layout_field
+CREATE TABLE IF NOT EXISTS dynamic_layout_field
 (
     field_id         INTEGER NOT NULL,
     metadata_field_id INTEGER,
@@ -33,10 +33,10 @@ CREATE TABLE IF NOT EXISTS cris_layout_field
     values_inline    BOOLEAN,
     row_style        VARCHAR(255),
     cell_style       VARCHAR(255),
-    cell             INTEGER NOT NULL DEFAULT 0,
-    CONSTRAINT cris_layout_field_pkey PRIMARY KEY (field_id),
-    CONSTRAINT cris_layout_box2metadata_metadata_field_id_fkey
+    cell             INTEGER NOT NULL,
+    CONSTRAINT dynamic_layout_field_pkey PRIMARY KEY (field_id),
+    CONSTRAINT dynamic_layout_box2metadata_metadata_field_id_fkey
         FOREIGN KEY (metadata_field_id) REFERENCES metadatafieldregistry (metadata_field_id),
-    CONSTRAINT cris_layout_field_box_fkey FOREIGN KEY (box_id)
-        REFERENCES cris_layout_box (id)
+    CONSTRAINT dynamic_layout_field_box_fkey FOREIGN KEY (box_id)
+        REFERENCES dynamic_layout_box (id)
 );
