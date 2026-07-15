@@ -459,13 +459,13 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected boolean isRecent(Long lastModified) {
         long now = Instant.now().toEpochMilli();
 
-        if (lastModified >= now) {
+        if (lastModified == null || lastModified >= now) {
             return true;
         }
 
-        // Less than one hour old
-        return (now - lastModified) <
-                (configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L) * 60 * 1000);
+        long waitHours = configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L);
+        long waitMilli = waitHours * 60 * 60 * 1000;
+        return (now - lastModified) < waitMilli;
     }
 
     protected BitStoreService getStore(int position) throws IOException {
