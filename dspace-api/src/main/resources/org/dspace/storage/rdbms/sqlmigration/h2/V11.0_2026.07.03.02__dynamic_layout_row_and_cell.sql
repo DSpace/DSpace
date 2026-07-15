@@ -11,26 +11,26 @@
 -- Consolidates: V7.0_2021.11.05 (row + cell)
 -------------------------------------------------------
 
-CREATE SEQUENCE IF NOT EXISTS cris_layout_row_id_seq;
+CREATE SEQUENCE IF NOT EXISTS dynamic_layout_row_id_seq;
 
-CREATE TABLE IF NOT EXISTS cris_layout_row
+CREATE TABLE IF NOT EXISTS dynamic_layout_row
 (
     id       INTEGER NOT NULL,
     style    VARCHAR(255),
     tab      INTEGER NOT NULL,
     position INTEGER,
-    CONSTRAINT cris_layout_row_pkey PRIMARY KEY (id),
-    CONSTRAINT cris_layout_tab_fkey FOREIGN KEY (tab) REFERENCES cris_layout_tab (id)
+    CONSTRAINT dynamic_layout_row_pkey PRIMARY KEY (id),
+    CONSTRAINT dynamic_layout_tab_fkey FOREIGN KEY (tab) REFERENCES dynamic_layout_tab (id)
 );
 
-CREATE SEQUENCE IF NOT EXISTS cris_layout_cell_id_seq;
+CREATE SEQUENCE IF NOT EXISTS dynamic_layout_cell_id_seq;
 
-CREATE TABLE IF NOT EXISTS cris_layout_cell
+CREATE TABLE IF NOT EXISTS dynamic_layout_cell
 (
     id       INTEGER NOT NULL,
     style    VARCHAR(255),
     row      INTEGER NOT NULL,
     position INTEGER,
-    CONSTRAINT cris_layout_cell_pkey PRIMARY KEY (id),
-    CONSTRAINT cris_layout_row_fkey FOREIGN KEY (row) REFERENCES cris_layout_row (id)
+    CONSTRAINT dynamic_layout_cell_pkey PRIMARY KEY (id),
+    CONSTRAINT dynamic_layout_row_fkey FOREIGN KEY (row) REFERENCES dynamic_layout_row (id)
 );

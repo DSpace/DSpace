@@ -12,9 +12,9 @@
 --   V7.0_2021.11.05 (tab), V7.6_2023.10.23, V7.6_2023.10.28
 -------------------------------------------------------
 
-CREATE SEQUENCE IF NOT EXISTS cris_layout_tab_id_seq;
+CREATE SEQUENCE IF NOT EXISTS dynamic_layout_tab_id_seq;
 
-CREATE TABLE IF NOT EXISTS cris_layout_tab
+CREATE TABLE IF NOT EXISTS dynamic_layout_tab
 (
     id            INTEGER NOT NULL,
     entity_id     INTEGER NOT NULL,
@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS cris_layout_tab
     security      INTEGER,
     is_leading    BOOLEAN,
     custom_filter VARCHAR(255),
-    CONSTRAINT cris_layout_tab_pkey PRIMARY KEY (id),
-    CONSTRAINT cris_layout_tab_entity_id_fkey FOREIGN KEY (entity_id)
+    CONSTRAINT dynamic_layout_tab_pkey PRIMARY KEY (id),
+    CONSTRAINT dynamic_layout_tab_entity_id_fkey FOREIGN KEY (entity_id)
     REFERENCES entity_type (id),
-    CONSTRAINT cris_layout_tab_entity_shortname_custom_filter_unique
+    CONSTRAINT dynamic_layout_tab_entity_shortname_custom_filter_unique
     UNIQUE (entity_id, shortname, custom_filter)
-    );
+);
