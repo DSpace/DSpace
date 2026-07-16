@@ -155,7 +155,7 @@ public class RorOrgUnitAuthorityIT extends AbstractControllerIntegrationTest {
     private ImportRecord getImportRecord1() {
         return new ImportRecord(
             List.of(
-                new RorMetadatum("dc.title", "Wind Energy Institute of Canada"),
+                new RorMetadatum("organization.legalName", "Wind Energy Institute of Canada"),
                 new RorMetadatum("organization.identifier.ror", "https://ror.org/02z02cv32"),
                 new RorMetadatum("oairecerif.identifier.url", "http://www.weican.ca/"),
                 new RorMetadatum("dc.type", "Nonprofit"),
@@ -185,7 +185,7 @@ public class RorOrgUnitAuthorityIT extends AbstractControllerIntegrationTest {
     private ImportRecord getImportRecord2() {
         return new ImportRecord(
             List.of(
-                new RorMetadatum("dc.title", "4Science"),
+                new RorMetadatum("organization.legalName", "4Science"),
                 new RorMetadatum("organization.identifier.ror", "https://ror.org/03vb2cr34"),
                 new RorMetadatum("oairecerif.identifier.url", "https://www.4science.it/"),
                 new RorMetadatum("dc.type", "Company"),

@@ -195,7 +195,7 @@
           <property name="metadataFieldMapping" ref="rorMetadataFieldMapping"/>
           <property name="url" value="${ror.orgunit-import.api-url}"/>
     </bean>
-    <bean id="rorMetadataFieldMapping" class="org.dspace.importer.external.ror.service.RorFieldMapping"/>
+    <bean id="rorMetadataFieldMapping" class="org.dspace.importer.external.ror.service.RorFieldMapping" autowire-candidate="true"/>
 
     <bean id="vufindImportService" class="org.dspace.importer.external.vufind.VuFindImportMetadataSourceServiceImpl" scope="singleton">
           <!-- Set to empty to use the default set of fields  -->

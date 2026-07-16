@@ -105,7 +105,7 @@ public class RorOrgUnitAuthority extends ItemAuthority {
     }
 
     private String getName(ImportRecord orgUnit) {
-        return orgUnit.getValue("dc", "title", null).stream()
+        return orgUnit.getValue("organization", "legalName", null).stream()
             .findFirst()
             .map(metadata -> metadata.getValue())
             .orElse(null);
