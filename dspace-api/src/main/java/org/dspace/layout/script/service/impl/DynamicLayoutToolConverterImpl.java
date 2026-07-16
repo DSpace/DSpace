@@ -63,7 +63,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
     private Workbook getTemplateWorkBook() {
         try (InputStream inputStream =
                  DynamicLayoutToolConverterImpl.class
-                     .getResourceAsStream("cris-layout-configuration-template.xls")) {
+                     .getResourceAsStream("dynamic-layout-configuration-template.xls")) {
             return WorkbookFactory.create(inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);

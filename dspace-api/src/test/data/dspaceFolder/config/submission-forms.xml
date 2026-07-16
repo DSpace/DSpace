@@ -1858,7 +1858,7 @@ it, please enter the types and the actual numbers or codes.</hint>
       </row>
     </form>
 
-    <form name="cris-layout-test">
+    <form name="dynamic-layout-test">
       <row>
         <field>
           <dc-schema>dc</dc-schema>

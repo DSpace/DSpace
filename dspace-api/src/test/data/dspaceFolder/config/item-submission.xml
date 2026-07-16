@@ -315,7 +315,7 @@
             <type>submission-form</type>
         </step-definition>
 
-        <step-definition id="cris-layout-test" mandatory="true">
+        <step-definition id="dynamic-layout-test" mandatory="true">
             <heading>submit.progressbar.describe.crislayouttest</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -525,8 +525,8 @@
             <step id="license" />
         </submission-process>
 
-        <submission-process name="cris-layout-test-process">
-            <step id="cris-layout-test" />
+        <submission-process name="dynamic-layout-test-process">
+            <step id="dynamic-layout-test" />
         </submission-process>
 
     </submission-definitions>

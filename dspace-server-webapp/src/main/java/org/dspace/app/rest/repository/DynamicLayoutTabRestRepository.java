@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 public class DynamicLayoutTabRestRepository extends DSpaceRestRepository<DynamicLayoutTabRest, Integer>
     implements ReloadableEntityObjectRepository<DynamicLayoutTab, Integer> {
 
-    public static final String SCOPE_ITEM_ATTRIBUTE = "cris-layout-tab.scope-item";
+    public static final String SCOPE_ITEM_ATTRIBUTE = "dynamic-layout-tab.scope-item";
 
     @Autowired
     private DynamicLayoutTabService service;

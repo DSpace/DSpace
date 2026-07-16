@@ -86,7 +86,7 @@
     </bean>
 
     <bean id="dynamic-layout-tool" class="org.dspace.layout.script.DynamicLayoutToolScriptConfiguration">
-        <property name="description" value="Script to import CRIS layout configuration from excel file"/>
+        <property name="description" value="Script to import Dynamic layout configuration from excel file"/>
         <property name="dspaceRunnableClass" value="org.dspace.layout.script.DynamicLayoutToolScript"/>
     </bean>
 
