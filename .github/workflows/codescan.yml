@@ -53,7 +53,8 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           # Codescan Javascript as well since a few JS files exist in REST API's interface
-          languages: java, javascript
+          # Also scan all GitHub actions/workflows
+          languages: java, javascript, actions
 
       # Autobuild attempts to build any compiled languages
       # NOTE: Based on testing, this autobuild process works well for DSpace. A custom
