@@ -16,14 +16,14 @@
         <property name="subTypeValidationRule" value="NOT_ALLOWED"/>
     </bean>
 
-    <bean id="crisrefRenderValidator" class="org.dspace.layout.script.service.impl.DynamicLayoutToolRenderValidatorImpl">
-        <property name="name" value="crisref"/>
+    <bean id="dynamicrefRenderValidator" class="org.dspace.layout.script.service.impl.DynamicLayoutToolRenderValidatorImpl">
+        <property name="name" value="dynamicref"/>
         <property name="fieldType" value="METADATA||METADATAGROUP"/>
         <property name="subTypeValidationRule" value="ALLOWED"/>
-        <property name="subTypes" ref="crisrefSubTypes" />
+        <property name="subTypes" ref="dynamicrefSubTypes" />
     </bean>
 
-    <bean id="crisrefSubTypes" class="org.dspace.layout.script.supplier.SimpleListSupplier">
+    <bean id="dynamicrefSubTypes" class="org.dspace.layout.script.supplier.SimpleListSupplier">
         <constructor-arg>
         <list>
             <value>email</value>
