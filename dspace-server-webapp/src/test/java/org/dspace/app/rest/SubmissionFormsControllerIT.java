@@ -699,7 +699,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
             "publication_references-dc-relation-project",
             "publication_bibliographic_details",
             "typebindtest",
-            "cris-layout-test",
+            "dynamic-layout-test",
             "bitstream-metadata",
             "titleAndIssuedDate",
             "test-outside-workflow-hidden",

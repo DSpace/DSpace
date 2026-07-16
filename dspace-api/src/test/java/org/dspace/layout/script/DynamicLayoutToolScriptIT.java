@@ -82,7 +82,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
 
         assertThat(tabService.findAll(context), empty());
 
-        String fileLocation = new File(getDspaceDir(), "etc/conftool/cris-layout-configuration.xls").getAbsolutePath();
+        String fileLocation = new File(getDspaceDir(), "etc/conftool/dynamic-layout-configuration.xls").getAbsolutePath();
         String[] args = new String[] { "dynamic-layout-tool", "-f", fileLocation };
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
