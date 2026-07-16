@@ -19,11 +19,21 @@ permissions:
 jobs:
   port_pr:
     runs-on: ubuntu-slim
-    # Don't run on closed *unmerged* pull requests
-    if: github.event.pull_request.merged
+    # Only run on MERGED pull requests,
+    # and only run if the merged PR has a label that starts with "port to"
+    if: >
+      github.event.pull_request.merged &&
+      contains(toJSON(github.event.pull_request.labels.*.name), '"port to ')
     steps:
       # Checkout code
       - uses: actions/checkout@v7
+        with:
+          # When using 'pull_request_target' (see above), this 'checkout' step will always fail because it
+          # may make the codebase vulnerable to "pwn requests" via the user-created PR.
+          # See https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target
+          # However, we are allowing this unsafe checkout because (1) it's required to backport the PR, and
+          # (2) this job only runs when a PR is MERGED, and merger only happens after a thorough review of the PR.
+          allow-unsafe-pr-checkout: true
       # Port PR to other branch (ONLY if labeled with "port to")
       # See https://github.com/korthout/backport-action
       - name: Create backport pull requests
