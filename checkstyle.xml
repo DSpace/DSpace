@@ -161,6 +161,41 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
             <property name="ignoreComments" value="true"/>
         </module>
 
+        <!-- Require to use XMLUtils.getDocumentBuilderFactory() statement instead of DocumentBuilderFactory.newInstance() -->
+        <module name="Regexp">
+            <property name="format" value="DocumentBuilderFactory\.newInstance\(.*\)" />
+            <property name="message" value="Use XMLUtils.getDocumentBuilderFactory() instead of DocumentBuilderFactory.newInstance()" />
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <!-- Require to use XMLUtils.getSAXBuilder() statement instead of "new SAXBuilder()" -->
+        <module name="Regexp">
+            <property name="format" value="new SAXBuilder\(.*\)" />
+            <property name="message" value="Use XMLUtils.getSAXBuilder() instead of new SAXBuilder()" />
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <!-- Require to use XMLUtils.getXMLInputFactory() statement instead of "XMLInputFactory.newFactory()" -->
+        <module name="Regexp">
+            <property name="format" value="XMLInputFactory\.newFactory\(.*\)" />
+            <property name="message" value="Use XMLUtils.getXMLInputFactory() instead of XMLInputFactory.newFactory()" />
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <!-- Require to use XMLUtils.getTransformerFactory() statement instead of "TransformerFactory.newInstance()" -->
+        <module name="Regexp">
+            <property name="format" value="TransformerFactory\.newInstance\(.*\)" />
+            <property name="message" value="Use XMLUtils.getTransformerFactory() instead of TransformerFactory.newInstance()" />
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <!-- Require to use XMLUtils.getSchemaFactory() statement instead of "SchemaFactory.newInstance()" -->
+        <module name="Regexp">
+            <property name="format" value="SchemaFactory\.newInstance\(.*\)" />
+            <property name="message" value="Use XMLUtils.getSchemaFactory() instead of SchemaFactory.newInstance()" />
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
 
     </module>
 </module>
