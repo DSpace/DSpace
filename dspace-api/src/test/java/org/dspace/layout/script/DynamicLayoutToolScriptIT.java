@@ -300,7 +300,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             "crisrp.name", null, null, false, true);
 
         DynamicLayoutField profileEmail = profileFields.get(3);
-        assertThatMetadataFieldHas(profileEmail, "Email", "row", null, 1, 2, 3, "crisref.email", 0,
+        assertThatMetadataFieldHas(profileEmail, "Email", "row", null, 1, 2, 3, "dynamicref.email", 0,
             "person.email", null, null, true, true);
 
         DynamicLayoutField profileDescription = profileFields.get(4);
@@ -323,7 +323,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         assertThat(profileNestedAffiliation.getLabel(), is("Organisation"));
         assertThat(profileNestedAffiliation.getMetadataField().toString('.'), is("oairecerif.person.affiliation"));
         assertThat(profileNestedAffiliation.getPriority(), is(1));
-        assertThat(profileNestedAffiliation.getRendering(), is("crisref"));
+        assertThat(profileNestedAffiliation.getRendering(), is("dynamicref"));
         assertThat(profileNestedAffiliation.getStyleLabel(), is("label-style"));
         assertThat(profileNestedAffiliation.getStyleValue(), is("value-style"));
 

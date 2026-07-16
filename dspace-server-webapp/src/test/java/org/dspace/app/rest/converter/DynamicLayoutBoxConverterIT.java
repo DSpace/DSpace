@@ -106,7 +106,7 @@ public class DynamicLayoutBoxConverterIT extends AbstractControllerIntegrationTe
 
         DynamicLayoutField authorField = DynamicLayoutFieldBuilder.createMetadataField(context, author, 1, 0, 1)
             .withLabel("LABEL Author")
-            .withRendering("crisref")
+            .withRendering("dynamicref")
             .withRowStyle("STYLE")
             .withNestedField(List.of(author, affiliation))
             .withValuesInline(true)
@@ -217,7 +217,7 @@ public class DynamicLayoutBoxConverterIT extends AbstractControllerIntegrationTe
         assertThat(fifthField.getFieldType(), is("METADATAGROUP"));
         assertThat(fifthField.getBitstream(), nullValue());
         assertThat(fifthField.getLabel(), is("LABEL Author"));
-        assertThat(fifthField.getRendering(), is("crisref"));
+        assertThat(fifthField.getRendering(), is("dynamicref"));
         assertThat(fifthField.isValuesInline(), is(true));
         assertThat(fifthField.getMetadata(), is("dc.contributor.author"));
         assertThat(fifthField.getMetadataGroup(), notNullValue());
