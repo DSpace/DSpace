@@ -26,6 +26,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import org.dspace.app.util.XMLUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -101,7 +102,7 @@ public class CurationTaskConfig {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
         // Give our configuration schema to the parser.
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        SchemaFactory schemaFactory = XMLUtils.getSchemaFactory(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = schemaFactory.newSchema(CurationTaskConfig.class.getResource("workflow-curation.xsd"));
         unmarshaller.setSchema(schema);
 
