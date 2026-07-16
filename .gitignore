@@ -46,3 +46,18 @@ rebel.xml
 
 ## Ignore jenv configuration
 .java-version
+
+## Ignore logs
+dspace/data/log/
+
+## ignore backup files
+*.backup
+
+## ignore yarn support files
+yarn.lock
+node_modules/
+
+## ignore stashed files
+stash/
+
+
