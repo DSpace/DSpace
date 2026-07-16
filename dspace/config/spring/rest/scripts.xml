@@ -60,12 +60,12 @@
     </bean>
 
     <bean id="dynamic-layout-tool" class="org.dspace.layout.script.DynamicLayoutToolScriptConfiguration" primary="true">
-        <property name="description" value="Script to import CRIS layout configuration from excel file"/>
+        <property name="description" value="Script to import Dynamic layout configuration from excel file"/>
         <property name="dspaceRunnableClass" value="org.dspace.layout.script.DynamicLayoutToolScript"/>
     </bean>
 
     <bean id="export-dynamic-layout-tool" class="org.dspace.layout.script.ExportDynamicLayoutToolScriptConfiguration" primary="true">
-        <property name="description" value="Script to export CRIS layout configuration into excel file"/>
+        <property name="description" value="Script to export Dynamic layout configuration into excel file"/>
         <property name="dspaceRunnableClass" value="org.dspace.layout.script.ExportDynamicLayoutToolScript"/>
     </bean>
 
