@@ -84,6 +84,9 @@ jobs:
   codecov:
     # Must run after 'tests' job above
     needs: tests
+    # Only run on the upstream repository: forks do not have the CODECOV_TOKEN secret,
+    # and Codecov refuses to create a commit on a protected branch without a token.
+    if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
