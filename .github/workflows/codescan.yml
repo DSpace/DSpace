@@ -17,8 +17,11 @@ on:
       - 'dspace-**'
     # Don't run if PR is only updating static documentation
     paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'LICENSES_THIRD_PARTY'
+      - 'NOTICE'
       - '**/*.md'
-      - '**/*.txt'
   schedule:
     - cron: "37 0 * * 1"
 
