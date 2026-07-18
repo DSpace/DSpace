@@ -64,6 +64,7 @@
         <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
         <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
         <name-map collection-entity-type="Dataset" submission-name="Dataset"/>
+            <name-map collection-entity-type="Funding" submission-name="Funding"/>
 
         <!-- Example of configuration using a community handle to map an Item Submission Process.
 
@@ -155,6 +156,11 @@
             <type>submission-form</type>
         </step-definition>
         <step-definition id="datasetStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="fundingStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -534,6 +540,24 @@
             <!-- Datasets use a custom first step, but share page 2 with "traditional" Item form -->
             <step id="datasetStep"/>
             <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+        </submission-process>
+
+        <!--
+        Submission Process for 'Funding' Entities.
+        To enable: create a collection for Fundings and add it to the <submission-map> tag linking to this process
+         -->
+        <submission-process name="Funding">
+            <step id="collection"/>
+            <step id="fundingStep"/>
+            <step id="upload"/>
+            <step id="license"/>
+        </submission-process>
+
+        <!-- Submission form used during Funding editing (post-publication via EditItem system).
+             Differs from "Funding" by excluding collection and license steps. -->
+        <submission-process name="funding-edit">
+            <step id="fundingStep"/>
             <step id="upload"/>
         </submission-process>
 
