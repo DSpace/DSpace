@@ -46,7 +46,8 @@ public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptC
         if (options == null) {
             Options options = new Options();
 
-            options.addOption("c", "collection", true, "the own collection of the imported items");
+            options.addOption("c", "collection", true,
+                    "The UUID of the collection where the bulk import will be performed");
             options.getOption("c").setType(String.class);
             options.getOption("c").setRequired(true);
 

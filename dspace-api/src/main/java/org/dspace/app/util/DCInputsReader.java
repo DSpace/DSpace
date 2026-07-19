@@ -186,6 +186,15 @@ public class DCInputsReader {
         }
     }
 
+    /**
+     * Returns the DC input sets configured for the upload step(s) of the submission
+     * configuration associated with the given collection.
+     *
+     * @param collection the collection for which to retrieve the upload DC input sets
+     * @return the list of DC input sets defined for the upload step(s) of the collection
+     * @throws DCInputsReaderException if no default submission form is defined or the
+     *                                 submission configuration cannot be read
+     */
     public List<DCInputSet> getInputsUploadByCollection(Collection collection)
             throws DCInputsReaderException {
         SubmissionConfig config;
@@ -212,6 +221,15 @@ public class DCInputsReader {
 
     }
 
+    /**
+     * Returns the DC input sets of the nested metadata groups defined in the input-form
+     * step(s) of the submission configuration associated with the given collection.
+     *
+     * @param collection the collection for which to retrieve the nested group DC input sets
+     * @return the list of DC input sets of the nested metadata groups configured for the collection
+     * @throws DCInputsReaderException if no default submission form is defined or the
+     *                                 submission configuration cannot be read
+     */
     public List<DCInputSet> getInputsGroupByCollection(Collection collection)
             throws DCInputsReaderException {
         SubmissionConfig config;
@@ -798,6 +816,20 @@ public class DCInputsReader {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the language values configured for the given metadata field in the
+     * submission form of the provided collection. The field is looked up either among
+     * the standard inputs or the nested metadata group inputs, depending on the
+     * {@code group} flag.
+     *
+     * @param collection the collection whose submission form is inspected
+     * @param metadata the metadata field for which to retrieve the configured languages
+     * @param group {@code true} to look up the field within nested metadata group inputs,
+     *              {@code false} to look it up among the standard inputs
+     * @return the list of configured language values for the metadata field, or an empty
+     *         list if the field is not found
+     * @throws DCInputsReaderException if the submission configuration cannot be read
+     */
     public List<String> getLanguagesForMetadata(Collection collection, String metadata, boolean group)
         throws DCInputsReaderException {
 
@@ -820,6 +852,16 @@ public class DCInputsReader {
 
     }
 
+    /**
+     * Returns all the metadata field names nested under the given metadata group in the
+     * submission form of the provided collection.
+     *
+     * @param collection the collection whose submission form is inspected
+     * @param groupName the name of the nested metadata group
+     * @return the list of metadata field names contained in the given group
+     * @throws DCInputsReaderException if no metadata group with the given name is found or
+     *                                 the submission configuration cannot be read
+     */
     public List<String> getAllNestedMetadataByGroupName(Collection collection, String groupName)
         throws DCInputsReaderException {
 
@@ -930,6 +972,14 @@ public class DCInputsReader {
         return "group".equals(dcInput.getInputType()) || "inline-group".equals(dcInput.getInputType());
     }
 
+    /**
+     * Returns all the metadata field names configured in the upload step(s) of the
+     * submission form associated with the given collection.
+     *
+     * @param collection the collection whose upload configuration is inspected
+     * @return the list of metadata field names defined in the upload step(s) of the collection
+     * @throws DCInputsReaderException if the submission configuration cannot be read
+     */
     public List<String> getUploadMetadataFieldsFromCollection(Collection collection) throws DCInputsReaderException {
         return getInputsUploadByCollection(collection)
             .stream()
