@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.Nullable;
 import org.apache.commons.collections.CollectionUtils;
@@ -463,9 +464,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             return true;
         }
 
-        long waitHours = configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L);
-        long waitMilli = waitHours * 60 * 60 * 1000;
-        return (now - lastModified) < waitMilli;
+        long waitWindowHours = configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L);
+        long waitWindowMilli = TimeUnit.HOURS.toMillis(waitWindowHours);
+        return (now - lastModified) < waitWindowMilli;
     }
 
     protected BitStoreService getStore(int position) throws IOException {
