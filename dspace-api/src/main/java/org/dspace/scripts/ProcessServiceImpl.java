@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.ListUtils;
@@ -44,8 +45,11 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.discovery.indexobject.IndexableProcess;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.DetailType;
+import org.dspace.event.Event;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +97,7 @@ public class ProcessServiceImpl implements ProcessService {
             });
 
         Process createdProcess = processDAO.create(context, process);
+        addIndexEvent(context, createdProcess, Event.MODIFY);
 
         if (ePerson != null) {
             log.info(LogHelper.getHeader(context, "process_create",
@@ -200,6 +205,7 @@ public class ProcessServiceImpl implements ProcessService {
             bitstreamService.delete(context, bitstream);
         }
         processDAO.delete(context, process);
+        addIndexEvent(context, process, Event.DELETE);
         log.info(LogHelper.getHeader(context, "process_delete", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has been deleted"));
     }
@@ -207,6 +213,14 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void update(Context context, Process process) throws SQLException {
         processDAO.save(context, process);
+        addIndexEvent(context, process, Event.MODIFY);
+    }
+
+    private void addIndexEvent(Context context, Process process, int eventType) {
+        ArrayList<String> identifiers = new ArrayList<>();
+        identifiers.add(process.getID().toString());
+        context.addEvent(new Event(eventType, Constants.PROCESS, UUID.randomUUID(), IndexableProcess.TYPE,
+                                   DetailType.DSO_TYPE, identifiers));
     }
 
     @Override
