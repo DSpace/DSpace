@@ -23,7 +23,6 @@
         <name-map collection-handle="123456789/nested-metadata-test"
                   submission-name="nestedMetadataTest"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
-        <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
         <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
         <name-map collection-handle="123456789/typebind-test" submission-name="typebindtest"/>
         <name-map collection-handle="123456789/accessCondition-not-discoverable" submission-name="accessConditionNotDiscoverable"/>
@@ -39,6 +38,8 @@
         <name-map collection-handle="123456789/modeA" submission-name="modeA"/>
         <name-map collection-handle="123456789/mode2" submission-name="modeB"/>
         <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
+        <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
+        <name-map collection-handle="123456789/grobid-extraction" submission-name="grobidextractiontestprocess"/>
     </submission-map>
 
 
@@ -136,13 +137,19 @@
         <!--Step will be to select a Creative Commons License -->
         <step-definition id="cclicense"> <heading>submit.progressbar.CClicense</heading>
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
-            <type>cclicense</type> 
+            <type>cclicense</type>
         </step-definition>
 
-        <step-definition id="extractionstep"> 
+        <step-definition id="extractionstep">
             <heading>submit.progressbar.ExtractMetadataStep</heading>
             <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
             <type>extract</type>
+        </step-definition>
+
+        <step-definition id="grobidmetadata" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
         </step-definition>
 
         <!-- Fake Steps to test parsing of all options -->
@@ -257,7 +264,7 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        
+
         <step-definition id="onlyTitle" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -354,8 +361,18 @@
 
         <submission-process name="extractiontestprocess">
             <step id="collection"/>
+            <step id="grobidmetadata"/>
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+            <step id="extractionstep"/>
+            <step id="license"/>
+            <step id="cclicense"/>
+        </submission-process>
+
+        <submission-process name="grobidextractiontestprocess">
+            <step id="collection"/>
+            <step id="grobidmetadata"/>
             <step id="upload"/>
             <step id="extractionstep"/>
             <step id="license"/>
