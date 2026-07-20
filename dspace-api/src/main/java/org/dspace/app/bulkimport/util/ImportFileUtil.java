@@ -71,7 +71,7 @@ public class ImportFileUtil {
         return false;
     }
 
-    private static String[] getAllowedIps() {
+    protected String[] getAllowedIps() {
         return DSpaceServicesFactory.getInstance()
                                     .getConfigurationService()
                                     .getArrayProperty("allowed.ips.import");
@@ -158,17 +158,39 @@ public class ImportFileUtil {
 
     private Optional<InputStream> getInputStreamOfRemoteFile(String path) throws IOException {
         URL url = getUrl(path);
+        if (!isHostAllowed(url, path)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(openStream(url));
+    }
+
+    /**
+     * Checks whether the host of the given URL is allowed to be contacted by the bulk
+     * import, according to the {@code allowed.ips.import} configuration property.
+     * <p>
+     * The same validation is applied to every URL-based retrieval (both HTTP/HTTPS and
+     * FTP) to mitigate server-side request forgery: when an allow-list is configured only
+     * the listed hosts can be reached. When the property is not set or empty no
+     * restriction is applied and any host is allowed.
+     * </p>
+     *
+     * @param url  the URL whose host has to be validated
+     * @param path the original file path, used only for logging a rejected request
+     * @return {@code true} if the host is allowed or no allow-list is configured,
+     *         {@code false} otherwise
+     */
+    private boolean isHostAllowed(URL url, String path) {
         Set<String> allowedIps = Set.of(getAllowedIps());
         String host = url.getHost();
 
         if (allowedIps.isEmpty() || allowedIps.contains(host)) {
-            return Optional.ofNullable(openStream(url));
+            return true;
         }
 
         // Log the rejected domain
         logWarning(String.format("Domain '%s' is not in the allowed list. Path: %s", host, path));
 
-        return Optional.empty();
+        return false;
     }
 
     protected InputStream openStream(URL url) {
@@ -185,6 +207,9 @@ public class ImportFileUtil {
 
     private Optional<InputStream> getInputStreamOfFtpFile(String url) throws IOException {
         URL urlObject = getUrl(url);
+        if (!isHostAllowed(urlObject, url)) {
+            return Optional.empty();
+        }
         URLConnection urlConnection = urlObject.openConnection();
         InputStream inputStream = urlConnection.getInputStream();
         if (inputStream == null) {

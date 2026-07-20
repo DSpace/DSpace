@@ -1761,6 +1761,24 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testFtpFilePathNotFromAllowedHostsIsRejected() {
+        try {
+            configurationService.setProperty("allowed.ips.import", new String[]{"allowed.example.com"});
+
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+            ImportFileUtil importFileUtil = new ImportFileUtil(handler);
+
+            assertThat(importFileUtil.getInputStream("ftp://not-allowed.example.com/file.pdf").isPresent(), is(false));
+            assertThat(handler.getWarningMessages(), contains(
+                containsString("Domain 'not-allowed.example.com' is not in the allowed list. "
+                    + "Path: ftp://not-allowed.example.com/file.pdf")));
+
+        } finally {
+            configurationService.setProperty("allowed.ips.import", new String[]{});
+        }
+    }
+
+    @Test
     public void testUploadMultipleBitstreamWithCorrectLocalPath() throws Exception {
 
         context.turnOffAuthorisationSystem();
