@@ -295,4 +295,6 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     List<Bitstream> findShowableByItem(Context context, UUID itemId, String bundleName,
                                        Map<String, String> filterMetadata) throws SQLException;
 
+    List<Bitstream> findByItemAndBundleAndMetadata(Context context, Item item, String bundleName,
+        Map<String, String> filterMetadata);
 }
