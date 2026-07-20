@@ -10,8 +10,6 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.bytebuddy.matcher.ElementMatchers.anyOf;
 import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
@@ -20,7 +18,6 @@ import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -51,7 +48,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
@@ -2629,25 +2625,23 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                       .withAuthor("Smith, Donald")
                                       .build();
 
-        Bundle license = BundleBuilder.createBundle(context, publicItem1)
-                                      .withName("LICENSE")
-                                      .build();
+        Bundle bundle = BundleBuilder.createBundle(context, publicItem1).withName("ORIGINAL").build();
 
         String bitstreamContent1 = "This is an archived bitstream";
         Bitstream bitstream1 = null;
         try (InputStream is = toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
-                createBitstream(context, license, is)
+                createBitstream(context, bundle, is)
                 .withName("this is a test")
                 .withMimeType("text/plain")
                 .build();
         }
 
-        String bitstreamContent2 = "This is an license bitstream";
+        String bitstreamContent2 = "This is an original bitstream";
         Bitstream bitstream2 = null;
         try (InputStream is = toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.
-                createBitstream(context, license, is)
+                createBitstream(context, bundle, is)
                 .withName("this is a test 2")
                 .withMimeType("text/plain")
                 .build();
@@ -2655,7 +2649,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/core/bitstreams/search/byItemId")
                        .param("uuid", publicItem1.getID().toString())
-                       .param("name", license.getName())
+                       .param("name", bundle.getName())
                        .param("filterMetadata", "dc.title")
                        .param("filterMetadataValue", "this is a test")
                        .param("projection", "full"))
@@ -2668,7 +2662,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/core/bitstreams/search/byItemId")
                        .param("uuid", publicItem1.getID().toString())
-                       .param("name", license.getName())
+                       .param("name", bundle.getName())
                        .param("filterMetadata", "dc.title")
                        .param("filterMetadataValue", "([a-z]+ [a-z]+ [a-z]+ [a-z]+)")
                        .param("projection", "full"))
@@ -2681,7 +2675,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/core/bitstreams/search/byItemId")
                        .param("uuid", publicItem1.getID().toString())
-                       .param("name", license.getName())
+                       .param("name", bundle.getName())
                        .param("filterMetadata", "dc.title")
                        .param("filterMetadataValue", "(this is a test.*)")
                        .param("projection", "full"))
