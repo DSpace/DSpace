@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -753,7 +754,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
         }
 
         assertEquals("Total unique IDs collected should match metadata", totalElements, allIds.size());
-        assertEquals("Collected IDs should exactly match the expected configuration set", expectedIds, allIds);
+        assertEquals("Collected IDs should exactly match the expected configuration set",
+                     new HashSet<>(expectedIds), new HashSet<>(allIds));
     }
 
     @Test
