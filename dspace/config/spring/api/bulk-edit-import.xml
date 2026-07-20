@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+    <bean name="bulkEditServiceFactory" class="org.dspace.app.bulkedit.service.BulkEditServiceFactoryImpl"/>
+
+    <bean name="bulkEditService" class="org.dspace.app.bulkedit.service.BulkEditServiceImpl" scope="prototype" autowire-candidate="false"/>
+
+    <!-- CSV import -->
+    <bean name="csvBulkEditParsingService" class="org.dspace.app.bulkedit.service.CSVBulkEditParsingServiceImpl" scope="prototype" autowire-candidate="false"/>
+</beans>
