@@ -26,11 +26,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
-import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderFormat;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderPublisherResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderUtils;
 import org.dspace.services.ConfigurationService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -336,7 +337,7 @@ public class OpenPolicyFinderService {
      * @param field     field eg "issn" or "title"
      * @param predicate predicate eg "equals" or "contains-word"
      * @param value     the actual value to search for (eg an ISSN or partial title)
-     * @return the count
+     * @return the number of matching results (the Open Policy Finder API caps results at 100)
      */
     public int performCountRequest(String type, String field, String predicate, String value) {
         // API Key is *required* for v2 API calls
@@ -350,29 +351,35 @@ public class OpenPolicyFinderService {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
             Thread.sleep(sleepBetweenTimeouts);
 
-            method = constructHttpGet(type, field, predicate, value, OpenPolicyFinderFormat.IDS, 0, 0);
+            // Count using the JSON format: the Ids format is currently broken on the
+            // api.openpolicyfinder.jisc.ac.uk platform (the upstream proxy returns HTTP 5xx for it).
+            // The API caps results at 100 and returns no grand total, so counting the returned
+            // "items" array yields the same bounded total the caller expects.
+            method = constructHttpGet(type, field, predicate, value, 0, 0);
 
             try (CloseableHttpResponse response = client.execute(method)) {
                 int statusCode = response.getStatusLine().getStatusCode();
 
                 if (statusCode != HttpStatus.SC_OK) {
-                    String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                    log.error("Error from OpenPolicyFinder HTTP request: " + errorBody);
+                    // Do not log the response body: upstream error payloads may contain sensitive
+                    // details (e.g. internal proxy API keys). Log the status code only.
+                    log.error("Error from Open Policy Finder count request: HTTP status {}", statusCode);
                     return 0;
                 }
 
                 HttpEntity responseBody = response.getEntity();
                 if (responseBody == null) {
-                    log.debug("Empty OpenPolicyFinder response body for query on " + value);
+                    log.debug("Empty Open Policy Finder response body for query on {}", value);
                     return 0;
                 }
 
                 String responseContent = IOUtils.toString(responseBody.getContent(), StandardCharsets.UTF_8);
-                return (int) responseContent.lines().count();
+                JSONArray items = new JSONObject(responseContent).optJSONArray("items");
+                return items == null ? 0 : items.length();
             }
 
         } catch (Exception ex) {
-            log.error("An error occurs counting the OpenPolicyFinder entries", ex);
+            log.error("An error occurred counting the Open Policy Finder entries", ex);
             return 0;
         } finally {
             if (method != null) {
@@ -408,24 +415,6 @@ public class OpenPolicyFinderService {
      */
     public HttpGet constructHttpGet(String type, String field, String predicate, String value, int start, int limit)
         throws URISyntaxException {
-        return constructHttpGet(type, field, predicate, value, OpenPolicyFinderFormat.JSON, start, limit);
-    }
-
-    /**
-     * Construct HTTP GET object for a "field,predicate,value" query
-     * eg. "title","contains-word","Lancet" or "issn","equals","1234-1234"
-     *
-     * @param field     the field (issn, title, etc)
-     * @param predicate the predicate (contains-word, equals, etc - see API docs)
-     * @param value     the query value itself
-     * @param format    the requested format
-     * @param start     row offset
-     * @param limit     number of results to return
-     * @return HttpGet object to be executed by the client
-     * @throws URISyntaxException
-     */
-    public HttpGet constructHttpGet(String type, String field, String predicate, String value,
-                                    OpenPolicyFinderFormat format, int start, int limit) throws URISyntaxException {
         // Sanitise query string (strip some characters) field, predicate and value
         if (null == type) {
             type = "publication";
@@ -439,7 +428,7 @@ public class OpenPolicyFinderService {
         URIBuilder uriBuilder = new URIBuilder(endpoint);
         uriBuilder.addParameter("item-type", type);
         uriBuilder.addParameter("filter", "[[\"" + field + "\",\"" + predicate + "\",\"" + value + "\"]]");
-        uriBuilder.addParameter("format", format.getValue());
+        uriBuilder.addParameter("format", "Json");
         // Set optional start (offset) and limit parameters
         if (start >= 0) {
             uriBuilder.addParameter("offset", String.valueOf(start));
@@ -492,7 +481,7 @@ public class OpenPolicyFinderService {
             log.warn("No ISSN supplied as query string for Open Policy Finder service search");
         }
         uriBuilder.addParameter("filter", "[[\"issn\",\"equals\",\"" + query + "\"]]");
-        uriBuilder.addParameter("format", OpenPolicyFinderFormat.JSON.getValue());
+        uriBuilder.addParameter("format", "Json");
         log.debug("Would search Open Policy Finder endpoint with {}", uriBuilder);
 
         // Return final built URI
