@@ -48,6 +48,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
@@ -720,6 +721,22 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         return streamOf(bitstreamDAO.findShowableByItem(context, itemId, bundleName))
             .filter(bitstream -> hasAllMetadataValues(bitstream, filterMetadata))
             .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<Bitstream> findByItemAndBundleAndMetadata(Context context, Item item, String bundleName,
+                                                          Map<String, String> filterMetadata) {
+
+        try {
+
+            return streamOf(bitstreamDAO.findByItemAndBundle(context, item.getID(), bundleName))
+                .filter(bitstream -> hasAllMetadataValues(bitstream, filterMetadata))
+                .collect(Collectors.toList());
+
+        } catch (SQLException ex) {
+            throw new SQLRuntimeException(ex);
+        }
 
     }
 
