@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import org.apache.commons.cli.ParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -39,13 +38,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.deletion.process.DSpaceObjectDeletionProcess;
 import org.dspace.discovery.IndexingService;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
-import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.dspace.scripts.service.ScriptService;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,18 +58,10 @@ public class DSpaceObjectDeletionProcessIT extends AbstractEntityIntegrationTest
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Autowired
-    private ScriptService scriptService;
-    @Autowired
     private IndexingService indexingService;
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-
-    @Autowired
-    private ItemService itemService;
-
-    private Item item1;
-    private Item item2;
 
     private Community community;
     private Collection collection;
@@ -401,16 +388,6 @@ public class DSpaceObjectDeletionProcessIT extends AbstractEntityIntegrationTest
                                   dSpaceRunnableParameterConverter.convert(dSpaceCommandLineParameter,
                                                                            Projection.DEFAULT))
                          .collect(Collectors.toList());
-    }
-
-    private void runDeletionProcessScript(String[] args, TestDSpaceRunnableHandler handler)
-        throws IllegalAccessException, InstantiationException, ParseException {
-        DSpaceObjectDeletionProcessScriptConfiguration<?> scriptConfig =
-            scriptService.getScriptConfiguration(OBJECT_DELETION_SCRIPT);
-        DSpaceObjectDeletionProcess<?> deletionProcess =
-            scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfig);
-        deletionProcess.initialize(args, handler, admin);
-        deletionProcess.run();
     }
 
 }
