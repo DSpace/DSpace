@@ -54,11 +54,6 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration<?>> implement
     protected DSpaceRunnableHandler handler;
 
     /**
-     * Tells if the current context user that is running the script is an admin
-     */
-    private Boolean isAdmin = null;
-
-    /**
      * The ScriptConfiguration that this DSpaceRunnable uses to retrieve information about the script
      */
     private T scriptConfiguration;
