@@ -99,6 +99,8 @@ public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
      */
     Iterator<Bitstream> findByItem(Context context, Item item) throws SQLException;
 
+    Iterator<Bitstream> findByItemAndBundle(Context context, UUID itemId, String bundleName) throws SQLException;
+
     /**
      * Returns an iterator over the bitstreams stored in the given assetstore.
      *
