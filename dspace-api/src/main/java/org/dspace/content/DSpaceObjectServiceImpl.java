@@ -55,6 +55,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceObjectServiceImpl.class);
 
+    private static final ThreadLocal<Collection> ingestCollection = new ThreadLocal<>();
+
     @Autowired(required = true)
     protected ChoiceAuthorityService choiceAuthorityService;
     @Autowired(required = true)
@@ -368,13 +370,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             if (metadataAuthorityService.isAuthorityControlled(fieldKey)) {
                 List<String> authorities = new ArrayList<>();
                 List<Integer> confidences = new ArrayList<>();
+                // Resolve the collection from the import context when the item has not yet been assigned an owning
+                // collection.
+                Collection collection = resolveAuthorityCollection(dso);
                 for (int i = 0; i < values.size(); ++i) {
-                    if (dso instanceof Item) {
-                        getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities,
-                                                     confidences, i);
-                    } else {
-                        getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
-                    }
+                    getAuthoritiesAndConfidences(fieldKey, collection, values, authorities, confidences, i);
                 }
                 return addMetadata(context, dso, metadataField, language, values, authorities, confidences);
             } else {
@@ -549,6 +549,22 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         // If we get this far, we have a match
         return true;
+    }
+
+    /**
+     * Resolve the collection to use for authority resolution.
+     * Falls back to the current import context when the item has not yet been
+     * assigned an owning collection.
+     *
+     * @param dso the DSpace object being updated
+     * @return the collection to use for authority resolution, or {@code null} if none is available
+     */
+    protected Collection resolveAuthorityCollection(T dso) {
+        Collection collection = ingestCollection.get();
+        if (collection == null && dso instanceof Item) {
+            collection = ((Item) dso).getOwningCollection();
+        }
+        return collection;
     }
 
     protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values,
@@ -857,6 +873,23 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         throw new NotImplementedException();
 
+    }
+
+
+    /**
+     * Set the collection to use for authority resolution during import.
+     *
+     * @param collection the import target collection
+     */
+    public static void setIngestCollection(Collection collection) {
+        ingestCollection.set(collection);
+    }
+
+    /**
+     * Clear the import collection context used for authority resolution.
+     */
+    public static void clearIngestCollection() {
+        ingestCollection.remove();
     }
 
 }
