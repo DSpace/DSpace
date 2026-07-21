@@ -50,6 +50,7 @@ import org.dspace.core.LogHelper;
 import org.dspace.curate.service.XmlWorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
@@ -123,6 +124,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamFormatService bitstreamFormatService;
+    @Autowired(required = true)
+    protected EPersonService ePersonService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
@@ -681,6 +684,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             EPerson ep = item.getSubmitter();
             // send the notification to the submitter unless the submitter eperson has been deleted
             if (null != ep) {
+                ep = ePersonService.find(context, ep.getID());
+                if (ep == null) {
+                    log.warn("Submitter EPerson not found or deleted. Skipping archive notification.");
+                    return;
+                }
                 // Get the Locale
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
@@ -1229,14 +1237,18 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 configurationService.getProperty("metadata.privacy.dc.description.provenance", "false");
         boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
 
-        if (myitem.getSubmitter() != null && !isProvenancePrivacyActive) {
-            provmessage.append("Submitted by ").append(myitem.getSubmitter().getFullName())
-                    .append(" (").append(myitem.getSubmitter().getEmail()).append(") on ")
-                    .append(now.toString());
+        EPerson submitter = myitem.getSubmitter();
+        if (submitter != null) {
+            submitter = ePersonService.find(context, submitter.getID());
+        }
+        if (submitter != null && !isProvenancePrivacyActive) {
+            provmessage.append("Submitted by ").append(submitter.getFullName())
+                    .append(" (").append(submitter.getEmail()).append(") on ")
+                    .append(now);
         } else {
             // else, null submitter
             provmessage.append("Submitted by unknown (probably automated or submitter hidden) on ")
-                    .append(now.toString());
+                    .append(now);
         }
         if (action != null) {
             provmessage.append(" workflow start=").append(action.getProvenanceStartId()).append("\n");

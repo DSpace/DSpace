@@ -720,6 +720,10 @@ public class DSpaceCSV implements Serializable {
         return csvLines.toString();
     }
 
+    public String getValueSeparator() {
+        return valueSeparator;
+    }
+
     public String getAuthoritySeparator() {
         return authoritySeparator;
     }
