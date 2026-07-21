@@ -2738,15 +2738,19 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .build();
         }
 
+        // Query the non-restricted ORIGINAL bundle: an anonymous client can read its bitstream, so it
+        // appears in the response content. Querying the restricted LICENSE bundle would report a count
+        // but omit the bitstream from _embedded (anonymous users cannot read LICENSE bitstreams). The
+        // LICENSE bundle above remains as the bundle the name filter must exclude.
         getClient().perform(get("/api/core/bitstreams/search/byItemId")
                        .param("uuid", publicItem1.getID().toString())
-                       .param("name", license.getName())
+                       .param("name", original.getName())
                        .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", is(1)))
                    .andExpect(jsonPath("$._embedded.bitstreams", hasSize(1)))
                    .andExpect(jsonPath("$._embedded.bitstreams", contains(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
+                       BitstreamMatcher.matchBitstreamEntry(bitstream2)
                    )));
 
     }
