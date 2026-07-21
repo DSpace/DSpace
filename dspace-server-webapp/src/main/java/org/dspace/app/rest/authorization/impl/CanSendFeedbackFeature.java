@@ -20,13 +20,14 @@ import org.springframework.stereotype.Component;
 
 /**
  * The send feedback feature. It can be used to verify if the parameter that contain
- * recipient e-mail is configured.
+ * recipient e-mail is configured and if the current user is authorized to send feedback.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CanSendFeedbackFeature.NAME,
-    description = "It can be used to verify if the parameter that contain recipient e-mail is configured.")
+    description = "It can be used to verify if the parameter that contain recipient e-mail is configured"
+        + " and if the current user is authorized to send feedback.")
 public class CanSendFeedbackFeature implements AuthorizationFeature {
 
     public static final String NAME = "canSendFeedback";
