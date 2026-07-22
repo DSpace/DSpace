@@ -9,11 +9,13 @@ package org.dspace.core;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mockStatic;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.services.ConfigurationService;
@@ -132,5 +134,26 @@ public class UtilsTest extends AbstractUnitTest {
 
         // remove the config we added
         configurationService.setProperty(configName, null);
+    }
+
+    /**
+     * Test that generateBytesKey returns 16 random bytes and does not repeat across calls.
+     */
+    @Test
+    public void testGenerateBytesKey() {
+        byte[] key = Utils.generateBytesKey();
+        // 16 bytes (128 bits), preserving the previous key size
+        assertEquals("Key should be 16 bytes long", 16, key.length);
+        // Two successive keys must differ; with a CSPRNG a repeat is cryptographically improbable
+        assertFalse("Two generated keys should not be identical",
+                    Arrays.equals(key, Utils.generateBytesKey()));
+    }
+
+    /**
+     * Test that generateHexKey returns the documented 32-character hex string.
+     */
+    @Test
+    public void testGenerateHexKeyLength() {
+        assertEquals("Hex key should be 32 characters long", 32, Utils.generateHexKey().length());
     }
 }
