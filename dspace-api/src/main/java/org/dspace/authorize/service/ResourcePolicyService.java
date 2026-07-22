@@ -319,6 +319,31 @@ public interface ResourcePolicyService {
     public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException;
 
     /**
+     * Return a paginated list of policies based on embargo date presence criteria
+     * 
+     * @param context      DSpace context object
+     * @param hasStartDate filter for start date presence, null=any, true=required, false=must be absent
+     * @param hasEndDate   filter for end date presence, null=any, true=required, false=must be absent
+     * @param offset       the position of the first result to return
+     * @param limit        paging limit
+     * @return             list of resource policies
+     * @throws SQLException if database error
+     */
+    public List<ResourcePolicy> findByDate(Context context, Boolean hasStartDate, Boolean hasEndDate,
+                                                   int offset, int limit) throws SQLException;
+
+    /**
+     * Count all the resource policies based on embargo date presence criteria
+     * 
+     * @param context      DSpace context object
+     * @param hasStartDate filter for start date presence, null=any, true=required, false=must be absent
+     * @param hasEndDate   filter for end date presence, null=any, true=required, false=must be absent
+     * @return             total policies
+     * @throws SQLException if database error
+     */
+    public int countByDate(Context context, Boolean hasStartDate, Boolean hasEndDate) throws SQLException;
+
+    /**
      * Check if the resource policy identified with (id) belong to ePerson
      * 
      * @param context           DSpace context object
