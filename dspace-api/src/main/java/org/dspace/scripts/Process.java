@@ -90,6 +90,10 @@ public class Process implements ReloadableEntity<Integer> {
     @Column(name = "creation_time", nullable = false)
     private Instant creationTime;
 
+    @Column(name = "heartbeat")
+    private Instant heartbeat;
+
+
     public static final String BITSTREAM_TYPE_METADATAFIELD = "dspace.process.filetype";
     public static final String OUTPUT_TYPE = "script_output";
 
@@ -233,6 +237,13 @@ public class Process implements ReloadableEntity<Integer> {
      */
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    public Instant getHeartbeat() {
+        return heartbeat;
+    }
+    public void setHeartbeat(Instant heartbeat) {
+        this.heartbeat = heartbeat;
     }
 
     /**

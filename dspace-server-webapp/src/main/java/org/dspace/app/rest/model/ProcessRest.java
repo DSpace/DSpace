@@ -33,6 +33,7 @@ public class ProcessRest extends BaseObjectRest<Integer> {
     public static final String FILES = "files";
     public static final String FILE_TYPES = "filetypes";
     public static final String OUTPUT = "output";
+    private Instant heartbeat;
 
     public String getCategory() {
         return CATEGORY;
@@ -123,6 +124,13 @@ public class ProcessRest extends BaseObjectRest<Integer> {
 
     public void setEndTime(Instant endTime) {
         this.endTime = endTime;
+    }
+    public Instant getHeartbeat() {
+        return heartbeat;
+    }
+
+    public void setHeartbeat(Instant heartbeat) {
+        this.heartbeat = heartbeat;
     }
 
     @JsonIgnore

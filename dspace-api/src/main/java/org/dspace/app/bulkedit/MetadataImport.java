@@ -622,6 +622,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             if (change && (rowCount % configurationService.getIntProperty("bulkedit.change.commit.count", 100) == 0)) {
                 c.commit();
                 handler.logInfo(LogHelper.getHeader(c, "metadata_import_commit", "lineNumber=" + rowCount));
+                handler.registerHeartbeat();
             }
             populateRefAndRowMap(line, item == null ? null : item.getID());
             // keep track of current rows processed

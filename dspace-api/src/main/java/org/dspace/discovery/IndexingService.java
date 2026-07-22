@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.core.Context;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
  * Interface used for indexing IndexableObject into discovery
@@ -64,7 +65,7 @@ public interface IndexingService {
 
     void updateIndex(Context context, boolean force);
 
-    void updateIndex(Context context, boolean force, String type);
+    void updateIndex(Context context, boolean force, String type, DSpaceRunnableHandler handler);
 
     void cleanIndex() throws IOException, SQLException, SearchServiceException;
 
@@ -86,4 +87,7 @@ public interface IndexingService {
      */
     void atomicUpdate(Context context, String uniqueIndexId, String field, Map<String,Object> fieldModifier)
             throws SolrServerException, IOException;
+
+    void cleanIndex(DSpaceRunnableHandler handler) throws IOException, SQLException, SearchServiceException;
+
 }

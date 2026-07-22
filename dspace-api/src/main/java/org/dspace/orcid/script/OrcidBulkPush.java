@@ -115,6 +115,7 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
 
         for (OrcidQueue queueRecord : queueRecords) {
             performSynchronization(queueRecord);
+            handler.registerHeartbeat();
         }
 
     }

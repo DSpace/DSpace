@@ -196,6 +196,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             // commit after each item to release DB resources
             c.commit();
             currentItem = null;
+            if (handler != null) {
+                handler.registerHeartbeat();
+            }
         }
     }
 
