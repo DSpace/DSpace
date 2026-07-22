@@ -173,7 +173,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                      VocabularyMatcher.matchProperties("event_types", "event_types", true, false),
                      VocabularyMatcher.matchProperties("patent-coar-types", "patent-coar-types", false, true),
                      VocabularyMatcher.matchProperties("publication-coar-types", "publication-coar-types", false, true),
-                     VocabularyMatcher.matchProperties("product-coar-types", "product-coar-types", false, true)
+                     VocabularyMatcher.matchProperties("product-coar-types", "product-coar-types", false, true),
                      VocabularyMatcher.matchProperties("gender", "gender", true, false)
                  )))
         .andExpect(jsonPath("$._links.self.href",

@@ -490,6 +490,19 @@ public interface CollectionService
         throws SQLException;
 
     /**
+     * Returns the collection related to the given item. If the item is archived,
+     * this method returns the own collection of that item, otherwise returns the
+     * collection related to the current InProgressSubmission related to that item.
+     *
+     * @param  context      the DSpace context
+     * @param  item         the item from where the search start
+     * @return              the collection related to the given item
+     * @throws SQLException if an SQL error occurs
+     */
+    public Collection findByItem(Context context, Item item) throws SQLException;
+
+
+    /**
      * Returns the collections that are administered by the current user.
      *
      * @param  query                  limit the returned collection to those with
@@ -505,7 +518,7 @@ public interface CollectionService
      * @throws SQLException           if something goes wrong
      * @throws SearchServiceException if search error
      */
-    List<Collection> findCollectionsAdministeredByEntityType(String query,String entityType,
+    public List<Collection> findCollectionsAdministeredByEntityType(String query,String entityType,
                                                              Context context, int offset, int limit)
             throws SQLException, SearchServiceException;
 
