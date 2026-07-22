@@ -80,7 +80,7 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         work.setWorkTitle(getWorkTitle(context, item));
         work.setPublicationDate(getPublicationDate(context, item));
         work.setWorkExternalIdentifiers(getWorkExternalIds(context, item, work));
-        work.setShortDescription(getShortDescription(context, item));
+        work.setShortDescription(orcidCommonObjectFactory.shortenDescription(getShortDescription(context, item)));
         work.setLanguageCode(getLanguageCode(context, item));
         work.setUrl(getUrl(context, item));
         return work;
