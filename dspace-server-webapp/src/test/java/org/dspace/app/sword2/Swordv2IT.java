@@ -10,21 +10,29 @@ package org.dspace.app.sword2;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import org.dspace.app.rest.test.AbstractWebClientIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.ItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.junit.Assume;
@@ -60,19 +68,24 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+    @Autowired
+    private ItemService itemService;
 
     // All SWORD v2 paths that we test against
-    private final String SWORD_PATH = "/swordv2";
-    private final String SERVICE_DOC_PATH = SWORD_PATH + "/servicedocument";
-    private final String COLLECTION_PATH = SWORD_PATH + "/collection";
-    private final String MEDIA_RESOURCE_PATH = SWORD_PATH + "/edit-media";
-    private final String EDIT_PATH = SWORD_PATH + "/edit";
-    private final String STATEMENT_PATH = SWORD_PATH + "/statement";
+    private static final String SWORD_PATH = "/swordv2";
+    private static final String SERVICE_DOC_PATH = SWORD_PATH + "/servicedocument";
+    private static final String COLLECTION_PATH = SWORD_PATH + "/collection";
+    private static final String MEDIA_RESOURCE_PATH = SWORD_PATH + "/edit-media";
+    private static final String EDIT_PATH = SWORD_PATH + "/edit";
+    private static final String STATEMENT_PATH = SWORD_PATH + "/statement";
 
     // Content Types used
-    private final String ATOM_SERVICE_CONTENT_TYPE = "application/atomserv+xml;charset=UTF-8";
-    private final String ATOM_FEED_CONTENT_TYPE = "application/atom+xml;type=feed;charset=UTF-8";
-    private final String ATOM_ENTRY_CONTENT_TYPE = "application/atom+xml;type=entry;charset=UTF-8";
+    private static final String ATOM_SERVICE_CONTENT_TYPE = "application/atomserv+xml;charset=UTF-8";
+    private static final String ATOM_FEED_CONTENT_TYPE = "application/atom+xml;type=feed;charset=UTF-8";
+    private static final String ATOM_ENTRY_CONTENT_TYPE = "application/atom+xml;type=entry;charset=UTF-8";
+
+    // MIME types used
+    private static final String COLLECTION_MIMETYPES = "application/pdf";
 
     /**
      * Create a global temporary upload folder which will be cleaned up automatically by JUnit.
@@ -187,15 +200,17 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         // Attempt to POST to /edit-media endpoint without sending authentication information
         ResponseEntity<String> response = postResponseAsString(MEDIA_RESOURCE_PATH, null, null, null);
         // Expect a 401 response code
-        assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     /**
-     * There should not be any Internal Server/Authorization error when uploading a new Item with embargo
-     * The embargo is defined in the `mets.xml` of the `example-embargo.zip` file
+     * Helper method to create a Collection for deposits via SWORD
+     *
+     * @return  Created Collection
+     * @throws SQLException         if database error
+     * @throws AuthorizeException   if authorization error
      */
-    @Test
-    public void depositItemWithEmbargo() throws Exception {
+    private Collection createCollection() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         // Create a top level community and one Collection
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -209,23 +224,44 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         // Above changes MUST be committed to the database for SWORDv2 to see them.
         context.commit();
         context.restoreAuthSystemState();
+        return collection;
+    }
 
+    /**
+     * Helper method to perform POST Zip file upload Request via SWORD
+     *
+     * @param collection    Target Collection to deposit to
+     * @param zipFileName   Zip file deposit package
+     * @return  ResponseEntity of the POST Request
+     */
+    private ResponseEntity<String> getResponseEntity(Collection collection, String zipFileName) {
         // Add file
         LinkedMultiValueMap<Object, Object> multipart = new LinkedMultiValueMap<>();
         multipart.add("file", new FileSystemResource(Path.of("src", "test", "resources",
-                "org", "dspace", "app", "sword2", "example-embargo.zip")));
+                "org", "dspace", "app", "sword2", zipFileName)));
         // Add required headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.setContentDisposition(ContentDisposition.attachment().filename("example-embargo.zip").build());
+        headers.setContentDisposition(ContentDisposition.attachment().filename(zipFileName).build());
         headers.set("Packaging", "http://purl.org/net/sword/package/METSDSpaceSIP");
         headers.setAccept(List.of(MediaType.APPLICATION_ATOM_XML));
 
-
         // Send POST to upload Zip file via SWORD
-        ResponseEntity<String> response = postResponseAsString(COLLECTION_PATH + "/" + collection.getHandle(),
+        return postResponseAsString(COLLECTION_PATH + "/" + collection.getHandle(),
                 eperson.getEmail(), password,
                 new HttpEntity<>(multipart, headers));
+    }
+
+    /**
+     * There should not be any Internal Server/Authorization error when uploading a new Item with embargo
+     * The embargo is defined in the `mets.xml` of the `example-embargo.zip` file
+     */
+    @Test
+    public void depositItemWithEmbargo() throws Exception {
+        Collection collection = createCollection();
+
+        // Get the response of the via SWORD POST Request uploaded Zip file
+        ResponseEntity<String> response = getResponseEntity(collection, "example-mimetypes.zip");
 
         // Expect a 201 CREATED response with ATOM "entry" content returned
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -241,39 +277,13 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
      */
     @Test
     public void depositAndEditViaSwordTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        // Create a top level community and one Collection
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        // Make sure our Collection allows the "eperson" user to submit into it
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test SWORDv2 Collection")
-                                                 .withSubmitterGroup(eperson)
-                                                 .build();
-        // Above changes MUST be committed to the database for SWORDv2 to see them.
-        context.commit();
-        context.restoreAuthSystemState();
-
-        // Add file
-        LinkedMultiValueMap<Object, Object> multipart = new LinkedMultiValueMap<>();
-        multipart.add("file", new FileSystemResource(Path.of("src", "test", "resources",
-                                                             "org", "dspace", "app", "sword2", "example.zip")));
-        // Add required headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        // Test the file with spaces or special characters in the name
-        headers.setContentDisposition(ContentDisposition.attachment().filename("example .zip").build());
-        headers.set("Packaging", "http://purl.org/net/sword/package/METSDSpaceSIP");
-        headers.setAccept(List.of(MediaType.APPLICATION_ATOM_XML));
+        Collection collection = createCollection();
 
         //----
         // STEP 1: Verify upload/submit via SWORDv2 works
         //----
-        // Send POST to upload Zip file via SWORD
-        ResponseEntity<String> response = postResponseAsString(COLLECTION_PATH + "/" + collection.getHandle(),
-                                                               eperson.getEmail(), password,
-                                                               new HttpEntity<>(multipart, headers));
+        // Get the response of the via SWORD POST Request uploaded Zip file
+        ResponseEntity<String> response = getResponseEntity(collection, "example.zip");
 
         // Expect a 201 CREATED response with ATOM "entry" content returned
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -366,6 +376,43 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         response = responseAsString(request);
         // Expect a 404 response as content was deleted
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    /**
+     * Test that only a Collection's specific allowed MIME types are ingested during a deposit
+     *
+     * @throws Exception    if any exception error
+     */
+    @Test
+    public void depositFilterCollectionDisallowedMimeTypesTest() throws Exception {
+        Collection collection = createCollection();
+
+        // Set Collection's specific allowed MIME types
+        configurationService.setProperty("swordv2-server.accept-mimetypes.collection." + collection.getHandle(),
+                COLLECTION_MIMETYPES);
+
+        // Get the response of the via SWORD POST Request uploaded Zip file
+        ResponseEntity<String> response = getResponseEntity(collection, "example-mimetypes.zip");
+
+        // Expect a 201 CREATED response with ATOM "entry" content returned
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(ATOM_ENTRY_CONTENT_TYPE,
+                Objects.requireNonNull(response.getHeaders().getContentType()).toString());
+
+
+        String editLink = Objects.requireNonNull(response.getHeaders().getLocation()).toString();
+        UUID itemUuid = UUID.fromString(editLink.substring(editLink.lastIndexOf('/') + 1));
+        Item item = itemService.find(context, itemUuid);
+        List<Bitstream> bitstreams =
+                item.getBundles("ORIGINAL").stream()
+                        .flatMap(bundle -> bundle.getBitstreams().stream())
+                        .toList();
+
+        assertEquals(1, bitstreams.size());
+        assertThat(bitstreams.stream().map(Bitstream::getName).toList(), hasItem("pdf1.pdf"));
+        assertThat(bitstreams.stream().map(Bitstream::getName).toList(), not(hasItem("text.txt")));
+        assertThat(bitstreams.stream().map(Bitstream::getName).toList(),
+                not(hasItem("dspace-logo.svg")));
     }
 
     @Test
