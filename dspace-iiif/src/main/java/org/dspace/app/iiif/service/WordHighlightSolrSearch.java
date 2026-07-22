@@ -88,7 +88,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         if (urlValidator.isValid(solrService) || validationEnabled) {
             HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
             solrServer.setUseMultiPartPost(true);
-            SolrQuery solrQuery = getSolrQuery(adjustQuery(query), manifestId);
+            SolrQuery solrQuery = getSolrQuery(configurationService, adjustQuery(query), manifestId);
             QueryRequest req = new QueryRequest(solrQuery);
             // returns raw json response.
             req.setResponseParser(new NoOpResponseParser("json"));
@@ -121,23 +121,25 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * Constructs a solr search URL. Compatible with solr-ocrhighlighting-0.7.2.
      * https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.2
      *
+     * @param configurationService the DSpace configuration service
      * @param query the search terms
      * @param manifestId the id of the manifest in which to search
      * @return solr query
      */
-    private SolrQuery getSolrQuery(String query, String manifestId) {
+    private SolrQuery getSolrQuery(ConfigurationService configurationService, String query, String manifestId) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.set("q", "ocr_text:" + query + " AND manifest_url:\"" + manifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
-        solrQuery.set("hl", "true");
-        solrQuery.set("hl.ocr.fl", "ocr_text");
-        solrQuery.set("hl.ocr.contextBlock", "line");
-        solrQuery.set("hl.ocr.contextSize", "2");
-        solrQuery.set("hl.snippets", "8192");
-        solrQuery.set("hl.ocr.maxPassages", "8192");
-        solrQuery.set("hl.ocr.trackPages", "on");
-        solrQuery.set("hl.ocr.limitBlock","page");
-        solrQuery.set("hl.ocr.absoluteHighlights", "true");
+        // Retrieve highlighting parameters from config
+        String[] highlightingParameters = configurationService
+            .getArrayProperty("iiif.search.query.highlighting.parameters");
+        if (highlightingParameters != null) {
+            for (String parameterValue : highlightingParameters) {
+                String parameter = parameterValue.substring(0, parameterValue.indexOf('=')).trim();
+                String value = parameterValue.substring(parameterValue.indexOf('=') + 1).trim();
+                solrQuery.set(parameter, value);
+            }
+        }
 
         return solrQuery;
     }
