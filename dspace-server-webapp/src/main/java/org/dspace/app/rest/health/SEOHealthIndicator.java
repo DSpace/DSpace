@@ -24,7 +24,16 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
 
     ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = createRestTemplate();
+
+    private static RestTemplate createRestTemplate() {
+        RestTemplate template = new RestTemplate();
+        template.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().set("User-Agent", "DSpace Backend SEO Health Check");
+            return execution.execute(request, body);
+        });
+        return template;
+    }
 
     @Override
     protected void doHealthCheck(Health.Builder builder) {
