@@ -147,6 +147,34 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     int searchNonMembersCount(Context context, String query, Group excludeGroup) throws SQLException;
 
     /**
+     * Find the EPersons that match the search query which are currently members of the given Group.  The search
+     * query is run against firstname, lastname or email.
+     *
+     * @param context      DSpace context
+     * @param query        The search string
+     * @param includeGroup Group to include results from. Members of this group will be returned only.
+     * @param offset       Inclusive offset (the position of the first result to return)
+     * @param limit        Maximum number of matches returned
+     * @return List of matching EPerson objects
+     * @throws SQLException if error
+     */
+    List<EPerson> searchMembers(Context context, String query, Group includeGroup,
+                                   int offset, int limit) throws SQLException;
+
+    /**
+     * Returns the total number of EPersons that match the search query which are currently members of the given
+     * Group. The search query is run against firstname, lastname or email. Can be used with searchMembers() to
+     * support pagination
+     *
+     * @param context      DSpace context
+     * @param query        The search string
+     * @param includeGroup Group to include results from. Members of this group will be returned only.
+     * @return List of matching EPerson objects
+     * @throws SQLException if error
+     */
+    int searchMembersCount(Context context, String query, Group includeGroup) throws SQLException;
+
+    /**
      * Find all the {@code EPerson}s in a specific order by field.
      * The sortable fields are:
      * <ul>
