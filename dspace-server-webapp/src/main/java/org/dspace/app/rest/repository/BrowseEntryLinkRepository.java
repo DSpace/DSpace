@@ -65,7 +65,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         }
 
 
-        Context context = obtainContext();
+        Context context = obtainReadOnlyContext();
         BrowseEngine be = new BrowseEngine(context);
         BrowserScope bs = new BrowserScope(context);
 
