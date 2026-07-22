@@ -13,6 +13,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +64,24 @@ public class PdfGeneratorTest {
         try (PDDocument document = pdfGenerator.generate(html)) {
             assertNotNull("Generated PDDocument should not be null", document);
             assertEquals("Generated PDF should have 1 page", 1, document.getNumberOfPages());
+        }
+    }
+
+    @Test
+    public void testParseTemplateToPathAndGenerateFromPath() throws IOException {
+        Path htmlFile = Files.createTempFile("pdf-generator-test-", ".html");
+        try {
+            Path result = pdfGenerator.parseTemplate("dspace_coverpage", variables, htmlFile);
+            assertEquals("Returned path should match output file", htmlFile, result);
+            assertTrue("HTML file should exist", Files.exists(htmlFile));
+            assertTrue("HTML file should not be empty", Files.size(htmlFile) > 0);
+
+            try (PDDocument document = pdfGenerator.generate(htmlFile)) {
+                assertNotNull("Generated PDDocument should not be null", document);
+                assertEquals("Generated PDF should have 1 page", 1, document.getNumberOfPages());
+            }
+        } finally {
+            Files.deleteIfExists(htmlFile);
         }
     }
 
