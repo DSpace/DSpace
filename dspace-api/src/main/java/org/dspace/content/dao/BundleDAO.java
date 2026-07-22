@@ -24,4 +24,21 @@ public interface BundleDAO extends DSpaceObjectLegacySupportDAO<Bundle> {
     int countRows(Context context) throws SQLException;
 
     int countBitstreams(Context context, Bundle bundle) throws SQLException;
+
+    /**
+     * Acquires a pessimistic write lock on the given bundle row and refreshes the entity from the
+     * database.
+     *
+     * <p>The refresh ensures that any stale in-memory state (e.g. a lazy-loaded bitstream
+     * collection that was initialised before a concurrent transaction committed its changes) is
+     * discarded and replaced with the current database state.  The {@code PESSIMISTIC_WRITE} lock
+     * prevents any other transaction from acquiring a conflicting lock on the same bundle row until
+     * the current transaction commits, which serialises all add / remove / reorder operations on
+     * the same bundle.</p>
+     *
+     * @param context the DSpace context (and thus the Hibernate session) to use
+     * @param bundle  the bundle to lock
+     * @throws SQLException if the database operation fails
+     */
+    void lockForWrite(Context context, Bundle bundle) throws SQLException;
 }
