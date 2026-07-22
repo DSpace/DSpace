@@ -132,7 +132,22 @@ public class DiscoverQueryBuilder implements InitializingBean {
         );
 
         addDiscoveryHitHighlightFields(discoveryConfiguration, queryArgs);
+        addDiscoverySpellcheckFields(discoveryConfiguration, query, queryArgs);
         return queryArgs;
+    }
+
+    private void addDiscoverySpellcheckFields(DiscoveryConfiguration discoveryConfiguration,
+                                              String query, DiscoverQuery queryArgs) {
+        if (!discoveryConfiguration.isSpellCheckEnabled() || StringUtils.isBlank(query)) {
+            return;
+        }
+
+        queryArgs.setSpellCheck(true);
+
+        queryArgs.addProperty("spellcheck.q", query);
+        queryArgs.addProperty("spellcheck.count", String.valueOf(discoveryConfiguration.getSpellcheckCount()));
+        queryArgs.addProperty("spellcheck.collate", "true");
+        queryArgs.addProperty("spellcheck.extendedResults", "true");
     }
 
     private void addDiscoveryHitHighlightFields(DiscoveryConfiguration discoveryConfiguration,

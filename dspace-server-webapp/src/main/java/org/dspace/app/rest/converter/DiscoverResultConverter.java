@@ -63,9 +63,15 @@ public class DiscoverResultConverter {
 
         addFacetValues(context, searchResult, resultsRest, configuration, projection);
 
+        addSpellCheckValue(searchResult, resultsRest);
+
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
         return resultsRest;
+    }
+
+    private void addSpellCheckValue(DiscoverResult searchResult, SearchResultsRest resultsRest) {
+        resultsRest.setSpellCheckSuggestions(searchResult.getSpellCheckSuggestions());
     }
 
     private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
