@@ -28,6 +28,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -124,7 +125,7 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest domain object
      */
     private void populateManifest(Item item, Context context) {
-        String manifestId = getManifestId(item.getID());
+        String manifestId = IIIFSharedUtils.getManifestId(item.getID());
         manifestGenerator.setIdentifier(manifestId);
         manifestGenerator.setLabel(item.getName());
         setLogoContainer();
@@ -158,6 +159,7 @@ public class ManifestService extends AbstractResourceService {
         if (guessCanvasDimension) {
             canvasService.guessCanvasDimensions(context, bundles);
         }
+        int index = 1;
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
@@ -166,9 +168,10 @@ public class ManifestService extends AbstractResourceService {
             }
             for (Bitstream bitstream : utils.getIIIFBitstreams(context, bnd)) {
                 // Add the Canvas to the Sequence.
-                CanvasGenerator canvas = sequenceService.addCanvas(context, item, bnd, bitstream);
+                CanvasGenerator canvas = sequenceService.addCanvas(context, item, bnd, bitstream, index);
                 // Update the Ranges.
                 rangeService.updateRanges(bitstream, bundleToCPrefix, canvas);
+                index++;
             }
         }
         // If Ranges were created, add them to manifest.
