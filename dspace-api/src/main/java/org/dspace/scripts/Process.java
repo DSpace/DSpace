@@ -8,7 +8,6 @@
 package org.dspace.scripts;
 
 import java.time.Instant;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +89,7 @@ public class Process implements ReloadableEntity<Integer> {
 
     @Column(name = "creation_time", nullable = false)
     private Instant creationTime;
+
     @Column(name = "heartbeat")
     private Instant heartbeat;
 
