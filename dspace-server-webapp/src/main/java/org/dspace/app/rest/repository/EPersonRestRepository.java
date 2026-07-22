@@ -24,6 +24,7 @@ import org.dspace.app.rest.EPersonRegistrationRestController;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.DSpaceConflictException;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
 import org.dspace.app.rest.exception.PasswordNotValidException;
 import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
@@ -128,6 +129,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         EPerson eperson = null;
         try {
             eperson = es.create(context);
+            if (es.findByEmail(context, epersonRest.getEmail()) != null) {
+                throw new DSpaceConflictException("email already exists");
+            }
 
             // this should be probably moved to the converter (a merge method?)
             eperson.setCanLogIn(epersonRest.isCanLogIn());
