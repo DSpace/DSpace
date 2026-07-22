@@ -31,7 +31,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * See the <code>AuthenticationMethod</code> interface for more details.
  * <p>
  * The <em>username</em> is the E-Person's email address,
- * and and the <em>password</em> (given to the <code>authenticate()</code>
+ * and the <em>password</em> (given to the <code>authenticate()</code>
  * method) must match the EPerson password.
  * <p>
  * This is the default method for a new DSpace configuration.
@@ -66,6 +66,7 @@ public class PasswordAuthentication
      * <p>
      * Example - aber.ac.uk domain : @aber.ac.uk
      * Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
+     * Example - MIT domain and NOT example.org: @mit.edu, !example.org
      *
      * @param email email
      * @throws SQLException if database error
@@ -78,7 +79,7 @@ public class PasswordAuthentication
         // Is there anything set in domain.valid?
         String[] domains = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getArrayProperty("authentication-password.domain.valid");
-        if ((domains == null) || (domains.length == 0)) {
+        if (domains == null || domains.length == 0) {
             // No conditions set, so must be able to self register
             return true;
         } else {
@@ -87,7 +88,7 @@ public class PasswordAuthentication
             email = email.trim().toLowerCase();
             for (int i = 0; i < domains.length; i++) {
                 check = domains[i].trim().toLowerCase();
-                if (email.endsWith(check)) {
+                if (email.endsWith(check) || (check.startsWith("!") && !email.endsWith(check.substring(1)))) {
                     // A match, so we can register this user
                     return true;
                 }
