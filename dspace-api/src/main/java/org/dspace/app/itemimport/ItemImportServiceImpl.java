@@ -335,9 +335,758 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
     }
 
+    @Override
+    public void addItemsFromZip(Context c, List<Collection> mycollections,
+                                Path zipFile, String mapFile, boolean template) throws Exception {
+        try (java.nio.file.FileSystem zipFs = java.nio.file.FileSystems.newFileSystem(zipFile)) {
+            Path root = zipFs.getPath("/");
+
+            // Find the SAF root: if the ZIP has a single top-level directory, use that
+            Path safRoot = root;
+            List<Path> topLevel;
+            try (java.util.stream.Stream<Path> stream = java.nio.file.Files.list(root)) {
+                topLevel = stream.collect(java.util.stream.Collectors.toList());
+            }
+            if (topLevel.size() == 1 && java.nio.file.Files.isDirectory(topLevel.get(0))) {
+                safRoot = topLevel.get(0);
+            }
+
+            addItemsFromPath(c, mycollections, safRoot, mapFile, template);
+        }
+    }
+
+    /**
+     * Add items from a Path-based source directory. Works with both regular filesystem
+     * paths and NIO ZIP filesystem paths, allowing direct import from ZIP files.
+     *
+     * @param c             DSpace context
+     * @param mycollections list of collections
+     * @param sourceDir     source directory as a Path (may be inside a ZIP filesystem)
+     * @param mapFile       map file path (on the regular filesystem)
+     * @param template      whether to use template item
+     * @throws Exception if error
+     */
+    protected void addItemsFromPath(Context c, List<Collection> mycollections,
+                                    Path sourceDir, String mapFile, boolean template) throws Exception {
+        File outFile = null;
+        PrintWriter mapOut = null;
+
+        try {
+            Map<String, String> skipItems = new HashMap<>();
+            itemFolderMap = new HashMap<>();
+
+            logDebug("Adding items from path: " + sourceDir);
+            logDebug("Generating mapfile: " + mapFile);
+
+            boolean directoryFileCollections = false;
+            if (mycollections == null) {
+                directoryFileCollections = true;
+            }
+
+            if (!isTest) {
+                if (isResume) {
+                    skipItems = readMapFile(mapFile);
+                }
+                outFile = new File(mapFile);
+                mapOut = new PrintWriter(new FileWriter(outFile, isResume));
+            }
+
+            if (!java.nio.file.Files.isDirectory(sourceDir)) {
+                throw new Exception("Error, cannot open source directory " + sourceDir);
+            }
+
+            // List subdirectories and sort them
+            List<String> dircontents;
+            try (java.util.stream.Stream<Path> stream = java.nio.file.Files.list(sourceDir)) {
+                dircontents = stream
+                    .filter(java.nio.file.Files::isDirectory)
+                    .map(p -> p.getFileName().toString())
+                    .sorted(ComparatorUtils.naturalComparator())
+                    .collect(java.util.stream.Collectors.toList());
+            }
+
+            for (int i = 0; i < dircontents.size(); i++) {
+                String dirname = dircontents.get(i);
+                if (skipItems.containsKey(dirname)) {
+                    logInfo("Skipping import of " + dirname);
+                    String skippedHandle = skipItems.get(dirname);
+                    Item skippedItem = (Item) handleService.resolveToObject(c, skippedHandle);
+                    itemFolderMap.put(dirname, skippedItem);
+                } else {
+                    List<Collection> clist;
+                    if (directoryFileCollections) {
+                        Path itemPath = sourceDir.resolve(dirname);
+                        try {
+                            List<Collection> cols = processCollectionFileFromPath(c, itemPath, "collections");
+                            if (cols == null) {
+                                logError("No collections specified for item " + dirname + ". Skipping.");
+                                continue;
+                            }
+                            clist = cols;
+                        } catch (IllegalArgumentException e) {
+                            logError(e.getMessage() + " Skipping.");
+                            continue;
+                        }
+                    } else {
+                        clist = mycollections;
+                    }
+
+                    Item item = addItemFromPath(c, clist, sourceDir, dirname, mapOut, template);
+                    itemFolderMap.put(dirname, item);
+                    c.uncacheEntity(item);
+                    logInfo(i + " " + dirname);
+                }
+            }
+
+            // link relationships
+            addRelationshipsFromPath(c, sourceDir);
+
+        } finally {
+            if (mapOut != null) {
+                mapOut.flush();
+                mapOut.close();
+            }
+        }
+    }
+
+    /**
+     * Add a single item from a Path-based source directory.
+     *
+     * @param c             DSpace context
+     * @param mycollections list of collections
+     * @param sourceDir     parent source directory
+     * @param itemname      name of item subdirectory
+     * @param mapOut        map file writer
+     * @param template      whether to use template item
+     * @return the created Item
+     * @throws Exception if error
+     */
+    protected Item addItemFromPath(Context c, List<Collection> mycollections, Path sourceDir,
+                                   String itemname, PrintWriter mapOut, boolean template) throws Exception {
+        String mapOutputString = null;
+
+        logDebug("adding item from directory " + itemname);
+
+        Item myitem = null;
+        WorkspaceItem wi = null;
+        WorkflowItem wfi = null;
+
+        if (!isTest) {
+            wi = workspaceItemService.create(c, mycollections.iterator().next(), template);
+            myitem = wi.getItem();
+        }
+
+        // Normalize and validate path to prevent traversal
+        Path itemDir = sourceDir.resolve(itemname).normalize();
+        if (!itemDir.startsWith(sourceDir.normalize())) {
+            throw new IOException("Illegal item metadata path: '" + itemDir + "'");
+        }
+
+        loadMetadataFromPath(c, myitem, itemDir);
+
+        List<String> options = processContentsFileFromPath(c, myitem, itemDir, "contents");
+
+        if (useWorkflow) {
+            if (!isTest) {
+                if (useWorkflowSendEmail) {
+                    wfi = workflowService.start(c, wi);
+                } else {
+                    wfi = workflowService.startWithoutNotify(c, wi);
+                }
+                mapOutputString = itemname + " " + myitem.getID();
+            }
+        } else {
+            String myhandle = processHandleFileFromPath(c, myitem, itemDir, "handle");
+
+            if (!isTest) {
+                try {
+                    String provenance = installItemService.getSubmittedByProvenanceMessage(c, wi.getItem());
+                    itemService.addMetadata(c, wi.getItem(), MetadataSchemaEnum.DC.getName(),
+                        "description", "provenance", "en", provenance);
+                    installItemService.installItem(c, wi, myhandle);
+                } catch (Exception e) {
+                    workspaceItemService.deleteAll(c, wi);
+                    logError("Exception after install item, try to revert...", e);
+                    throw e;
+                }
+
+                myhandle = handleService.findHandle(c, myitem);
+                mapOutputString = itemname + " " + myhandle;
+            }
+
+            if (options.size() > 0) {
+                logInfo("Processing options");
+                processOptions(c, myitem, options);
+            }
+        }
+
+        if (mycollections.size() > 1) {
+            for (int i = 1; i < mycollections.size(); i++) {
+                if (!isTest) {
+                    collectionService.addItem(c, mycollections.get(i), myitem);
+                }
+            }
+        }
+
+        if (mapOut != null) {
+            mapOut.println(mapOutputString);
+        }
+
+        c.uncacheEntity(wi);
+        c.uncacheEntity(wfi);
+
+        return myitem;
+    }
+
+    /**
+     * Load all metadata schemas from a Path-based item directory.
+     *
+     * @param c       DSpace context
+     * @param myitem  the item
+     * @param itemDir the item directory path (may be inside a ZIP filesystem)
+     * @throws Exception if error
+     */
+    protected void loadMetadataFromPath(Context c, Item myitem, Path itemDir)
+        throws Exception {
+        loadDublinCoreFromPath(c, myitem, itemDir.resolve("dublin_core.xml"));
+
+        // Load additional metadata schemas
+        try (java.util.stream.Stream<Path> stream = java.nio.file.Files.list(itemDir)) {
+            List<Path> metadataFiles = stream
+                .filter(p -> LocalSchemaFilenameFilter.PATTERN.matcher(
+                    p.getFileName().toString()).matches())
+                .collect(java.util.stream.Collectors.toList());
+            for (Path metadataFile : metadataFiles) {
+                loadDublinCoreFromPath(c, myitem, metadataFile);
+            }
+        }
+    }
+
+    /**
+     * Load metadata from a single XML file given as a Path.
+     *
+     * @param c        DSpace context
+     * @param myitem   the item
+     * @param xmlFile  path to the metadata XML file
+     * @throws Exception if error
+     */
+    protected void loadDublinCoreFromPath(Context c, Item myitem, Path xmlFile)
+        throws Exception {
+        Document document;
+        try (InputStream is = java.nio.file.Files.newInputStream(xmlFile)) {
+            DocumentBuilder docBuilder = XMLUtils.getDocumentBuilder();
+            document = docBuilder.parse(is);
+        }
+
+        String schema;
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList metadata = (NodeList) xPath.compile("/dublin_core").evaluate(document, XPathConstants.NODESET);
+        Node schemaAttr = metadata.item(0).getAttributes().getNamedItem("schema");
+        if (schemaAttr == null) {
+            schema = MetadataSchemaEnum.DC.getName();
+        } else {
+            schema = schemaAttr.getNodeValue();
+        }
+
+        NodeList dcNodes = (NodeList) xPath.compile("/dublin_core/dcvalue").evaluate(document, XPathConstants.NODESET);
+
+        if (!isQuiet) {
+            logInfo("\tLoading dublin core from " + xmlFile);
+        }
+
+        for (int i = 0; i < dcNodes.getLength(); i++) {
+            Node n = dcNodes.item(i);
+            addDCValue(c, myitem, schema, n);
+        }
+    }
+
+    /**
+     * Process the handle file from a Path-based item directory.
+     *
+     * @param c        DSpace context
+     * @param i        the item
+     * @param itemDir  item directory path
+     * @param filename handle filename
+     * @return the handle string or null
+     */
+    protected String processHandleFileFromPath(Context c, Item i, Path itemDir, String filename) {
+        Path file = itemDir.resolve(filename);
+        String result = null;
+
+        logInfo("Processing handle file: " + filename);
+        if (java.nio.file.Files.exists(file)) {
+            try (BufferedReader reader = java.nio.file.Files.newBufferedReader(file)) {
+                result = reader.readLine();
+                logInfo("read handle: '" + result + "'");
+            } catch (IOException e) {
+                logWarn("It appears there is no handle file -- generating one");
+            }
+        } else {
+            logWarn("It appears there is no handle file -- generating one");
+        }
+
+        return result;
+    }
+
+    /**
+     * Process the collections file from a Path-based item directory.
+     *
+     * @param c        DSpace context
+     * @param itemDir  item directory path
+     * @param filename collections filename
+     * @return list of collections or null
+     * @throws IOException  if IO error
+     * @throws SQLException if database error
+     */
+    protected List<Collection> processCollectionFileFromPath(Context c, Path itemDir, String filename)
+        throws IOException, SQLException {
+        Path file = itemDir.resolve(filename);
+        ArrayList<Collection> collections = new ArrayList<>();
+        List<Collection> result = null;
+        logInfo("Processing collections file: " + filename);
+
+        if (java.nio.file.Files.exists(file)) {
+            try (BufferedReader br = java.nio.file.Files.newBufferedReader(file)) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    DSpaceObject obj = null;
+                    if (line.indexOf('/') != -1) {
+                        obj = handleService.resolveToObject(c, line);
+                        if (obj == null || obj.getType() != Constants.COLLECTION) {
+                            obj = null;
+                        }
+                    } else {
+                        obj = collectionService.find(c, UUID.fromString(line));
+                    }
+
+                    if (obj == null) {
+                        throw new IllegalArgumentException("Cannot resolve " + line + " to a collection.");
+                    }
+                    collections.add((Collection) obj);
+                }
+                result = collections;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Process contents file from a Path-based item directory.
+     *
+     * @param c        DSpace context
+     * @param i        the item
+     * @param itemDir  item directory path
+     * @param filename contents filename
+     * @return list of permission options
+     * @throws SQLException       if database error
+     * @throws IOException        if IO error
+     * @throws AuthorizeException if authorization error
+     */
+    protected List<String> processContentsFileFromPath(Context c, Item i, Path itemDir,
+                                                       String filename)
+        throws SQLException, IOException, AuthorizeException {
+        Path contentsFile = itemDir.resolve(filename);
+        String line = "";
+        List<String> options = new ArrayList<>();
+
+        logInfo("\tProcessing contents file: " + contentsFile);
+
+        if (java.nio.file.Files.exists(contentsFile)) {
+            try (BufferedReader reader = java.nio.file.Files.newBufferedReader(contentsFile)) {
+                while ((line = reader.readLine()) != null) {
+                    if ("".equals(line.trim())) {
+                        continue;
+                    }
+
+                    if (line.trim().startsWith("-r ")) {
+                        // Registered bitstream line
+                        String sRegistrationLine = line.trim();
+                        int iAssetstore = -1;
+                        String sFilePath = null;
+                        String sBundle = null;
+                        StringTokenizer tokenizer = new StringTokenizer(sRegistrationLine);
+                        while (tokenizer.hasMoreTokens()) {
+                            String sToken = tokenizer.nextToken();
+                            if ("-r".equals(sToken)) {
+                                continue;
+                            } else if ("-s".equals(sToken) && tokenizer.hasMoreTokens()) {
+                                try {
+                                    iAssetstore = Integer.parseInt(tokenizer.nextToken());
+                                } catch (NumberFormatException e) {
+                                    // ignore
+                                }
+                            } else if ("-f".equals(sToken) && tokenizer.hasMoreTokens()) {
+                                sFilePath = tokenizer.nextToken();
+                            } else if (sToken.startsWith("bundle:")) {
+                                sBundle = sToken.substring(7);
+                            }
+                        }
+                        if (iAssetstore == -1 || sFilePath == null) {
+                            logError("\tERROR: invalid contents file line");
+                            logInfo("\t\tSkipping line: " + sRegistrationLine);
+                            continue;
+                        }
+
+                        String descriptionMarker = "\tdescription:";
+                        int dMarkerIndex = line.indexOf(descriptionMarker);
+                        int dEndIndex = 0;
+                        boolean descriptionExists = false;
+                        if (dMarkerIndex > 0) {
+                            dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
+                            if (dEndIndex == -1) {
+                                dEndIndex = line.length();
+                            }
+                            descriptionExists = true;
+                        }
+                        String sDescription = "";
+                        if (descriptionExists) {
+                            sDescription = line.substring(dMarkerIndex, dEndIndex);
+                            sDescription = sDescription.replaceFirst("description:", "");
+                        }
+
+                        // For registered bitstreams, validate against the item directory
+                        validateFilePathInPath(itemDir, sFilePath);
+                        registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
+                        logInfo("\tRegistering Bitstream: " + sFilePath
+                            + "\tAssetstore: " + iAssetstore
+                            + "\tBundle: " + sBundle
+                            + "\tDescription: " + sDescription);
+                        continue;
+                    }
+
+                    int bitstreamEndIndex = line.indexOf('\t');
+
+                    if (bitstreamEndIndex == -1) {
+                        processContentFileEntryFromPath(c, i, itemDir, line, null, false);
+                        logInfo("\tBitstream: " + line);
+                    } else {
+                        String bitstreamName = line.substring(0, bitstreamEndIndex);
+
+                        boolean bundleExists = false;
+                        boolean permissionsExist = false;
+                        boolean descriptionExists = false;
+                        boolean labelExists = false;
+                        boolean heightExists = false;
+                        boolean widthExists = false;
+                        boolean tocExists = false;
+
+                        String labelMarker = "\tiiif-label";
+                        int lMarkerIndex = line.indexOf(labelMarker);
+                        int lEndIndex = 0;
+                        if (lMarkerIndex > 0) {
+                            lEndIndex = line.indexOf("\t", lMarkerIndex + 1);
+                            if (lEndIndex == -1) {
+                                lEndIndex = line.length();
+                            }
+                            labelExists = true;
+                        }
+
+                        String heightMarker = "\tiiif-height";
+                        int hMarkerIndex = line.indexOf(heightMarker);
+                        int hEndIndex = 0;
+                        if (hMarkerIndex > 0) {
+                            hEndIndex = line.indexOf("\t", hMarkerIndex + 1);
+                            if (hEndIndex == -1) {
+                                hEndIndex = line.length();
+                            }
+                            heightExists = true;
+                        }
+
+                        String widthMarker = "\tiiif-width";
+                        int wMarkerIndex = line.indexOf(widthMarker);
+                        int wEndIndex = 0;
+                        if (wMarkerIndex > 0) {
+                            wEndIndex = line.indexOf("\t", wMarkerIndex + 1);
+                            if (wEndIndex == -1) {
+                                wEndIndex = line.length();
+                            }
+                            widthExists = true;
+                        }
+
+                        String tocMarker = "\tiiif-toc";
+                        int tMarkerIndex = line.indexOf(tocMarker);
+                        int tEndIndex = 0;
+                        if (tMarkerIndex > 0) {
+                            tEndIndex = line.indexOf("\t", tMarkerIndex + 1);
+                            if (tEndIndex == -1) {
+                                tEndIndex = line.length();
+                            }
+                            tocExists = true;
+                        }
+
+                        String bundleMarker = "\tbundle:";
+                        int bMarkerIndex = line.indexOf(bundleMarker);
+                        int bEndIndex = 0;
+                        if (bMarkerIndex > 0) {
+                            bEndIndex = line.indexOf("\t", bMarkerIndex + 1);
+                            if (bEndIndex == -1) {
+                                bEndIndex = line.length();
+                            }
+                            bundleExists = true;
+                        }
+
+                        String permissionsMarker = "\tpermissions:";
+                        int pMarkerIndex = line.indexOf(permissionsMarker);
+                        int pEndIndex = 0;
+                        if (pMarkerIndex > 0) {
+                            pEndIndex = line.indexOf("\t", pMarkerIndex + 1);
+                            if (pEndIndex == -1) {
+                                pEndIndex = line.length();
+                            }
+                            permissionsExist = true;
+                        }
+
+                        String descriptionMarker = "\tdescription:";
+                        int dMarkerIndex = line.indexOf(descriptionMarker);
+                        int dEndIndex = 0;
+                        if (dMarkerIndex > 0) {
+                            dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
+                            if (dEndIndex == -1) {
+                                dEndIndex = line.length();
+                            }
+                            descriptionExists = true;
+                        }
+
+                        String primaryBitstreamMarker = "\tprimary:true";
+                        boolean primary = false;
+                        String primaryStr = "";
+                        if (line.contains(primaryBitstreamMarker)) {
+                            primary = true;
+                            primaryStr = "\t **Setting as primary bitstream**";
+                        }
+
+                        if (bundleExists) {
+                            String bundleName = line.substring(bMarkerIndex
+                                + bundleMarker.length(), bEndIndex).trim();
+                            processContentFileEntryFromPath(c, i, itemDir, bitstreamName, bundleName, primary);
+                            logInfo("\tBitstream: " + bitstreamName
+                                + "\tBundle: " + bundleName + primaryStr);
+                        } else {
+                            processContentFileEntryFromPath(c, i, itemDir, bitstreamName, null, primary);
+                            logInfo("\tBitstream: " + bitstreamName + primaryStr);
+                        }
+
+                        if (permissionsExist || descriptionExists || labelExists || heightExists
+                            || widthExists || tocExists) {
+                            logInfo("Gathering options.");
+                            String extraInfo = bitstreamName;
+                            if (permissionsExist) {
+                                extraInfo = extraInfo + line.substring(pMarkerIndex, pEndIndex);
+                            }
+                            if (descriptionExists) {
+                                extraInfo = extraInfo + line.substring(dMarkerIndex, dEndIndex);
+                            }
+                            if (labelExists) {
+                                extraInfo = extraInfo + line.substring(lMarkerIndex, lEndIndex);
+                            }
+                            if (heightExists) {
+                                extraInfo = extraInfo + line.substring(hMarkerIndex, hEndIndex);
+                            }
+                            if (widthExists) {
+                                extraInfo = extraInfo + line.substring(wMarkerIndex, wEndIndex);
+                            }
+                            if (tocExists) {
+                                extraInfo = extraInfo + line.substring(tMarkerIndex, tEndIndex);
+                            }
+                            options.add(extraInfo);
+                        }
+                    }
+                }
+            }
+        } else {
+            // No contents file — verify only metadata files exist
+            try (java.util.stream.Stream<Path> stream = java.nio.file.Files.list(itemDir)) {
+                List<Path> entries = stream.collect(java.util.stream.Collectors.toList());
+                for (Path entry : entries) {
+                    String name = entry.getFileName().toString();
+                    if (!"dublin_core.xml".equals(name) && !"handle".equals(name)
+                        && !LocalSchemaFilenameFilter.PATTERN.matcher(name).matches()
+                        && !"collections".equals(name) && !"relationships".equals(name)) {
+                        throw new FileNotFoundException("No contents file found");
+                    }
+                }
+            }
+            logInfo("No contents file found - but only metadata files found. Assuming metadata only.");
+        }
+
+        return options;
+    }
+
+    /**
+     * Process a bitstream entry from a Path-based item directory.
+     *
+     * @param c          DSpace context
+     * @param i          the item
+     * @param itemDir    item directory path
+     * @param fileName   bitstream filename
+     * @param bundleName bundle name
+     * @param primary    whether this is the primary bitstream
+     * @throws SQLException       if database error
+     * @throws IOException        if IO error
+     * @throws AuthorizeException if authorization error
+     */
+    protected void processContentFileEntryFromPath(Context c, Item i, Path itemDir,
+                                                   String fileName, String bundleName,
+                                                   boolean primary)
+        throws SQLException, IOException, AuthorizeException {
+        if (isExcludeContent) {
+            return;
+        }
+
+        validateFilePathInPath(itemDir, fileName);
+        Path bitstreamPath = itemDir.resolve(fileName);
+
+        BufferedInputStream bis = new BufferedInputStream(java.nio.file.Files.newInputStream(bitstreamPath));
+
+        Bitstream bs = null;
+        String newBundleName = bundleName;
+
+        if (bundleName == null) {
+            if (Constants.LICENSE_BITSTREAM_NAME.equals(fileName)) {
+                newBundleName = Constants.LICENSE_BUNDLE_NAME;
+            } else {
+                newBundleName = Constants.CONTENT_BUNDLE_NAME;
+            }
+        }
+
+        if (!isTest) {
+            List<Bundle> bundles = itemService.getBundles(i, newBundleName);
+            Bundle targetBundle = null;
+
+            if (bundles.size() < 1) {
+                targetBundle = bundleService.create(c, i, newBundleName);
+            } else {
+                targetBundle = bundles.iterator().next();
+            }
+
+            bs = bitstreamService.create(c, targetBundle, bis);
+            bs.setName(c, fileName);
+
+            BitstreamFormat bf = bitstreamFormatService.guessFormat(c, bs);
+            bitstreamService.setFormat(c, bs, bf);
+
+            if (primary) {
+                targetBundle.setPrimaryBitstreamID(bs);
+                bundleService.update(c, targetBundle);
+            }
+
+            bitstreamService.update(c, bs);
+        }
+
+        bis.close();
+    }
+
+    /**
+     * Validate that a file path does not escape the item directory (Path-based version).
+     *
+     * @param itemDir  the item directory
+     * @param fileName the filename to validate
+     * @throws IOException if path traversal is detected
+     */
+    private void validateFilePathInPath(Path itemDir, String fileName) throws IOException {
+        Path resolved = itemDir.resolve(fileName).normalize();
+        if (!resolved.startsWith(itemDir.normalize())) {
+            log.error("File path outside of item directory requested: {} does not begin with {}",
+                resolved, itemDir);
+            throw new IOException("Illegal file path '" + fileName + "' encountered. This references a path "
+                + "outside of the import package. Please see the system logs for more details.");
+        }
+    }
+
+    /**
+     * Process the relationship file from a Path-based item directory.
+     *
+     * @param itemDir  item directory path
+     * @param filename relationship filename
+     * @return map of relationship types to item identifiers
+     * @throws Exception if error
+     */
+    protected Map<String, List<String>> processRelationshipFileFromPath(Path itemDir, String filename)
+        throws Exception {
+        Path file = itemDir.resolve(filename);
+        Map<String, List<String>> result = new HashMap<>();
+
+        if (java.nio.file.Files.exists(file)) {
+            logInfo("\tProcessing relationships file: " + filename);
+            try (BufferedReader br = java.nio.file.Files.newBufferedReader(file)) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    if ("".equals(line)) {
+                        continue;
+                    }
+
+                    String relationshipType = null;
+                    String itemIdentifier = null;
+
+                    StringTokenizer st = new StringTokenizer(line);
+                    if (st.hasMoreTokens()) {
+                        relationshipType = st.nextToken();
+                        if (relationshipType.split("\\.").length > 1) {
+                            relationshipType = relationshipType.split("\\.")[1];
+                        }
+                    } else {
+                        throw new Exception("Bad mapfile line:\n" + line);
+                    }
+
+                    if (st.hasMoreTokens()) {
+                        itemIdentifier = st.nextToken("").trim();
+                    } else {
+                        throw new Exception("Bad mapfile line:\n" + line);
+                    }
+
+                    if (!result.containsKey(relationshipType)) {
+                        result.put(relationshipType, new ArrayList<>());
+                    }
+                    result.get(relationshipType).add(itemIdentifier);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Add relationships from Path-based source directory.
+     *
+     * @param c         DSpace context
+     * @param sourceDir the source directory path
+     * @throws Exception if error
+     */
+    protected void addRelationshipsFromPath(Context c, Path sourceDir) throws Exception {
+        for (Map.Entry<String, Item> itemEntry : itemFolderMap.entrySet()) {
+            String folderName = itemEntry.getKey();
+            Path itemDir = sourceDir.resolve(folderName);
+            Item item = itemEntry.getValue();
+
+            Map<String, List<String>> relationships = processRelationshipFileFromPath(itemDir, "relationships");
+            if (!relationships.isEmpty()) {
+                for (Map.Entry<String, List<String>> relEntry : relationships.entrySet()) {
+                    String relationshipType = relEntry.getKey();
+                    List<String> identifierList = relEntry.getValue();
+
+                    for (String itemIdentifier : identifierList) {
+                        if (isTest) {
+                            logInfo("\tAdding relationship (type: " + relationshipType
+                                + ") from " + folderName + " to " + itemIdentifier);
+                            continue;
+                        }
+
+                        Item relationItem = resolveRelatedItem(c, itemIdentifier);
+                        if (null == relationItem) {
+                            throw new Exception("Could not find item for " + itemIdentifier);
+                        }
+                        addRelationship(c, item, relationItem, relationshipType);
+                    }
+                }
+            }
+        }
+    }
+
      /**
       * Add relationships from a 'relationships' manifest file.
-      * 
+      *
       * @param c Context
       * @param sourceDir The parent import source directory
       * @throws Exception
@@ -2195,20 +2944,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         is.close();
                         os.close();
 
-                        sourcePath = unzip(new File(dataPath), dataDir);
-
-                        //Move files to the required folder
-                        FileUtils.moveDirectory(new File(sourcePath), new File(
-                            importDirFile + File.separator + "data_unzipped" + File.separator));
-                        FileDeleteStrategy.FORCE.delete(new File(dataDir));
-                        dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
+                        // No extraction needed — read directly from ZIP
                     } else if (theInputType.equals("safupload")) {
-                        sourcePath = unzip(new File(dataPath), dataDir);
-                        //Move files to the required folder
-                        FileUtils.moveDirectory(new File(sourcePath), new File(
-                            importDirFile + File.separator + "data_unzipped" + File.separator));
-                        FileDeleteStrategy.FORCE.delete(new File(dataDir));
-                        dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
+                        // No extraction needed — read directly from ZIP
                     }
 
                     //Create mapfile path
@@ -2225,7 +2963,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                     if (theInputType.equals("saf") || theInputType
                         .equals("safupload")) { //In case of Simple Archive Format import
-                        addItems(context, finalCollections, dataDir, mapFilePath, template);
+                        addItemsFromZip(context, finalCollections,
+                            new File(dataPath).toPath(), mapFilePath, template);
                     }
 
                     // email message letting user know the file is ready for
