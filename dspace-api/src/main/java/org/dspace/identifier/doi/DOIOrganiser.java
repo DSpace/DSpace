@@ -326,8 +326,11 @@ public class DOIOrganiser {
 
     /**
      * Process all DOIs matching the given statuses in batches.
-     * Each batch queries moves the offset by BATCH_SIZE. Each doi will be process once and the loop will stop, when all dois have been iterated (the batch is empty) or an entire batch fails
-     * (to prevent infinite loops). Unprocessable dois stay in the database and will be queried again in the next run. Admins should be notified by email or log entry about possible errors.
+     * Each batch queries moves the offset by BATCH_SIZE. Each doi will be process once
+     * and the loop will stop, when all dois have been iterated (the batch is empty)
+     * or an entire batch fails (to prevent infinite loops).
+     * Unprocessable dois stay in the database and will be queried again in the next run.
+     * Admins should be notified by email or log entry about possible errors.
      *
      * @param context     current DSpace session.
      * @param doiService  the DOI service to query.
@@ -349,9 +352,9 @@ public class DOIOrganiser {
                                            + "that could be processed for " + processName + ".");
                 }
                 firstBatch = false;
-                // many errors in doi processing are shadowed by DOIIdentifierException, that do not change database status.
-                // This forces change in batch
-                offset = offset + BATCH_SIZE; 
+                // many errors in doi processing are shadowed by DOIIdentifierException,
+                // that do not change database status. This forces change in batch
+                offset = offset + BATCH_SIZE;
                 int succeeded = 0;
                 for (DOI doi : batch) {
                     doi = context.reloadEntity(doi);
