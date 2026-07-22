@@ -48,6 +48,7 @@
     <bean class="org.dspace.content.InstallItemServiceImpl"/>
     <bean class="org.dspace.content.ItemServiceImpl"/>
     <bean class="org.dspace.content.MetadataDSpaceCsvExportServiceImpl"/>
+    <bean class="org.dspace.app.bulkedit.StreamingDSpaceCsvExporter"/>
     <bean class="org.dspace.content.MetadataFieldServiceImpl"/>
     <bean class="org.dspace.content.MetadataSchemaServiceImpl"/>
     <bean class="org.dspace.content.MetadataValueServiceImpl"/>
