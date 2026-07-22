@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -290,6 +291,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                     for (int i = 0; i < childFilePaths.length; i++) {
                         addPackageReference(dso, childFilePaths[i]);
                     }
+
+                    Map<String, List<String>> relFilePathsMap = manifest.getRelMetsFilePaths(params);
+                    for (String relType : relFilePathsMap.keySet()) {
+                        for (String relFilePath : relFilePathsMap.get(relType)) {
+                            addRelPackageReference(dso, relType, relFilePath);
+                        }
+                    }
                 }
             } //end if dso not null
 
@@ -460,11 +468,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
         crosswalkObjectDmd(context, dso, manifest, callback, manifest
             .getItemDmds(), params);
-
-        // For Items, also sanity-check the metadata for minimum requirements.
-        if (type == Constants.ITEM) {
-            PackageUtils.checkItemMetadata((Item) dso);
-        }
 
         // -- Step 5 --
         // Add all content files as bitstreams on new DSpace Object
@@ -670,11 +673,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
         crosswalkObjectDmd(context, dso, manifest, callback, manifest
             .getItemDmds(), params);
-
-        // For Items, also sanity-check the metadata for minimum requirements.
-        if (dso.getType() == Constants.ITEM) {
-            PackageUtils.checkItemMetadata((Item) dso);
-        }
 
         // -- Step 6 --
         // Finish things up!
