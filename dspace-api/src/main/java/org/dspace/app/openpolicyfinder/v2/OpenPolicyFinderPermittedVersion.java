@@ -50,6 +50,8 @@ public class OpenPolicyFinderPermittedVersion implements Serializable {
     private List<String> licenses;
     // Embargo
     private OpenPolicyFinderEmbargo embargo;
+    // Additional OA fee
+    private Boolean additionalOpenAccessFee;
 
     public String getArticleVersion() {
         return articleVersion;
@@ -97,6 +99,14 @@ public class OpenPolicyFinderPermittedVersion implements Serializable {
 
     public void setEmbargo(OpenPolicyFinderEmbargo embargo) {
         this.embargo = embargo;
+    }
+
+    public Boolean getAdditionalOpenAccessFee() {
+        return additionalOpenAccessFee;
+    }
+
+    public void setAdditionalOpenAccessFee(Boolean additionalOpenAccessFee) {
+        this.additionalOpenAccessFee = additionalOpenAccessFee;
     }
 
     public int getOption() {
