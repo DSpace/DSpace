@@ -10,18 +10,21 @@ package org.dspace.content.security;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -68,8 +71,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * <ul>
  *   <li><strong>Public Fields Configuration:</strong> {@code metadata.publicField} property
  *       defines which fields are always publicly visible. Supports wildcards (e.g., "dc.title.*")</li>
- *   <li><strong>Hidden Fields:</strong> Uses {@link MetadataExposureService} to check if fields
- *       are marked as hidden in the system configuration</li>
+ *   <li><strong>Hidden Fields:</strong> Honors the legacy {@code metadata.hide.*}
+ *       properties (see {@link #isFieldHidden}) to keep admin-only fields out of
+ *       non-admin responses.</li>
  *   <li><strong>Submission Definitions:</strong> When in submission context, uses DCInput
  *       definitions to determine field visibility</li>
  *   <li><strong>Security Levels Map:</strong> The {@code securityLevelsMap} maps numeric security
@@ -102,7 +106,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * </ul>
  * 
  * @see MetadataSecurityService
- * @see MetadataExposureService
  * @see AuthorizeService
  * @see DCInputsReader
  * @see MetadataSecurityEvaluation
@@ -110,6 +113,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Giamminonni (4science.it)
  */
 public class MetadataSecurityServiceImpl implements MetadataSecurityService {
+
+    private static final Logger log = LogManager.getLogger(MetadataSecurityServiceImpl.class);
 
     @Resource(name = "securityLevelsMap")
     private final Map<String, MetadataSecurityEvaluation> securityLevelsMap = new HashMap<>();
@@ -121,15 +126,24 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     private AuthorizeService authorizeService;
 
     @Autowired
-    private MetadataExposureService metadataExposureService;
-
-    @Autowired
     private RequestService requestService;
 
     @Autowired
     private ConfigurationService configurationService;
 
     private DCInputsReader dcInputsReader;
+
+    /**
+     * Cached lookup for legacy {@code metadata.hide.<schema>.<element>} entries,
+     * keyed by schema. Populated lazily on first {@link #isFieldHidden} call.
+     */
+    private Map<String, Set<String>> hiddenElementSets;
+
+    /**
+     * Cached lookup for legacy {@code metadata.hide.<schema>.<element>.<qualifier>}
+     * entries, keyed by schema then element. Populated lazily.
+     */
+    private Map<String, Map<String, Set<String>>> hiddenElementMaps;
 
     @PostConstruct
     private void setup() throws DCInputsReaderException {
@@ -141,10 +155,13 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     public <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso,
                                                                                             String schema,
                                                                    String element, String qualifier, String language) {
+        if (withdrawnFullyBlacked(context, dso)) {
+            return List.of();
+        }
         DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         List<MetadataValue> values =
             dSpaceObjectService.getMetadata(dso, schema, element, qualifier, language);
-        return getPermissionFilteredMetadata(context, dso, values);
+        return filter(context, dso, values);
     }
 
     @Override
@@ -155,10 +172,24 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     @Override
     public <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context,
                                                                                                    T dso) {
+        if (withdrawnFullyBlacked(context, dso)) {
+            return List.of();
+        }
         String language = context != null ? context.getCurrentLocale().getLanguage() : Item.ANY;
         DSpaceObjectService<T> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         List<MetadataValue> values = dSpaceObjectService.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, language);
-        return getPermissionFilteredMetadata(context, dso, values);
+        return filter(context, dso, values);
+    }
+
+    /**
+     * Withdrawn items must not disseminate any metadata to non-admins when
+     * rendered externally (REST API, OAI, RDF, CSV export, etc). This is a
+     * dissemination-level concern and intentionally NOT enforced by
+     * {@link #filter}: internal service calls such as {@code item.getName()}
+     * still need to resolve a title on withdrawn items.
+     */
+    private <T extends DSpaceObject> boolean withdrawnFullyBlacked(Context context, T dso) {
+        return (dso instanceof Item item) && item.isWithdrawn() && isNotAdmin(context, dso);
     }
 
     /**
@@ -185,12 +216,9 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      * @param metadataValues the complete list of metadata values to filter
      * @return filtered list containing only metadata values the user can access
      */
-    private <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadata(Context context, T dso,
-                                                              List<MetadataValue> metadataValues) {
-
-        if ((dso instanceof Item item) && item.isWithdrawn() && isNotAdmin(context, dso)) {
-            return List.of();
-        }
+    @Override
+    public <T extends DSpaceObject> List<MetadataValue> filter(Context context, T dso,
+                                                               List<MetadataValue> metadataValues) {
 
         Optional<List<DCInputSet>> inputs = submissionDefinitionInputs();
         if (inputs.isPresent()) {
@@ -422,11 +450,82 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
     private boolean isNotHidden(Context context, MetadataField metadataField) {
         try {
             return metadataField != null &&
-                !metadataExposureService.isHidden(context, metadataField.getMetadataSchema().getName(),
-                                                  metadataField.getElement(), metadataField.getQualifier());
+                !isFieldHidden(context, metadataField.getMetadataSchema().getName(),
+                               metadataField.getElement(), metadataField.getQualifier());
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean isFieldHidden(Context context, String schema, String element, String qualifier)
+        throws SQLException {
+        if (hiddenElementSets == null) {
+            initHiddenFieldMaps();
+        }
+
+        boolean hidden;
+        if (qualifier == null) {
+            Set<String> elts = hiddenElementSets.get(schema);
+            hidden = elts != null && elts.contains(element);
+        } else {
+            Map<String, Set<String>> elts = hiddenElementMaps.get(schema);
+            if (elts == null) {
+                return false;
+            }
+            Set<String> quals = elts.get(element);
+            hidden = quals != null && quals.contains(qualifier);
+        }
+
+        if (hidden && context != null) {
+            // Administrators always see hidden fields.
+            hidden = !authorizeService.isAdmin(context);
+        }
+        return hidden;
+    }
+
+    /**
+     * Loads the legacy {@code metadata.hide.*} configuration into the
+     * lookup maps on first use. Emits a one-time deprecation warning when
+     * any legacy keys are present so installs migrate to the equivalent
+     * {@code metadatavalue.visibility.*.settings = [2]} expression in
+     * {@code metadata-security.cfg}.
+     */
+    private synchronized void initHiddenFieldMaps() {
+        if (hiddenElementSets != null) {
+            return;
+        }
+        Map<String, Set<String>> sets = new HashMap<>();
+        Map<String, Map<String, Set<String>>> maps = new HashMap<>();
+        boolean legacyKeysFound = false;
+        for (String key : configurationService.getPropertyKeys()) {
+            if (!key.startsWith(LEGACY_HIDE_PREFIX)) {
+                continue;
+            }
+            if (!configurationService.getBooleanProperty(key, true)) {
+                continue;
+            }
+            legacyKeysFound = true;
+            String mdField = key.substring(LEGACY_HIDE_PREFIX.length());
+            String[] segment = mdField.split("\\.", 3);
+            if (segment.length == 3) {
+                maps.computeIfAbsent(segment[0], k -> new HashMap<>())
+                    .computeIfAbsent(segment[1], k -> new HashSet<>())
+                    .add(segment[2]);
+            } else if (segment.length == 2) {
+                sets.computeIfAbsent(segment[0], k -> new HashSet<>()).add(segment[1]);
+            } else {
+                log.warn("Bad format in hidden metadata directive, field=\"{}\", config property={}",
+                         mdField, key);
+            }
+        }
+        if (legacyKeysFound) {
+            log.warn("`{}*` configuration is deprecated; migrate these entries to "
+                     + "`metadatavalue.visibility.*.settings = [2]` in `metadata-security.cfg`.",
+                     LEGACY_HIDE_PREFIX);
+        }
+        this.hiddenElementSets = sets;
+        this.hiddenElementMaps = maps;
     }
 
     public MetadataSecurityEvaluation getMetadataSecurityEvaluator(int securityValue) {

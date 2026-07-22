@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
@@ -34,6 +35,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataFieldService;
@@ -44,7 +46,9 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
+import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -75,6 +79,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataAuthorityService metadataAuthorityService;
     @Autowired(required = true)
     protected RelationshipService relationshipService;
+    @Autowired(required = true)
+    protected MetadataSecurityService metadataSecurityService;
 
     public DSpaceObjectServiceImpl() {
 
@@ -141,8 +147,64 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         if (dso.isMetadataModified()) {
             values.sort(MetadataValueComparators.defaultComparator);
         }
-        // Create an array of matching values
-        return values;
+        return applyMetadataSecurity(dso, values);
+    }
+
+    /**
+     * Apply metadata-level permission filtering when the current thread is
+     * serving a read-only (GET/HEAD/OPTIONS) HTTP request. This is the default
+     * safety net that prevents callers from accidentally disseminating
+     * admin-only metadata at dissemination time.
+     *
+     * <p>The filter is intentionally <strong>not</strong> applied during
+     * mutating requests (POST/PUT/PATCH/DELETE): those code paths legitimately
+     * inspect admin-only metadata (provenance, person.email) to drive business
+     * logic and run inside transactions where an extra policy lookup in the
+     * middle of a flush can collide with cascade saves. Likewise, CLI/batch
+     * paths without an HTTP request and callers that have opted out via
+     * {@link Context#turnOffAuthorisationSystem} skip the filter.</p>
+     */
+    protected List<MetadataValue> applyMetadataSecurity(T dso, List<MetadataValue> values) {
+        if (!(dso instanceof Item)) {
+            return values;
+        }
+        HttpServletRequest httpRequest = currentHttpServletRequest();
+        if (httpRequest == null || !isReadOnlyHttpMethod(httpRequest.getMethod())) {
+            return values;
+        }
+        Context ctx;
+        try {
+            ctx = ContextUtil.obtainContext(httpRequest);
+        } catch (Exception e) {
+            return values;
+        }
+        if (ctx == null || ctx.ignoreAuthorization()) {
+            return values;
+        }
+        return metadataSecurityService.filter(ctx, dso, values);
+    }
+
+    /**
+     * Resolve the raw {@link HttpServletRequest} bound to the current thread,
+     * or {@code null} if this thread is not inside an HTTP request (CLI
+     * scripts, packager invocations, tests driven outside the webapp,
+     * background workers, etc). Unlike
+     * {@link ContextUtil#obtainCurrentRequestContext()} this never dereferences
+     * a null request, so it stays safe when the thread-bound {@link Request}
+     * is an internal (non-servlet) one.
+     */
+    private HttpServletRequest currentHttpServletRequest() {
+        Request currentRequest = new DSpace().getRequestService().getCurrentRequest();
+        if (currentRequest == null) {
+            return null;
+        }
+        return currentRequest.getHttpServletRequest();
+    }
+
+    private boolean isReadOnlyHttpMethod(String method) {
+        return "GET".equalsIgnoreCase(method)
+            || "HEAD".equalsIgnoreCase(method)
+            || "OPTIONS".equalsIgnoreCase(method);
     }
 
     @Override
