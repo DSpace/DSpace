@@ -88,4 +88,6 @@ public interface IndexingService {
     void atomicUpdate(Context context, String uniqueIndexId, String field, Map<String,Object> fieldModifier)
             throws SolrServerException, IOException;
 
+    void cleanIndex(DSpaceRunnableHandler handler) throws IOException, SQLException, SearchServiceException;
+
 }
