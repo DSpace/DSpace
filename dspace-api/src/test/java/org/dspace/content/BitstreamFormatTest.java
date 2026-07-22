@@ -31,6 +31,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -549,5 +551,40 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         assertThat("setExtensions 6", bf.getExtensions(), notNullValue());
         assertTrue("setExtensions 7", bf.getExtensions().size() == 0);
         bf.setExtensions(backupExtensions);
+    }
+
+    /**
+     * Test of isUploadAllowed method, of class BitstreamFormat.
+     */
+    @Test
+    public void testIsUploadAllowed() throws SQLException {
+        ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+        BitstreamFormat known = bitstreamFormatService.findByShortDescription(context, "Adobe PDF");
+        assertThat("Adobe PDF should have KNOWN support level",
+                   known.getSupportLevel(), equalTo(BitstreamFormat.KNOWN));
+
+        try {
+            // Whitelist disabled (default): everything is allowed, including Unknown and null.
+            configurationService.setProperty("bitstream.format.upload.whitelist.enabled", null);
+            assertTrue("disabled: known allowed", bitstreamFormatService.isUploadAllowed(known));
+            assertTrue("disabled: unknown allowed", bitstreamFormatService.isUploadAllowed(bunknown));
+            assertTrue("disabled: null allowed", bitstreamFormatService.isUploadAllowed(null));
+
+            // Whitelist enabled, default minimum support level (KNOWN): Unknown/null rejected.
+            configurationService.setProperty("bitstream.format.upload.whitelist.enabled", true);
+            configurationService.setProperty("bitstream.format.upload.whitelist.min-support-level", null);
+            assertTrue("enabled: known allowed", bitstreamFormatService.isUploadAllowed(known));
+            assertFalse("enabled: unknown rejected", bitstreamFormatService.isUploadAllowed(bunknown));
+            assertFalse("enabled: null rejected", bitstreamFormatService.isUploadAllowed(null));
+
+            // Stricter minimum (SUPPORTED): a KNOWN format is now rejected too.
+            configurationService.setProperty("bitstream.format.upload.whitelist.min-support-level",
+                                             BitstreamFormat.SUPPORTED);
+            assertFalse("strict: known rejected", bitstreamFormatService.isUploadAllowed(known));
+        } finally {
+            configurationService.setProperty("bitstream.format.upload.whitelist.enabled", null);
+            configurationService.setProperty("bitstream.format.upload.whitelist.min-support-level", null);
+        }
     }
 }
