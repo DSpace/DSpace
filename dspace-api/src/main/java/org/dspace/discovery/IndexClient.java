@@ -37,19 +37,30 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 
 /**
  * Class used to reindex DSpace communities/collections/items into discovery.
  */
-public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguration> {
+public class IndexClient<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private Context context;
     private IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
             .getServiceByName(IndexingService.class.getName(), IndexingService.class);
 
     private IndexClientOptions indexClientOptions;
+
+    /**
+     * Constructor for IndexClient script.
+     * This script rebuilds and updates the Solr Discovery search index.
+     * 
+     * @param scriptConfiguration The script configuration defining indexing parameters,
+     *                           target objects, and index rebuild options
+     */
+    public IndexClient(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     public void internalRun() throws Exception {
@@ -146,12 +157,6 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         }
 
         handler.logInfo("Done with indexing");
-    }
-
-    @Override
-    public IndexDiscoveryScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("index-discovery",
-                IndexDiscoveryScriptConfiguration.class);
     }
 
     public void setup() throws ParseException {

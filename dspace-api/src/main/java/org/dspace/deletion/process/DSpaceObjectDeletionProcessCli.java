@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import org.apache.commons.cli.ParseException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Extension of {@link DSpaceObjectDeletionProcess} for CLI execution.
@@ -22,6 +23,18 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
  *
  */
 public class DSpaceObjectDeletionProcessCli extends DSpaceObjectDeletionProcess {
+
+    /**
+     * Constructor for DSpaceObjectDeletionProcess script.
+     * This process permanently deletes DSpace objects (Items, Collections, Communities)
+     * and all their child objects using delegation strategies.
+     *
+     * @param scriptConfiguration The script configuration defining deletion parameters,
+     *                            target object identifiers, and safety options
+     */
+    public DSpaceObjectDeletionProcessCli(ScriptConfiguration scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     /**
      * Assigns the current user to the context based on the email parameter for CLI execution.
@@ -64,12 +77,6 @@ public class DSpaceObjectDeletionProcessCli extends DSpaceObjectDeletionProcess 
         } else {
             throw new ParseException("Required parameter -e missing!");
         }
-    }
-
-    @Override
-    public DSpaceObjectDeletionProcessScriptConfiguration<DSpaceObjectDeletionProcess> getScriptConfiguration() {
-        org.dspace.kernel.ServiceManager sm = new org.dspace.utils.DSpace().getServiceManager();
-        return sm.getServiceByName(OBJECT_DELETION_SCRIPT, DSpaceObjectDeletionProcessCliScriptConfiguration.class);
     }
 
 }

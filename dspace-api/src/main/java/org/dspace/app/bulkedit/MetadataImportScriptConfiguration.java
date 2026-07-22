@@ -15,7 +15,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link MetadataImport} script
  */
-public class MetadataImportScriptConfiguration<T extends MetadataImport> extends ScriptConfiguration<T> {
+public class MetadataImportScriptConfiguration<T extends MetadataImport<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

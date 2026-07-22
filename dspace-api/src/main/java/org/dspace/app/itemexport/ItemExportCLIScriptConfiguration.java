@@ -16,7 +16,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  * 
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemExportCLIScriptConfiguration extends ItemExportScriptConfiguration<ItemExportCLI> {
+public class ItemExportCLIScriptConfiguration<T extends ItemExport<?>> extends ItemExportScriptConfiguration<T> {
 
     @Override
     public Options getOptions() {

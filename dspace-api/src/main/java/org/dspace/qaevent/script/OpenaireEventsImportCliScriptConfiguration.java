@@ -16,7 +16,7 @@ import org.apache.commons.cli.Options;
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsImportCliScriptConfiguration<T extends OpenaireEventsImport>
+public class OpenaireEventsImportCliScriptConfiguration<T extends OpenaireEventsImport<?>>
     extends OpenaireEventsImportScriptConfiguration<T> {
 
     @Override

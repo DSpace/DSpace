@@ -13,6 +13,6 @@ package org.dspace.administer;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class ProcessCleanerCliConfiguration extends ProcessCleanerConfiguration<ProcessCleanerCli> {
+public class ProcessCleanerCliConfiguration<T extends ProcessCleaner<?>> extends ProcessCleanerConfiguration<T> {
 
 }

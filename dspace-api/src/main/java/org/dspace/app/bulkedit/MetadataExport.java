@@ -22,6 +22,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.utils.DSpace;
 
 /**
@@ -29,7 +30,7 @@ import org.dspace.utils.DSpace;
  *
  * @author Stuart Lewis
  */
-public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfiguration> {
+public class MetadataExport<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private boolean help = false;
     private String filename = null;
@@ -45,6 +46,17 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     private DSpaceObjectUtils dSpaceObjectUtils = UtilServiceFactory.getInstance().getDSpaceObjectUtils();
+
+    /**
+     * Constructor for MetadataExport script.
+     * Exports metadata from items, collections, or communities to CSV format
+     * for batch editing and external processing.
+     * 
+     * @param scriptConfiguration The script configuration defining export scope and format options
+     */
+    public MetadataExport(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     public void internalRun() throws Exception {
@@ -72,12 +84,6 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
     protected void logHelpInfo() {
         handler.logInfo("\nfull export: metadata-export");
         handler.logInfo("partial export: metadata-export -i handle/UUID");
-    }
-
-    @Override
-    public MetadataExportScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("metadata-export",
-                                                                 MetadataExportScriptConfiguration.class);
     }
 
     @Override
