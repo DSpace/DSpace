@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -44,8 +43,6 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
     @Autowired
     private RequestService requestService;
     @Autowired
-    private DSpaceObjectUtils dspaceObjectUtil;
-    @Autowired
     AuthorizeService authorizeService;
     @Autowired
     protected BitstreamService bitstreamService;
@@ -61,9 +58,14 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
 
             try {
                 UUID dsoUuid = UUID.fromString(targetId.toString());
-                DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
-                if (dso instanceof Bitstream) {
-                    return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
+                // Look up the target as a Bitstream directly. This permission plugin only applies to
+                // Bitstreams, so a typed lookup avoids the generic DSpaceObjectUtils#findDSpaceObject sweep,
+                // which probes every DSpaceObject type and (given the shared-UUID JOINED inheritance model)
+                // logs a spurious Hibernate ObjectNotFoundException when the UUID is resolved as the wrong
+                // type (e.g. a Collection/Community logo bitstream). See issue #12839.
+                Bitstream bitstream = bitstreamService.find(context, dsoUuid);
+                if (bitstream != null) {
+                    return this.metadataReadPermissionOnBitstream(context, bitstream);
                 }
             } catch (SQLException e) {
                 log.error(e::getMessage, e);
