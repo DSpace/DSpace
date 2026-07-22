@@ -119,12 +119,12 @@ public class OAIHarvester {
     Context ourContext;
 
     // Namespace used by the ORE serialization format
-    // Set in dspace.cfg as oai.harvester.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
+    // Set in oai.cfg as oai.harvester.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
     private Namespace ORESerialNS;
     private String ORESerialKey;
 
     // Namespace of the descriptive metadata that should be harvested in addition to the ORE
-    // Set in dspace.cfg as oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
+    // Set in oai.cfg as oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
     private Namespace metadataNS;
     private String metadataKey;
 
@@ -664,11 +664,9 @@ public class OAIHarvester {
 
 
     /**
-     * Scan an item's metadata, looking for the value "identifier.*". If it meets the parameters that identify it as
-     * valid handle
-     * as set in dspace.cfg (harvester.acceptedHandleServer and harvester.rejectedHandlePrefix), use that handle
-     * instead of
-     * minting a new one.
+     * Scan an item's metadata, looking for the value "dc.identifier.*". If it meets the parameters that identify it as
+     * valid handle as set in oai.cfg (oai.harvester.acceptedHandleServer and oai.harvester.rejectedHandlePrefix),
+     * use that handle instead of minting a new one.
      *
      * @param item a newly created, but not yet installed, DSpace Item
      * @return null or the handle to be used.

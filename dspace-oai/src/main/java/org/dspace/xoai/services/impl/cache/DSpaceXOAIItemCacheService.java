@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import javax.xml.stream.XMLStreamException;
 
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
@@ -26,7 +27,6 @@ import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
     private static final String ITEMDIR = File.separator + "items";
 
@@ -37,7 +37,7 @@ public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
 
     private String getBaseDir() {
         if (baseDir == null) {
-            baseDir = configurationService.getProperty("oai", "cache.dir") + ITEMDIR;
+            baseDir = configurationService.getProperty("oai.cache.dir") + ITEMDIR;
         }
         return baseDir;
     }
@@ -62,7 +62,7 @@ public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
 
     @Override
     public Metadata get(Item item) throws IOException {
-        System.out.println(FileUtils.readFileToString(getMetadataCache(item)));
+        System.out.println(FileUtils.readFileToString(getMetadataCache(item), StandardCharsets.UTF_8));
         Metadata metadata;
         FileInputStream input = new FileInputStream(getMetadataCache(item));
         try {
@@ -86,9 +86,7 @@ public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
             context.getWriter().close();
 
             output.close();
-        } catch (XMLStreamException e) {
-            throw new IOException(e);
-        } catch (WritingXmlException e) {
+        } catch (XMLStreamException | WritingXmlException e) {
             throw new IOException(e);
         }
     }
