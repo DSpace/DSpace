@@ -105,7 +105,7 @@ public class DSpaceMETSDisseminator
         MetsHdr metsHdr = new MetsHdr();
 
         // FIXME: CREATEDATE is now: maybe should be item create?
-        metsHdr.setCREATEDATE(java.util.Date.from(Instant.now()));
+        metsHdr.setCREATEDATE(java.util.Date.from(Instant.now())); // NOPMD - required by third-party API
 
         // Agent
         Agent agent = new Agent();

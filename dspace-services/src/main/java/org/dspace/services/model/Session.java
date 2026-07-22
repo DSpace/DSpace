@@ -69,6 +69,7 @@ public interface Session extends HttpSession {
      * @param key the key for the attribute
      * @return the value if one exists OR null if none
      */
+    @Override
     public String getAttribute(String key);
 
     /**

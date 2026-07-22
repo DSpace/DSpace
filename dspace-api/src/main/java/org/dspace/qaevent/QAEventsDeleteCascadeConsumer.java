@@ -44,6 +44,7 @@ public class QAEventsDeleteCascadeConsumer implements Consumer {
         }
     }
 
+    @Override
     public void end(Context context) throws Exception {
     }
 

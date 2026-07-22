@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,7 +39,7 @@ public class AuditEventRest extends BaseObjectRest<UUID> {
     private UUID subjectUUID;
     private String subjectType;
     private String eventType;
-    private Date timeStamp;
+    private Instant timeStamp;
     private String detail;
     private String metadataField;
     private String value;
@@ -118,11 +118,11 @@ public class AuditEventRest extends BaseObjectRest<UUID> {
         this.eventType = eventType;
     }
 
-    public Date getTimeStamp() {
+    public Instant getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Date timeStamp) {
+    public void setTimeStamp(Instant timeStamp) {
         this.timeStamp = timeStamp;
     }
 

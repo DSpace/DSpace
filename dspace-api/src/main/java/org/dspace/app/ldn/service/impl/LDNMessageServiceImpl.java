@@ -239,6 +239,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         return null;
     }
 
+    @Override
     public NotifyServiceEntity findNotifyService(Context context, Service service) throws SQLException {
         return notifyServiceDao.findByLdnUrl(context, service.getInbox());
     }
@@ -430,6 +431,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         return null;
     }
 
+    @Override
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException {
         ldnMessageDao.delete(context, ldnMessage);
     }

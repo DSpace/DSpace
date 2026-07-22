@@ -41,6 +41,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
     @Autowired
     private Utils utils;
 
+    @Override
     protected void addLinks(DSpaceResource halResource, Pageable page, LinkedList<Link> list) throws Exception {
         RestAddressableModel data = halResource.getContent();
 
@@ -87,10 +88,12 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
         halResource.add(utils.linkToSingleResource(data, IanaLinkRelations.SELF.value()));
     }
 
+    @Override
     protected Class<RestResourceController> getControllerClass() {
         return RestResourceController.class;
     }
 
+    @Override
     protected Class<DSpaceResource> getResourceClass() {
         return DSpaceResource.class;
     }

@@ -40,10 +40,12 @@ public class RESTBitstreamNotFoundException extends UnprocessableEntityException
         RESTBitstreamNotFoundException.uuid = uuid;
     }
 
+    @Override
     public String getMessageKey() {
         return MESSAGE_KEY;
     }
 
+    @Override
     public String getLocalizedMessage(Context context) {
         return formatMessage(I18nUtil.getMessage(MESSAGE_KEY, context));
     }

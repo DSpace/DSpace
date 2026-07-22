@@ -27,6 +27,7 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
 
+    @Override
     protected void addLinks(RootResource halResource, Pageable page, LinkedList<Link> list) throws Exception {
         for (Link endpointLink : discoverableEndpointsService.getDiscoverableEndpoints()) {
             list.add(
@@ -36,10 +37,12 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
         list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn().listDefinedEndpoint(null)));
     }
 
+    @Override
     protected Class<RootRestResourceController> getControllerClass() {
         return RootRestResourceController.class;
     }
 
+    @Override
     protected Class<RootResource> getResourceClass() {
         return RootResource.class;
     }

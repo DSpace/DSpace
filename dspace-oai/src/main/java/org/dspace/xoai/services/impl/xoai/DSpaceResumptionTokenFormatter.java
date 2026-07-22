@@ -36,8 +36,14 @@ public class DSpaceResumptionTokenFormatter implements ResumptionTokenFormatter 
                 int offset = Integer.parseInt(res[4]);
                 String prefix = (res[0].equals("")) ? null : res[0];
                 String set = (res[3].equals("")) ? null : res[3];
-                java.util.Date from = (res[1].equals("")) ? null : java.util.Date.from(DateUtils.parse(res[1]));
-                java.util.Date until = res[2].equals("") ? null : java.util.Date.from(DateUtils.parse(res[2]));
+                java.util.Date from = (res[1].equals("")) ? null : // NOPMD - required by third-party API
+                        java.util.Date.from( // NOPMD - required by third-party API
+                        DateUtils.parse(res[1]) // NOPMD - required by third-party API
+                );
+                java.util.Date until = res[2].equals("") ? null : // NOPMD - required by third-party API
+                        java.util.Date.from( // NOPMD - required by third-party API
+                        DateUtils.parse(res[2]) // NOPMD - required by third-party API
+                );
                 return new ResumptionToken(offset, prefix, set, from, until);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);

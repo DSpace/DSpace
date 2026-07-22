@@ -7,7 +7,7 @@
  */
 package org.dspace.app.audit;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 
@@ -23,7 +23,7 @@ public class AuditEvent {
     private UUID subjectUUID;
     private String subjectType;
     private String eventType;
-    private Date timeStamp;
+    private Instant timeStamp;
     private String detail;
     private String metadataField;
     private String value;
@@ -115,11 +115,11 @@ public class AuditEvent {
     /**
      * @return the date and time of the event
      */
-    public Date getDatetime() {
+    public Instant getDatetime() {
         return timeStamp;
     }
 
-    public void setDatetime(Date datetime) {
+    public void setDatetime(Instant datetime) {
         this.timeStamp = datetime;
     }
 
@@ -230,7 +230,7 @@ public class AuditEvent {
                 .append(LOG_FIELD_SEPARATOR).append("checksum=").append(nullSafe(getChecksum()))
                 .append(LOG_FIELD_SEPARATOR).append("detail=").append(nullSafe(getDetail()))
                 .append(LOG_FIELD_SEPARATOR).append("datetime=").append(getDatetime() == null ?
-                        "null" : String.valueOf(getDatetime().getTime()))
+                        "null" : String.valueOf(getDatetime().toString()))
                 .append(LOG_FIELD_SEPARATOR).append("epersonUUID=").append(nullSafe(getEpersonUUID()));
         return sb.toString();
     }

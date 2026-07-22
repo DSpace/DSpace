@@ -16,8 +16,8 @@ package org.dspace.app.audit;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -269,6 +269,7 @@ public class AuditSolrServiceImpl implements AuditService {
      * @param audit   the complete audit event to store, no details about the
      *                current user are extracted from the context
      */
+    @Override
     public void store(AuditEvent audit) {
         SolrInputDocument solrInDoc = solrDocumentFactory.create();
         // this is usually NOT the case, as the audit event get a random uuid by solr
@@ -286,7 +287,8 @@ public class AuditSolrServiceImpl implements AuditService {
         if (audit.getEpersonUUID() != null) {
             solrInDoc.addField(EPERSON_UUID_FIELD, audit.getEpersonUUID().toString());
         }
-        solrInDoc.addField(DATETIME_FIELD, audit.getDatetime());
+        solrInDoc.addField(DATETIME_FIELD,
+                java.util.Date.from(audit.getDatetime())); // NOPMD - required by third-party API
         if (audit.getDetail() != null) {
             solrInDoc.addField(DETAIL_FIELD, audit.getDetail());
         }
@@ -323,6 +325,7 @@ public class AuditSolrServiceImpl implements AuditService {
      * @param event the dspace event
      * @return a non-empty list of audit events wrapping the event without any user details
      */
+    @Override
     public List<AuditEvent> getAuditEventsFromEvent(Context context, Event event) {
         ArrayList<AuditEvent> audits = new ArrayList<>();
         List<MetadataEvent> metadataEvents = event.getDetailList()
@@ -364,7 +367,7 @@ public class AuditSolrServiceImpl implements AuditService {
 
     private AuditEvent buildBasicAuditEvent(Context context, Event event) {
         AuditEvent audit = new AuditEvent();
-        audit.setDatetime(new Date(event.getTimeStamp()));
+        audit.setDatetime(Instant.ofEpochMilli(event.getTimeStamp()));
         audit.setEventType(event.getEventTypeAsString());
 
         EPerson eperson = context.getCurrentUser();
@@ -385,7 +388,7 @@ public class AuditSolrServiceImpl implements AuditService {
 
     /**
      * Shortcut for
-     * {@link #findEvents(UUID, Date, Date, int, int, boolean)} with
+     * {@link #findEvents(UUID, Instant, Instant, int, int, boolean)} with
      * objectUuid, from and to null
      * 
      * @param context DSpace context
@@ -394,6 +397,7 @@ public class AuditSolrServiceImpl implements AuditService {
      * @param asc     if true sort the result in ascending order (by timeStamp)
      * @return the list of audit event according to the pagination parameters
      */
+    @Override
     public List<AuditEvent> findAllEvents(Context context, int limit, int offset,
             boolean asc) {
         return findEvents(null, null, null, limit, offset, asc);
@@ -413,7 +417,8 @@ public class AuditSolrServiceImpl implements AuditService {
      * @return the list of events in the specified time window for the requested
      *         object
      */
-    public List<AuditEvent> findEvents(UUID objectUuid, Date from, Date to, int limit, int offset,
+    @Override
+    public List<AuditEvent> findEvents(UUID objectUuid, Instant from, Instant to, int limit, int offset,
             boolean asc) {
         String q = "*";
         if (objectUuid != null) {
@@ -438,6 +443,7 @@ public class AuditSolrServiceImpl implements AuditService {
         return listResourceSyncEvent;
     }
 
+    @Override
     public AuditEvent findEvent(Context context, UUID id) {
         SolrQuery solrQuery = new SolrQuery(UUID_FIELD + ":" + id.toString());
         QueryResponse queryResponse;
@@ -468,7 +474,9 @@ public class AuditSolrServiceImpl implements AuditService {
             rse.setEpersonUUID(UUID.fromString((String) sd.getFieldValue(EPERSON_UUID_FIELD)));
         }
         rse.setEventType((String) sd.getFieldValue(EVENT_TYPE_FIELD));
-        rse.setDatetime((Date) sd.getFieldValue(DATETIME_FIELD));
+        rse.setDatetime(
+                ((java.util.Date) sd.getFieldValue(DATETIME_FIELD)).toInstant() // NOPMD - required by third-party API
+        );
         rse.setDetail((String) sd.getFieldValue(DETAIL_FIELD));
         rse.setMetadataField((String) sd.getFieldValue(METADATA_FIELD));
         rse.setValue((String) sd.getFieldValue(VALUE_FIELD));
@@ -480,7 +488,8 @@ public class AuditSolrServiceImpl implements AuditService {
         return rse;
     }
 
-    public void deleteEvents(Context context, Date from, Date to) {
+    @Override
+    public void deleteEvents(Context context, Instant from, Instant to) {
         try {
             getSolr().deleteByQuery(buildTimeQuery(from, to));
         } catch (SolrServerException | IOException e) {
@@ -496,6 +505,7 @@ public class AuditSolrServiceImpl implements AuditService {
         }
     }
 
+    @Override
     public void commit() {
         try {
             getSolr().commit();
@@ -504,13 +514,13 @@ public class AuditSolrServiceImpl implements AuditService {
         }
     }
 
-    private String buildTimeQuery(Date from, Date to) {
+    private String buildTimeQuery(Instant from, Instant to) {
         String fromDate;
         if (from == null) {
             fromDate = "*";
         } else {
             fromDate = SolrUtils.getDateFormatter().format(
-                from.toInstant().atZone(java.time.ZoneId.systemDefault())
+                from.atZone(java.time.ZoneId.systemDefault())
             );
         }
         String toDate;
@@ -518,17 +528,19 @@ public class AuditSolrServiceImpl implements AuditService {
             toDate = "*";
         } else {
             toDate = SolrUtils.getDateFormatter().format(
-                to.toInstant().atZone(java.time.ZoneId.systemDefault())
+                to.atZone(java.time.ZoneId.systemDefault())
             );
         }
         return DATETIME_FIELD + ":[" + fromDate + " TO " + toDate + "]";
     }
 
+    @Override
     public long countAllEvents(Context context) {
         return countEvents(context, null, null, null);
     }
 
-    public long countEvents(Context context, UUID objectUuid, Date from, Date to) {
+    @Override
+    public long countEvents(Context context, UUID objectUuid, Instant from, Instant to) {
         String q = "*";
         if (objectUuid != null) {
             q = objectUuid.toString();

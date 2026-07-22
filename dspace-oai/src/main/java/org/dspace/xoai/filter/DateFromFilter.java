@@ -39,7 +39,8 @@ public class DateFromFilter extends DSpaceFilter {
     @Override
     public SolrFilterResult buildSolrQuery() {
         // Tweak to set the milliseconds
-        String format = dateProvider.format(java.util.Date.from(date)).replace("Z", ".000Z");
+        String format = dateProvider.format(java.util.Date.from(date)) // NOPMD - required by third-party API
+                .replace("Z", ".000Z");
         return new SolrFilterResult("item.lastmodified:["
                                         + ClientUtils.escapeQueryChars(format)
                                         + " TO *]");

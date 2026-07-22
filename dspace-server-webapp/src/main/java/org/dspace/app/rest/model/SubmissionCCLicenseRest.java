@@ -30,10 +30,12 @@ public class SubmissionCCLicenseRest extends BaseObjectRest<String> {
 
     private List<SubmissionCCLicenseFieldRest> fields;
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(final String id) {
         this.id = id;
     }

@@ -77,6 +77,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
         return getAuthorityValues(context, item, null);
     }
 
+    @Override
     public List<AuthorityValue> getAuthorityValues(Context context, Item item, Map<String, AuthorityValue> cache)
             throws SQLException, AuthorizeException {
         List<AuthorityValue> values = new ArrayList<>();
