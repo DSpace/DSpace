@@ -30,6 +30,8 @@ import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderPublisherResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderUtils;
 import org.dspace.services.ConfigurationService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -264,8 +266,7 @@ public class OpenPolicyFinderService {
                 try (CloseableHttpResponse response = client.execute(method)) {
                     int statusCode = response.getStatusLine().getStatusCode();
 
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
+                    log.debug("{}: {}", statusCode, response.getStatusLine().getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
                         opfResponse = new OpenPolicyFinderResponse(
@@ -330,6 +331,64 @@ public class OpenPolicyFinderService {
     }
 
     /**
+     * Perform an API request to the Open Policy Finder API to count the results related to the given parameters.
+     *
+     * @param type      entity type eg "publication" or "publisher"
+     * @param field     field eg "issn" or "title"
+     * @param predicate predicate eg "equals" or "contains-word"
+     * @param value     the actual value to search for (eg an ISSN or partial title)
+     * @return the number of matching results (the Open Policy Finder API caps results at 100)
+     */
+    public int performCountRequest(String type, String field, String predicate, String value) {
+        // API Key is *required* for v2 API calls
+        if (null == apiKey) {
+            log.error("Open Policy Finder API Key missing: " +
+                      "please register for an API key and set openpolicyfinder.apikey");
+            return 0;
+        }
+
+        HttpGet method = null;
+        try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
+            Thread.sleep(sleepBetweenTimeouts);
+
+            // Count using the JSON format: the Ids format is currently broken on the
+            // api.openpolicyfinder.jisc.ac.uk platform (the upstream proxy returns HTTP 5xx for it).
+            // The API caps results at 100 and returns no grand total, so counting the returned
+            // "items" array yields the same bounded total the caller expects.
+            method = constructHttpGet(type, field, predicate, value, 0, 0);
+
+            try (CloseableHttpResponse response = client.execute(method)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+
+                if (statusCode != HttpStatus.SC_OK) {
+                    // Do not log the response body: upstream error payloads may contain sensitive
+                    // details (e.g. internal proxy API keys). Log the status code only.
+                    log.error("Error from Open Policy Finder count request: HTTP status {}", statusCode);
+                    return 0;
+                }
+
+                HttpEntity responseBody = response.getEntity();
+                if (responseBody == null) {
+                    log.debug("Empty Open Policy Finder response body for query on {}", value);
+                    return 0;
+                }
+
+                String responseContent = IOUtils.toString(responseBody.getContent(), StandardCharsets.UTF_8);
+                JSONArray items = new JSONObject(responseContent).optJSONArray("items");
+                return items == null ? 0 : items.length();
+            }
+
+        } catch (Exception ex) {
+            log.error("An error occurred counting the Open Policy Finder entries", ex);
+            return 0;
+        } finally {
+            if (method != null) {
+                method.releaseConnection();
+            }
+        }
+    }
+
+    /**
      * Construct HTTP GET object for a "field,predicate,value" query with default start, limit
      * eg. "title","contains-word","Lancet" or "issn","equals","1234-1234"
      * @param field the field (issn, title, etc)
@@ -378,7 +437,7 @@ public class OpenPolicyFinderService {
             uriBuilder.addParameter("limit", String.valueOf(limit));
         }
 
-        log.debug("Open Policy Finder API URL: " + uriBuilder.toString());
+        log.debug("Open Policy Finder API URL: {}", uriBuilder);
 
         // Create HTTP GET object
         HttpGet method = new HttpGet(uriBuilder.build());
@@ -423,7 +482,7 @@ public class OpenPolicyFinderService {
         }
         uriBuilder.addParameter("filter", "[[\"issn\",\"equals\",\"" + query + "\"]]");
         uriBuilder.addParameter("format", "Json");
-        log.debug("Would search Open Policy Finder endpoint with " + uriBuilder.toString());
+        log.debug("Would search Open Policy Finder endpoint with {}", uriBuilder);
 
         // Return final built URI
         return uriBuilder.build();
