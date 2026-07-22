@@ -15,11 +15,15 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
@@ -30,22 +34,28 @@ import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.RequestItemConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.IncompleteItemRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.CaptchaService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -84,30 +94,34 @@ public class RequestItemRepository
 
     @Autowired(required = true)
     protected RequestItemEmailNotifier requestItemEmailNotifier;
+
     @Autowired
     protected AuthorizeService authorizeService;
+
+    @Autowired
+    protected GroupService groupService;
+
+    @Autowired
+    private Validator validator;
 
     // TODO: Work towards full coverage of captcha, so we can use getCaptchaService() instead
     private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getAltchaCaptchaService();
 
-    private static final Logger log = LogManager.getLogger();
-
-    @Autowired
-    private ObjectMapper mapper;
-
-    /*
-     * DSpaceRestRepository
-     */
-
     @PreAuthorize("permitAll()")
     @Override
     public RequestItemRest findOne(Context context, String token) {
+        if (StringUtils.isBlank(token)) {
+            throw new DSpaceBadRequestException("Token is required and cannot be blank");
+        }
+        if (StringUtils.length(token) > 48) {
+            throw new DSpaceBadRequestException("Token is too long");
+        }
         RequestItem requestItem = requestItemService.findByToken(context, token);
         if (null == requestItem) {
-            return null;
-        } else {
-            return requestItemConverter.convert(requestItem, Projection.DEFAULT);
+            throw new ResourceNotFoundException("Token not found: " + token);
         }
+
+        return requestItemConverter.convert(requestItem, Projection.DEFAULT);
     }
 
     @Override
@@ -148,6 +162,19 @@ public class RequestItemRepository
             throw new UnprocessableEntityException("error parsing the body", ex);
         }
 
+        // Validation of deserialized RequestItemRest object
+        Set<ConstraintViolation<RequestItemRest>> violations = validator.validate(rir);
+        if (violations != null && !violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<RequestItemRest> v : violations) {
+                sb.append(v.getPropertyPath())
+                    .append(": ")
+                    .append(v.getMessage())
+                    .append("; ");
+            }
+            throw new UnprocessableEntityException("Validation error: " + sb.toString());
+        }
+
         // Check request.item.type:
         // "all" = anyone can request.
         // "logged" = only authenticated user can request.
@@ -173,6 +200,20 @@ public class RequestItemRepository
             if (null == bitstream) {
                 throw new IncompleteItemRequestException("That bitstream does not exist");
             }
+
+            // Check that the bitstream is not public, otherwise it does not require a request
+            Group anonymous = groupService.findByName(ctx, Group.ANONYMOUS);
+            List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(ctx, bitstream, Constants.READ);
+            boolean isPublicAndWithoutEmbargo = policies.stream().anyMatch(policy ->
+                policy.getGroup() != null &&
+                policy.getGroup().getID().equals(anonymous.getID()) &&
+                policy.getEPerson() == null &&
+                policy.getStartDate() == null &&
+                policy.getEndDate() == null
+            );
+            if (isPublicAndWithoutEmbargo) {
+                throw new IncompleteItemRequestException("That bitstream is public and does not require a request");
+            }
         } else {
             bitstream = null;
         }
@@ -185,6 +226,36 @@ public class RequestItemRepository
         Item item = itemService.find(ctx, UUID.fromString(itemId));
         if (null == item) {
             throw new IncompleteItemRequestException("That item does not exist");
+        }
+        if (!item.isArchived()) {
+            throw new IncompleteItemRequestException("That item is not archived");
+        }
+        if (item.isWithdrawn()) {
+            throw new IncompleteItemRequestException("That item is withdrawn");
+        }
+
+        // check that the bitstream is part of bundle ORIGINAL of the item, otherwise it is not a valid request
+        if (bitstream != null) {
+            Bundle originalBundle = bitstream.getBundles().stream()
+                    .filter(bundle -> "ORIGINAL".equals(bundle.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new IncompleteItemRequestException(
+                        "That bitstream is not in the ORIGINAL bundle of the item"));
+            if (!originalBundle.getItems().contains(item)) {
+                throw new IncompleteItemRequestException(
+                    "That bitstream is not part of the item");
+            }
+        }
+        if (allFiles) {
+            // If all files are requested, check that the item has at least one bitstream in its ORIGINAL bundle
+            Bundle originalBundle = item.getBundles().stream()
+                    .filter(bundle -> "ORIGINAL".equals(bundle.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new IncompleteItemRequestException("That item has no ORIGINAL bundle"));
+
+            if (originalBundle.getBitstreams().isEmpty()) {
+                throw new IncompleteItemRequestException("That item has no bitstreams in the ORIGINAL bundle");
+            }
         }
 
         // Requester's email address.
@@ -202,17 +273,24 @@ public class RequestItemRepository
             }
         }
 
-        // Requester's human-readable name.
+        // (optional) Requester's human-readable name.
         String username;
         if (null != user) { // Prefer authenticated user's name.
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
+            if (isBlank(rir.getRequestName())) {
+                username = email; // Fallback to email if no name provided
+            } else {
+                username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
+            }
         }
 
-        // Requester's message text, escaped to evade nasty XSS attempts
-        String message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
+        // (optional) Requester's message text, escaped to evade nasty XSS attempts
+        String message = "";
+        if (!isBlank(rir.getRequestMessage())) {
+            message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
+        }
 
         // Create the request.
         String token;
@@ -256,6 +334,10 @@ public class RequestItemRepository
     public RequestItemRest put(Context context, HttpServletRequest request,
             String apiCategory, String model, String token, JsonNode requestBody)
             throws AuthorizeException {
+
+        // validation of token is not required here, because request mappings of PUT methods in RestResourceController
+        // will not allow a request to reach this method if the token is blank or too long
+
         RequestItem ri = requestItemService.findByToken(context, token);
         if (null == ri) {
             throw new UnprocessableEntityException("Item request not found");
@@ -284,6 +366,12 @@ public class RequestItemRepository
         String message = null;
         if (responseMessageNode != null && !responseMessageNode.isNull()) {
             message = responseMessageNode.asText();
+            // Strip length of message to a maximum of request.item.email.message.maxlength characters to avoid
+            // excessively long emails
+            int maxLength = configurationService.getIntProperty("request.item.email.message.maxlength", 1000);
+            if (message.length() > maxLength) {
+                message = message.substring(0, maxLength);
+            }
         }
 
         // Set the decision date (now)`
@@ -302,6 +390,11 @@ public class RequestItemRepository
         String subject = null;
         if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
             subject = responseSubjectNode.asText();
+            // Strip length of subject to a maximum of request.item.email.subject.maxlength characters
+            int maxLength = configurationService.getIntProperty("request.item.email.subject.maxlength", 200);
+            if (subject.length() > maxLength) {
+                subject = subject.substring(0, maxLength);
+            }
         }
         requestItemService.update(context, ri);
 
@@ -309,16 +402,16 @@ public class RequestItemRepository
         try {
             requestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
-            LOG.warn("Response not sent:  {}", ex::getMessage);
+            LOG.warn("Response not sent: {}", ex::getMessage);
             throw new RuntimeException("Response not sent", ex);
         }
 
         // Perhaps send Open Access request to admin.s.
-        if (requestBody.findValue("suggestOpenAccess").asBoolean(false)) {
+        if (requestBody.findValue("suggestOpenAccess").asBoolean()) {
             try {
                 requestItemEmailNotifier.requestOpenAccess(context, ri);
             } catch (IOException ex) {
-                LOG.warn("Open access request not sent:  {}", ex::getMessage);
+                LOG.warn("Open access request not sent: {}", ex::getMessage);
                 throw new RuntimeException("Open access request not sent", ex);
             }
         }
@@ -337,17 +430,23 @@ public class RequestItemRepository
     @SearchRestMethod(name = "byAccessToken")
     public RequestItemRest findByAccessToken(@Parameter(value = "accessToken", required = true) String accessToken) {
 
-        // Send 404 NOT FOUND if access token is null
+        // Send 404 NOT FOUND if access token is blank
         if (StringUtils.isBlank(accessToken)) {
-            throw new ResourceNotFoundException("No such accessToken=" + accessToken);
+            throw new ResourceNotFoundException("Token is required and cannot be blank");
+        }
+        if (StringUtils.length(accessToken) > 48) {
+            throw new DSpaceBadRequestException("Token is too long");
         }
 
         // Get the current context and request item
         Context context = obtainContext();
         RequestItem requestItem = requestItemService.findByAccessToken(context, accessToken);
+        if (requestItem == null) {
+            throw new ResourceNotFoundException("Token not found: " + accessToken);
+        }
 
         // Previously, a 404 was thrown if the request item was not found, and a 401 or 403 was thrown depending
-        // on authorization and validity checks. These checks are still strictly enforced in the BitstreamContoller
+        // on authorization and validity checks. These checks are still strictly enforced in the BitstreamController
         // and BitstreamResourceAccessByToken classes for actual downloads, but here we continue to pass a 200 OK
         // response so that we can display more meaningful alerts to users in the item page rather than serve hard
         // redirects or lose information like expiry dates and access status
