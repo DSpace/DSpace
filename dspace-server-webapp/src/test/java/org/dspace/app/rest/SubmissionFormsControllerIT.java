@@ -712,7 +712,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
             "traditionalpagetwo",
             "sampleauthority",
             "traditionalpageone",
-            "funding-oairecerif-funder"
+            "funding-oairecerif-funder",
             "orgunit",
             "publication",
             "test-outside-submission-hidden",
