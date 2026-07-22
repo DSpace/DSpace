@@ -121,29 +121,22 @@ public class BitstreamRestController {
      * @throws SQLException if database error occurs
      * @throws AuthorizeException if user lacks permission and author bypass is disabled
      */
-    @PreAuthorize("#accessToken != null|| hasPermission(#uuid, 'BITSTREAM', 'READ')")
+    @PreAuthorize("#accessToken != null || hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
     public ResponseEntity retrieve(@PathVariable UUID uuid,
                                    @Parameter(value = "accessToken", required = false) String accessToken,
                                    HttpServletResponse response,
                                    HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
-
+        // Any non-null access token will skip the preauthorize check above so we can
+        // quickly check here to see if the feature is even enabled. If it is not, throw
+        // an authorize exception.
+        if (StringUtils.isNotBlank(accessToken) && !requestACopyEnabled()) {
+            throw new AuthorizeException("Access by token is not allowed");
+        }
         // Obtain context
         Context context = ContextUtil.obtainContext(request);
         // Find bitstream
         Bitstream bit = bitstreamService.find(context, uuid);
-        if (bit == null || bit.isDeleted()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return null;
-        }
-        // Get EPerson
-        EPerson currentUser = context.getCurrentUser();
-
-        // Get bitstream metadata
-        Long lastModified = bitstreamService.getLastModified(bit);
-        BitstreamFormat format = bit.getFormat(context);
-        String mimetype = format.getMIMEType();
-        String name = getBitstreamName(bit, format);
 
         // If an access token is found, immediately authenticate it if request a copy is enabled
         // Though, if we do further "has to be loggd in requester" checks we'll have to check here anyway
@@ -164,6 +157,18 @@ public class BitstreamRestController {
         // want a fallback we will need to reauthenticate as otherwise any eperson could have supplied a non-blank
         // access token here
 
+        if (bit == null || bit.isDeleted()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+        // Get EPerson
+        EPerson currentUser = context.getCurrentUser();
+
+        // Get bitstream metadata
+        Long lastModified = bitstreamService.getLastModified(bit);
+        BitstreamFormat format = bit.getFormat(context);
+        String mimetype = format.getMIMEType();
+        String name = getBitstreamName(bit, format);
         if (StringUtils.isBlank(request.getHeader("Range"))) {
             //We only log a download request when serving a request without Range header. This is because
             //a browser always sends a regular request first to check for Range support.
