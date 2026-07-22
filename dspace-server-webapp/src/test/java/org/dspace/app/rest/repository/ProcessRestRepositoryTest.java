@@ -25,7 +25,7 @@ public class ProcessRestRepositoryTest {
 
     @Test
     public void testInitRunsAfterApplicationReady() throws Exception {
-        Method init = ProcessRestRepository.class.getMethod("init");
+        Method init = ProcessRestRepository.class.getMethod("failRunningProcesses");
         EventListener eventListener = init.getAnnotation(EventListener.class);
 
         assertNotNull(eventListener);

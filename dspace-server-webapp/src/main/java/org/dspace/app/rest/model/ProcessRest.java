@@ -60,6 +60,7 @@ public class ProcessRest extends BaseObjectRest<Integer> {
     private ProcessStatus processStatus;
     @JsonProperty(value = "parameters")
     private List<ParameterValueRest> parameterRestList;
+    private UUID instance;
 
     public UUID getUserId() {
         return userId;
@@ -123,6 +124,14 @@ public class ProcessRest extends BaseObjectRest<Integer> {
 
     public void setEndTime(Instant endTime) {
         this.endTime = endTime;
+    }
+
+    public UUID getInstance() {
+        return instance;
+    }
+
+    public void setInstance(UUID instance) {
+        this.instance = instance;
     }
 
     @JsonIgnore
