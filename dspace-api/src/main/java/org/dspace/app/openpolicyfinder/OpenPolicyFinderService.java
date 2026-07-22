@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Function;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
@@ -56,6 +57,16 @@ public class OpenPolicyFinderService {
 
     @Autowired
     ConfigurationService configurationService;
+
+    /**
+     * Parses a successful HTTP response body into an Open Policy Finder response object.
+     * Lets {@link #performRequest} and {@link #performPublisherRequest} share a single retry
+     * loop while constructing different response types.
+     */
+    @FunctionalInterface
+    private interface ResponseParser<T> {
+        T parse(InputStream input) throws IOException;
+    }
 
     /**
      * Complete initialization of the Bean.
@@ -117,104 +128,11 @@ public class OpenPolicyFinderService {
     public OpenPolicyFinderPublisherResponse performPublisherRequest(
             String type, String field, String predicate, String value,
             int start, int limit) {
-        // API Key is *required* for API calls
-        if (null == apiKey) {
-            log.error("Open Policy Finder API Key missing: "
-                + "please register for an API key and set openpolicyfinder.apikey");
-            return new OpenPolicyFinderPublisherResponse("Open Policy Finder configuration invalid or missing");
-        }
-
-        HttpGet method = null;
-        OpenPolicyFinderPublisherResponse opfResponse = null;
-        int numberOfTries = 0;
-
-        while (numberOfTries < maxNumberOfTries && opfResponse == null) {
-            numberOfTries++;
-
-            log.debug(String.format(
-                "Trying to contact Open Policy Finder - attempt %d of %d; timeout is %d; "
-                    + "sleep between timeouts is %d",
-                numberOfTries,
-                maxNumberOfTries,
-                timeout,
-                sleepBetweenTimeouts));
-
-            try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
-                if (numberOfTries > 1) {
-                    Thread.sleep(sleepBetweenTimeouts);
-                }
-
-                // Construct a default HTTP method (first result)
-                method = constructHttpGet(type, field, predicate, value, start, limit);
-
-                // Execute the method
-                try (CloseableHttpResponse response = client.execute(method)) {
-                    int statusCode = response.getStatusLine().getStatusCode();
-
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
-
-                    if (statusCode != HttpStatus.SC_OK) {
-                        opfResponse = new OpenPolicyFinderPublisherResponse(
-                            "Open Policy Finder return not OK status: " + statusCode);
-                        String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                        log.error("Error from Open Policy Finder HTTP request: " + errorBody);
-                        // The error body has consumed the response stream; skip the JSON parsing block
-                        // below (which would otherwise throw "Attempted read from closed stream").
-                        continue;
-                    }
-
-                    HttpEntity responseBody = response.getEntity();
-
-                    // If the response body is valid, pass to OpenPolicyFinderResponse for parsing as JSON
-                    if (null != responseBody) {
-                        log.debug("Non-null response received for query of " + value);
-                        InputStream content = null;
-                        try {
-                            content = responseBody.getContent();
-                            opfResponse = new OpenPolicyFinderPublisherResponse(
-                                    content,
-                                    OpenPolicyFinderPublisherResponse.ResponseFormat.JSON);
-                        } catch (IOException e) {
-                            log.error("Encountered exception while contacting Open Policy Finder: "
-                                + e.getMessage(), e);
-                        } finally {
-                            if (content != null) {
-                                content.close();
-                            }
-                        }
-                    } else {
-                        log.debug("Empty response body for query on " + value);
-                        opfResponse = new OpenPolicyFinderPublisherResponse("Open Policy Finder returned no response");
-                    }
-                }
-            } catch (URISyntaxException e) {
-                String errorMessage = "Error building Open Policy Finder API URI: " + e.getMessage();
-                log.error(errorMessage, e);
-                opfResponse = new OpenPolicyFinderPublisherResponse(errorMessage);
-            } catch (IOException e) {
-                String errorMessage = "Encountered exception while contacting Open Policy Finder: " + e.getMessage();
-                log.error(errorMessage, e);
-                opfResponse = new OpenPolicyFinderPublisherResponse(errorMessage);
-            }  catch (InterruptedException e) {
-                String errorMessage = "Encountered exception while sleeping thread: " + e.getMessage();
-                log.error(errorMessage, e);
-                opfResponse = new OpenPolicyFinderPublisherResponse(errorMessage);
-            } finally {
-                if (method != null) {
-                    method.releaseConnection();
-                }
-            }
-        }
-
-        if (opfResponse == null) {
-            log.debug("Response is still null");
-            opfResponse = new OpenPolicyFinderPublisherResponse(
-                "Error processing the Open Policy Finder answer");
-        }
-
-        // Return the final response
-        return opfResponse;
+        return executeRequest(
+            type, field, predicate, value, start, limit,
+            input -> new OpenPolicyFinderPublisherResponse(
+                input, OpenPolicyFinderPublisherResponse.ResponseFormat.JSON),
+            OpenPolicyFinderPublisherResponse::new);
     }
 
     /**
@@ -230,15 +148,39 @@ public class OpenPolicyFinderService {
      */
     public OpenPolicyFinderResponse performRequest(String type, String field, String predicate, String value,
                                          int start, int limit) {
+        return executeRequest(
+            type, field, predicate, value, start, limit,
+            input -> new OpenPolicyFinderResponse(input, OpenPolicyFinderResponse.ResponseFormat.JSON),
+            OpenPolicyFinderResponse::new);
+    }
+
+    /**
+     * Shared HTTP-execution and retry loop for {@link #performRequest} and
+     * {@link #performPublisherRequest}. The two callers differ only in how they parse the
+     * successful response body and how they package an error message, so those two pieces are
+     * supplied as functions.
+     *
+     * <p>Behaviour matches the previous duplicated implementations: a non-200 status, an
+     * IOException from the HTTP layer, a URI build error, or a thread interruption produces an
+     * error response and exits the loop. A parse-time IOException leaves the response unset so
+     * the loop can retry up to {@code maxNumberOfTries}. The first attempt does not pay the
+     * configured {@code sleepBetweenTimeouts}.</p>
+     *
+     * @param successParser  parses a successful response InputStream into the response object
+     * @param errorBuilder   builds an error response object from a message string
+     */
+    private <T> T executeRequest(String type, String field, String predicate, String value,
+                                 int start, int limit,
+                                 ResponseParser<T> successParser, Function<String, T> errorBuilder) {
         // API Key is *required* for API calls
         if (null == apiKey) {
             log.error("Open Policy Finder API Key missing: "
                 + "please register for an API key and set openpolicyfinder.apikey");
-            return new OpenPolicyFinderResponse("Open Policy Finder configuration invalid or missing");
+            return errorBuilder.apply("Open Policy Finder configuration invalid or missing");
         }
 
         HttpGet method = null;
-        OpenPolicyFinderResponse opfResponse = null;
+        T opfResponse = null;
         int numberOfTries = 0;
 
         while (numberOfTries < maxNumberOfTries && opfResponse == null) {
@@ -252,7 +194,7 @@ public class OpenPolicyFinderService {
                 timeout,
                 sleepBetweenTimeouts));
 
-            try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5)) {
+            try (CloseableHttpClient client = newHttpClient()) {
                 if (numberOfTries > 1) {
                     Thread.sleep(sleepBetweenTimeouts);
                 }
@@ -268,7 +210,7 @@ public class OpenPolicyFinderService {
                             + response.getStatusLine().getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
-                        opfResponse = new OpenPolicyFinderResponse(
+                        opfResponse = errorBuilder.apply(
                             "Open Policy Finder return not OK status: " + statusCode);
                         String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
                         log.error("Error from Open Policy Finder HTTP request: " + errorBody);
@@ -279,39 +221,33 @@ public class OpenPolicyFinderService {
 
                     HttpEntity responseBody = response.getEntity();
 
-                    // If the response body is valid, pass to OpenPolicyFinderResponse for parsing as JSON
+                    // If the response body is valid, pass to the success parser for parsing as JSON
                     if (null != responseBody) {
                         log.debug("Non-null response received for query of " + value);
-                        InputStream content = null;
-                        try {
-                            content = responseBody.getContent();
-                            opfResponse = new OpenPolicyFinderResponse(
-                                    content, OpenPolicyFinderResponse.ResponseFormat.JSON);
+                        try (InputStream content = responseBody.getContent()) {
+                            opfResponse = successParser.parse(content);
                         } catch (IOException e) {
                             log.error("Encountered exception while contacting Open Policy Finder: "
                                 + e.getMessage(), e);
-                        } finally {
-                            if (content != null) {
-                                content.close();
-                            }
+                            // opfResponse stays null so the loop retries if attempts remain.
                         }
                     } else {
                         log.debug("Empty response body for query on " + value);
-                        opfResponse = new OpenPolicyFinderResponse("Open Policy Finder returned no response");
+                        opfResponse = errorBuilder.apply("Open Policy Finder returned no response");
                     }
                 }
             } catch (URISyntaxException e) {
                 String errorMessage = "Error building Open Policy Finder API URI: " + e.getMessage();
                 log.error(errorMessage, e);
-                opfResponse = new OpenPolicyFinderResponse(errorMessage);
+                opfResponse = errorBuilder.apply(errorMessage);
             } catch (IOException e) {
                 String errorMessage = "Encountered exception while contacting Open Policy Finder: " + e.getMessage();
                 log.error(errorMessage, e);
-                opfResponse = new OpenPolicyFinderResponse(errorMessage);
+                opfResponse = errorBuilder.apply(errorMessage);
             } catch (InterruptedException e) {
                 String errorMessage = "Encountered exception while sleeping thread: " + e.getMessage();
                 log.error(errorMessage, e);
-                opfResponse = new OpenPolicyFinderResponse(errorMessage);
+                opfResponse = errorBuilder.apply(errorMessage);
             } finally {
                 if (method != null) {
                     method.releaseConnection();
@@ -321,12 +257,19 @@ public class OpenPolicyFinderService {
 
         if (opfResponse == null) {
             log.debug("Response is still null");
-            opfResponse = new OpenPolicyFinderResponse(
-                "Error processing the Open Policy Finder answer");
+            opfResponse = errorBuilder.apply("Error processing the Open Policy Finder answer");
         }
 
         // Return the final response
         return opfResponse;
+    }
+
+    /**
+     * Build an {@link CloseableHttpClient} for one HTTP attempt against the Open Policy Finder API.
+     * Extracted as a protected method so that unit tests can override it to inject a mocked client.
+     */
+    protected CloseableHttpClient newHttpClient() throws IOException {
+        return DSpaceHttpClientFactory.getInstance().buildWithoutAutomaticRetries(5);
     }
 
     /**
