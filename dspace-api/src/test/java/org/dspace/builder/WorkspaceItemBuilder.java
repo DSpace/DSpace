@@ -83,7 +83,6 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     public WorkspaceItem build() {
         try {
             context.dispatchEvents();
-            indexingService.commit();
             return workspaceItem;
         } catch (Exception e) {
             return handleException(e);
@@ -152,7 +151,6 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
                 deleteItem(c, item);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 

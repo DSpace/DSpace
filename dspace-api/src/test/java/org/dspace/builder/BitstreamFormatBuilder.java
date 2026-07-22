@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.service.DSpaceCRUDService;
 
 /**
@@ -42,7 +41,6 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
                 delete(c, bitstreamFormat);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -65,12 +63,7 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
             bitstreamFormatService.update(context, bitstreamFormat);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException e) {
-            log.error(e);
-        } catch (SQLException e) {
-            log.error(e);
-        } catch (AuthorizeException e) {
+        } catch (Exception e) {
             log.error(e);
         }
         return bitstreamFormat;
