@@ -62,11 +62,12 @@ import org.springframework.stereotype.Component;
  * This is the repository responsible to manage PooledTask Rest object
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Andrei Alesik (andrewalesik at pcgacademia)
  */
 
 @Component(PoolTaskRest.CATEGORY + "." + ClaimedTaskRest.PLURAL_NAME)
 public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskRest, Integer>
-                                       implements InitializingBean {
+        implements InitializingBean {
 
     private static final Logger log = LogManager.getLogger();
 
@@ -114,15 +115,15 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
 
     @SearchRestMethod(name = "findByUser")
     public Page<ClaimedTaskRest> findByUser(@Parameter(value = "uuid", required = true) UUID userID,
-            Pageable pageable) {
+                                            Pageable pageable) {
         //FIXME this should be secured with annotation but they are currently ignored by search methods
         try {
             Context context = obtainContext();
             EPerson currentUser = context.getCurrentUser();
             if (currentUser == null) {
                 throw new RESTAuthorizationException(
-                    "This endpoint is available only to logged-in user to search for their"
-                    + " own claimed tasks or the admins");
+                        "This endpoint is available only to logged-in user to search for their"
+                                + " own claimed tasks or the admins");
             }
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context, userID);
@@ -139,7 +140,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     @PreAuthorize("hasAuthority('ADMIN')")
     @SearchRestMethod(name = "findAllByItem")
     public Page<ClaimedTaskRest> findAllByItem(@Parameter(value = "uuid", required = true) UUID itemUUID,
-           Pageable pageable) {
+                                               Pageable pageable) {
         List<ClaimedTask> tasks = null;
         try {
             Context context = obtainContext();
@@ -154,6 +155,28 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                 tasks = claimedTaskService.findByWorkflowItem(context, xmlWFI);
             }
             return converter.toRestPage(tasks, pageable, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "checkIfClaimedTaskExistForItem")
+    public ClaimedTaskRest checkIfClaimedTaskExistForItem(@Parameter(value = "uuid", required = true) UUID itemUUID) {
+        ClaimedTask claimedTask = null;
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUUID);
+            if (item == null) {
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
+            }
+            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
+            if (xmlWFI == null) {
+                return null;
+            } else {
+                claimedTask = claimedTaskService.findFirstByWorkflowItem(context, xmlWFI);
+            }
+            return converter.toRest(claimedTask, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -192,7 +215,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     @Override
     @PreAuthorize("hasPermission(#id, 'CLAIMEDTASK', 'WRITE')")
     protected ClaimedTaskRest action(Context context, HttpServletRequest request, Integer id)
-        throws SQLException, IOException {
+            throws SQLException, IOException {
         ClaimedTask task = null;
         task = claimedTaskService.find(context, id);
         if (task == null) {
@@ -208,11 +231,11 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             String submitButton = Util.getSubmitButton(request, null);
             if (!currentActionConfig.getProcessingAction().getOptions().contains(submitButton)) {
                 throw new UnprocessableEntityException(submitButton + " is not a valid option on this action (" +
-                    currentActionConfig.getProcessingAction().getClass() + ").");
+                        currentActionConfig.getProcessingAction().getClass() + ").");
             }
             workflowService
-                .doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(), workflow,
-                    currentActionConfig);
+                    .doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(), workflow,
+                            currentActionConfig);
             if (!Action.getErrorFields(request).isEmpty()) {
                 throw new UnprocessableEntityException(
                         "Missing required fields: " + StringUtils.join(Action.getErrorFields(request), ","));
@@ -275,7 +298,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             workflowService.doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(),
                     workflow, currentActionConfig);
             claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context,
-                                             task.getWorkflowItem(), context.getCurrentUser());
+                    task.getWorkflowItem(), context.getCurrentUser());
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (WorkflowConfigurationException | MessagingException | WorkflowException | IOException e) {
