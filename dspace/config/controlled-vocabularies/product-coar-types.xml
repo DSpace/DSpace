@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML was automatically generated from the SKOS sources for the COAR Vocabulary. It follows the schema developed by 4Science (https://www.4science.it/) for DSpace -->
+<node id="http://purl.org/coar/resource_type/scheme" label="Resource Types">
+  <isComposedBy>
+    <node id="c_12cc" label="cartographic material">
+      <hasNote>Any material representing the whole or part of the earth or any celestial body at any scale. Cartographic materials include two- and three-dimensional maps and plans (including maps of imaginary places); aeronautical, navigational, and celestial charts; atlases; globes; block diagrams; sections; aerial photographs with a cartographic purpose; bird's-eye views (map views), etc. [Source: http://www.loc.gov/marc/cfmap.html]
+      </hasNote>
+      <isComposedBy>
+        <node id="c_12cd" label="map">
+          <hasNote>Defined as a representation normally to scale and on a flat medium, of a selection of material or abstract features on, or in relation to, the surface of the earth or of another celestial body. [Source: https://www.loc.gov/marc/bibliographic/bd007a.html]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="c_ddb1" label="dataset">
+      <hasNote>A collection of related facts and data encoded in a defined structure. [Source: Adapted from http://purl.org/spar/fabio/Dataset]
+      </hasNote>
+      <isComposedBy>
+        <node id="ACF7-8YT9" label="aggregated data">
+          <hasNote>Statistics that relate to broad classes, groups, or categories. The data are averaged, totaled, or otherwise derived from individual-level data, and it is no longer possible to distinguish the characteristics of individuals within those classes, groups, or categories. For example, the number and age group of the unemployed in specific geographic regions, or national level statistics on the occurrence of specific offences, originally derived from the statistics of individual police districts. [Source: https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="c_cb28" label="clinical trial data">
+          <hasNote>Data resulting from a research study in which one or more human subjects are prospectively assigned to one or more interventions (which may include placebo or other control) to evaluate the effects of those interventions on health-related biomedical or behavioral outcomes. [Source: Adapted from https://grants.nih.gov/policy/clinical-trials/definition.htm]
+          </hasNote>
+        </node>
+        <node id="FXF3-D3G7" label="compiled data">
+          <hasNote>Data collected or assembled from multiple, often heterogeneous sources that have one or more reference points in common, and at least one of the sources was originally produced for other purposes. The data are incorporated in a new entity. For example, providing data on the number of universities in the last 150 years using a variety of available sources (e.g. finance documents, official statistics, university registers), combining survey data with information about geographical areas from official statistics (e.g. population density, doctors per capita, etc.), or using RSS to collect blog posts or tweets, etc. [Source: Adapted from https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="AM6W-6QAW" label="encoded data">
+          <hasNote>Qualitative data (textual, video, audio or still-image) originally produced for other purposes into quantitative data (expressed in unit-by-variable matrices) by using coding techniques in accordance with pre-defined categorization schemes. For example, coded party manifesto data like the "European Parliament Election Study 2009, Manifesto Study" (doi:10.4232/1.10204)". [Source: Adapted from https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="63NG-B465" label="experimental data">
+          <hasNote>Data resulting from the experimental research method involving the manipulation of some or all of the independent variables included in the hypotheses. [Source: Adapted from https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="A8F1-NPV9" label="genomic data">
+          <hasNote>Genomic data refers to the genome and DNA data of an organism. They are used in bioinformatics for collecting, storing and processing the genomes of living things. Genomic data is a more extensive term than sequencing data. However genomic data mostly come from sequencing techniques. It may include non-sequencing data such as data from microarrays, data from real-time PCR panels and data from pharmacogenomics studies. [Source: Adapted from https://www.techopedia.com/definition/31247/genomic-data]
+          </hasNote>
+        </node>
+        <node id="2H0M-X761" label="geospatial data">
+          <hasNote>Discrete geospatial data are usually represented using vector data consisting of points, lines and polygons, while continuous geospatial data are usually represented by raster data, consisting of a grid of cells that each has its own value. Any number of applications in a wide range of areas produce geospatial data, such as GIS, Remote Sensing equipment, GPS units, archaeological total stations, manual mapping and computer-aided design (CAD), in a number of formats, including images, vector, text, and tabular data. Vector-based geospatial data include tables listing archaeological sites along with their coordinates, text-based files (e.g., XML) containing coordinates and topology for historic road networks, voting figures for political parties by administrative area. Raster-based geospatial data include satellite images, aerial photographs, scanned maps, and digital maps of elevations, vegetation, land-use, sea surface temperatures, air pollution, soil-types, etc. [Source: https://ddialliance.org/Specification/DDI-CV/GeneralDataFormat_2.0.html]
+          </hasNote>
+        </node>
+        <node id="H41Y-FW7B" label="laboratory notebook">
+          <hasNote>A laboratory notebook (colloq. lab notebook or lab book) is a primary record of research. Researchers use a lab notebook to document their hypotheses, experiments and initial analysis or interpretation of these experiments. This label is used both for traditional and electronic laboratory notebook. [Source: Adapted from https://en.wikipedia.org/wiki/Lab_notebook]
+          </hasNote>
+        </node>
+        <node id="DD58-GFSX" label="measurement and test data">
+          <hasNote>Data resulting from assessing specific properties (or characteristics) of beings, things, phenomena, (and/ or processes) by applying pre-established standards and/or specialized instruments or techniques. [Source: Adapted from  https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="FF4C-28RK" label="observational data">
+          <hasNote>Data resulting from observational research, which involves collecting observations as they occur (for example, observing behaviors, events, development of condition or disease, etc.), without attempting to manipulate any of the independent variables. [Source:  Adapted from https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="CQMR-7K63" label="recorded data">
+          <hasNote>Data registered by mechanical or electronic means, in a form that allows the information to be retrieved and/or reproduced. For example, images or sounds on disc or magnetic tape. [Source: Adapted from https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="W2XT-7017" label="simulation data">
+          <hasNote>Data resulting from modeling or imitative representation of real-world processes, events, or systems, often using computer programs. For example, a program modeling household consumption responses to indirect tax changes; or a dataset on hypothetical patients and their drug exposure, background conditions, and known adverse events. [Source: Adapted from https://ddialliance.org/Specification/DDI-CV/ModeOfCollection_3.0.html]
+          </hasNote>
+        </node>
+        <node id="NHD0-W6SY" label="survey data">
+          <hasNote>Data resulting from a survey, which is defined as an investigation about the characteristics of a given population by means of collecting data from a sample of that population and estimating their characteristics through the systematic use of statistical methodology. Included are censuses, sample surveys, the collection of data from administrative records and derived statistical activities as well as questionnaires. [Source: Adapted from https://stats.oecd.org/glossary/detail.asp?ID=2620]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="542X-3S04" label="design">
+      <hasNote>Plans, drawing or set of drawings showing how something e.g. building, product is to be made and how it will work and look. [Source: Adapted from https://dictionary.cambridge.org/dictionary/english/design]
+      </hasNote>
+      <isComposedBy>
+        <node id="JBNF-DYAD" label="industrial design">
+          <hasNote>Industrial designs are applied to a wide variety of industrial products and handicrafts. They refer to the ornamental or aesthetic aspects of a useful article,including compositions of lines or colors or any three-dimensional forms that give a special appearance to a product or handicraft. [Source: https://www.wipo.int/edocs/pubdocs/en/wipo_pub_943_2018.pdf]
+          </hasNote>
+        </node>
+        <node id="BW7T-YM2G" label="layout design">
+          <hasNote>Layout-design (topography) means the three-dimensional disposition, however expressed, of the interconnections of an integrated circuit, or such a three-dimensional disposition prepared for an integrated circuit intended for manufacture the elements of an integrated circuit (at least one of which is an active element) and of some or all. [Source: https://www.wipo.int/edocs/lexdocs/laws/en/hk/hk028en.pdf]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="c_c513" label="image">
+      <hasNote>A visual representation other than text, including all types of moving image and still image. [Source: Adapted from  http://purl.org/dc/dcmitype/Image]
+      </hasNote>
+      <isComposedBy>
+        <node id="c_8a7e" label="moving image">
+          <hasNote>A moving display, either generated dynamically by a computer program or formed from a series of pre-recorded still images imparting an impression of motion when shown in succession. [Source: http://purl.org/spar/fabio/MovingImage]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_12ce" label="video">
+              <hasNote>A recording of visual images, usually in motion and with sound accompaniment. [Source: http://www.ifla.org/files/assets/cataloguing/isbd/isbd-cons_20110321.pdf ]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_ecc8" label="still image">
+          <hasNote>A recorded static visual representation. This class of image includes diagrams, drawings, graphs, graphic designs, plans, photographs and prints. [Source: Adapted from  http://purl.org/spar/fabio/StillImage]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="c_e9a0" label="interactive resource">
+      <hasNote>A resource requiring interaction from the user to be understood, executed, or experienced. Examples include forms on Web pages, applets, multimedia learning objects, chat services, or virtual reality environments.
+Source: http://purl.org/dc/dcmitype/InteractiveResource
+      </hasNote>
+      <isComposedBy>
+        <node id="c_7ad9" label="website">
+          <hasNote>A collection of related web pages containing text, images, videos and/or other digital assets that are addressed relative to a common Uniform Resource Locator (URL). A web site is hosted on at least one web server, accessible via a network such as the Internet or a private local area network.
+[Source: http://purl.org/spar/fabio/WebSite]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="c_e059" label="learning object">
+      <hasNote>A digital resource that can be reused to enhance teaching and learning. [Source: https://icas-ca.org/archive/projects/coerc/oer-glossary]
+      </hasNote>
+    </node>
+    <node id="c_1843" label="other">
+      <hasNote>A resource type that is not included in existing terms. [COAR definition]
+      </hasNote>
+    </node>
+    <node id="c_5ce6" label="software">
+      <hasNote>A computer program in source code (text) or compiled form. [Source: http://purl.org/dc/dcmitype/Software]
+      </hasNote>
+      <isComposedBy>
+        <node id="c_c950" label="research software">
+          <hasNote>Software that is used to generate, process or analyse results that you intend to appear in a publication (either in a journal, conference paper, monograph, book or thesis). Research software can be anything from a few lines of code written by yourself, to a professionally developed software package. [Source: https://datashare.ed.ac.uk/handle/10283/785]
+          </hasNote>
+        </node>
+        <node id="QH80-2R4E" label="source code">
+          <hasNote>Source code is any collection of code, with or without comments, written using a human-readable programming language, usually as plain text. [Source: https://en.wikipedia.org/wiki/Source_code]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="c_18cc" label="sound">
+      <hasNote>A resource primarily intended to be heard. Examples include a music playback file format, an audio compact disc, and recorded speech or sounds. [Source: http://dublincore.org/documents/dcmi-terms/#dcmitype-Sound]
+      </hasNote>
+      <isComposedBy>
+        <node id="c_18cd" label="musical composition">
+          <hasNote>Musical composition can refer to an original piece of music, the structure of a musical piece, or the process of creating a new piece of music. [Source: https://en.wikipedia.org/wiki/Musical_composition ]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="H6QP-SC1X" label="trademark">
+      <hasNote>A sign used to distinguish the goods or services of one undertaking from those
+of others. A trademark may consist of words and combinations of words (for
+instance, names or slogans), logos, figures and images, letters, numbers,
+sounds, or, in rare instances, smells or moving images, or a combination thereof. [Source: https://www.wipo.int/trademarks/en]
+      </hasNote>
+    </node>
+    <node id="c_393c" label="workflow">
+      <hasNote>A recorded sequence of connected steps, which may be automated, specifying a reliably repeatable sequence of operations to be undertaken when conducting a particular job, for example an in silico investigation that extracts and processes information from a number of bioinformatics databases. [Source: Adapted from http://purl.org/spar/fabio/Workflow]
+      </hasNote>
+    </node>
+  </isComposedBy>
+</node>

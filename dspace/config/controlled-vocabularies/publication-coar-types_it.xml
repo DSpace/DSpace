@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML was automatically generated from the SKOS sources for the COAR Vocabulary. It follows the schema developed by 4Science (https://www.4science.it/) for DSpace -->
+<node id="http://purl.org/coar/resource_type/scheme" label="Tipi di risorse">
+  <isComposedBy>
+    <node id="c_18cf" label="testo">
+      <hasNote>Una risorsa costituita principalmente da parole da leggere. Esempi sono libri, lettere, tesi di laurea, poesie, giornali, articoli, archivi di mailing list. Si noti che i facsimili o le immagini di testi appartengono ancora al genere Testo. [Fonte: http://purl.org/dc/dcmitype/Text]
+      </hasNote>
+      <isComposedBy>
+        <node id="c_1162" label="annotazione">
+          <hasNote>Un'annotazione nel senso di nota legale è un commento giuridicamente esplicativo su una decisione emessa da un tribunale o da un tribunale arbitrale. [Fonte: DRIVER info:eu-repo definition]
+          </hasNote>
+        </node>
+        <node id="c_86bc" label="bibliografia">
+          <hasNote>Un elenco di libri e articoli che sono stati utilizzati da qualcuno per scrivere un particolare libro o articolo [Fonte: https://dictionary.cambridge.org/dictionary/english/bibliography]
+          </hasNote>
+        </node>
+        <node id="c_6947" label="post di un blog">
+          <hasNote>Un pezzo di scrittura o altro contenuto pubblicato su un blog. [Fonte: https://www.lexico.com/definition/blog_post]
+          </hasNote>
+        </node>
+        <node id="c_2f33" label="libro">
+          <hasNote>Una pubblicazione non seriale completa in un volume o in un numero finito di volumi. [Fonte: Adattato da http://purl.org/eprint/type/Book]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_3248" label="parte di libro">
+              <hasNote>Un capitolo o una sezione definita di un libro, di solito con un titolo o un numero separato. [Fonte: http://purl.org/spar/fabio/BookChapter]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_c94f" label="output di un convegno">
+          <hasNote>Tutti i tipi di risorse digitali fornite a una conferenza, come presentazioni di conferenze (diapositive), relazioni di conferenze, lezioni di conferenze, abstract, dimostrazioni. Per i documenti, i poster o gli atti di una conferenza si devono usare i sottoconcetti specifici. [definizione COAR]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_18cp" label="documento di conferenza non pubblicato negli atti">
+              <hasNote>Un documento, tipicamente la realizzazione di un lavoro di ricerca che riporta i risultati di una ricerca originale. Utilizzare questa etichetta quando l'articolo non è stato pubblicato in un documento. [Fonte: Adattato da http://purl.org/spar/fabio/ConferencePaper]
+              </hasNote>
+            </node>
+            <node id="c_18co" label="poster della conferenza non pubblicato negli atti">
+              <hasNote>Un poster espositivo, tipicamente contenente un testo con figure e/o tabelle illustrative, che di solito riporta i risultati di una ricerca o propone ipotesi, presentato per essere accettato e/o presentato a una conferenza, un seminario, un simposio, un workshop o un evento simile. Utilizzare questa etichetta se il poster non è stato pubblicato in un documento. [Fonte: http://purl.org/spar/fabio/ConferencePoster]
+              </hasNote>
+            </node>
+            <node id="R60J-J5BD" label="presentazione della conferenza">
+              <hasNote>Una serie di diapositive contenenti testo, tabelle o figure, progettate per comunicare idee o risultati di ricerca, per la proiezione e la visione da parte di un pubblico in occasione di una conferenza, un simposio, un seminario, una lezione, un workshop o altri incontri. [Fonte: Adattato da http://purl.org/spar/fabio/Presentation]
+              </hasNote>
+            </node>
+            <node id="c_f744" label="atti della conferenza">
+              <hasNote>Gli atti della conferenza sono il resoconto ufficiale di una riunione di conferenza. Si tratta di una raccolta di documenti che corrispondono alle presentazioni tenute durante la conferenza. Può includere contenuti aggiuntivi. [Fonte: http://www.ieee.org/documents/confprocdefined.pdf ]
+              </hasNote>
+              <isComposedBy>
+                <node id="c_5794" label="documento della conferenza">
+                  <hasNote>Un documento, pubblicato all'interno degli atti di una conferenza, è in genere la realizzazione di un lavoro di ricerca che riporta i risultati di una ricerca originale. [Fonte: Adattato da http://purl.org/spar/fabio/ConferencePaper]
+                  </hasNote>
+                </node>
+                <node id="c_6670" label="poster di conferenza">
+                  <hasNote>Un poster espositivo, pubblicato all'interno di un documento di conferenza, contenente solitamente un testo con figure e/o tabelle illustrative, che di solito riporta risultati di ricerca o propone ipotesi, presentato per l'accettazione e/o presentato a una conferenza, un seminario, un simposio, un workshop o un evento simile. [Fonte: adattato http://purl.org/spar/fabio/ConferencePoster]
+                  </hasNote>
+                </node>
+              </isComposedBy>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_0640" label="rivista">
+          <hasNote>Una rivista è una pubblicazione seriale dedicata alla diffusione di ricerche originali e di sviluppi attuali su un argomento. (Adattato da ODLIS) [Fonte: http://dspacecris.eurocris.org/cris/classcerif/classcerif00422]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_b239" label="editoriale">
+              <hasNote>Un breve saggio che esprime l'opinione o la posizione del direttore (o dei direttori) di una rivista (accademica) rispetto a una questione politica, sociale, culturale o professionale attuale. [Fonte: Adattato da ODLIS [Fonte: http://www.abc-clio.com/ODLIS/odlis_e.aspx ]
+              </hasNote>
+            </node>
+            <node id="c_6501" label="articolo di giornale">
+              <hasNote>Un articolo, tipicamente la realizzazione di un lavoro di ricerca che riporta i risultati di una ricerca originale, pubblicato in un numero di una rivista. [Fonte: http://purl.org/spar/fabio/JournalArticle]
+              </hasNote>
+              <isComposedBy>
+                <node id="c_7acd" label="rettifica">
+                  <hasNote>Una correzione formale di un errore introdotto dall'autore in un documento precedentemente pubblicato. (adattato da https://sparontologies.github.io/fabio/current/fabio.html#d4e2712)
+                  </hasNote>
+                </node>
+                <node id="c_beb9" label="documento di dati">
+                  <hasNote>Un documento sui dati è una pubblicazione scientifica che descrive un particolare insieme di dati o un gruppo di dati, pubblicata sotto forma di articolo sottoposto a revisione paritaria in una rivista scientifica. Lo scopo principale di un documento sui dati è descrivere i dati, le circostanze della loro raccolta e le informazioni relative alle caratteristiche dei dati, all'accesso e al potenziale riutilizzo. Adattato da https://en.wikipedia.org/wiki/Data_paper e http://www.gbif.org/publishing-data/data-papers
+                  </hasNote>
+                </node>
+                <node id="c_2df8fbb1" label="articolo di ricerca">
+                  <hasNote>Un articolo di ricerca è una fonte primaria, cioè riporta i metodi e i risultati di uno studio originale condotto dagli autori. (adattato da http://apus.libanswers.com/faq/2324)
+                  </hasNote>
+                </node>
+                <node id="c_dcae04bc" label="articolo di revisione">
+                  <hasNote>Un articolo di revisione è una fonte secondaria, cioè è scritto su altri articoli e non riporta ricerche originali proprie. [Fonte: Adattato da http://apus.libanswers.com/faq/2324]
+                  </hasNote>
+                </node>
+                <node id="c_7bab" label="articolo sul software">
+                  <hasNote>Un documento sul software dovrebbe includere le motivazioni per lo sviluppo dello strumento e i dettagli del codice utilizzato per la sua costruzione. [Fonte: Adattato da https://f1000research.com/for-authors/article-guidelines/software-tool-articles ]
+                  </hasNote>
+                </node>
+              </isComposedBy>
+            </node>
+            <node id="c_545b" label="lettera all'editore">
+              <hasNote>Una lettera indirizzata all'editore che commenta o discute un articolo precedentemente pubblicato da quel periodico, o di interesse per i suoi lettori. [Fonte: Adattato da http://purl.org/spar/fabio/Letter]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_8544" label="lettera">
+          <hasNote>Trascrizione di una presentazione orale o di un discorso destinato a presentare informazioni o a insegnare alle persone un particolare argomento, ad esempio da parte di un insegnante universitario o di un college. [Fonte: Adattato da https://en.wikipedia.org/wiki/Lecture]
+          </hasNote>
+        </node>
+        <node id="c_0857" label="lettera">
+          <hasNote>Breve descrizione di una nuova ricerca importante, nota anche come "comunicazione". [Fonte: https://cerif.eurocris.org/vocab/html/OutputTypes.html#Letter]
+          </hasNote>
+        </node>
+        <node id="c_2cd9" label="rivista">
+          <hasNote>Un periodico di interesse popolare che di solito contiene articoli su una varietà di argomenti, scritti da vari autori in uno stile non accademico o una pubblicazione commerciale che, a differenza di una pubblicazione di consumo, tratta un argomento specifico per le persone che lavorano in quel particolare campo o settore. [Fonte: Adattato da https://www.thebalance.com/what-is-a-trade-publication-exactly-2316039 e http://www.abc-clio.com/ODLIS/odlis_m.aspx]
+          </hasNote>
+        </node>
+        <node id="c_0040" label="manoscritto">
+          <hasNote>Un manoscritto è un'opera di qualsiasi tipo (testo, iscrizione, spartito musicale, mappa, ecc.) scritta interamente a mano. [Fonte: https://products.abc-clio.com/ODLIS/odlis_m.aspx]
+          </hasNote>
+        </node>
+        <node id="c_18cw" label="notazione musicale">
+          <hasNote>Simboli usati per scrivere musica, come in uno spartito, e per esprimere concetti matematici.
+[Source: Adapted from https://products.abc-clio.com/ODLIS/odlis_n.aspx]
+          </hasNote>
+        </node>
+        <node id="c_2fe3" label="giornale">
+          <hasNote>Un periodico non recensito, di solito pubblicato quotidianamente o settimanalmente, che consiste principalmente in editoriali e notizie riguardanti eventi attuali o recenti e questioni di interesse pubblico. [Fonte: http://purl.org/spar/fabio/Newspaper]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_998f" label="articolo di giornale">
+              <hasNote>Lavoro che consiste in una notizia apparsa su un giornale di interesse generale o su un altro periodico di informazione generale, contenente informazioni di interesse attuale e tempestivo in un campo. (Adattato da http://www.reference.md/files/D018/mD018431.html )
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="QX5C-AR31" label="altro periodico">
+          <hasNote>Un tipo di risorsa che non è incluso nei termini esistenti sotto il concetto superiore "Testo". [definizione COAR]
+          </hasNote>
+        </node>
+        <node id="c_816b" label="prestampa">
+          <hasNote>Un preprint è un manoscritto scientifico non sottoposto a peer-review e non ancora accettato da una rivista, tipicamente inviato dall'autore a un server/repository pubblico. [Fonte: Adattato da https://asapbio.org/preprint-info/preprint-faq#qaef-637]
+          </hasNote>
+        </node>
+        <node id="c_93fc" label="relazione">
+          <hasNote>Un rapporto è un resoconto pubblicato separatamente dei risultati di una ricerca, di una ricerca ancora in corso, di sviluppi ed eventi politici o di altri risultati tecnici, di solito con un numero di rapporto e talvolta di sovvenzione assegnato dall'agenzia di finanziamento. È anche un documento ufficiale delle attività di un comitato o di un'entità aziendale, dei procedimenti di un ente governativo o di un'indagine di un'agenzia, pubblicato o privato, solitamente archiviato o presentato a un'autorità superiore, volontariamente o su mandato. In senso più generale, qualsiasi resoconto formale di fatti o informazioni relativi a un evento o fenomeno specifico, talvolta fornito a intervalli regolari. [Fonte: http://lu.com/odlis/odlis_R.cfm#report ]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_7877" label="studio clinico">
+              <hasNote>Un lavoro che riporta i risultati di uno studio di ricerca per valutare interventi o esposizioni su esiti biomedici o sanitari. I due tipi principali di studi clinici sono gli studi interventistici (trial clinici) e gli studi osservazionali. Sebbene la maggior parte degli studi clinici riguardi gli esseri umani, questo tipo di pubblicazione può essere utilizzato per articoli clinici veterinari che soddisfano i requisiti per gli esseri umani. [Fonte: https://www.ncbi.nlm.nih.gov/mesh/2009830]
+              </hasNote>
+            </node>
+            <node id="c_ab20" label="piano di gestione dei dati">
+              <hasNote>Una dichiarazione formale che descrive come i dati di ricerca saranno gestiti e documentati nel corso di un progetto di ricerca e i termini relativi al successivo deposito dei dati presso un archivio di dati per la gestione e la conservazione a lungo termine. [Fonte: https://casrai.org/rdm-glossary]
+              </hasNote>
+            </node>
+            <node id="c_18wz" label="memorandum">
+              <hasNote>Una nota formale distribuita internamente a una o più persone in un'azienda, agenzia, organizzazione o istituzione, con un'intestazione che indica la data di invio e che specifica a chi è indirizzata (To:), da chi è inviata (From:) e l'oggetto del testo (Re:). A differenza di una lettera, un memo non richiede un saluto completo o una firma alla fine del testo: il mittente può semplicemente siglare il proprio nome nell'intestazione. [Fonte: https://products.abc-clio.com/ODLIS/odlis_m.aspx#memorandum]
+              </hasNote>
+            </node>
+            <node id="c_186u" label="rapporto sulla politica">
+              <hasNote>Un rapporto politico presenta ciò che si sa su una particolare questione o problema. Riunisce fatti e prove per aiutare i lettori a comprendere questioni complesse e a formulare una risposta. Può mirare a essere neutrale o a persuadere i lettori in una particolare direzione. [Fonte: https://www.uow.edu.au/student/learning-co-op/assessments/policy-report/#]
+              </hasNote>
+            </node>
+            <node id="c_18op" label="deliverable di progetto">
+              <hasNote>Un documento contenente una relazione di progetto, destinato a essere consegnato a un cliente o a un'agenzia di finanziamento, che descrive i risultati ottenuti nell'ambito di un progetto specifico. [Fonte: http://purl.org/spar/fabio/ProjectReportDocument]
+              </hasNote>
+            </node>
+            <node id="YZ1N-ZFT9" label="protocollo di ricerca">
+              <hasNote>Il protocollo è un piano dettagliato dello studio di ricerca che include un sommario del progetto, una descrizione del progetto che copre il razionale, gli obiettivi, la metodologia, la gestione e l'analisi dei dati, le considerazioni etiche, le questioni di genere e i riferimenti. [Fonte: Adattato da https://www.who.int/publications/i/item/a-practical-guide-for-health-researchers]
+              </hasNote>
+            </node>
+            <node id="c_18ws" label="rapporto di ricerca">
+              <hasNote>È una pubblicazione che riporta i risultati di un progetto di ricerca o, in alternativa, osservazioni scientifiche su un argomento. [Fonte: Adattato da https://en.wikipedia.org/wiki/Research_report]
+              </hasNote>
+            </node>
+            <node id="c_18gh" label="relazione tecnica">
+              <hasNote>Un documento che descrive il processo, i progressi o i risultati di una ricerca tecnica o scientifica o lo stato di un problema di ricerca tecnica o scientifica. Può anche includere raccomandazioni e conclusioni della ricerca. [Fonte: http://guides.library.cornell.edu/ecommons/types]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_baaf" label="proposta di ricerca">
+          <hasNote>Una proposta di ricerca è un documento che propone un progetto di ricerca, generalmente in ambito scientifico o accademico, e costituisce generalmente una richiesta di sponsorizzazione di tale ricerca. [Fonte: https://en.wikipedia.org/wiki/Research_proposal]
+          </hasNote>
+        </node>
+        <node id="c_efa0" label="recensione">
+          <hasNote>Una rassegna di lavori pubblicati da altri. [Fonte: adattato da http://purl.org/spar/fabio/Review]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_ba08" label="recensione di un libro">
+              <hasNote>Una recensione scritta e un'analisi critica del contenuto, della portata e della qualità di un libro o di un'altra opera monografica. [Fonte: http://purl.org/spar/fabio/BookReview]
+              </hasNote>
+            </node>
+            <node id="D97F-VB57" label="commento">
+              <hasNote>Un commento è un'analisi più approfondita scritta per attirare l'attenzione su un'opera già pubblicata. I commenti sono in qualche modo simili alle "recensioni", in quanto l'autore presenta la propria analisi di un'opera e il motivo per cui sarebbe interessante per un pubblico specifico. [Fonte: https://www.enago.com/academy/perspective-opinion-and-commentary-pieces]
+              </hasNote>
+            </node>
+            <node id="H9BQ-739P" label="revisione tra pari">
+              <hasNote>Una valutazione di un lavoro scientifico, accademico o professionale da parte di altri che lavorano nello stesso campo. [Fonte: ] Adottato da https://schema.datacite.org/meta/kernel-4.4/doc/DataCite-MetadataKernel_v4.4.pdf]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_71bd" label="documentazione tecnica">
+          <hasNote>La documentazione tecnica si riferisce a qualsiasi tipo di documentazione che descrive la gestione, la funzionalità e l'architettura di un prodotto tecnico o di un prodotto in fase di sviluppo o di utilizzo. [Fonte: https://en.wikipedia.org/wiki/Technical_documentation]
+          </hasNote>
+        </node>
+        <node id="c_46ec" label="tesi di laurea">
+          <hasNote>Un libro scritto da uno studente che contiene una presentazione formale dei risultati della ricerca presentata per l'esame al termine di un corso di studi presso un istituto di istruzione superiore, per soddisfare i requisiti di un titolo accademico. Conosciuto anche come tesi di laurea. [Fonte: http://purl.org/spar/fabio/Thesis]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_7a1f" label="tesi di laurea">
+              <hasNote>Una tesi che riporta un progetto di ricerca intrapreso nell'ambito di un corso di studi universitario che porta al conseguimento di un diploma di laurea. [Fonte: http://purl.org/spar/fabio/BachelorsThesis]
+              </hasNote>
+            </node>
+            <node id="c_db06" label="tesi di dottorato">
+              <hasNote>Una tesi che riporta la ricerca intrapresa durante un periodo di studi universitari che porta al conseguimento di un dottorato. [Fonte: http://purl.org/spar/fabio/DoctoralThesis]
+              </hasNote>
+            </node>
+            <node id="c_bdcc" label="tesi di master">
+              <hasNote>Una tesi che riporta un progetto di ricerca intrapreso nell'ambito di un corso di laurea che porta al conseguimento di un master. [Fonte: http://purl.org/spar/fabio/MastersThesis]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="6NC7-GK9S" label="trascrizione">
+          <hasNote>Una registrazione scritta di parole pronunciate in un procedimento giudiziario o in un discorso, un'intervista, una trasmissione o una registrazione sonora. [Fonte: Adattato da https://products.abc-clio.com/ODLIS/odlis_t.aspx]
+          </hasNote>
+        </node>
+        <node id="c_8042" label="carta di lavoro">
+          <hasNote>Un documento di lavoro o di discussione diffuso pubblicamente o tra un gruppo di colleghi. Alcune discipline, ad esempio l'economia, pubblicano documenti di lavoro in serie. [Fonte: http://www.ukoln.ac.uk/repositories/digirep/index/Eprints_Type_Vocabulary_Encoding_Scheme#:~:text=http%3A//purl.org/eprint/type/WorkingPaper].
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="c_1843" label="altro">
+      <hasNote>Un tipo di risorsa che non è incluso nei termini esistenti. [Definizione COAR]
+      </hasNote>
+    </node>
+  </isComposedBy>
+</node>

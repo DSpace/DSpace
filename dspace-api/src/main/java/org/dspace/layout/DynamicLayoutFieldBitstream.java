@@ -1,0 +1,61 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.layout;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+/**
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ *
+ */
+@Entity(name = "DynamicLayoutFieldBitstream")
+@DiscriminatorValue(DynamicLayoutFieldBitstream.BITSTREAM_FIELD_TYPE)
+public class DynamicLayoutFieldBitstream extends DynamicLayoutField {
+
+    public static final String BITSTREAM_FIELD_TYPE = "BITSTREAM";
+
+    @Column(name = "bundle")
+    private String bundle;
+    @Column(name = "metadata_value")
+    private String metadataValue;
+
+    /**
+     * Returns the bundle.
+     */
+    public String getBundle() {
+        return bundle;
+    }
+
+    /**
+     * Sets the bundle.
+     */
+    public void setBundle(String bundle) {
+        this.bundle = bundle;
+    }
+
+    /**
+     * Returns the metadata value.
+     */
+    public String getMetadataValue() {
+        return metadataValue;
+    }
+
+    /**
+     * Sets the metadata value.
+     */
+    public void setMetadataValue(String metadataValue) {
+        this.metadataValue = metadataValue;
+    }
+
+    @Override
+    public String getType() {
+        return BITSTREAM_FIELD_TYPE;
+    }
+}
