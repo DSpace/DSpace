@@ -202,6 +202,23 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
+    public List<Relationship> findByRelationshipTypeAfterId(Context context, RelationshipType relationshipType,
+                                                            int limit, int lastId) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.where(
+            criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType),
+            criteriaBuilder.greaterThan(relationshipRoot.get(Relationship_.id), lastId));
+        // Deterministic order is required for stable keyset pagination.
+        criteriaQuery.orderBy(criteriaBuilder.asc(relationshipRoot.get(Relationship_.id)));
+        // offset = -1: no setFirstResult; keyset uses the id cursor instead. Not cacheable: each
+        // page query is unique and these are large one-shot scans.
+        return list(context, criteriaQuery, false, Relationship.class, limit, -1);
+    }
+
+    @Override
     public List<Relationship> findByItemAndRelationshipType(
         Context context, Item item, RelationshipType relationshipType, Integer limit, Integer offset,
         boolean excludeNonLatest

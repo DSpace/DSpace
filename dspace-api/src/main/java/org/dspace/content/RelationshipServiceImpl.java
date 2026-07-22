@@ -1049,6 +1049,12 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
+    public List<Relationship> findByRelationshipTypeAfterId(Context context, RelationshipType relationshipType,
+                                                            int limit, int lastId) throws SQLException {
+        return relationshipDAO.findByRelationshipTypeAfterId(context, relationshipType, limit, lastId);
+    }
+
+    @Override
     public List<Relationship> findByTypeName(Context context, String typeName)
             throws SQLException {
         return this.findByTypeName(context, typeName, -1, -1);
