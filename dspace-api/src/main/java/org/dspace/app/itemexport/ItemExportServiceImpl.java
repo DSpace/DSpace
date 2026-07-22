@@ -484,6 +484,143 @@ public class ItemExportServiceImpl implements ItemExportService {
     }
 
     @Override
+    public long estimateExportSize(Context context, List<DSpaceObject> dsObjects) throws SQLException {
+        long size = 0;
+        for (DSpaceObject dso : dsObjects) {
+            if (dso.getType() == Constants.COMMUNITY) {
+                Community community = (Community) dso;
+                List<Collection> collections = communityService.getAllCollections(context, community);
+                for (Collection collection : collections) {
+                    Iterator<Item> iitems = itemService.findByCollection(context, collection);
+                    while (iitems.hasNext()) {
+                        size += getItemBitstreamSize(iitems.next());
+                    }
+                }
+            } else if (dso.getType() == Constants.COLLECTION) {
+                Collection collection = (Collection) dso;
+                Iterator<Item> iitems = itemService.findByCollection(context, collection);
+                while (iitems.hasNext()) {
+                    size += getItemBitstreamSize(iitems.next());
+                }
+            } else if (dso.getType() == Constants.ITEM) {
+                size += getItemBitstreamSize((Item) dso);
+            }
+        }
+        return size;
+    }
+
+    /**
+     * Sum the sizes of all bitstreams in an item's bundles.
+     *
+     * @param item the item
+     * @return total bitstream size in bytes
+     */
+    private long getItemBitstreamSize(Item item) {
+        long size = 0;
+        for (Bundle bundle : item.getBundles()) {
+            for (Bitstream bitstream : bundle.getBitstreams()) {
+                size += bitstream.getSizeBytes();
+            }
+        }
+        return size;
+    }
+
+    @Override
+    public void validateExportSize(long estimatedSize) throws ItemExportException, Exception {
+        // Check against configured maximum size
+        String megaBytes = configurationService
+            .getProperty("org.dspace.app.itemexport.max.size");
+        if (megaBytes != null) {
+            float maxSize = 0;
+            try {
+                maxSize = Float.parseFloat(megaBytes);
+            } catch (NumberFormatException e) {
+                // ignore invalid configuration
+            }
+
+            if (maxSize > 0 && maxSize < (estimatedSize / 1048576.00)) {
+                throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
+                    String.format(
+                        "The export is too large. Estimated size: %s, configured maximum: %.0f MB. "
+                            + "Consider using the exclude bitstreams (-x) option for a metadata-only export.",
+                        formatSize(estimatedSize), maxSize));
+            }
+        }
+
+        // Check against available disk space.
+        // The export writes bitstreams to a temp directory and then zips them,
+        // so peak disk usage is roughly 2x the bitstream size.
+        int minFreeSpaceMB = configurationService
+            .getIntProperty("org.dspace.app.itemexport.min.free.space", 500);
+        if (minFreeSpaceMB > 0) {
+            String exportDir = getExportWorkDirectory();
+            File workDir = new File(exportDir);
+            if (!workDir.exists()) {
+                workDir.mkdirs();
+            }
+            long usableSpace = workDir.getUsableSpace();
+            long minFreeSpaceBytes = (long) minFreeSpaceMB * 1048576L;
+            long peakDiskUsage = estimatedSize * 2;
+            if (peakDiskUsage > (usableSpace - minFreeSpaceBytes)) {
+                throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
+                    String.format(
+                        "Insufficient disk space for export. Estimated size: %s "
+                            + "(peak disk usage ~%s due to temp files), "
+                            + "available space: %s, required reserve: %d MB. "
+                            + "Consider using the exclude bitstreams (-x) option for a metadata-only export.",
+                        formatSize(estimatedSize), formatSize(peakDiskUsage),
+                        formatSize(usableSpace), minFreeSpaceMB));
+            }
+        }
+    }
+
+    @Override
+    public int countExportItems(Context context, List<DSpaceObject> dsObjects) throws SQLException {
+        int count = 0;
+        for (DSpaceObject dso : dsObjects) {
+            if (dso.getType() == Constants.COMMUNITY) {
+                count += itemService.countItems(context, (Community) dso);
+            } else if (dso.getType() == Constants.COLLECTION) {
+                count += itemService.countItems(context, (Collection) dso);
+            } else if (dso.getType() == Constants.ITEM) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public void validateExportItemCount(int itemCount) throws ItemExportException {
+        int maxItems = configurationService
+            .getIntProperty("org.dspace.app.itemexport.max.items", 0);
+        if (maxItems > 0 && itemCount > maxItems) {
+            throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
+                String.format(
+                    "The export contains too many items. Item count: %d, configured maximum: %d. "
+                        + "Consider exporting a smaller collection or individual items.",
+                    itemCount, maxItems));
+        }
+    }
+
+    /**
+     * Format a byte size as a human-readable string (e.g., "2.3 GB", "150 MB").
+     *
+     * @param bytes the size in bytes
+     * @return formatted string
+     */
+    private String formatSize(long bytes) {
+        if (bytes >= 1073741824L) {
+            return String.format("%.1f GB", bytes / 1073741824.0);
+        } else if (bytes >= 1048576L) {
+            return String.format("%.1f MB", bytes / 1048576.0);
+        } else if (bytes >= 1024L) {
+            return String.format("%.1f KB", bytes / 1024.0);
+        } else {
+            return bytes + " bytes";
+        }
+    }
+
+    @Override
     public void exportAsZip(Context context, Iterator<Item> items,
                             String destDirName, String zipFileName,
                             int seqStart, boolean migrate,
@@ -570,103 +707,45 @@ public class ItemExportServiceImpl implements ItemExportService {
         //deleteOldExportArchives(eperson.getID());
         deleteOldExportArchives();
 
-        // keep track of the commulative size of all bitstreams in each of the
-        // items
-        // it will be checked against the config file entry
-        double size = 0;
+        // Phase 1: lightweight item count check
+        int itemCount = countExportItems(context, dsObjects);
+        validateExportItemCount(itemCount);
+
+        // Phase 2: size + disk space check
+        long estimatedSize = estimateExportSize(context, dsObjects);
+        validateExportSize(estimatedSize);
+
+        // Build itemsMap for the export thread
         final HashMap<String, List<UUID>> itemsMap = new HashMap<>();
         for (DSpaceObject dso : dsObjects) {
             if (dso.getType() == Constants.COMMUNITY) {
                 Community community = (Community) dso;
-                // get all the collections in the community
                 List<Collection> collections = communityService.getAllCollections(context, community);
                 for (Collection collection : collections) {
                     ArrayList<UUID> items = new ArrayList<>();
-                    // get all the items in each collection
                     Iterator<Item> iitems = itemService.findByCollection(context, collection);
-                    try {
-                        while (iitems.hasNext()) {
-                            Item item = iitems.next();
-                            // get all the bundles in the item
-                            List<Bundle> bundles = item.getBundles();
-                            for (Bundle bundle : bundles) {
-                                // get all the bitstreams in each bundle
-                                List<Bitstream> bitstreams = bundle.getBitstreams();
-                                for (Bitstream bitstream : bitstreams) {
-                                    // add up the size
-                                    size += bitstream.getSizeBytes();
-                                }
-                            }
-                            items.add(item.getID());
-                        }
-                    } finally {
-                        if (items.size() > 0) {
-                            itemsMap.put("collection_" + collection.getID(), items);
-                        }
+                    while (iitems.hasNext()) {
+                        items.add(iitems.next().getID());
+                    }
+                    if (!items.isEmpty()) {
+                        itemsMap.put("collection_" + collection.getID(), items);
                     }
                 }
             } else if (dso.getType() == Constants.COLLECTION) {
                 Collection collection = (Collection) dso;
                 ArrayList<UUID> items = new ArrayList<>();
-
-                // get all the items in the collection
                 Iterator<Item> iitems = itemService.findByCollection(context, collection);
-                try {
-                    while (iitems.hasNext()) {
-                        Item item = iitems.next();
-                        // get all thebundles in the item
-                        List<Bundle> bundles = item.getBundles();
-                        for (Bundle bundle : bundles) {
-                            // get all the bitstreams in the bundle
-                            List<Bitstream> bitstreams = bundle.getBitstreams();
-                            for (Bitstream bitstream : bitstreams) {
-                                // add up the size
-                                size += bitstream.getSizeBytes();
-                            }
-                        }
-                        items.add(item.getID());
-                    }
-                } finally {
-                    if (items.size() > 0) {
-                        itemsMap.put("collection_" + collection.getID(), items);
-                    }
+                while (iitems.hasNext()) {
+                    items.add(iitems.next().getID());
+                }
+                if (!items.isEmpty()) {
+                    itemsMap.put("collection_" + collection.getID(), items);
                 }
             } else if (dso.getType() == Constants.ITEM) {
                 Item item = (Item) dso;
-                // get all the bundles in the item
-                List<Bundle> bundles = item.getBundles();
-                for (Bundle bundle : bundles) {
-                    // get all the bitstreams in the bundle
-                    List<Bitstream> bitstreams = bundle.getBitstreams();
-                    for (Bitstream bitstream : bitstreams) {
-                        // add up the size
-                        size += bitstream.getSizeBytes();
-                    }
-                }
                 ArrayList<UUID> items = new ArrayList<>();
                 items.add(item.getID());
                 itemsMap.put("item_" + item.getID(), items);
-            } else {
-                // nothing to do just ignore this type of DSpaceObject
-            }
-        }
-
-        // check the size of all the bitstreams against the configuration file
-        // entry if it exists
-        String megaBytes = configurationService
-            .getProperty("org.dspace.app.itemexport.max.size");
-        if (megaBytes != null) {
-            float maxSize = 0;
-            try {
-                maxSize = Float.parseFloat(megaBytes);
-            } catch (Exception e) {
-                // ignore...configuration entry may not be present
-            }
-
-            if (maxSize > 0 && maxSize < (size / 1048576.00)) { // a megabyte
-                throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
-                                              "The overall size of this export is too large.  Please contact your " +
-                                                  "administrator for more information.");
             }
         }
 
