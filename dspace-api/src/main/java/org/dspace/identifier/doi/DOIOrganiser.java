@@ -324,11 +324,13 @@ public class DOIOrganiser {
 
     }
 
-    /**
+      /**
      * Process all DOIs matching the given statuses in batches.
-     * Each batch queries moves the offset by BATCH_SIZE. Each doi will be process once
-     * and the loop will stop, when all dois have been iterated (the batch is empty)
-     * or an entire batch fails (to prevent infinite loops).
+     * If for some reason a doi can not be processed (i.e the doi status does not change after processing)
+     * a stuck counter increases and the follwoing batch query is offset by this counter.
+     * This will skip unprocessable dois and ensures loop termination. 
+     * Each doi will be process once and the loop will stop, when all dois have been iterated (the batch is empty)
+     * or an entire batch fails (to prevent infinite loops). 
      * Unprocessable dois stay in the database and will be queried again in the next run.
      * Admins should be notified by email or log entry about possible errors.
      *
@@ -344,35 +346,32 @@ public class DOIOrganiser {
         try {
             List<DOI> batch;
             boolean firstBatch = true;
-            int offset = 0;
+            // Number of DOIs that could not be processed and therefore remain in the query result.
+            int stuck = 0;
             do {
-                batch = doiService.getDOIsByStatus(context, statuses, BATCH_SIZE, offset);
+                batch = doiService.getDOIsByStatus(context, statuses, BATCH_SIZE, stuck);
                 if (firstBatch && batch.isEmpty()) {
                     System.err.println("There are no objects in the database "
                                            + "that could be processed for " + processName + ".");
                 }
                 firstBatch = false;
-                // many errors in doi processing are shadowed by DOIIdentifierException,
-                // that do not change database status. This forces change in batch
-                offset = offset + BATCH_SIZE;
-                int succeeded = 0;
+
                 for (DOI doi : batch) {
                     doi = context.reloadEntity(doi);
                     try {
                         operation.process(doi);
                         context.commit();
-                        succeeded++;
                     } catch (Exception e) {
                         System.err.format("DOI %s %s failed, skipping: %s%n",
                                           doi.getDoi(), processName, e.getMessage());
                         context.rollback();
                     }
-                }
-                // If no DOI in this batch succeeded, stop to prevent an infinite loop.
-                if (!batch.isEmpty() && succeeded == 0) {
-                    System.err.println("Entire batch failed for " + processName
-                                           + ", stopping to prevent infinite loop.");
-                    break;
+                    // The operation may have logged and mailed an error without rethrowing it,
+                    // leaving the status untouched. Skip such DOIs instead of querying them again.
+                    DOI processedDoi = context.reloadEntity(doi);
+                    if (null != processedDoi && statuses.contains(processedDoi.getStatus())) {
+                        stuck++;
+                    }
                 }
             } while (!batch.isEmpty());
         } catch (SQLException ex) {
