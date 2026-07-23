@@ -341,6 +341,8 @@ public class XMLUtils {
             String filePath;
             if (systemId.startsWith("file://")) {
                 filePath = systemId.substring(7);
+            } else if (systemId.startsWith("file:/")) {
+                filePath = systemId.substring(6);
             } else if (systemId.startsWith("file:")) {
                 filePath = systemId.substring(5);
             } else if (!systemId.contains("://")) {
