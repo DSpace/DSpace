@@ -185,11 +185,10 @@ public class DiscoveryConfigurationService {
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrIndexableObject(Context context,
                                                                                    String configurationName,
                                                                                    IndexableObject indexableObject) {
-        if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
-            return getMap().get(configurationName);
-        } else {
-            return getDiscoveryConfiguration(context, indexableObject);
+        if (indexableObject == null) {
+            return this.getDiscoveryConfiguration(configurationName, true);
         }
+        return getDiscoveryConfiguration(context, indexableObject);
     }
 
     /**
