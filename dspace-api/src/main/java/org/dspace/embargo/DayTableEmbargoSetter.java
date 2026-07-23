@@ -65,7 +65,7 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter {
             if (days != null && days.length() > 0) {
                 long lift = Instant.now().toEpochMilli() +
                     (Long.parseLong(days) * 24 * 60 * 60 * 1000);
-                return new DCDate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(lift), ZoneOffset.UTC));
+                return new DCDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(lift), ZoneOffset.UTC));
             }
         }
         return null;
