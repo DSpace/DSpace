@@ -328,9 +328,9 @@ public class DOIOrganiser {
      * Process all DOIs matching the given statuses in batches.
      * If for some reason a doi can not be processed (i.e the doi status does not change after processing)
      * a stuck counter increases and the follwoing batch query is offset by this counter.
-     * This will skip unprocessable dois and ensures loop termination. 
+     * This will skip unprocessable dois and ensures loop termination.
      * Each doi will be process once and the loop will stop, when all dois have been iterated (the batch is empty)
-     * or an entire batch fails (to prevent infinite loops). 
+     * or an entire batch fails (to prevent infinite loops).
      * Unprocessable dois stay in the database and will be queried again in the next run.
      * Admins should be notified by email or log entry about possible errors.
      *
