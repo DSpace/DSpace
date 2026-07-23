@@ -129,7 +129,7 @@ public class DCInputsReader {
         File inputFile = new File(fileName);
         String inputFileDir = inputFile.toPath().normalize().getParent().toString();
 
-        String uri = "file:" + inputFile.getAbsolutePath();
+        String uri = inputFile.toURI().toString();
 
         try {
             // This document builder will *not* disable external

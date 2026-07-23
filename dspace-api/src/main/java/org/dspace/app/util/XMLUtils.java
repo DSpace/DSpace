@@ -338,23 +338,23 @@ public class XMLUtils {
                 return null;
             }
 
-            String filePath;
-            if (systemId.startsWith("file://")) {
-                filePath = systemId.substring(7);
-            } else if (systemId.startsWith("file:/")) {
-                filePath = systemId.substring(6);
-            } else if (systemId.startsWith("file:")) {
-                filePath = systemId.substring(5);
-            } else if (!systemId.contains("://")) {
-                filePath = systemId;
-            } else {
+            URI fileUri;
+            try {
+                fileUri = new URI(systemId);
+            } catch (Exception e) {
+                throw new SAXException("Invalid URI: " + systemId, e);
+            }
+
+            // Only allow for "file" scheme or empty scheme
+            String scheme = fileUri.getScheme();
+            if (scheme != null && !"file".equalsIgnoreCase(scheme)) {
                 throw new SAXException("External resources not allowed: " + systemId +
                         ". Only local file paths are permitted.");
             }
 
             Path resolvedPath;
             try {
-                resolvedPath = Paths.get(filePath).toAbsolutePath().normalize();
+                resolvedPath = Paths.get(fileUri).toAbsolutePath().normalize();
             } catch (Exception e) {
                 throw new SAXException("Invalid path: " + systemId, e);
             }
