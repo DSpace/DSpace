@@ -809,6 +809,65 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void givenRegistrationDataWithEmail_whenPatchWithDifferentToken_thenThrowError()
+        throws Exception {
+
+        // Create first registration
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+        registrationRest.setUser(eperson.getID());
+
+        // Post first RegistrationData to create registration entry
+        getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+                                .content(mapper.writeValueAsBytes(registrationRest))
+                                .contentType(contentType))
+                   .andExpect(status().isCreated());
+
+        RegistrationData registrationData =
+            registrationDataService.findByEmail(context, registrationRest.getEmail());
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String tokenOne = registrationData.getToken();
+
+        // Create second registration with different email
+        RegistrationRest registration2Rest = new RegistrationRest();
+        registration2Rest.setEmail("person@example.org");
+
+        // Post second RegistrationData to create registration entry
+        getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+                                .content(mapper.writeValueAsBytes(registration2Rest))
+                                .contentType(contentType))
+                   .andExpect(status().isCreated());
+
+        RegistrationData registration2Data =
+            registrationDataService.findByEmail(context, registration2Rest.getEmail());
+
+        assertThat(registration2Data, notNullValue());
+        assertThat(registration2Data.getToken(), not(emptyOrNullString()));
+
+        String tokenTwo = registration2Data.getToken();
+
+        // Create patch content to modify the email fo the first registration
+        String newMail = "vins-01@fake.mail";
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        // Here we are attempting to patch the *first* registration using the token from the *second* registration
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, tokenTwo)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then unauthorized error is thrown
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void givenRegistrationDataWithEmail_whenPatchForReplaceEmail_thenSuccessfullResponse()
         throws Exception {
 

@@ -256,11 +256,12 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         return converter.toRest(registrationData, utils.obtainProjection());
     }
 
-    private void validateToken(Context context, String token) {
+    private void validateToken(Context context, Integer id, String token) {
         try {
             RegistrationData registrationData =
                 registrationDataService.findByToken(context, token);
-            if (registrationData == null || !registrationDataService.isValid(registrationData)) {
+            if (registrationData == null || !registrationDataService.isValid(registrationData) ||
+                !id.equals(registrationData.getID())) {
                 throw new AccessDeniedException("The token is invalid");
             }
         } catch (SQLException e) {
@@ -294,7 +295,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         }
         Context context = obtainContext();
 
-        validateToken(context, token);
+        validateToken(context, id, token);
 
         try {
             resourcePatch.patch(context, registrationDataService.find(context, id), patch.getOperations());
