@@ -94,7 +94,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             processService.start(context, process);
             context.complete();
             logInfo("The script has started");
-        } catch (SQLException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be started", e);
         } finally {
             if (context.isValid()) {
@@ -281,8 +281,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             process.setProcessStatus(ProcessStatus.SCHEDULED);
             processService.update(context, process);
             context.complete();
-        } catch (SQLException e) {
-            log.error("RestDSpaceRunnableHandler with process: " + processId + " ran into an SQLException", e);
+        } catch (SQLException | AuthorizeException e) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " ran into an exception", e);
         } finally {
             if (context.isValid()) {
                 context.abort();
