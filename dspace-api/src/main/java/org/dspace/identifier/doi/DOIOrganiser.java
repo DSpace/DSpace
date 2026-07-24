@@ -65,7 +65,7 @@ public class DOIOrganiser {
      * Functional interface for a DOI processing operation.
      */
     @FunctionalInterface
-    private interface DOIOperation {
+    interface DOIOperation {
         /**
          * Process a single DOI.
          *
@@ -324,15 +324,8 @@ public class DOIOrganiser {
 
     }
 
-      /**
-     * Process all DOIs matching the given statuses in batches.
-     * If for some reason a doi can not be processed (i.e the doi status does not change after processing)
-     * a stuck counter increases and the follwoing batch query is offset by this counter.
-     * This will skip unprocessable dois and ensures loop termination.
-     * Each doi will be process once and the loop will stop, when all dois have been iterated (the batch is empty)
-     * or an entire batch fails (to prevent infinite loops).
-     * Unprocessable dois stay in the database and will be queried again in the next run.
-     * Admins should be notified by email or log entry about possible errors.
+    /**
+     * Process all DOIs matching the given statuses in batches of {@link #BATCH_SIZE}.
      *
      * @param context     current DSpace session.
      * @param doiService  the DOI service to query.
@@ -340,16 +333,49 @@ public class DOIOrganiser {
      * @param operation   the operation to perform on each DOI.
      * @param processName a human-readable name for the operation (for logging).
      */
-    private static void processBatched(Context context, DOIService doiService,
-                                       List<Integer> statuses, DOIOperation operation,
-                                       String processName) {
+    static void processBatched(Context context, DOIService doiService,
+                               List<Integer> statuses, DOIOperation operation,
+                               String processName) {
+        processBatched(context, doiService, statuses, operation, processName, BATCH_SIZE);
+    }
+
+    /**
+     * Process all DOIs matching the given statuses in batches of the given size.
+     *
+     * <p>A DOI that was processed successfully changes its status and drops out of the query on
+     * its own, so the paging window only has to move past the DOIs that did <em>not</em> make
+     * progress. A DOI whose status is still one of the queried statuses after the operation ran is
+     * counted as stuck and the offset of the next query is increased accordingly.
+     *
+     * <p>This guarantees that the loop terminates: the offset strictly increases for every stuck
+     * DOI, while every queued DOI is attempted exactly once per run. Note that an operation can
+     * fail without throwing: {@link #register(DOI)} and friends report an
+     * {@link org.dspace.identifier.IdentifierException} by log entry and alert mail and then return
+     * normally, leaving the status untouched. Such DOIs stay in the database and are queried again
+     * on the next run.
+     *
+     * <p>The batch size is a parameter to allow tests to exercise the paging across several
+     * batches; production code calls
+     * {@link #processBatched(Context, DOIService, List, DOIOperation, String)}, which uses
+     * {@link #BATCH_SIZE}.
+     *
+     * @param context     current DSpace session.
+     * @param doiService  the DOI service to query.
+     * @param statuses    the statuses to query for.
+     * @param operation   the operation to perform on each DOI.
+     * @param processName a human-readable name for the operation (for logging).
+     * @param batchSize   the number of DOIs to fetch per query.
+     */
+    static void processBatched(Context context, DOIService doiService,
+                               List<Integer> statuses, DOIOperation operation,
+                               String processName, int batchSize) {
         try {
             List<DOI> batch;
             boolean firstBatch = true;
             // Number of DOIs that could not be processed and therefore remain in the query result.
             int stuck = 0;
             do {
-                batch = doiService.getDOIsByStatus(context, statuses, BATCH_SIZE, stuck);
+                batch = doiService.getDOIsByStatus(context, statuses, batchSize, stuck);
                 if (firstBatch && batch.isEmpty()) {
                     System.err.println("There are no objects in the database "
                                            + "that could be processed for " + processName + ".");
