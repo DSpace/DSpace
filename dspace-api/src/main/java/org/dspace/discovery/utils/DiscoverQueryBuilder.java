@@ -145,7 +145,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
         queryArgs.setSpellCheck(true);
 
         queryArgs.addProperty("spellcheck.q", query);
-        queryArgs.addProperty("spellcheck.count", String.valueOf(discoveryConfiguration.getSpellcheckCount()));
+        queryArgs.addProperty("spellcheck.count", String.valueOf(discoveryConfiguration.getSpellCheckCount()));
         queryArgs.addProperty("spellcheck.collate", "true");
         queryArgs.addProperty("spellcheck.extendedResults", "true");
     }

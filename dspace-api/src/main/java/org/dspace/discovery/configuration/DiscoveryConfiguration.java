@@ -224,11 +224,11 @@ public class DiscoveryConfiguration implements InitializingBean {
         return null;
     }
 
-    public int getSpellcheckCount() {
+    public int getSpellCheckCount() {
         return spellCheckCount;
     }
 
-    public void setSpellcheckCount(int spellCheckCount) {
+    public void setSpellCheckCount(int spellCheckCount) {
         this.spellCheckCount = spellCheckCount;
     }
 }

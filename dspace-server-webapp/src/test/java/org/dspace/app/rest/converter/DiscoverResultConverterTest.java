@@ -67,7 +67,7 @@ public class DiscoverResultConverterTest {
     }
 
     // -----------------------------------------------------------------------
-    // spellcheck: suggestion presente
+    // spellcheck: suggestion present
     // -----------------------------------------------------------------------
 
     @Test
@@ -79,22 +79,13 @@ public class DiscoverResultConverterTest {
         assertEquals(List.of("java"), result.getSpellCheckSuggestions());
     }
 
-    @Test
-    public void testSpellCheckSuggestionIsTrimmed() {
-        discoverResult.setSpellCheckSuggestions(List.of("java"));
-
-        SearchResultsRest result = convert("jav");
-
-        assertEquals(List.of("java"), result.getSpellCheckSuggestions());
-    }
-
     // -----------------------------------------------------------------------
-    // spellcheck: suggestion assente / vuota / blank
+    // spellcheck: suggestion missing / empty / blank
     // -----------------------------------------------------------------------
 
     @Test
     public void testSpellCheckSuggestionIsNullWhenNotProvided() {
-        // nessuna suggestion impostata sul DiscoverResult
+        // no suggestion set on the DiscoverResult
         SearchResultsRest result = convert("anyquery");
 
         assertEquals(null, result.getSpellCheckSuggestions());

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -1006,33 +1007,30 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             List<String> zombieDocs = new ArrayList<>();
             QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
                           solrSearchCore.REQUEST_METHOD);
-            SpellCheckResponse spellCheckResponse = solrQueryResponse.getSpellCheckResponse();
-            if (spellCheckResponse != null) {
-                List<String> suggestions = new ArrayList<>();
-                List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
-                if (collations != null && !collations.isEmpty()) {
-                    suggestions.addAll(collations.stream()
-                            .map(collation -> collation.getCollationQueryString().trim())
-                            .toList());
-                }
-
-                List<SpellCheckResponse.Suggestion> alternatives = spellCheckResponse.getSuggestions();
-                if (alternatives != null && !alternatives.isEmpty()) {
-                    alternatives.stream()
-                            .flatMap(s -> IntStream.range(0, s.getAlternatives().size())
-                                    .mapToObj(i -> Map.entry(
-                                            s.getAlternatives().get(i),
-                                            s.getAlternativeFrequencies().get(i))))
-                            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                            .forEach(e -> {
-                                if (!suggestions.contains(e.getKey())) {
-                                    suggestions.add(e.getKey());
-                                }
-                            });
-                }
-                result.setSpellCheckSuggestions(suggestions);
-            }
             if (solrQueryResponse != null) {
+                SpellCheckResponse spellCheckResponse = solrQueryResponse.getSpellCheckResponse();
+                if (spellCheckResponse != null) {
+                    List<String> suggestions = new ArrayList<>();
+                    List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
+                    if (collations != null && !collations.isEmpty()) {
+                        suggestions.addAll(collations.stream()
+                                .map(collation -> collation.getCollationQueryString().trim())
+                                .toList());
+                    }
+
+                    List<SpellCheckResponse.Suggestion> alternatives = spellCheckResponse.getSuggestions();
+                    if (CollectionUtils.isNotEmpty(alternatives)) {
+                        alternatives.stream()
+                                .flatMap(this::getAlternativesByFrequency)
+                                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                                .forEach(e -> {
+                                    if (!suggestions.contains(e.getKey())) {
+                                        suggestions.add(e.getKey());
+                                    }
+                                });
+                    }
+                    result.setSpellCheckSuggestions(suggestions);
+                }
                 result.setSearchTime(solrQueryResponse.getQTime());
                 result.setStart(query.getStart());
                 result.setMaxResults(query.getMaxResults());
@@ -1118,6 +1116,39 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             throw new RuntimeException(message);
         }
         return result;
+    }
+
+    /**
+     * Pairs each spellcheck alternative of the given suggestion with its frequency in the index.
+     * <p>
+     * Solr only returns the alternative frequencies when the {@code spellcheck.extendedResults} parameter is
+     * enabled, so {@link SpellCheckResponse.Suggestion#getAlternativeFrequencies()} may be {@code null}. When the
+     * frequencies are missing, or their amount does not match the amount of alternatives, all the alternatives are
+     * paired with a frequency of 0: this keeps the ordering returned by Solr (which is already sorted by relevance)
+     * since the sorting applied by the caller is stable.
+     *
+     * @param suggestion the spellcheck suggestion to process
+     * @return a stream of alternative / frequency pairs, empty if the suggestion has no alternatives
+     */
+    private Stream<Map.Entry<String, Integer>> getAlternativesByFrequency(SpellCheckResponse.Suggestion suggestion) {
+        List<String> alternatives = suggestion.getAlternatives();
+        if (CollectionUtils.isEmpty(alternatives)) {
+            return Stream.empty();
+        }
+
+        List<Integer> frequencies = suggestion.getAlternativeFrequencies();
+        boolean hasFrequencies = frequencies != null && frequencies.size() == alternatives.size();
+
+        return IntStream.range(0, alternatives.size())
+                        .filter(i -> StringUtils.isNotBlank(alternatives.get(i)))
+                        .mapToObj(i -> Map.entry(alternatives.get(i), getFrequency(frequencies, hasFrequencies, i)));
+    }
+
+    private int getFrequency(List<Integer> frequencies, boolean hasFrequencies, int index) {
+        if (!hasFrequencies || frequencies.get(index) == null) {
+            return 0;
+        }
+        return frequencies.get(index);
     }
 
     /**
