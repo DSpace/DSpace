@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
@@ -64,7 +65,7 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter {
             String days = termProps.getProperty(terms);
             if (days != null && days.length() > 0) {
                 long lift = Instant.now().toEpochMilli() +
-                    (Long.parseLong(days) * 24 * 60 * 60 * 1000);
+                    TimeUnit.DAYS.toMillis(Long.parseLong(days));
                 return new DCDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(lift), ZoneOffset.UTC));
             }
         }
