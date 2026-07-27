@@ -10,7 +10,9 @@ package org.dspace.core;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
 import java.net.InetAddress;
@@ -155,5 +157,16 @@ public class UtilsTest extends AbstractUnitTest {
     @Test
     public void testGenerateHexKeyLength() {
         assertEquals("Hex key should be 32 characters long", 32, Utils.generateHexKey().length());
+    }
+
+    /**
+     * Test that generateKey returns a non-empty base-10 string that does not repeat across calls.
+     * This is the fast, non-security identifier used for Bitstream storage ids.
+     */
+    @Test
+    public void testGenerateKey() {
+        String key = Utils.generateKey();
+        assertTrue("Key should be a non-empty sequence of base-10 digits", key.matches("\\d+"));
+        assertNotEquals("Two generated keys should not be identical", key, Utils.generateKey());
     }
 }
