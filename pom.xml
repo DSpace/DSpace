@@ -517,6 +517,7 @@
                             </includes>
                             <excludes>
                                 <exclude>**/target/**</exclude>
+                                <exclude>**/.*/**</exclude>
                             </excludes>
                         </validationSet>
                     </validationSets>
