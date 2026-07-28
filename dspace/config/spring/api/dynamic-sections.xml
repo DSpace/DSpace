@@ -164,14 +164,7 @@
                     <property name="discoveryConfigurationName" value="homePageTopItems" />
                     <property name="sortField" value="dc.date.accessioned" />
                     <property name="order" value="desc" />
-                    <property name="style" value="col-md-6"/>
-                    <property name="numberOfItems" value="5"/>
-                </bean>
-                <bean class="org.dspace.layout.DynamicLayoutTopComponent">
-                    <property name="discoveryConfigurationName" value="homePageTopItems" />
-                    <property name="sortField" value="metric.view" />
-                    <property name="order" value="desc" />
-                    <property name="style" value="col-md-6"/>
+                    <property name="style" value="col-12"/>
                     <property name="numberOfItems" value="5"/>
                 </bean>
             </list>
