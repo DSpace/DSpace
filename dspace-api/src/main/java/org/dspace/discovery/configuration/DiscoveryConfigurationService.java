@@ -185,6 +185,13 @@ public class DiscoveryConfigurationService {
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrIndexableObject(Context context,
                                                                                    String configurationName,
                                                                                    IndexableObject indexableObject) {
+        if (indexableObject != null
+                && (StringUtils.equals(configurationName, "collection")
+                    || StringUtils.equals(configurationName, "community"))
+                && indexableObject instanceof IndexableDSpaceObject) {
+            return getDiscoveryConfiguration(context, indexableObject);
+        }
+
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
         } else {
