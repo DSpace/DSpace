@@ -458,7 +458,6 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                             log.error("Multiple beans of type {} found. Only one bean was expected!", type.getName());
                         }
                     }
-                    }
                 } catch (BeansException e) {
                     // I guess there are no beans of this type
                     log.error(e.getMessage(), e);
