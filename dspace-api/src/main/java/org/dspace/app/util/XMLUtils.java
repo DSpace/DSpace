@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -349,13 +350,25 @@ public class XMLUtils {
                     fileUri = Paths.get(systemId).toUri();
                 } catch (Exception e2) {
                     // Doesn't appear to be a valid URI or a Path, so we'll have to throw an error.
-                    throw new SAXException("Invalid path: " + systemId, e2);
+                    throw new SAXException("Invalid URI or path: " + systemId, e2);
                 }
             }
 
-            // Only allow for "file" scheme or empty scheme
             String scheme = fileUri.getScheme();
-            if (scheme != null && !"file".equalsIgnoreCase(scheme)) {
+
+            // If our URI has a null scheme, that means it's a relative URI or missing its scheme (e.g. /tmp/path)
+            // Because we only accept file URIs, we'll attempt to recreate it as a file URI.
+            if (scheme == null) {
+                try {
+                    fileUri = new URI("file", fileUri.getSchemeSpecificPart(), fileUri.getFragment());
+                    scheme = fileUri.getScheme();
+                } catch (URISyntaxException e) {
+                    throw new SAXException("Cannot convert to absolute file URI:" + systemId, e);
+                }
+            }
+
+            // Only allow for "file" scheme
+            if (!"file".equalsIgnoreCase(scheme)) {
                 throw new SAXException("External resources not allowed: " + systemId +
                         ". Only local file paths are permitted.");
             }
@@ -480,7 +493,7 @@ public class XMLUtils {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            final URI uri;
+            URI uri;
             // Base path is optional, as the "href" might already be an absolute path
             if (base == null || base.isEmpty()) {
                 uri = URI.create(href);
@@ -488,9 +501,21 @@ public class XMLUtils {
                 uri = URI.create(base).resolve(href);
             }
 
-            // Only allow for "file" scheme or empty scheme
             String scheme = uri.getScheme();
-            if (scheme != null && !"file".equalsIgnoreCase(scheme)) {
+
+            // If our URI has a null scheme, that means it's a relative URI or missing its scheme (e.g. /tmp/path)
+            // Because we only accept file URIs, we'll attempt to recreate it as a file URI.
+            if (scheme == null) {
+                try {
+                    uri = new URI("file", uri.getSchemeSpecificPart(), uri.getFragment());
+                    scheme = uri.getScheme();
+                } catch (URISyntaxException e) {
+                    throw new TransformerException("Cannot convert to absolute file URI:" + uri, e);
+                }
+            }
+
+            // Only allow for "file" scheme
+            if (!"file".equalsIgnoreCase(scheme)) {
                 throw new TransformerException("External resources not allowed: " + uri +
                                            ". Only local file paths are permitted.");
             }
