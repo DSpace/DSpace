@@ -452,7 +452,12 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                         // only return the bean if there is exactly one
                         service = (T) map.values().iterator().next();
                     } else {
-                        log.error("Multiple beans of type {} found. Only one was expected!", type.getName());
+                        if (map.isEmpty()) {
+                            log.error("No bean of type {} found. One bean was expected!", type.getName());
+                        } else {
+                            log.error("Multiple beans of type {} found. Only one bean was expected!", type.getName());
+                        }
+                    }
                     }
                 } catch (BeansException e) {
                     // I guess there are no beans of this type
