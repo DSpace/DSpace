@@ -537,7 +537,7 @@
                 </executions>
                 <configuration>
                     <validationSets>
-                        <!-- validate ALL XML and XSL files throughout the project (excluding target dirs) -->
+                        <!-- validate ALL XML and XSL files throughout the project (excluding target and dot dirs) -->
                         <validationSet>
                             <dir>${root.basedir}</dir>
                             <includes>
