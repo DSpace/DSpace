@@ -93,10 +93,7 @@ public class DynamicLayoutSectionRestRepositoryIT extends AbstractControllerInte
                                                                                                  "person")))))
 
             .andExpect(jsonPath("$._embedded.sections",
-              hasItem(withIdAndTopComponent("site", 2, 0, "col-md-6", "homePageTopItems", "dc.date.accessioned",
-                                            "desc", 5))))
-            .andExpect(jsonPath("$._embedded.sections",
-              hasItem(withIdAndTopComponent("site", 2, 1, "col-md-6", "homePageTopItems", "metric.view",
+              hasItem(withIdAndTopComponent("site", 2, 0, "col-12", "homePageTopItems", "dc.date.accessioned",
                                             "desc", 5))))
             ;
     }
