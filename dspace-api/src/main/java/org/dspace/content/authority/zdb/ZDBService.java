@@ -19,6 +19,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -68,17 +69,27 @@ public class ZDBService {
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build();
              CloseableHttpResponse response = client.execute(new HttpGet(requestURL))) {
 
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode != HttpStatus.SC_OK) {
-                throw new RuntimeException("WS call failed: " + statusCode);
+            if (response.getStatusLine() == null) {
+                throw new IOException("WS call failed: no status line in the ZDB response");
             }
 
-            DocumentBuilderFactory factory = XMLUtils.getDocumentBuilderFactory();
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                throw new IOException("WS call failed: " + statusCode);
+            }
+
+            // A HTTP 200 is theoretically possible without a body, so guard the entity before reading it
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                throw new IOException("WS call failed: empty entity in the ZDB response");
+            }
+
             DocumentBuilder builder;
             try {
+                DocumentBuilderFactory factory = XMLUtils.getDocumentBuilderFactory();
                 builder = factory.newDocumentBuilder();
 
-                Document inDoc = builder.parse(response.getEntity().getContent());
+                Document inDoc = builder.parse(entity.getContent());
 
                 Element xmlRoot = inDoc.getDocumentElement();
 
@@ -90,6 +101,12 @@ public class ZDBService {
 
                 } else {
                     Element recordsElement = XMLUtils.getSingleElement(xmlRoot, "records");
+
+                    if (recordsElement == null) {
+                        // No "records" element found: no results to parse, return an empty list
+                        log.info("No 'records' element found in the ZDB response for URL: {}", requestURL);
+                        return results;
+                    }
 
                     // called search endpoint
                     List<Element> recordElement = XMLUtils.getElementList(recordsElement, "record");
