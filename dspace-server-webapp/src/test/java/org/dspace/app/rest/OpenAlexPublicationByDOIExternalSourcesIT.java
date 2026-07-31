@@ -60,16 +60,20 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
     @Qualifier("openalexImportPublicationByDOIService")
     private OpenAlexImportMetadataSourceServiceImpl openAlexImportMetadataSourceService;
 
+    String token;
 
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         ReflectionTestUtils.setField(openAlexImportMetadataSourceService, "liveImportClient", liveImportClient);
+        // All tests just require basic authentication privileges
+        token = getAuthToken(eperson.getEmail(), password);
     }
 
     @Test
     public void findOneOpenalexImportPublicationByDOIExternalSourceTest() throws Exception {
-        getClient().perform(get("/api/integration/externalsources?size=25")).andExpect(status().isOk())
+        getClient(token).perform(get("/api/integration/externalsources?size=25")).andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItem(
                        ExternalSourceMatcher.matchExternalSource("openalexPublicationByDOI",
                                                                  "openalexPublicationByDOI", false))));
@@ -84,11 +88,18 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
                 .thenReturn(jsonResponse);
 
 
-            getClient().perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
+            getClient(token).perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
                                     .param("query", "W1775749144"))
                        .andExpect(status().isOk()).andExpect(jsonPath("$.page.number", is(0)));
             verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), anyString(), anyMap());
         }
+    }
+
+    @Test
+    public void findOpenalexPublicationByDOIExternalSourceEntriesEmptyWithQueryAnonymousTest() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
+                                     .param("query", "W1775749144"))
+                        .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -100,7 +111,7 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);
 
-            getClient().perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
+            getClient(token).perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
                                     .param("query", "10.1016/s0021-9258(19)52451-6"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasSize(1)))
@@ -220,7 +231,7 @@ public class OpenAlexPublicationByDOIExternalSourcesIT extends AbstractControlle
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);
 
-            getClient().perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
+            getClient(token).perform(get("/api/integration/externalsources/openalexPublicationByDOI/entries")
                                     .param("query", "https://doi.org/10.1016/s0021-9258(19)52451-6"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasSize(1)))

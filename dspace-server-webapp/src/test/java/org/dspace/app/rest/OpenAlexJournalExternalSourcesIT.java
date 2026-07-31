@@ -53,15 +53,20 @@ public class OpenAlexJournalExternalSourcesIT extends AbstractControllerIntegrat
     @Qualifier("openalexImportJournalService")
     private OpenAlexImportMetadataSourceServiceImpl openAlexImportMetadataSourceService;
 
+    String token;
 
     @Before
-    public void setUp() {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         ReflectionTestUtils.setField(openAlexImportMetadataSourceService, "liveImportClient", liveImportClient);
+        // All tests just require basic authentication privileges
+        token = getAuthToken(eperson.getEmail(), password);
     }
 
     @Test
     public void findOneOpenalexImportJournalServiceExternalSourceTest() throws Exception {
-        getClient().perform(get("/api/integration/externalsources?size=25")).andExpect(status().isOk())
+        getClient(token).perform(get("/api/integration/externalsources?size=25")).andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItem(
                        ExternalSourceMatcher.matchExternalSource("openalexJournal",
                                                                  "openalexJournal", false))));
@@ -76,11 +81,18 @@ public class OpenAlexJournalExternalSourcesIT extends AbstractControllerIntegrat
                 .thenReturn(jsonResponse);
 
 
-            getClient().perform(get("/api/integration/externalsources/openalexJournal/entries")
+            getClient(token).perform(get("/api/integration/externalsources/openalexJournal/entries")
                                     .param("query", "empty"))
                        .andExpect(status().isOk()).andExpect(jsonPath("$.page.number", is(0)));
             verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), anyString(), anyMap());
         }
+    }
+
+    @Test
+    public void findOpenalexJournalExternalSourceEntriesEmptyWithQueryAnonymousTest() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/openalexJournal/entries")
+                                     .param("query", "empty"))
+                        .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -91,7 +103,7 @@ public class OpenAlexJournalExternalSourcesIT extends AbstractControllerIntegrat
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);
 
-            getClient().perform(get("/api/integration/externalsources/openalexJournal/entries")
+            getClient(token).perform(get("/api/integration/externalsources/openalexJournal/entries")
                                     .param("query", "Chem"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].id").value("S41354064"))
@@ -142,7 +154,7 @@ public class OpenAlexJournalExternalSourcesIT extends AbstractControllerIntegrat
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);
 
-            getClient().perform(get("/api/integration/externalsources/openalexJournal/entries")
+            getClient(token).perform(get("/api/integration/externalsources/openalexJournal/entries")
                                     .param("query", "Chem"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.externalSourceEntries", hasSize(2)))

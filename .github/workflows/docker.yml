@@ -11,7 +11,21 @@ on:
       - 'dspace-**'
     tags:
       - 'dspace-**'
+    # Don't run if PR is only updating static documentation
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'LICENSES_THIRD_PARTY'
+      - 'NOTICE'
+      - '**/*.md'
   pull_request:
+    # Don't run if PR is only updating static documentation
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'LICENSES_THIRD_PARTY'
+      - 'NOTICE'
+      - '**/*.md'
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)

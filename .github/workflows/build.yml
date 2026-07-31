@@ -4,7 +4,23 @@
 name: Build
 
 # Run this Build for all pushes / PRs to current branch
-on: [push, pull_request]
+on:
+  push:
+    # Don't run if PR is only updating static documentation
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'LICENSES_THIRD_PARTY'
+      - 'NOTICE'
+      - '**/*.md'
+  pull_request:
+    # Don't run if PR is only updating static documentation
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'LICENSES_THIRD_PARTY'
+      - 'NOTICE'
+      - '**/*.md'
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
@@ -84,6 +100,9 @@ jobs:
   codecov:
     # Must run after 'tests' job above
     needs: tests
+    # Only run on the upstream repository: forks do not have the CODECOV_TOKEN secret,
+    # and Codecov refuses to create a commit on a protected branch without a token.
+    if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

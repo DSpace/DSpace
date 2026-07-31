@@ -17,9 +17,20 @@ import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 
 public class OpenaireFundingExternalSourcesIT extends AbstractControllerIntegrationTest {
+
+    String token;
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        // All tests just require basic authentication privileges
+        token = getAuthToken(eperson.getEmail(), password);
+    }
 
     /**
      * Test openaire funding external source
@@ -28,7 +39,7 @@ public class OpenaireFundingExternalSourcesIT extends AbstractControllerIntegrat
      */
     @Test
     public void findOneOpenaireFundingExternalSourceTest() throws Exception {
-        getClient().perform(get("/api/integration/externalsources")).andExpect(status().isOk())
+        getClient(token).perform(get("/api/integration/externalsources")).andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItem(
                         ExternalSourceMatcher.matchExternalSource("openaireFunding", "openaireFunding", false))));
     }
@@ -40,9 +51,16 @@ public class OpenaireFundingExternalSourcesIT extends AbstractControllerIntegrat
      */
     @Test
     public void findOneOpenaireFundingExternalSourceEntriesEmptyWithQueryTest() throws Exception {
-
-        getClient().perform(get("/api/integration/externalsources/openaireFunding/entries").param("query", "empty"))
+        getClient(token).perform(get("/api/integration/externalsources/openaireFunding/entries")
+                                     .param("query", "empty"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page.number", is(0)));
+    }
+
+    @Test
+    public void findOneOpenaireFundingExternalSourceEntriesEmptyWithQueryAnonymousTest() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/openaireFunding/entries")
+                                     .param("query", "empty"))
+                        .andExpect(status().isUnauthorized());
     }
 
     /**
@@ -54,7 +72,7 @@ public class OpenaireFundingExternalSourcesIT extends AbstractControllerIntegrat
     @Test
     public void findOneOpenaireFundingExternalSourceEntriesWithQueryMultipleKeywordsTest() throws Exception {
 
-        getClient()
+        getClient(token)
                 .perform(
                         get("/api/integration/externalsources/openaireFunding/entries").param("query", "empty+results"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page.number", is(0)));
@@ -67,7 +85,8 @@ public class OpenaireFundingExternalSourcesIT extends AbstractControllerIntegrat
      */
     @Test
     public void findOneOpenaireFundingExternalSourceEntriesWithQueryTest() throws Exception {
-        getClient().perform(get("/api/integration/externalsources/openaireFunding/entries").param("query", "mushroom"))
+        getClient(token).perform(get("/api/integration/externalsources/openaireFunding/entries")
+                                     .param("query", "mushroom"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.externalSourceEntries",
                         Matchers.hasItem(ExternalSourceEntryMatcher.matchExternalSourceEntry(
@@ -90,7 +109,7 @@ public class OpenaireFundingExternalSourcesIT extends AbstractControllerIntegrat
         String projectName = "Portuguese Wild Mushrooms: Chemical characterization and functional study"
                 + " of antiproliferative and proapoptotic properties in cancer cell lines";
 
-        getClient().perform(get("/api/integration/externalsources/openaireFunding/entryValues/" + projectID))
+        getClient(token).perform(get("/api/integration/externalsources/openaireFunding/entryValues/" + projectID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         Matchers.allOf(hasJsonPath("$.id", is(projectID)), hasJsonPath("$.display", is(projectName)),
