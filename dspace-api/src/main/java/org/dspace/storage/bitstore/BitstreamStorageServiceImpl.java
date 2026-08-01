@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.Nullable;
 import org.apache.commons.collections.CollectionUtils;
@@ -459,13 +460,13 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected boolean isRecent(Long lastModified) {
         long now = Instant.now().toEpochMilli();
 
-        if (lastModified >= now) {
+        if (lastModified == null || lastModified >= now) {
             return true;
         }
 
-        // Less than one hour old
-        return (now - lastModified) <
-                (configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L) * 60 * 1000);
+        long waitWindowHours = configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L);
+        long waitWindowMilli = TimeUnit.HOURS.toMillis(waitWindowHours);
+        return (now - lastModified) < waitWindowMilli;
     }
 
     protected BitStoreService getStore(int position) throws IOException {

@@ -19,12 +19,12 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>21</java.version>
-        <spring.version>6.2.18</spring.version>
-        <spring-ldap.version>3.3.7</spring-ldap.version>
-        <spring-boot.version>3.5.14</spring-boot.version>
-        <spring-security.version>6.5.10</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>6.2.19</spring.version>
+        <spring-ldap.version>3.3.8</spring-ldap.version>
+        <spring-boot.version>3.5.15</spring-boot.version>
+        <spring-security.version>6.5.11</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.10.Final</hibernate.version>
-        <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
+        <hibernate-validator.version>8.0.4.Final</hibernate-validator.version>
         <!-- Pin antlr4-runtime to the version required by Hibernate (compiled with ANTLR tool 4.13.0) -->
         <antlr4.version>4.13.0</antlr4.version>
         <postgresql.driver.version>42.7.11</postgresql.driver.version>
