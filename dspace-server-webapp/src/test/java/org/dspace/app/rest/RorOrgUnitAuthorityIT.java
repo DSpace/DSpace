@@ -84,7 +84,7 @@ public class RorOrgUnitAuthorityIT extends AbstractControllerIntegrationTest {
 
         Mockito.when(
             metadataSourceService.getRecords(
-                ROR_FILTER, 0, 0
+                Mockito.eq(ROR_FILTER), Mockito.anyInt(), Mockito.anyInt()
             )
         ).thenReturn(List.of(getImportRecord1(), getImportRecord2()));
 
@@ -150,6 +150,38 @@ public class RorOrgUnitAuthorityIT extends AbstractControllerIntegrationTest {
                                                 )
                                             )
                         ));
+    }
+
+    @Test
+    public void testAuthorityFallsBackToLocalResultsWhenRorFails() throws Exception {
+
+        Mockito.reset(metadataSourceService);
+        Mockito.when(
+            metadataSourceService.getRecords(Mockito.eq(ROR_FILTER), Mockito.anyInt(), Mockito.anyInt())
+        ).thenThrow(new org.dspace.importer.external.exception.MetadataSourceException("ROR API is down"));
+
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.RorOrgUnitAuthority = OrgUnitAuthority"
+                                         });
+        configurationService.setProperty("cris.ItemAuthority.OrgUnitAuthority.source", "ror");
+        configurationService.setProperty("choices.plugin.crisrp.qualification", "OrgUnitAuthority");
+        configurationService.setProperty("choices.presentation.crisrp.qualification", "suggest");
+        configurationService.setProperty("authority.controlled.crisrp.qualification", "true");
+
+        DCInputAuthority.reset();
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.getChoiceAuthoritiesNames();
+        choiceAuthorityService.clearCache();
+        DCInputAuthority.getPluginNames();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        // The ROR API failure must be handled gracefully: the request still succeeds and
+        // returns only the (empty) local Solr results instead of propagating the exception.
+        getClient(token).perform(get("/api/submission/vocabularies/OrgUnitAuthority/entries")
+                                     .param("filter", ROR_FILTER))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.entries", hasSize(0)));
     }
 
     private ImportRecord getImportRecord1() {

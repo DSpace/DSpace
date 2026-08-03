@@ -14,7 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.authority.factory.ItemAuthorityServiceFactory;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
@@ -43,6 +46,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class RorOrgUnitAuthority extends ItemAuthority {
 
+    private static final Logger log = LogManager.getLogger(RorOrgUnitAuthority.class);
+
     private final RorImportMetadataSourceService rorImportMetadataSource =
         RorServicesFactory.getInstance().getRorImportMetadataSourceService();
 
@@ -64,22 +69,43 @@ public class RorOrgUnitAuthority extends ItemAuthority {
         super.setPluginInstanceName(authorityName);
         Choices solrChoices = super.getMatches(text, start, limit, locale);
 
+        int rorSearchStart = start > solrChoices.total ? start - solrChoices.total : 0;
+        int rorSearchLimit = limit > solrChoices.values.length ? limit - solrChoices.values.length : 0;
+
         try {
-            return solrChoices.values.length == 0 ? getRORApiMatches(text, locale, start, limit) : solrChoices;
+
+            Choices rorChoices = getRORApiMatches(text, locale, rorSearchStart, rorSearchLimit);
+            int total = solrChoices.total + rorChoices.total;
+
+            Choice[] choices = ArrayUtils.addAll(solrChoices.values, rorChoices.values);
+            return new Choices(choices, start, total, calculateConfidence(choices), total > (start + limit), 0);
+
         } catch (MetadataSourceException e) {
-            throw new RuntimeException(e);
+            log.error("An error occurred while querying the ROR API for text '{}'; "
+                + "falling back to local results", text, e);
+            return solrChoices;
         }
     }
 
     private Choices getRORApiMatches(String text, String locale, int start, int limit) throws MetadataSourceException {
-        Choice[] rorApiChoices = getChoiceFromRORQueryResults(rorImportMetadataSource.getRecords(text, 0, 0), locale)
+        if (limit <= 0) {
+            return new Choices(Choices.CF_UNSET);
+        }
+
+        Choice[] rorApiChoices = getChoiceFromRORQueryResults(
+            rorImportMetadataSource.getRecords(text, start, limit), locale)
             .toArray(new Choice[0]);
+
+        int total = rorImportMetadataSource.getRecordsCount(text);
+        if (total <= 0) {
+            total = rorApiChoices.length;
+        }
 
         int confidenceValue = itemAuthorityServiceFactory.getInstance(authorityName)
                                                          .getConfidenceForChoices(rorApiChoices);
 
-        return new Choices(rorApiChoices, start, rorApiChoices.length, confidenceValue,
-                           rorApiChoices.length > (start + limit), 0);
+        return new Choices(rorApiChoices, start, total, confidenceValue,
+                           total > (start + limit), 0);
     }
 
     private List<Choice> getChoiceFromRORQueryResults(Collection<ImportRecord> orgUnits, String locale) {

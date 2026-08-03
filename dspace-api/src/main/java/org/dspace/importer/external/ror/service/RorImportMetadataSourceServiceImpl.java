@@ -49,6 +49,9 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     protected static final String ROR_CLIENT_ID_HEADER = "Client-Id";
     protected static final String ROR_CLIENT_ID_PROP = "ror.client-id";
 
+    // The ROR v2 API returns a fixed number of results per page (controlled by the "page" parameter)
+    protected static final int ROR_PAGE_SIZE = 20;
+
     private String url;
 
     private int timeout = 5000;
@@ -79,7 +82,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
-        return retry(new SearchByQueryCallable(query));
+        return retry(new SearchByQueryCallable(query, start, count));
     }
 
     @Override
@@ -125,13 +128,23 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             query.addParameter("query", queryString);
         }
 
+        private SearchByQueryCallable(String queryString, int start, int count) {
+            query = new Query();
+            query.addParameter("query", queryString);
+            query.addParameter("start", start);
+            query.addParameter("count", count);
+        }
+
         private SearchByQueryCallable(Query query) {
             this.query = query;
         }
 
         @Override
         public List<ImportRecord> call() throws Exception {
-            return search(query.getParameterAsClass("query", String.class));
+            String queryString = query.getParameterAsClass("query", String.class);
+            Integer start = query.getParameterAsClass("start", Integer.class);
+            Integer count = query.getParameterAsClass("count", Integer.class);
+            return search(queryString, start, count);
         }
     }
 
@@ -237,16 +250,80 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     private List<ImportRecord> search(String query) {
+        return search(query, null, null);
+    }
+
+    /**
+     * Search the ROR API for the given query, honouring the requested pagination window.
+     *
+     * <p>The ROR v2 API is page-based with a fixed page size of {@value #ROR_PAGE_SIZE} results per
+     * page (controlled by the {@code page} query parameter, 1-based). DSpace, however, requests an
+     * offset-based window defined by {@code start} (0-based offset) and {@code count} (page size).
+     * To bridge the two, this method fetches every ROR page that overlaps the requested window and
+     * then slices the aggregated records down to exactly {@code [start, start + count)}.</p>
+     *
+     * <p>When {@code start}/{@code count} are {@code null} or {@code count <= 0}, the first ROR page
+     * is returned unsliced (legacy behaviour).</p>
+     *
+     * @param query the query string
+     * @param start the 0-based offset of the first record to return, or {@code null}
+     * @param count the maximum number of records to return, or {@code null}
+     * @return the windowed list of import records
+     */
+    private List<ImportRecord> search(String query, Integer start, Integer count) {
         List<ImportRecord> importResults = new ArrayList<>();
+
+        int offset = start != null && start > 0 ? start : 0;
+        int limit = count != null ? count : 0;
+
+        // Without a positive limit we cannot bound the window: fetch the first page as-is
+        if (limit <= 0) {
+            collectPage(query, 1, importResults);
+            return importResults;
+        }
+
+        // ROR pages are 1-based and fixed-size; compute the page range covering [offset, offset+limit)
+        int firstPage = (offset / ROR_PAGE_SIZE) + 1;
+        int lastPage = ((offset + limit - 1) / ROR_PAGE_SIZE) + 1;
+
+        List<ImportRecord> aggregated = new ArrayList<>();
+        for (int page = firstPage; page <= lastPage; page++) {
+            int before = aggregated.size();
+            collectPage(query, page, aggregated);
+            // Stop early if the page came back short (or empty): there are no further results
+            if (aggregated.size() - before < ROR_PAGE_SIZE) {
+                break;
+            }
+        }
+
+        // Slice the aggregated pages down to the exact requested window
+        int fromIndex = Math.min(offset - ((firstPage - 1) * ROR_PAGE_SIZE), aggregated.size());
+        int toIndex = Math.min(fromIndex + limit, aggregated.size());
+        importResults.addAll(aggregated.subList(fromIndex, toIndex));
+
+        return importResults;
+    }
+
+    /**
+     * Fetch a single ROR result page and append its parsed records to the given list.
+     *
+     * @param query   the query string
+     * @param page    the 1-based ROR page number to fetch
+     * @param results the list to append parsed records to
+     */
+    private void collectPage(String query, int page, List<ImportRecord> results) {
         try {
             Map<String, Map<String, String>> params = getBaseParams();
 
             URIBuilder uriBuilder = new URIBuilder(this.url);
             uriBuilder.addParameter("query", query);
+            if (page > 1) {
+                uriBuilder.addParameter("page", String.valueOf(page));
+            }
 
             String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             if (StringUtils.isEmpty(resp)) {
-                return importResults;
+                return;
             }
 
             JsonNode jsonNode = convertStringJsonToJsonNode(resp);
@@ -255,15 +332,14 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 Iterator<JsonNode> nodes = docs.elements();
                 while (nodes.hasNext()) {
                     JsonNode node = nodes.next();
-                    importResults.add(transformSourceRecords(node.toString()));
+                    results.add(transformSourceRecords(node.toString()));
                 }
             } else {
-                importResults.add(transformSourceRecords(docs.toString()));
+                results.add(transformSourceRecords(docs.toString()));
             }
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return importResults;
     }
 
     protected Map<String, Map<String, String>> getBaseParams() {
