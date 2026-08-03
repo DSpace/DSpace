@@ -81,13 +81,24 @@ public class OpenAIREProjectAuthority extends ItemAuthority {
 
     private Choices openAIREProjectSearch(String text, int start, int limit) {
 
+        if (limit <= 0) {
+            return new Choices(Choices.CF_UNSET);
+        }
+
         List<ImportRecord> records = importOpenAIREProjects(text, start, limit);
 
         if (CollectionUtils.isEmpty(records)) {
             return new Choices(Choices.CF_UNSET);
         }
 
-        int total = records.size();
+        // The OpenAIRE API reports the grand total across all pages in the response header
+        // (//header/total), exposed via getRecordsCount. Use it so that pagination reflects the
+        // full result set rather than the size of the single page returned here. Fall back to the
+        // page size when the count is unavailable.
+        int total = countOpenAIREProjects(text);
+        if (total <= 0) {
+            total = records.size();
+        }
 
         Choice[] choices = records.stream()
             .map(this::convertToChoice)
@@ -99,6 +110,14 @@ public class OpenAIREProjectAuthority extends ItemAuthority {
     private List<ImportRecord> importOpenAIREProjects(String text, int start, int limit) {
         try {
             return (List<ImportRecord>) openAIREProjectService.getRecords(text, start, limit);
+        } catch (MetadataSourceException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private int countOpenAIREProjects(String text) {
+        try {
+            return openAIREProjectService.getRecordsCount(text);
         } catch (MetadataSourceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -71,19 +70,25 @@ public class OpenAIREProjectAuthorityIT extends AbstractControllerIntegrationTes
     public void setup() throws Exception {
         DSpaceHttpClientFactory mockFactory = Mockito.mock(DSpaceHttpClientFactory.class);
         CloseableHttpClient mockClient = Mockito.mock(CloseableHttpClient.class);
-        CloseableHttpResponse mockResponse = Mockito.mock(CloseableHttpResponse.class);
         StatusLine mockStatusLine = Mockito.mock(StatusLine.class);
-        HttpEntity mockEntity = Mockito.mock(HttpEntity.class);
 
         String xml = IOUtils.resourceToString(
             "/org/dspace/external/openaire-projects.xml", StandardCharsets.UTF_8);
-        InputStream xmlStream = IOUtils.toInputStream(xml, StandardCharsets.UTF_8);
 
         Mockito.when(mockStatusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
-        Mockito.when(mockResponse.getStatusLine()).thenReturn(mockStatusLine);
-        Mockito.when(mockResponse.getEntity()).thenReturn(mockEntity);
-        Mockito.when(mockEntity.getContent()).thenReturn(xmlStream);
-        Mockito.when(mockClient.execute(Mockito.any())).thenReturn(mockResponse);
+
+        // The authority issues two independent HTTP calls per search (one for the page of results,
+        // one for the grand-total count). Each call must receive a fresh response with a fresh,
+        // unconsumed content stream, so build them lazily on every execute().
+        Mockito.when(mockClient.execute(Mockito.any())).thenAnswer(invocation -> {
+            CloseableHttpResponse mockResponse = Mockito.mock(CloseableHttpResponse.class);
+            HttpEntity mockEntity = Mockito.mock(HttpEntity.class);
+            Mockito.when(mockResponse.getStatusLine()).thenReturn(mockStatusLine);
+            Mockito.when(mockResponse.getEntity()).thenReturn(mockEntity);
+            Mockito.when(mockEntity.getContent())
+                .thenReturn(IOUtils.toInputStream(xml, StandardCharsets.UTF_8));
+            return mockResponse;
+        });
         Mockito.when(mockFactory.buildWithRequestConfig(Mockito.any(RequestConfig.class)))
             .thenReturn(mockClient);
 
@@ -168,7 +173,9 @@ public class OpenAIREProjectAuthorityIT extends AbstractControllerIntegrationTes
                     "Respiratory Mechanisms in Cultivated Mushroom",
                     "Respiratory Mechanisms in Cultivated Mushroom(6112554)",
                     "vocabularyEntry"))))
-            .andExpect(jsonPath("$.page.totalElements", Matchers.is(10)));
+            // The response returns a page of 10 results but the header advertises a grand total of 77
+            // (//header/total); pagination must reflect the full result set, not the page size.
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(77)));
 
     }
 
