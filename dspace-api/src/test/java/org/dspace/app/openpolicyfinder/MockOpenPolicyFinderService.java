@@ -148,15 +148,6 @@ public class MockOpenPolicyFinderService extends OpenPolicyFinderService {
         }
     }
 
-    @Override
-    public int performCountRequest(String type, String field, String predicate, String value) {
-        OpenPolicyFinderResponse opfResponse = performRequest(type, field, predicate, value, 0, 0);
-        if (opfResponse != null && CollectionUtils.isNotEmpty(opfResponse.getJournals())) {
-            return opfResponse.getJournals().size();
-        }
-        return 0;
-    }
-
     private <T> void applyStartAndLimit(List<T> list, int start, int limit) {
         if (CollectionUtils.isEmpty(list)) {
             return;

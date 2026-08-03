@@ -126,43 +126,26 @@ public class OpenPolicyFinderAuthority extends ItemAuthority {
         String field = isIssn ? ISSN_FIELD : TITLE_FIELD;
         String predicate = isIssn ? PREDICATE_EQUALS : PREDICATE_CONTAINS_WORD;
 
-        List<OpenPolicyFinderJournal> journals = getJournalsFromOpenPolicyFinder(field, predicate, text, start, limit);
-
-        Choice[] results = journals.stream()
-                                   .map(journal -> convertToChoice(journal))
-                                   .toArray(Choice[]::new);
-
-        // From OpenPolicyFinder we don't get the total number of results for a specific search,
-        // so the pagination count may be incorrect
-        int total = opfService.performCountRequest(TYPE, field, predicate, text);
-
-        if (total <= 0) {
-            total = results.length;
-        }
-        return new Choices(results, start, total, calculateConfidence(results), total > (start + limit), 0);
-    }
-
-    /**
-     * Query the Open Policy Finder API for journals matching the given criteria.
-     *
-     * @param field     the field to search (e.g. "issn" or "title")
-     * @param predicate the predicate (e.g. "equals" or "contains word")
-     * @param text      the search value
-     * @param start     the offset for pagination
-     * @param limit     the maximum number of results
-     * @return list of matching journals, or empty list if none found
-     */
-    private List<OpenPolicyFinderJournal> getJournalsFromOpenPolicyFinder(String field, String predicate, String text,
-                                                                          int start, int limit) {
-        if (limit <= 0) {
-            return List.of();
-        }
-
+        // Issue a single offset/limit request. The API reports the grand total across all pages in its
+        // "totalHits" field, which we use directly for accurate pagination. The total is carried in the same
+        // data response, so no separate count call is required. The request already applies offset/limit
+        // server-side (mirrored by the mock in tests).
         OpenPolicyFinderResponse opfResponse = opfService.performRequest(TYPE, field, predicate, text, start, limit);
-        if (opfResponse == null || CollectionUtils.isEmpty(opfResponse.getJournals())) {
-            return List.of();
+
+        List<OpenPolicyFinderJournal> journals = opfResponse.getJournals();
+        if (CollectionUtils.isEmpty(journals)) {
+            return new Choices(Choices.CF_UNSET);
         }
-        return opfResponse.getJournals();
+
+        int total = opfResponse.getTotalHits();
+
+        // When local item choices already fill the requested page (limit <= 0), contribute no OPF entries
+        // but still surface the OPF total so the combined pagination in getMatches stays accurate.
+        Choice[] results = limit > 0
+            ? journals.stream().map(journal -> convertToChoice(journal)).toArray(Choice[]::new)
+            : new Choice[0];
+
+        return new Choices(results, start, total, calculateConfidence(results), total > (start + limit), 0);
     }
 
     /**
