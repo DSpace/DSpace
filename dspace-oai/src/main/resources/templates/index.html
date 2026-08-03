@@ -19,7 +19,7 @@
 
     <!-- NOTE: We use JQuery and Bootstrap via WebJars which are configured in dspace-server-webapp -->
     <script src="../webjars/jquery/dist/jquery.min.js" type="text/javascript"></script>
-    <script src="../webjars/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="../webjars/bootstrap/dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="../webjars/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="static/css/style.css" type="text/css" />
 </head>
@@ -55,8 +55,26 @@
                     <a role="button" class="btn btn-outline-secondary" th:href="${item.baseUrl} + '?verb=Identify'">Identify</a>
                     <a role="button" class="btn btn-outline-secondary" th:href="${item.baseUrl} + '?verb=ListSets'">List Sets</a>
                     <a role="button" class="btn btn-outline-secondary" th:href="${item.baseUrl} + '?verb=ListMetadataFormats'">List Metadata Formats</a>
-                    <a role="button" class="btn btn-outline-secondary" th:href="${item.baseUrl} + '?verb=ListIdentifiers&metadataPrefix=oai_dc'">List Identifiers</a>
-                    <a role="button" class="btn btn-outline-secondary" th:href="${item.baseUrl} + '?verb=ListRecords&metadataPrefix=oai_dc'">List Records</a>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            List Identifiers
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" th:each="format : ${item.formats}"
+                               th:href="${item.baseUrl} + '?verb=ListIdentifiers&metadataPrefix=' + ${format.prefix}"
+                               th:text="${format.prefix}"></a>
+                        </div>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            List Records
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" th:each="format : ${item.formats}"
+                               th:href="${item.baseUrl} + '?verb=ListRecords&metadataPrefix=' + ${format.prefix}"
+                               th:text="${format.prefix}"></a>
+                        </div>
+                    </div>
                 </div>
                 </p>
             </div>
