@@ -8,11 +8,13 @@
 package org.dspace.content.authority.zdb;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -24,12 +26,15 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -100,6 +105,8 @@ public class ZDBServiceTest {
 
     private ZDBService zdbService;
 
+    private CloseableHttpClient httpClient;
+
     @Mock
     private ConfigurationService configurationService;
 
@@ -119,7 +126,7 @@ public class ZDBServiceTest {
         when(response.getStatusLine()).thenReturn(null);
 
         try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
-            List<ZDBAuthorityValue> results = zdbService.list("Acta", 0, 10);
+            List<ZDBAuthorityValue> results = zdbService.listRecords("Acta", 0, 10);
             assertTrue("Expected an empty result list when the response has no status line",
                 results.isEmpty());
         }
@@ -132,7 +139,7 @@ public class ZDBServiceTest {
         CloseableHttpResponse response = mockResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
 
         try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
-            List<ZDBAuthorityValue> results = zdbService.list("Acta", 0, 10);
+            List<ZDBAuthorityValue> results = zdbService.listRecords("Acta", 0, 10);
             assertTrue("Expected an empty result list when the response status is not 200",
                 results.isEmpty());
         }
@@ -149,7 +156,7 @@ public class ZDBServiceTest {
         when(response.getEntity()).thenReturn(null);
 
         try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
-            List<ZDBAuthorityValue> results = zdbService.list("Acta", 0, 10);
+            List<ZDBAuthorityValue> results = zdbService.listRecords("Acta", 0, 10);
             assertTrue("Expected an empty result list for a 200 response without a body",
                 results.isEmpty());
         }
@@ -166,7 +173,7 @@ public class ZDBServiceTest {
         CloseableHttpResponse response = mockResponse(HttpStatus.SC_OK, xml);
 
         try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
-            List<ZDBAuthorityValue> results = zdbService.list("Acta", 0, 10);
+            List<ZDBAuthorityValue> results = zdbService.listRecords("Acta", 0, 10);
             assertTrue("Expected an empty result list when no 'records' element is present",
                 results.isEmpty());
         }
@@ -179,7 +186,7 @@ public class ZDBServiceTest {
         CloseableHttpResponse response = mockResponse(HttpStatus.SC_OK, "<not-well-formed>");
 
         try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
-            List<ZDBAuthorityValue> results = zdbService.list("Acta", 0, 10);
+            List<ZDBAuthorityValue> results = zdbService.listRecords("Acta", 0, 10);
             assertTrue("Expected an empty result list when the response body is malformed XML",
                 results.isEmpty());
         }
@@ -192,7 +199,7 @@ public class ZDBServiceTest {
         CloseableHttpResponse response = mockResponse(HttpStatus.SC_OK, SEARCH_XML_ONE_RECORD);
 
         try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
-            List<ZDBAuthorityValue> results = zdbService.list("Acta", 0, 10);
+            List<ZDBAuthorityValue> results = zdbService.listRecords("Acta", 0, 10);
 
             assertEquals("Expected a single parsed record", 1, results.size());
             ZDBAuthorityValue value = results.get(0);
@@ -207,6 +214,51 @@ public class ZDBServiceTest {
                 value.getOtherMetadata().get("journalTitle"));
             assertEquals("Unexpected alternative title metadata", List.of("Acta Math"),
                 value.getOtherMetadata().get("journalAlternativeTitle"));
+        }
+    }
+
+    @Test
+    public void testListTotalComesFromNumberOfRecords() throws Exception {
+        // The grand total must come from the SRU "numberOfRecords" element (42 here), not from the
+        // number of records actually returned on this page (1).
+        String xml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<searchRetrieveResponse xmlns=\"http://www.loc.gov/zing/srw/\""
+            + " xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""
+            + " xmlns:dc=\"http://purl.org/dc/elements/1.1/\">"
+            + "<numberOfRecords>42</numberOfRecords>"
+            + "<records>"
+            + "<record><recordData><rdf:RDF>"
+            + "<rdf:Description rdf:about=\"https://zdb.org/12345\">"
+            + "<dc:title>Acta Mathematica</dc:title>"
+            + "</rdf:Description>"
+            + "</rdf:RDF></recordData></record>"
+            + "</records>"
+            + "</searchRetrieveResponse>";
+
+        CloseableHttpResponse response = mockResponse(HttpStatus.SC_OK, xml);
+
+        try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
+            ZDBSearchResult result = zdbService.list("Acta", 0, 10);
+            assertEquals("Total must be read from numberOfRecords", 42, result.getTotal());
+            assertEquals("Expected a single parsed record on this page", 1, result.getRecords().size());
+        }
+    }
+
+    @Test
+    public void testListTotalZeroWhenNumberOfRecordsMissing() throws Exception {
+        // When the SRU response has no "numberOfRecords" element the total defaults to 0.
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<searchRetrieveResponse xmlns=\"http://www.loc.gov/zing/srw/\">"
+            + "</searchRetrieveResponse>";
+
+        CloseableHttpResponse response = mockResponse(HttpStatus.SC_OK, xml);
+
+        try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
+            ZDBSearchResult result = zdbService.list("Acta", 0, 10);
+            assertEquals("Total should default to 0 when numberOfRecords is absent",
+                0, result.getTotal());
+            assertTrue("Expected no records when none are present", result.getRecords().isEmpty());
         }
     }
 
@@ -240,6 +292,42 @@ public class ZDBServiceTest {
         try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
             AuthorityValue value = zdbService.details("98765-2");
             assertNull("Expected null when the detail search returns no records", value);
+        }
+    }
+
+    @Test
+    public void testListSendsPaginationParameters() throws Exception {
+        // A positive start/rows must translate to SRU startRecord (1-based) and maximumRecords params.
+        CloseableHttpResponse response = mockResponse(HttpStatus.SC_OK, SEARCH_XML_ONE_RECORD);
+
+        try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
+            zdbService.list("Acta", 20, 10);
+
+            HttpGet executed = capturedRequest();
+            String uri = executed.getURI().toASCIIString();
+            // 0-based offset 20 becomes 1-based startRecord 21
+            assertTrue("Expected startRecord=21 in the SRU request URL, was: " + uri,
+                uri.contains("startRecord=21"));
+            assertTrue("Expected maximumRecords=10 in the SRU request URL, was: " + uri,
+                uri.contains("maximumRecords=10"));
+        }
+    }
+
+    @Test
+    public void testListOmitsMaximumRecordsWhenRowsNotPositive() throws Exception {
+        // When rows is not positive the maximumRecords param is omitted so the SRU service applies
+        // its own default page size, but startRecord is still sent for the (0-based) offset.
+        CloseableHttpResponse response = mockResponse(HttpStatus.SC_OK, SEARCH_XML_ONE_RECORD);
+
+        try (MockedStatic<DSpaceHttpClientFactory> ignored = mockClient(response)) {
+            zdbService.list("Acta", 0, 0);
+
+            HttpGet executed = capturedRequest();
+            String uri = executed.getURI().toASCIIString();
+            assertTrue("Expected startRecord=1 in the SRU request URL, was: " + uri,
+                uri.contains("startRecord=1"));
+            assertFalse("maximumRecords should be omitted when rows is not positive, was: " + uri,
+                uri.contains("maximumRecords"));
         }
     }
 
@@ -304,14 +392,27 @@ public class ZDBServiceTest {
      * @throws IOException never thrown by the mock setup
      */
     private MockedStatic<DSpaceHttpClientFactory> mockClient(CloseableHttpResponse response) throws IOException {
-        CloseableHttpClient client = mock(CloseableHttpClient.class);
-        when(client.execute(any())).thenReturn(response);
+        httpClient = mock(CloseableHttpClient.class);
+        when(httpClient.execute(any())).thenReturn(response);
 
         DSpaceHttpClientFactory factory = mock(DSpaceHttpClientFactory.class);
-        when(factory.build()).thenReturn(client);
+        when(factory.build()).thenReturn(httpClient);
 
         MockedStatic<DSpaceHttpClientFactory> mockedStatic = Mockito.mockStatic(DSpaceHttpClientFactory.class);
         mockedStatic.when(DSpaceHttpClientFactory::getInstance).thenReturn(factory);
         return mockedStatic;
+    }
+
+    /**
+     * Capture the request executed against the mocked HTTP client, so that the constructed SRU URL
+     * (including pagination parameters) can be asserted.
+     *
+     * @return the executed {@link HttpGet} request
+     * @throws IOException never thrown by the mock verification
+     */
+    private HttpGet capturedRequest() throws IOException {
+        ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
+        verify(httpClient).execute(captor.capture());
+        return (HttpGet) captor.getValue();
     }
 }

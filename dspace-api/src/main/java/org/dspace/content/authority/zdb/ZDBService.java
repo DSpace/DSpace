@@ -62,9 +62,10 @@ public class ZDBService {
      * @return list of parsed authority values
      * @throws IOException if the HTTP request fails
      */
-    private List<ZDBAuthorityValue> search(String requestURL) throws IOException {
+    private ZDBSearchResult search(String requestURL) throws IOException {
 
         List<ZDBAuthorityValue> results = new ArrayList<ZDBAuthorityValue>();
+        int total = 0;
 
         try (CloseableHttpClient client = DSpaceHttpClientFactory.getInstance().build();
              CloseableHttpResponse response = client.execute(new HttpGet(requestURL))) {
@@ -98,14 +99,20 @@ public class ZDBService {
                     ZDBAuthorityValue zdbItem = getRecord(xmlRoot);
 
                     results.add(zdbItem);
+                    total = results.size();
 
                 } else {
+                    // The SRU service reports the grand total of matching records in the
+                    // "numberOfRecords" element; use it so pagination reflects the full result set
+                    // rather than the size of the single page returned.
+                    total = parseNumberOfRecords(xmlRoot);
+
                     Element recordsElement = XMLUtils.getSingleElement(xmlRoot, "records");
 
                     if (recordsElement == null) {
                         // No "records" element found: no results to parse, return an empty list
                         log.info("No 'records' element found in the ZDB response for URL: {}", requestURL);
-                        return results;
+                        return new ZDBSearchResult(results, total);
                     }
 
                     // called search endpoint
@@ -132,7 +139,26 @@ public class ZDBService {
             log.error(e1.getMessage(), e1);
         }
 
-        return results;
+        return new ZDBSearchResult(results, total);
+    }
+
+    /**
+     * Read the grand total of matching records from the SRU {@code numberOfRecords} element.
+     *
+     * @param xmlRoot the document root of the SRU {@code searchRetrieveResponse}
+     * @return the reported total, or {@code 0} when the element is missing or not a valid integer
+     */
+    private int parseNumberOfRecords(Element xmlRoot) {
+        String numberOfRecords = XMLUtils.getElementValue(xmlRoot, "numberOfRecords");
+        if (StringUtils.isBlank(numberOfRecords)) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(numberOfRecords.trim());
+        } catch (NumberFormatException e) {
+            log.warn("Unable to parse ZDB 'numberOfRecords' value: {}", numberOfRecords);
+            return 0;
+        }
     }
 
     /**
@@ -196,7 +222,7 @@ public class ZDBService {
         }
 
         String url = buildDetailsURL(id);
-        List<ZDBAuthorityValue> results = search(url);
+        List<ZDBAuthorityValue> results = search(url).getRecords();
         if (!results.isEmpty()) {
             return results.get(0);
         }
@@ -206,14 +232,21 @@ public class ZDBService {
     /**
      * Search the ZDB SRU API for journals matching the given title query.
      *
-     * @param query    the title search string (must not be empty)
-     * @param page     the page number (currently unused by ZDB)
-     * @param pagesize the desired page size (currently unused by ZDB)
-     * @return list of matching {@link ZDBAuthorityValue} entries
+     * <p>Pagination is delegated to the SRU service via the {@code startRecord} and
+     * {@code maximumRecords} parameters. SRU positions are 1-based, so the supplied 0-based
+     * {@code start} offset is translated to {@code startRecord = start + 1}. The
+     * {@code maximumRecords} parameter is only sent when a positive {@code rows} value is
+     * requested; otherwise the SRU service applies its own default page size.</p>
+     *
+     * @param query the title search string (must not be empty)
+     * @param start the 0-based offset of the first record to return
+     * @param rows  the maximum number of records to return; ignored when not positive
+     * @return the search result holding the matching {@link ZDBAuthorityValue} entries for the
+     *         requested page and the grand total reported by the SRU service
      * @throws IOException              if the HTTP request fails
      * @throws IllegalArgumentException if the query is empty
      */
-    public List<ZDBAuthorityValue> list(String query, int page, int pagesize) throws IOException {
+    public ZDBSearchResult list(String query, int start, int rows) throws IOException {
         if (StringUtils.isEmpty(query)) {
             throw new IllegalArgumentException("The query must not be empty");
         }
@@ -223,8 +256,36 @@ public class ZDBService {
             throw new IllegalStateException("ZDB search URL configuration is missing");
         }
 
-        String queryURL = baseUrl + "&query=tit=" + URLEncoder.encode(query, Charset.defaultCharset());
-        return search(queryURL);
+        StringBuilder queryURL = new StringBuilder(baseUrl)
+            .append("&query=tit=")
+            .append(URLEncoder.encode(query, Charset.defaultCharset()));
+
+        // SRU uses a 1-based startRecord position; DSpace supplies a 0-based offset
+        if (start >= 0) {
+            queryURL.append("&startRecord=").append(start + 1);
+        }
+        // SRU maximumRecords bounds the page size; only send it when a positive value is requested,
+        // otherwise let the SRU service apply its default page size
+        if (rows > 0) {
+            queryURL.append("&maximumRecords=").append(rows);
+        }
+
+        return search(queryURL.toString());
+    }
+
+    /**
+     * Search the ZDB SRU API for journals matching the given title query, returning only the parsed
+     * records for the requested page.
+     *
+     * @param query the title search string (must not be empty)
+     * @param start the 0-based offset of the first record to return
+     * @param rows  the maximum number of records to return; ignored when not positive
+     * @return list of matching {@link ZDBAuthorityValue} entries for the requested page
+     * @throws IOException              if the HTTP request fails
+     * @throws IllegalArgumentException if the query is empty
+     */
+    public List<ZDBAuthorityValue> listRecords(String query, int start, int rows) throws IOException {
+        return list(query, start, rows).getRecords();
     }
 
     /**

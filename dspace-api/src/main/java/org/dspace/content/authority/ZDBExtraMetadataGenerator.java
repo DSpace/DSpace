@@ -29,5 +29,5 @@ public interface ZDBExtraMetadataGenerator {
      * @param val the {@link AuthorityValue} to extract metadata from
      * @return a map of extra metadata key-value pairs
      */
-    public Map<String, String> build(AuthorityValue val);
+    Map<String, String> build(AuthorityValue val);
 }

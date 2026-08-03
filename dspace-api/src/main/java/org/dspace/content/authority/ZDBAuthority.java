@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.content.authority.zdb.ZDBAuthorityValue;
+import org.dspace.content.authority.zdb.ZDBSearchResult;
 import org.dspace.content.authority.zdb.ZDBService;
 import org.dspace.content.authority.zdb.ZDBServicesFactory;
 
@@ -49,8 +50,17 @@ public class ZDBAuthority extends ItemAuthority {
     @Override
     public Choices getMatches(String query, int start, int limit, String locale) {
         Choices choices = super.getMatches(query, start, limit, locale);
-        return new Choices(addExternalResults(query, choices, start, limit <= 0 ? DEFAULT_MAX_ROWS : limit),
-                           choices.start, choices.total, choices.confidence, choices.more);
+
+        int max = limit <= 0 ? DEFAULT_MAX_ROWS : limit;
+        ZDBExternalResults external = addExternalResults(query, choices, start, max);
+
+        // The ZDB SRU service reports the grand total of matching records via "numberOfRecords".
+        // Combine it with the local Solr total so that pagination reflects the full result set
+        // rather than only the page of external results appended here.
+        int total = choices.total + external.total;
+        boolean more = limit > 0 ? total > (start + limit) : false;
+
+        return new Choices(external.values, choices.start, total, choices.confidence, more);
     }
 
     /**
@@ -60,13 +70,14 @@ public class ZDBAuthority extends ItemAuthority {
      * @param choices the existing Solr-based choices
      * @param start   the start index
      * @param max     the maximum number of external results to add
-     * @return the combined array of choices
+     * @return the combined choices together with the grand total reported by the ZDB service
      */
-    protected Choice[] addExternalResults(String text, Choices choices, int start, int max) {
+    protected ZDBExternalResults addExternalResults(String text, Choices choices, int start, int max) {
         if (source != null) {
             try {
                 List<Choice> results = new ArrayList<Choice>();
-                List<ZDBAuthorityValue> values = source.list(text, start, max);
+                ZDBSearchResult searchResult = source.list(text, start, max);
+                List<ZDBAuthorityValue> values = searchResult.getRecords();
                 // adding choices loop
                 int added = 0;
                 for (AuthorityValue val : values) {
@@ -78,14 +89,38 @@ public class ZDBAuthority extends ItemAuthority {
                         added++;
                     }
                 }
-                return (Choice[]) ArrayUtils.addAll(choices.values, results.toArray(new Choice[results.size()]));
+                Choice[] combined =
+                    (Choice[]) ArrayUtils.addAll(choices.values, results.toArray(new Choice[results.size()]));
+                return new ZDBExternalResults(combined, searchResult.getTotal());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         } else {
             log.warn("external source for authority not configured");
         }
-        return choices.values;
+        return new ZDBExternalResults(choices.values, 0);
+    }
+
+    /**
+     * Holder for the combined choices array and the grand total of external ZDB records reported
+     * by the SRU service, so that {@link #getMatches(String, int, int, String)} can compute
+     * accurate pagination.
+     */
+    protected static class ZDBExternalResults {
+
+        private final Choice[] values;
+        private final int total;
+
+        /**
+         * Create a new holder.
+         *
+         * @param values the combined (local + external) choices array
+         * @param total  the grand total of external ZDB records reported by the SRU service
+         */
+        protected ZDBExternalResults(Choice[] values, int total) {
+            this.values = values;
+            this.total = total;
+        }
     }
 
     private Map<String, String> getZDBExtra(AuthorityValue val) {

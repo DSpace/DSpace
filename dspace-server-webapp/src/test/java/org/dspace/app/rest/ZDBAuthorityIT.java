@@ -22,6 +22,7 @@ import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.ItemAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.zdb.ZDBAuthorityValue;
+import org.dspace.content.authority.zdb.ZDBSearchResult;
 import org.dspace.content.authority.zdb.ZDBService;
 import org.dspace.content.authority.zdb.ZDBServicesFactory;
 import org.dspace.content.authority.zdb.ZDBServicesFactoryImpl;
@@ -162,7 +163,7 @@ public class ZDBAuthorityIT extends AbstractControllerIntegrationTest {
             "cris.ItemAuthority.ZDBAuthority.source", ItemAuthority.DEFAULT);
     }
 
-    private List<ZDBAuthorityValue> createMockResults() {
+    private ZDBSearchResult createMockResults() {
         List<ZDBAuthorityValue> results = new ArrayList<>();
         // Create the first entry
         ZDBAuthorityValue zdb1 = new ZDBAuthorityValue();
@@ -189,6 +190,6 @@ public class ZDBAuthorityIT extends AbstractControllerIntegrationTest {
         results.add(zdb1);
         results.add(zdb2);
         results.add(zdb3);
-        return results;
+        return new ZDBSearchResult(results, results.size());
     }
 }
