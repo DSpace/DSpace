@@ -58,7 +58,7 @@ public class GrobidClientImpl implements GrobidClient {
     private final String baseUrl;
 
     public GrobidClientImpl(String baseUrl) {
-        this.baseUrl = baseUrl;
+        this.baseUrl = baseUrl.replaceAll("/+$", "");
     }
 
     @Override
