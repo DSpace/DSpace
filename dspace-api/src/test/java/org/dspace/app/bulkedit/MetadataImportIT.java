@@ -36,9 +36,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -57,6 +59,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     private final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
+    private final MetadataValueService metadataValueService
+            = ContentServiceFactory.getInstance().getMetadataValueService();
     private final EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
     private final RelationshipService relationshipService
@@ -279,6 +283,32 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         item = findItemByName(itemTitle);
         assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
+    }
+
+    @Test
+    public void metadataImportDetectsTrailingWhitespaceChangeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing trailing whitespace change";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withAuthor("Gopalan, Deepa")
+                               .withTitle(itemTitle)
+                               .build();
+        // Simulate an existing value from a submission path that preserved trailing whitespace.
+        MetadataValue author = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0);
+        author.setValue("Gopalan, Deepa ");
+        metadataValueService.update(context, author);
+        context.restoreAuthSystemState();
+
+        assertEquals("Gopalan, Deepa ",
+            itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue());
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle + ",\"Gopalan, Deepa\""};
+        performImportScript(csv);
+
+        item = findItemByName(itemTitle);
+        assertEquals("Gopalan, Deepa",
+            itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue());
     }
 
     private Item findItemByName(String name) throws Exception {
