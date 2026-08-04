@@ -84,23 +84,6 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemRestRepository.class);
 
-    /**
-     * Configuration key for the maximum size (in bytes) of an uploaded file that is still copied into
-     * a second temp file to probe it for bibliographic metadata. Import formats (BibTeX, RIS, PDF,
-     * XML, ...) are always small text/document files, so larger binaries (video, datasets, disk
-     * images, ...) can skip the probe and be stored directly as a plain bitstream, avoiding an extra
-     * full-file copy. Configurable via local.cfg; defaults to
-     * {@link #IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_DEFAULT}.
-     */
-    private static final String IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_PROPERTY =
-        "submission.import.metadata-lookup.max-file-size";
-
-    /**
-     * Default value (100 MB, in bytes) for {@link #IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_PROPERTY}
-     * when the property is not configured.
-     */
-    private static final long IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_DEFAULT = 100L * 1024 * 1024;
-
     @Autowired
     WorkspaceItemService wis;
 
@@ -281,11 +264,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             submissionConfigService.getSubmissionConfigByCollection(collection);
         List<WorkspaceItem> result = null;
         List<ImportRecord> records = new ArrayList<>();
-        long importMetadataLookupMaxFileSize = configurationService.getLongProperty(
-            IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_PROPERTY, IMPORT_METADATA_LOOKUP_MAX_FILE_SIZE_DEFAULT);
         try {
             for (MultipartFile mpFile : uploadfiles) {
-                if (mpFile.getSize() > importMetadataLookupMaxFileSize) {
+                // Only files whose name matches a supported import format (BibTeX, RIS, CSV, ...) can
+                // yield metadata. Check that before writing a temp copy, so unsupported uploads (large
+                // binaries especially) are not copied to disk just to be probed and immediately deleted.
+                if (!importService.isValidSourceForFile(mpFile.getOriginalFilename())) {
                     continue;
                 }
                 File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
