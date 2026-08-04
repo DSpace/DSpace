@@ -14,7 +14,7 @@ jobs:
   stale:
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@v11
         with:
           # Number of GitHub API calls to allow in a single run (to avoid hitting GitHub's rate limit)
           # Default is 30. But, we've found that only results in processing ~7 issues or PRs. So, we've increased it.
