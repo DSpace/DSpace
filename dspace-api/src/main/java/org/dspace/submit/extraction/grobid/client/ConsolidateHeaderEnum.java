@@ -43,8 +43,4 @@ public enum ConsolidateHeaderEnum {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
 }
