@@ -202,7 +202,7 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
                                 )
                                 .andExpect(
                                     grobidMetadataMatcher(
-                                        "dc.identifier.doi",
+                                        "dc.relation.hasversion",
                                         is("10.1234/example.2026.0123")
                                     )
                                 )

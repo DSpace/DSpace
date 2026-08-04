@@ -1932,12 +1932,12 @@ it, please enter the types and the actual numbers or codes.</hint>
        </field>
        <field>
          <dc-schema>dc</dc-schema>
-         <dc-element>identifier</dc-element>
-         <dc-qualifier>doi</dc-qualifier>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>hasversion</dc-qualifier>
          <repeatable>true</repeatable>
          <label>DOI</label>
          <input-type>onebox</input-type>
-         <hint>Enter the DIO of the publication.</hint>
+         <hint>Enter the external DOI of the publication.</hint>
          <required></required>
        </field>
      </row>
