@@ -242,8 +242,3 @@ db.password = dspace
 ########################
 ldn.enabled = true
 
-##########################
-# METADATA EXTRACTION #
-##########################
-# Grobid url.
-grobid.service.url =
