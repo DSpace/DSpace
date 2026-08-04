@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.constraints.NotNull;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.FileMultipleOccurencesException;
 import org.dspace.importer.external.exception.FileSourceException;
@@ -34,6 +35,7 @@ import org.w3c.dom.Document;
 public class GrobidImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
         implements FileSource {
 
+    @NotNull
     private GrobidClient grobidClient;
     private List<String> supportedExtensions;
 
