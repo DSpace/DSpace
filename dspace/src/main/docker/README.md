@@ -16,14 +16,14 @@ Caching these Maven dependencies provides a speed increase to all later builds b
 are only downloaded once.
 
 ```
-docker build -t dspace/dspace-dependencies:latest -f Dockerfile.dependencies .
+docker build -t dspace/dspace-dependencies:dspace-10_x -f Dockerfile.dependencies .
 ```
 
 This image is built *automatically* after each commit is made to the `main` branch.
 
 Admins to our DockerHub repo can manually publish with the following command.
 ```
-docker push dspace/dspace-dependencies:latest
+docker push dspace/dspace-dependencies:dspace-10_x
 ```
 
 ## Dockerfile.test (in root folder)
@@ -34,14 +34,14 @@ This image deploys one webapp to Tomcat running in Docker:
 This image also sets up debugging in Tomcat for development.
 
 ```
-docker build -t dspace/dspace:latest-test -f Dockerfile.test .
+docker build -t dspace/dspace:dspace-10_x-test -f Dockerfile.test .
 ```
 
 This image is built *automatically* after each commit is made to the `main` branch.
 
 Admins to our DockerHub repo can manually publish with the following command.
 ```
-docker push dspace/dspace:latest-test
+docker push dspace/dspace:dspace-10_x-test
 ```
 
 ## Dockerfile (in root folder)
@@ -51,28 +51,28 @@ This image deploys one DSpace webapp to Tomcat running in Docker:
 1. The DSpace REST API (at `http://localhost:8080/server`)
 
 ```
-docker build -t dspace/dspace:latest -f Dockerfile .
+docker build -t dspace/dspace:dspace-10_x -f Dockerfile .
 ```
 
 This image is built *automatically* after each commit is made to the `main` branch.
 
 Admins to our DockerHub repo can publish with the following command.
 ```
-docker push dspace/dspace:latest
+docker push dspace/dspace:dspace-10_x
 ```
 
 ## Dockerfile.cli (in root folder)
 
 This Dockerfile builds a DSpace CLI (command line interface) image, which can be used to run DSpace's commandline tools via Docker.
 ```
-docker build -t dspace/dspace-cli:latest -f Dockerfile.cli .
+docker build -t dspace/dspace-cli:dspace-10_x -f Dockerfile.cli .
 ```
 
 This image is built *automatically* after each commit is made to the `main` branch.
 
 Admins to our DockerHub repo can publish with the following command.
 ```
-docker push dspace/dspace-cli:latest
+docker push dspace/dspace-cli:dspace-10_x
 ```
 
 ## ./dspace-postgres-loadsql/Dockerfile
@@ -87,18 +87,18 @@ This image is built *automatically* after each commit is made to the `main` bran
 How to build manually:
 ```
 cd dspace/src/main/docker/dspace-postgres-loadsql
-docker build -t dspace/dspace-postgres-loadsql:latest .
+docker build -t dspace/dspace-postgres-loadsql:dspace-10_x .
 ```
 
 It is also possible to change the version of PostgreSQL or the PostgreSQL user's password during the build:
 ```
 cd dspace/src/main/docker/dspace-postgres-loadsql
-docker build -t dspace/dspace-postgres-loadsql:latest --build-arg POSTGRES_VERSION=17 --build-arg POSTGRES_PASSWORD=mypass .
+docker build -t dspace/dspace-postgres-loadsql:dspace-10_x --build-arg POSTGRES_VERSION=17 --build-arg POSTGRES_PASSWORD=mypass .
 ```
 
 Admins to our DockerHub repo can (manually) publish with the following command.
 ```
-docker push dspace/dspace-postgres-loadsql:latest
+docker push dspace/dspace-postgres-loadsql:dspace-10_x
 ```
 
 ## ./dspace-shibboleth/Dockerfile
