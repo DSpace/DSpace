@@ -130,7 +130,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         try {
             eperson = es.create(context);
             if (es.findByEmail(context, epersonRest.getEmail()) != null) {
-                throw new DSpaceConflictException("email already exists");
+                throw new DSpaceConflictException(
+                    String.format("eperson with email %s already exists", epersonRest.getEmail()));
             }
 
             // this should be probably moved to the converter (a merge method?)
