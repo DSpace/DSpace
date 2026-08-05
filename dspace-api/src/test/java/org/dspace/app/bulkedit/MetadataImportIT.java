@@ -311,6 +311,48 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue());
     }
 
+    @Test
+    public void metadataImportReportsNewlineRemovalAlongsideOtherChangesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing newline removal";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withTitle(itemTitle)
+                               .withMetadata("dc", "contributor", "other", "Name with space at the end")
+                               .withMetadata("dc", "contributor", "other", "Name with newline at the end")
+                               .withMetadata("dc", "contributor", "other", "Name with nothing at the end")
+                               .build();
+        List<MetadataValue> existing = itemService.getMetadata(
+            item, "dc", "contributor", "other", Item.ANY);
+        existing.get(0).setValue("Name with space at the end ");
+        metadataValueService.update(context, existing.get(0));
+        existing.get(1).setValue("Name with newline at the end\n");
+        metadataValueService.update(context, existing.get(1));
+        context.restoreAuthSystemState();
+
+        assertEquals("Name with space at the end ", existing.get(0).getValue());
+        assertEquals("Name with newline at the end\n", existing.get(1).getValue());
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.other",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle +
+                ",\"Name with space at the end||Name with newline at the end||Name with nothing at the end\""};
+        TestDSpaceRunnableHandler handler = performImportScript(csv, false);
+
+        assertTrue("The import summary must report removal of the value containing a newline",
+            handler.getInfoMessages().contains("Name with newline at the end\n"));
+        item = findItemByName(itemTitle);
+        assertEquals(List.of("Name with space at the end", "Name with newline at the end",
+                "Name with nothing at the end"),
+            itemService.getMetadata(item, "dc", "contributor", "other", Item.ANY)
+                       .stream().map(MetadataValue::getValue).toList());
+    }
+
+    @Test
+    public void cleanNormalizesLineEndingsWithoutRemovingNewlinesTest() {
+        MetadataImport metadataImport = new MetadataImport();
+
+        assertEquals("First line\nSecond line\n", metadataImport.clean("First line\r\nSecond line\r"));
+    }
+
     private Item findItemByName(String name) throws Exception {
         List<Item> items =
             IteratorUtils.toList(itemService.findArchivedByMetadataField(context, "dc", "title", null, name));
@@ -333,7 +375,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
      * @param csv content for test file.
      * @throws java.lang.Exception passed through.
      */
-    public void performImportScript(String[] csv, boolean useTemplate) throws Exception {
+    public TestDSpaceRunnableHandler performImportScript(String[] csv, boolean useTemplate) throws Exception {
         File csvFile = File.createTempFile("dspace-test-import", "csv");
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"));
         for (String csvLine : csv) {
@@ -342,17 +384,18 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         out.flush();
         out.close();
         String fileLocation = csvFile.getAbsolutePath();
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
         try {
             String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", admin.getEmail(), "-s"};
             if (useTemplate) {
                 args = ArrayUtils.add(args, "-t");
             }
-            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
             ScriptLauncher
                 .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         } finally {
             csvFile.delete();
         }
+        return testDSpaceRunnableHandler;
     }
 
     @Test

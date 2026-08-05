@@ -1256,8 +1256,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             return null;
         }
 
-        // Remove newlines as different operating systems sometimes use different formats
-        return in.replaceAll("\r\n", "").replaceAll("\n", "");
+        // Normalize line endings across operating systems without discarding meaningful newlines
+        return in.replace("\r\n", "\n").replace('\r', '\n');
     }
 
     /**
