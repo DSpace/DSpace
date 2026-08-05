@@ -48,6 +48,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.access.status.AccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.authorize.ResourcePolicy;
@@ -85,10 +86,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 @SuppressWarnings("deprecation")
 public class XOAI {
-    private static final String ACCESS_STATUS_OPEN_ACCESS = "open.access";
-    private static final String ACCESS_STATUS_EMBARGO = "embargo";
-    private static final String ACCESS_STATUS_RESTRICTED = "restricted";
-
     private static Logger log = LogManager.getLogger(XOAI.class);
 
     // needed because the solr query only returns 10 rows by default
@@ -543,7 +540,7 @@ public class XOAI {
         }
         // check for bitstream access status
         String accessStatus = accessStatusService.getAnonymousAccessStatus(context, item).getStatus();
-        if (accessStatus.equals(ACCESS_STATUS_EMBARGO) || accessStatus.equals(ACCESS_STATUS_RESTRICTED)) {
+        if (accessStatus.equals(AccessStatusHelper.EMBARGO) || accessStatus.equals(AccessStatusHelper.RESTRICTED)) {
             return true;
         }
         return false;
@@ -563,7 +560,7 @@ public class XOAI {
     private boolean isOpenAccess(Item item) {
         try {
             String accessStatus = accessStatusService.getAnonymousAccessStatus(context, item).getStatus();
-            return accessStatus.equals(ACCESS_STATUS_OPEN_ACCESS);
+            return accessStatus.equals(AccessStatusHelper.OPEN_ACCESS);
         } catch (SQLException e) {
             log.error(e.getMessage());
         }

@@ -14,7 +14,7 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.access.status.DefaultAccessStatusHelper;
+import org.dspace.access.status.AccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.AccessStatus;
@@ -45,7 +45,7 @@ import org.dspace.xoai.util.ItemUtils;
  * }
  * </pre>
  * Returning Values are based on:
- * @see org.dspace.access.status.DefaultAccessStatusHelper  DefaultAccessStatusHelper
+ * @see org.dspace.access.status.AccessStatusHelper  AccessStatusHelper
  */
 public class AccessStatusElementItemCompilePlugin implements XOAIExtensionItemCompilePlugin {
 
@@ -58,7 +58,7 @@ public class AccessStatusElementItemCompilePlugin implements XOAIExtensionItemCo
             String accessStatusType = accessStatusResult.getStatus();
             LocalDate availabilityDate = accessStatusResult.getAvailabilityDate();
             String embargoFromItem = null;
-            if (accessStatusType == DefaultAccessStatusHelper.EMBARGO && availabilityDate != null) {
+            if (accessStatusType == AccessStatusHelper.EMBARGO && availabilityDate != null) {
                 embargoFromItem = availabilityDate.toString();
             }
 
