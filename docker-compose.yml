@@ -34,7 +34,7 @@ services:
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: ${proxies__P__trusted__P__ipranges:-172.23.0}
       LOGGING_CONFIG: ${LOGGING_CONFIG:-/dspace/config/log4j2-container.xml}
-    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-latest-test}"
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-10_x-test}"
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -85,7 +85,7 @@ services:
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-latest}"
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-10_x}"
     build:
       context: ./dspace/src/main/docker/dspace-solr/
       # Provide path to Solr configs necessary to build Docker image
