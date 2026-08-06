@@ -73,7 +73,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(content().contentType(contentType))
                         //The configuration file for the test env includes 6 forms
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(23)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(35)))
                         .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(
@@ -91,7 +91,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(23)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(35)))
                         .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
@@ -686,26 +686,45 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void findAllPaginationTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         int pageSize = 2;
-        int totalElements = 16;
-        int totalPages = 8;
+        int totalElements = 35;
+        int totalPages = 18;
 
         List<String> expectedIds = Arrays.asList(
-            "personstep",
             "publicationStepGroup-dc-contributor-author",
-            "journalVolumeStep",
-            "funding",
-            "publicationStepGroup",
             "patent",
             "publicationStepGroup-dc-contributor-editor",
-            "patent_indexing",
+            "publication_references",
             "patent_references",
+            "person-crisrp-education",
+            "publication_references-dc-relation-project",
+            "publication_bibliographic_details",
             "typebindtest",
             "bitstream-metadata",
             "titleAndIssuedDate",
             "test-outside-workflow-hidden",
-            "languagetest",
             "onlyTitle",
-            "publicationStep"
+            "orgunit",
+            "publication",
+            "test-outside-submission-hidden",
+            "person-crisrp-qualification",
+            "sampleauthority",
+            "traditionalpageone",
+            "personstep",
+            "journalVolumeStep",
+            "funding",
+            "publicationStepGroup",
+            "patent_indexing",
+            "person-oairecerif-person-affiliation",
+            "publication-dc-contributor-author",
+            "publication-dc-contributor-editor",
+            "languagetest",
+            "person",
+            "publicationStep",
+            "publication_indexing",
+            "qualdroptest",
+            "person-oairecerif-identifier-url",
+            "traditionalpagetwo",
+            "funding-oairecerif-funder"
         );
 
         List<String> allIds = new ArrayList<>();

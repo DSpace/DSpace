@@ -199,16 +199,16 @@ public class AccessConditionOption {
         LOG.debug("Validate policy dates:  name '{}', startDate {}, endDate {}",
                 name, startDate, endDate);
         if (getHasStartDate() && Objects.isNull(startDate)) {
-            throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
+            throw new IllegalStateException("The access condition '" + getName() + "' requires a start date.");
         }
         if (getHasEndDate() && Objects.isNull(endDate)) {
-            throw new IllegalStateException("The access condition " + getName() + " requires an end date.");
+            throw new IllegalStateException("The access condition '" + getName() + "' requires an end date.");
         }
         if (!getHasStartDate() && Objects.nonNull(startDate)) {
-            throw new IllegalStateException("The access condition " + getName() + " cannot contain a start date.");
+            throw new IllegalStateException("The access condition '" + getName() + "' cannot contain a start date.");
         }
         if (!getHasEndDate() && Objects.nonNull(endDate)) {
-            throw new IllegalStateException("The access condition " + getName() + " cannot contain an end date.");
+            throw new IllegalStateException("The access condition '" + getName() + "' cannot contain an end date.");
         }
 
         DateMathParser dateMathParser = new DateMathParser();

@@ -250,12 +250,20 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, language, subject);
     }
 
+    public WorkspaceItemBuilder withIsniIdentifier(String isni) {
+        return addMetadataValue("person", "identifier", "isni", isni);
+    }
+
     public WorkspaceItemBuilder withEntityType(final String entityType) {
         return setMetadataSingleValue("dspace", "entity", "type", entityType);
     }
 
     public WorkspaceItemBuilder withOrcidIdentifier(String orcid) {
         return addMetadataValue("person", "identifier", "orcid", orcid);
+    }
+
+    public WorkspaceItemBuilder withPatentNo(String patentNo) {
+        return addMetadataValue("dc", "identifier", "patentno", patentNo);
     }
 
     public WorkspaceItemBuilder withCustomUrl(String url) {

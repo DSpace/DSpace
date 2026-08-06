@@ -28,6 +28,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
     </bean>
 
+    <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportScriptConfiguration" primary="true">
+        <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImport"/>
+    </bean>
+
      <bean id="type-conversion-test" class="org.dspace.app.scripts.TypeConversionTestScriptConfiguration" primary="true">
         <property name="description" value="Test the type conversion different option types"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.scripts.TypeConversionTestScript"/>
