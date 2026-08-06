@@ -1698,11 +1698,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void embedLogoAsAnonymousUserTest() throws Exception {
-        // Regression test for #12839: an anonymous user requesting a Collection with its logo
-        // embedded must receive the logo. Resolving the logo Bitstream's METADATA_READ permission
-        // must not fall back to the generic DSpaceObjectUtils#findDSpaceObject type sweep, which
-        // logged a spurious Hibernate ObjectNotFoundException for the logo bitstream on every
-        // such request.
+        // An anonymous user requesting a Collection with its logo embedded must receive the logo.
+        // This covers the non-admin branch of the logo Bitstream's METADATA_READ evaluation
+        // (BitstreamMetadataReadPermissionEvaluatorPlugin falls through to a READ authorization
+        // check), which projectonLevelTest does not reach because it embeds the logo as an admin.
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
