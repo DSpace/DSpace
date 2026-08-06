@@ -58,11 +58,9 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
 
             try {
                 UUID dsoUuid = UUID.fromString(targetId.toString());
-                // Look up the target as a Bitstream directly. This permission plugin only applies to
-                // Bitstreams, so a typed lookup avoids the generic DSpaceObjectUtils#findDSpaceObject sweep,
-                // which probes every DSpaceObject type and (given the shared-UUID JOINED inheritance model)
-                // logs a spurious Hibernate ObjectNotFoundException when the UUID is resolved as the wrong
-                // type (e.g. a Collection/Community logo bitstream). See issue #12839.
+                // Resolve the target as a Bitstream directly: this plugin only handles Bitstreams, and the
+                // untyped DSpaceObjectUtils#findDSpaceObject sweep logs a spurious Hibernate
+                // ObjectNotFoundException here (see #12839).
                 Bitstream bitstream = bitstreamService.find(context, dsoUuid);
                 if (bitstream != null) {
                     return this.metadataReadPermissionOnBitstream(context, bitstream);
