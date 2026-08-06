@@ -23,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -507,31 +506,21 @@ public class Utils {
      */
     private List<String> readFromRequest(HttpServletRequest request) throws IOException {
         List<String> list = new LinkedList<>();
-        Scanner scanner = new Scanner(request.getInputStream(), StandardCharsets.UTF_8);
 
-        try {
-
+        try (Scanner scanner = new Scanner(request.getInputStream(), StandardCharsets.UTF_8)) {
             while (scanner.hasNextLine()) {
-
                 String line = scanner.nextLine();
                 if (org.springframework.util.StringUtils.hasText(line)) {
                     list.add(decodeUrl(line));
                 }
             }
-
-        } finally {
-            scanner.close();
         }
+
         return list;
     }
 
     private String decodeUrl(String url) {
-        try {
-            return URLDecoder.decode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            log.warn("The following url could not be decoded: " + url);
-        }
-        return StringUtils.EMPTY;
+        return URLDecoder.decode(url, StandardCharsets.UTF_8);
     }
 
     /**

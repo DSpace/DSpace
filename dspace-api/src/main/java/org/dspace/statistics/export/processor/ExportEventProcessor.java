@@ -8,8 +8,9 @@
 package org.dspace.statistics.export.processor;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -18,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.content.DCDate;
@@ -47,7 +47,7 @@ public abstract class ExportEventProcessor {
     protected static final String ITEM_VIEW = "Investigation";
     protected static final String BITSTREAM_DOWNLOAD = "Request";
 
-    protected final static String UTF_8 = CharEncoding.UTF_8;
+    protected final static Charset UTF_8 = StandardCharsets.UTF_8;
 
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -103,10 +103,8 @@ public abstract class ExportEventProcessor {
      *
      * @param item
      * @return the parameter string to be used in the url
-     * @throws UnsupportedEncodingException
      */
-    protected String getBaseParameters(Item item)
-            throws UnsupportedEncodingException {
+    protected String getBaseParameters(Item item) {
 
         //We have a valid url collect the rest of the data
         String clientIP = request.getRemoteAddr();
