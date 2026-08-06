@@ -136,6 +136,12 @@
 
     <bean id="valuePairSupplier" class="org.dspace.layout.script.supplier.ValuePairSupplier"/>
 
+    <bean id="openStreetMapRenderValidator" class="org.dspace.layout.script.service.impl.DynamicLayoutToolRenderValidatorImpl">
+        <property name="name" value="openstreetmap"/>
+        <property name="fieldType" value="METADATAGROUP"/>
+        <property name="subTypeValidationRule" value="NOT_ALLOWED"/>
+    </bean>
+
     <bean id="htmlRenderValidator" class="org.dspace.layout.script.service.impl.DynamicLayoutToolRenderValidatorImpl">
         <property name="name" value="html"/>
         <property name="fieldType" value="METADATA"/>
