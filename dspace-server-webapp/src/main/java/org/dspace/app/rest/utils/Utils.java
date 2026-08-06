@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -506,7 +507,7 @@ public class Utils {
      */
     private List<String> readFromRequest(HttpServletRequest request) throws IOException {
         List<String> list = new LinkedList<>();
-        Scanner scanner = new Scanner(request.getInputStream());
+        Scanner scanner = new Scanner(request.getInputStream(), StandardCharsets.UTF_8);
 
         try {
 
