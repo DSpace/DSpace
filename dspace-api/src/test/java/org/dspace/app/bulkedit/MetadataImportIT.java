@@ -347,6 +347,32 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void metadataImportPreservesNewlineOnUnchangedValueTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing unchanged newline preservation";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withTitle(itemTitle)
+                               .withMetadata("dc", "contributor", "other", "First Author")
+                               .withMetadata("dc", "contributor", "other", "Second Author")
+                               .build();
+        List<MetadataValue> existing = itemService.getMetadata(
+            item, "dc", "contributor", "other", Item.ANY);
+        existing.get(1).setValue("Second Author\n");
+        metadataValueService.update(context, existing.get(1));
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.other",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle +
+                ",\"first Author||Second Author\n\""};
+        performImportScript(csv);
+
+        item = findItemByName(itemTitle);
+        assertEquals(List.of("first Author", "Second Author\n"),
+            itemService.getMetadata(item, "dc", "contributor", "other", Item.ANY)
+                       .stream().map(MetadataValue::getValue).toList());
+    }
+
+    @Test
     public void cleanNormalizesLineEndingsWithoutRemovingNewlinesTest() {
         MetadataImport metadataImport = new MetadataImport();
 
