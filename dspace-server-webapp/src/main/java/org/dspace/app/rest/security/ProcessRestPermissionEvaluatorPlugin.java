@@ -61,9 +61,10 @@ public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         try {
             int processId = Integer.parseInt(targetId.toString());
             Process process = processService.find(context, processId);
-            // TODO: Why true? Because this will throw a 404 later?
+            // This previously returned true, to allow a 404 to be thrown later. However, this assists enumeration
+            // of sequential process IDs. It is better to simply return 'unauthorized' here.
             if (process == null) {
-                return true;
+                return false;
             }
             // Only the process owner or an administrator may perform any action
             return processService.authorizeActionBoolean(context, process);
