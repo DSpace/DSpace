@@ -240,5 +240,24 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
         }
     }
 
+    @Test
+    public void createWorkspaceItemFromEmptyPDFFileTest() throws Exception {
+        // Simulate empty (204) response from GROBID client
+        when(grobidClientMock.retrieveHeaderDocument(any(InputStream.class), any(ConsolidateHeaderEnum.class)))
+                .thenReturn(Optional.empty());
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        try (InputStream pdf = getClass().getResourceAsStream("/org/dspace/app/rest/blank-article.pdf")) {
+            final MockMultipartFile pdfFile =
+                    new MockMultipartFile("file", "/local/path/blank-article.pdf", "application/pdf", pdf);
+
+            // bulk create a workspaceitem
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems").file(pdfFile))
+                    .andExpect(status().isOk())
+                    // testing grobid extraction
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.grobidmetadata").isEmpty());
+        }
+    }
 
 }
