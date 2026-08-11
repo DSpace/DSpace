@@ -137,7 +137,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/system/processes/" + process.getID() * 23 + 17))
-                        .andExpect(status().isNotFound());
+                        .andExpect(status().isForbidden());
     }
 
     @Test
