@@ -206,7 +206,8 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
         List<AuthorityValue> findings = new ArrayList<AuthorityValue>();
         try {
             SolrQuery solrQuery = new SolrQuery();
-            solrQuery.setQuery(filtered(queryString));
+            solrQuery.setQuery(queryString);
+            solrQuery.addFilterQuery("-deleted:true");
             log.debug("AuthorityValueFinder makes the query: " + queryString);
             QueryResponse queryResponse = SolrAuthority.getSearchService().search(solrQuery);
             if (queryResponse != null && queryResponse.getResults() != null && 0 < queryResponse.getResults()
@@ -222,14 +223,6 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
         }
 
         return findings;
-    }
-
-    protected String filtered(String queryString) throws InstantiationException, IllegalAccessException {
-        String instanceFilter = "-deleted:true";
-        if (StringUtils.isNotBlank(instanceFilter)) {
-            queryString += " AND " + instanceFilter;
-        }
-        return queryString;
     }
 
     protected String fieldParameter(String schema, String element, String qualifier) {
