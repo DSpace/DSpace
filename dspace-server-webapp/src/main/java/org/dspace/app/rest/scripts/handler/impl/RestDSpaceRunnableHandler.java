@@ -30,8 +30,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.Process;
@@ -51,11 +49,10 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     private Integer processId;
     private String scriptName;
-    private UUID ePersonId;
+    private EPerson ePerson;
 
     /**
      * This constructor will initialise the handler with the process created from the parameters
@@ -69,7 +66,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
                                      final Set<Group> specialGroups) {
         Context context = new Context();
         try {
-            ePersonId = ePerson.getID();
+            this.ePerson = ePerson;
             Process process = processService.create(context, ePerson, scriptName, parameters, specialGroups);
             processId = process.getID();
             this.scriptName = process.getName();
@@ -89,6 +86,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public void start() {
         Context context = new Context();
+        if (null != ePerson) {
+            context.setCurrentUser(ePerson);
+        }
         try {
             Process process = processService.find(context, processId);
             processService.start(context, process);
@@ -106,6 +106,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public void handleCompletion() {
         Context context = new Context();
+        if (null != ePerson) {
+            context.setCurrentUser(ePerson);
+        }
         try {
             Process process = processService.find(context, processId);
             processService.complete(context, process);
@@ -143,6 +146,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         logError(message, e);
 
         Context context = new Context();
+        if (null != ePerson) {
+            context.setCurrentUser(ePerson);
+        }
         try {
             Process process = processService.find(context, processId);
             processService.fail(context, process);
@@ -276,6 +282,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         TaskExecutor taskExecutor = new DSpace().getServiceManager()
                                                 .getServiceByName("dspaceRunnableThreadExecutor", TaskExecutor.class);
         Context context = new Context();
+        if (null != ePerson) {
+            context.setCurrentUser(ePerson);
+        }
         try {
             Process process = processService.find(context, processId);
             process.setProcessStatus(ProcessStatus.SCHEDULED);
@@ -301,7 +310,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     private void addLogBitstreamToProcess(Context context) throws SQLException, IOException, AuthorizeException {
         try {
-            EPerson ePerson = ePersonService.find(context, ePersonId);
             Process process = processService.find(context, processId);
 
             context.setCurrentUser(ePerson);
@@ -314,6 +322,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public List<UUID> getSpecialGroups() {
         Context context = new Context();
+        if (ePerson != null) {
+            context.setCurrentUser(ePerson);
+        }
         List<UUID> specialGroups = new ArrayList<>();
         try {
             Process process = processService.find(context, processId);
