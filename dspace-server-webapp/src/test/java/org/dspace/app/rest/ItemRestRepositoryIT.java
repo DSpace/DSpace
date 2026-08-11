@@ -641,6 +641,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findOneNonexistentUuidAnonymousReturnsNotFound() throws Exception {
+        getClient().perform(get("/api/core/items/" + UUID.randomUUID()))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findOneMalformedUuidAnonymousReturnsNotFound() throws Exception {
+        getClient().perform(get("/api/core/items/not-a-uuid"))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void withdrawPatchTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
