@@ -376,20 +376,25 @@
 
     <!-- DataCite (2) :: Creator -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
-        <xsl:variable name="authority" select="@authority"/>
         <creator>
             <creatorName>
-                <xsl:call-template name="nameType">
-                    <xsl:with-param name="authority_value" select="$authority"/>
-                </xsl:call-template>
+                <xsl:if test="@authority">
+                    <xsl:variable name="authority" select="@authority"/>
+                    <xsl:call-template name="nameType">
+                        <xsl:with-param name="authority_value" select="$authority"/>
+                    </xsl:call-template>
+                </xsl:if>
                 <xsl:value-of select="." />
             </creatorName>
-            <xsl:call-template name="personOrcid">
-                <xsl:with-param name="authority_value" select="$authority"/>
-            </xsl:call-template>
-            <xsl:call-template name="organizationRor">
-                <xsl:with-param name="authority_value" select="$authority"/>
-            </xsl:call-template>
+            <xsl:if test="@authority">
+                <xsl:variable name="authority" select="@authority"/>
+                <xsl:call-template name="personOrcid">
+                    <xsl:with-param name="authority_value" select="$authority"/>
+                </xsl:call-template>
+                <xsl:call-template name="organizationRor">
+                    <xsl:with-param name="authority_value" select="$authority"/>
+                </xsl:call-template>
+            </xsl:if>
         </creator>
     </xsl:template>
 
