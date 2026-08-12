@@ -65,6 +65,19 @@
         Duplicate tokens at the same position (which may result from Stemmed Synonyms or
         WordDelim parts) are removed.
         -->
+    <!-- Analysis chain for coded metadata values (language codes, identifiers).
+         These fields must NOT pass through the stopword-filtered "text" chain:
+         eight valid ISO 639-1 codes (an, as, be, is, it, no, or, to) are
+         English stopwords, so values like dc.language.iso=it are dropped at
+         index AND query time (DSpace/DSpace#12245). -->
+    <fieldType name="text_identifier" class="solr.TextField" omitNorms="true" positionIncrementGap="100">
+        <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.TrimFilterFactory"/>
+            <filter class="org.apache.lucene.analysis.icu.ICUFoldingFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
    	<fieldType name="text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
@@ -345,6 +358,11 @@
     <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true"  docValues="true"/>
 
     <!--Used for matching on all other fields -->
+    <!-- Coded fields routed away from the stopword-filtered catch-all (#12245).
+         Explicit declarations take precedence over the dynamicField below. -->
+    <field name="dc.language.iso" type="text_identifier" indexed="true" stored="true" multiValued="true"/>
+    <field name="dcterms.language" type="text_identifier" indexed="true" stored="true" multiValued="true"/>
+
     <dynamicField name="*" type="text" multiValued="true"/>
 
     <!-- Leftovers from sample schema.  Are these used? -->
