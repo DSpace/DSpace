@@ -18,9 +18,11 @@ import java.util.List;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.authority.AuthoritySearchService;
@@ -326,10 +328,15 @@ public class ItemUtils {
             return;
         }
 
+        // Virtual authorities refer to relationships, not to entries in the authority core, so skip them.
+        if (StringUtils.startsWith(mdValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+            return;
+        }
+
         try {
             // Query the authority core using the authority key on the metadata value.
             SolrQuery query = new SolrQuery();
-            query.setQuery("id:" + mdValue.getAuthority());
+            query.setQuery("id:\"" + ClientUtils.escapeQueryChars(mdValue.getAuthority()) + "\"");
             SolrDocumentList results = authoritySearchService.search(query).getResults();
 
             if (results.getNumFound() > 0 && results.get(0).get("orcid_id") != null) {
@@ -337,7 +344,10 @@ public class ItemUtils {
                 valueElem.getField().add(createValue("orcid_id", (String) results.get(0).get("orcid_id")));
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            String message = "Could not retrieve the ORCID identifier for authority "
+                    + mdValue.getAuthority() + " of metadata field " + mdValue.getMetadataField().toString('.');
+            log.error(message, e);
+            System.err.println(message + ": " + e.getMessage());
         }
     }
 
