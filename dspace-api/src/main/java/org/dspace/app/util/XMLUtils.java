@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -338,21 +339,43 @@ public class XMLUtils {
                 return null;
             }
 
-            String filePath;
-            if (systemId.startsWith("file://")) {
-                filePath = systemId.substring(7);
-            } else if (systemId.startsWith("file:")) {
-                filePath = systemId.substring(5);
-            } else if (!systemId.contains("://")) {
-                filePath = systemId;
-            } else {
+            URI fileUri;
+            try {
+                // First, try to parse this string as a URI.
+                fileUri = new URI(systemId);
+            } catch (Exception e) {
+                try {
+                    // Could not be parsed as a URI.
+                    // Second, try to parse it as a Path and convert to URI.
+                    fileUri = Paths.get(systemId).toUri();
+                } catch (Exception e2) {
+                    // Doesn't appear to be a valid URI or a Path, so we'll have to throw an error.
+                    throw new SAXException("Invalid URI or path: " + systemId, e2);
+                }
+            }
+
+            String scheme = fileUri.getScheme();
+
+            // If our URI has a null scheme, that means it's a relative URI or missing its scheme (e.g. /tmp/path)
+            // Because we only accept file URIs, we'll attempt to recreate it as a file URI.
+            if (scheme == null) {
+                try {
+                    fileUri = new URI("file", fileUri.getSchemeSpecificPart(), fileUri.getFragment());
+                    scheme = fileUri.getScheme();
+                } catch (URISyntaxException e) {
+                    throw new SAXException("Cannot convert to absolute file URI:" + systemId, e);
+                }
+            }
+
+            // Only allow for "file" scheme
+            if (!"file".equalsIgnoreCase(scheme)) {
                 throw new SAXException("External resources not allowed: " + systemId +
                         ". Only local file paths are permitted.");
             }
 
             Path resolvedPath;
             try {
-                resolvedPath = Paths.get(filePath).toAbsolutePath().normalize();
+                resolvedPath = Paths.get(fileUri).toAbsolutePath().normalize();
             } catch (Exception e) {
                 throw new SAXException("Invalid path: " + systemId, e);
             }
@@ -470,7 +493,7 @@ public class XMLUtils {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            final URI uri;
+            URI uri;
             // Base path is optional, as the "href" might already be an absolute path
             if (base == null || base.isEmpty()) {
                 uri = URI.create(href);
@@ -478,9 +501,21 @@ public class XMLUtils {
                 uri = URI.create(base).resolve(href);
             }
 
-            // Only allow for "file" scheme or empty scheme
             String scheme = uri.getScheme();
-            if (scheme != null && !"file".equalsIgnoreCase(scheme)) {
+
+            // If our URI has a null scheme, that means it's a relative URI or missing its scheme (e.g. /tmp/path)
+            // Because we only accept file URIs, we'll attempt to recreate it as a file URI.
+            if (scheme == null) {
+                try {
+                    uri = new URI("file", uri.getSchemeSpecificPart(), uri.getFragment());
+                    scheme = uri.getScheme();
+                } catch (URISyntaxException e) {
+                    throw new TransformerException("Cannot convert to absolute file URI:" + uri, e);
+                }
+            }
+
+            // Only allow for "file" scheme
+            if (!"file".equalsIgnoreCase(scheme)) {
                 throw new TransformerException("External resources not allowed: " + uri +
                                            ". Only local file paths are permitted.");
             }
