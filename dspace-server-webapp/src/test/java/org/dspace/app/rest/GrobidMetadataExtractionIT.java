@@ -31,6 +31,7 @@ import org.dspace.content.Community;
 import org.dspace.submit.extraction.grobid.GrobidImportMetadataSourceServiceImpl;
 import org.dspace.submit.extraction.grobid.client.ConsolidateHeaderEnum;
 import org.dspace.submit.extraction.grobid.client.GrobidClient;
+import org.dspace.submit.extraction.grobid.client.GrobidClientException;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Test;
@@ -242,7 +243,7 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
 
     @Test
     public void createWorkspaceItemFromEmptyPDFFileTest() throws Exception {
-        // Simulate empty (204) response from GROBID client
+        // empty response from client should result in new workspace item
         when(grobidClientMock.retrieveHeaderDocument(any(InputStream.class), any(ConsolidateHeaderEnum.class)))
                 .thenReturn(Optional.empty());
 
@@ -252,7 +253,27 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
             final MockMultipartFile pdfFile =
                     new MockMultipartFile("file", "/local/path/blank-article.pdf", "application/pdf", pdf);
 
-            // bulk create a workspaceitem
+            // create a workspaceitem from pdf upload
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems").file(pdfFile))
+                    .andExpect(status().isOk())
+                    // testing grobid extraction
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.grobidmetadata").isEmpty());
+        }
+    }
+
+    @Test
+    public void createWorkspaceItemHandleGrobidErrorTest() throws Exception {
+        // client exception should be handled gracefully and result in empty new workspace item
+        when(grobidClientMock.retrieveHeaderDocument(any(InputStream.class), any(ConsolidateHeaderEnum.class)))
+                .thenThrow(new GrobidClientException("error"));
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        try (InputStream pdf = getClass().getResourceAsStream("/org/dspace/app/rest/blank-article.pdf")) {
+            final MockMultipartFile pdfFile =
+                    new MockMultipartFile("file", "/local/path/blank-article.pdf", "application/pdf", pdf);
+
+            // create a workspaceitem from pdf upload
             getClient(authToken).perform(multipart("/api/submission/workspaceitems").file(pdfFile))
                     .andExpect(status().isOk())
                     // testing grobid extraction

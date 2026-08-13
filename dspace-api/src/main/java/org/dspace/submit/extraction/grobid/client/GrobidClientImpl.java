@@ -97,13 +97,13 @@ public class GrobidClientImpl implements GrobidClient {
 
             HttpResponse response = client.execute(method);
 
-            if (isNotSuccessful(response)) {
-                throw new GrobidClientException(formatErrorMessage(response));
-            }
-
             if (hasNoContent(response)) {
                 LOG.warn("Cannot extract metadata from the document: GROBID returned NO CONTENT");
                 return Optional.empty();
+            }
+
+            if (isNotSuccessful(response)) {
+                throw new GrobidClientException(formatErrorMessage(response));
             }
 
             try (InputStream content = response.getEntity().getContent()) {
