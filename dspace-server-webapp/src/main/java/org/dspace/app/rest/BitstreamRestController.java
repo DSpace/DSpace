@@ -121,7 +121,10 @@ public class BitstreamRestController {
      * @throws SQLException if database error occurs
      * @throws AuthorizeException if user lacks permission and author bypass is disabled
      */
-    @PreAuthorize("#accessToken != null || hasPermission(#uuid, 'BITSTREAM', 'READ')")
+    // Keep this condition aligned with the isNotBlank checks in the method body. If preauthorization accepts a
+    // token that the body ignores, the request reaches the response handling without a Bitstream READ check.
+    @PreAuthorize("T(org.apache.commons.lang3.StringUtils).isNotBlank(#accessToken)" +
+        " || hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
     public ResponseEntity retrieve(@PathVariable UUID uuid,
                                    @Parameter(value = "accessToken", required = false) String accessToken,
