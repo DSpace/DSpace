@@ -373,6 +373,37 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void metadataImportPreservesNewlinesForChangedAndUnchangedAuthorValuesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing unchanged author newlines";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withTitle(itemTitle)
+                               .withAuthor("Orth, Alan")
+                               .withAuthor("Donohue, Tim")
+                               .withAuthor("Goyal, Sakshamm")
+                               .build();
+        List<MetadataValue> existing = itemService.getMetadata(
+            item, "dc", "contributor", "author", Item.ANY);
+        existing.get(0).setValue("Orth, Alan\n");
+        metadataValueService.update(context, existing.get(0));
+        existing.get(1).setValue("Donohue, Tim\n");
+        metadataValueService.update(context, existing.get(1));
+        existing.get(2).setValue("Goyal, Sakshamm\n");
+        metadataValueService.update(context, existing.get(2));
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle +
+                ",\"Oorth, Alan\n||Donohue, Tim\n||Goyal, Sakshamm\n\""};
+        performImportScript(csv);
+
+        item = findItemByName(itemTitle);
+        assertEquals(List.of("Oorth, Alan\n", "Donohue, Tim\n", "Goyal, Sakshamm\n"),
+            itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY)
+                       .stream().map(MetadataValue::getValue).toList());
+    }
+
+    @Test
     public void cleanNormalizesLineEndingsWithoutRemovingNewlinesTest() {
         MetadataImport metadataImport = new MetadataImport();
 

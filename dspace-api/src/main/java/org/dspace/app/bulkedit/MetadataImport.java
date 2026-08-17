@@ -789,7 +789,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             List<String> values = new ArrayList<String>();
             List<String> authorities = new ArrayList<String>();
             List<Integer> confidences = new ArrayList<Integer>();
-            List<Boolean> constants = new ArrayList<Boolean>();
             for (BulkEditMetadataValue value : list) {
                 if ((qualifier == null) && (language == null)) {
                     if ((schema.equals(value.getSchema())) &&
@@ -799,7 +798,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         values.add(value.getValue());
                         authorities.add(value.getAuthority());
                         confidences.add(value.getConfidence());
-                        constants.add(changes.getConstant().contains(value));
                     }
                 } else if (qualifier == null) {
                     if ((schema.equals(value.getSchema())) &&
@@ -809,7 +807,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         values.add(value.getValue());
                         authorities.add(value.getAuthority());
                         confidences.add(value.getConfidence());
-                        constants.add(changes.getConstant().contains(value));
                     }
                 } else if (language == null) {
                     if ((schema.equals(value.getSchema())) &&
@@ -819,7 +816,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         values.add(value.getValue());
                         authorities.add(value.getAuthority());
                         confidences.add(value.getConfidence());
-                        constants.add(changes.getConstant().contains(value));
                     }
                 } else {
                     if ((schema.equals(value.getSchema())) &&
@@ -829,7 +825,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         values.add(value.getValue());
                         authorities.add(value.getAuthority());
                         confidences.add(value.getConfidence());
-                        constants.add(changes.getConstant().contains(value));
                     }
                 }
             }
@@ -851,9 +846,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     List<MetadataValue> added = itemService.addMetadata(c, item, schema, element, qualifier,
                                                                        language, values, authorities, confidences);
                     for (int i = 0; i < added.size(); i++) {
-                        if (constants.get(i)) {
-                            added.get(i).setValue(values.get(i));
-                        }
+                        // DSpaceObjectService trims values before persisting them. Restore the exact imported
+                        // representation so meaningful newlines are not lost when a sibling value changes.
+                        added.get(i).setValue(values.get(i));
                     }
                 }
                 itemService.update(c, item);
