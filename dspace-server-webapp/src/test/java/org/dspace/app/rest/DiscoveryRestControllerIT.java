@@ -4456,7 +4456,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.resourceTypeFacet(false),
                         FacetEntryMatcher.typeFacet(false),
-                        FacetEntryMatcher.dateIssuedFacet(false)
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -4502,7 +4503,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
                         FacetEntryMatcher.resourceTypeFacet(false),
                         FacetEntryMatcher.typeFacet(false),
-                        FacetEntryMatcher.dateIssuedFacet(false)
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -4687,7 +4689,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.resourceTypeFacet(false),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
-                        FacetEntryMatcher.submitterFacet(false)
+                        FacetEntryMatcher.submitterFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -4737,7 +4740,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.resourceTypeFacet(false),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
-                        FacetEntryMatcher.submitterFacet(false)
+                        FacetEntryMatcher.submitterFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -4770,7 +4774,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.resourceTypeFacet(false),
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
-                        FacetEntryMatcher.submitterFacet(false)
+                        FacetEntryMatcher.submitterFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -6803,6 +6808,128 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             )))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+    }
+
+    @Test
+    public void discoverHasContentInOriginalBundleFacetWorkspaceItemsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).build();
+        Collection col = CollectionBuilder.createCollection(context, com).build();
+
+        context.setCurrentUser(eperson);
+        try (InputStream is = IOUtils.toInputStream("dummy", CharEncoding.UTF_8)) {
+            WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                    .withFulltext("test.txt", "/local/path/test.txt", is)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/discover/search/objects")
+                                         .param("configuration", "workspace"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.facets", Matchers.hasItem(
+                                allOf(
+                                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                                        hasJsonPath("$._embedded.values", Matchers.hasItem(
+                                                allOf(
+                                                        hasJsonPath("$.label", is("true")),
+                                                        hasJsonPath("$.count", is(1))
+                                                )
+                                        ))
+                                )
+                        )));
+    }
+
+    @Test
+    public void discoverHasContentInOriginalBundleFacetUnclaimableWorkflowItemsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).build();
+        Collection col = CollectionBuilder.createCollection(context, com).withWorkflowGroup(1, admin).build();
+
+        context.setCurrentUser(eperson);
+        try (InputStream is = IOUtils.toInputStream("dummy", CharEncoding.UTF_8)) {
+            WorkflowItemBuilder.createWorkflowItem(context, col)
+                    .withFulltext("test.txt", "/local/path/test.txt", is)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/discover/search/objects")
+                                         .param("configuration", "workspace"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.facets", Matchers.hasItem(
+                                allOf(
+                                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                                        hasJsonPath("$._embedded.values", Matchers.hasItem(
+                                                allOf(
+                                                        hasJsonPath("$.label", is("true")),
+                                                        hasJsonPath("$.count", is(1))
+                                                )
+                                        ))
+                                )
+                        )));
+    }
+
+    @Test
+    public void discoverHasContentInOriginalBundleFacetUnclaimedWorkflowItemsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).build();
+        Collection col = CollectionBuilder.createCollection(context, com).withWorkflowGroup(1, eperson).build();
+
+        try (InputStream is = IOUtils.toInputStream("dummy", CharEncoding.UTF_8)) {
+            PoolTaskBuilder.createPoolTask(context, col, eperson)
+                    .withFulltext("test.txt", "/local/path/test.txt", is)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/discover/search/objects")
+                                         .param("configuration", "workflow"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.facets", Matchers.hasItem(
+                                allOf(
+                                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                                        hasJsonPath("$._embedded.values", Matchers.hasItem(
+                                                allOf(
+                                                        hasJsonPath("$.label", is("true")),
+                                                        hasJsonPath("$.count", is(1))
+                                                )
+                                        ))
+                                )
+                        )));
+    }
+
+    @Test
+    public void discoverHasContentInOriginalBundleFacetClaimedWorkflowItemsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).build();
+        Collection col = CollectionBuilder.createCollection(context, com).withWorkflowGroup(1, eperson).build();
+
+        try (InputStream is = IOUtils.toInputStream("dummy", CharEncoding.UTF_8)) {
+            ClaimedTaskBuilder.createClaimedTask(context, col, eperson)
+                    .withFulltext("test.txt", "/local/path/test.txt", is)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/discover/search/objects")
+                                         .param("configuration", "workflow"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.facets", Matchers.hasItem(
+                                allOf(
+                                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                                        hasJsonPath("$._embedded.values", Matchers.hasItem(
+                                                allOf(
+                                                        hasJsonPath("$.label", is("true")),
+                                                        hasJsonPath("$.count", is(1))
+                                                )
+                                        ))
+                                )
+                        )));
     }
 
 }
