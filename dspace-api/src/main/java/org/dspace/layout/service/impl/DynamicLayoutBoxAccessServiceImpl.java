@@ -38,8 +38,14 @@ public class DynamicLayoutBoxAccessServiceImpl implements DynamicLayoutBoxAccess
 
     @Override
     public boolean hasAccess(Context context, EPerson user, DynamicLayoutBox box, Item item) {
+        Integer securityValue = box.getSecurity();
+        LayoutSecurity security = securityValue != null ? LayoutSecurity.valueOf(securityValue) : null;
+        if (security == null) {
+            // An unknown or missing security value cannot be evaluated, deny access by default.
+            return false;
+        }
         try {
-            return layoutSecurityService.hasAccess(LayoutSecurity.valueOf(box.getSecurity()), context, user,
+            return layoutSecurityService.hasAccess(security, context, user,
                 box.getMetadataSecurityFields(), box.getGroupSecurityFields(), item);
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);

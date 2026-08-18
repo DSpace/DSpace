@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.layout.DynamicLayoutTab;
 import org.dspace.layout.LayoutSecurity;
@@ -37,13 +38,19 @@ public class DynamicLayoutTabAccessServiceImpl implements DynamicLayoutTabAccess
 
     @Override
     public boolean hasAccess(Context context, EPerson user, DynamicLayoutTab tab, Item item) {
+        Integer securityValue = tab.getSecurity();
+        LayoutSecurity security = securityValue != null ? LayoutSecurity.valueOf(securityValue) : null;
+        if (security == null) {
+            // An unknown or missing security value cannot be evaluated, deny access by default.
+            return false;
+        }
         try {
             return layoutSecurityService.hasAccess(
-                LayoutSecurity.valueOf(tab.getSecurity()), context, user, tab.getMetadataSecurityFields(),
+                security, context, user, tab.getMetadataSecurityFields(),
                 tab.getGroupSecurityFields(), item
             );
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLRuntimeException(e);
         }
     }
 }
