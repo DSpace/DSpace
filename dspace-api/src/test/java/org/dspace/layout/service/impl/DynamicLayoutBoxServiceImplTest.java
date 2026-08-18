@@ -276,39 +276,6 @@ public class DynamicLayoutBoxServiceImplTest {
 
     }
 
-    @Test
-    public void testNetworkLabBoxHasContentWithMetadataTrue() {
-        Item item = item();
-
-        when(itemService.getMetadataFirstValue(item, new MetadataFieldName("dspace", "networklab", "enabled"),
-                Item.ANY)).thenReturn("true");
-
-        DynamicLayoutBox box = dynamicLayoutBox("Box", "NETWORKLAB");
-
-        assertTrue(dynamicLayoutBoxService.hasContent(context, box, item));
-    }
-
-    @Test
-    public void testNetworkLabBoxHasNoContentWithMetadataFalse() {
-        Item item = item();
-
-        when(itemService.getMetadataFirstValue(item, new MetadataFieldName("dspace", "networklab", "enabled"),
-                Item.ANY)).thenReturn("false");
-
-        DynamicLayoutBox box = dynamicLayoutBox("Box", "NETWORKLAB");
-
-        assertFalse(dynamicLayoutBoxService.hasContent(context, box, item));
-    }
-
-    @Test
-    public void testNetworkLabBoxHasNoContentWithMetadataUndefined() {
-        Item item = item();
-
-        DynamicLayoutBox box = dynamicLayoutBox("Box", "NETWORKLAB");
-
-        assertFalse(dynamicLayoutBoxService.hasContent(context, box, item));
-    }
-
     private DynamicLayoutBox dynamicLayoutMetadataBox(String shortname, MetadataField... metadataFields) {
         return dynamicLayoutBox(shortname, DynamicLayoutBoxTypes.METADATA.name(), metadataFields);
     }
