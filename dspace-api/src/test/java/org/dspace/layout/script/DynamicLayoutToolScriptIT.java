@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
@@ -22,12 +23,17 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -49,7 +55,9 @@ import org.dspace.layout.DynamicMetadataGroup;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.factory.DynamicLayoutServiceFactory;
 import org.dspace.layout.script.service.DynamicLayoutToolValidator;
+import org.dspace.layout.service.DynamicLayoutBoxService;
 import org.dspace.layout.service.DynamicLayoutTabService;
+import org.dspace.util.WorkbookUtils;
 import org.junit.After;
 import org.junit.Test;
 
@@ -64,6 +72,8 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
     private static final String BASE_XLS_DIR_PATH = "./target/testing/dspace/assetstore/layout/script";
 
     private DynamicLayoutTabService tabService = DynamicLayoutServiceFactory.getInstance().getTabService();
+
+    private DynamicLayoutBoxService boxService = DynamicLayoutServiceFactory.getInstance().getBoxService();
 
     @After
     public void after() throws SQLException, AuthorizeException {
@@ -156,6 +166,207 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             exportedFile.delete();
         }
 
+    }
+
+    /**
+     * Verifies that importing a workbook that <b>defines</b> the same box (entity + shortname) more
+     * than once in the box sheet is rejected by validation and no layout is persisted.
+     * <p>
+     * Note: this guards the box-sheet duplicate-definition validation. It is distinct from a box
+     * being <b>referenced</b> from multiple tab2box cells, which is a valid workbook and is covered
+     * by {@link #testBoxReferencedFromMultipleCellsCreatesOneInstancePerReference()}.
+     */
+    @Test
+    public void testWithDuplicateBoxDefinitions() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createEntityType("Publication");
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), empty());
+
+        File duplicateBoxesFile = new File(BASE_XLS_DIR_PATH, "duplicate-boxes.xls");
+        duplicateBoxesFile.getParentFile().mkdirs();
+
+        try (Workbook workbook = new HSSFWorkbook()) {
+            Sheet boxSheet = workbook.createSheet(DynamicLayoutToolValidator.BOX_SHEET);
+            Row header = boxSheet.createRow(0);
+            header.createCell(0).setCellValue(DynamicLayoutToolValidator.ENTITY_COLUMN);
+            header.createCell(1).setCellValue(DynamicLayoutToolValidator.SHORTNAME_COLUMN);
+
+            // Two rows defining the very same Publication:main box.
+            Row first = boxSheet.createRow(1);
+            first.createCell(0).setCellValue("Publication");
+            first.createCell(1).setCellValue("main");
+
+            Row second = boxSheet.createRow(2);
+            second.createCell(0).setCellValue("Publication");
+            second.createCell(1).setCellValue("main");
+
+            try (FileOutputStream out = new FileOutputStream(duplicateBoxesFile)) {
+                workbook.write(out);
+            }
+        }
+
+        try {
+            String[] args = new String[] { "dynamic-layout-tool", "-f", duplicateBoxesFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+            handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+            assertThat(handler.getInfoMessages(), empty());
+            assertThat(handler.getErrorMessages(),
+                hasItem(startsWith("Duplicate boxes detected in 'box' sheet:")));
+
+            // The import must have been aborted, so no layout is persisted.
+            assertThat(tabService.findAll(context), empty());
+        } finally {
+            duplicateBoxesFile.delete();
+        }
+    }
+
+    /**
+     * Verifies that when a box shortname is referenced from multiple cells (i.e. multiple box
+     * instances share the same entity + shortname), the export writes a single box row and keeps
+     * a tab2box reference for each cell. This is the export-side de-duplication that prevents box
+     * rows from multiplying over export/import cycles.
+     */
+    @Test
+    public void testExportDeduplicatesSharedBox() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType publicationType = createEntityType("Publication");
+
+        DynamicLayoutBox firstBox = DynamicLayoutBoxBuilder.createBuilder(context, publicationType, false, false)
+            .withHeader("Shared Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("shared-box")
+            .build();
+
+        DynamicLayoutBox secondBox = DynamicLayoutBoxBuilder.createBuilder(context, publicationType, false, false)
+            .withHeader("Shared Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("shared-box")
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, publicationType, 0)
+            .withShortName("publication-tab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Publication Tab")
+            .withLeading(true)
+            .addBoxIntoNewRow(firstBox)
+            .addBoxIntoNewRow(secondBox)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), hasSize(1));
+
+        String[] args = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
+
+        assertThat(handler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
+
+            Sheet boxSheet = workbook.getSheet(DynamicLayoutToolValidator.BOX_SHEET);
+            long sharedBoxRows = countRows(boxSheet, DynamicLayoutToolValidator.SHORTNAME_COLUMN, "shared-box");
+            assertThat("The box must be exported only once", sharedBoxRows, is(1L));
+
+            Sheet tab2boxSheet = workbook.getSheet(DynamicLayoutToolValidator.TAB2BOX_SHEET);
+            long references = countBoxesReferences(tab2boxSheet, "shared-box");
+            assertThat("Each cell must keep its own reference to the box", references, is(2L));
+
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
+    private long countRows(Sheet sheet, String headerName, String value) {
+        return WorkbookUtils.getNotEmptyRowsSkippingHeader(sheet).stream()
+            .map(row -> WorkbookUtils.getCellValue(row, headerName))
+            .filter(value::equals)
+            .count();
+    }
+
+    private long countBoxesReferences(Sheet sheet, String boxShortname) {
+        return WorkbookUtils.getNotEmptyRowsSkippingHeader(sheet).stream()
+            .map(row -> WorkbookUtils.getCellValue(row, DynamicLayoutToolValidator.BOXES_COLUMN))
+            .filter(boxes -> boxes != null && List.of(boxes.split(","))
+                .stream().map(String::trim).anyMatch(boxShortname::equals))
+            .count();
+    }
+
+    /**
+     * Reproduces the reviewer's scenario: a box defined once but <b>referenced from multiple
+     * tab2box cells</b>. This is a valid workbook (export writes a single box row plus one
+     * tab2box reference per cell), but on import the parser builds a new {@link DynamicLayoutBox}
+     * instance per reference, so a single logical box becomes multiple persisted rows that share
+     * the same entity + shortname.
+     * <p>
+     * The test performs a full export/import round-trip and documents the current behavior:
+     * the box is persisted once per tab2box reference.
+     */
+    @Test
+    public void testBoxReferencedFromMultipleCellsCreatesOneInstancePerReference() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType publicationType = createEntityType("Publication");
+
+        // A single logical box referenced from two different cells of the same tab.
+        DynamicLayoutBox firstReference = DynamicLayoutBoxBuilder
+            .createBuilder(context, publicationType, false, false)
+            .withHeader("Shared Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("shared-box")
+            .build();
+
+        DynamicLayoutBox secondReference = DynamicLayoutBoxBuilder
+            .createBuilder(context, publicationType, false, false)
+            .withHeader("Shared Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("shared-box")
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, publicationType, 0)
+            .withShortName("publication-tab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Publication Tab")
+            .withLeading(true)
+            .addBoxIntoNewRow(firstReference)
+            .addBoxIntoNewRow(secondReference)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // Export the layout: this produces one box row and two tab2box references to "shared-box".
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            // Re-import the exported workbook (cleanUpLayout wipes the previous layout first).
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            // Count the persisted boxes sharing the entity + shortname.
+            long sharedBoxInstances = boxService.findByEntityType(context, "Publication", null, null).stream()
+                .filter(box -> "shared-box".equals(box.getShortname()))
+                .count();
+
+            // Current behavior: the parser creates one instance per tab2box reference, so a box
+            // referenced from two cells is persisted twice under the same shortname.
+            assertThat("A box referenced from multiple cells is currently persisted once per reference",
+                sharedBoxInstances, is(2L));
+        } finally {
+            exportedFile.delete();
+        }
     }
 
     @Test
