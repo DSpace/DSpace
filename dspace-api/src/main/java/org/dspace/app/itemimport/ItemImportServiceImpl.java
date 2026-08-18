@@ -1977,9 +1977,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         File tempdir = new File(destinationDir);
         if (!tempdir.isDirectory()) {
-            logError("'" + configurationService.getProperty("org.dspace.app.batchitemimport.work.dir") +
-                          "' as defined by the key 'org.dspace.app.batchitemimport.work.dir' in dspace.cfg " +
-                          "is not a valid directory");
+            logError("'" + destinationDir + "' is not a valid directory");
         }
 
         if (!tempdir.exists() && !tempdir.mkdirs()) {
