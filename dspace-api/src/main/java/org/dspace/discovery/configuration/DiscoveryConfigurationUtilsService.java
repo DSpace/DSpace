@@ -6,10 +6,8 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.discovery.configuration;
-import static org.apache.commons.collections4.iterators.EmptyIterator.emptyIterator;
 
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,25 +34,46 @@ public class DiscoveryConfigurationUtilsService {
     private DiscoveryConfigurationService searchConfigurationService;
 
     /**
-     * Returns the items related to the given item through the named relation.
+     * Counts the items related to the given item through the named relation without
+     * resolving the related items themselves.
+     * <p>
+     * This runs the relation discovery query but requests zero rows, so no items are
+     * fetched from the database, and reads the total match count from the search response.
+     * It is intended for callers that only need to know whether (or how many) related
+     * items exist.
+     * </p>
      *
      * @param context the DSpace context
-     * @param item the item whose related items are searched
+     * @param item the item whose related items are counted
      * @param relationName the name of the relation
-     * @return an iterator over the related items, empty if none is found
+     * @return the number of related items, {@code 0} if none is found
      */
-    public Iterator<Item> findByRelation(Context context, Item item, String relationName) {
+    public long countByRelation(Context context, Item item, String relationName) {
+        DiscoverQuery discoverQuery = buildRelationQuery(item, relationName);
+        if (discoverQuery == null) {
+            return 0;
+        }
+
+        // We only need the total match count, so avoid resolving any item from the database.
+        discoverQuery.setMaxResults(0);
+
+        return new DiscoverResultIterator<Item, UUID>(context, discoverQuery, false).getTotalSearchResults();
+    }
+
+    private DiscoverQuery buildRelationQuery(Item item, String relationName) {
         String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         if (entityType == null) {
-            log.warn("The item with id " + item.getID() + " has no dspace.entity.type. No related items is found.");
-            return emptyIterator();
+            log.warn("The item with id {} has no dspace.entity.type. No related items is found.", item.getID());
+            return null;
         }
 
         DiscoveryConfiguration discoveryConfiguration = findDiscoveryConfiguration(entityType, relationName);
         if (discoveryConfiguration == null) {
-            log.warn("No discovery configuration found for relation " + relationName + " for item with id "
-                + item.getID() + " and type " + entityType + ". No related items is found.");
-            return emptyIterator();
+            log.warn(
+                "No discovery configuration found for relation {} for item with id {} and type {}. " +
+                    "No related items is found.",
+                relationName, item.getID(), entityType);
+            return null;
         }
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -78,7 +97,7 @@ public class DiscoveryConfigurationUtilsService {
             discoverQuery.addFilterQueries(MessageFormat.format(defaultFilterQuery, item.getID()));
         }
 
-        return new DiscoverResultIterator<Item, UUID>(context, discoverQuery);
+        return discoverQuery;
     }
 
     private DiscoveryConfiguration findDiscoveryConfiguration(String entityType, String relationName) {
