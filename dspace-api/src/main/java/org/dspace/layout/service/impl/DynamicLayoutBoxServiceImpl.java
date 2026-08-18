@@ -10,7 +10,6 @@ package org.dspace.layout.service.impl;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -230,8 +229,7 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
     }
 
     private boolean hasRelationBoxContent(Context context, DynamicLayoutBox box, Item item) {
-        Iterator<Item> relatedItems = searchConfigurationUtilsService.findByRelation(context, item, box.getShortname());
-        return relatedItems.hasNext();
+        return searchConfigurationUtilsService.countByRelation(context, item, box.getShortname()) > 0;
     }
 
     private boolean isIiifEnabled(Item item) {

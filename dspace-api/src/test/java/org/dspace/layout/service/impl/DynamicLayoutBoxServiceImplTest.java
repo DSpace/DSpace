@@ -7,8 +7,6 @@
  */
 package org.dspace.layout.service.impl;
 
-import static org.apache.commons.collections4.IteratorUtils.arrayIterator;
-import static org.apache.commons.collections4.IteratorUtils.emptyIterator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
@@ -18,12 +16,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -38,7 +34,6 @@ import org.dspace.layout.DynamicLayoutBox;
 import org.dspace.layout.DynamicLayoutBoxTypes;
 import org.dspace.layout.DynamicLayoutField;
 import org.dspace.layout.DynamicLayoutFieldBitstream;
-import org.dspace.layout.dao.DynamicLayoutBoxDAO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -59,12 +54,6 @@ public class DynamicLayoutBoxServiceImplTest {
 
     @Mock
     private Context context;
-
-    @Mock
-    private DynamicLayoutBoxDAO dao;
-
-    @Mock
-    private AuthorizeService authorizeService;
 
     @Mock
     private DiscoveryConfigurationUtilsService searchConfigurationUtilsService;
@@ -93,10 +82,8 @@ public class DynamicLayoutBoxServiceImplTest {
         DynamicLayoutBox box = dynamicLayoutBox("authors", DynamicLayoutBoxTypes.RELATION.name());
         Item item = item();
 
-        Iterator<Item> relatedItems = arrayIterator(item(), item());
-        when(searchConfigurationUtilsService.findByRelation(context, item, "authors")).thenReturn(relatedItems);
+        when(searchConfigurationUtilsService.countByRelation(context, item, "authors")).thenReturn(2L);
         assertThat(dynamicLayoutBoxService.hasContent(context, box, item), is(true));
-
     }
 
     @Test
@@ -105,9 +92,8 @@ public class DynamicLayoutBoxServiceImplTest {
         DynamicLayoutBox box = dynamicLayoutBox("authors", DynamicLayoutBoxTypes.RELATION.name());
         Item item = item();
 
-        when(searchConfigurationUtilsService.findByRelation(context, item, "authors")).thenReturn(emptyIterator());
+        when(searchConfigurationUtilsService.countByRelation(context, item, "authors")).thenReturn(0L);
         assertThat(dynamicLayoutBoxService.hasContent(context, box, item), is(false));
-
     }
 
     @Test
