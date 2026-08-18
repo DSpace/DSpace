@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.access.status.AccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.Item;
@@ -45,7 +46,10 @@ public class DSpaceOpenAccessFilter extends DSpaceFilter {
             if (item == null) {
                 return false;
             }
-            shown = accessStatusService.getAnonymousAccessStatus(context, item).getStatus().equals("open.access");
+            shown = accessStatusService
+                .getAnonymousAccessStatus(context, item)
+                .getStatus()
+                .equals(AccessStatusHelper.OPEN_ACCESS);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
