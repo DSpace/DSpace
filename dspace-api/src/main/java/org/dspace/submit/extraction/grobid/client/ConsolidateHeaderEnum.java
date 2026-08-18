@@ -9,6 +9,14 @@ package org.dspace.submit.extraction.grobid.client;
 
 /**
  * Model the consolidateHeader parameter of {@link GrobidClient}.
+
+ * From the official documentation:
+ *
+ * consolidateHeader is a string of value
+ * 0 (no consolidation),
+ * 1 (consolidate and inject all extra metadata, default value),
+ * 2 (consolidate the header metadata and inject DOI only) or
+ * 3 (consolidate using only extracted DOI, if extracted, and do not try to consolidate using any other metadata)
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -31,7 +39,12 @@ public enum ConsolidateHeaderEnum {
     /**
      * Consolidation against CrossRef and, if matching, addition of the DOI only.
      */
-    CONSOLIDATE_AND_INJECT_DOI("2");
+    CONSOLIDATE_AND_INJECT_DOI("2"),
+
+    /**
+     * Consolidation using only the DOI, do not use any other metadata for consolidation
+     */
+    CONSOLIDATE_WITH_DOI_ONLY("3");
 
     private String value;
 

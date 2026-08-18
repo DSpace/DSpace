@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.constraints.NotNull;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.FileMultipleOccurencesException;
 import org.dspace.importer.external.exception.FileSourceException;
@@ -35,9 +37,12 @@ import org.w3c.dom.Document;
 public class GrobidImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
         implements FileSource {
 
+    private final static Logger log = LogManager.getLogger(GrobidImportMetadataSourceServiceImpl.class);
+
     @NotNull
     private GrobidClient grobidClient;
     private List<String> supportedExtensions;
+    private ConsolidateHeaderEnum consolidateHeader;
 
     @Override
     public String getImportSource() {
@@ -52,8 +57,7 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public List<ImportRecord> getRecords(InputStream inputStream) throws FileSourceException {
         try {
-            Optional<Document> teiDocument = grobidClient.retrieveHeaderDocument(inputStream,
-                    ConsolidateHeaderEnum.CONSOLIDATE_AND_INJECT_METADATA);
+            Optional<Document> teiDocument = grobidClient.retrieveHeaderDocument(inputStream, consolidateHeader);
             return teiDocument.map(document -> {
                 // Convert W3C Document to JDOM for use with downstream MetadataContributors
                 DOMBuilder domBuilder = new DOMBuilder();
@@ -62,6 +66,8 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractImportMetadat
                 return List.of(transformSourceRecords(rootElement));
             }).orElse(Collections.emptyList());
         } catch (GrobidClientException e) {
+            log.error("GROBID metadata extraction failed. File upload will proceed without it. Details: {}",
+                    e.getMessage(), e);
             throw new FileSourceException(e.getMessage(), e);
         }
     }
@@ -90,8 +96,18 @@ public class GrobidImportMetadataSourceServiceImpl extends AbstractImportMetadat
         this.grobidClient = grobidClient;
     }
 
+    public ConsolidateHeaderEnum getConsolidateHeader() {
+        return consolidateHeader;
+    }
+
+    public void setConsolidateHeader(ConsolidateHeaderEnum consolidateHeader) {
+        this.consolidateHeader = consolidateHeader;
+    }
+
     @Override
     public void init() throws Exception {
-
+        if (consolidateHeader == null) {
+            consolidateHeader = ConsolidateHeaderEnum.CONSOLIDATE_AND_INJECT_METADATA;
+        }
     }
 }
