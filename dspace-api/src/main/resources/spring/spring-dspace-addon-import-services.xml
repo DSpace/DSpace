@@ -334,6 +334,8 @@
         <property name="grobidClient">
             <bean class="org.dspace.submit.extraction.grobid.client.GrobidClientImpl">
                 <constructor-arg name="baseUrl" value="${grobid.service.url:#{null}}" />
+                <constructor-arg name="maxRetries" value="${grobid.client.maxRetries:3}" />
+                <constructor-arg name="retryInterval" value="${grobid.client.retryInterval:2000}" />
             </bean>
         </property>
         <property name="supportedExtensions">

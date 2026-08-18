@@ -25,6 +25,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.dspace.service.impl.HttpConnectionPoolService;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +45,7 @@ import org.w3c.dom.Document;
 public class GrobidClientTest {
 
     @InjectMocks
-    private GrobidClientImpl grobidClient = new GrobidClientImpl("http://localhost:8070");
+    private GrobidClientImpl grobidClient = new GrobidClientImpl("http://localhost:8070", 3, 2000);
 
     @Mock
     private HttpConnectionPoolService httpConnectionPoolService;
@@ -63,7 +64,8 @@ public class GrobidClientTest {
 
     @Before
     public void setUp() throws Exception {
-        when(httpConnectionPoolService.getClient()).thenReturn(httpClient);
+        when(httpConnectionPoolService.getClient(new DefaultServiceUnavailableRetryStrategy(3, 2000)))
+                .thenReturn(httpClient);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
     }

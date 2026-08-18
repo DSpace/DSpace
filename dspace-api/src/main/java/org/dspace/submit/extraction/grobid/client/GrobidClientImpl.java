@@ -26,6 +26,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.service.impl.HttpConnectionPoolService;
 import org.slf4j.Logger;
@@ -59,16 +60,28 @@ public class GrobidClientImpl implements GrobidClient {
     private final String baseUrl;
 
     /**
+     * Max retries to use on a service unavailable (503) response
+     */
+    private final int maxRetries;
+
+    /**
+     * Retry interval in milliseconds
+     */
+    private final int retryInterval;
+
+    /**
      * If present in configuration, strip trailing slashes from base URL.
      * If blank or missing, set to null (disable the service)
      * @param baseUrl the provided base URL. See grobid.cfg, spring-dspace-addon-import-services.xml
      */
-    public GrobidClientImpl(String baseUrl) {
+    public GrobidClientImpl(String baseUrl, int maxRetries, int retryInterval) {
         if (StringUtils.isNotBlank(baseUrl)) {
             this.baseUrl = baseUrl.replaceAll("/+$", "");
         } else {
             this.baseUrl = null;
         }
+        this.maxRetries = maxRetries;
+        this.retryInterval = retryInterval;
     }
 
     @Override
@@ -92,7 +105,8 @@ public class GrobidClientImpl implements GrobidClient {
             throw new GrobidClientException("Base URL not configured, GROBID client is disabled");
         }
         try  {
-            CloseableHttpClient client = httpConnectionPoolService.getClient();
+            CloseableHttpClient client = httpConnectionPoolService
+                    .getClient(new DefaultServiceUnavailableRetryStrategy(maxRetries, retryInterval));
             HttpPost method = new HttpPost(baseUrl + "/api/processHeaderDocument");
             method.addHeader("Accept", "application/xml");
 
