@@ -10,9 +10,7 @@ package org.dspace.layout;
 public enum DynamicLayoutBoxTypes {
     IIIFVIEWER,
     METADATA,
-    METRICS,
     RELATION,
     COLLECTIONS,
     VERSIONING,
-    NETWORKLAB
 }
