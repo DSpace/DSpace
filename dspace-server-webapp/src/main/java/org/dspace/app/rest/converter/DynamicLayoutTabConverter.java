@@ -72,11 +72,12 @@ public class DynamicLayoutTabConverter implements DSpaceConverter<DynamicLayoutT
     public DynamicLayoutTabRest convert(DynamicLayoutTab model, Projection projection) {
         Item item = getScopeItem();
 
-        if (item == null || hasAccess(getScopeItem(), model)) {
+        if (item == null || hasAccess(item, model)) {
             return convertTab(model, projection);
         }
 
         return Optional.ofNullable(findAlternativeTab(model))
+                       .filter(tab -> hasAccess(item, tab))
                        .map(tab -> convertTab(tab, projection))
                        .orElseGet(DynamicLayoutTabRest::new);
     }
@@ -180,7 +181,7 @@ public class DynamicLayoutTabConverter implements DSpaceConverter<DynamicLayoutT
                        .filter(b -> hasAccess(item, b) && hasContent(item, b))
                        .orElseGet(() ->
                            Optional.ofNullable(findAlternativeBox(box))
-                                   .filter(altBox -> hasContent(item, altBox))
+                                   .filter(altBox -> hasAccess(item, altBox) && hasContent(item, altBox))
                                    .orElse(null));
     }
 

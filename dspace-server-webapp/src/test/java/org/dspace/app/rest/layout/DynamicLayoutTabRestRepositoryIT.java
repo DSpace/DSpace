@@ -2041,6 +2041,196 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
                    .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(boxOne))));
     }
 
+    /**
+     * Verifies that when a user cannot access a tab, the fallback alternative tab is only
+     * returned if the same user can access it too. A non-public
+     * alternative tab must never be leaked to an unauthorized user.
+     *
+     * @throws Exception if an error occurs
+     */
+    @Test
+    public void testFindByItemAlternativeTabRespectsAccess() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Test Community")
+                                              .withTitle("Title test community")
+                                              .build();
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Test Collection")
+                                                 .build();
+        // Create entity Type
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+                         .build();
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+                                               .build();
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withPersonIdentifierFirstName("Danilo")
+                               .withPersonIdentifierLastName("Di Nuzzo")
+                               .withEntityType(eTypePer.getLabel())
+                               .build();
+
+        DynamicLayoutBox boxOne = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+                                                         .withShortname("Box shortname 1")
+                                                         .withSecurity(LayoutSecurity.PUBLIC)
+                                                         .withContainer(false)
+                                                         .build();
+
+        DynamicLayoutBox boxTwo = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+                                                         .withShortname("Box shortname 2")
+                                                         .withSecurity(LayoutSecurity.PUBLIC)
+                                                         .withContainer(false)
+                                                         .build();
+
+        DynamicLayoutFieldBuilder.createMetadataField(context, firstName, 0, 1)
+                                 .withLabel("GIVEN NAME")
+                                 .withRendering("TEXT")
+                                 .withBox(boxOne)
+                                 .build();
+
+        DynamicLayoutFieldBuilder.createMetadataField(context, firstName, 0, 1)
+                                 .withLabel("GIVEN NAME")
+                                 .withRendering("TEXT")
+                                 .withBox(boxTwo)
+                                 .build();
+
+        // the alternative tab is ADMINISTRATOR-only and must not be exposed to anonymous users
+        DynamicLayoutTab adminTab =
+            DynamicLayoutTabBuilder.createTab(context, eTypePer, 0)
+                                   .withShortName("Administrator alternative tab")
+                                   .withSecurity(LayoutSecurity.ADMINISTRATOR)
+                                   .withHeader("Administrator Tab header")
+                                   .addBoxIntoNewRow(boxOne, "rowTwoStyle", "cellOfRowTwoStyle")
+                                   .build();
+
+        DynamicLayoutTab restrictedTab =
+            DynamicLayoutTabBuilder.createTab(context, eTypePer, 0)
+                                   .withShortName("Restricted tab - priority 0")
+                                   .withSecurity(LayoutSecurity.CUSTOM_DATA)
+                                   .withHeader("Restricted Tab header")
+                                   .addBoxIntoNewRow(boxTwo, "rowTwoStyle2", "cellOfRowTwoStyle2")
+                                   .addTab2SecurityGroups(adminGroup, adminTab)
+                                   .build();
+
+        context.restoreAuthSystemState();
+
+        // admin user will see both tabs
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(get("/api/layout/tabs/search/findByItem")
+                         .param("uuid", item.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.totalElements", is(2)))
+            .andExpect(jsonPath("$._embedded.tabs[0].id", is(adminTab.getID())))
+            .andExpect(jsonPath("$._embedded.tabs[1].id", is(restrictedTab.getID())));
+
+        // anonymous user cannot access restrictedTab and must NOT see the ADMINISTRATOR alternative either
+        getClient().perform(get("/api/layout/tabs/search/findByItem")
+                                .param("uuid", item.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded.tabs").doesNotExist());
+    }
+
+    /**
+     * Verifies that when a user cannot access a box, the fallback alternative box is only
+     * returned if the same user can access it too (review finding #9). A non-public
+     * alternative box must never be leaked to an unauthorized user.
+     *
+     * @throws Exception if an error occurs
+     */
+    @Test
+    public void testFindByItemAlternativeBoxRespectsAccess() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Test Community")
+                                              .withTitle("Title test community")
+                                              .build();
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Test Collection")
+                                                 .build();
+        // Create entity Type
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+                         .build();
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+                                               .build();
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withPersonIdentifierFirstName("Danilo")
+                               .withPersonIdentifierLastName("Di Nuzzo")
+                               .withEntityType(eTypePer.getLabel())
+                               .build();
+
+        // the alternative box is ADMINISTRATOR-only and must not be exposed to anonymous users
+        DynamicLayoutBox adminBox = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+                                                   .withShortname("Administrator alternative box")
+                                                   .withSecurity(LayoutSecurity.ADMINISTRATOR)
+                                                   .withContainer(false)
+                                                   .build();
+
+        // add adminBox as alternative to the restricted box
+        DynamicLayoutBox restrictedBox = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+                                                   .withShortname("Restricted box")
+                                                   .withSecurity(LayoutSecurity.CUSTOM_DATA)
+                                                   .withContainer(false)
+                                                   .addBox2SecurityGroups(adminGroup, adminBox)
+                                                   .build();
+
+        DynamicLayoutFieldBuilder.createMetadataField(context, firstName, 0, 1)
+                              .withLabel("GIVEN NAME")
+                              .withRendering("TEXT")
+                              .withBox(adminBox)
+                              .build();
+
+        DynamicLayoutFieldBuilder.createMetadataField(context, firstName, 0, 1)
+                              .withLabel("GIVEN NAME")
+                              .withRendering("TEXT")
+                              .withBox(restrictedBox)
+                              .build();
+
+        // add restrictedBox to a public tab
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, eTypePer, 0)
+                                                .withShortName("TabOne For Person - priority 0")
+                                                .withSecurity(LayoutSecurity.PUBLIC)
+                                                .withHeader("New Tab header")
+                                                .withLeading(true)
+                                                .addBoxIntoNewRow(restrictedBox, "rowTwoStyle", "cellOfRowTwoStyle")
+                                                .build();
+
+        context.restoreAuthSystemState();
+
+        // admin user will see the restricted box
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(get("/api/layout/tabs/search/findByItem")
+                .param("uuid", item.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.tabs[0].id", is(tab.getID())))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(restrictedBox))));
+
+        // anonymous user cannot access restrictedBox and must NOT see the ADMINISTRATOR alternative either;
+        // the tab therefore has no visible boxes and is filtered out entirely
+        getClient().perform(get("/api/layout/tabs/search/findByItem")
+                       .param("uuid", item.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded.tabs").doesNotExist());
+    }
+
     @Test
     public void findByItemWithAttachment() throws Exception {
         context.turnOffAuthorisationSystem();
