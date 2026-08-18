@@ -11,6 +11,7 @@ public enum DynamicLayoutBoxTypes {
     IIIFVIEWER,
     METADATA,
     RELATION,
+    METRICS,
     COLLECTIONS,
     VERSIONING,
 }
