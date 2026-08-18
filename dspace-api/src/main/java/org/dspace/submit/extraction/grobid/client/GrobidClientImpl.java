@@ -12,13 +12,14 @@ import static java.nio.charset.Charset.defaultCharset;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Named;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -29,6 +30,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.service.impl.HttpConnectionPoolService;
+import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,37 +54,54 @@ public class GrobidClientImpl implements GrobidClient {
     @Named("grobidHttpConnectionPoolService")
     protected HttpConnectionPoolService httpConnectionPoolService;
 
+
     private static final Logger LOG = LoggerFactory.getLogger(GrobidClientImpl.class);
+    @Autowired
+    private ConfigurationService configurationService;
+
+    /**
+     * Default value of a "disabled" URL
+     */
+    public static final String DISABLED_BASE_URL = null;
+    /**
+     * Default number of retries
+     */
+    public static final int DEFAULT_MAX_RETRIES = 3;
+    /**
+     * Default retry interval in milliseconds
+     */
+    public static final int DEFAULT_RETRY_INTERVAL = 2000;
 
     /**
      * Base URL of GROBID service. Set in constructor {@see spring-dspace-addon-import-services.xml}
      */
-    private final String baseUrl;
+    private String baseUrl = DISABLED_BASE_URL;
 
     /**
      * Max retries to use on a service unavailable (503) response
      */
-    private final int maxRetries;
+    private int maxRetries = DEFAULT_MAX_RETRIES;
 
     /**
      * Retry interval in milliseconds
      */
-    private final int retryInterval;
+    private int retryInterval = DEFAULT_RETRY_INTERVAL;
 
-    /**
-     * If present in configuration, strip trailing slashes from base URL.
-     * If blank or missing, set to null (disable the service)
-     * @param baseUrl the provided base URL. See grobid.cfg, spring-dspace-addon-import-services.xml
-     */
-    public GrobidClientImpl(String baseUrl, int maxRetries, int retryInterval) {
-        if (StringUtils.isNotBlank(baseUrl)) {
-            this.baseUrl = baseUrl.replaceAll("/+$", "");
-        } else {
-            this.baseUrl = null;
-        }
-        this.maxRetries = maxRetries;
-        this.retryInterval = retryInterval;
+    public GrobidClientImpl() {
     }
+
+    @PostConstruct
+    protected void init() {
+        this.baseUrl = configurationService.getProperty("grobid.service.url", DISABLED_BASE_URL);
+        if (this.baseUrl != null) {
+            this.baseUrl = baseUrl.replaceAll("/+$", "");
+        }
+        this.maxRetries = configurationService.getIntProperty(
+                "grobid.client.maxRetries", DEFAULT_MAX_RETRIES);
+        this.retryInterval = configurationService.getIntProperty(
+                "grobid.client.retryInterval", DEFAULT_RETRY_INTERVAL);
+    }
+
 
     @Override
     public Optional<Document> retrieveHeaderDocument(InputStream inputStream) throws GrobidClientException {
@@ -101,7 +120,7 @@ public class GrobidClientImpl implements GrobidClient {
     @Override
     public Optional<Document> retrieveHeaderDocument(InputStream inputStream, ConsolidateHeaderEnum consolidateHeader)
             throws GrobidClientException {
-        if (null == this.baseUrl) {
+        if (Objects.equals(DISABLED_BASE_URL, baseUrl)) {
             throw new GrobidClientException("Base URL not configured, GROBID client is disabled");
         }
         try  {

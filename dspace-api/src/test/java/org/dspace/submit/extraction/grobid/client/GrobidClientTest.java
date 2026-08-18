@@ -25,8 +25,8 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.dspace.service.impl.HttpConnectionPoolService;
+import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,10 +45,13 @@ import org.w3c.dom.Document;
 public class GrobidClientTest {
 
     @InjectMocks
-    private GrobidClientImpl grobidClient = new GrobidClientImpl("http://localhost:8070", 3, 2000);
+    private GrobidClientImpl grobidClient = new GrobidClientImpl();
 
     @Mock
     private HttpConnectionPoolService httpConnectionPoolService;
+
+    @Mock
+    private ConfigurationService configurationService;
 
     @Mock
     private CloseableHttpClient httpClient;
@@ -64,8 +67,16 @@ public class GrobidClientTest {
 
     @Before
     public void setUp() throws Exception {
-        when(httpConnectionPoolService.getClient(new DefaultServiceUnavailableRetryStrategy(3, 2000)))
-                .thenReturn(httpClient);
+        // Catch config property gets and return a valid non-null URL to 'enable' the client
+        when(configurationService.getProperty("grobid.service.url", null))
+                .thenReturn("http://localhost:8070");
+        when(configurationService.getIntProperty("grobid.client.maxRetries", 3))
+                .thenReturn(3);
+        when(configurationService.getIntProperty("grobid.client.retryInterval", 2000))
+                .thenReturn(2000);
+
+        grobidClient.init();
+        when(httpConnectionPoolService.getClient(any())).thenReturn(httpClient);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
     }
@@ -162,6 +173,17 @@ public class GrobidClientTest {
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(httpEntity.getContent()).thenReturn(
             new ByteArrayInputStream("Service Unavailable".getBytes(StandardCharsets.UTF_8)));
+
+        InputStream pdfStream = new ByteArrayInputStream("mock pdf content".getBytes(StandardCharsets.UTF_8));
+        grobidClient.retrieveHeaderDocument(pdfStream);
+    }
+
+    @Test(expected = GrobidClientException.class)
+    public void testDisabledClientThrowsException() throws Exception {
+        // Override the earlier mock so we definitely return null now (disable)
+        when(configurationService.getProperty("grobid.service.url", null))
+                .thenReturn(null);
+        grobidClient.init();
 
         InputStream pdfStream = new ByteArrayInputStream("mock pdf content".getBytes(StandardCharsets.UTF_8));
         grobidClient.retrieveHeaderDocument(pdfStream);
