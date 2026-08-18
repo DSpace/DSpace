@@ -163,8 +163,6 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
                 return isIiifEnabled(item);
             case "VERSIONING":
                 return hasVersioningBox(context, item);
-            case "NETWORKLAB":
-                return isNetworkLabEnabled(item);
             case "METADATA":
             default:
                 return hasMetadataBoxContent(context, box, item);
@@ -235,11 +233,6 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
     private boolean isIiifEnabled(Item item) {
         return BooleanUtils.toBoolean(itemService.getMetadataFirstValue(item,
             new MetadataFieldName("dspace.iiif.enabled"), Item.ANY));
-    }
-
-    private boolean isNetworkLabEnabled(Item item) {
-        return BooleanUtils.toBoolean(itemService.getMetadataFirstValue(item,
-                new MetadataFieldName("dspace.networklab.enabled"), Item.ANY));
     }
 
     private boolean isOwningCollectionPresent(Item item) {
