@@ -216,14 +216,23 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         context.commit();
 
-        // Get a fully verified token (simulate MFA complete)
-        String token = getAuthToken(eperson.getEmail(), password);
+        // Get a token (has mfa_verified=false since MFA is enabled)
+        String pendingToken = getAuthToken(eperson.getEmail(), password);
+
+        // Verify MFA to get a fully verified token
+        counter = Math.floorDiv(timeProvider.getTime(), 30);
+        String verifyCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String token = getClient(pendingToken).perform(post("/api/authn/mfa/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of("code", verifyCode))))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader("Authorization").replace("Bearer ", "");
 
         // Generate current TOTP for disable operation
         counter = Math.floorDiv(timeProvider.getTime(), 30);
         String disableCode = codeGenerator.generate(mfa.getSecret(), counter);
 
-        // Disable MFA (note: this will work because /mfa/verify and /mfa/disable are whitelisted)
+        // Disable MFA (requires a fully verified token + valid TOTP code)
         getClient(token).perform(post("/api/authn/mfa/disable")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of("code", disableCode))))
