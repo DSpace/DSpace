@@ -24,9 +24,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -90,6 +93,68 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         assertThat(handler.getErrorMessages(), empty());
 
         assertThat(tabService.findAll(context), not(empty()));
+
+    }
+
+    /**
+     * Verifies that the export script produces a valid workbook on a clean checkout.
+     */
+    @Test
+    public void testExportProducesValidWorkbook() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType publicationType = createEntityType("Publication");
+
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, publicationType, false, false)
+            .withHeader("Publication Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("publication-box")
+            .withStyle("STYLE")
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, publicationType, 0)
+            .withShortName("publication-tab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Publication Tab")
+            .withLeading(true)
+            .addBoxIntoNewRow(box)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), hasSize(1));
+
+        String[] args = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
+
+        assertThat(handler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
+                assertThat(workbook.getSheet(DynamicLayoutToolValidator.TAB_SHEET), notNullValue());
+                assertThat(workbook.getSheet(DynamicLayoutToolValidator.TAB2BOX_SHEET), notNullValue());
+                assertThat(workbook.getSheet(DynamicLayoutToolValidator.BOX_SHEET), notNullValue());
+                assertThat(workbook.getSheet(DynamicLayoutToolValidator.BOX2METADATA_SHEET), notNullValue());
+                assertThat(workbook.getSheet(DynamicLayoutToolValidator.METADATAGROUPS_SHEET), notNullValue());
+                assertThat(workbook.getSheet(DynamicLayoutToolValidator.TAB_POLICY_SHEET), notNullValue());
+                assertThat(workbook.getSheet(DynamicLayoutToolValidator.BOX_POLICY_SHEET), notNullValue());
+            }
+
+            // Round trip: the exported file must be importable without errors.
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            assertThat(tabService.findAll(context), hasSize(1));
+
+        } finally {
+            exportedFile.delete();
+        }
 
     }
 
