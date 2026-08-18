@@ -333,7 +333,7 @@
     <bean id="grobidImportMetadataSourceService" class="org.dspace.submit.extraction.grobid.GrobidImportMetadataSourceServiceImpl">
         <property name="grobidClient">
             <bean class="org.dspace.submit.extraction.grobid.client.GrobidClientImpl">
-                <constructor-arg name="baseUrl" value="${grobid.service.url}" />
+                <constructor-arg name="baseUrl" value="${grobid.service.url:#{null}}" />
             </bean>
         </property>
         <property name="supportedExtensions">

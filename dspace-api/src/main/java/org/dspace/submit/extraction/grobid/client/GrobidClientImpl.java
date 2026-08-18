@@ -18,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jakarta.inject.Named;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -57,8 +58,17 @@ public class GrobidClientImpl implements GrobidClient {
      */
     private final String baseUrl;
 
+    /**
+     * If present in configuration, strip trailing slashes from base URL.
+     * If blank or missing, set to null (disable the service)
+     * @param baseUrl the provided base URL. See grobid.cfg, spring-dspace-addon-import-services.xml
+     */
     public GrobidClientImpl(String baseUrl) {
-        this.baseUrl = baseUrl.replaceAll("/+$", "");
+        if (StringUtils.isNotBlank(baseUrl)) {
+            this.baseUrl = baseUrl.replaceAll("/+$", "");
+        } else {
+            this.baseUrl = null;
+        }
     }
 
     @Override
@@ -78,6 +88,9 @@ public class GrobidClientImpl implements GrobidClient {
     @Override
     public Optional<Document> retrieveHeaderDocument(InputStream inputStream, ConsolidateHeaderEnum consolidateHeader)
             throws GrobidClientException {
+        if (null == this.baseUrl) {
+            throw new GrobidClientException("Base URL not configured, GROBID client is disabled");
+        }
         try  {
             CloseableHttpClient client = httpConnectionPoolService.getClient();
             HttpPost method = new HttpPost(baseUrl + "/api/processHeaderDocument");
