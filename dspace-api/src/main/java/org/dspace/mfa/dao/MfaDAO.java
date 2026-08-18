@@ -8,7 +8,6 @@
 package org.dspace.mfa.dao;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;

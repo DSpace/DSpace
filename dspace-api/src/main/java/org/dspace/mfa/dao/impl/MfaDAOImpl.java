@@ -8,7 +8,6 @@
 package org.dspace.mfa.dao.impl;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaDelete;
