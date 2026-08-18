@@ -1886,7 +1886,7 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
                               .withBox(boxTwo)
                               .build();
 
-        // add boxOne to tabOne
+        // add boxOne to tabOne, the ADMINISTRATOR-only alternative tab for tabTwo
         DynamicLayoutTab tabOne =
             DynamicLayoutTabBuilder.createTab(context, eTypePer, 0)
                                 .withShortName("TabOne For Person - priority 0")
@@ -1925,21 +1925,14 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
             .andExpect(jsonPath("$._embedded.tabs[1].security", is(LayoutSecurity.CUSTOM_DATA.getValue())))
             .andExpect(jsonPath("$._embedded.tabs[1].rows", hasSize(1)));
 
-        // anonymous user will see only alternative tab is tabOne
+        // anonymous user cannot access tabTwo; the alternative tabOne is ADMINISTRATOR-only,
+        // so after the finding #8 fix it must NOT be leaked either (no tabs returned)
         getClient().perform(get("/api/layout/tabs/search/findByItem")
                        .param("uuid", item.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.page.totalElements", is(1)))
-                   .andExpect(jsonPath("$._embedded.tabs[0].id", is(tabOne.getID())))
-                   .andExpect(jsonPath("$._embedded.tabs[0].shortname", is("TabOne For Person - priority 0")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].header", is("New Tab header")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].security", is(LayoutSecurity.ADMINISTRATOR.getValue())))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows", hasSize(1)))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].style", is("rowTwoStyle")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells", hasSize(1)))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].style", is("cellOfRowTwoStyle")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(boxOne))));
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded.tabs").doesNotExist());
     }
 
     @Test
