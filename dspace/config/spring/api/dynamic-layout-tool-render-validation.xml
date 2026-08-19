@@ -134,6 +134,12 @@
         <property name="subTypes" ref="valuePairSupplier"/>
     </bean>
 
+    <bean id="searchresultRenderValidator" class="org.dspace.layout.script.service.impl.DynamicLayoutToolRenderValidatorImpl">
+        <property name="name" value="searchresult"/>
+        <property name="fieldType" value="METADATA"/>
+        <property name="subTypeValidationRule" value="NOT_ALLOWED"/>
+    </bean>
+
     <bean id="valuePairSupplier" class="org.dspace.layout.script.supplier.ValuePairSupplier"/>
 
     <bean id="openStreetMapRenderValidator" class="org.dspace.layout.script.service.impl.DynamicLayoutToolRenderValidatorImpl">
