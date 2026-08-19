@@ -123,33 +123,32 @@
         <property name="virtualQualifier" value="orcid" />
     </bean>
 
-    <!-- JOURNAL HIERARCHY ENHANCER
-         Stores, on each research output, the flattened ancestor chain of the Journal it
-         belongs to, as a Solr-facetable virtual metadata field.
 
-         What it does:
-         - Finds the Journal entity referenced via the authority-controlled dc.relation.journal field
-           (authority holds the Journal item UUID)
-         - Copies the Journal's own dc.relation.journal value AND its already-computed
-           dspace.virtual.journal-hierarchy value, recursively flattening the whole ancestor
-           chain into a single stored field (same recursion trick as the OrgUnit
-           parent-organization enhancer)
-         - Creates dspace.virtual.journal-hierarchy (values) and
-           dspace.virtualsource.journal-hierarchy (source UUIDs) on the Publication/Product/Patent
 
-         IMPORTANT SCOPE NOTE:
-         This enhancer can only traverse links exposed through an authority-controlled metadata
-         field whose authority is a bare item UUID (here: dc.relation.journal -> Journal).
-         The intermediate JournalVolume and JournalIssue levels are linked through DSpace
-         *relationships* (isJournalVolumeOfIssue, isJournalIssueOfPublication, ...), whose
-         relation.* metadata carry a "virtual::<id>" authority rather than a plain UUID, so they
-         are intentionally NOT reachable by this enhancer. The full 4-level parentage
-         (Journal -> Volume -> Issue -> Article) is recreated on-read by the relationship-driven
-         beans in virtual-metadata.xml (relation.isJournalOfPublication,
-         relation.isJournalVolumeOfPublication, relation.isJournalOfIssue, etc.). This bean adds a
-         stored, facetable Journal-level ancestor field on top of that. -->
+
+    <bean class="org.dspace.content.enhancer.impl.RootItemEnhancer">
+        <property name="sourceEntityTypes" value="Journal"/>
+        <property name="sourceItemMetadataField" value="dc.title"/>
+        <property name="rootMetadataField" value="dc.relation.journal"/>
+        <property name="virtualQualifier" value="journal-hierarchy"/>
+    </bean>
+
+
+
+
+    <bean class="org.dspace.content.enhancer.impl.RootItemEnhancer">
+        <property name="sourceEntityTypes" value="JournalVolume"/>
+        <property name="sourceItemMetadataField" value="dc.title"/>
+        <property name="rootMetadataField" value="dc.relation.journalvolume"/>
+        <property name="virtualQualifier" value="journalvolume-hierarchy"/>
+    </bean>
+
     <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
-        <property name="sourceEntityTypes" ref="researchOutputsEntityTypes" />
+        <property name="sourceEntityTypes">
+            <list>
+                <value>JournalVolume</value>
+            </list>
+        </property>
         <property name="sourceItemMetadataFields">
             <list>
                 <value>dc.relation.journal</value>
@@ -157,11 +156,64 @@
         </property>
         <property name="relatedItemMetadataFields">
             <list>
-                <value>dc.relation.journal</value>
                 <value>dspace.virtual.journal-hierarchy</value>
             </list>
         </property>
         <property name="virtualQualifier" value="journal-hierarchy" />
     </bean>
+
+    <bean class="org.dspace.content.enhancer.impl.RootItemEnhancer">
+        <property name="sourceEntityTypes" value="JournalIssue"/>
+        <property name="sourceItemMetadataField" value="dc.title"/>
+        <property name="rootMetadataField" value="dc.relation.journalissue"/>
+        <property name="virtualQualifier" value="journalissue-hierarchy"/>
+    </bean>
+
+    <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
+        <property name="sourceEntityTypes">
+            <list>
+                <value>JournalIssue</value>
+            </list>
+        </property>
+        <property name="sourceItemMetadataFields">
+            <list>
+                <value>dc.relation.journalvolume</value>
+            </list>
+        </property>
+        <property name="relatedItemMetadataFields">
+            <list>
+                <value>dspace.virtual.journalvolume-hierarchy</value>
+                <value>dspace.virtual.journal-hierarchy</value>
+            </list>
+        </property>
+        <property name="virtualQualifier" value="journal-hierarchy" />
+    </bean>
+
+
+    <bean class="org.dspace.content.enhancer.impl.RelatedEntityItemEnhancer" >
+        <property name="sourceEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+        <property name="sourceItemMetadataFields">
+            <list>
+                <value>dc.relation.journalissue</value>
+            </list>
+        </property>
+        <property name="relatedItemMetadataFields">
+            <list>
+                <value>dspace.virtual.journalissue-hierarchy</value>
+                <value>dspace.virtual.journal-hierarchy</value>
+            </list>
+        </property>
+        <property name="virtualQualifier" value="journal-hierarchy" />
+    </bean>
+
+    <util:list id="journalRelatedEntityTypes">
+        <value>Journal</value>
+        <value>JournalVolume</value>
+        <value>JournalIssue</value>
+    </util:list>
 
 </beans>

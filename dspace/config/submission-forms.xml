@@ -302,6 +302,17 @@
                     <!--<regex>\w+(,)+\w+</regex>-->
                 </relation-field>
             </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>journalissue</dc-qualifier>
+                    <label>Journal Issue</label>
+                    <hint>Select the journal issue related to this volume.</hint>
+                    <input-type>onebox</input-type>
+                </field>
+            </row>
             <!--
                 Uncomment the following definition to enable entry of
                 editors on the publication submission form
@@ -787,15 +798,14 @@
         <!-- Form which defines the metadata page/section for depositing JournalVolume Entities -->
         <form name="journalVolumeStep">
             <row>
-                <relation-field>
-                    <relationship-type>isJournalOfVolume</relationship-type>
-                    <search-configuration>journal</search-configuration>
-                    <!-- example of filtering Discovery search for Journal by a specific publisher -->
-                    <!--<filter>creativework.publisher:somepublishername</filter>-->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>journal</dc-qualifier>
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
-                    <externalsources>opfJournal</externalsources>
-                </relation-field>
+                    <input-type>onebox</input-type>
+                </field>
             </row>
             <row>
                 <field>
@@ -838,12 +848,14 @@
         <!-- Form which defines the metadata page/section for depositing JournalIssue Entities -->
         <form name="journalIssueStep">
             <row>
-                <relation-field>
-                    <relationship-type>isJournalVolumeOfIssue</relationship-type>
-                    <search-configuration>journalvolume</search-configuration>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>journalvolume</dc-qualifier>
                     <label>Journal Volume</label>
                     <hint>Select the journal volume related to this issue.</hint>
-                </relation-field>
+                    <input-type>onebox</input-type>
+                </field>
             </row>
             <row>
                 <field>
