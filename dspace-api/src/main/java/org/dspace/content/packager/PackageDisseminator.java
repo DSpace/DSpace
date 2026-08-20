@@ -103,6 +103,7 @@ public interface PackageDisseminator {
      * @param params  Properties-style list of options specific to this packager
      * @param pkgFile File where initial package should be written. All other
      *                packages will be written to the same directory as this File.
+     * @param alreadyDisseminated
      * @return List of all package Files which were successfully disseminated
      * @throws PackageValidationException if package cannot be created or there is
      *                                    a fatal error in creating it.
@@ -112,7 +113,7 @@ public interface PackageDisseminator {
      * @throws IOException                if IO error
      */
     List<File> disseminateAll(Context context, DSpaceObject dso,
-                              PackageParameters params, File pkgFile)
+                              PackageParameters params, File pkgFile, List<DSpaceObject> alreadyDisseminated)
         throws PackageException, CrosswalkException,
         AuthorizeException, SQLException, IOException;
 
