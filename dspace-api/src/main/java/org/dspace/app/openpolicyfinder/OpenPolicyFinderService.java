@@ -149,6 +149,13 @@ public class OpenPolicyFinderService {
 
                 // Execute the method
                 try (CloseableHttpResponse response = client.execute(method)) {
+                    if (response.getStatusLine() == null) {
+                        opfResponse = new OpenPolicyFinderPublisherResponse(
+                            "Open Policy Finder returned no status line");
+                        log.error("Open Policy Finder returned a response with no status line");
+                        continue;
+                    }
+
                     int statusCode = response.getStatusLine().getStatusCode();
 
                     log.debug(response.getStatusLine().getStatusCode() + ": "
@@ -157,8 +164,11 @@ public class OpenPolicyFinderService {
                     if (statusCode != HttpStatus.SC_OK) {
                         opfResponse = new OpenPolicyFinderPublisherResponse(
                             "Open Policy Finder return not OK status: " + statusCode);
-                        String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                        log.error("Error from Open Policy Finder HTTP request: " + errorBody);
+                        if (response.getEntity() != null) {
+                            String errorBody =
+                                IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                            log.error("Error from Open Policy Finder HTTP request: " + errorBody);
+                        }
                         // The error body has consumed the response stream; skip the JSON parsing block
                         // below (which would otherwise throw "Attempted read from closed stream").
                         continue;
@@ -262,16 +272,25 @@ public class OpenPolicyFinderService {
 
                 // Execute the method
                 try (CloseableHttpResponse response = client.execute(method)) {
+                    if (response.getStatusLine() == null) {
+                        opfResponse = new OpenPolicyFinderResponse(
+                            "Open Policy Finder returned no status line");
+                        log.error("Open Policy Finder returned a response with no status line");
+                        continue;
+                    }
+
                     int statusCode = response.getStatusLine().getStatusCode();
 
-                    log.debug(response.getStatusLine().getStatusCode() + ": "
-                            + response.getStatusLine().getReasonPhrase());
+                    log.debug("{}: {}", statusCode, response.getStatusLine().getReasonPhrase());
 
                     if (statusCode != HttpStatus.SC_OK) {
                         opfResponse = new OpenPolicyFinderResponse(
                             "Open Policy Finder return not OK status: " + statusCode);
-                        String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                        log.error("Error from Open Policy Finder HTTP request: " + errorBody);
+                        if (response.getEntity() != null) {
+                            String errorBody =
+                                IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                            log.error("Error from Open Policy Finder HTTP request: " + errorBody);
+                        }
                         // The error body has consumed the response stream; skip the JSON parsing block
                         // below (which would otherwise throw "Attempted read from closed stream").
                         continue;
@@ -356,6 +375,28 @@ public class OpenPolicyFinderService {
      */
     public HttpGet constructHttpGet(String type, String field, String predicate, String value, int start, int limit)
         throws URISyntaxException {
+        return constructHttpGet(type, field, predicate, value, start, limit, null);
+    }
+
+    /**
+     * Construct HTTP GET object for a "field,predicate,value" query with cursor-based paging support.
+     * When {@code searchAfter} is non-blank it is appended as the {@code search_after} parameter, which the
+     * API recommends for paging beyond 10,000 records. When it is blank the request behaves exactly as the
+     * offset/limit-based overload.
+     * eg. "title","contains-word","Lancet" or "issn","equals","1234-1234"
+     * @param field the field (issn, title, etc)
+     * @param predicate the predicate (contains-word, equals, etc - see API docs)
+     * @param value the query value itself
+     * @param start row offset
+     * @param limit number of results to return
+     * @param searchAfter optional cursor for the next page (from a previous response's next_search_after);
+     *                    ignored when blank
+     * @return HttpGet object to be executed by the client
+     * @throws URISyntaxException if the URL build fails
+     */
+    public HttpGet constructHttpGet(String type, String field, String predicate, String value, int start, int limit,
+                                    String searchAfter)
+        throws URISyntaxException {
         // Sanitise query string (strip some characters) field, predicate and value
         if (null == type) {
             type = "publication";
@@ -377,8 +418,12 @@ public class OpenPolicyFinderService {
         if (limit > 0) {
             uriBuilder.addParameter("limit", String.valueOf(limit));
         }
+        // Optional cursor for deep-paging; the API returns the next cursor as "next_search_after"
+        if (StringUtils.isNotBlank(searchAfter)) {
+            uriBuilder.addParameter("search_after", searchAfter);
+        }
 
-        log.debug("Open Policy Finder API URL: " + uriBuilder.toString());
+        log.debug("Open Policy Finder API URL: {}", uriBuilder);
 
         // Create HTTP GET object
         HttpGet method = new HttpGet(uriBuilder.build());
@@ -408,6 +453,13 @@ public class OpenPolicyFinderService {
      * @throws URISyntaxException
      */
     public URI prepareQuery(String query, String endpoint, String apiKey) throws URISyntaxException {
+        // Fail fast if no query is supplied instead of building a filter containing the literal "null"
+        if (StringUtils.isBlank(query)) {
+            log.warn("No ISSN supplied as query string for Open Policy Finder service search");
+            throw new URISyntaxException(StringUtils.defaultString(endpoint),
+                "No ISSN supplied as query string for Open Policy Finder service search");
+        }
+
         // Sanitise query string
         query = OpenPolicyFinderUtils.sanitiseQuery(query);
 
@@ -417,13 +469,9 @@ public class OpenPolicyFinderService {
         // Build URI parameters from supplied values
         uriBuilder.addParameter("item-type", "publication");
 
-        // Log warning if no query is supplied
-        if (null == query) {
-            log.warn("No ISSN supplied as query string for Open Policy Finder service search");
-        }
         uriBuilder.addParameter("filter", "[[\"issn\",\"equals\",\"" + query + "\"]]");
         uriBuilder.addParameter("format", "Json");
-        log.debug("Would search Open Policy Finder endpoint with " + uriBuilder.toString());
+        log.debug("Would search Open Policy Finder endpoint with {}", uriBuilder);
 
         // Return final built URI
         return uriBuilder.build();

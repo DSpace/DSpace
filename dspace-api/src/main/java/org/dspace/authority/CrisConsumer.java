@@ -217,15 +217,15 @@ public class CrisConsumer implements Consumer {
                 continue;
             }
 
-            String entityType = choiceAuthorityService.getLinkedEntityType(fieldKey);
-            if (entityType == null) {
+            String[] entityTypes = choiceAuthorityService.getLinkedEntityTypes(fieldKey);
+            if (entityTypes == null || entityTypes.length == 0) {
                 log.debug(NO_ENTITY_TYPE_FOUND_MSG, fieldKey);
                 continue;
             }
 
             String crisSourceId = generateCrisSourceId(metadata);
 
-            Item relatedItem = itemSearchService.search(context, crisSourceId, entityType, item);
+            Item relatedItem = itemSearchService.search(context, crisSourceId, entityTypes, item);
             boolean relatedItemAlreadyPresent = relatedItem != null;
 
             if (!relatedItemAlreadyPresent && isNotBlank(authority) && isReferenceAuthority(authority)) {
@@ -235,14 +235,17 @@ public class CrisConsumer implements Consumer {
             }
 
             if (!relatedItemAlreadyPresent) {
+                // the primary entity type is used when creating a new item
+                String entityType = choiceAuthorityService.getPrimaryLinkedEntityType(fieldKey);
+
                 Collection collection = collectionService.retrieveCollectionByEntityType(context, item, entityType);
                 if (collection == null) {
-                    log.warn(NO_COLLECTION_FOUND_MSG, entityType, item.getID());
+                    log.warn(NO_COLLECTION_FOUND_MSG, entityTypes, item.getID());
                     continue;
                 }
                 collection = context.reloadEntity(collection);
 
-                log.debug(ITEM_CREATION_MSG, entityType, item.getID());
+                log.debug(ITEM_CREATION_MSG, entityTypes, item.getID());
                 relatedItem = buildRelatedItem(context, item, collection, metadata, entityType, crisSourceId);
 
             }
