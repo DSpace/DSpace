@@ -55,16 +55,18 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                                  Object permission) {
-        if (permission.toString().equalsIgnoreCase(METADATA_READ_PERMISSION) && targetId != null) {
+        if (permission.toString().equalsIgnoreCase(METADATA_READ_PERMISSION) && targetId != null &&
+            Constants.typeText[Constants.BITSTREAM].equalsIgnoreCase(targetType)) {
             Request request = requestService.getCurrentRequest();
             Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
 
             try {
                 UUID dsoUuid = UUID.fromString(targetId.toString());
                 DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
-                if (dso instanceof Bitstream) {
-                    return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
+                if (!(dso instanceof Bitstream)) {
+                    return true; // Let downstream REST layer handle with 404
                 }
+                return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
             } catch (SQLException e) {
                 log.error(e::getMessage, e);
             }
