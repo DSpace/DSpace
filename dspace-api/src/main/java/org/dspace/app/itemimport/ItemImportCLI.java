@@ -120,8 +120,14 @@ public class ItemImportCLI extends ItemImport {
 
                 workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
                         + File.separator + context.getCurrentUser().getID());
-                sourcedir = itemImportService.unzip(
-                        new File(sourcedir + File.separator + zipfilename), workDir.getAbsolutePath());
+                try {
+                    sourcedir = itemImportService.unzip(
+                            new File(sourcedir + File.separator + zipfilename), workDir.getAbsolutePath());
+                } catch (Exception e) {
+                    // avoid removing user files
+                    sourcedir = null;
+                    throw e;
+                }
             } else {
                 // manage zip via remote url
                 Optional<InputStream> optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
@@ -139,7 +145,13 @@ public class ItemImportCLI extends ItemImport {
                         FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
                         workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
                                 + File.separator + context.getCurrentUser().getID());
-                        sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+                        try {
+                            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+                        } catch (Exception e) {
+                            // avoid removing user files
+                            sourcedir = null;
+                            throw e;
+                        }
                     } else {
                         throw new IllegalArgumentException(
                                 "Error reading file, the file couldn't be found for filename: " + zipfilename);
