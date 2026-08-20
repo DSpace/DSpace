@@ -65,7 +65,7 @@ public class DOIOrganiser {
      * Functional interface for a DOI processing operation.
      */
     @FunctionalInterface
-    private interface DOIOperation {
+    interface DOIOperation {
         /**
          * Process a single DOI.
          *
@@ -325,10 +325,7 @@ public class DOIOrganiser {
     }
 
     /**
-     * Process all DOIs matching the given statuses in batches.
-     * Each batch queries from offset 0 because successfully processed DOIs change status and
-     * drop out of subsequent queries. Stops when a batch is empty or an entire batch fails
-     * (to prevent infinite loops).
+     * Process all DOIs matching the given statuses in batches of {@link #BATCH_SIZE}.
      *
      * @param context     current DSpace session.
      * @param doiService  the DOI service to query.
@@ -336,38 +333,71 @@ public class DOIOrganiser {
      * @param operation   the operation to perform on each DOI.
      * @param processName a human-readable name for the operation (for logging).
      */
-    private static void processBatched(Context context, DOIService doiService,
-                                       List<Integer> statuses, DOIOperation operation,
-                                       String processName) {
+    static void processBatched(Context context, DOIService doiService,
+                               List<Integer> statuses, DOIOperation operation,
+                               String processName) {
+        processBatched(context, doiService, statuses, operation, processName, BATCH_SIZE);
+    }
+
+    /**
+     * Process all DOIs matching the given statuses in batches of the given size.
+     *
+     * <p>A DOI that was processed successfully changes its status and drops out of the query on
+     * its own, so the paging window only has to move past the DOIs that did <em>not</em> make
+     * progress. A DOI whose status is still one of the queried statuses after the operation ran is
+     * counted as stuck and the offset of the next query is increased accordingly.
+     *
+     * <p>This guarantees that the loop terminates: the offset strictly increases for every stuck
+     * DOI, while every queued DOI is attempted exactly once per run. Note that an operation can
+     * fail without throwing: {@link #register(DOI)} and friends report an
+     * {@link org.dspace.identifier.IdentifierException} by log entry and alert mail and then return
+     * normally, leaving the status untouched. Such DOIs stay in the database and are queried again
+     * on the next run.
+     *
+     * <p>The batch size is a parameter to allow tests to exercise the paging across several
+     * batches; production code calls
+     * {@link #processBatched(Context, DOIService, List, DOIOperation, String)}, which uses
+     * {@link #BATCH_SIZE}.
+     *
+     * @param context     current DSpace session.
+     * @param doiService  the DOI service to query.
+     * @param statuses    the statuses to query for.
+     * @param operation   the operation to perform on each DOI.
+     * @param processName a human-readable name for the operation (for logging).
+     * @param batchSize   the number of DOIs to fetch per query.
+     */
+    static void processBatched(Context context, DOIService doiService,
+                               List<Integer> statuses, DOIOperation operation,
+                               String processName, int batchSize) {
         try {
             List<DOI> batch;
             boolean firstBatch = true;
+            // Number of DOIs that could not be processed and therefore remain in the query result.
+            int stuck = 0;
             do {
-                batch = doiService.getDOIsByStatus(context, statuses, BATCH_SIZE, 0);
+                batch = doiService.getDOIsByStatus(context, statuses, batchSize, stuck);
                 if (firstBatch && batch.isEmpty()) {
                     System.err.println("There are no objects in the database "
                                            + "that could be processed for " + processName + ".");
                 }
                 firstBatch = false;
 
-                int succeeded = 0;
                 for (DOI doi : batch) {
                     doi = context.reloadEntity(doi);
                     try {
                         operation.process(doi);
                         context.commit();
-                        succeeded++;
                     } catch (Exception e) {
                         System.err.format("DOI %s %s failed, skipping: %s%n",
                                           doi.getDoi(), processName, e.getMessage());
                         context.rollback();
                     }
-                }
-                // If no DOI in this batch succeeded, stop to prevent an infinite loop.
-                if (!batch.isEmpty() && succeeded == 0) {
-                    System.err.println("Entire batch failed for " + processName
-                                           + ", stopping to prevent infinite loop.");
-                    break;
+                    // The operation may have logged and mailed an error without rethrowing it,
+                    // leaving the status untouched. Skip such DOIs instead of querying them again.
+                    DOI processedDoi = context.reloadEntity(doi);
+                    if (null != processedDoi && statuses.contains(processedDoi.getStatus())) {
+                        stuck++;
+                    }
                 }
             } while (!batch.isEmpty());
         } catch (SQLException ex) {
