@@ -212,7 +212,7 @@
                 Occ: 0-n
                 Required Attribute: dataType - controlled list
             --> 
-            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='date' and 
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='date' and
                         (@qualifier='accessioned' 
                          or @qualifier='available' 
                          or @qualifier='copyright' 
@@ -221,7 +221,7 @@
                          or @qualifier='submitted'
                          or @qualifier='updated')]" >
                 <xsl:element name="dates">
-                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='date' and 
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='date' and
                         (@qualifier='accessioned' 
                          or @qualifier='available' 
                          or @qualifier='copyright' 
@@ -285,9 +285,9 @@
                 DataCite (13)
                 Add sizes.
             -->
-            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">             
+            <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">
                 <xsl:element name="sizes">
-                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']" />      
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']" />
                 </xsl:element>
             </xsl:if>
 
@@ -296,7 +296,7 @@
             -->
             <xsl:if test="$dim-root//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]">
                 <xsl:element name="formats">
-                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]" />       
+                    <xsl:apply-templates select="$dim-root//dspace:field[@mdschema='dc' and @element='format'][not(@qualifier='extent')]" />
                 </xsl:element>
             </xsl:if>
 
@@ -353,24 +353,35 @@
 
     <!-- Add doi identifier information. -->
     <!--
-        dc.identifier.uri may contain more than one DOI, e.g. if the
-        repository contains an item that is published by a publishing 
-        company as well. We have to ensure to use URIs of our prefix
-        as primary identifiers only.
+        Given doi metadata field may contain more than one DOI (url), e.g. if the
+        repository contains an item that is published by a publishing
+        company as well. We have to ensure to use URIs of doi prefix or direct doi's (starts with 10.)
+        Don't add identifier identifierType=DOI tag if no value to put in it
     -->
     <xsl:template match="dspace:field[@mdschema=$mdSchema and @element=$mdElement and (contains(., $prefix))]">
         <xsl:if test="(($mdQualifier and $mdQualifier != '') and @qualifier=$mdQualifier) or ((not($mdQualifier) or $mdQualifier = '') and not(@qualifier))">
-            <identifier identifierType="DOI">
-                <xsl:if test="starts-with(string(text()), 'https://doi.org/')">
-                    <xsl:value-of select="substring(., 17)"/>
-                </xsl:if>
-                <xsl:if test="starts-with(string(text()), 'http://dx.doi.org/')">
-                    <xsl:value-of select="substring(., 19)"/>
-                </xsl:if>
-                <xsl:if test="starts-with(string(text()), 'https://api.test.datacite.org/')">
-                    <xsl:value-of select="substring(., 31)"/>
-                </xsl:if>
-            </identifier>
+            <xsl:variable name="doiValue">
+                <xsl:choose>
+                    <xsl:when test="starts-with(string(text()), 'https://doi.org/')">
+                        <xsl:value-of select="substring(., 17)"/>
+                    </xsl:when>
+                    <xsl:when test="starts-with(string(text()), 'http://dx.doi.org/')">
+                        <xsl:value-of select="substring(., 19)"/>
+                    </xsl:when>
+                    <xsl:when test="starts-with(string(text()), '10.')">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:when test="starts-with(string(text()), 'https://api.test.datacite.org/')">
+                        <xsl:value-of select="substring(., 31)"/>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:variable>
+            <!-- Only add <identifier> tag if doiValue is not empty -->
+            <xsl:if test="string-length($doiValue) &gt; 0">
+                <identifier identifierType="DOI">
+                    <xsl:value-of select="$doiValue"/>
+                </identifier>
+            </xsl:if>
         </xsl:if>
     </xsl:template>
 
