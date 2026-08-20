@@ -303,6 +303,19 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return withDspaceObjectOwner(ePerson.getFullName(), ePerson.getID().toString());
     }
 
+
+    public ItemBuilder withPersonEducation(String education) {
+        return addMetadataValue(item, "crisrp", "education", null, education);
+    }
+
+    public ItemBuilder withPersonEducationStartDate(String startDate) {
+        return addMetadataValue(item, "crisrp", "education", "start", startDate);
+    }
+
+    public ItemBuilder withPersonEducationEndDate(String endDate) {
+        return addMetadataValue(item, "crisrp", "education", "end", endDate);
+    }
+
     public ItemBuilder withDspaceObjectOwner(String value, String authority) {
         return addMetadataValue(item, "dspace", "object", "owner", null, value, authority, CF_ACCEPTED);
     }

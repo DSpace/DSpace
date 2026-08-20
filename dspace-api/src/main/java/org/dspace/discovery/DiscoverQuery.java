@@ -40,6 +40,21 @@ public class DiscoverQuery {
 
     private int start = 0;
     private int maxResults = -1;
+    private IndexableObject scopeObject;
+
+    /**
+     * Returns the scope object.
+     */
+    public IndexableObject getScopeObject() {
+        return scopeObject;
+    }
+
+    /**
+     * Sets the scope object.
+     */
+    public void setScopeObject(final IndexableObject scopeObject) {
+        this.scopeObject = scopeObject;
+    }
 
     /**
      * Attributes used for sorting of results
@@ -81,6 +96,9 @@ public class DiscoverQuery {
 
     private boolean inheritAuthorizations = true;
 
+    /**
+     * Creates a new, empty discovery query.
+     */
     public DiscoverQuery() {
         //Initialize all our lists
         this.filterQueries = new ArrayList<>();
@@ -96,31 +114,52 @@ public class DiscoverQuery {
     }
 
 
+    /**
+     * Sets the query.
+     */
     public void setQuery(String query) {
         this.query = query;
     }
 
+    /**
+     * Returns the query.
+     */
     public String getQuery() {
         return query;
     }
 
+    /**
+     * Returns the start.
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * Sets the start.
+     */
     public void setStart(int start) {
         this.start = start;
     }
 
+    /**
+     * Sets the sort field.
+     */
     public void setSortField(String sortField, SORT_ORDER sortOrder) {
         this.sortField = sortField;
         this.sortOrder = sortOrder;
     }
 
+    /**
+     * Returns the sort field.
+     */
     public String getSortField() {
         return sortField;
     }
 
+    /**
+     * Returns the sort order.
+     */
     public SORT_ORDER getSortOrder() {
         return sortOrder;
     }
@@ -203,6 +242,9 @@ public class DiscoverQuery {
         this.fieldPresentQueries.addAll(Arrays.asList(fieldPresentQueries));
     }
 
+    /**
+     * Returns the field present queries.
+     */
     public List<String> getFieldPresentQueries() {
         return fieldPresentQueries;
     }
@@ -325,26 +367,49 @@ public class DiscoverQuery {
         properties.put(property, toAddList);
     }
 
+    /**
+     * Returns the hit highlighting field.
+     */
     public DiscoverHitHighlightingField getHitHighlightingField(String field) {
         return hitHighlighting.get(field);
     }
 
+    /**
+     * Returns the hit highlighting fields.
+     */
     public List<DiscoverHitHighlightingField> getHitHighlightingFields() {
         return new ArrayList<>(hitHighlighting.values());
     }
 
+    /**
+     * Adds a hit highlighting field to this query.
+     *
+     * @param hitHighlighting the hit highlighting field to add
+     */
     public void addHitHighlightingField(DiscoverHitHighlightingField hitHighlighting) {
         this.hitHighlighting.put(hitHighlighting.getField(), hitHighlighting);
     }
 
+    /**
+     * Returns whether spell check.
+     */
     public boolean isSpellCheck() {
         return spellCheck;
     }
 
+    /**
+     * Sets the spell check.
+     */
     public void setSpellCheck(boolean spellCheck) {
         this.spellCheck = spellCheck;
     }
 
+    /**
+     * Adds a date facet covering the given year range to this query.
+     *
+     * @param facet the facet configuration
+     * @param facetYearRange the year range to facet on
+     */
     public void addYearRangeFacet(DiscoverySearchFilterFacet facet, FacetYearRange facetYearRange) {
         if (facetYearRange.isValid()) {
 
@@ -422,10 +487,16 @@ public class DiscoverQuery {
         this.discoveryConfigurationName = discoveryConfigurationName;
     }
 
+    /**
+     * Returns whether include not discoverable or withdrawn.
+     */
     public boolean isIncludeNotDiscoverableOrWithdrawn() {
         return includeNotDiscoverableOrWithdrawn;
     }
 
+    /**
+     * Sets the include not discoverable or withdrawn.
+     */
     public void setIncludeNotDiscoverableOrWithdrawn(boolean includeNotDiscoverableAndWithdrawn) {
         this.includeNotDiscoverableOrWithdrawn = includeNotDiscoverableAndWithdrawn;
     }
