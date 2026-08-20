@@ -17,7 +17,7 @@ import org.apache.commons.cli.Options;
  *
  */
 public class DSpaceObjectDeletionProcessCliScriptConfiguration<T extends DSpaceObjectDeletionProcessCli>
-    extends DSpaceObjectDeletionProcessScriptConfiguration<T> {
+    extends DSpaceObjectDeletionProcessScriptConfiguration {
 
     @Override
     public Options getOptions() {

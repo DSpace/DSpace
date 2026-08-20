@@ -24,8 +24,8 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObjectDeletionProcess>
-    extends ScriptConfiguration<T> {
+public class DSpaceObjectDeletionProcessScriptConfiguration<T extends DSpaceObjectDeletionProcess<?>>
+        extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

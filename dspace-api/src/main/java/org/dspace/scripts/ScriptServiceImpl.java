@@ -7,6 +7,7 @@
  */
 package org.dspace.scripts;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.List;
@@ -24,30 +25,39 @@ import org.springframework.beans.factory.annotation.Autowired;
  * The implementation for the {@link ScriptService}
  */
 public class ScriptServiceImpl implements ScriptService {
+
     private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ServiceManager serviceManager;
 
     @Override
-    public ScriptConfiguration getScriptConfiguration(String name) {
+    public <S extends ScriptConfiguration<? extends DSpaceRunnable<?>>> S getScriptConfiguration(String name) {
         return serviceManager.getServiceByName(name, ScriptConfiguration.class);
     }
 
     @Override
-    public List<ScriptConfiguration> getScriptConfigurations(Context context) {
-        return serviceManager.getServicesByType(ScriptConfiguration.class).stream().filter(
-            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context, null)
-                             && scriptConfiguration.getIsVisibleFromUI())
-                             .sorted(Comparator.comparing(ScriptConfiguration::getName))
-                             .collect(Collectors.toList());
+    public <S extends ScriptConfiguration<T>, T extends DSpaceRunnable<?>> List<S> getScriptConfigurations(
+        Context context) {
+        List<S> configurations = serviceManager.getServicesByType(ScriptConfiguration.class);
+        return configurations
+            .stream()
+            .filter(scriptConfiguration ->
+                        scriptConfiguration.isAllowedToExecute(context, null) &&
+                            scriptConfiguration.getIsVisibleFromUI()
+            )
+            .sorted(Comparator.comparing(ScriptConfiguration::getName))
+            .collect(Collectors.toList());
     }
 
     @Override
-    public DSpaceRunnable createDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
+    public <S extends ScriptConfiguration<T>, T extends DSpaceRunnable<? extends ScriptConfiguration<?>>>
+        T createDSpaceRunnableForScriptConfiguration(S scriptToExecute)
         throws IllegalAccessException, InstantiationException {
         try {
-            return (DSpaceRunnable) scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor().newInstance();
+            Constructor<T> declaredConstructor =
+                scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor(ScriptConfiguration.class);
+            return declaredConstructor.newInstance(scriptToExecute);
         } catch (InvocationTargetException | NoSuchMethodException e) {
             log.error(e::getMessage, e);
             throw new RuntimeException(e);

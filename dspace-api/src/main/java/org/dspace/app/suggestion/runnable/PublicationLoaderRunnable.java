@@ -43,8 +43,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  **/
-public class PublicationLoaderRunnable
-    extends DSpaceRunnable<ScriptConfiguration<?>> {
+public class PublicationLoaderRunnable<T extends ScriptConfiguration<?>>
+    extends DSpaceRunnable<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PublicationLoaderRunnable.class);
     protected Context context;
     protected String profile;
@@ -56,18 +56,15 @@ public class PublicationLoaderRunnable
     private Integer itemLimit;
     private List<SolrSuggestionProvider> providers;
 
-
     /**
-     * Retrieves the script configuration for this runnable.
-     * The configuration is fetched from the DSpace service manager.
-     *
-     * @return The {@link ScriptConfiguration} instance for the import-loader-suggestions script.
+     * Constructor for PublicationLoaderRunnable script.
+     * Loads publication suggestions from external sources into Solr
+     * for researcher profiles to enhance discoverability and completeness.
+     * 
+     * @param scriptConfiguration The script configuration defining loader settings and processing parameters
      */
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public ScriptConfiguration<?> getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                           .getServiceByName("import-loader-suggestions", ScriptConfiguration.class);
+    public PublicationLoaderRunnable(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
 

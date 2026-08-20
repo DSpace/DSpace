@@ -143,8 +143,9 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
     public void testReprocessPartOfUrls() throws Exception {
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
-        ScriptConfiguration retryOpenUrlTrackerConfig = scriptService.getScriptConfiguration("retry-tracker");
-        DSpaceRunnable retryOpenUrlTracker =
+        ScriptConfiguration<RetryFailedOpenUrlTracker<?>> retryOpenUrlTrackerConfig =
+            scriptService.getScriptConfiguration("retry-tracker");
+        RetryFailedOpenUrlTracker<?> retryOpenUrlTracker =
                 scriptService.createDSpaceRunnableForScriptConfiguration(retryOpenUrlTrackerConfig);
         String[] args = {"-r"};
 

@@ -15,6 +15,7 @@ import java.util.List;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * CLI variant for the {@link ItemExport} class.
@@ -22,7 +23,17 @@ import org.dspace.core.Context;
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemExportCLI extends ItemExport {
+public class ItemExportCLI<T extends ScriptConfiguration<?>> extends ItemExport<T> {
+
+    /**
+     * Constructor for ItemExportCLI.
+     * Command-line interface wrapper for ItemExport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public ItemExportCLI(T scriptConfiguration) {
+        super(scriptConfiguration);
+    }
 
     @Override
     protected void validate() {

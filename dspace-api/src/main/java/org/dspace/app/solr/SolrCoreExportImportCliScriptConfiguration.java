@@ -12,7 +12,7 @@ package org.dspace.app.solr;
  *
  * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
-public class SolrCoreExportImportCliScriptConfiguration<T extends SolrCoreExportImportCli>
+public class SolrCoreExportImportCliScriptConfiguration<T extends SolrCoreExportImport<?>>
         extends SolrCoreExportImportScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;

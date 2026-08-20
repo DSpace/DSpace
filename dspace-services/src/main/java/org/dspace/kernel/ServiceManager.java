@@ -36,7 +36,7 @@ public interface ServiceManager {
      *            as well)
      * @return the list of service singletons OR empty list if none is found
      */
-    public <T> List<T> getServicesByType(Class<T> type);
+    <T> List<T> getServicesByType(Class<? super T> type);
 
     /**
      * Allows developers to get the desired service singleton by the provided name and type.
@@ -57,7 +57,7 @@ public interface ServiceManager {
      *             the interface class but can be concrete as well).
      * @return the service singleton OR null if none is found
      */
-    public <T> T getServiceByName(String name, Class<T> type);
+    <T> T getServiceByName(String name, Class<? super T> type);
 
     /**
      * Lookup to see if a service exists with the given name.

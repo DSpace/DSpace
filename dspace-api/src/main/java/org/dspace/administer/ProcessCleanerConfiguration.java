@@ -13,7 +13,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 /**
  * The {@link ScriptConfiguration} for the {@link ProcessCleaner} script.
  */
-public class ProcessCleanerConfiguration<T extends ProcessCleaner> extends ScriptConfiguration<T> {
+public class ProcessCleanerConfiguration<T extends ProcessCleaner<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

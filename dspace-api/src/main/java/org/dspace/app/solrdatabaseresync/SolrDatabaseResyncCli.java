@@ -33,17 +33,17 @@ import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
-import org.dspace.utils.DSpace;
 
 /**
  * {@link DSpaceRunnable} implementation to update solr items with "predb" status to either:
  * - Delete them from solr if they're not present in the database
  * - Remove their status if they're present in the database
  */
-public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliScriptConfiguration> {
+public class SolrDatabaseResyncCli<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
     /* Log4j logger */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrDatabaseResyncCli.class);
 
@@ -57,14 +57,21 @@ public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliS
     private int timeUntilReindex = 0;
     private String maxTime;
 
-    @Override
-    public SolrDatabaseResyncCliScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-                .getServiceByName("solr-database-resync", SolrDatabaseResyncCliScriptConfiguration.class);
+    /**
+     * Constructor for SolrDatabaseResyncCli script.
+     * Resyncs Solr index with database by updating items with "predb" status,
+     * ensuring consistency between search index and database state.
+     * 
+     * @param configuration The script configuration defining resync parameters and timing settings
+     */
+    public SolrDatabaseResyncCli(T configuration) {
+        super(configuration);
     }
 
-    public static void runScheduled() throws Exception {
-        SolrDatabaseResyncCli script = new SolrDatabaseResyncCli();
+    public static <T extends SolrDatabaseResyncCliScriptConfiguration<?>> void runScheduled(T configuration)
+        throws Exception {
+        SolrDatabaseResyncCli<T> script = new SolrDatabaseResyncCli<>(configuration);
+
         script.setup();
         script.internalRun();
     }
