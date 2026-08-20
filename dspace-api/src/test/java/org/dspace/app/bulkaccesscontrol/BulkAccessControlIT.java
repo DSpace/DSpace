@@ -1635,11 +1635,9 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             matches(Constants.READ, anonymousGroup, "lease", TYPE_CUSTOM, null, "2023-06-24", null)
         ));
 
-        assertThat(textBundle.getBitstreams().get(0).getResourcePolicies(), hasSize(2));
-        assertThat(textBundle.getBitstreams().get(0).getResourcePolicies(), containsInAnyOrder(
-            matches(READ, anonymousGroup, "openaccess", TYPE_CUSTOM),
-            matches(Constants.READ, anonymousGroup, "lease", TYPE_CUSTOM, null, "2023-06-24", null)
-        ));
+        // Unlike the previous bundles, we expect TEXT bundle and bitstreams to inherit NO policies from the
+        // item as TEXT is in the default "restricted bundles" list.
+        assertThat(textBundle.getBitstreams().get(0).getResourcePolicies(), hasSize(0));
     }
 
     @Test

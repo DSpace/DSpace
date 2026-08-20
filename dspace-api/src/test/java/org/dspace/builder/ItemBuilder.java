@@ -43,6 +43,7 @@ import org.dspace.profile.OrcidSynchronizationMode;
 public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     private boolean withdrawn = false;
+    private boolean inArchive = false;
     private String handle = null;
     private WorkspaceItem workspaceItem;
     private Item item;
@@ -309,6 +310,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
+    public ItemBuilder inArchive() {
+        inArchive = true;
+        return this;
+    }
+
     /**
      * Set an embargo to end after some time from "now".
      *
@@ -415,6 +421,9 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
             if (withdrawn) {
                 itemService.withdraw(context, item);
+            }
+            if (inArchive) {
+                item.setArchived(inArchive);
             }
 
             if (lastModified != null) {
