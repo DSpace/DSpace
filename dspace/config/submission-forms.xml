@@ -230,6 +230,7 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of tag MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
+                    <max-occurrences>10</max-occurrences>
                     <label>Subject Keywords</label>
                     <input-type>tag</input-type>
                     <hint>Enter appropriate subject keywords or phrases.</hint>
