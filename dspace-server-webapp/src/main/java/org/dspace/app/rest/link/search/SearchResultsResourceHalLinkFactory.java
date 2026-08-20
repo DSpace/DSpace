@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SearchResultsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchResultsResource> {
 
+    @Override
     protected void addLinks(SearchResultsResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
         SearchResultsRest resultsRest = halResource.getContent();

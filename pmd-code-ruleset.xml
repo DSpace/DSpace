@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="DSpace PMD code ruleset"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.github.io/schema/ruleset_2_0_0.xsd">
+    <description>PMD code rules </description>
+
+    <rule ref="category/java/errorprone.xml/ReplaceJavaUtilDate"/>
+    <rule ref="category/java/bestpractices.xml/MissingOverride"/>
+    <rule name="BanJavaUtilDateEverywhere"
+          language="java"
+          message="Avoid java.util.Date; use java.time instead."
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <properties>
+            <property name="xpath">
+                <value><![CDATA[//ClassType[pmd-java:typeIsExactly('java.util.Date')]]]></value>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

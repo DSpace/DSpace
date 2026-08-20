@@ -23,10 +23,12 @@ public class RootRest extends RestAddressableModel {
     private String dspaceServer;
     private String dspaceVersion;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -39,6 +41,7 @@ public class RootRest extends RestAddressableModel {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return RootRestResourceController.class;
     }

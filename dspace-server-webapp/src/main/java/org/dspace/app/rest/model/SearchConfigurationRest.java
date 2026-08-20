@@ -34,10 +34,12 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     private SortOption defaultSortOption;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -50,6 +52,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return DiscoveryRestController.class;
     }

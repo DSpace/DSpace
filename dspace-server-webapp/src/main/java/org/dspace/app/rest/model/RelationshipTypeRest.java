@@ -32,6 +32,7 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
     private EntityTypeRest leftType;
     private EntityTypeRest rightType;
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -41,10 +42,12 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
         return PLURAL_NAME;
     }
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }

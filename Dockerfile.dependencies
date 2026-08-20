@@ -73,7 +73,7 @@ COPY --chown=dspace dspace-swordv2/pom.xml /app/dspace-swordv2/
 # Trigger the installation of all maven dependencies (hide download progress messages)
 # Maven flags here ensure that we skip final assembly, skip building test environment and skip all code verification checks.
 # These flags speed up this installation and skip tasks we cannot perform as we don't have the full source code.
-ENV MAVEN_FLAGS="-P-assembly -P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxjc.skip=true -Dxml.skip=true"
+ENV MAVEN_FLAGS="-P-assembly -P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dpmd.skip=true -Dlicense.skip=true -Dxjc.skip=true -Dxml.skip=true"
 RUN mvn --no-transfer-progress verify ${MAVEN_FLAGS}
 
 # Clear the contents of the /app directory (including all maven target folders), so no artifacts remain.

@@ -72,6 +72,7 @@ public class ChecksumHistory implements ReloadableEntity<Long> {
     protected ChecksumHistory() {
     }
 
+    @Override
     public Long getID() {
         return id;
     }

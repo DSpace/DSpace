@@ -131,6 +131,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
 
     }
 
+    @Override
     protected void replaceValue(Context context, Item source, String target, List<MetadataValueRest> list)
             throws SQLException {
         String[] metadata = Utils.tokenize(target);

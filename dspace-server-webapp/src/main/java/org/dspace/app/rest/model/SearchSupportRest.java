@@ -19,10 +19,12 @@ public class SearchSupportRest extends BaseObjectRest<String> {
     public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -35,6 +37,7 @@ public class SearchSupportRest extends BaseObjectRest<String> {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return DiscoveryRestController.class;
     }

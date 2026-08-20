@@ -28,10 +28,12 @@ public class SearchResultEntryRest extends RestAddressableModel {
     private RestAddressableModel indexableObject;
 
     @JsonIgnore
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -45,6 +47,7 @@ public class SearchResultEntryRest extends RestAddressableModel {
     }
 
     @JsonIgnore
+    @Override
     public Class getController() {
         return DiscoveryRestController.class;
     }

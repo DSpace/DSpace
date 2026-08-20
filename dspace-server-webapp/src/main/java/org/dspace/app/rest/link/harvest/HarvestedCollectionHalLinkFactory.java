@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class HarvestedCollectionHalLinkFactory
     extends HarvestedCollectionRestHalLinkFactory<HarvestedCollectionResource> {
 
+    @Override
     protected void addLinks(HarvestedCollectionResource halResource, Pageable page, LinkedList<Link> list)
         throws Exception {
         HarvestedCollectionRest data = halResource.getContent();
@@ -39,6 +40,7 @@ public class HarvestedCollectionHalLinkFactory
         }
     }
 
+    @Override
     protected Class<HarvestedCollectionResource> getResourceClass() {
         return HarvestedCollectionResource.class;
     }

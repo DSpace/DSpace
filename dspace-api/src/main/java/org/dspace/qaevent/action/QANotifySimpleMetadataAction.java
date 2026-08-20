@@ -20,6 +20,7 @@ import org.dspace.qaevent.service.dto.QAMessageDTO;
  */
 public class QANotifySimpleMetadataAction extends ASimpleMetadataAction {
 
+    @Override
     public String extractMetadataValue(QAMessageDTO message) {
         return ((NotifyMessageDTO) message).getHref();
     }

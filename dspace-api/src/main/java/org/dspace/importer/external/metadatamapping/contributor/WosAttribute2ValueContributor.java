@@ -103,6 +103,7 @@ public class WosAttribute2ValueContributor implements MetadataContributor<Elemen
         return metadataFieldMapping;
     }
 
+    @Override
     public void setMetadataFieldMapping(
         MetadataFieldMapping<Element, MetadataContributor<Element>> metadataFieldMapping) {
         this.metadataFieldMapping = metadataFieldMapping;
