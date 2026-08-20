@@ -41,11 +41,12 @@ public interface MetadataDSpaceCsvExportService {
      * @param context       The relevant DSpace context
      * @param toExport      The iterator containing the items to export
      * @param exportAll     Defines if all metadata should be exported or only the allowed ones
+     * @param handler       The handler to register the heartbeat with
      * @return              A DSpaceCSV object containing the exported information
      * @throws Exception    If something goes wrong
      */
-    public DSpaceCSV export(Context context, Iterator<Item> toExport,
-                            boolean exportAll, DSpaceRunnableHandler handler) throws Exception;
+    public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll,
+                                            DSpaceRunnableHandler handler) throws Exception;
 
     /**
      * This method will export all the Items within the given Community to a DSpaceCSV

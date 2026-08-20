@@ -124,4 +124,10 @@ public interface DSpaceRunnableHandler {
      * @return List containing UUIDs of Special Groups of the associated Process.
      */
     public List<UUID> getSpecialGroups();
+    /**
+     * Registers a heartbeat for the currently running process.
+     * Implementations can use this to update the heartbeat timestamp
+     * of long-running scripts or processes.
+     */
+    public void registerHeartbeat();
 }

@@ -374,7 +374,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         try {
             Collection collection = resolveCollection(context, collectionID);
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
-            harvester = new OAIHarvester(context, collection, hc);
+            harvester = new OAIHarvester(context, collection, hc, handler);
             handler.logInfo("Initialized the harvester successfully");
         } catch (HarvestingException hex) {
             handler.logError("Initializing the harvester failed.");

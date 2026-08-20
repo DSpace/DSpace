@@ -121,4 +121,8 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     public List<UUID> getSpecialGroups() {
         return Collections.emptyList();
     }
+
+    @Override
+    public void registerHeartbeat() {
+    }
 }
