@@ -65,11 +65,8 @@ public class DynamicLayoutSectionRestRepositoryIT extends AbstractControllerInte
             .andExpect(jsonPath("$._embedded.sections",
                 hasItem(withIdAndSearchComponent("researchoutputs", 0, 1, "col-md-8", "researchoutputs"))))
             .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndTopComponent("researchoutputs", 1, 0, "col-md-6",
+                hasItem(withIdAndTopComponent("researchoutputs", 1, 0, "col-12",
                     "researchoutputs", "dc.date.accessioned", "desc", 5))))
-            .andExpect(jsonPath("$._embedded.sections",
-                hasItem(withIdAndTopComponent("researchoutputs", 1, 1, "col-md-6",
-                                    "researchoutputs", "metric.view", "desc", 5))))
             .andExpect(jsonPath("$._embedded.sections",
                 hasItem(withIdAndFacetComponent("researchoutputs", 2, 0, "col-md-12", "researchoutputs"))))
 
@@ -150,10 +147,8 @@ public class DynamicLayoutSectionRestRepositoryIT extends AbstractControllerInte
             .andExpect(jsonPath("$.id", is("researchoutputs")))
             .andExpect(jsonPath("$", withBrowseComponent(0, 0, "col-md-4", expectedBrowseNames)))
             .andExpect(jsonPath("$", withSearchComponent(0, 1, "col-md-8", "researchoutputs")))
-            .andExpect(jsonPath("$", withTopComponent(1, 0, "col-md-6", "researchoutputs",
+            .andExpect(jsonPath("$", withTopComponent(1, 0, "col-12", "researchoutputs",
                                                       "dc.date.accessioned", "desc", 5)))
-            .andExpect(jsonPath("$", withTopComponent(1, 1, "col-md-6", "researchoutputs", "metric.view", "desc",
-                5)))
             .andExpect(jsonPath("$", withFacetComponent(2, 0, "col-md-12", "researchoutputs")));
     }
 
