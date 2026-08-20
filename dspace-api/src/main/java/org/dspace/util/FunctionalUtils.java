@@ -8,6 +8,8 @@
 package org.dspace.util;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -56,6 +58,45 @@ public class FunctionalUtils {
             return defaultValue;
         }
         return builder.get();
+    }
+
+    /**
+     * Wraps a consumer that may throw a checked exception into a standard consumer.
+     *
+     * @param throwingConsumer the consumer that may throw a checked exception
+     * @return a consumer that rethrows checked exceptions as runtime exceptions
+     */
+    public static <T> Consumer<T> throwingConsumerWrapper(
+            ThrowingConsumer<T, Exception> throwingConsumer) {
+        return i -> {
+            try {
+                throwingConsumer.accept(i);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    /**
+     * Wraps a mapping function that may throw a checked exception into a standard function.
+     *
+     * @param throwingConsumer the mapper that may throw a checked exception
+     * @param defaultValue the value returned when the mapper throws
+     * @return a function that returns the default value on failure
+     */
+    public static <T, R> Function<T, R> throwingMapperWrapper(
+            ThrowingMapper<T, R, Exception> throwingConsumer,
+            R defaultValue
+    ) {
+        return i -> {
+            R value = defaultValue;
+            try {
+                value = throwingConsumer.accept(i);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return value;
+        };
     }
 
 }
