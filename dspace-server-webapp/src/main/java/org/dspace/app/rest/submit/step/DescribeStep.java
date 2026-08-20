@@ -55,6 +55,9 @@ public class DescribeStep extends AbstractProcessingStep {
     private final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private final TypeBindUtils typeBindUtils =
+        DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(TypeBindUtils.class).getFirst();
+
     private RelationshipMetadataService relationshipMetadataService =
         ContentServiceFactory.getInstance().getRelationshipMetadataService();
 
@@ -77,7 +80,7 @@ public class DescribeStep extends AbstractProcessingStep {
 
     private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
                            DCInputSet inputConfig) throws DCInputsReaderException {
-        List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj);
+        List<MetadataValue> documentTypes = typeBindUtils.getTypeBindMetadataValues(obj);
 
         // Get list of all field names (including qualdrop names) allowed for this dc.type
         List<String> allowedFieldNames =
