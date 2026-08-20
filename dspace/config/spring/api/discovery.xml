@@ -203,8 +203,10 @@
                 <entry key="RELATION.Journal.issues" value-ref="relationJournalIssuesConfiguration"/>
                 <entry key="RELATION.Journal.articles" value-ref="relationJournalArticlesConfiguration"/>
 
-                <entry key="RELATION.JournalVolume.items" value-ref="relationJournalConfiguration"/>
-                <entry key="RELATION.JournalIssue.items" value-ref="relationJournalConfiguration"/>
+                <entry key="RELATION.JournalVolume.issues" value-ref="relationJournalIssuesConfiguration"/>
+                <entry key="RELATION.JournalVolume.articles" value-ref="relationJournalArticlesConfiguration"/>
+
+                <entry key="RELATION.JournalIssue.articles" value-ref="relationJournalArticlesConfiguration"/>
 
                 <!-- COAR NOTIFY LDN MESSAGES configuration -->
                 <entry key="NOTIFY.incoming" value-ref="NOTIFY.incoming"/>
@@ -1536,58 +1538,6 @@
                 <value>dc.contributor.other_authority:{0}</value>
                 <value>-withdrawn:true AND -discoverable:false</value>
             </list>
-        </property>
-    </bean>
-
-
-    <bean id="relationJournalConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
-        <!--Which sidebar facets are to be displayed-->
-        <property name="sidebarFacets">
-            <list>
-                <ref bean="searchFilterEntityType" />
-            </list>
-        </property>
-        <!--The search filters which can be used on the discovery search page-->
-        <property name="searchFilters">
-            <list>
-                <ref bean="searchFilterEntityType" />
-            </list>
-        </property>
-        <!--The sort filters for the discovery search-->
-        <property name="searchSortConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
-                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
-                <property name="sortFields">
-                    <list>
-                        <ref bean="sortByProjectsSelection" />
-                        <ref bean="sortTitleAsc" />
-                    </list>
-                </property>
-            </bean>
-        </property>
-        <!--Any default filter queries, these filter queries will be used for all
-                queries done by discovery for this configuration -->
-        <property name="defaultFilterQueries">
-            <list>
-                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
-                <value>dspace.virtual.journal-hierarchy_authority:{0} AND search.resourcetype:Item</value>
-                <value>-search.resourceid:{0}</value>
-                <value>-withdrawn:true AND -discoverable:false</value>
-            </list>
-        </property>
-        <!--Default result per page  -->
-        <property name="defaultRpp" value="10" />
-        <property name="hitHighlightingConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
-                <property name="metadataFields">
-                    <list>
-                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
-                            <property name="field" value="dspace.entity.type"/>
-                            <property name="snippets" value="5"/>
-                        </bean>
-                    </list>
-                </property>
-            </bean>
         </property>
     </bean>
 
