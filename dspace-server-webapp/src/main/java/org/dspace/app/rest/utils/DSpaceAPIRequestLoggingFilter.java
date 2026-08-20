@@ -38,7 +38,7 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
 
     @Override
     protected boolean shouldLog(HttpServletRequest request) {
-        return true;
+        return configurationService.getBooleanProperty("logging.server.enabled", true);
     }
 
     @Override
