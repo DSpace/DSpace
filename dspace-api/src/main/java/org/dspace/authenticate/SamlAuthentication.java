@@ -8,6 +8,7 @@
 package org.dspace.authenticate;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -178,6 +179,26 @@ public class SamlAuthentication implements AuthenticationMethod {
 
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) throws SQLException {
+        // Check if authentication-saml.login.specialgroup config has a group defined
+        try {
+            // without a logged in user, this method should return an empty list
+            if (context.getCurrentUser() == null) {
+                return List.of();
+            }
+            String groupName = configurationService.getProperty("authentication-saml.login.specialgroup");
+            if ((groupName != null) && (!groupName.trim().equals(""))) {
+                Group group = groupService.findByName(context, groupName);
+                if (group == null) {
+                    // Group not found
+                    log.warn("Group defined in authentication-saml.login.specialgroup does not exist");
+                    return List.of();
+                } else {
+                    return Arrays.asList(group);
+                }
+            }
+        } catch (SQLException ex) {
+            // Database error, ignore
+        }
         return List.of();
     }
 
