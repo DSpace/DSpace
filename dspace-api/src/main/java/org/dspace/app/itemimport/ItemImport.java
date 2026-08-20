@@ -240,17 +240,17 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             }
         } finally {
             if (zip) {
-                // if zip file was valid then clean sourcedir
+                // if zip file was valid then clean sourcedir (used by replace/delete paths)
                 if (zipvalid && sourcedir != null && new File(sourcedir).exists()) {
                     FileUtils.deleteDirectory(new File(sourcedir));
                 }
 
-                // clean workdir
+                // clean workdir (used by replace/delete paths)
                 if (workDir != null && workDir.exists()) {
                     FileUtils.deleteDirectory(workDir);
                 }
 
-                // conditionally clean workFile if import was done in the UI or via a URL and it still exists
+                // clean workFile (the ZIP file saved to temp)
                 if (workFile != null && workFile.exists()) {
                     workFile.delete();
                 }
@@ -310,7 +310,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
         readMapfile(context);
 
         if ("add".equals(command)) {
-            itemImportService.addItems(context, collections, sourcedir, mapfile, template);
+            // Import directly from the ZIP file — no extraction needed
+            itemImportService.addItemsFromZip(context, collections, workFile.toPath(), mapfile, template);
         } else if ("replace".equals(command)) {
             itemImportService.replaceItems(context, collections, sourcedir, mapfile, template);
         } else if ("delete".equals(command)) {
@@ -360,9 +361,13 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                         "Error reading file, the file couldn't be found for filename: " + zipfilename);
             }
 
-            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
-                    + File.separator + context.getCurrentUser().getID());
-            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+            // For "add", we read directly from the ZIP — no extraction needed.
+            // For "replace", we still need to extract since replaceItems() uses a directory path.
+            if (!"add".equals(command)) {
+                workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                        + File.separator + context.getCurrentUser().getID());
+                sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+            }
         } finally {
             optionalFileStream.ifPresent(IOUtils::closeQuietly);
             validationFileStream.ifPresent(IOUtils::closeQuietly);
