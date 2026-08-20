@@ -20,9 +20,9 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -78,11 +78,7 @@ public final class Utils {
 
     private static final long MS_IN_YEAR = 31536000000L;
 
-    private static int counter = 0;
-
-    private static final Random random = new Random();
-
-    private static final VMID vmid = new VMID();
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     // for parseISO8601Date
     private static final DateTimeFormatter[] parseFmt = {
@@ -182,18 +178,25 @@ public final class Utils {
     }
 
     /**
-     * Generate a unique key. The key is a long (length 38 to 40) sequence of
-     * digits.
+     * Generate a unique, non-security key. The key is a long (length 38 to 40) sequence of digits.
+     *
+     * <p>This is used only for internal identifiers whose sole purpose is uniqueness (e.g. the
+     * internal id that decides where a Bitstream is stored on disk, or an event transaction id),
+     * so it uses a fast, non-cryptographic {@link ThreadLocalRandom} rather than paying the cost of
+     * {@link SecureRandom} on hot paths such as bitstream storage. Do not use it for tokens or any
+     * value that must be unpredictable; use {@link #generateHexKey()} for those.
      *
      * @return A unique key as a long sequence of base-10 digits.
      */
     public static String generateKey() {
-        return new BigInteger(generateBytesKey()).abs().toString();
+        byte[] bytes = new byte[16];
+        ThreadLocalRandom.current().nextBytes(bytes);
+        return new BigInteger(bytes).abs().toString();
     }
 
     /**
-     * Generate a unique key. The key is a 32-character long sequence of hex
-     * digits.
+     * Generate a unique, cryptographically secure key. The key is a 32-character long sequence of
+     * hex digits, suitable for security-relevant values such as tokens.
      *
      * @return A unique key as a long sequence of hex digits.
      */
@@ -202,17 +205,19 @@ public final class Utils {
     }
 
     /**
-     * Generate a unique key as a byte array.
+     * Generate a unique, cryptographically secure key as a byte array.
      *
-     * @return A unique key as a byte array.
+     * <p>The key consists of 16 bytes (128 bits) obtained from {@link SecureRandom}, making it
+     * suitable for security-relevant identifiers such as tokens. For internal identifiers that only
+     * need to be unique (not unpredictable), prefer {@link #generateKey()}, which avoids the cost of
+     * {@link SecureRandom}.
+     *
+     * @return A 16-byte cryptographically secure random key.
      */
-    public static synchronized byte[] generateBytesKey() {
-        byte[] junk = new byte[16];
-
-        random.nextBytes(junk);
-        String input = String.valueOf(vmid) + Instant.now().toEpochMilli() + Arrays.toString(junk) + counter++;
-
-        return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
+    public static byte[] generateBytesKey() {
+        byte[] key = new byte[16];
+        secureRandom.nextBytes(key);
+        return key;
     }
 
     // The following two methods are taken from the Jakarta IOUtil class.
