@@ -182,7 +182,9 @@ public class WebSecurityConfiguration {
             // before each URL
             .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager, restAuthenticationService,
                                                                ePersonRestAuthenticationProvider, requestService),
-                             StatelessLoginFilter.class);
+                             StatelessLoginFilter.class)
+            // Add MFA verification filter after authentication to block access for MFA-pending tokens
+            .addFilterAfter(new MfaVerificationFilter(), StatelessAuthenticationFilter.class);
         return http.build();
     }
 
