@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -93,7 +92,7 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
      * @throws URISyntaxException
      */
     @Test
-    public void testUriConstruction() throws URISyntaxException, UnsupportedEncodingException {
+    public void testUriConstruction() throws URISyntaxException {
         // Get values for base URL (API key is now a header, not in the URL)
         String endpoint = configurationService.getProperty("openpolicyfinder.url",
             configurationService.getProperty("sherpa.romeo.url",
