@@ -102,7 +102,7 @@ public final class SolrAuthUtils {
             return null;
         }
 
-        String token = user + ":" + password;
+        String token = user + ":" + StringUtils.defaultString(password);
         return "Basic " + Base64.getEncoder().encodeToString(token.getBytes(StandardCharsets.UTF_8));
     }
 
