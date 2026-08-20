@@ -7,19 +7,21 @@
  */
 package org.dspace.mfa.service.impl;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
-import dev.samstevens.totp.code.CodeVerifier;
-import dev.samstevens.totp.code.DefaultCodeGenerator;
-import dev.samstevens.totp.code.DefaultCodeVerifier;
-import dev.samstevens.totp.code.HashingAlgorithm;
-import dev.samstevens.totp.secret.DefaultSecretGenerator;
-import dev.samstevens.totp.secret.SecretGenerator;
-import dev.samstevens.totp.time.SystemTimeProvider;
+import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
+import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -72,6 +74,15 @@ public class MfaServiceImpl implements MfaService {
     /** Default issuer label used if none is configured. */
     private static final String DEFAULT_ISSUER = "DSpace";
 
+    /** TOTP time step duration (30 seconds per RFC 6238). */
+    private static final Duration TIME_STEP = Duration.ofSeconds(30);
+
+    /** HMAC algorithm used for TOTP generation. */
+    private static final String HMAC_ALGORITHM = "HmacSHA1";
+
+    /** Number of TOTP digits. */
+    private static final int CODE_DIGITS = 6;
+
     @Autowired
     private MfaDAO mfaDAO;
 
@@ -81,17 +92,23 @@ public class MfaServiceImpl implements MfaService {
     @Autowired
     private ConfigurationService configurationService;
 
-    /** Generates Base32-encoded secrets for TOTP setup. */
-    private final SecretGenerator secretGenerator = new DefaultSecretGenerator(32);
+    /** Base32 codec for encoding/decoding TOTP secrets. */
+    private final Base32 base32 = new Base32();
 
-    /** Verifies TOTP codes against a secret using SHA1, 6 digits, 30-second period. */
-    private final CodeVerifier codeVerifier = new DefaultCodeVerifier(
-        new DefaultCodeGenerator(HashingAlgorithm.SHA1, 6),
-        new SystemTimeProvider()
-    );
+    /** TOTP generator using SHA1, 6 digits, 30-second period. */
+    private final TimeBasedOneTimePasswordGenerator totpGenerator;
 
     /** Cryptographically secure random number generator for recovery code generation. */
     private final SecureRandom secureRandom = new SecureRandom();
+
+    /**
+     * Constructs the service and initializes the TOTP generator.
+     *
+     * @throws NoSuchAlgorithmException if HmacSHA1 is not available
+     */
+    public MfaServiceImpl() throws NoSuchAlgorithmException {
+        this.totpGenerator = new TimeBasedOneTimePasswordGenerator(TIME_STEP, CODE_DIGITS, HMAC_ALGORITHM);
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -113,7 +130,7 @@ public class MfaServiceImpl implements MfaService {
             throw new IllegalStateException("MFA is already enabled. Disable it first.");
         }
 
-        String secret = secretGenerator.generate();
+        String secret = generateBase32Secret();
 
         if (existing != null) {
             // Reuse existing non-enabled record with a fresh secret
@@ -134,7 +151,7 @@ public class MfaServiceImpl implements MfaService {
         if (mfa == null) {
             return false;
         }
-        if (!codeVerifier.isValidCode(mfa.getSecret(), code)) {
+        if (!isValidCode(mfa.getSecret(), code)) {
             return false;
         }
         mfa.setEnabled(true);
@@ -149,7 +166,7 @@ public class MfaServiceImpl implements MfaService {
         if (mfa == null || !mfa.isEnabled()) {
             return false;
         }
-        return codeVerifier.isValidCode(mfa.getSecret(), code);
+        return isValidCode(mfa.getSecret(), code);
     }
 
     /** {@inheritDoc} */
@@ -255,5 +272,57 @@ public class MfaServiceImpl implements MfaService {
      */
     private String hashCode(String code) {
         return DigestUtils.sha256Hex(code);
+    }
+
+    /**
+     * Generates a new TOTP secret and returns it as a Base32-encoded string.
+     *
+     * @return Base32-encoded secret suitable for storage and provisioning URIs
+     */
+    private String generateBase32Secret() {
+        try {
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(HMAC_ALGORITHM);
+            keyGenerator.init(160); // 20 bytes = 160 bits, standard for HmacSHA1
+            SecretKey key = keyGenerator.generateKey();
+            return base32.encodeToString(key.getEncoded()).replace("=", "");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("HmacSHA1 algorithm not available", e);
+        }
+    }
+
+    /**
+     * Converts a Base32-encoded secret string into a {@link SecretKey}.
+     *
+     * @param base32Secret the Base32-encoded secret from the database
+     * @return a SecretKey suitable for TOTP generation
+     */
+    private SecretKey secretKeyFromBase32(String base32Secret) {
+        byte[] decoded = base32.decode(base32Secret);
+        return new SecretKeySpec(decoded, HMAC_ALGORITHM);
+    }
+
+    /**
+     * Validates a TOTP code against the stored secret, allowing a window of +/- 1 time step
+     * to account for clock drift between server and client.
+     *
+     * @param base32Secret the Base32-encoded secret from the database
+     * @param code the TOTP code provided by the user
+     * @return true if the code matches the current or adjacent time steps
+     */
+    private boolean isValidCode(String base32Secret, String code) {
+        SecretKey key = secretKeyFromBase32(base32Secret);
+        Instant now = Instant.now();
+        try {
+            for (int i = -1; i <= 1; i++) {
+                Instant timestamp = now.plus(TIME_STEP.multipliedBy(i));
+                String expected = totpGenerator.generateOneTimePasswordString(key, timestamp);
+                if (expected.equals(code)) {
+                    return true;
+                }
+            }
+        } catch (InvalidKeyException e) {
+            throw new IllegalStateException("Invalid TOTP secret key", e);
+        }
+        return false;
     }
 }

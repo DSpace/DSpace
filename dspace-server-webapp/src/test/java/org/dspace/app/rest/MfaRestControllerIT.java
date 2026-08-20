@@ -14,12 +14,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
+import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.samstevens.totp.code.DefaultCodeGenerator;
-import dev.samstevens.totp.code.HashingAlgorithm;
-import dev.samstevens.totp.time.SystemTimeProvider;
+import org.apache.commons.codec.binary.Base32;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.mfa.service.MfaService;
 import org.dspace.services.ConfigurationService;
@@ -42,8 +47,13 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final DefaultCodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.SHA1, 6);
-    private final SystemTimeProvider timeProvider = new SystemTimeProvider();
+    private static final Duration TIME_STEP = Duration.ofSeconds(30);
+    private final TimeBasedOneTimePasswordGenerator totpGenerator;
+    private final Base32 base32 = new Base32();
+
+    public MfaRestControllerIT() throws NoSuchAlgorithmException {
+        this.totpGenerator = new TimeBasedOneTimePasswordGenerator(TIME_STEP, 6, "HmacSHA1");
+    }
 
     @Before
     public void setup() {
@@ -104,8 +114,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         String secret = setup.get("secret");
 
         // Generate a valid TOTP code from the secret
-        long counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String validCode = codeGenerator.generate(secret, counter);
+        String validCode = generateTotpCode(secret);
 
         // Verify setup with the code
         getClient(token).perform(post("/api/authn/mfa/verify-setup")
@@ -141,8 +150,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         // First enable MFA for eperson
         context.turnOffAuthorisationSystem();
         var mfa = mfaService.initSetup(context, eperson);
-        long counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String code = codeGenerator.generate(mfa.getSecret(), counter);
+        String code = generateTotpCode(mfa.getSecret());
         mfaService.verifyAndEnable(context, eperson, code);
         mfaService.generateRecoveryCodes(context, eperson);
         context.restoreAuthSystemState();
@@ -163,8 +171,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         // Enable MFA for eperson
         context.turnOffAuthorisationSystem();
         var mfa = mfaService.initSetup(context, eperson);
-        long counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String setupCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String setupCode = generateTotpCode(mfa.getSecret());
         mfaService.verifyAndEnable(context, eperson, setupCode);
         mfaService.generateRecoveryCodes(context, eperson);
         context.restoreAuthSystemState();
@@ -174,8 +181,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         String pendingToken = getAuthToken(eperson.getEmail(), password);
 
         // Generate a fresh TOTP code for verification
-        counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String verifyCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String verifyCode = generateTotpCode(mfa.getSecret());
 
         // Verify MFA
         getClient(pendingToken).perform(post("/api/authn/mfa/verify")
@@ -190,8 +196,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         // Enable MFA for eperson
         context.turnOffAuthorisationSystem();
         var mfa = mfaService.initSetup(context, eperson);
-        long counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String setupCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String setupCode = generateTotpCode(mfa.getSecret());
         mfaService.verifyAndEnable(context, eperson, setupCode);
         context.restoreAuthSystemState();
         context.commit();
@@ -210,8 +215,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         // Enable MFA for eperson
         context.turnOffAuthorisationSystem();
         var mfa = mfaService.initSetup(context, eperson);
-        long counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String setupCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String setupCode = generateTotpCode(mfa.getSecret());
         mfaService.verifyAndEnable(context, eperson, setupCode);
         context.restoreAuthSystemState();
         context.commit();
@@ -220,8 +224,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         String pendingToken = getAuthToken(eperson.getEmail(), password);
 
         // Verify MFA to get a fully verified token
-        counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String verifyCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String verifyCode = generateTotpCode(mfa.getSecret());
         String token = getClient(pendingToken).perform(post("/api/authn/mfa/verify")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of("code", verifyCode))))
@@ -229,8 +232,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
             .andReturn().getResponse().getHeader("Authorization").replace("Bearer ", "");
 
         // Generate current TOTP for disable operation
-        counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String disableCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String disableCode = generateTotpCode(mfa.getSecret());
 
         // Disable MFA (requires a fully verified token + valid TOTP code)
         getClient(token).perform(post("/api/authn/mfa/disable")
@@ -251,8 +253,7 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         // Enable MFA for eperson
         context.turnOffAuthorisationSystem();
         var mfa = mfaService.initSetup(context, eperson);
-        long counter = Math.floorDiv(timeProvider.getTime(), 30);
-        String setupCode = codeGenerator.generate(mfa.getSecret(), counter);
+        String setupCode = generateTotpCode(mfa.getSecret());
         mfaService.verifyAndEnable(context, eperson, setupCode);
         context.restoreAuthSystemState();
         context.commit();
@@ -289,5 +290,14 @@ public class MfaRestControllerIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/authn/mfa/status"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.setupRequired", is(true)));
+    }
+
+    /**
+     * Generates a TOTP code for the given Base32-encoded secret at the current time.
+     */
+    private String generateTotpCode(String base32Secret) throws InvalidKeyException {
+        byte[] decoded = base32.decode(base32Secret);
+        SecretKey key = new SecretKeySpec(decoded, "HmacSHA1");
+        return totpGenerator.generateOneTimePasswordString(key, Instant.now());
     }
 }

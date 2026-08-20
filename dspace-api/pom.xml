@@ -325,9 +325,9 @@
     <dependencies>
         <!-- TOTP MFA support -->
         <dependency>
-            <groupId>dev.samstevens.totp</groupId>
-            <artifactId>totp</artifactId>
-            <version>${totp.version}</version>
+            <groupId>com.eatthepath</groupId>
+            <artifactId>java-otp</artifactId>
+            <version>${java-otp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
