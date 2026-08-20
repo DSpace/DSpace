@@ -27,6 +27,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -46,6 +51,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.MoreLikeThisParams;
@@ -58,6 +64,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -73,7 +80,6 @@ import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
-import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -111,6 +117,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     // facet by indexing "each word to end of value' partial value
     public static final String SOLR_FIELD_SUFFIX_FACET_PREFIXES = "_prefix";
 
+    // Recycle worker Contexts, log progress, and commit Solr every this many objects.
+    private static final int INDEX_BATCH_SIZE = 1000;
+
     @Autowired
     protected ContentServiceFactory contentServiceFactory;
     @Autowired
@@ -121,6 +130,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected SolrSearchCore solrSearchCore;
     @Autowired
     protected ConfigurationService configurationService;
+    @Autowired
+    protected ItemService itemService;
 
     protected SolrServiceImpl() {
 
@@ -335,36 +346,243 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     @Override
     public void updateIndex(Context context, boolean force) {
-        updateIndex(context, force, null);
+        updateIndex(context, force, (String) null);
     }
 
     @Override
     public void updateIndex(Context context, boolean force, String type) {
+        final int numThreads = configurationService.getIntProperty("discovery.index.threads", 1);
         try {
-            final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
-                getIndexFactories();
-            int indexObject = 0;
+            final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.getIndexFactories();
             for (IndexFactory indexableObjectService : indexableObjectServices) {
                 if (type == null || Strings.CS.equals(indexableObjectService.getType(), type)) {
                     final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
+                    // Only parallelize when force=true: every object needs actual work.
+                    // When force=false, requiresIndexing() is a cheap Solr check per object that filters down
+                    // to a small percentage of the total, so parallelizing would add more overhead than it's worth
+                    if (numThreads > 1 && force) {
+                        log.info("Collecting IDs for type {} ...", indexableObjectService.getType());
+                        final List<String> ids = new ArrayList<>();
+                        while (indexableObjects.hasNext()) {
+                            final IndexableObject obj = indexableObjects.next();
+                            ids.add(obj.getID().toString());
+                            context.uncacheEntity(obj.getIndexedObject());
+                        }
+                        log.info("Collected {} objects of type {}, starting parallel indexing with {} threads",
+                                 ids.size(), indexableObjectService.getType(), numThreads);
+                        indexContentParallel(indexableObjectService, ids, force, numThreads);
+                    } else {
+                        long processed = 0;
+                        while (indexableObjects.hasNext()) {
+                            final IndexableObject indexableObject = indexableObjects.next();
+                            indexContent(context, indexableObject, force);
+                            context.uncacheEntity(indexableObject.getIndexedObject());
+                            processed++;
+                            if (processed % INDEX_BATCH_SIZE == 0) {
+                                log.info("Processed {} objects of type {} ...",
+                                         processed, indexableObjectService.getType());
+                                // Only commit mid-batch when forcing a full reindex; committing
+                                // when nothing has changed triggers needless Solr segment merges.
+                                if (force && solrSearchCore.getSolr() != null) {
+                                    solrSearchCore.getSolr().commit();
+                                }
+                            }
+                        }
+                    }
+                    if (force) {
+                        log.info("Committing Solr for type {} ...", indexableObjectService.getType());
+                        if (solrSearchCore.getSolr() != null) {
+                            solrSearchCore.getSolr().commit();
+                        }
+                        log.info("Solr commit complete for type {}", indexableObjectService.getType());
+                    }
+                }
+            }
+        } catch (IOException | SQLException | SolrServerException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateIndex(Context context, boolean force, String type, List<SolrServiceIndexPlugin> plugins) {
+        try {
+            for (IndexFactory indexableObjectService : indexObjectServiceFactory.getIndexFactories()) {
+                if (type == null || StringUtils.equals(indexableObjectService.getType(), type)) {
+                    final Iterator<IndexableObject> indexableObjects = indexableObjectService.findAll(context);
                     while (indexableObjects.hasNext()) {
                         final IndexableObject indexableObject = indexableObjects.next();
-                        indexContent(context, indexableObject, force);
+                        applyPluginsAtomic(context, indexableObject, plugins);
                         context.uncacheEntity(indexableObject.getIndexedObject());
-                        indexObject++;
-                        if ((indexObject % 100) == 0 && indexableObjectService instanceof ItemIndexFactory) {
-                            context.uncacheEntities();
-                        }
                     }
                 }
             }
             if (solrSearchCore.getSolr() != null) {
                 solrSearchCore.getSolr().commit();
             }
-
         } catch (IOException | SQLException | SolrServerException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public long indexItems(Context context, Collection collection, boolean force, int numThreads)
+        throws SQLException, IOException, SearchServiceException {
+        log.info("Collecting items for collection {} ...", collection.getHandle());
+        final List<String> ids = new ArrayList<>();
+        final Iterator<Item> it = itemService.findByCollection(context, collection);
+        while (it.hasNext()) {
+            final Item item = it.next();
+            ids.add(item.getID().toString());
+            context.uncacheEntity(item);
+        }
+        log.info("Collected {} items for collection {}", ids.size(), collection.getHandle());
+
+        final String label = "items in collection " + collection.getHandle();
+        final long count;
+        if (numThreads > 1) {
+            count = runParallelWorkers(ids, numThreads,
+                (ctx, id) -> {
+                    final Item item = itemService.find(ctx, UUID.fromString(id));
+                    return item != null ? Optional.of(new IndexableItem(item)) : Optional.empty();
+                },
+                force, label);
+        } else {
+            long c = 0;
+            for (final String id : ids) {
+                final Item item = itemService.find(context, UUID.fromString(id));
+                if (item != null) {
+                    indexContent(context, new IndexableItem(item), force, false);
+                    c++;
+                    context.uncacheEntity(item);
+                    if (c % INDEX_BATCH_SIZE == 0) {
+                        log.info("Indexed {}/{} {}", c, ids.size(), label);
+                    }
+                }
+            }
+            count = c;
+        }
+        log.info("Committing Solr for {} ({} items) ...", label, count);
+        commit();
+        return count;
+    }
+
+    /**
+     * Functional interface for loading an {@link IndexableObject} from the database
+     * inside a worker thread, given the object's string ID.
+     */
+    @FunctionalInterface
+    private interface ObjectLoader {
+        Optional<? extends IndexableObject> load(Context ctx, String id) throws Exception;
+    }
+
+    /**
+     * Run a fixed pool of worker threads that each poll from {@code ids} and index objects
+     * using a per-thread read-only {@link Context}.
+     * <p>
+     * Each worker calls {@link Context#uncacheEntity} after each item to evict Item, Bundle and
+     * Bitstream from the Hibernate first-level cache, and recycles its Context entirely every
+     * {@link #INDEX_BATCH_SIZE} items to clear entities that {@code uncacheEntity()} does not
+     * evict, in particular the MetadataValue, MetadataField, EPerson and Version objects that
+     * {@code buildDocument()} loads. Individual item failures are logged and skipped, the
+     * returned count reflects only successfully indexed objects.
+     *
+     * @param ids           string IDs of all objects to index
+     * @param numThreads    size of the worker thread pool
+     * @param loader        loads an {@link IndexableObject} by its string ID
+     * @param force         when {@code true} every object is re-indexed regardless of modification date
+     * @param progressLabel human-readable label used in log messages
+     * @return total number of objects successfully indexed
+     */
+    private long runParallelWorkers(final List<String> ids,
+                                    final int numThreads,
+                                    final ObjectLoader loader,
+                                    final boolean force,
+                                    final String progressLabel) {
+        final ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>(ids);
+        final AtomicLong count = new AtomicLong(0);
+        final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        try {
+            for (int t = 0; t < numThreads; t++) {
+                executor.submit(() -> {
+                    Context workerContext = null;
+                    try {
+                        workerContext = new Context(Context.Mode.READ_ONLY);
+                        workerContext.turnOffAuthorisationSystem();
+                        String id;
+                        long workerCount = 0;
+                        while ((id = queue.poll()) != null) {
+                            try {
+                                final Optional<? extends IndexableObject> obj = loader.load(workerContext, id);
+                                if (obj.isPresent()) {
+                                    indexContent(workerContext, obj.get(), force);
+                                    // Evict Item, Bundle and Bitstream immediately. The periodic Context
+                                    // recycle below clears everything else (MetadataValue, EPerson, etc.)
+                                    // that buildDocument() loads but uncacheEntity() does not cover.
+                                    workerContext.uncacheEntity(obj.get().getIndexedObject());
+                                    final long total = count.incrementAndGet();
+                                    if (total % INDEX_BATCH_SIZE == 0) {
+                                        log.info("Indexed {}/{} {} ...", total, ids.size(), progressLabel);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                log.error("Failed to index {} from {}", id, progressLabel, e);
+                            }
+                            workerCount++;
+                            if (workerCount % INDEX_BATCH_SIZE == 0) {
+                                // Recycle the Context to flush everything the Hibernate session has
+                                // accumulated over the last batch (MetadataValue, MetadataField,
+                                // EPerson, Version, etc.) that uncacheEntity() does not evict.
+                                workerContext.abort();
+                                workerContext = new Context(Context.Mode.READ_ONLY);
+                                workerContext.turnOffAuthorisationSystem();
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error("Parallel indexing worker for {} failed to initialize", progressLabel, e);
+                    } finally {
+                        if (workerContext != null) {
+                            workerContext.abort();
+                        }
+                    }
+                });
+            }
+        } finally {
+            // Guarantee shutdown
+            executor.shutdown();
+        }
+        try {
+            // Poll with a finite timeout so we can log progress and avoid hanging silently
+            // if a worker stalls.
+            while (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                log.info("Still indexing {}, {} items remaining in queue ...", progressLabel, queue.size());
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Parallel indexing of {} was interrupted", progressLabel);
+            executor.shutdownNow();
+        }
+        return count.get();
+    }
+
+    /**
+     * Index a list of objects in parallel using a fixed thread pool.
+     * Delegates to {@link #runParallelWorkers} for the actual parallel execution.
+     *
+     * @param indexableObjectService factory used to reload each object by its ID
+     * @param ids                    string IDs of all objects to index
+     * @param force                  when {@code true} every object is re-indexed regardless of modification date
+     * @param numThreads             size of the worker thread pool
+     */
+    private void indexContentParallel(final IndexFactory indexableObjectService,
+                                      final List<String> ids,
+                                      final boolean force,
+                                      final int numThreads) {
+        final String label = indexableObjectService.getType() + " objects";
+        log.info("Starting parallel indexing of {} {} using {} threads", ids.size(), label, numThreads);
+        runParallelWorkers(ids, numThreads,
+            (ctx, id) -> indexableObjectService.findIndexableObject(ctx, id),
+            force, label);
+        log.info("All parallel workers finished for type {}", indexableObjectService.getType());
     }
 
     /**
@@ -1590,6 +1808,43 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if (commit) {
             commit();
         }
+    }
+
+    @Override
+    public void indexContent(Context context, IndexableObject dso, boolean force, boolean commit,
+                             List<SolrServiceIndexPlugin> plugins) throws SearchServiceException, SQLException {
+        try {
+            applyPluginsAtomic(context, dso, plugins);
+        } catch (IOException | SolrServerException e) {
+            throw new SearchServiceException(e.getMessage(), e);
+        }
+        if (commit) {
+            commit();
+        }
+    }
+
+    /**
+     * Collect contributions from the given plugins into a single atomic-update Solr document and submit it.
+     * Only fields actually written by the plugins are touched; all other index fields are left intact.
+     */
+    private void applyPluginsAtomic(Context context, IndexableObject indexableObject,
+                                    List<SolrServiceIndexPlugin> plugins) throws IOException, SolrServerException {
+        SolrInputDocument pluginDoc = new SolrInputDocument();
+        for (SolrServiceIndexPlugin plugin : plugins) {
+            plugin.additionalIndex(context, indexableObject, pluginDoc);
+        }
+        if (pluginDoc.isEmpty() || solrSearchCore.getSolr() == null) {
+            return;
+        }
+        SolrInputDocument atomicDoc = new SolrInputDocument();
+        atomicDoc.setField(SearchUtils.RESOURCE_UNIQUE_ID, indexableObject.getUniqueIndexID());
+        for (SolrInputField field : pluginDoc) {
+            List<Object> values = new ArrayList<>(field.getValues());
+            Map<String, Object> atomicOp = new HashMap<>();
+            atomicOp.put("set", values.size() == 1 ? values.get(0) : values);
+            atomicDoc.setField(field.getName(), atomicOp);
+        }
+        solrSearchCore.getSolr().add(atomicDoc);
     }
 
     @Override

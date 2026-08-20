@@ -12,8 +12,8 @@ import static org.dspace.discovery.IndexClientOptions.TYPE_OPTION;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +27,6 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableCollection;
@@ -37,6 +36,7 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
@@ -48,6 +48,9 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
     private Context context;
     private IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
             .getServiceByName(IndexingService.class.getName(), IndexingService.class);
+    private final ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+    private int numThreads;
 
     private IndexClientOptions indexClientOptions;
 
@@ -68,6 +71,25 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                         type, Arrays.toString(indexableObjectTypes.toArray())));
             }
         }
+
+        // Resolve optional plugin list (-p)
+        List<SolrServiceIndexPlugin> plugins = new ArrayList<>();
+        if (commandLine.hasOption('p')) {
+            if (indexClientOptions == IndexClientOptions.BUILD ||
+                    indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
+                throw new IllegalArgumentException(
+                        "-p (plugin) cannot be combined with -b (build): a full rebuild always applies all plugins. ");
+            }
+            plugins = resolvePlugins(commandLine.getOptionValues('p'));
+            handler.logInfo("Running plugin(s): " + StringUtils.join(plugins.stream()
+                                                                            .map(p -> p.getClass().getName())
+                                                                            .collect(Collectors.toList()), ", "));
+        }
+
+        /** Acquire from dspace-services in future */
+        /**
+         * new DSpace.getServiceManager().getServiceByName("org.dspace.discovery.SolrIndexer");
+         */
 
         Optional<IndexableObject> indexableObject = Optional.empty();
 
@@ -118,8 +140,13 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             case INDEX:
                 handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
                 final long startTimeMillis = Instant.now().toEpochMilli();
-                final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
-                    indexableObject.get());
+                final long count;
+                if (!plugins.isEmpty()) {
+                    indexer.indexContent(context, indexableObject.get(), true, true, plugins);
+                    count = 1;
+                } else {
+                    count = indexAll(indexer, context, indexableObject.get(), numThreads);
+                }
                 final long seconds = (Instant.now().toEpochMilli() - startTimeMillis) / 1000;
                 handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") +
                                 " in " + seconds + " seconds");
@@ -127,7 +154,11 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             case UPDATE:
             case UPDATEANDSPELLCHECK:
                 handler.logInfo("Updating Index");
-                indexer.updateIndex(context, false, type);
+                if (!plugins.isEmpty()) {
+                    indexer.updateIndex(context, false, type, plugins);
+                } else {
+                    indexer.updateIndex(context, false, type);
+                }
                 if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
                     checkRebuildSpellCheck(commandLine, indexer);
                 }
@@ -135,7 +166,11 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             case FORCEUPDATE:
             case FORCEUPDATEANDSPELLCHECK:
                 handler.logInfo("Updating Index");
-                indexer.updateIndex(context, true, type);
+                if (!plugins.isEmpty()) {
+                    indexer.updateIndex(context, true, type, plugins);
+                } else {
+                    indexer.updateIndex(context, true, type);
+                }
                 if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
                     checkRebuildSpellCheck(commandLine, indexer);
                 }
@@ -162,6 +197,91 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
         }
         indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
+        numThreads = configurationService.getIntProperty("discovery.index.threads", 1);
+    }
+
+    /**
+     * Resolves the given class names to registered {@link SolrServiceIndexPlugin} beans.
+     *
+     * If a class name cannot be found on the classpath the method fails and lists all available plugin
+     *       class names
+     * If the class exists but is not registered as a {@link SolrServiceIndexPlugin} Spring bean the
+     *       method fails and lists all supported plugin class names
+     *
+     * @param classNames fully-qualified class names of the plugins to run
+     * @return resolved plugin instances, in the same order as {@code classNames}
+     */
+    private List<SolrServiceIndexPlugin> resolvePlugins(String[] classNames) {
+        List<SolrServiceIndexPlugin> available = DSpaceServicesFactory.getInstance()
+                .getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<String> availableNames = available.stream()
+                .map(p -> p.getClass().getName())
+                .collect(Collectors.toList());
+
+        List<SolrServiceIndexPlugin> result = new ArrayList<>();
+        for (String className : classNames) {
+            try {
+                Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                throw new IllegalArgumentException(
+                        "Plugin class not found: " + className + ". Available plugins: \n - " +
+                                String.join("\n - ", availableNames));
+            }
+            SolrServiceIndexPlugin plugin = available.stream()
+                    .filter(p -> p.getClass().getName().equals(className))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Plugin " + className + " is not a registered SolrServiceIndexPlugin bean. "
+                                    + "Supported plugins: \n - " + String.join("\n - ", availableNames)));
+            result.add(plugin);
+        }
+        return result;
+    }
+
+
+    /**
+     * Indexes the given object and all children, if applicable.
+     *
+     * @param indexingService The indexing service.
+     * @param context         The relevant DSpace Context.
+     * @param dso             DSpace object to index recursively
+     * @param numThreads      number of parallel indexing threads; 1 means sequential
+     * @throws IOException            A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SearchServiceException in case of a solr exception
+     * @throws SQLException           An exception that provides information on a database access error or other errors.
+     */
+    private static long indexAll(final IndexingService indexingService,
+                                 final Context context,
+                                 final IndexableObject dso,
+                                 final int numThreads)
+        throws IOException, SearchServiceException, SQLException {
+        long count = 0;
+
+        indexingService.indexContent(context, dso, true, true);
+        count++;
+        if (dso.getIndexedObject() instanceof Community) {
+            final Community community = (Community) dso.getIndexedObject();
+            final String communityHandle = community.getHandle();
+            for (final Community subcommunity : community.getSubcommunities()) {
+                count += indexAll(indexingService, context, new IndexableCommunity(subcommunity), numThreads);
+                //To prevent memory issues, discard an object from the cache after processing
+                context.uncacheEntity(subcommunity);
+            }
+            final Community reloadedCommunity = (Community) HandleServiceFactory.getInstance().getHandleService()
+                                                                                .resolveToObject(context,
+                                                                                                 communityHandle);
+            for (final Collection collection : reloadedCommunity.getCollections()) {
+                count++;
+                indexingService.indexContent(context, new IndexableCollection(collection), true, true);
+                count += indexingService.indexItems(context, collection, true, numThreads);
+                //To prevent memory issues, discard an object from the cache after processing
+                context.uncacheEntity(collection);
+            }
+        } else if (dso instanceof IndexableCollection) {
+            count += indexingService.indexItems(context, (Collection) dso.getIndexedObject(), true, numThreads);
+        }
+
+        return count;
     }
 
     /**
@@ -202,56 +322,6 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             }
         }
         return Optional.empty();
-    }
-
-    /**
-     * Indexes the given object and all its children recursively.
-     *
-     * @param indexingService The indexing service.
-     * @param itemService     The item service.
-     * @param context         The relevant DSpace Context.
-     * @param indexableObject The IndexableObject to index recursively.
-     * @return The count of indexed objects.
-     * @throws IOException            If I/O error occurs.
-     * @throws SearchServiceException If a search service error occurs.
-     * @throws SQLException           If database error occurs.
-     */
-    private long indexAll(final IndexingService indexingService, final ItemService itemService, final Context context,
-            final IndexableObject indexableObject) throws IOException, SearchServiceException, SQLException {
-        long count = 0;
-
-        boolean commit = indexableObject instanceof IndexableCommunity ||
-            indexableObject instanceof IndexableCollection;
-        indexingService.indexContent(context, indexableObject, true, commit);
-        count++;
-
-        if (indexableObject instanceof IndexableCommunity) {
-            final Community community = (Community) indexableObject.getIndexedObject();
-            final String communityHandle = community.getHandle();
-            for (final Community subcommunity : community.getSubcommunities()) {
-                count += indexAll(indexingService, itemService, context, new IndexableCommunity(subcommunity));
-                context.uncacheEntity(subcommunity);
-            }
-            // Reload community to get up-to-date collections
-            final Community reloadedCommunity = (Community) HandleServiceFactory.getInstance().getHandleService()
-                    .resolveToObject(context, communityHandle);
-            for (final Collection collection : reloadedCommunity.getCollections()) {
-                count += indexAll(indexingService, itemService, context, new IndexableCollection(collection));
-                context.uncacheEntity(collection);
-            }
-        } else if (indexableObject instanceof IndexableCollection) {
-            final Collection collection = (Collection) indexableObject.getIndexedObject();
-            final Iterator<Item> itemIterator = itemService.findByCollection(context, collection);
-            while (itemIterator.hasNext()) {
-                Item item = itemIterator.next();
-                indexingService.indexContent(context, new IndexableItem(item), true, false);
-                count++;
-                context.uncacheEntity(item);
-            }
-            indexingService.commit();
-        }
-
-        return count;
     }
 
     /**
