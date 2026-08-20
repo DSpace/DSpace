@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -279,12 +280,24 @@ public interface ProcessService {
     int countByUser(Context context, EPerson user) throws SQLException;
 
     /**
-     * Cleans up running processes by failing them an attaching their logs to the process objects.
+     * Returns a list of all Process objects in the database by the given instance.
+     *
+     * @param context The relevant DSpace context
+     * @param instance    The instance to search for
+     * @param limit   The limit for the amount of Processes returned
+     * @param offset  The offset for the Processes to be returned
+     * @return The list of all Process objects in the Database
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findByInstance(Context context, UUID instance, int limit, int offset) throws SQLException;
+
+    /**
+     * Cleans up processes of the given instance, by failing them and attaching their logs to the process objects.
      *
      * @param context   The DSpace context
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
-    void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException;
+    void failProcessesOfInstance(Context context, UUID instance) throws SQLException, IOException, AuthorizeException;
 }
