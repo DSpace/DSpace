@@ -80,33 +80,33 @@ public class DiscoverResultConverterTest {
     }
 
     // -----------------------------------------------------------------------
-    // spellcheck: suggestion missing / empty / blank
+    // spellcheck: suggestions missing / empty / blank
     // -----------------------------------------------------------------------
 
     @Test
-    public void testSpellCheckSuggestionIsNullWhenNotProvided() {
-        // no suggestion set on the DiscoverResult
+    public void testSpellCheckSuggestionsAreNullWhenNotProvided() {
+        // no suggestions set on the DiscoverResult
         SearchResultsRest result = convert("anyquery");
 
         assertEquals(null, result.getSpellCheckSuggestions());
     }
 
     @Test
-    public void testSpellCheckSuggestionIsNullWhenEmpty() {
-        discoverResult.setSpellCheckSuggestions(List.of(""));
-
-        SearchResultsRest result = convert("anyquery");
-
-        assertEquals(List.of(""), result.getSpellCheckSuggestions());
-    }
-
-    @Test
-    public void testSpellCheckSuggestionIsNullWhenBlank() {
+    public void testSpellCheckSuggestionsAreEmptyListWhenEmptyListProvided() {
         discoverResult.setSpellCheckSuggestions(List.of());
 
         SearchResultsRest result = convert("anyquery");
 
         assertEquals(List.of(), result.getSpellCheckSuggestions());
+    }
+
+    @Test
+    public void testBlankSpellCheckSuggestionIsKeptAsIs() {
+        discoverResult.setSpellCheckSuggestions(List.of(""));
+
+        SearchResultsRest result = convert("anyquery");
+
+        assertEquals(List.of(""), result.getSpellCheckSuggestions());
     }
 
     // -----------------------------------------------------------------------

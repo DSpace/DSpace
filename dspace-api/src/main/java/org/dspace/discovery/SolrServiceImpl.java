@@ -22,10 +22,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -1010,26 +1012,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (solrQueryResponse != null) {
                 SpellCheckResponse spellCheckResponse = solrQueryResponse.getSpellCheckResponse();
                 if (spellCheckResponse != null) {
-                    List<String> suggestions = new ArrayList<>();
-                    List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
-                    if (collations != null && !collations.isEmpty()) {
-                        suggestions.addAll(collations.stream()
-                                .map(collation -> collation.getCollationQueryString().trim())
-                                .toList());
-                    }
-
-                    List<SpellCheckResponse.Suggestion> alternatives = spellCheckResponse.getSuggestions();
-                    if (CollectionUtils.isNotEmpty(alternatives)) {
-                        alternatives.stream()
-                                .flatMap(this::getAlternativesByFrequency)
-                                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                                .forEach(e -> {
-                                    if (!suggestions.contains(e.getKey())) {
-                                        suggestions.add(e.getKey());
-                                    }
-                                });
-                    }
-                    result.setSpellCheckSuggestions(suggestions);
+                    result.setSpellCheckSuggestions(getSpellCheckSuggestions(spellCheckResponse));
                 }
                 result.setSearchTime(solrQueryResponse.getQTime());
                 result.setStart(query.getStart());
@@ -1116,6 +1099,38 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             throw new RuntimeException(message);
         }
         return result;
+    }
+
+    /**
+     * Extracts the "did you mean" suggestions out of the given Solr spellcheck response.
+     * <p>
+     * The collated queries come first, since they are corrections of the query as a whole, followed by the single
+     * term alternatives sorted by descending frequency in the index. Suggestions must be unique while preserving
+     * that ordering, hence the {@link LinkedHashSet}.
+     *
+     * @param spellCheckResponse the spellcheck section of the Solr response
+     * @return the ordered, deduplicated list of suggestions, empty if the response holds none
+     */
+    private List<String> getSpellCheckSuggestions(SpellCheckResponse spellCheckResponse) {
+        Set<String> suggestions = new LinkedHashSet<>();
+
+        List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
+        if (CollectionUtils.isNotEmpty(collations)) {
+            collations.stream()
+                      .map(collation -> collation.getCollationQueryString().trim())
+                      .forEach(suggestions::add);
+        }
+
+        List<SpellCheckResponse.Suggestion> alternatives = spellCheckResponse.getSuggestions();
+        if (CollectionUtils.isNotEmpty(alternatives)) {
+            alternatives.stream()
+                        .flatMap(this::getAlternativesByFrequency)
+                        .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                        .map(Map.Entry::getKey)
+                        .forEach(suggestions::add);
+        }
+
+        return new ArrayList<>(suggestions);
     }
 
     /**
