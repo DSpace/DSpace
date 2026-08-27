@@ -1037,6 +1037,22 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         String secondItemId = getItemIdByProfileId(newUserToken, id);
         assertEquals("The item should be the same", firstItemId, secondItemId);
 
+        getClient(getAuthToken(admin.getEmail(), password))
+                .perform(get("/api/authz/resourcepolicies/search/resource")
+                        .param("uuid", firstItemId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        hasItem(matchResourcePolicyProperties(null, user, itemToBeClaimed, null,
+                                Constants.WRITE, null))));
+
+        getClient(newUserToken)
+                .perform(get("/api/authz/authorizations/search/object")
+                        .param("uri", "http://localhost/api/core/items/" + firstItemId)
+                        .param("feature", "canEditMetadata")
+                        .param("embed", "feature"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.authorizations[0]._embedded.feature.id")
+                        .value("canEditMetadata"));
     }
 
     @Test
