@@ -127,11 +127,9 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                     if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
                         DataProcessingStep stepProcessing = (DataProcessingStep) stepClass.newInstance();
-                        if (stepProcessing.hasDataSection()) {
-                            witem.getSections().put(
-                                sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig)
-                            );
-                        }
+                        witem.getSections().put(
+                            sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig)
+                        );
                     } else if (!(stepInstance instanceof RestProcessingStep)) {
                         log.warn("The submission step class specified by '" + stepConfig.getProcessingClassName() +
                                  "' does not implement the interface org.dspace.app.rest.submit.RestProcessingStep!" +
