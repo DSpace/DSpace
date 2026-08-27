@@ -167,11 +167,15 @@ public class GrobidClientImpl implements GrobidClient {
     }
 
     private String formatErrorMessage(HttpResponse response) {
-        int statusCode = response.getStatusLine().getStatusCode();
-        String message = format("An error occurs calling GROBID web services - Response status %s", statusCode);
-        return getEntityContentString(response)
-            .map(content -> message + " - " + content)
-            .orElse(message);
+        try {
+            int statusCode = response.getStatusLine().getStatusCode();
+            String message = format("An error occured calling GROBID web services. Response status: %s", statusCode);
+            return getEntityContentString(response)
+                .map(content -> message + " - " + content)
+                .orElse(message);
+        } catch (NullPointerException e) {
+            return "GROBID response object contained a null body or status";
+        }
     }
 
     private boolean isNotSuccessful(HttpResponse response) {
@@ -184,6 +188,10 @@ public class GrobidClientImpl implements GrobidClient {
 
     private Optional<String> getEntityContentString(HttpResponse response) {
         try {
+            HttpEntity entity = response.getEntity();
+            if (null == entity) {
+                return Optional.empty();
+            }
             return Optional.ofNullable(IOUtils.toString(response.getEntity().getContent(), defaultCharset()));
         } catch (UnsupportedOperationException | IOException e) {
             LOG.error("An error occurs reading HTTP response entity content", e);
