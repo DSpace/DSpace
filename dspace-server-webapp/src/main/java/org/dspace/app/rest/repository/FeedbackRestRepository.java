@@ -28,6 +28,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import org.apache.logging.log4j.Logger;
+
 /**
  * This is the Repository that takes care of the operations on the {@link FeedbackRest} objects
  * 
@@ -35,6 +37,8 @@ import org.springframework.stereotype.Component;
  */
 @Component(FeedbackRest.CATEGORY + "." + FeedbackRest.NAME)
 public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, Integer> {
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(FeedbackRestRepository.class);
 
     @Autowired
     private FeedbackService feedbackService;
@@ -74,13 +78,46 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
 
         String senderEmail = feedbackRest.getEmail();
         String message = feedbackRest.getMessage();
+        // UM Chnage
+        String subject = feedbackRest.getSubject();        
+
+        if ( "".equals(subject) )
+        {
+            subject = "Deep Blue Feedback Form";
+        }
+        // End UM Change
+
 
         if (StringUtils.isBlank(senderEmail) || StringUtils.isBlank(message)) {
             throw new DSpaceBadRequestException("e-mail and message fields are mandatory!");
         }
 
+
+        // If you get this far, then you are ready to send an email
+        // The bot we were getting in April 2022, seemed to be sending pages with values ending like this:
+        // /feedback or .edu/ , normally the page is /contact or /submission...
+        // So if page ends with .edu/, /feedback, or /documents, error out. 
+
+        // in dev ===> dspace.ui.url = http://localhost:4000
+
+        String dspaceUiUrl = configurationService.getProperty("dspace.ui.url");
+        String page = feedbackRest.getPage();
+        if (( page == null )  || page.endsWith( "/feedback" ) || page.endsWith( ".edu/" ) || page.endsWith( "/documents" ) || !page.contains(dspaceUiUrl) )
+        {
+            log.info("Feedback: Probably a bot hitting us. page = " + page);
+            log.info("Feedback: Probably a bot hitting us. senderEmail = " + senderEmail);
+            log.info("Feedback: Probably a bot hitting us. subject = " + subject);
+            log.info("Feedback: Probably a bot hitting us. message = " + message);
+
+            throw new DSpaceBadRequestException("There is a strong chance that this Feedback request came from a bot.");
+        }
+        // End UM Change
+
+
+
         try {
-            feedbackService.sendEmail(context, req, recipientEmail, senderEmail, message, feedbackRest.getPage());
+            log.info("Feedback: about to send feedback with subject = " + subject);
+            feedbackService.sendEmail(context, req, recipientEmail, senderEmail, subject, message, feedbackRest.getPage());
         } catch (IOException | MessagingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

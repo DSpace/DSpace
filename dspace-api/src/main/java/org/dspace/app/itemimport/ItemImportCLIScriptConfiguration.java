@@ -71,6 +71,11 @@ public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfigurat
                 .desc("don't display metadata")
                 .hasArg(false).required(false).build());
 
+        options.addOption(Option.builder("o").longOpt("omitdoi")
+                .desc("omit doi creation")
+                .hasArg(false).required(false).build());
+
+
         options.addOption(Option.builder("h").longOpt("help")
                 .desc("help")
                 .hasArg(false).required(false).build());

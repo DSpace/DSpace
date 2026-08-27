@@ -33,6 +33,17 @@ import org.dspace.event.Event;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+// UM Change - to create bitstreamurl metadata
+import org.dspace.content.Bitstream;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.eperson.EPerson;
+import java.util.Date;
+// End
+
+
 /**
  * Service implementation for the Bitstream object.
  * This class is responsible for all business logic calls for the Bitstream object and is autowired by spring.
@@ -48,12 +59,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     private static final Logger log
             = org.apache.logging.log4j.LogManager.getLogger();
 
-
     @Autowired(required = true)
     protected BitstreamDAO bitstreamDAO;
     @Autowired(required = true)
     protected ItemService itemService;
-
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -126,10 +135,20 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
+
+        log.info(LogHelper.getHeader(context, "DONE: with find create_bitstream",
+                                      "bitstream_id=" + bitstreamID));
+
         setFormat(context, bitstream, null);
+        log.info(LogHelper.getHeader(context, "DONE: with format creation",
+                                      "bitstream_id=" + bitstreamID));
+
 
         context.addEvent(
             new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null, getIdentifiers(context, bitstream)));
+
+        log.info(LogHelper.getHeader(context, "DONE: with event",
+                                      "bitstream_id=" + bitstreamID));
 
         return bitstream;
     }
@@ -235,10 +254,14 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public void update(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
-        // Check authorisation
+
+        log.info(LogHelper.getHeader(context, "update_bitstream before the auth check",
+                                      "bitstream_id=" + bitstream.getID()));
+
+
         authorizeService.authorizeAction(context, bitstream, Constants.WRITE);
 
-        log.info(LogHelper.getHeader(context, "update_bitstream",
+        log.info(LogHelper.getHeader(context, "update_bitstream after the auth check",
                                       "bitstream_id=" + bitstream.getID()));
         super.update(context, bitstream);
         if (bitstream.isModified()) {
@@ -275,8 +298,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         //Remove our bitstream from all our bundles
         final List<Bundle> bundles = bitstream.getBundles();
+        Item item = null;
         for (Bundle bundle : bundles) {
             bundle.removeBitstream(bitstream);
+            if ( bundle.getName().equals("ORIGINAL") )
+            {
+                item = bundle.getItems().get(0);   
+            }
         }
 
         //Remove all bundles from the bitstream object, clearing the connection in 2 ways
@@ -284,6 +312,53 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         // Remove policies only after the bitstream has been updated (otherwise the current user has not WRITE rights)
         authorizeService.removeAllPolicies(context, bitstream);
+
+        // UM Change to set the bitstreamurl info.
+        // You want to remove the bitstream url from the bitstream url list.
+
+        if (item != null)
+        {
+            itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", Item.ANY);
+            String handle = item.getHandle();
+
+            String sequence_id =  Integer.toString(bitstream.getSequenceID());
+            String filename =  bitstream.getName();
+            String bit_uuid =  bitstream.getID().toString();
+
+            EPerson e = context.getCurrentUser();
+            String userName = e.getFullName();
+            Date date = new Date();
+            String timestamp = date.toString();
+
+
+            String biturl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.ui.url")  + "/bitstreams/" + bit_uuid + "/download";
+            String msg = biturl + " removed on " + timestamp + " by " + userName;
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", msg);
+
+
+            List<Bundle> bundlesList = item.getBundles ("ORIGINAL");
+            Bundle[] bunds = bundlesList.toArray(new Bundle[bundlesList.size()]);
+            if ( bunds.length != 0 )
+            {
+                if (bunds[0] != null)
+                {
+                     List<Bitstream> bitsList = bunds[0].getBitstreams ();
+                     Bitstream[] bits = bitsList.toArray(new Bitstream[bitsList.size()]);
+
+                    for (int i = 0; (i < bits.length); i++)
+                    {
+                        sequence_id =  Integer.toString(bits[i].getSequenceID());
+                        filename =  bits[i].getName();
+                        bit_uuid =  bits[i].getID().toString();
+
+                        biturl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.ui.url")  + "/bitstreams/" + bit_uuid + "/download";
+                        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", "en", biturl);
+
+                    }
+                }
+            }
+            itemService.update(context, item);
+        }
     }
 
     @Override

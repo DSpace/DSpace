@@ -438,4 +438,51 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         return count(query);
 
     }
+
+    @Override
+    public String findMaxCollDtFromStats(Context context) throws SQLException {
+        org.hibernate.Query query = getHibernateSession(context).createSQLQuery("SELECT max(colldt) AS colldt  FROM consolidatedstatstable");
+        String value = (String) query.uniqueResult();
+        return value;
+    }
+
+    @Override
+    public int getMonthStat(Context context, String handle, String colldt, Boolean cumm) throws SQLException
+    {
+        String stmt = "SELECT bit_count FROM consolidatedstatstable  WHERE handle=:handle AND colldt=:colldt";
+        if ( cumm )
+        {
+           stmt = "SELECT sum(bit_count) FROM consolidatedstatstable  WHERE handle=:handle AND colldt>=:colldt";
+        }
+
+        org.hibernate.Query query = getHibernateSession(context).createSQLQuery(stmt);
+        query.setParameter("handle", handle);
+        query.setParameter("colldt", colldt);
+
+        if (query.uniqueResult() == null )
+        {
+                return 0;
+        }
+        else
+        {
+           String s = query.uniqueResult().toString();
+           int value = Integer.parseInt(s);
+           return value;
+        }
+
+
+    }
+
+    @Override
+    public String getCollDt(Context context, String handle) throws SQLException
+    {
+        org.hibernate.Query query = getHibernateSession(context).createSQLQuery("SELECT max(colldt) FROM consolidatedstatstable  WHERE handle=:handle");
+        query.setParameter("handle", handle);
+
+        String value = (String) query.uniqueResult();
+        return value;
+
+    }
+
+    
 }

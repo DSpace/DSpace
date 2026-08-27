@@ -110,7 +110,6 @@ public class ItemsResource extends Resource {
                         @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Reading item(id=" + itemId + ").");
         org.dspace.core.Context context = null;
         Item item = null;
 
@@ -174,7 +173,6 @@ public class ItemsResource extends Resource {
                            @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Reading items.(offset=" + offset + ",limit=" + limit + ").");
         org.dspace.core.Context context = null;
         List<Item> items = null;
 
@@ -245,7 +243,6 @@ public class ItemsResource extends Resource {
                                            @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Reading item(id=" + itemId + ") metadata.");
         org.dspace.core.Context context = null;
         List<MetadataEntry> metadata = null;
 
@@ -270,6 +267,23 @@ public class ItemsResource extends Resource {
         log.trace("Item(id=" + itemId + ") metadata were successfully read.");
         return metadata.toArray(new MetadataEntry[0]);
     }
+
+    // To not offer TEXT or THUMNAIL in rest api.
+    public static List<Bitstream> filterBitstreams(List<Bitstream> bitstreams) {
+        List<Bitstream> filteredBitstreams = new ArrayList<>();
+
+        for (Bitstream bitstream : bitstreams) {
+
+            String bundleName = bitstream.getBundleName();
+            if (!"TEXT".equalsIgnoreCase(bundleName) && !"THUMBNAIL".equalsIgnoreCase(bundleName)) {
+                filteredBitstreams.add(bitstream);
+            }
+
+        }
+
+        return filteredBitstreams;
+    }
+
 
     /**
      * Return array of bitstreams in item. It can be paged.
@@ -304,7 +318,6 @@ public class ItemsResource extends Resource {
                                          @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Reading item(id=" + itemId + ") bitstreams.(offset=" + offset + ",limit=" + limit + ")");
         org.dspace.core.Context context = null;
         List<Bitstream> bitstreams = null;
         try {
@@ -314,8 +327,11 @@ public class ItemsResource extends Resource {
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request,
                        context);
 
-            List<Bitstream> itemBitstreams = new Item(dspaceItem, servletContext, "bitstreams", context)
+            List<Bitstream> allitemBitstreams = new Item(dspaceItem, servletContext, "bitstreams", context)
                 .getBitstreams();
+
+            // to filter out TEXT and THUMBNAIL bitstreams from the REST api
+            List<Bitstream> itemBitstreams = filterBitstreams(allitemBitstreams);
 
             if ((offset + limit) > (itemBitstreams.size() - offset)) {
                 bitstreams = itemBitstreams.subList(offset, itemBitstreams.size());
@@ -372,7 +388,6 @@ public class ItemsResource extends Resource {
                                     @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Adding metadata to item(id=" + itemId + ").");
         org.dspace.core.Context context = null;
 
         try {
@@ -403,7 +418,6 @@ public class ItemsResource extends Resource {
             processFinally(context);
         }
 
-        log.info("Metadata to item(id=" + itemId + ") were successfully added.");
         return Response.status(Status.OK).build();
     }
 
@@ -452,7 +466,6 @@ public class ItemsResource extends Resource {
                                       @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Adding bitstream to item(id=" + itemId + ").");
         org.dspace.core.Context context = null;
         Bitstream bitstream = null;
 
@@ -565,7 +578,6 @@ public class ItemsResource extends Resource {
             processFinally(context);
         }
 
-        log.info("Bitstream(id=" + bitstream.getUUID() + ") was successfully added into item(id=" + itemId + ").");
         return bitstream;
     }
 
@@ -602,7 +614,6 @@ public class ItemsResource extends Resource {
                                        @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Updating metadata in item(id=" + itemId + ").");
         org.dspace.core.Context context = null;
 
         try {
@@ -649,7 +660,6 @@ public class ItemsResource extends Resource {
             processFinally(context);
         }
 
-        log.info("Metadata of item(id=" + itemId + ") were successfully updated.");
         return Response.status(Status.OK).build();
     }
 
@@ -684,7 +694,6 @@ public class ItemsResource extends Resource {
                                @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Deleting item(id=" + itemId + ").");
         org.dspace.core.Context context = null;
 
         try {
@@ -712,7 +721,6 @@ public class ItemsResource extends Resource {
             processFinally(context);
         }
 
-        log.info("Item(id=" + itemId + ") was successfully deleted.");
         return Response.status(Status.OK).build();
     }
 
@@ -747,7 +755,6 @@ public class ItemsResource extends Resource {
                                        @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Deleting metadata in item(id=" + itemId + ").");
         org.dspace.core.Context context = null;
 
         try {
@@ -789,7 +796,6 @@ public class ItemsResource extends Resource {
             processFinally(context);
         }
 
-        log.info("Item(id=" + itemId + ") metadata were successfully deleted.");
         return Response.status(Status.OK).build();
     }
 
@@ -827,7 +833,6 @@ public class ItemsResource extends Resource {
                                         @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Deleting bitstream in item(id=" + itemId + ").");
         org.dspace.core.Context context = null;
 
         try {
@@ -872,7 +877,6 @@ public class ItemsResource extends Resource {
             processFinally(context);
         }
 
-        log.info("Bitstream(id=" + bitstreamId + ") from item(id=" + itemId + ") was successfuly deleted .");
         return Response.status(Status.OK).build();
     }
 
@@ -911,8 +915,6 @@ public class ItemsResource extends Resource {
                                            @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
 
-        log.info("Looking for item with metadata(key=" + metadataEntry.getKey() + ",value=" + metadataEntry.getValue()
-                     + ", language=" + metadataEntry.getLanguage() + ").");
         org.dspace.core.Context context = null;
 
         List<Item> items = new ArrayList<Item>();
@@ -954,12 +956,6 @@ public class ItemsResource extends Resource {
             processException("IO error:" + e.getMessage(), context);
         } finally {
             processFinally(context);
-        }
-
-        if (items.size() == 0) {
-            log.info("Items not found.");
-        } else {
-            log.info("Items were found.");
         }
 
         return items.toArray(new Item[0]);

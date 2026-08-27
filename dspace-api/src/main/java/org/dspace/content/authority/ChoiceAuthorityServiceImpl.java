@@ -36,6 +36,8 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * Broker for ChoiceAuthority plugins, and for other information configured
  * about the choice aspect of authority control for a metadata field.
@@ -262,14 +264,26 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     @Override
     public void clearCache() {
+        try 
+        {
         controller.clear();
         authorities.clear();
         presentation.clear();
         closed.clear();
         controllerFormDefinitions.clear();
         authoritiesFormDefinitions.clear();
-        itemSubmissionConfigReader = null;
+        //itemSubmissionConfigReader = null;
+        itemSubmissionConfigReader.reload();
         initialized = false;
+    }
+    catch (SubmissionConfigReaderException e) {
+            // the system is in an illegal state as the submission definition is not valid
+            //throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
+            //        e);
+log.info("ERROR: with configuration of submission form");
+
+
+        }
     }
 
     private void loadChoiceAuthorityConfigurations() {
@@ -557,6 +571,16 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             init();
             ChoiceAuthority source = this.getChoiceAuthorityByAuthorityName(nameVocab);
             if (source != null && source instanceof DSpaceControlledVocabulary) {
+
+                // First, check if this vocabulary index is disabled
+                String[] vocabulariesDisabled = configurationService
+                    .getArrayProperty("webui.browse.vocabularies.disabled");
+                if (vocabulariesDisabled != null && ArrayUtils.contains(vocabulariesDisabled, nameVocab)) {
+                    // Discard this vocabulary browse index
+                    return null;
+                }
+
+
                 Set<String> metadataFields = new HashSet<>();
                 Map<String, List<String>> formsToFields = this.authoritiesFormDefinitions.get(nameVocab);
                 for (Map.Entry<String, List<String>> formToField : formsToFields.entrySet()) {

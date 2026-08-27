@@ -73,6 +73,12 @@ public class CommunityCollectionLinkRepository extends AbstractDSpaceRestReposit
             discoverQuery.addFilterQueries("location.parent:" + communityId);
             discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
             discoverQuery.setMaxResults(pageable.getPageSize());
+
+            // this is to change the community order on the top page
+            // We need this so that Bently does not show up at the top.
+            //discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.desc);
+
+
             discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.asc);
             Iterator<Order> orderIterator = pageable.getSort().iterator();
             if (orderIterator.hasNext()) {

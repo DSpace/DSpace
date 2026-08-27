@@ -54,6 +54,11 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name = "size_bytes")
     private long sizeBytes;
 
+    // UM Change For hidden file
+    @Column(name = "bitstream_format_id", insertable = false, updatable = false)
+    private Integer formatId;
+    // End
+
     @Column(name = "deleted")
     private boolean deleted = false;
 
@@ -231,6 +236,12 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     public void setSizeBytes(long sizeBytes) {
         this.sizeBytes = sizeBytes;
     }
+
+    // UM Change - For Hidden file
+    public Integer getFormatId() {
+        return formatId;
+    }
+    // End
 
     /**
      * Get the user's format description. Returns null if the format is known by

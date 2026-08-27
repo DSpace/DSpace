@@ -575,6 +575,38 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
+    public List<EPerson> findProxiesForDepositor(Context context, UUID depositor_id) throws SQLException {
+        return ePersonDAO.findProxiesForDepositor(context, depositor_id);
+    }
+
+    @Override
+    public List <EPerson> findProxiesForDepositorInCollection(Context context, UUID depositor_id, String collection_handle) throws SQLException {
+        return ePersonDAO.findProxiesForDepositorInCollection(context, depositor_id, collection_handle);
+    }
+
+    @Override
+    public List <EPerson> findProxiesForDepositorInCollectionByUUID(Context context, UUID depositor_id, String collectionUUID) throws SQLException {
+        return ePersonDAO.findProxiesForDepositorInCollectionByUUID(context, depositor_id, collectionUUID);
+    }
+
+    @Override
+    public int countIndivStats(Context context, String email) throws SQLException {
+        return ePersonDAO.countIndivStats(context, email);
+    }
+
+
+    @Override
+    public void DeleteFromIndivStats(Context context, String email) throws SQLException {
+        ePersonDAO.DeleteFromIndivStats(context, email);
+    }
+
+    @Override
+    public void AddIndivStats(Context context, String email) throws SQLException {
+        ePersonDAO.AddIndivStats(context, email);
+    }
+
+
+    @Override
     public int countTotal(Context context) throws SQLException {
         return ePersonDAO.countRows(context);
     }

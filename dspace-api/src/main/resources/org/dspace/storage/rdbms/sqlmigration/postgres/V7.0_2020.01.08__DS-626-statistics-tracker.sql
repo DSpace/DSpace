@@ -18,12 +18,16 @@
 -- This will create the setup for the IRUS statistics harvester
 -------------------------------------------------------------
 
-CREATE SEQUENCE openurltracker_seq;
+-- Because UM crated this before, but now we want it slightly different
+-- This is the migration I added when we had 6.3
+-- V5.0_2015.06.18__statistics-harvester.sql
 
-CREATE TABLE openurltracker
-(
-    tracker_id INTEGER,
-    tracker_url VARCHAR(1000),
-    uploaddate DATE,
-    CONSTRAINT  openurltracker_PK PRIMARY KEY (tracker_id)
-);
+-- CREATE SEQUENCE openurltracker_seq;
+
+-- CREATE TABLE openurltracker
+--(
+--    tracker_id INTEGER,
+--    tracker_url VARCHAR(1000),
+--    uploaddate DATE,
+--    CONSTRAINT  openurltracker_PK PRIMARY KEY (tracker_id)
+--);

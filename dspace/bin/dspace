@@ -36,8 +36,13 @@ fi
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
   #Default Java to use 256MB of memory
-  JAVA_OPTS="-Xmx256m -Dfile.encoding=UTF-8"
+  #JAVA_OPTS="-Xmx256m -Dfile.encoding=UTF-8"
+  #JAVA_OPTS="-Xmx4096m -Xms2048m -Dfile.encoding=UTF-8"
+  #Because of solr heap error:
+  JAVA_OPTS="-Xmx6144m -Xms2048m -Dfile.encoding=UTF-8"
 fi
+
+export JAVA_OPTS="$JAVA_OPTS -Dlog4j2.configurationFile=$DSPACEDIR/config/log4j2-cli.xml"
 
 # Now invoke Java
 java $JAVA_OPTS \

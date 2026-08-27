@@ -62,7 +62,12 @@ public class DescribeStep extends AbstractProcessingStep {
 
     @Override
     public DataDescribe getData(SubmissionService submissionService, InProgressSubmission obj,
-            SubmissionStepConfig config) {
+            SubmissionStepConfig config) throws Exception {
+
+log.info("PROX: web DataDescribe");
+        inputReader = new DCInputsReader();
+
+
         DataDescribe data = new DataDescribe();
         try {
             DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
@@ -75,6 +80,8 @@ public class DescribeStep extends AbstractProcessingStep {
 
     private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
                            DCInputSet inputConfig) throws DCInputsReaderException {
+log.info("PROX: web readField");
+
         String documentTypeValue = "";
         List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
                 configurationService.getProperty("submit.type-bind.field", "dc.type"));
@@ -150,6 +157,10 @@ public class DescribeStep extends AbstractProcessingStep {
     public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
             Operation op, SubmissionStepConfig stepConf) throws Exception {
 
+log.info("PROX: web doPatchProcessing");
+        inputReader = new DCInputsReader();
+
+
         String[] pathParts = op.getPath().substring(1).split("/");
         DCInputSet inputConfig = inputReader.getInputsByFormName(stepConf.getId());
         if ("remove".equals(op.getOp()) && pathParts.length < 3) {
@@ -178,6 +189,10 @@ public class DescribeStep extends AbstractProcessingStep {
     }
 
     private List<String> getInputFieldsName(DCInputSet inputConfig, String configId) throws DCInputsReaderException {
+log.info("PROX: web getInputFieldsName");
+
+        inputReader = new DCInputsReader();
+
         List<String> fieldsName = new ArrayList<String>();
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {

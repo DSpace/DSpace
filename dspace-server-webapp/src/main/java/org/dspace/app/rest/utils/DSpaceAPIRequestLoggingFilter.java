@@ -81,7 +81,17 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
                 referrer = "unknown";
             }
         }
-        logger.info(message + " originated from " + referrer);
+
+String clientIp = request.getHeader("X-Forwarded-For");
+if (StringUtils.isBlank(clientIp)) {
+    clientIp = request.getRemoteAddr();
+} else {
+    // Hedging against multiple proxies, as "X-Forwarded-For" can contain a list of IPs
+    clientIp = clientIp.split(",")[0].trim();
+}
+    // Log the message with referrer and IP information
+    // logger.info(message + " originated from " + referrer + " with IP address " + clientIp);
+
     }
 
     @Override

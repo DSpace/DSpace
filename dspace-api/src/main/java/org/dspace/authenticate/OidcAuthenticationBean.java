@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ *In: RequestCopy
  * http://www.dspace.org/license/
  */
 package org.dspace.authenticate;
@@ -35,6 +35,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+// UM Changes
+import java.util.UUID;
+import org.dspace.eperson.service.GroupService;
+import java.io.*;
+import java.net.*;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.service.ClientInfoService;
+
 /**
  * OpenID Connect Authentication for DSpace.
  *
@@ -46,6 +59,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 public class OidcAuthenticationBean implements AuthenticationMethod {
+
+    protected ClientInfoService clientInfoService;
 
     public static final String OIDC_AUTH_ATTRIBUTE = "oidc";
 
@@ -85,7 +100,315 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) throws SQLException {
-        return List.of();
+      try
+            {
+        clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
+
+        String defaultUUID = "00000000-0000-1000-a000-000000000000";
+        UUID bioId = UUID.fromString(defaultUUID);
+        UUID umId = UUID.fromString(defaultUUID);
+        UUID bentOnlyId = UUID.fromString(defaultUUID);
+        int count = 0;
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        // UM Change
+        // The way swordv2 works now, the code will come here, and in that case request will be null.
+        if ( request == null )
+        {
+            return Collections.emptyList();
+        }
+        // This is what you should use on production.
+        String addr = request.getRemoteAddr();
+
+        // This is the one you should use local machine.
+        String addr3 = request.getHeader("X-Forwarded-For");
+
+        // Get the user's IP address
+        String addr2 = clientInfoService.getClientIp(request);
+
+        String referer = request.getHeader("referer");
+
+        // Define the IP address that should trigger an error
+        String problematicIpAddress = "10.255.12.30";
+        
+        // Check if the client's IP address matches the problematic IP, for debugging.
+        if (problematicIpAddress.equals(addr)) {
+            // Throw a runtime exception to generate a stack trace
+            //throw new RuntimeException("Access attempt from problematic IP address: " + addr);
+        }
+
+                if ( addr == null )
+                {
+                    return Collections.emptyList();
+                }
+
+                if ( isBioUser( request, addr ) )
+                    {
+                        Group bioGroup = groupService.findByName(context, "Bio Users");
+                        if (bioGroup != null) {
+                            bioId = bioGroup.getID();  // This is safe, as bioGroup exists
+                            count++;
+                        }
+                    }
+
+                if ( isBentleyOnlyUser( context, request, addr ) )
+                    {
+                        Group bentOnlyGroup = groupService.findByName(context, "Bentley Only Users");
+                        if (bentOnlyGroup  != null) {
+                            // Append to list of elligible groups
+                            bentOnlyId = bentOnlyGroup.getID();
+                            count++;
+                        }
+                    }
+
+                // If logged in and has access.
+                // OR is at a UM Address
+                if (hasUMPriviledges(context) || isUMUser(request, addr))
+                    {
+                        Group umGroup = groupService.findByName(context, "UM Users");
+                        if (umGroup != null) {
+                            // Append to list of elligible groups
+                            umId = umGroup.getID();
+                            count++;
+                        }
+
+                    }
+
+                if ( (bioId.compareTo(UUID.fromString(defaultUUID))==1) && (umId.compareTo(UUID.fromString(defaultUUID))==1) && (bentOnlyId.compareTo(UUID.fromString(defaultUUID))==1) )
+                    {
+                        return Collections.emptyList();
+                    }
+
+                UUID[] groupIds = new UUID[count];
+                int newcount = 0;
+                if ( !bioId.equals(UUID.fromString(defaultUUID)) )
+                    {
+                        groupIds[newcount] = bioId;
+                        newcount++;
+                    }
+                if ( !bentOnlyId.equals(UUID.fromString(defaultUUID)) )
+                    {
+                        groupIds[newcount] = bentOnlyId;
+                        newcount++;
+                    }
+                if ( !umId.equals(UUID.fromString(defaultUUID)) )
+                    {
+                        groupIds[newcount] = umId;
+                    }
+
+                List<Group> specialGroups = new ArrayList<Group>();
+                for(int i = 0; i < groupIds.length; i++)
+                {
+                    Group g =  EPersonServiceFactory.getInstance().getGroupService().find(context, groupIds[i]);;
+                    specialGroups.add ( g );
+                }
+
+                return specialGroups;
+
+            }
+        catch(SQLException sqle)
+            {
+                return Collections.emptyList();
+            }
+
+    }
+
+
+    public static boolean isUMUser(HttpServletRequest request, String addr)
+    {
+       //String addr = request.getHeader("X-Forwarded-For");
+       //String addr = request.getRemoteAddr();
+
+       String ips = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                 .getProperty("ip.umIPs");
+       final String[] umIPs = ips.split("\\|");
+
+        if ( addr == null )
+        {
+            return false;
+        }
+
+        for (int i = 0; i < umIPs.length; i++)
+        {
+            if (addr.startsWith(umIPs[i]))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private static boolean isWithinRange(String addr, String[] range) {
+      String[] rangeStart = range[0].split("\\.");
+      String[] rangeEnd = range[1].split("\\.");
+      String[] addrParts = addr.split("\\.");
+
+      for (int i = 0; i < 4; i++) {
+        int start = Integer.parseInt(rangeStart[i]);
+        int end = Integer.parseInt(rangeEnd[i]);
+        int current = Integer.parseInt(addrParts[i]);
+
+        if (current < start || current > end) {
+            return false;
+        }
+      }
+      return true;
+    }
+
+    public static boolean isBioUser(HttpServletRequest request, String addr)
+    {
+
+
+        if ( addr == null )
+        {
+            return false;
+        }
+
+        String ips1 = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                     .getProperty("ip.bioIPsRange1");
+
+        String ips2 = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                     .getProperty("ip.bioIPsRange2");
+
+        final String[] bioIPsRange1 = ips1.split("\\|");
+        final String[] bioIPsRange2 = ips2.split("\\|");       
+
+        String[] range1 = {bioIPsRange1[0], bioIPsRange1[1]};
+        String[] range2 = {bioIPsRange2[0], bioIPsRange2[1]};
+
+        return isWithinRange(addr, range1) || isWithinRange(addr, range2);  
+    }
+
+   public static boolean isBentleyOnlyUser(Context context, HttpServletRequest request, String addr)
+    {
+       //String addr = request.getRemoteAddr();
+       //String addr = request.getHeader("X-Forwarded-For");
+
+       String ips = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                  .getProperty("ip.BentleyOnlyIPs");
+
+       final String[] BentleyOnlyIPs = ips.split("\\|");
+
+        if ( addr == null )
+        {
+            return false;
+        }
+
+        int count = 0;
+        for (int i = 0; i < BentleyOnlyIPs.length; i++)
+        {
+            while ( count < 128 )
+            {
+                if (addr.equals( BentleyOnlyIPs[i] + Integer.toString(count) ) )
+
+                {
+                    return true;
+                }
+                count = count + 1;
+            }
+        }
+
+
+        return false;
+    }
+
+    public static boolean hasUMPriviledges(Context context)
+    {
+
+        String api_key = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                 .getProperty("api.user.key");
+
+        try
+        {
+        EPerson eperson = context.getCurrentUser();
+        String email = "noemail@umich.edu";
+        if ( eperson != null )
+            {
+                email = eperson.getEmail ();
+            }
+        else
+            {
+                //LOGGER.info ("OIDC: hasUMPriviledges(false) email not found; email =" + email);
+                return false;
+            }
+
+        // http://www.unix.org.ua/orelly/java-ent/jnut/ch04_02.htm  good page about
+        // manipulating strings.
+        // Now emove the @xxxx.xxx from the email
+        int pos = email.indexOf('@');
+        if ( pos > 0 )
+            {
+                String userid = email.substring(0,pos); // Extract the userid
+                String request_url = "https://api-na.hosted.exlibrisgroup.com/almaws/v1/users/" + userid + "?apikey=" + api_key;
+
+                URL url = new URL(request_url);
+
+                // Get an input stream for reading
+                InputStream in = url.openStream();
+
+                // Create a buffered input stream for efficency
+                BufferedInputStream bufIn = new BufferedInputStream(in);
+
+                StringBuffer ReturnedValue = new StringBuffer("");
+                for (;;)
+                    {
+                        int data = bufIn.read();
+
+                        // Check for EOF
+                        if (data == -1)
+                            {break;}
+                        else
+                            {
+                                ReturnedValue.append ( (char) data );
+                            }
+                    }
+                String ResponseValue = ReturnedValue.toString();
+                int pos2 = ResponseValue.indexOf("Error in Verification");
+                if ( pos2 > 0 )
+                    {
+                        //LOGGER.info ("OIDC: hasUMPriviledges(false) ERROR with verification; email =" + email);
+                        return false;
+                    }
+                else
+                    {
+                        // Now check for:
+                        //  <z303-budget>UMAA - Ann Arbor
+                        //  <z303-budget>UMFL - Flint
+                        //  <z303-budget>UMDB - Dearborn
+                        int posUM = ResponseValue.indexOf("UMAA</campus_code>");
+                        int posFL = ResponseValue.indexOf("UMFL</campus_code>");
+                        int posDB = ResponseValue.indexOf("UMDB</campus_code>");
+                        if ( ( posUM > 0 ) || ( posFL > 0 ) || ( posDB > 0 ) )
+                        {
+                            // Has UM permissions
+                            LOGGER.info ("OIDC: hasUMPriviledges(true) UM Person; email =" + email);
+                            return true;
+                        }
+                        else
+                        {
+                            LOGGER.info ("OIDC: hasUMPriviledges(false) Not a UM Person; email =" + email);
+                            return false;
+                        }
+                    }
+            }
+
+        }
+        catch (MalformedURLException mue)
+        {
+            //LOGGER.info ("OIDC: hasUMPriviledges Invalid URL");
+            System.err.println ("Invalid URL");
+        }
+        catch (IOException ioe)
+        {
+            //LOGGER.info ("OIDC: hasUMPriviledges I/O Error");
+            System.err.println ("I/O Error - " + ioe);
+        }
+
+        //LOGGER.info ("OIDC: hasUMPriviledges(false) does not have UM Priviledges");
+        return false;
     }
 
     @Override
@@ -181,9 +504,10 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         }
 
         try {
+            //LOGGER.warn("OIDC: LOGIN ==> " + format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8")));
             return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e.getMessage(), e);
+            //LOGGER.error(e.getMessage(), e);
             return "";
         }
 
@@ -233,9 +557,12 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     private OidcTokenResponseDTO getOidcAccessToken(String code) {
         try {
+
+
+            //LOGGER.error("OIDC:  Trying to get oidc access token with this code = " + code);
             return oidcClient.getAccessToken(code);
         } catch (Exception ex) {
-            LOGGER.error("An error occurs retriving the OIDC access_token", ex);
+            //LOGGER.error("An error occurs retriving the OIDC access_token", ex);
             return null;
         }
     }
@@ -244,7 +571,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         try {
             return oidcClient.getUserInfo(accessToken);
         } catch (Exception ex) {
-            LOGGER.error("An error occurs retriving the OIDC user info", ex);
+            //LOGGER.error("An error occurs retriving the OIDC user info", ex);
             return Map.of();
         }
     }

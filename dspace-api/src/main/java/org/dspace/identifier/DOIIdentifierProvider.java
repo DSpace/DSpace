@@ -606,7 +606,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      */
     @Override
     public String mint(Context context, DSpaceObject dso, Filter filter) throws IdentifierException {
-
         String doi = null;
         try {
             doi = getDOIByObject(context, dso);

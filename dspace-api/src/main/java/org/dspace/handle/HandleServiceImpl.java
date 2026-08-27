@@ -27,6 +27,9 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
+
 /**
  * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
  * System</a>.
@@ -81,10 +84,52 @@ public class HandleServiceImpl implements HandleService {
             return null;
         }
 
-        String url = configurationService.getProperty("dspace.ui.url")
-            + "/handle/" + handle;
 
-        log.debug("Resolved {} to {}", handle, url);
+String url;
+
+boolean useUuid = configurationService.getBooleanProperty("handle.use.uuid", false);
+
+if (useUuid)
+{
+DSpaceObject dso = dbhandle.getDSpaceObject();
+UUID uuid = dso != null ? dso.getID() : null;
+        if (uuid == null) {
+            return null;
+        }
+
+String uuidString = uuid.toString();
+
+String type = null;
+if (dso != null) {
+    int resourceTypeId = dso.getType();
+    switch(resourceTypeId) {
+        case Constants.ITEM:
+            type = "items";
+            break;
+        case Constants.COLLECTION:
+            type = "collections";
+            break;
+        case Constants.COMMUNITY:
+            type = "communities";
+            break;
+        default:
+            type = "Unknown";
+    }
+}
+
+url = configurationService.getProperty("dspace.ui.url")
+    + "/" + type + "/" + uuidString;
+}
+else {
+  url = configurationService.getProperty("dspace.ui.url")
+         + "/handle/" + handle;
+}
+
+
+
+
+log.info("HDL:  returing url=" + url);
+        //log.debug("Resolved {} to {}", handle, url);
 
         return url;
     }

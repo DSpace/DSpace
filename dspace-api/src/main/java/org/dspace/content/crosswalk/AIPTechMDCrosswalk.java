@@ -340,7 +340,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
         // accumulate values for bitstream format in case we have to make one
         String bsfShortName = null;
         String bsfMIMEType = null;
-        int bsfSupport = BitstreamFormat.KNOWN;
+        int bsfSupport = BitstreamFormat.LIMITED;
         boolean bsfInternal = false;
 
         for (Element field : dimList) {
@@ -417,7 +417,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                         } else if (dcField.equals("rights.accessRights")) {
                             //check if item is withdrawn
                             if (value.equalsIgnoreCase("WITHDRAWN")) {
-                                itemService.withdraw(context, item);
+                                itemService.withdraw(context, item, "");
                             }
                         } else if (dcField.equals("identifier.uri") ||
                             dcField.equals("relation.isPartOf")) {

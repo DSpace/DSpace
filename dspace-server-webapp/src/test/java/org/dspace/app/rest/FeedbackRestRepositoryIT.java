@@ -73,7 +73,7 @@ public class FeedbackRestRepositoryIT extends AbstractControllerIntegrationTest 
                                 .andExpect(status().isCreated());
 
             verify(feedbackServiceMock).sendEmail(isNotNull(), isNotNull(), eq("recipient.email@test.com"),
-                    eq("misha.boychuk@test.com"), eq("My feedback!"), isNull());
+                    eq("misha.boychuk@test.com"), eq("The subject"), eq("My feedback!"), isNull());
 
             verifyNoMoreInteractions(feedbackServiceMock);
         } finally {

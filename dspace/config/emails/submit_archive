@@ -3,19 +3,19 @@
 ## {0}  Title of submission
 ## {1}  Name of collection
 ## {2}  handle
+## {3}  Identifier
 ##
-#set($subject = "${config.get('dspace.name')}: Submission Approved and Archived")
+#set($subject = 'Deep Blue: Submission Approved and Archived')
 
-You submitted: ${params[0]}
+${params[0]}: ${params[1]}
 
-To collection: ${params[1]}
+To collection: ${params[2]}
 
-Your submission has been accepted and archived in ${config.get('dspace.name')},
-and it has been assigned the following identifier:
-${params[2]}
+Deep Blue DOI: ${params[4]}
 
-Please use this identifier when citing your submission.
+Note: Please use this identifier when citing your work; you can use it immediately, but it may take one to two (1-2) hours for the DOI to be activated as a clickable URL.
 
-Many thanks!
+Thank you!
 
-The ${config.get('dspace.name')} Team
+Deep Blue
+

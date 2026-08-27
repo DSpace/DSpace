@@ -114,6 +114,8 @@ public class Context implements AutoCloseable {
      */
     private String dispName = null;
 
+    private boolean noDoiStatus = false;
+
     /**
      * Context mode
      */
@@ -248,6 +250,15 @@ public class Context implements AutoCloseable {
     public void setCurrentUser(EPerson user) {
         currentUser = user;
     }
+
+    public void setNoDoiStatus(boolean status) {
+        noDoiStatus = status;
+    }
+
+    public boolean getNoDoiStatus() {
+        return noDoiStatus;
+    }
+
 
     /**
      * Get the current (authenticated) user
@@ -389,7 +400,6 @@ public class Context implements AutoCloseable {
     public void complete() throws SQLException {
         // If Context is no longer open/valid, just note that it has already been closed
         if (!isValid()) {
-            log.info("complete() was called on a closed Context object. No changes to commit.");
             return;
         }
 
@@ -421,7 +431,6 @@ public class Context implements AutoCloseable {
     public void commit() throws SQLException {
         // If Context is no longer open/valid, just note that it has already been closed
         if (!isValid()) {
-            log.info("commit() was called on a closed Context object. No changes to commit.");
             return;
         }
 
@@ -553,7 +562,6 @@ public class Context implements AutoCloseable {
     public void rollback() throws SQLException {
         // If Context is no longer open/valid, just note that it has already been closed
         if (!isValid()) {
-            log.info("rollback() was called on a closed Context object. No changes to abort.");
             return;
         }
 
@@ -581,7 +589,6 @@ public class Context implements AutoCloseable {
     public void abort() {
         // If Context is no longer open/valid, just note that it has already been closed
         if (!isValid()) {
-            log.info("abort() was called on a closed Context object. No changes to abort.");
             return;
         }
 
@@ -853,6 +860,20 @@ public class Context implements AutoCloseable {
     public boolean isBatchModeEnabled() {
         return mode != null && mode == Mode.BATCH_EDIT;
     }
+
+    /**
+     * Remove all entities from the cache and reload the current user entity. This is useful when batch processing
+     * a large number of entities when the calling code requires the cache to be completely cleared before continuing.
+     *
+     * @throws SQLException if a database error occurs.
+     */
+    public void uncacheEntities() throws SQLException {
+        dbConnection.uncacheEntities();
+        reloadContextBoundEntities();
+    }
+
+
+
 
     /**
      * Reload an entity from the database into the cache. This method will return a reference to the "attached"

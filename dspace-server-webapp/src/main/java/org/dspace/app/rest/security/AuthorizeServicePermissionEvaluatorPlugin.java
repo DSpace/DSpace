@@ -58,55 +58,61 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
 
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (restPermission == null) {
-            return false;
+             return false;
         }
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = null;
         try {
-            if (targetId != null) {
-                UUID dsoId = UUIDUtils.fromString(targetId.toString());
-                DSpaceObjectService<DSpaceObject> dSpaceObjectService;
-                try {
-                    dSpaceObjectService =
-                        contentServiceFactory.getDSpaceObjectService(Constants.getTypeID(targetType));
-                } catch (UnsupportedOperationException e) {
-                    // ok not a dspace object
-                    return false;
-                }
+         if (targetId != null) {
+             UUID dsoId = UUIDUtils.fromString(targetId.toString());
+             DSpaceObjectService<DSpaceObject> dSpaceObjectService;
+             try {
+                     dSpaceObjectService =
+                         contentServiceFactory.getDSpaceObjectService(Constants.getTypeID(targetType));
+                 } catch (UnsupportedOperationException e) {
+                     // ok not a dspace object
+                     return false;
+                 }
 
-                ePerson = context.getCurrentUser();
+                 ePerson = context.getCurrentUser();
 
-                if (dSpaceObjectService != null && dsoId != null) {
-                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
+                 if (dSpaceObjectService != null && dsoId != null) {
+                     DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
 
-                    //If the dso is null then we give permission so we can throw another status code instead
-                    if (dSpaceObject == null) {
-                        return true;
-                    }
+                     //If the dso is null then we give permission so we can throw another status code instead
+                     if (dSpaceObject == null) {
+                         return true;
+                     }
 
 
-                    if (dSpaceObject instanceof Item) {
-                        Item item = (Item) dSpaceObject;
-                        if (DSpaceRestPermission.STATUS.equals(restPermission) && item.isWithdrawn()) {
-                            return true;
-                        }
-                        // If the item is still inprogress we can process here only the READ permission.
-                        // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
-                        if (!DSpaceRestPermission.READ.equals(restPermission) &&
-                                   !item.isArchived() && !item.isWithdrawn()) {
-                            return false;
-                        }
-                    }
+                     if (dSpaceObject instanceof Item) {
+                         Item item = (Item) dSpaceObject;
 
-                    return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
-                        restPermission.getDspaceApiActionId(), true);
-                }
-            }
+                         if (item.isWithdrawn()) {
+                           return true;
+                         }
+
+
+                         if (DSpaceRestPermission.STATUS.equals(restPermission) && item.isWithdrawn()) {
+                           return true;
+                         }
+                         // If the item is still inprogress we can process here only the READ permission.
+                         // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
+                         if (!DSpaceRestPermission.READ.equals(restPermission) &&
+                                  !item.isArchived() && !item.isWithdrawn()) {
+                           return false;
+                         }
+                     }
+
+                     return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
+                         restPermission.getDspaceApiActionId(), true);
+                 }
+             }
 
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+        log.error(e.getMessage(), e);
         }
 
         return false;

@@ -41,6 +41,11 @@ public class BitstreamRest extends DSpaceObjectRest {
     private String bundleName;
 
     private Long sizeBytes;
+
+    // For Hidden file
+    private Integer formatId;
+    // End
+
     private CheckSumRest checkSum;
     // sequenceId is READ_ONLY because it is assigned by the ItemService (as it must be unique within an Item)
     @JsonProperty(access = Access.READ_ONLY)
@@ -61,6 +66,17 @@ public class BitstreamRest extends DSpaceObjectRest {
     public void setSizeBytes(Long sizeBytes) {
         this.sizeBytes = sizeBytes;
     }
+
+    // For hidden files
+    public Integer getFormatId() {
+        return formatId;
+    }
+
+    public void setFormatId(Integer formatId) {
+        this.formatId = formatId;
+    }
+    // End
+
 
     public CheckSumRest getCheckSum() {
         return checkSum;

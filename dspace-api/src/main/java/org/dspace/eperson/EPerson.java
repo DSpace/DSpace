@@ -33,6 +33,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
+// UM Change
+import java.util.UUID;
 /**
  * Class representing an e-person.
  *
@@ -166,6 +168,51 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
         return hash;
     }
 
+    // UM Change to get list of proxies.
+    public static EPerson[] getProxies (Context context, UUID depositor_id, String collection_handle) throws SQLException
+    {
+        List<EPerson> proxies = new ArrayList<EPerson>();
+
+        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();        
+        if (!collection_handle.equals("NOVALUE") )
+        {
+            proxies = ePersonService.findProxiesForDepositorInCollection(context, depositor_id, collection_handle);
+        }
+        else
+        {
+            proxies = ePersonService.findProxiesForDepositor(context, depositor_id);
+        }
+
+        EPerson[] epersonArray = new EPerson[proxies.size()];
+        epersonArray = (EPerson[]) proxies.toArray(epersonArray);
+
+        return epersonArray;
+
+    }
+
+    public static EPerson[] getProxiesByUUID (Context context, UUID depositor_id, String collectionUUID) throws SQLException
+    {
+        List<EPerson> proxies = new ArrayList<EPerson>();
+
+        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();        
+        if (!collectionUUID.equals("NO_UUID") )
+        {
+            proxies = ePersonService.findProxiesForDepositorInCollectionByUUID(context, depositor_id, collectionUUID);
+        }
+        else
+        {
+            proxies = ePersonService.findProxiesForDepositor(context, depositor_id);
+        }
+
+        EPerson[] epersonArray = new EPerson[proxies.size()];
+        epersonArray = (EPerson[]) proxies.toArray(epersonArray);
+
+        return epersonArray;
+
+    }
+
+    // End UM Change
+
     /**
      * Get the e-person's language
      *
@@ -187,6 +234,50 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
     public void setLanguage(Context context, String language) throws SQLException {
         getePersonService().setMetadataSingleValue(context, this, "eperson", "language", null, null, language);
     }
+
+    //Sending Individual Stats for xmlui - jose
+    public Boolean SendingIndivStats(Context context, String email) throws java.sql.SQLException
+    {
+
+        //EPersonDAO ePersonDAO;
+        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+        int count = ePersonService.countIndivStats(context, email);
+
+        if ( count >= 1 )
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+
+    public void DeleteFromIndivStats(Context context, String email) throws java.sql.SQLException
+    {
+
+        //EPersonDAO ePersonDAO;
+        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+        ePersonService.DeleteFromIndivStats(context, email);
+
+    }
+
+
+    public void AddIndivStats(Context context, String email) throws java.sql.SQLException
+    {
+
+        //EPersonDAO ePersonDAO;
+        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+        ePersonService.AddIndivStats(context, email);
+
+    }
+
+
 
     /**
      * Get the e-person's email address

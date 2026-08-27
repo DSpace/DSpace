@@ -99,8 +99,10 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         super(dsoService);
     }
 
+    //@PreAuthorize("hasPermission(#id, 'ITEM', 'STATUS') || hasPermission(#id, 'ITEM', 'READ')")
+
     @Override
-    @PreAuthorize("hasPermission(#id, 'ITEM', 'STATUS') || hasPermission(#id, 'ITEM', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
     public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
@@ -255,6 +257,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      */
     private void deleteRelationshipCopyVirtualMetadata(Item itemToDelete, Relationship relationshipToDelete)
         throws SQLException, AuthorizeException {
+
 
         boolean copyToLeft = relationshipToDelete.getRightItem().equals(itemToDelete);
         boolean copyToRight = relationshipToDelete.getLeftItem().equals(itemToDelete);

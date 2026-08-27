@@ -23,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import org.apache.logging.log4j.Logger;
+
 /**
  * This is the repository responsible to manage InputForm Rest object
  *
@@ -32,6 +34,8 @@ import org.springframework.stereotype.Component;
 public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String> {
     private Map<Locale, DCInputsReader> inputReaders;
     private DCInputsReader defaultInputReader;
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionFormRest.class);
 
     public SubmissionFormRestRepository() throws DCInputsReaderException {
         defaultInputReader = new DCInputsReader();
@@ -94,6 +98,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
      * @throws DCInputsReaderException
      */
     public void reload() throws DCInputsReaderException {
+        log.info("PROX:  reloading based on local");
         this.defaultInputReader = new DCInputsReader();
         Locale[] locales = I18nUtil.getSupportedLocales();
         this.inputReaders = new HashMap<Locale, DCInputsReader>();

@@ -74,6 +74,18 @@ import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+// UM Changes.
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import org.dspace.app.util.Restrict;
+import org.dspace.content.service.CollectionService;
+import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
+import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.content.DSpaceObject;
+
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * {@code cwf_workflowitem} table pointing to it.
@@ -105,6 +117,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
+    protected CollectionService collectionService;    
+    @Autowired(required = true)
     protected PoolTaskService poolTaskService;
     @Autowired(required = true)
     protected WorkflowItemRoleService workflowItemRoleService;
@@ -128,6 +142,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected ConfigurationService configurationService;
     @Autowired(required = true)
     protected XmlWorkflowCuratorService xmlWorkflowCuratorService;
+
+    /* to support proxies */
+    private static EPerson depositor = null;
+    private static EPerson originalDepositor = null;
+
 
     protected XmlWorkflowServiceImpl() {
 
@@ -619,12 +638,143 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             + wfi.getID() + "item_id=" + item.getID() + "collection_id="
             + collection.getID()));
 
+        // This will be used later in this class in case we have a proxy deposit.
+        originalDepositor = item.getSubmitter();
+
         installItemService.installItem(context, wfi);
+
+        // Start UM Changes.
+        // Change for PR mapping Embarog and collection mapping.
+
+        // Now that the item is archived.  See if you need to withdraw it, 
+        // because of restriction.
+        // This code is new to handle restriction. - (UM Change)
+        String restriction = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(), "date", "available", Item.ANY);
+
+        if ( restriction.equals("NO_RESTRICTION") )
+        {
+            itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "available", Item.ANY);
+        }
+
+        String withheldTemplate = "WITHHELD_.*_MONTHS";
+        Pattern withheldRegex = null;
+        withheldRegex = Pattern.compile(withheldTemplate);
+        Matcher matchRegex = null;
+
+        matchRegex = withheldRegex.matcher(restriction);
+
+        int restrictionValue = -1;
+        if (restriction.equals("WITHHELD_THREE_MONTHS"))
+        {
+            restrictionValue = 3;
+        }
+        else if (restriction.equals("WITHHELD_HALF_YEAR"))
+        {
+            restrictionValue = 6;
+        }
+        else if (restriction.equals("WITHHELD_ONE_YEAR"))
+        {
+            restrictionValue = 12;
+        }
+        else if (matchRegex.matches())
+        {
+            //Now get the months out.
+            int pos1 = restriction.indexOf("WITHHELD_");
+            int pos2 = restriction.indexOf("_MONTHS");
+
+            String months = restriction.substring (pos1 + 9, pos2 );
+            restrictionValue = Integer.parseInt ( months );
+        }
+
+        if (restrictionValue != -1)
+        {
+            // create a date object with the release date in it
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar release = Calendar.getInstance();
+            release.setTime(new Date());
+            release.add(release.MONTH, restrictionValue);
+            Date releaseDate = release.getTime();
+
+            itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "available", Item.ANY);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "available", "en", df.format(releaseDate));
+
+            // apply the restrictions to the item
+            Restrict.applyByMonth(context, item, restrictionValue);
+        }
+        //End of new code for embarog. (UM Change)
+
+
+        //Do Collection Mapping here, and PR mapping
+        String PeerReviewed = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(), "description", "peerreviewed", Item.ANY);
+
+        if ( PeerReviewed != null )
+        {
+            if ( PeerReviewed.equals("Peer Reviewed") )
+            {
+                String collection_id = configurationService.getProperty("pr.collectionid");
+                Collection PR_Collection = collectionService.find ( context, UUID.fromString(collection_id));
+                collectionService.addItem(context, PR_Collection, item);
+                collectionService.update(context, PR_Collection);
+            }
+        }
+
+        java.util.List<MetadataValue> values = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "description", "mapping", Item.ANY);
+        MetadataValue[] mappings = values.toArray(new MetadataValue[values.size()]);
+
+        if ( mappings.length > 0 )
+        {
+            for (int i = 0; i < mappings.length; i++)
+            {
+                String collection_id = mappings[i].getValue();
+
+                if (! collection_id.equals("-1")  )
+                {
+                    Collection Map_Collection = collectionService.find ( context, UUID.fromString(collection_id));
+                    collectionService.addItem(context, Map_Collection, item);
+                    collectionService.update(context, Map_Collection);
+                }
+            }
+        }
+        //End Mapping collection
+
+        java.util.List<MetadataValue> tops = itemService.getMetadata(item, "dc", "subject", "hlbtoplevel", Item.ANY);
+        MetadataValue[] toplevel = tops.toArray(new MetadataValue[tops.size()]);
+
+        java.util.List<MetadataValue> secs = itemService.getMetadata(item, "dc", "subject", "hlbsecondlevel", Item.ANY);
+        MetadataValue[] seclevel = secs.toArray(new MetadataValue[secs.size()]);
+
+        if ( toplevel != null )
+        {
+            if (toplevel.length == 1)
+            {
+                if ( toplevel[0].getValue().equals("REPLACE") && (toplevel.length == 1) )
+                    {
+                        itemService.clearMetadata(context, item, "dc", "subject", "hlbtoplevel", Item.ANY);
+                    }
+            }
+        }
+
+        if ( seclevel != null )
+        {
+            if (seclevel.length == 1)
+            {
+                if ( seclevel[0].getValue().equals("REPLACE") && (seclevel.length == 1) )
+                    {
+                        itemService.clearMetadata(context, item, "dc", "subject", "hlbsecondlevel", Item.ANY);
+                    }
+            }
+        }
+
+        itemService.update(context, item);
+        //  END of UM changes 
+
 
         //Notify
         notifyOfArchive(context, item, collection);
 
         //Clear any remaining workflow metadata
+        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), 
+                        "description", "depositor", Item.ANY);
         itemService
             .clearMetadata(context, item, WorkflowRequirementsService.WORKFLOW_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
         itemService.update(context, item);
@@ -659,6 +809,25 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 // Get the item handle to email to user
                 String handle = handleService.findHandle(context, item);
 
+                DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
+                    .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
+
+                DSpaceObject item_dso = (DSpaceObject) item;
+                String doi = doiIdentifierProvider.getDOIByObject(context, item_dso);
+
+
+                String doi_url = "";
+                if (doi == null) {
+                    doi_url ="NO DOI CREATED";
+                } else {
+                    doi_url = doi.replace("doi:", "https://dx.doi.org/"); 
+                }
+
+                // what you get for doi: doi:10.33577/42
+                // what you want to send out in email:https://dx.doi.org/10.7302/22447
+                //  String doi_url = doi.replace("doi:", "https://dx.doi.org/"); 
+                log.info("DOIHERE is = " + doi_url);
+
                 // Get title
                 List<MetadataValue> titles = itemService
                     .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
@@ -671,11 +840,49 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 if (titles.size() > 0) {
                     title = titles.iterator().next().getValue();
                 }
-
                 email.addRecipient(ep.getEmail());
+
+                // If configed, send email to Deep Blue that shows deposit 
+                // item was deposited.
+                boolean sendToAdmin = configurationService.getBooleanProperty(
+                                    "deposit.notify.admin", false);
+                if ( sendToAdmin )
+                {
+                    email.addRecipient(configurationService.getProperty("feedback.recipient"));
+                } 
+
+
+                // UM Change To find out if there was a proxy depositor.
+                // For Proxie depoist.
+                String SubmitterMsg = "You submitted";
+                java.util.List<MetadataValue> proxylist = itemService.getMetadata(item, "dc", "description", "depositor", Item.ANY);
+                MetadataValue[] proxies = proxylist.toArray(new MetadataValue[proxylist.size()]);
+                if ( proxies.length > 0 )
+                {
+                    for (int i = 0; i < proxies.length; i++)
+                    {
+                        if (!proxies[i].getValue().equals("SELF"))
+                        {
+                            depositor = originalDepositor;
+                        }
+                    }   
+                }   
+                // End of this.
+
+                if ( depositor != null )
+                {
+                    email.addRecipient(depositor.getEmail());
+
+                    SubmitterMsg = depositor.getFullName() + " submitted on behalf of " + ep.getFullName();
+                    depositor = null;
+                }
+                email.addArgument(SubmitterMsg);
+                // End UM Change
+
                 email.addArgument(title);
                 email.addArgument(coll.getName());
                 email.addArgument(handleService.getCanonicalForm(handle));
+                email.addArgument(doi_url);
 
                 email.send();
             }

@@ -314,6 +314,12 @@ public interface CollectionService
     public void canEdit(Context context, Collection collection, boolean useInheritance)
         throws SQLException, AuthorizeException;
 
+    public int IsSubscribedToStats(Context context, String collemail) throws SQLException;
+     
+    public void DeleteEmailFromStats(Context context, String collemail) throws SQLException;
+     
+    public void InsertEmailFromStats(Context context, String collemail) throws SQLException;
+
     /**
      * return an array of collections that user has a given permission on
      * (useful for trimming 'select to collection' list) or figuring out which

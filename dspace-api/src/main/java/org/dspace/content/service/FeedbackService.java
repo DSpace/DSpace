@@ -31,6 +31,5 @@ public interface FeedbackService {
      * @throws MessagingException
      */
     public void sendEmail(Context context, HttpServletRequest request, String recipientEmail, String senderEmail,
-            String message, String page) throws IOException, MessagingException;
-
+            String subject, String message, String page) throws IOException, MessagingException;
 }

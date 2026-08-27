@@ -88,7 +88,10 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     @Column(name = "confidence")
     private int confidence = -1;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    // When I tried to add a bitstream URL, I was getting a PersistenceException 
+    // I found on the web that if I changed to to MERGE, it could resolve the problem.  (UM Change) 
+    //@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})    
     @JoinColumn(name = "dspace_object_id")
     protected DSpaceObject dSpaceObject;
 

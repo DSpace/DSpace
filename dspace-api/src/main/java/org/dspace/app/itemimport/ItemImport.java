@@ -81,6 +81,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zipvalid = false;
     protected boolean help = false;
     protected File workDir = null;
+    protected boolean noDoi = false;
     protected File workFile = null;
 
     protected static final CollectionService collectionService =
@@ -144,6 +145,10 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
 
         if (commandLine.hasOption('q')) {
             isQuiet = true;
+        }
+
+        if (commandLine.hasOption('o')) {
+            noDoi = true;
         }
 
         setZip();
@@ -216,6 +221,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             itemImportService.setUseWorkflow(useWorkflow);
             itemImportService.setUseWorkflowSendEmail(useWorkflowSendEmail);
             itemImportService.setQuiet(isQuiet);
+            itemImportService.setDoi(noDoi);     
             itemImportService.setHandler(handler);
 
             try {

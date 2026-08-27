@@ -123,6 +123,19 @@ public interface DBConnection<T> {
      */
     public long getCacheSize() throws SQLException;
 
+
+    /**
+     * Remove all entities from the session cache.
+     *
+     * <p>Entities removed from cache are not saved in any way. Therefore, if you
+     * have modified any entities, you should be sure to {@link #commit()} changes
+     * before calling this method.
+     *
+     * @throws SQLException passed through.
+     */
+    public void uncacheEntities() throws SQLException;
+
+
     /**
      * Reload a DSpace object from the database. This will make sure the object
      * is valid and stored in the cache.  The returned object should be used

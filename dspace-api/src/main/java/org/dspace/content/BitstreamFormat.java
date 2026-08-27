@@ -90,21 +90,24 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      * the system
      */
     @Transient
-    public static final int UNKNOWN = 0;
+    public static final int AS_IS_UNKNOWN = 0;
 
     /**
      * The "known" support level - for bitstream formats that are known to the
      * system, but not fully supported
      */
     @Transient
-    public static final int KNOWN = 1;
+    public static final int LIMITED = 1;
 
     /**
      * The "supported" support level - for bitstream formats known to the system
      * and fully supported.
      */
     @Transient
-    public static final int SUPPORTED = 2;
+    public static final int HIGHEST_LEVEL = 2;
+
+    @Transient
+    public static final int AS_IS_KNOWN = 3;
 
     /**
      * Protected constructor, create object using:

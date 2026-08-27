@@ -34,11 +34,16 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
 import org.dspace.statistics.export.service.OpenUrlService;
 
+import org.apache.logging.log4j.Logger;
+
 /**
  * Abstract export event processor that contains all shared logic to handle both Items and Bitstreams
  * from the IrusExportUsageEventListener
  */
 public abstract class ExportEventProcessor {
+
+    /*  Log4j logger*/
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     protected static final String ENTITY_TYPE_DEFAULT = "Publication";
 
@@ -93,6 +98,8 @@ public abstract class ExportEventProcessor {
             baseUrl = configurationService.getProperty("irus.statistics.tracker.testurl");
         }
 
+	log.info ("IRUS: baseUrl = " + baseUrl);
+
         openUrlService.processUrl(context, baseUrl + "?" + urlParameters);
     }
 
@@ -106,8 +113,12 @@ public abstract class ExportEventProcessor {
     protected String getBaseParameters(Item item)
             throws UnsupportedEncodingException {
 
+        // UM Change - carry over from 6.3
         //We have a valid url collect the rest of the data
-        String clientIP = request.getRemoteAddr();
+        //This change was done so that they could get legit ip addresses.
+        //String clientIP = request.getRemoteAddr();
+        String clientIP = request.getHeader("X-Forwarded-For");
+
         if (configurationService.getBooleanProperty("useProxies", false) && request
                 .getHeader("X-Forwarded-For") != null) {
             /* This header is a comma delimited list */

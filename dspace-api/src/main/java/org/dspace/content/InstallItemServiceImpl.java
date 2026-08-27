@@ -32,6 +32,14 @@ import org.dspace.supervision.SupervisionOrder;
 import org.dspace.supervision.service.SupervisionOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+// UM Changes
+import org.dspace.web.ContextUtil;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import java.util.UUID;
+import org.dspace.services.factory.DSpaceServicesFactory;
+
 /**
  * Support to install an Item in the archive.
  *
@@ -51,10 +59,16 @@ public class InstallItemServiceImpl implements InstallItemService {
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
+    protected EPersonService ePersonService;
+    @Autowired(required = true)
     protected SupervisionOrderService supervisionOrderService;
     @Autowired(required = false)
 
     Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
+
+    /* to support proxies */
+    private static EPerson depositor = null;
+
 
     protected InstallItemServiceImpl() {
     }
@@ -143,7 +157,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         }
 
         // Record that the item was restored
-        String provDescription = "Restored into DSpace on " + now + " (GMT).";
+        String provDescription = "Restored into Deep Blue Documents " + now + " (GMT).";
         itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
                                 "description", "provenance", "en", provDescription);
 
@@ -183,7 +197,41 @@ public class InstallItemServiceImpl implements InstallItemService {
             }
         }
 
-        String provDescription = "Made available in DSpace on " + now
+        // Start UM Change. In case you have a proxy deposit.
+        java.util.List<MetadataValue> proxylist = itemService.getMetadata(item, "dc", "description", "depositor", Item.ANY);
+        MetadataValue[] proxies = proxylist.toArray(new MetadataValue[proxylist.size()]);
+        if ( proxies.length > 0 )
+        {
+            for (int i = 0; i < proxies.length; i++)
+            {
+                if (!proxies[i].getValue().equals("SELF"))
+                {
+                    depositor = item.getSubmitter();
+
+                    String proxy_id = proxies[i].getValue();
+                    //log.info("PROXY:  putting in prove message proxy_id = " + proxy_id);
+
+                    Context context = ContextUtil.obtainCurrentRequestContext();
+                    EPerson proxyPerson = ePersonService.find(context, UUID.fromString(proxy_id));
+
+                    String Submitter_FullName = item.getSubmitter().getFullName();
+                    String Submitter_Email = item.getSubmitter().getEmail();
+
+                    //Set the submitter to the on behalf person
+                    item.setSubmitter ( proxyPerson );
+
+                    String provmessage = "Submitted by " + Submitter_FullName
+                        + " (" + Submitter_Email + ") on behalf of " + item.getSubmitter().getFullName() + " (" +  item.getSubmitter().getEmail() + ") on " + now + "\n";
+
+                    itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provmessage);
+                }
+            }
+        }
+        //End UM Change
+
+        // This is the initial provenance when the item is installed regarding the bitstreams.
+        String provDescription = "Made available in Deep Blue Documents on " + now
             + " (GMT). " + getBitstreamProvenanceMessage(c, item);
 
         // If an issue date was passed in and it wasn't set to "today" (literal string)
@@ -227,6 +275,49 @@ public class InstallItemServiceImpl implements InstallItemService {
 
         // save changes ;-)
         itemService.update(c, item);
+
+
+        // Start the bitstreamurl metadata creation.
+        //the handle was being lost, not exactly sure why.  But don't want to mess things up.
+        String suppliedHandle = item.getHandle();
+
+        List<Bundle> bundList = itemService.getBundles(item, "ORIGINAL");
+        Bundle[] bunds = bundList.toArray(new Bundle[bundList.size()]);
+        if ( bunds.length != 0 )
+        {
+            if (bunds[0] != null)
+            {
+                //Bitstream[] bits = bunds[0].getBitstreams();
+                List<Bitstream> bitsList = bunds[0].getBitstreams();
+                Bitstream[] bits = bitsList.toArray(new Bitstream[bitsList.size()]);
+                for (int i = 0; (i < bits.length); i++)
+                {
+                    // The bitstreamurl
+                    // <code>/bitstream/handle/sequence_id/filename</code>
+                    String sequence_id =  Integer.toString(bits[i].getSequenceID());
+                    String filename =  bits[i].getName();
+                    String filedesc =  bits[i].getDescription();
+                    String bit_uuid =  bits[i].getID().toString();
+
+                    String dspace_url = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                         .getProperty("dspace.ui.url");
+
+                    String biturl = dspace_url + "/bitstreams/" + bit_uuid + "/download";
+                    itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", null, biturl);
+
+                    if ( filedesc != null )
+                    {
+                        if ( !filedesc.equals("") )
+                        {
+                            String msg = "Description of " + filename + " : " + filedesc;
+                            itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(), "description", "filedescription", null, msg);
+                        }
+                    }
+
+                }
+                itemService.update(c, item);
+            }
+        }
 
         // Notify interested parties of newly archived Item
         c.addEvent(new Event(Event.INSTALL, Constants.ITEM, item.getID(),

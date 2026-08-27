@@ -49,6 +49,14 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+// UM Change
+import org.dspace.content.service.ItemService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.Item;
+import org.dspace.content.service.DSpaceObjectService;
 
 /**
  * This is the repository responsible to manage Bitstream Rest object
@@ -58,6 +66,10 @@ import org.springframework.stereotype.Component;
 
 @Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
 public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstream, BitstreamRest> {
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamRestRepository.class);
+
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private final BitstreamService bs;
 
@@ -148,7 +160,55 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             throw new RuntimeException(e.getMessage(), e);
         }
         try {
+            Item item = bit.getBundles().iterator().next().getItems().iterator().next();
             bs.delete(context, bit);
+
+            itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", Item.ANY);
+
+            //the handle was being lost, not exactly sure why.  But don't want to mess things up.
+            String suppliedHandle = item.getHandle();
+
+            //Bundle[] bunds = item.getBundles("ORIGINAL");
+            List<Bundle> bundList = itemService.getBundles(item, "ORIGINAL");
+            Bundle[] bunds = bundList.toArray(new Bundle[bundList.size()]);
+            if ( bunds.length != 0 )
+            {
+            if (bunds[0] != null)
+            {
+                //Bitstream[] bits = bunds[0].getBitstreams();
+                List<Bitstream> bitsList = bunds[0].getBitstreams();
+                Bitstream[] bits = bitsList.toArray(new Bitstream[bitsList.size()]);
+                for (int i = 0; (i < bits.length); i++)
+                {
+                    // The bitstreamurl
+                    // <code>/bitstream/handle/sequence_id/filename</code>
+                    String sequence_id =  Integer.toString(bits[i].getSequenceID());
+                    String filename =  bits[i].getName();
+                    String filedesc =  bits[i].getDescription();
+                    String bit_uuid =  bits[i].getID().toString();
+
+                    String dspace_url = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                         .getProperty("dspace.ui.url");
+                    String biturl = dspace_url + "/bitstreams/" + bit_uuid + "/download";
+                    // Get the information you need for the bitstream.
+                    //item.addDC("description", "bitstreamurl", null, biturl);
+                    itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", null, biturl);
+
+                    if ( filedesc != null )
+                    {
+                        if ( !filedesc.equals("") )
+                        {
+                            String msg = "Description of " + filename + " : " + filedesc;
+                            //item.addDC("description", "filedescription", null, msg);
+                            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "filedescription", null, msg);
+                        }
+                    }
+
+                }
+                itemService.update(context, item);
+                context.commit();
+            }
+        }
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

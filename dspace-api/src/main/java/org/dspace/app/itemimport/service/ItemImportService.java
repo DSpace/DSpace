@@ -244,6 +244,8 @@ public interface ItemImportService {
      */
     public void setQuiet(boolean isQuiet);
 
+    public void setDoi(boolean noDoi);
+
     /**
      * Set the DSpace Runnable Handler
      * @param handler

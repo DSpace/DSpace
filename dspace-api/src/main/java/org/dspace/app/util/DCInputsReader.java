@@ -30,6 +30,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+// UM Change
+import javax.servlet.http.HttpServletRequest;
+import org.dspace.core.Context;
+import javax.servlet.ServletException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+// For UM Changes.
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
+import java.util.UUID;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.factory.ContentServiceFactory;
+
+//UM Changes
+import org.dspace.web.ContextUtil;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
+import org.dspace.utils.DSpace;
+
 /**
  * Submission form generator for DSpace. Reads and parses the installation
  * form definitions file, submission-forms.xml, from the configuration directory.
@@ -53,6 +74,12 @@ import org.xml.sax.SAXException;
  */
 
 public class DCInputsReader {
+
+    private static final Logger log = LoggerFactory.getLogger(DCInputsReader.class);
+
+    private CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
+
     /**
      * The ID of the default collection. Will never be the ID of a named
      * collection
@@ -108,7 +135,7 @@ public class DCInputsReader {
 
 
     public DCInputsReader(String fileName)
-        throws DCInputsReaderException {
+        throws DCInputsReaderException {  
         buildInputs(fileName);
     }
 
@@ -138,11 +165,124 @@ public class DCInputsReader {
     }
 
     public Iterator<String> getPairsNameIterator() {
+        String defsFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+            + File.separator + "config" + File.separator + FORM_DEF_FILE;
+
         return valuePairs.keySet().iterator();
     }
 
+    // There is code here to support proxy deposits and collection mapping 
+    // at  ingestion.
     public List<String> getPairs(String name) {
-        return valuePairs.get(name);
+        String defsFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+            + File.separator + "config" + File.separator + FORM_DEF_FILE;
+
+        // UM Change - needed for mapping and proxy depositor logic.
+        Context c = ContextUtil.obtainCurrentRequestContext();
+
+        //HttpServletRequest request = null;
+
+        RequestService requestService = new DSpace().getRequestService();
+
+        String collectionUUID = "NO_UUID"; // Default Value
+
+        // This code could be cleaned up.  From what I see the currentRequest is never null, 
+        // but I will leave it here for now.
+        Request currentRequest = requestService.getCurrentRequest();
+        if ( currentRequest == null)
+        {
+            log.info("COLL: owningCollectin=" + collectionUUID);
+        }
+        {
+            collectionUUID = ContextUtil.getCollectionUUID();
+        }
+
+        List<String> myList = new ArrayList<>();
+
+        if (name.equals("collection_mappings")) {
+        try
+        {
+            String pr_collection_id = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                            .getProperty("pr.collectionid");
+
+            List<Collection> collections = collectionService.findAuthorizedOptimized(c, Constants.ADD);
+            for (Collection t : collections) {
+                String handle = t.getHandle();
+                if ( handle != null )
+                {
+                    String nameUser = t.getName();
+                    UUID     id = t.getID();
+                    String the_id = id.toString();
+
+                    if ( !the_id.equals(pr_collection_id) && !the_id.equals(collectionUUID) )
+                    {
+                        myList.add(nameUser); 
+                        myList.add( the_id );
+                    }
+                }
+             }
+
+        }
+        catch (Exception exc)
+        {
+            myList.add("ERROR collmapping"); 
+            myList.add("ERROR collmapping");
+        }
+        } else if (name.startsWith("depositor")) {
+        try
+        {
+            // This is the way I was doing it when I could not get the uuid or handle passed on.
+            // But found a way to get it passed to this method.
+            // UM Change.
+            // Get the collection handle from the configuration.
+            // This is different from the way we did it in 6.3
+            // depositor_123456789_6
+            // 01234567890
+            //String collectionHandle = name.substring(10).replace("_", "/");
+            //log.info ("PROX: this is the coll=" + collectionHandle);
+
+            if ( c.getCurrentUser() != null )
+            {
+                //Get the eperson
+                EPerson ePerson = c.getCurrentUser();
+                UUID userid = ePerson.getID();
+
+                String nameMain = ePerson.getFullName();
+                String emailMain = ePerson.getEmail();
+
+                String labelMain = nameMain + ", " + emailMain;
+
+                myList.add(labelMain); 
+                myList.add("SELF");
+
+                EPerson[] Proxies = ePerson.getProxiesByUUID ( c, userid, collectionUUID );
+
+                for (int k = 0; k < Proxies.length; k++)
+                {
+                 String nameFull = Proxies[k].getFullName();
+                 String email = Proxies[k].getEmail();
+                 UUID id = Proxies[k].getID();
+
+                 String label = nameFull + ", " + email;
+
+                 myList.add(label); 
+                 myList.add(id.toString());
+
+                }
+            }
+        }
+        catch (Exception exc2 )
+        {
+            log.info("PROX: ERROR but it may be OK, creating the depositor picklist for proxies, request is null==>" + exc2.toString());
+            myList.add ( "ERROR proxy depositor" );
+            myList.add ( "ERROR proxy depositor" );
+        }
+        } else {
+            myList = valuePairs.get(name);
+        }
+
+        return myList;
+
     }
 
     /**
@@ -156,6 +296,7 @@ public class DCInputsReader {
      */
     public List<DCInputSet> getInputsByCollectionHandle(String collectionHandle)
         throws DCInputsReaderException {
+
         SubmissionConfig config;
         try {
             config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
@@ -207,14 +348,22 @@ public class DCInputsReader {
      */
     public DCInputSet getInputsByFormName(String formName)
         throws DCInputsReaderException {
+
+        String defsFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+            + File.separator + "config" + File.separator + FORM_DEF_FILE;
+
+        buildInputs(defsFile);
+        
         // check mini-cache, and return if match
-        if (lastInputSet != null && lastInputSet.getFormName().equals(formName)) {
-            return lastInputSet;
-        }
+        //    lastInputSet = null;
+        //if (lastInputSet != null && lastInputSet.getFormName().equals(formName)) {
+            // UM Change.
+            //return lastInputSet;
+        //}
         // cache miss - construct new DCInputSet
         List<List<Map<String, String>>> pages = formDefns.get(formName);
         if (pages == null) {
-            throw new DCInputsReaderException("Missing the " + formName + " form");
+            throw new DCInputsReaderException("Missing the " + formName + " form defsFile " + defsFile);
         }
         lastInputSet = new DCInputSet(formName,
                                       pages, valuePairs);
@@ -688,6 +837,7 @@ public class DCInputsReader {
 
     public String getInputFormNameByCollectionAndField(Collection collection, String field)
         throws DCInputsReaderException {
+
         List<DCInputSet> inputSets = getInputsByCollectionHandle(collection.getHandle());
         for (DCInputSet inputSet : inputSets) {
             String[] tokenized = Utils.tokenize(field);

@@ -384,12 +384,12 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testSetSupportLevelValidValues() {
-        bf.setSupportLevel(BitstreamFormat.UNKNOWN);
-        assertThat("testSetSupportLevelValidValues 0", bf.getSupportLevel(), equalTo(BitstreamFormat.UNKNOWN));
-        bf.setSupportLevel(BitstreamFormat.KNOWN);
-        assertThat("testSetSupportLevelValidValues 1", bf.getSupportLevel(), equalTo(BitstreamFormat.KNOWN));
-        bf.setSupportLevel(BitstreamFormat.SUPPORTED);
-        assertThat("testSetSupportLevelValidValues 2", bf.getSupportLevel(), equalTo(BitstreamFormat.SUPPORTED));
+        bf.setSupportLevel(BitstreamFormat.AS_IS_UNKNOWN);
+        assertThat("testSetSupportLevelValidValues 0", bf.getSupportLevel(), equalTo(BitstreamFormat.AS_IS_UNKNOWN));
+        bf.setSupportLevel(BitstreamFormat.LIMITED);
+        assertThat("testSetSupportLevelValidValues 1", bf.getSupportLevel(), equalTo(BitstreamFormat.LIMITED));
+        bf.setSupportLevel(BitstreamFormat.HIGHEST_LEVEL);
+        assertThat("testSetSupportLevelValidValues 2", bf.getSupportLevel(), equalTo(BitstreamFormat.HIGHEST_LEVEL));
     }
 
 
@@ -398,12 +398,12 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testGetSupportLevelIDValid() {
-        int id1 = bitstreamFormatService.getSupportLevelID("UNKNOWN");
-        assertThat("testGetSupportLevelIDValid 0", id1, equalTo(BitstreamFormat.UNKNOWN));
-        int id2 = bitstreamFormatService.getSupportLevelID("KNOWN");
-        assertThat("testGetSupportLevelIDValid 1", id2, equalTo(BitstreamFormat.KNOWN));
-        int id3 = bitstreamFormatService.getSupportLevelID("SUPPORTED");
-        assertThat("testGetSupportLevelIDValid 2", id3, equalTo(BitstreamFormat.SUPPORTED));
+        int id1 = bitstreamFormatService.getSupportLevelID("AS_IS_UNKNOWN");
+        assertThat("testGetSupportLevelIDValid 0", id1, equalTo(BitstreamFormat.AS_IS_UNKNOWN));
+        int id2 = bitstreamFormatService.getSupportLevelID("LIMITED");
+        assertThat("testGetSupportLevelIDValid 1", id2, equalTo(BitstreamFormat.LIMITED));
+        int id3 = bitstreamFormatService.getSupportLevelID("HIGHEST_LEVEL");
+        assertThat("testGetSupportLevelIDValid 2", id3, equalTo(BitstreamFormat.HIGHEST_LEVEL));
     }
 
     /**

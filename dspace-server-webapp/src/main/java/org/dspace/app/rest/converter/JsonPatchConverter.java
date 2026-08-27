@@ -65,6 +65,12 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
             String opType = opNode.get("op").textValue();
             String path = opNode.get("path").textValue();
 
+            String reason = "";
+            if ( opNode.get("reason") != null )
+            {  
+               reason = opNode.get("reason").textValue();
+            } 
+
             JsonNode valueNode = opNode.get("value");
             Object value = valueFromJsonNode(path, valueNode);
             String from = opNode.has("from") ? opNode.get("from").textValue() : null;
@@ -72,7 +78,7 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
             //IDEA maybe if the operation have a universal name the PatchOperation can be retrieve here not in
             // WorkspaceItemRestRepository.evaluatePatch
             if (opType.equals("replace")) {
-                ops.add(new ReplaceOperation(path, value));
+                ops.add(new ReplaceOperation(path, value, reason));
             } else if (opType.equals("remove")) {
                 ops.add(new RemoveOperation(path));
             } else if (opType.equals("add")) {

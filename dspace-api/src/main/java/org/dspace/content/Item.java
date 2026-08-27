@@ -36,6 +36,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
+import org.apache.logging.log4j.Logger;
+
 /**
  * Class representing an item in DSpace.
  * <P>
@@ -52,6 +54,9 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "item")
 public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
+
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
@@ -310,6 +315,22 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
         return matchingBundles;
     }
 
+    // Pass ORIGINAL for NAME
+    public List<String> getFiles(String name) {
+        List<String> matchingBitstreams = new ArrayList<>();
+         // now only keep bundles with matching names
+        List<Bundle> bunds = getBundles();
+        for (Bundle bundle : bunds) {
+            if (name.equals(bundle.getName())) {
+                List<Bitstream> bits = bundle.getBitstreams();
+                for (Bitstream bit : bits) {
+                    matchingBitstreams.add(bit.getName());
+                }   
+            }
+        }
+        return matchingBitstreams;
+    }
+
     /**
      * Add a bundle to the item, should not be made public since we don't want to skip business logic
      *
@@ -402,4 +423,42 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
         this.cachedMetadata = cachedMetadata;
         modifiedMetadataCache = false;
     }
+
+    public String getMonthStat(Context context, String colldt, Boolean cumm) throws java.sql.SQLException
+    {
+
+        String handle = getHandle();
+        //String colldt = getCollDt();
+
+        if ( colldt == null )
+        {       
+                colldt = getItemService().getCollDt(context, handle);
+        }       
+
+        EPerson currentUser = context.getCurrentUser();
+        String email = currentUser.getEmail();
+        String collemail = this.getID().toString() + " : " + email;
+
+        int count = 0;
+ 
+        if ( ( handle != null) && ( colldt != null ) )
+        {
+           count = getItemService().getMonthStat(context, handle, colldt, cumm);
+        }
+        else
+        {
+           log.info ("STATS: ERROR has occrued check the handle and colldt passed in.");
+        }
+
+        if (count > 0)
+        {
+           return Integer.toString(count);
+        }else
+        {
+          return "-";
+        }
+
+    }
+
+
 }

@@ -109,7 +109,11 @@ public class DCInput {
     /**
      * if input list-controlled, the list itself
      */
-    private List<String> valueList = null;
+    // This is how it was declared in 7.6 originally.
+    //private List<String> valueList = null;
+    private List<String> valueList = new ArrayList<String>();
+
+
 
     /**
      * if non-null, visibility scope restriction
@@ -173,6 +177,7 @@ public class DCInput {
      * @param listMap  value-pairs map, computed from the forms definition XML file
      */
     public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap) {
+
         dcElement = fieldMap.get("dc-element");
         dcQualifier = fieldMap.get("dc-qualifier");
 
@@ -205,8 +210,11 @@ public class DCInput {
         if ("dropdown".equals(inputType) || "qualdrop_value".equals(inputType)
             || "list".equals(inputType)) {
             valueListName = fieldMap.get("value-pairs-name");
+
+            // The first value is how it came with 7.6.
             valueList = listMap.get(valueListName);
         }
+
         hint = fieldMap.get("hint");
         warning = fieldMap.get("required");
         required = warning != null && warning.length() > 0;
@@ -227,18 +235,18 @@ public class DCInput {
                 typeBind.add(type.trim());
             }
         }
-        style = fieldMap.get("style");
-        isRelationshipField = fieldMap.containsKey("relationship-type");
-        isMetadataField = fieldMap.containsKey("dc-schema");
-        relationshipType = fieldMap.get("relationship-type");
-        searchConfiguration = fieldMap.get("search-configuration");
-        filter = fieldMap.get("filter");
-        externalSources = new ArrayList<>();
-        String externalSourcesDef = fieldMap.get("externalsources");
-        if (StringUtils.isNotBlank(externalSourcesDef)) {
-            String[] sources = StringUtils.split(externalSourcesDef, ",");
-            for (String source: sources) {
-                externalSources.add(StringUtils.trim(source));
+         style = fieldMap.get("style");
+         isRelationshipField = fieldMap.containsKey("relationship-type");
+         isMetadataField = fieldMap.containsKey("dc-schema");
+         relationshipType = fieldMap.get("relationship-type");
+         searchConfiguration = fieldMap.get("search-configuration");
+         filter = fieldMap.get("filter");
+         externalSources = new ArrayList<>();
+         String externalSourcesDef = fieldMap.get("externalsources");
+         if (StringUtils.isNotBlank(externalSourcesDef)) {
+             String[] sources = StringUtils.split(externalSourcesDef, ",");
+             for (String source: sources) {
+                 externalSources.add(StringUtils.trim(source));
             }
         }
 
@@ -523,11 +531,12 @@ public class DCInput {
      * @return true when there is no type restriction or typeName is allowed
      */
     public boolean isAllowedFor(String typeName) {
-        if (typeBind.size() == 0) {
-            return true;
-        }
+        return true;
+        //if (typeBind.size() == 0) {
+        //    return true;
+        // }
 
-        return typeBind.contains(typeName);
+        //return typeBind.contains(typeName);
     }
 
     public String getScope() {
@@ -570,18 +579,18 @@ public class DCInput {
     }
 
     public boolean validate(String value) {
-        if (StringUtils.isNotBlank(value)) {
-            try {
-                if (this.pattern != null) {
-                    if (!pattern.matcher(value).matches()) {
-                        return false;
-                    }
-                }
-            } catch (PatternSyntaxException ex) {
-                log.error("Regex validation failed!  {}", ex.getMessage());
-            }
+        // if (StringUtils.isNotBlank(value)) {
+        //     try {
+        //         if (this.pattern != null) {
+        //             if (!pattern.matcher(value).matches()) {
+        //                 return false;
+        //             }
+        //         }
+        //     } catch (PatternSyntaxException ex) {
+        //         log.error("Regex validation failed!  {}", ex.getMessage());
+        //     }
 
-        }
+        // }
         return true;
     }
 

@@ -94,6 +94,8 @@ public class HdlResolverRestController {
      *         or 400 - <code>HttpStatus.BAD_REQUEST</code> error
      */
     public ResponseEntity<String> resolveHandle(HttpServletRequest request, String hdlService) {
+
+log.info ("HDL: to resolve the handle");
         HdlResolverDTO handleResolver =
                 this.hdlResolverService.resolveBy(
                         request.getRequestURI(),

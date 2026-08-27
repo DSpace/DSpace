@@ -36,6 +36,9 @@ import org.dspace.eperson.service.SubscribeService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
+// UM Change
+import org.dspace.content.service.UmrestrictedService;
+
 /**
  * Abstract factory to get services for the content package, use ContentServiceFactory.getInstance() to retrieve an
  * implementation
@@ -70,6 +73,8 @@ public abstract class ContentServiceFactory {
     public abstract WorkspaceItemService getWorkspaceItemService();
 
     public abstract InstallItemService getInstallItemService();
+
+    public abstract UmrestrictedService getUmrestrictedService();
 
     public abstract SiteService getSiteService();
 

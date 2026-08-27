@@ -24,6 +24,7 @@ public class FeedbackRest extends BaseObjectRest<Integer> {
     private String page;
     private String email;
     private String message;
+    private String subject;
 
     public String getEmail() {
         return email;
@@ -40,6 +41,16 @@ public class FeedbackRest extends BaseObjectRest<Integer> {
     public void setMessage(String message) {
         this.message = message;
     }
+
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
 
     public String getPage() {
         return page;

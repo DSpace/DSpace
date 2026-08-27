@@ -75,6 +75,9 @@ public class ItemConverter
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         List<MetadataValue> returnList = new LinkedList<>();
         try {
+            if (obj.isWithdrawn() ) {
+                return new MetadataValueList(fullList);
+            }
             if (obj.isWithdrawn() && (Objects.isNull(context) ||
                                       Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
                 return new MetadataValueList(new ArrayList<MetadataValue>());

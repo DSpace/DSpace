@@ -126,6 +126,9 @@ public class SubmissionService {
             collectionUUID = configurationService.getProperty("submission.default.collection");
         }
 
+        // Save collection UUID to pass to the DCInputsReader.java file.
+	org.dspace.web.ContextUtil.setCollectionUUID(collectionUUID);
+
         try {
             if (StringUtils.isNotBlank(collectionUUID)) {
                 collection = collectionService.find(context, UUID.fromString(collectionUUID));

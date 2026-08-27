@@ -60,23 +60,20 @@ public class ClientInfoServiceImpl implements ClientInfoService {
 
         if (isUseProxiesEnabled()) {
             String xForwardedForIp = getXForwardedForIpValue(remoteIp, xForwardedForHeaderValue);
-
             if (StringUtils.isNotBlank(xForwardedForIp) && isRequestFromTrustedProxy(ip)) {
-                ip = xForwardedForIp;
+                ip = xForwardedForIp;             
             }
 
         } else if (StringUtils.isNotBlank(xForwardedForHeaderValue)) {
             log.warn("X-Forwarded-For header sent from client, but useProxies is not enabled. " +
                          "To trust X-Forwarded-For headers, set useProxies=true.");
         }
-
         if (isIPv4Address(ip)) {
             int ipAnonymizationBytes = getIpAnonymizationBytes();
             if (ipAnonymizationBytes > 0) {
                 ip = anonymizeIpAddress(ip, ipAnonymizationBytes);
             }
         }
-
         return ip;
     }
 

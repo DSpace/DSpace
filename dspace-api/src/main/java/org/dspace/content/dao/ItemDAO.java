@@ -195,4 +195,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException;
 
+    public String findMaxCollDtFromStats(Context context) throws SQLException;
+
+    public int getMonthStat(Context context, String handle, String colldt, Boolean cumm) throws SQLException;
+   
+    public String getCollDt(Context context, String handle) throws SQLException;
+
 }

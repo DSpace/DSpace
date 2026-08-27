@@ -1,3 +1,8 @@
+# Ignore Greg's Agent Framework local settings and agents.
+#   This is a symbolic link to the actual directory,
+#   which is located outside of the repository.
+.agents
+
 ## Ignore the MVN compiled output directories from version tracking
 target/
 
@@ -46,3 +51,18 @@ rebel.xml
 
 ## Ignore jenv configuration
 .java-version
+
+## Ignore logs
+dspace/data/log/
+
+## ignore backup files
+*.backup
+
+## ignore yarn support files
+yarn.lock
+node_modules/
+
+## ignore stashed files
+stash/
+
+

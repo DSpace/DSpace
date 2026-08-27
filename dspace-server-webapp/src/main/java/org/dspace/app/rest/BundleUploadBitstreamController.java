@@ -43,6 +43,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+// UM Change
+import org.dspace.content.service.ItemService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.Item;
+import org.dspace.content.service.DSpaceObjectService;
+
+import org.dspace.eperson.EPerson;
+import java.util.Date;
+
+
 /**
  * Controller to upload bitstreams to a certain bundle, indicated by a uuid in the request
  * Usage: POST /api/core/bundles/{uuid}/bitstreams (with file and properties of file in request)
@@ -63,7 +76,11 @@ import org.springframework.web.multipart.MultipartFile;
         + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/" + BitstreamRest.PLURAL_NAME)
 public class BundleUploadBitstreamController {
 
+    private ContentServiceFactory contentServiceFactory;
+
     private static final Logger log = LogManager.getLogger();
+
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     @Autowired
     protected Utils utils;
@@ -111,9 +128,33 @@ public class BundleUploadBitstreamController {
             throw new UnprocessableEntityException("The InputStream from the file couldn't be read", e);
         }
 
+        EPerson eperson = context.getCurrentUser();
+        String userName = eperson.getFullName();
+        Date date = new Date();
+        String timestamp = date.toString();
+
         BitstreamRest bitstreamRest = bundleRestRepository.uploadBitstream(
                 context, bundle, uploadfile.getOriginalFilename(), fileInputStream, properties);
         BitstreamResource bitstreamResource = converter.toResource(bitstreamRest);
+
+        // UM Change - You should be able to add the bitstreamurl here.
+        try{
+        Item item = bundle.getItems().iterator().next();
+        String sequence_id =  Integer.toString(bitstreamRest.getSequenceId());
+        String filename =  bitstreamRest.getName();
+        String biturl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.ui.url")  + "/bitstream/" + item.getHandle() + "/" + sequence_id + "/" + filename;
+
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", "en", biturl);
+
+        String msg = biturl + " added on " + timestamp + " by " + userName;
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", msg);
+
+        itemService.update(context, item);
+        context.commit();
+        } catch (Exception e) {
+            log.info("DEBUG:  exception = " + e);
+        }
+        // End the adding of the metadata
 
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), bitstreamResource);
     }

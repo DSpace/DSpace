@@ -1129,7 +1129,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Allow Collection ADMIN perms
         when(authorizeServiceSpy.authorizeActionBoolean(context, collection, Constants.ADMIN)).thenReturn(true);
 
-        itemService.withdraw(context, it);
+        itemService.withdraw(context, it, "");
         assertTrue("testWithdrawAuth 0", it.isWithdrawn());
     }
 
@@ -1138,7 +1138,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testWithdrawNoAuth() throws Exception {
-        itemService.withdraw(context, it);
+        itemService.withdraw(context, it, "");
         fail("Exception expected");
     }
 
@@ -1154,7 +1154,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         // initialize item as withdrawn
         context.turnOffAuthorisationSystem();
-        itemService.withdraw(context, it);
+        itemService.withdraw(context, it, "");
         context.restoreAuthSystemState();
 
         itemService.reinstate(context, it);
@@ -1168,7 +1168,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testReinstateNoAuth() throws Exception {
         // initialize item as withdrawn
         context.turnOffAuthorisationSystem();
-        itemService.withdraw(context, it);
+        itemService.withdraw(context, it, "");
         context.restoreAuthSystemState();
 
         itemService.reinstate(context, it);

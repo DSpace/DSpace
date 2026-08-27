@@ -20,6 +20,13 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
+// UM Change
+import org.dspace.content.service.ItemService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Action to delete bitstreams
  *
@@ -28,6 +35,9 @@ import org.dspace.core.Context;
  * Derivatives of the bitstream to be deleted are not also deleted
  */
 public class DeleteBitstreamsAction extends UpdateBitstreamsAction {
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DeleteBitstreamsAction.class);
+
     /**
      * Delete bitstream from item
      *
@@ -45,6 +55,8 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction {
     public void execute(Context context, ItemArchive itarch, boolean isTest,
                         boolean suppressUndo) throws IllegalArgumentException, IOException,
         SQLException, AuthorizeException, ParseException {
+
+        Item item = null;            
         File f = new File(itarch.getDirectory(), ItemUpdate.DELETE_CONTENTS_FILE);
         if (!f.exists()) {
             ItemUpdate.pr("Warning: Delete_contents file for item " + itarch.getDirectoryName() + " not found.");
@@ -70,12 +82,13 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction {
                                 }
                             }
 
+                            item = bundles.iterator().next().getItems().iterator().next();
                             if (alterProvenance) {
                                 DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");
 
                                 String append = "Bitstream " + bs.getName() + " deleted on " + DCDate
                                     .getCurrent() + "; ";
-                                Item item = bundles.iterator().next().getItems().iterator().next();
+                                //Item item = bundles.iterator().next().getItems().iterator().next();
                                 ItemUpdate.pr("Append provenance with: " + append);
 
                                 if (!isTest) {
@@ -89,6 +102,52 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction {
                 }
             }
         }
+
+       // Go ahead and update the bitstreamurl information.
+       if(item != null){
+               itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", Item.ANY);
+
+
+                String handle = item.getHandle();
+
+                List<Bundle> bundlesList = item.getBundles ("ORIGINAL");
+                Bundle[] bunds = bundlesList.toArray(new Bundle[bundlesList.size()]);
+                if ( bunds.length != 0 )
+                {
+                    if (bunds[0] != null)
+                    {
+                         List<Bitstream> bitsList = bunds[0].getBitstreams ();
+                         Bitstream[] bits = bitsList.toArray(new Bitstream[bitsList.size()]);
+
+                        for (int i = 0; (i < bits.length); i++)
+                        {
+                            String sequence_id =  Integer.toString(bits[i].getSequenceID());
+                            String filename =  bits[i].getName();
+                            String bit_uuid =  bits[i].getID().toString();
+
+                            String biturl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.ui.url")  + "/bitstreams/" + bit_uuid + "/download";
+                            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "bitstreamurl", "en", biturl);
+
+
+                            // //Add the link to image class if item has jpeg
+                            // Collection owningCollection = item.getOwningCollection();
+                            // String format = bits[i].getUserFormatDescription();
+
+                            // if ( IsAJpegCollection(handle) && format.equals("JPEG 2000 Pt. 1") )
+                            // {
+                            //     String internal_id =  bits[i].getInternalId();
+                            //     String image_url = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("image.url") + "?c=deepblueic;evl=full-image;quality=4;view=entry;subview=detail;cc=deepblueic;entryid=" + handle + ";viewid=" + internal_id + ";start=;resnum=";
+                            //     //String image_url = ConfigurationManager.getProperty("image.url") + "?c=deepblueic;evl=full-image;quality=4;view=entry;subview=detail;cc=deepblueic;entryid=" + handle + ";viewid=" + internal_id + ";start=;resnum=";
+                            //     //item.addDC("identifier", "imageclass", null, image_url);
+                            //     itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "imageclass", "en", image_url);
+                            // }
+
+                        }
+                    }
+                }
+                itemService.update(context, item);
+            }
+            // End change.
     }
 
 }

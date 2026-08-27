@@ -50,6 +50,8 @@ public interface IdentifierService {
      */
     List<String> lookup(Context context, DSpaceObject dso);
 
+    List<String> lookupNoDoi(Context context, DSpaceObject dso);    
+
     /**
      * This will resolve a DSpaceObject based on a provided Identifier.
      * The Service will interrogate the providers in no particular order

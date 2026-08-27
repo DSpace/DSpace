@@ -48,7 +48,6 @@ public class LogHelper {
             contextExtraInfo = "no_context";
         }
 
-
         StringBuilder result = new StringBuilder();
         // Escape everthing but the extra context info because for some crazy reason two fields
         // are generated inside this entry one for the session id, and another for the ip
@@ -57,6 +56,42 @@ public class LogHelper {
               .append(escapeLogField(action)).append(":").append(escapeLogField(extrainfo));
         return result.toString();
     }
+
+
+    public static String getHeader2(Context context, String action,
+                                    String extrainfo, String extrainfo2 )
+    {
+        String email = "anonymous";
+        String contextExtraInfo;
+        String handle = "handle=";
+
+        if (context != null)
+        {
+            EPerson e = context.getCurrentUser();
+
+            if (e != null)
+            {
+                email = e.getEmail();
+            }
+
+            contextExtraInfo = context.getExtraLogInfo();
+        }
+        else
+        {
+            contextExtraInfo = "no_context";
+        }
+
+
+        StringBuilder result = new StringBuilder();
+        // Escape everthing but the extra context info because for some crazy reason two fields
+        // are generated inside this entry one for the session id, and another for the ip 
+        // address. Everything else should be escaped.
+        result.append(escapeLogField(email)).append(":").append(contextExtraInfo).append(":").append(escapeLogField(handle)).append(escapeLogField(extrainfo)).append(":").append(escapeLogField(action)).append(":filename=").append(escapeLogField(extrainfo2));
+
+        return result.toString();
+
+    }
+
 
 
     /**

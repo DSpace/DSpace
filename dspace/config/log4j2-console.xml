@@ -10,7 +10,7 @@
                xmlns='http://logging.apache.org/log4j/2.0/config'>
     <Properties>
         <!-- Default log file directory for DSpace. -->
-        <Property name='log.dir'>${log4j:configParentLocation}/../log</Property>
+        <Property name='log.dir'>${log4j:configParentLocation}/../data/log</Property>
     </Properties>
 
     <Appenders>

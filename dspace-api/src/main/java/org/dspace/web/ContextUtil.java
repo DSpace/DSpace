@@ -45,6 +45,8 @@ public class ContextUtil {
      */
     private ContextUtil() { }
 
+    public static String collectionUUID = "NO_UUID";
+
     /**
      * Inspection method to check if a DSpace context has been created for this request.
      *
@@ -105,6 +107,16 @@ public class ContextUtil {
         }
         return context;
     }
+
+    // To be able to pass the collection UUID to DCInputsReader.java
+    public static void setCollectionUUID(String uuid) {
+        collectionUUID = uuid;
+    }
+
+    public static String getCollectionUUID() {
+        return collectionUUID;
+    }
+    // End
 
     private static Locale getLocale(Context context, HttpServletRequest request) {
         Locale userLocale = null;

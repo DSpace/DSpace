@@ -27,6 +27,10 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.proxy.HibernateProxyHelper;
 
+import org.dspace.services.factory.DSpaceServicesFactory;
+
+import org.apache.logging.log4j.Logger;
+
 /**
  * Class representing bundles of bitstreams stored in the DSpace system
  * <P>
@@ -41,6 +45,9 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "bundle")
 public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Bundle.class);
+
     @Column(name = "bundle_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -137,6 +144,54 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      * @return the bitstreams
      */
     public List<Bitstream> getBitstreams() {
+        List<Bitstream> bitstreamList = new ArrayList<>(this.bitstreams);
+
+        List<Bitstream> bitstreamsNoHiddenFiles = new ArrayList<>();
+
+        String hidden_format = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                 .getProperty("hidden.format");
+
+        String no_doi_email = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                 .getProperty("nodoi.email");
+
+        String handle_prefix = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                 .getProperty("handle.prefix");
+
+
+        //log.info("TEST hidden the value is => " + hidden_format);
+        //log.info("TEST nodoi.email => " + no_doi_email);
+        //log.info("TEST handle.prefix => " + handle_prefix);
+
+
+
+
+
+
+        // When a bitstream is first uploaded using the UI, this method gets called.  At that 
+        // moment the getFormatId() is null, but you still need to retun hte list of bistreams.
+        // I had some code in here that would return an empty list of bits when the format was null.
+        // So in this case, when in the submission form, when the user picked the 1st bitstream it
+        // would report an error in the load.  Then when the user picked the next bit, it would 
+        // pass, but the bitstreams being reported on the bit section was the first. It always seemd 
+        // like we were off by one.                                          
+                                     
+
+        for(Bitstream bit: bitstreamList) {  
+            // This is the case at file creation.
+            if( (bit.getFormatId() == null) )
+            { 
+               bitstreamsNoHiddenFiles.add(bit); 
+            }else if (bit.getFormatId() != Integer.valueOf(hidden_format) ) 
+            {
+                bitstreamsNoHiddenFiles.add(bit); 
+            }
+        }
+
+        return bitstreamsNoHiddenFiles;
+    }
+
+    // UM Change.  I created this method in case we need it. Presently not used.
+    public List<Bitstream> getBitstreamsAll() {
         List<Bitstream> bitstreamList = new ArrayList<>(this.bitstreams);
         return bitstreamList;
     }

@@ -49,8 +49,9 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      * translate support-level ID to string.  MUST keep this table in sync
      * with support level definitions above.
      */
+/* These need to change */
     protected final String supportLevelText[] =
-        {"UNKNOWN", "KNOWN", "SUPPORTED"};
+        {"AS_IS_UNKNOWN", "LIMITED", "HIGHEST_LEVEL", "AS_IS_KNOWN"};
 
 
     /**
@@ -166,7 +167,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     @Override
     public void setSupportLevel(BitstreamFormat bitstreamFormat, int supportLevel) {
         // Sanity check
-        if ((supportLevel < 0) || (supportLevel > 2)) {
+        if ((supportLevel < 0) || (supportLevel > 3)) {
             throw new IllegalArgumentException("Invalid support level");
         }
 

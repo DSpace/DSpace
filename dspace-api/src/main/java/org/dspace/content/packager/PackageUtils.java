@@ -346,7 +346,7 @@ public class PackageUtils {
     public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
                                                               String shortDesc, String MIMEType, String desc)
         throws SQLException, AuthorizeException {
-        return findOrCreateBitstreamFormat(context, shortDesc, MIMEType, desc, BitstreamFormat.KNOWN, false);
+        return findOrCreateBitstreamFormat(context, shortDesc, MIMEType, desc, BitstreamFormat.LIMITED, false);
     }
 
     /**

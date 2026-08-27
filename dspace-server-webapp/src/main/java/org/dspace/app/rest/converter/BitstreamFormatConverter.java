@@ -38,7 +38,7 @@ public class BitstreamFormatConverter implements DSpaceConverter<BitstreamFormat
         if (obj.getSupportLevel() > 0) {
             bf.setSupportLevel(bitstreamFormatService.getSupportLevelText(obj));
         } else {
-            bf.setSupportLevel("UNKNOWN");
+            bf.setSupportLevel("AS_IS_UNKNOWN");
         }
         bf.setExtensions(obj.getExtensions());
         return bf;

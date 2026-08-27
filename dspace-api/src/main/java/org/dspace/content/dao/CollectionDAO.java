@@ -52,5 +52,11 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
 
     int countRows(Context context) throws SQLException;
 
+    public int IsSubscribedToStats(Context context, String collemail) throws SQLException;
+
+    public void DeleteEmailFromStats(Context context, String collemail) throws SQLException;
+    
+    public void InsertEmailFromStats(Context context, String collemail) throws SQLException;
+
     List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
 }

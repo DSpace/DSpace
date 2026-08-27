@@ -112,10 +112,20 @@ public class SwordUrlManager {
         return sUrl;
     }
 
+    // UM Change
+    public String getSwordBaseUrlTrue()
+            throws DSpaceSwordException
+    {
+        String sUrl = configurationService.getProperty("swordv2-server.urltrue");
+        return sUrl;
+    }
+    // UM Change End
+
     public Item getItem(Context context, String location)
         throws DSpaceSwordException, SwordError {
         try {
-            String baseUrl = this.getSwordBaseUrl();
+            //String baseUrl = this.getSwordBaseUrl();
+            String baseUrl = this.getSwordBaseUrlTrue();
             String emBaseUrl = baseUrl + "/edit-media/";
             String eBaseUrl = baseUrl + "/edit/";
             String sBaseUrl = baseUrl + "/statement/";
@@ -177,7 +187,8 @@ public class SwordUrlManager {
     public Collection getCollection(Context context, String location)
         throws DSpaceSwordException, SwordError {
         try {
-            String baseUrl = this.getBaseCollectionUrl();
+            //String baseUrl = this.getBaseCollectionUrl();
+            String baseUrl = this.getBaseCollectionUrlTrue();
             if (baseUrl.length() == location.length()) {
                 throw new SwordError(DSpaceUriRegistry.BAD_URL,
                                      "The deposit URL is incomplete");
@@ -340,6 +351,23 @@ public class SwordUrlManager {
         }
         return depositUrl;
     }
+
+    public String getBaseCollectionUrlTrue()
+        throws DSpaceSwordException {
+        String depositUrl = configurationService
+            .getProperty("swordv2-server.collection.trueurl");
+        if (depositUrl == null || "".equals(depositUrl)) {
+            if (dspaceUrl == null || "".equals(dspaceUrl)) {
+                throw new DSpaceSwordException(
+                    "Unable to construct deposit urls, due to missing/invalid config in " +
+                        "swordv2-server.cfg deposit.url and/or dspace.server.url");
+            }
+            depositUrl = buildSWORDUrl("collection");
+        }
+        return depositUrl;
+    }
+
+
 
     /**
      * Is the given URL the base service document URL?

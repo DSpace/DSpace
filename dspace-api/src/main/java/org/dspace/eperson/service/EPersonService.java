@@ -24,6 +24,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
 
+import java.util.UUID;
+
 /**
  * Service interface class for the EPerson object.
  * The implementation of this class is responsible for all business logic calls
@@ -255,6 +257,19 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     List<EPerson> findEPeopleWithSubscription(Context context) throws SQLException;
+
+    public List<EPerson> findProxiesForDepositor(Context context, UUID depositor_id) throws SQLException;
+
+    public List <EPerson> findProxiesForDepositorInCollection(Context context, UUID depositor_id, String collection_handle) throws SQLException;
+
+    public List <EPerson> findProxiesForDepositorInCollectionByUUID(Context context, UUID depositor_id, String collectionUUID) throws SQLException;
+
+    public int countIndivStats(Context context, String email) throws SQLException;
+
+    public void DeleteFromIndivStats(Context context, String email) throws SQLException;
+
+    public void AddIndivStats(Context context, String email) throws SQLException;
+
 
     /**
      * Count all accounts.

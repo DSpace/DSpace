@@ -156,7 +156,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
                 new ByteArrayInputStream("Item 3 Bitstream 2".getBytes(StandardCharsets.UTF_8))));
 
             // Withdraw the second item for later testing
-            itemService.withdraw(context, itemTwo);
+            itemService.withdraw(context, itemTwo, "");
             // Initialise metadata field for later testing with both items
             this.metadataField = metadataFieldService.findByElement(context,
                 MetadataSchemaEnum.DC.getName(), element, qualifier);

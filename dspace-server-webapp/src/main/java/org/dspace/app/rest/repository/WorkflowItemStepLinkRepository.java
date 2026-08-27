@@ -65,7 +65,11 @@ public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository
         try {
             XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.find(context, workflowItemId);
             if (xmlWorkflowItem == null) {
-                throw new ResourceNotFoundException("XmlWorkflowItem with id: " + workflowItemId + " wasn't found");
+              // UM Change - During submission, if an item is embargoed, we endup here. 
+              // and are stuck in the submission page, this command will return the user
+              // to the MyDSpace page.
+              return converter.toRest( xmlWorkflowFactory.getStepByName("finaleditstep"), projection);
+              //throw new ResourceNotFoundException("XmlWorkflowItem with id: " + workflowItemId + " wasn't found");
             }
             List<PoolTask> poolTasks = poolTaskService.find(context, xmlWorkflowItem);
             List<ClaimedTask> claimedTasks = claimedTaskService.find(context, xmlWorkflowItem);

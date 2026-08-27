@@ -50,6 +50,27 @@
     		</dim:field>
     	</xsl:if>
     	
+     <!-- creator element: dc.publisher.none -->
+     <xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/publisher'">
+           <dim:field mdschema="dc" element="publisher">
+                   <xsl:value-of select="epdcx:valueString"/>
+           </dim:field>
+     </xsl:if>
+
+     <!-- creator element: dc.identifier.source -->
+     <xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/journal'">
+           <dim:field mdschema="dc" element="identifier" qualifier="source">
+                   <xsl:value-of select="epdcx:valueString"/>
+           </dim:field>
+     </xsl:if>
+
+     <!-- creator element: dc.identifier.issn -->
+     <xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/issn'">
+           <dim:field mdschema="dc" element="identifier" qualifier="issn">
+                   <xsl:value-of select="epdcx:valueString"/>
+           </dim:field>
+     </xsl:if>
+
     	<!-- identifier element: dc.identifier.* -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/identifier'">
     		<xsl:element name="dim:field">
@@ -73,7 +94,7 @@
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/type' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Type'">
     		<xsl:if test="./@epdcx:valueURI='http://purl.org/eprint/type/JournalArticle'">
     			<dim:field mdschema="dc" element="type">
-    				Journal Article
+    				Article
     			</dim:field>
     		</xsl:if>
     	</xsl:if>
@@ -88,7 +109,7 @@
     	<!-- publication status element: dc.description.version -->
     	<xsl:if test="./@epdcx:propertyURI='http://purl.org/eprint/terms/status' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Status'">
     		<xsl:if test="./@epdcx:valueURI='http://purl.org/eprint/status/PeerReviewed'">
-	    		<dim:field mdschema="dc" element="description" qualifier="version">
+	    		<dim:field mdschema="dc" element="description" qualifier="peerreviewed">
 	    			Peer Reviewed
 	    		</dim:field>
     		</xsl:if>

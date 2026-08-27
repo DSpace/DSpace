@@ -44,6 +44,8 @@ public class HdlResolverServiceImpl implements HdlResolverService {
 
     @Override
     public HdlResolverDTO resolveBy(String requestURI, String path) {
+        log.info ("HDL: from resolveBy requestURI=" + requestURI + " path=" + path);
+
         return new HdlResolverDTO(requestURI, path);
     }
 

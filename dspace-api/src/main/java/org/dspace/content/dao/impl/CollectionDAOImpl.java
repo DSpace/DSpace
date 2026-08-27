@@ -32,6 +32,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
+// UM Change
+import java.math.BigInteger;
+
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
  * This class is responsible for all database calls for the Collection object and is autowired by Spring.
@@ -165,6 +168,43 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM Collection"));
+    }
+
+    @Override
+    public int IsSubscribedToStats(Context context, String collemail) throws SQLException {
+
+        org.hibernate.Query query = getHibernateSession(context).createSQLQuery("SELECT count(*) FROM admin_stats WHERE collemail=:collemail");
+        query.setParameter("collemail", collemail);
+
+        int value = ((BigInteger) query.uniqueResult()).intValue();
+        
+        return value;
+
+    }
+
+    @Override
+    public void DeleteEmailFromStats(Context context, String collemail) throws SQLException {
+
+        Query query = getHibernateSession(context)
+            .createSQLQuery("DELETE FROM admin_stats WHERE collemail=:collemail");
+        query.setParameter("collemail", collemail);
+        query.executeUpdate();
+
+context.commit();
+
+        return;
+    }
+
+    @Override
+    public void InsertEmailFromStats(Context context, String collemail) throws SQLException {
+
+        Query query = getHibernateSession(context).createSQLQuery("INSERT INTO admin_stats (collemail) VALUES (:collemail)");
+        query.setParameter("collemail", collemail);
+        query.executeUpdate();
+
+        context.commit();
+
+        return;
     }
 
     @Override

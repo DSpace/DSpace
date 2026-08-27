@@ -1,0 +1,11 @@
+## Sent to the person requesting a copy of a restricted document when the
+## request is granted.
+##
+## Parameters:
+##  {0} name of person requesting the item
+##  {1} email of person requesting the item
+#set($subject = 'Your email was sent out.')
+
+
+Your response to ${params[0]} (${params[1]}) was sent out.
+

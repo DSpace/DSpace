@@ -406,8 +406,7 @@ public interface ItemService
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public void withdraw(Context context, Item item) throws SQLException, AuthorizeException;
-
+    public void withdraw(Context context, Item item, String reason) throws SQLException, AuthorizeException;
 
     /**
      * Reinstate a withdrawn item
@@ -885,5 +884,11 @@ public interface ItemService
      * @return the entity type of the given item, or null if not found.
      */
     public EntityType getEntityType(Context context, Item item) throws SQLException;
+
+    public int getMonthStat(Context context, String handle, String colldt, Boolean cumm) throws SQLException;
+
+    public String getCollDt(Context context, String handle) throws SQLException;
+
+    public String findMaxCollDtFromStats(Context contect) throws SQLException;
 
 }

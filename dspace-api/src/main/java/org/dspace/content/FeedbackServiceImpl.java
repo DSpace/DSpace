@@ -27,7 +27,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public void sendEmail(Context context, HttpServletRequest request, String recipientEmail, String senderEmail,
-            String message, String page) throws IOException, MessagingException {
+            String subject, String message, String page) throws IOException, MessagingException {
         String session = request.getHeader("x-correlation-id");
         String agent = request.getHeader("User-Agent");
         String currentUserEmail = StringUtils.EMPTY;
@@ -44,6 +44,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         email.addArgument(agent);          // User agent
         email.addArgument(session);       // Session ID
         email.addArgument(message);      // The feedback itself
+        email.addArgument(subject);     // The subject line 
         email.send();
     }
 

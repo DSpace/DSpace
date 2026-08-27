@@ -202,7 +202,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             discoverQuery.setDSpaceObjectFilter(IndexableCommunity.TYPE);
             discoverQuery.addFilterQueries("-location.parent:*");
             discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
-            discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.asc);
+            discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.desc);
             discoverQuery.setMaxResults(pageable.getPageSize());
             DiscoverResult resp = searchService.search(context, discoverQuery);
             long tot = resp.getTotalSearchResults();

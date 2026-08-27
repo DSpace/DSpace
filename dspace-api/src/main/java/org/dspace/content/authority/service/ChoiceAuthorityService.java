@@ -17,6 +17,8 @@ import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.DSpaceControlledVocabularyIndex;
 
+import org.dspace.app.util.SubmissionConfigReaderException;
+
 /**
  * Broker for ChoiceAuthority plugins, and for other information configured
  * about the choice aspect of authority control for a metadata field.

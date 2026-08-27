@@ -312,7 +312,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
                 .withMimeType("application/octet-stream")
                 .withDescription("Description - updateAdminAccess")
-                .withSupportLevel(BitstreamFormat.SUPPORTED)
+                .withSupportLevel(BitstreamFormat.LIMITED)
                 .build();
         context.restoreAuthSystemState();
 

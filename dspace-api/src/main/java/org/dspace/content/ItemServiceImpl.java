@@ -95,7 +95,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemServiceImpl.class);
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -224,6 +224,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         return item;
     }
+
 
     @Override
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
@@ -638,10 +639,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public void withdraw(Context context, Item item) throws SQLException, AuthorizeException {
+    public void withdraw(Context context, Item item, String reason) throws SQLException, AuthorizeException {
         // Check permission. User either has to have REMOVE on owning collection
         // or be COLLECTION_EDITOR of owning collection
-        AuthorizeUtil.authorizeWithdrawItem(context, item);
+
+//        AuthorizeUtil.authorizeWithdrawItem(context, item);
+// Only allow sys admin to withdraw item.  UM Chnage
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "To withdraw item must be an SYTEM Admin to do this - UM Change");
+        }
+
 
         String timestamp = DCDate.getCurrent().toString();
 
@@ -671,6 +679,21 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
         addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
+
+        if (reason != null && !reason.isEmpty()) {
+          log.info("WITH:  the reason is =" + reason);
+          addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "withdrawalreason", "en", reason);
+        }
+
+        // To store the filename for display later.
+        clearMetadata(context, item, "dc", "description", "filename", Item.ANY);
+
+        // Find out the item's bitnames
+        List<String> bitnames = item.getFiles("ORIGINAL");
+        for (String bitname : bitnames) {
+            addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "filename", "en", bitname);
+        } 
+
 
         // Update item in DB
         update(context, item);
@@ -1016,6 +1039,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // if come from InstallItem: remove all submission/workflow policies
             authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_SUBMISSION);
             authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
+
+//UM Chnage I was trying out, but it screwed things up.  Leaving it here in case I need to revisit this issue, I'll have a starting point.
+//context.getCurrentUser()
+//Not sure this is available yet. item.getSubmitter()
+//        authorizeService.addPolicy(context, item, Constants.ADMIN, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+
 
             // add default policies only if not already in place
             addDefaultPoliciesNotInPlace(context, item, defaultCollectionPolicies);
@@ -1509,7 +1538,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 return true;
             }
             if (authorizeService.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
-                if (item.isDiscoverable()) {
+                if (item.isDiscoverable() && !item.isWithdrawn()) {
                     return true;
                 }
             }
@@ -1815,6 +1844,22 @@ prevent the generation of resource policy entry values with null dspace_object a
         for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
             orcidQueueService.delete(context, orcidQueueRecord);
         }
+    }
+
+
+    @Override
+    public int getMonthStat(Context context, String handle, String colldt, Boolean cumm) throws SQLException {
+       return itemDAO.getMonthStat(context, handle, colldt, cumm);
+    }
+
+    @Override
+    public String getCollDt(Context context, String handle) throws SQLException {
+       return itemDAO.getCollDt(context, handle);
+    }
+
+    @Override
+    public String findMaxCollDtFromStats(Context context) throws SQLException {
+       return itemDAO.findMaxCollDtFromStats(context);
     }
 
 }

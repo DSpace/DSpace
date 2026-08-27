@@ -172,6 +172,35 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         itemService.update(context, item);
 
+        boolean noDoi = context.getNoDoiStatus();
+
+        EPerson ep = item.getSubmitter();
+
+        String email = ep.getEmail();
+
+        log.info("DOI:  the submitter email ==> " + email);
+
+        //String nodoi_email = config.getProperty("nodoi.acmemail");
+
+        String nodoi_email = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("nodoi.email");
+
+        //String nodoi_email = "blancoj@umich.edu";
+
+
+        log.info("DOI:  acm email = " + nodoi_email);
+
+        if ( email.equals(nodoi_email) )
+        {
+           log.info("DOI:  no doi creation, this is a special case for ACM");
+
+            context.setNoDoiStatus (true);
+            noDoi= true;
+        }
+
+        // Put this here just for safety, but don't think it affects anything from my testing (UM Change)
+        log.info("DOI:  trying to create a DOI for the initial page");
+        if ( !noDoi ) {
+
         // If configured, register identifiers (eg handle, DOI) now. This is typically used with the Show Identifiers
         // submission step which previews minted handles and DOIs during the submission process. Default: false
         if (DSpaceServicesFactory.getInstance().getConfigurationService()
@@ -190,6 +219,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 log.error("Could not register identifier(s) for item {}: {}", item.getID(), e.getMessage());
             }
         }
+
+    }
+
+// You want to remove the uri from the item metadata, so it does not show up on the the item page.
+itemService.clearMetadata(context, item, "dc", "identifier", "uri", Item.ANY);
 
         workspaceItem.setItem(item);
 

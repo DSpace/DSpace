@@ -15,8 +15,8 @@ import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.dspace.app.rest.matcher.BitstreamFormatMatcher.matchBitstreamFormat;
 import static org.dspace.builder.BitstreamFormatBuilder.createBitstreamFormat;
 import static org.dspace.builder.ResourcePolicyBuilder.createResourcePolicy;
-import static org.dspace.content.BitstreamFormat.KNOWN;
-import static org.dspace.content.BitstreamFormat.SUPPORTED;
+import static org.dspace.content.BitstreamFormat.AS_IS_UNKNOWN;
+import static org.dspace.content.BitstreamFormat.LIMITED;
 import static org.dspace.core.Constants.DEFAULT_BITSTREAM_READ;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.core.Constants.WRITE;
@@ -158,14 +158,14 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                             .withMimeType("known test mime type")
                                             .withDescription("known test description")
                                             .withShortDescription("known test short description")
-                                            .withSupportLevel(KNOWN)
+                                            .withSupportLevel(LIMITED)
                                             .build();
 
         supportedFormat = createBitstreamFormat(context)
                 .withMimeType("supported mime type")
                 .withDescription("supported description")
                 .withShortDescription("supported short description")
-                .withSupportLevel(SUPPORTED)
+                .withSupportLevel(LIMITED)
                 .build();
 
         bitstream.setFormat(context, supportedFormat);

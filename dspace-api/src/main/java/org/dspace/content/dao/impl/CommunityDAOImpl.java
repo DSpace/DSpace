@@ -73,7 +73,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                                                 "from c.metadata internal " +
                                                 "where internal.metadataField = :sortField and" +
                                                     " internal.dSpaceObject = c.id)" +
-                                " ORDER BY LOWER(title.value)");
+                                " ORDER BY LOWER(title.value) DESC");
         Query query = createQuery(context, queryBuilder.toString());
         if (offset != null) {
             query.setFirstResult(offset);

@@ -19,11 +19,13 @@ public abstract class Operation {
     protected String op;
     protected String path;
     protected Object value;
+    protected String reason;
 
     public Operation(String operation, String path) {
         this.op = operation;
         this.path = path;
         this.value = null;
+        this.reason = null;
     }
 
     public Operation(String operation, String path, Object value) {
@@ -32,8 +34,19 @@ public abstract class Operation {
         this.value = value;
     }
 
+    public Operation(String operation, String path, Object value, String reason) {
+        this.op = operation;
+        this.path = path;
+        this.value = value;
+        this.reason = reason;
+    }
+
     public String getOp() {
         return op;
+    }
+
+    public String getReason() {
+        return reason;
     }
 
     public String getPath() {

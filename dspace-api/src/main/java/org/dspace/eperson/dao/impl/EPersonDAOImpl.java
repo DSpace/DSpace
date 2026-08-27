@@ -31,6 +31,14 @@ import org.dspace.eperson.EPerson_;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.EPersonDAO;
 
+//UM Change
+import java.math.BigInteger;
+//import org.hibernate.Query;
+
+
+import org.apache.logging.log4j.Logger;
+
+
 /**
  * Hibernate implementation of the Database Access Object interface class for the EPerson object.
  * This class is responsible for all database calls for the EPerson object and is autowired by Spring.
@@ -39,6 +47,9 @@ import org.dspace.eperson.dao.EPersonDAO;
  * @author kevinvandevelde at atmire.com
  */
 public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements EPersonDAO {
+
+private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonDAOImpl .class);
+
     protected EPersonDAOImpl() {
         super();
     }
@@ -201,7 +212,89 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
+    public List<EPerson> findProxiesForDepositor(Context context, UUID depositor_id) throws SQLException {
+
+        Query query = createQuery(context, "SELECT e FROM EPerson e  WHERE e.id in (SELECT p.ePerson_proxy from Proxies p WHERE p.ePerson_depositor = :depositor_id)");
+
+        query.setParameter("depositor_id", depositor_id);
+
+        return list(query);
+
+    }
+
+    @Override
+    public List <EPerson> findProxiesForDepositorInCollection(Context context, UUID depositor_id, String collection_handle) throws SQLException {
+
+
+        Query query = createQuery(context,  "SELECT e FROM EPerson e WHERE e.id in (SELECT p.ePerson_proxy FROM Proxies p WHERE p.ePerson_depositor = :depositor_id AND p.handle= :collection_handle)");
+        query.setParameter("depositor_id", depositor_id);
+        query.setParameter("collection_handle", collection_handle);
+
+        return list(query);
+    }
+
+    @Override
+    public List <EPerson> findProxiesForDepositorInCollectionByUUID(Context context, UUID depositor_id, String collectionUUID) throws SQLException {
+
+
+        Query query = createQuery(context,  "SELECT e FROM EPerson e WHERE e.id in (SELECT p.ePerson_proxy FROM Proxies p WHERE p.ePerson_depositor = :depositor_id AND p.uuid= :collectionUUID)");
+        query.setParameter("depositor_id", depositor_id);
+        query.setParameter("collectionUUID", collectionUUID);
+
+        return list(query);
+    }
+
+    @Override
+    public int countIndivStats(Context context, String email) throws SQLException {
+
+        org.hibernate.Query query = getHibernateSession(context).createSQLQuery("SELECT count(*) FROM individual_stats WHERE email=:email");
+        query.setParameter("email", email);
+
+        int value = ((BigInteger) query.uniqueResult()).intValue();
+
+        return value;
+
+    }
+
+    @Override
+    public void DeleteFromIndivStats(Context context, String email) throws SQLException {
+
+        Query query = getHibernateSession(context)
+            .createSQLQuery("DELETE FROM individual_stats WHERE email=:email");
+        query.setParameter("email", email);
+        query.executeUpdate();
+
+context.commit();
+
+        return;
+
+    }
+
+    @Override
+    public void AddIndivStats(Context context, String email) throws SQLException {
+
+        log.info("STATS: Frist part in DAO email ===>" + email);
+        //Query query = getHibernateSession(context).createSQLQuery("INSERT INTO umrestricted (item_id, release_date) VALUES (:item_id, :release_date)");
+        
+        javax.persistence.Query query = getHibernateSession(context).createSQLQuery("INSERT INTO individual_stats (email) VALUES (:email)");
+        //org.hibernate.Query query = getHibernateSession(context).createSQLQuery("INSERT INTO individual_stats (email) VALUES (:email)");
+
+        //Query query = createQuery(context,  "INSERT INTO individual_stats (email) VALUES (:email)");
+
+        query.setParameter("email", email);
+        query.executeUpdate();
+
+        // You need this or it will not work completely.
+        context.commit();
+
+        log.info("STATS: in DAO email ===>" + email);
+
+        return;
+    }
+
+    @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM EPerson"));
     }
+
 }

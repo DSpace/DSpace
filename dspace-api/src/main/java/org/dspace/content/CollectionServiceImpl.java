@@ -301,6 +301,23 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
+    public int IsSubscribedToStats(Context context, String collemail) throws SQLException {
+        return collectionDAO.IsSubscribedToStats(context, collemail);
+    }
+
+    @Override
+    public void DeleteEmailFromStats(Context context, String collemail) throws SQLException {
+        collectionDAO.DeleteEmailFromStats(context, collemail);
+        return;
+    }
+
+    @Override
+    public void InsertEmailFromStats(Context context, String collemail) throws SQLException {
+        collectionDAO.InsertEmailFromStats(context, collemail);
+        return;
+    }
+
+    @Override
     public List<Collection> findGroupMapped(Context context, int actionID) throws SQLException {
         List<Community> communities = communityService
             .findAuthorized(context, Arrays.asList(Constants.ADD, Constants.ADMIN));

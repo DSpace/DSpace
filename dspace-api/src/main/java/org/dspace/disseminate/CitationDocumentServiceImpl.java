@@ -189,8 +189,9 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
         fields = configurationService.getArrayProperty("citation-page.fields");
         if (fields == null || fields.length == 0) {
-            fields = new String[] {"dc.date.issued", "dc.title", "dc.creator", "dc.contributor.author",
-                "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
+            //fields = new String[] {"dc.date.issued", "dc.title", "dc.creator", "dc.contributor.author",
+            //    "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
+            fields = new String[]{"dc.date.issued", "dc.title", "dc.contributor.author",  "dc.identifier.doi", "dc.identifier.uri", "dc.rights.uri", "_line_"};
         }
 
         String footerConfig = configurationService.getProperty("citation-page.footer");
@@ -340,9 +341,9 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             PDFont fontHelveticaOblique = PDType1Font.HELVETICA_OBLIQUE;
             contentStream.setNonStrokingColor(Color.BLACK);
 
-            String[][] content = {header1};
-            drawTable(coverPage, contentStream, ypos, xpos, content, fontHelveticaBold, 11, false);
-            ypos -= (ygap);
+//            String[][] content = {header1};
+//            drawTable(coverPage, contentStream, ypos, xpos, content, fontHelveticaBold, 11, false);
+//            ypos -= (ygap);
 
             String[][] content2 = {header2};
             drawTable(coverPage, contentStream, ypos, xpos, content2, fontHelveticaBold, 11, false);
@@ -352,21 +353,21 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             contentStream.fill();
             contentStream.closeAndStroke();
 
-            String[][] content3 = {{getOwningCommunity(context, item), getOwningCollection(item)}};
-            drawTable(coverPage, contentStream, ypos, xpos, content3, fontHelvetica, 9, false);
-            ypos -= ygap;
+//            String[][] content3 = {{getOwningCommunity(context, item), getOwningCollection(item)}};
+//            drawTable(coverPage, contentStream, ypos, xpos, content3, fontHelvetica, 9, false);
+//            ypos -= ygap;
 
-            contentStream.addRect(xpos, ypos, xwidth, 1);
-            contentStream.fill();
-            contentStream.closeAndStroke();
+//            contentStream.addRect(xpos, ypos, xwidth, 1);
+//            contentStream.fill();
+//            contentStream.closeAndStroke();
             ypos -= (ygap * 2);
 
             for (String field : fields) {
                 field = field.trim();
                 PDFont font = fontHelvetica;
-                int fontSize = 11;
+                int fontSize = 16;
                 if (field.contains("title")) {
-                    fontSize = 26;
+                    fontSize = 24;
                     ypos -= ygap;
                 } else if (field.contains("creator") || field.contains("contributor")) {
                     fontSize = 16;
@@ -384,7 +385,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 }
 
                 if (field.contains("title")) {
-                    ypos -= ygap;
+//                    ypos -= ygap;
                 }
             }
 
