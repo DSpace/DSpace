@@ -4,6 +4,8 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:doc="http://www.lyncode.com/xoai"
 	version="1.0">
+	<xsl:include href="../templates/templates.xsl"/>
+
 	<xsl:output omit-xml-declaration="yes" method="xml" indent="yes" />
 	
 	<xsl:template match="/">
@@ -34,6 +36,18 @@
 			<!-- dc.contributor -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element/doc:field[@name='value']">
 				<dc:contributor><xsl:value-of select="." /></dc:contributor>
+			</xsl:for-each>
+			<!-- dc. subject ddc number -->
+			<xsl:for-each
+					select="doc:metadata/doc:element[@name='dc']/doc:element[@name='subject']/doc:element[@name='ddc']/doc:element/doc:field[@name='value']">
+				<xsl:variable name="ddcnumber">
+					<xsl:call-template name="find-ddc-recursively">
+						<xsl:with-param name="text" select="text()"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test="string-length(normalize-space($ddcnumber)) = 3">
+					<dc:subject>ddc:<xsl:value-of select="$ddcnumber"/></dc:subject>
+				</xsl:if>
 			</xsl:for-each>
 			<!-- dc.subject -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='subject']/doc:element/doc:field[@name='value']">
