@@ -1,0 +1,3395 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# For subjects;
+#  77 | Chemistry â\u0080\u0093 A European Journal
+# <dcvalue element="subject" qualifier="hlbtoplevel">Science'</dcvalue>
+# <dcvalue element="subject" qualifier="hlbsecondlevel">Chemistry</dcvalue>
+
+# 125 | Psychoâ\u0080\u0090Oncology
+# <dcvalue element="subject" qualifier="hlbtoplevel">Health Sciences</dcvalue>
+# <dcvalue element="subject" qualifier="hlbsecondlevel">Hematology and Oncology</dcvalue>
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use Encode;
+use utf8;
+use DBI;
+use File::Path;
+
+use LWP::Simple;
+use LWP::UserAgent;
+use Getopt::Std;
+
+#for funny character
+use Encode;
+
+########################################################################
+#    Here are somethings to check next time you run this program
+#    (remember to change -my $fileNumber = 'New1' for the new 
+#     batch to be uploaded from the wiley tar files.
+#     1.  I put some code to clean up the date date.issued not being 
+#         the right format.  This is in the routine: CreateDCValue
+#         make sure you step through this code and check the db
+#     2.  There is some special code to handle the missing jusbject.s\(
+#         Step through this code and check db. EnhanceSubjectHeadingsMore();
+#     3.  Theres is some code here that adds publisher information if we don't have 
+#         any.  Step through this code:  CreateDCValue.  Check db too.
+#     4.  Sometimes you will have duplicate pdf file.  This script will
+#         report these make sure you clean it up, before ingesting.
+#     5.  You can check that the date.issued vmalues are correct with the 
+#         following sql:
+#         select distinct value from WileyItems where batch='$fileNumber' and dc='date.issued';
+#         select distinct id from WileyItems where batch='$fileNumber and dc='subject.hlbtoplevel';
+#         select distinct id from WileyItems where batch='$fileNumber' and dc='subject.hlbsecondlevel';
+#         For the subject check, you'll want to make sure that you have at least a top level for every
+#         id in your batch.
+#         This is a sample sql to get the ids missing the subjects:
+#         select id, value from wileyitems where type='JO' and batch = 'NewAfterEmbargoFixNov13' and id in (select distinct id from WileyItems where batch='NewAfterEmbargoFixNov13' and id not in (select id from wileyitems where batch='NewAfterEmbargoFixNov13' and dc='subject.hlbtoplevel'));         
+#
+#
+#     6.  There is some logic to check that you will not prepare an item with a doi that already has been
+#         loaded.  print statements will show you if such items are found.  After you load the data in 
+#         deepblue, you will need to insert records indicating the (id,batch,handle, embargo) information into 
+#         the table wileyidbatchhandle.
+#
+########################################################################     
+
+
+######
+###
+### Good sight for utf8 chars:
+###   https://www.utf8-chartable.de/unicode-utf8-table.pl?unicodeinhtml=dec
+###
+######
+
+
+
+#######################
+### if you ever need to run the action = 'u' again, you need to remove the rows
+### for the batch in question in the followoing tables.
+###
+### WileyTarFiles
+### WileyFiles
+### WileyItems
+##$
+### so it would be for "where batch='NewAfterEmbargoFixOct22'"  for example 
+###
+##################
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+my $gBaseDataDir    = qq{/mnt/prep};
+
+
+my $gWileyFtpSite     = $ENV{'WILEY_FTP_SITE'};
+my $gWileyFtpUser     = $ENV{'WILEY_FTP_USER'};
+my $gWileyFtpPassword = $ENV{'WILEY_FTP_PASSWORD'};
+
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my %opts;
+getopts('a:', \%opts);
+
+#Always assume metadata Prefix is oai_id
+my $action            = $opts{'p'};
+
+my ( $month, $year ) = &GetPreviousMonthYear();
+
+
+#my $fileNumber = 'NewAfterEmbargoFixNov19';   
+my $fileNumber = qq{NewAfterEmbargoFix$month$year};   
+
+print "month = " . $month . "\n";
+print "year = " . $year . "\n";
+print "fileNumber = " . $fileNumber . "\n";
+print "Looks good (y/n)? ";
+my $go_on = <STDIN>;
+chop $go_on;
+if ( $go_on eq 'y' )
+  {
+    print "Going on..." ."\n";
+  }
+else
+  {
+    print "Task terminated..." ."\n";
+    exit;
+
+  }
+
+
+#my $fileNumber = 'NewAfterEmbargoFixNov19';
+my $action = 'p';
+if ( $action eq 'p' )
+  {
+    my $msg = qq{Preparering dir for import \n};
+    print $msg,"\n";
+  }
+elsif ( $action eq 'u' )
+  {
+    my $msg = qq{Pulling Data and Preparing database \n};
+    print $msg,"\n";
+  }
+else
+  {
+    my $msg = qq{action not supplied example -n [u|p]\n};
+    print $msg,"\n";
+    exit;
+  }
+
+
+#This was to check if items to be loaded is in Production on Dec 2013 when a whole bunch of 
+#items came in.  It may be useful in other cases.
+#&CompareData ();
+
+my $untar_files = 0;
+my $move_to_working = 0;
+my $create_db_metadata = 0;
+my $enhance_metadata = 0;
+my $prep_files_for_import = 0;
+my $get_ftp_files = 0;
+
+if ( $action eq 'u' )
+  {
+    $get_ftp_files = 1;
+    $untar_files = 1;
+    $move_to_working = 1;
+    $create_db_metadata = 1;
+    $enhance_metadata = 1;
+    $prep_files_for_import = 0;
+  }
+else  #It must be u - to to prepare the data and import it.
+  {
+    $get_ftp_files = 0;
+    $untar_files = 0;
+    $move_to_working = 0;
+    $create_db_metadata = 0;
+    $enhance_metadata = 0;
+    $prep_files_for_import = 1;
+  }
+
+my $id;
+
+
+my $gCollDir;
+my $gLogDir = qq{$gBaseDataDir/wiley};
+
+#Create a log file to keep track of errors.
+&CreateLogFile();
+
+#Set the client encoding to latin1, since that is the data that is being passed in.
+&SetEncoding();
+
+my $tar_data_dir    = qq{$gBaseDataDir/wiley/PeriodicUpdateScripts/data_raw_tar/$fileNumber};
+my $working_dir     = qq{$gBaseDataDir/wiley/PeriodicUpdateScripts/data_raw_tar/working};
+
+if ( $get_ftp_files )
+  {
+    &GetFtpFilesNew();
+  }
+
+if ( $untar_files )
+  {
+    &UntarDirectory( $tar_data_dir );
+  }
+
+if ( $move_to_working )
+  {
+    &MoveDataToNewWorkingDir ( $tar_data_dir, $working_dir );
+  }
+
+if ($create_db_metadata )
+  {
+    &CleanProcessTables();
+    &ProcessWileyDir ( $working_dir );
+    &CreateWileyMetadata ();
+  }
+
+if ( $enhance_metadata )
+  {
+
+    ############## --- involves intervention by me ------------------------------
+    #After EnhanceSubjectHeading.  Check if you have any items for this batch that
+    #do not have subject.hlb%, you should give Jim a list of the journals for which
+    #there were no subjects, and he will give you subjects, which you can then update
+    #the database with.  I think there is a routine for this in the prepare-wiley file
+    #used initially to get wiley ready.
+    
+    &EnhanceSubjectHeadings();
+
+    &EnhanceSubjectHeadingsMore();
+    
+  }
+
+my $gCount = 1;
+if ( $prep_files_for_import )
+  {
+
+    $gCollDir = qq{$gBaseDataDir/wiley/PeriodicUpdateScripts/data/$fileNumber-open};
+    &MakeRootDir();
+    
+    #Find out all the batches that have items that are scheduled to go into
+    #deepblue.
+    my @batches = &GetBatchesWithScheduledItems();
+
+    $gCount = 1;
+    foreach my $batch (@batches)
+    {
+      &PrepareCollection ( 'scheduled', $batch );
+    }    
+
+  }
+
+$dbhP->disconnect;
+
+exit;
+
+sub GetFtpFilesNew
+{
+  `rm $gBaseDataDir/wiley/PeriodicUpdateScripts/temp_ftp_dir/*`;
+
+  use Net::SFTP::Foreign;
+  print "retrieving file from seal\n";
+  my $ftpobj = Net::SFTP::Foreign->new($gWileyFtpSite,
+    user => $gWileyFtpUser,
+    password => $gWileyFtpPassword,
+    more => ['-o', 'StrictHostKeyChecking=no']
+  );
+
+  my @files = @{ $ftpobj->ls };
+  foreach my $file (@files)
+    {
+      my $target = qq{$gBaseDataDir/wiley/PeriodicUpdateScripts/temp_ftp_dir/$file->{filename}};
+      print $target . "\n";
+
+      if ( $target =~ m,.*zip$, )
+	{
+	  $ftpobj-> get($file->{filename}, $target) or print "put failed: " . $ftpobj->error;;
+	}
+    }
+
+  `rm -r $tar_data_dir`;
+  `rmdir $tar_data_dir`;
+  `mkdir $tar_data_dir`;
+  `mv $gBaseDataDir/wiley/PeriodicUpdateScripts/temp_ftp_dir/*.zip $tar_data_dir`;
+  
+}
+
+
+sub GetBatchesWithScheduledItems
+{
+
+    #only interested in the one for this iteration.
+    my $statement = qq{select distinct batch from WileyFiles where access='scheduled' and batch='$fileNumber'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @batches, @data );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @batches, $data[0] );
+    }
+    $sth->finish;
+    
+    return @batches;
+
+}
+
+
+sub CompareData
+{
+  my @doiHere = &GetDoiHere();
+  my $doiProd = &IsDoiInProdDbAlready ( @doiHere );
+
+  my $a;
+}
+
+sub GetDoiHere
+  {
+    my $statement = qq{select value from WileyItems where batch='$fileNumber' and dc='identifier.doi'};
+
+    my @dois;
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $tarloaded = 0;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      push (@dois, $data[0]);
+    }
+    $sth->finish;
+
+    return @dois;
+  }
+
+
+sub CleanProcessTables
+{
+  
+  #***********************************************************************************************
+  #*** Tables used for processing:  WileyItems
+  #***********************************************************************************************
+  my $statement = qq{delete from WileyFiles where batch = '$fileNumber'};
+  &ProcessSQL ( $statement );
+
+  my $statement = qq{delete from WileyItems where batch = '$fileNumber'};
+  &ProcessSQL ( $statement );
+
+}
+
+
+sub UntarDirectory
+  {
+    my ( $dir ) = @_;
+
+    #Get a list of all the tar files.
+    my $DirName = $dir;
+
+    my $basedir = $dir;
+    my $source = $basedir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @allitems;
+    foreach my $itemname (@testtems)
+    {
+        my $item = qq{$source/$itemname};
+        push (@allitems, $item);
+    }
+
+
+    my $FileCount = 1;
+    #Get a complete list of all directories.
+    my @listOfDirs;
+    foreach my $itemname (@allitems)
+    {
+        open  (FH, "<$itemname");
+	if ( not -d FH)
+        {
+	  if ($itemname =~ m,.*zip, )
+	    {
+	      if ( &TarHasBeenLoaded ( $itemname ) )
+		{}
+	      else
+		{
+		  `mkdir $source/$FileCount`;
+		  #`tar -xf $itemname -C $source/$FileCount`;
+		  `unzip $itemname -d $source/$FileCount`;
+		  $FileCount = $FileCount + 1;
+		  
+		  &ReportTarFile ( $itemname, $fileNumber );
+		}
+	    }
+
+        }
+        else  #it must be a directory
+        {
+
+        }
+        close(FH);
+    }
+
+  }
+
+sub TarHasBeenLoaded
+  {
+    my ( $tarfile ) = @_;
+    
+    $tarfile =~ s,.*\/(.*),$1,;
+
+    my $statement = qq{select filename from WileyTarFiles where filename='$tarfile'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $tarloaded = 0;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $tarloaded = 1;
+    }
+    $sth->finish;
+
+    return $tarloaded;
+
+  }
+
+sub ReportTarFile
+  {
+    my ( $tarfile, $batch ) = @_;
+
+    $tarfile =~ s,.*\/(.*),$1,;
+    
+    my $statement = qq{insert into WileyTarFiles values ( '$tarfile', '$batch' )};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+
+  }
+
+sub MoveDataToNewWorkingDir
+  {
+    my ( $dir, $working_dir ) = @_;
+
+    #Get a list of all the tar files.
+    my $DirName = $dir;
+
+    my $basedir = $dir;
+    my $source = $basedir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @allitems;
+    foreach my $itemname (@testtems)
+    {
+        if ( $itemname =~ m,[0-9]+$, )
+	  {
+	    my $item = qq{$source/$itemname};
+	    push (@allitems, $item);
+	  }
+    }
+
+    `rm -r $working_dir`;
+    `mkdir $working_dir`;
+    my $FileCount = 0;
+    #Get a complete list of all directories.
+    my @listOfDirs;
+    foreach my $itemname (@allitems)
+    {
+      opendir FH2, $itemname;
+      #avoid files with . and ..
+      my @allfilesTemp = grep !/^\.\.?$/, readdir FH2;
+      close(FH2);
+      my @itemsToAdd = &CompleteList($itemname, @allfilesTemp);
+      my @tempitems;
+      push (@tempitems, @itemsToAdd);
+      
+      my $count = $itemname;
+      $count =~ s,.*\/(.*),$1,s;
+	
+      `mkdir $working_dir/$count`;
+      foreach my $tempitem ( @tempitems )
+      {
+        open  (FH, "<$tempitem");
+	if ( not -d FH)
+	{
+	  $tempitem =~ s,\(,\\(,gs;
+	  $tempitem =~ s,\),\\),gs;
+	  $tempitem =~ s,\ ,\\ ,gs;
+	  if ($tempitem =~ m,.*xml, )
+	    {
+	      my $toGo = $tempitem;
+	      $toGo =~ s,.*/(.*),$1,;
+	      $toGo =~ s,\(,_,gs;
+	      $toGo =~ s,\),_,gs;
+	      $toGo =~ s,\ ,_,gs;
+
+	      `cp $tempitem $working_dir/$count/$toGo`;
+	    }
+	  elsif ($tempitem =~ m,.*pdf, )
+	    {
+	      my $toGo = $tempitem;
+	      $toGo =~ s,.*/(.*),$1,;
+	      $toGo =~ s,\(,_,gs;
+	      $toGo =~ s,\),_,gs;
+	      $toGo =~ s,\ ,_,gs;
+
+	      `cp $tempitem $working_dir/$count/$toGo`;
+	    }
+	  
+        }
+        else  #it must be a directory
+        {
+	  opendir FH2, $tempitem;
+	  #avoid files with . and ..
+	  my @allfilesTemp = grep !/^\.\.?$/, readdir FH2;
+	  close(FH2);
+	  my @itemsToAdd = &CompleteList($tempitem, @allfilesTemp);
+	  push (@tempitems, @itemsToAdd);
+        }
+        close(FH);
+      }
+    }
+    
+  }
+
+
+sub CompleteList
+{
+    my ($dir, @list) = @_;
+    
+    my @outdir;
+    
+    foreach my $item (@list)
+    {
+        my $outdir = qq{$dir/$item};
+        push (@outdir, $outdir);
+    }
+    return @outdir;
+}
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+  }
+
+
+sub ProcessWileyDir
+  {
+    my ( $dir ) = @_;
+
+    my $statement = qq{delete from WileyFiles where batch = '$fileNumber'};
+    &ProcessSQL ( $statement );
+
+    my $basedir = $dir;
+    my $source = $basedir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @idlist = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my $msg = qq{Getting a list of the files.\n};
+    print $msg;
+
+    my @allitems;
+    foreach my $itemname (@idlist)
+    {
+        my $item = qq{$source/$itemname};
+        push (@allitems, $item);
+    }
+
+    my $count = 0;
+    #Get a complete list of all directories.
+    my @listOfDirs;
+    my ( $textfile, $pdffile);
+    foreach my $itemname (@allitems)
+    {
+        opendir  FH, $itemname;
+	my @filelist = grep !/^\.\.?$/, readdir FH;
+	foreach my $file (@filelist)
+	  {
+	    if ( ( $file =~ m,.*\.xml, ) && ( $file ne 'control_file.xml' ) )
+	      {
+		$textfile = $file;
+	      }
+	    elsif ( $file ne 'control_file.xml' )  # it must be a pdf file.
+	      {
+		$pdffile .= qq{$file;};
+	      }
+	  }
+	&ReportToWileyDB ( $itemname, $textfile, $pdffile );
+	$textfile = '';
+	$pdffile ='';
+        close(FH);
+      }    
+  }
+
+
+sub CreateWileyMetadata
+  {
+
+  my $statement = qq{select id, basedir, textfile from WileyFiles where batch='$fileNumber' order by id};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $basedir, $id, $textfile, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $id           = $data[0];
+      $basedir      = $data[1];
+      $textfile     = $data[2];
+     
+      my $filename = qq{$basedir/$textfile};
+      my $buffer = &ReadFile ( $filename );
+
+      #Get the DOI, if we already have it, update wileyfiles to indicate this
+      #gie it an access of 'DoiAlreadyInDb'
+      #This way the item will not be loaded into Deep Blue more than once
+      my $doi_value = &GetDCValue ( '<publicationMeta level="unit".*?<doi.*?>', '</doi>', $buffer );
+      my @doi;
+      push ( @doi, $doi_value );
+      if ( &IsDoiInDbAlready ( @doi ) || &IsDoiInProdDbAlready ( @doi ) )
+      {
+	      my $statement = qq{update WileyFiles set access='DoiAlreadyInDb' where batch='$fileNumber' and id=$id};
+	      &ProcessSQL ( $statement );
+      }
+      &ReportToDB ( $id, 0, 'FULLDATA', 'null.null', $filename );
+      &CreateDCValue ( $id, $buffer );
+
+    }
+    $sth->finish;
+
+  }
+
+sub IsDoiInDbAlready
+  {
+    my ( @doi ) = @_;
+
+    my $DoiInDb = 0;
+    foreach my $value ( @doi )
+    {
+      my $statement = qq{select id, batch from WileyItems where value like '%$value' and type='ARTITCLE-DOI'};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+	      $DoiInDb = 1;
+	      my $msg = qq{DOI In wileyitems table in dspace-dev-30 db.\n};
+	      print $msg;
+      }
+      $sth->finish;
+    }
+
+    return $DoiInDb;
+
+  }
+
+sub IsDoiInProdDbAlready
+  {
+
+    my ( @doi ) = @_;
+
+    my $DoiInDb = 0;
+    foreach my $value ( @doi )
+    {
+      my $statement = qq{select metadata_value_id from metadatavalue where ( metadata_field_id = 84 or metadata_field_id = 25 ) and text_value like '%$value'};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+	      $DoiInDb = 1;
+	      my $msg = qq{DOI In $gDbName db.\n};
+	      print $msg;
+        $sth->finish; 
+        last;
+      }
+      $sth->finish;
+    }
+   
+
+    return $DoiInDb;
+
+  }
+
+sub CreateDCValue
+  {
+
+    my ( $id, $data ) = @_;
+
+    #Parse out the data
+    my $publisher = &GetDCValue ( '<publisherName>', '</publisherName>', $data );
+    &ReportToDB ( $id, 1, 'PU', 'publisher.none', $publisher );
+
+    #if wiley is not in the publisher
+    if ( $publisher =~ m,.*wiley.*,is )
+      {
+      }
+    else
+      {
+	      &ReportToDB ( $id, 1, 'PU', 'publisher.none', 'Wiley Periodicals, Inc.' );
+      }
+
+    if (( $id == 60 ) || ( $id == 154 ))
+      {
+	      my $a;
+      }
+
+
+    my $journalTitle = &GetDCValue ( '.*?<publicationMeta.*?>.*?<title.*?type="main".*?>', '</title>', $data );
+    &ReportToDB ( $id, 3, 'JO', 'identifier.source', $journalTitle );
+
+    my $identifierIssn = &GetDCValue ( '<issn type="print">', '</issn>', $data );
+    &ReportToDB ( $id, 4, '', 'identifier.issn', $identifierIssn );
+
+    my $identifierIssnOther = &GetDCValue ( '<issn type="electronic">', '</issn>', $data );
+    &ReportToDB ( $id, 5, '', 'identifier.issn', $identifierIssnOther );
+
+    #This has many valued
+    my $subjectOther = &GetSubjects ( $id, $data );
+
+    my $volume = &GetDCValue ( '<numbering type="journalVolume".*?>', '</numbering>', $data );
+    my $issue = &GetDCValue ( '<numbering type="journalIssue".*?>', '</numbering>', $data );
+
+    my $dateIssued = &GetDCValueFromAttribute ( 'coverDate', 'startDate', $data );
+    &ReportToDB ( $id, 8, 'PY', 'date.issued', $dateIssued );
+    my $yearpub = $dateIssued;
+    $yearpub =~ s,(.*?)\-.*,$1,si;
+
+    #There are two dois to keep.
+    #<doi origin="wiley" registered="yes">10.1002/jmri.22413</doi>
+    #<doi registered="yes">10.1002/(ISSN)1522-2586</doi>
+    #my $doi = &GetDCValue ( '<doi origin="wiley".*?>', '</doi>', $data );
+    #&ReportToDB ( $id, 9, 'DOI-ARTICLE', 'identifier.doi', $doi );
+
+    my $doi = &GetDCValue ( '<publicationMeta level="unit".*?<doi.*?>', '</doi>', $data );
+    &ReportToDB ( $id, 9, 'DOI-ARTICLE', 'identifier.doi', $doi );
+
+    my $firstPage = &GetDCValue ( '<numbering type="pageFirst">', '</numbering>', $data );
+    my $lastPage = &GetDCValue ( '<numbering type="pageLast">', '</numbering>', $data );
+
+    #Clean title data before passing it on
+    my $title = &GetDCValue ( '<contentMeta>.*?<title type="main".*?>', '</title>', $data );
+    my $test_title = $title;
+    $test_title =~ s, ,,gs;
+    $test_title =~ s,\,,,gs;
+    $test_title =~ s,\,,,gs;
+    $test_title =~ s,\-,,gs;
+    $test_title =~ s,\.,,gs;
+    $test_title =~ s,\(,,gs;
+    $test_title =~ s,\),,gs;
+    $test_title =~ s,\',,gs;
+    if ( $test_title eq uc $test_title )
+      {
+         if ( utf8::is_utf8($title) ) 
+         {
+           $title = lc( $title );
+           $title =~ s/\b(\w+)\b/ucfirst($1)/ge;
+         } 
+         else
+	       {
+           $title = lc(decode_utf8( $title ));
+           $title =~ s/\b(\w+)\b/ucfirst($1)/ge;
+	       }
+      }
+
+    &ReportToDB ( $id, 10, '', 'title.none', $title );
+
+    my $abstract = &GetDCValue ( '<abstractGroup>.*?<title type="main">Abstract</title>', '</abstractGroup>', $data );
+    #May need some cleaning up.  -check that.
+    &ReportToDB ( $id, 11, 'AB', 'description.abstract', $abstract );
+
+    my ( $authors ) = &GetAuthors ( $id, $data ); #Special processing for this one.
+
+    if ( $authors eq '' )
+      {
+	      my $msg = qq{NOT AUTHORS FOUND **************\n};
+	      print $msg;
+      }
+
+    &GetAffiliations ( $id, $data ); #Special processing for this one.
+
+    #Composed form the above.  Jim what about the relation.ispartofseries
+    my $citation = qq{$authors ($yearpub). "$title." $journalTitle $volume};
+    if ( ( $issue )  && ( $firstPage ) )
+    {
+       $citation .= qq{($issue): $firstPage-$lastPage.};
+    }
+    elsif ( ( $issue )  && (! $firstPage ) )
+    {
+       $citation .= qq{($issue).};
+    }
+    elsif ( ( $firstPage )  && ( ! $issue ) )
+    {
+       $citation .= qq{: $firstPage-$lastPage.};
+    }
+    else
+    {
+       $citation .= qq{.};
+    }
+    &ReportToDB ( $id, 99, 'PU', 'identifier.citation', $citation );
+
+
+    #citeRef goes here.
+    &GetCitedReferences ( $id, $data );
+
+    #This is a constant.
+    my $descriptionNone = 'Peer Reviewed';
+    &ReportToDB ( $id, 12, '', 'description.peerreviewed', $descriptionNone );
+
+    #Add type as Article
+    &ReportToDB ( $id, 99, '', 'type.none', 'Article' );
+
+    my $rightsRobots = 'IndexNoFollow';
+    &ReportToDB ( $id, 99, 'RIGHTS', 'rights.robots', 'IndexNoFollow' );
+
+  }
+
+sub GetCitedReferences
+  {
+    my ( $id, $data ) = @_;
+    
+    my $backup_data = $data;
+    my $authors;
+
+    #<author>; <author> (<pubYear>). "<articleTitle>" <journalTitle>, <vol>(<issue>): <pageFirst>-<pageLast>.
+
+    #<author>; <author> (<pubYear>). "<chapterTitle>" in <bookTitle>, <publisherName>: <pageFirst>-<pageLast>.
+
+
+    while ( $data =~ s,(<bib xml.*?>(.*?)</bib>),,si )
+    {
+      my $citation = $2;
+
+      if ( $citation =~ m,.*?<journal123Title>.*, )
+	{
+	  my $authors = &GetCitedAuthors( $citation );
+          my $pubYear = $citation;
+	  $pubYear =~ s,.*?<pubYear.*?>(.*?)<.*,$1,si;
+          my $articleTitle = $citation;
+	  $articleTitle =~ s,.*?<articleTitle.*?>(.*?)<.*,$1,si;
+          my $journalTitle = $citation;
+	  $journalTitle =~ s,.*?<journalTitle.*?>(.*?)<.*,$1,si;
+          my $vol = $citation;
+	  $vol =~ s,.*?<vol.*?>(.*?)<.*,$1,si;
+          my $issue;
+	  if ( $citation =~ m,.*?<issue.*?>(.*?)<.*, )
+	  {
+	    $issue = $citation;
+	    $issue =~ s,.*?<issue.*?>(.*?)<.*,$1,si;
+	  }
+          my $pageFirst = $citation;
+	  $pageFirst =~ s,.*?<pageFirst.*?>(.*?)<.*,$1,si;
+	  my $pageLast = $citation;
+	  $pageLast =~ s,.*?<pageLast.*?>(.*?)<.*,$1,si;
+
+          my $citedRef = qq{$authors ($pubYear). "$articleTitle." $journalTitle $vol};
+          if ( ( $issue )  && ( $pageFirst ) )
+          {
+            $citedRef .= qq{($issue): $pageFirst-$pageLast.};
+          }
+          elsif ( ( $issue )  && (! $pageFirst ) )
+          {
+            $citedRef .= qq{($issue).};
+          }
+          elsif ( ( $pageFirst )  && ( ! $issue ) )
+          {
+            $citedRef .= qq{: $pageFirst-$pageLast.};
+          }
+          else
+          {
+            $citedRef .= qq{.};
+          }
+
+	  &ReportToDB ( $id, 0, 'CR', 'identifier.citedreference', $citedRef );
+
+	}
+      elsif ( $citation =~ m,.*?<book123Title>.*, )
+	{
+	  my $authors = &GetCitedAuthors( $citation );
+          my $pubYear = $citation;
+	  $pubYear =~ s,.*?<pubYear.*?>(.*?)<.*,$1,si;
+          my $chapterTitle;
+          if ( $citation =~ m,.*?<chapterTitle.*?>(.*?)<.*, )
+          {
+             $chapterTitle = $citation;
+	     $chapterTitle =~ s,.*?<chapterTitle.*?>(.*?)<.*,$1,;
+          }
+          my $bookTitle = $citation;
+	  $bookTitle =~ s,.*?<bookTitle.*?>(.*?)<.*,$1,si;
+
+          my $vol;
+          if ( $citation =~ m,.*?<vol.*?>(.*?)<.*, )
+          {
+             $vol = $citation;
+	     $vol =~ s,.*?<vol.*?>(.*?)<.*,$1,;
+          }
+          my $pageFirst;
+          if ( $citation =~ m,.*?<pageFirst.*?>(.*?)<.*, )
+          {
+             $pageFirst = $citation;
+	     $pageFirst =~ s,.*?<pageFirst.*?>(.*?)<.*,$1,;
+          }
+
+
+	  my $pageLast;
+          if ( $citation =~ m,.*?<pageLast.*?>(.*?)<.*, )
+          {
+             $pageLast = $citation;
+	     $pageLast =~ s,.*?<pageLast.*?>(.*?)<.*,$1,;
+          }
+
+	  my $publisherName;
+          if ( $citation =~ m,.*?<publisherName.*?>(.*?)<.*, )
+          {
+             $publisherName = $citation;
+	     $publisherName =~ s,.*?<publisherName.*?>(.*?)<.*,$1,;
+          }
+
+          my $citedRef = qq{$authors ($pubYear). "$chapterTitle." in $bookTitle, $publisherName};
+          if ( $pageFirst )
+          {
+            $citedRef .= qq{:$pageFirst-$pageLast.};
+          }
+          else
+          {
+            $citedRef .= qq{.};
+          }
+
+	  &ReportToDB ( $id, 0, 'CR', 'identifier.citedreference', $citedRef );
+
+	}
+      else
+	{
+	  my $msg = qq{Check this one out.\n};
+	  #print $msg;
+	  
+	  $citation =~ s,\n,,gs;
+	  $citation =~ s,<label>.*</label>,,gsi;
+	  $citation =~ s,\r,,gs;
+	  $citation =~ s,\t, ,gs;
+	  $citation =~ s,<.*?>, ,gsi;
+	  #Now remove double space.
+	  $citation =~ s,[ ]+, ,gsi;
+	  $citation =~ s, \.,\.,gsi;
+	  $citation =~ s, \,,\,,gsi;
+	  $citation =~ s, \;,\;,gsi;
+	  $citation =~ s, \:,\:,gsi;
+	  
+	  #my $msg = qq{$citation\n};
+	  #print $msg;
+	  if ( $citation eq ' ' )
+	    {
+	      my $a;
+	    }
+	  else
+	    {
+	      &ReportToDB ( $id, 0, 'CR', 'identifier.citedreference', $citation );
+	    }
+
+	}
+
+    }
+
+  }
+
+
+sub GetDCValue
+  {
+    my ( $start, $end, $data ) = @_;
+    
+    if ( $data =~ m,.*?$start(.*?)$end.*,si )
+      {
+	$data =~ s,.*?$start(.*?)$end.*,$1,si;
+    
+	$data = &CleanupData ( $data );
+
+	return $data;
+      }
+    else 
+      {
+	return '';
+      }
+  }
+
+
+sub GetDCValueFromAttribute
+  {
+    my ( $tag, $attribute, $data ) = @_;
+    
+    if ( $data =~ m,.*?<$tag.*?$attribute="(.*?)".*,s )
+      {
+	$data =~ s,.*?<$tag.*?$attribute="(.*?)".*,$1,s;
+	return $data;
+      }
+    else
+      {
+	return '';
+      }
+  }
+
+
+sub GetWileyDOI
+  {
+    my ( $metadata ) = @_;
+
+    my $doi1 = $metadata;
+    if ( $doi1 =~ m,.*?<doi origin="wiley" registered="yes">.*?</doi>.*,si )
+      {
+	$doi1 =~ s,.*?<doi origin="wiley" registered="yes">(.*?)</doi>.*,$1,si;
+      }
+    else 
+      {
+	$doi1 ='';
+      }
+
+    my $doi2 = $metadata;
+    if ( $doi2 =~ m,.*?<doi registered="yes".*?>.*?</doi>.*,si )
+      {
+	$doi2 =~ s,.*?<doi registered="yes".*?>(.*?)</doi>.*,$1,si;
+      }
+    else 
+      {
+	$doi2 ='';
+      }
+
+    my @doi;
+    push ( @doi, $doi1);
+    push ( @doi, $doi2);
+
+
+    return @doi;
+
+  }
+
+sub GetCitedAuthors
+{
+  my ( $data ) = @_;
+
+    my $count = 1;
+    my $authors;
+    while ( $data =~ s,(<author>(.*?<familyName>.*?)</author>),,s )
+    {
+      my $author = $2;
+
+      my $LN = $author;
+      my $FN = $author;
+
+      $LN =~ s,.*?<familyName>(.*?)<.*,$1,si;
+      $FN =~ s,.*?<givenNames>(.*?)<.*,$1,si;
+      
+      my $final_author = qq{$LN, $FN};
+
+      my $test_author = $final_author;
+      $test_author =~ s, ,,gs;
+      $test_author =~ s,\,,,gs;
+      $test_author =~ s,\,,,gs;
+      $test_author =~ s,\-,,gs;
+      $test_author =~ s,\.,,gs;
+      $test_author =~ s,\(,,gs;
+      $test_author =~ s,\),,gs;
+      $test_author =~ s,\',,gs;
+
+      if ( $LN =~ m,^[A-Z][A-Z].*, )
+	{
+	  $final_author = &FixAuthor ( $final_author );
+	}
+      elsif ( $test_author =~ m,\W, )
+	{
+	  $final_author = &FixAuthor ( $final_author );
+	}
+
+      $authors .= qq{$final_author; };
+
+      $count = $count + 1;
+    }
+
+    $authors =~ s,(.*); ,$1,;
+    return $authors
+
+  }
+
+sub FixAuthor
+  {
+    my ( $old_author ) = @_;
+
+	#These never seem to be the case
+	if ( $old_author =~ m,Mc.*, )
+	  {
+	    my $a;
+	  }
+
+	if ( $old_author =~ m,Mac.*, )
+	  {
+	    my $a;
+	  }
+
+        if ( utf8::is_utf8($old_author) )
+	  {
+	   $old_author = lc( $old_author );
+	 }
+        else
+	  {
+	   $old_author = lc(decode_utf8( $old_author ));
+	  }
+
+	my $new_author;
+	my @names = split ( / /, $old_author );
+	foreach my $value ( @names )
+	{
+	  
+          # We will need a break point here  
+          $value =~ s,‐,-,gs;
+
+	  if ( $value =~ m,.*\-.*, )
+	  {
+	    #print $value . "\n";
+	    $value =~ s,(.*\-)(.*),$1\u$2,;
+	    #print $value . "\n\n";
+	    
+	  }
+	  if ( $value =~ m,.*\’.*, )
+	  {
+	    #print $value . "\n";
+	    $value =~ s,(.*\’)(.*),$1\u$2,;
+	    #print $value . "\n\n";
+	    
+	  }
+
+	  $new_author .= ucfirst($value) . " ";
+	}
+
+	$old_author = $new_author;
+
+        return $old_author;
+  }
+
+sub GetAuthors
+  {
+    my ( $id, $data ) = @_;
+    
+    my $backup_data = $data;
+    my $authors;
+
+    $data =~ s,.*?<creators>(.*)</creators>.*,$1,si;
+
+    my $count = 1;
+    while ( $data =~ s,(<creator.*?creatorRole=\"author\".*?>(.*?<familyName>.*?)</creator>),,si )
+    {
+      my $author = $2;
+
+      my $LN = $author;
+      my $FN = $author;
+
+      $LN =~ s,.*?<familyName>(.*?)<.*,$1,si;
+      $FN =~ s,.*?<givenNames>(.*?)<.*,$1,si;
+
+      my $final_author = qq{$LN, $FN};
+
+      my $test_author = $final_author;
+      $test_author =~ s, ,,gs;
+      $test_author =~ s,\,,,gs;
+      $test_author =~ s,\,,,gs;
+      $test_author =~ s,\-,,gs;
+      $test_author =~ s,\.,,gs;
+      $test_author =~ s,\(,,gs;
+      $test_author =~ s,\),,gs;
+      $test_author =~ s,\',,gs;
+ 
+
+      if ( $LN =~ m,^[A-Z][A-Z].*, )
+	{
+	  $final_author = &FixAuthor ( $final_author );
+	}
+      elsif ( $test_author =~ m,\W, )
+	{
+	  $final_author = &FixAuthor ( $final_author );
+	}
+      $author = qq{$final_author};
+      #Now you have the author and affiliation
+      &ReportToDB ( $id, $count, 'AU', 'contributor.author', $author );
+      
+      $authors .= qq{$author; };
+
+      $count = $count + 1;
+    }
+
+    $authors =~ s,(.*); ,$1,;
+    return $authors
+
+  }
+
+
+sub GetAuthorsOld
+  {
+    my ( $id, $data ) = @_;
+    
+    my $backup_data = $data;
+    my $authors;
+
+    $data =~ s,.*?<creators>(.*?)</creators>.*,$1,si;
+
+    my $count = 1;
+    while ( $data =~ s,(<creator.*?>(.*?<familyName>.*?)</creator>),,si )
+    {
+      my $author = $2;
+
+      my $LN = $author;
+      my $FN = $author;
+
+      $LN =~ s,.*?<familyName>(.*?)<.*,$1,si;
+      $FN =~ s,.*?<givenNames>(.*?)<.*,$1,si;
+
+      my $final_author = qq{$LN, $FN};
+
+      my $test_author = $final_author;
+      $test_author =~ s, ,,gs;
+      $test_author =~ s,\,,,gs;
+      $test_author =~ s,\,,,gs;
+      $test_author =~ s,\-,,gs;
+      $test_author =~ s,\.,,gs;
+      $test_author =~ s,\(,,gs;
+      $test_author =~ s,\),,gs;
+      $test_author =~ s,\',,gs;
+ 
+
+      if ( $LN =~ m,^[A-Z][A-Z].*, )
+	{
+	  $final_author = &FixAuthor ( $final_author );
+	}
+      elsif ( $test_author =~ m,\W, )
+	{
+	  $final_author = &FixAuthor ( $final_author );
+	}
+      $author = qq{$final_author};
+      #Now you have the author and affiliation
+      &ReportToDB ( $id, $count, 'AU', 'contributor.author', $author );
+      
+      $authors .= qq{$author; };
+
+      $count = $count + 1;
+    }
+
+    $authors =~ s,(.*); ,$1,;
+    return $authors
+
+  }
+
+sub GetSubjects
+  {
+    my ( $id, $data ) = @_;
+    
+    my $count = 1;
+    while ( $data =~ s,(<keyword .*?>(.*?)</keyword>),,si )
+    {
+      my $keyword = $2;
+      &ReportToDB ( $id, 6, '', 'subject.other', $keyword );
+    }
+  }
+
+
+sub GetAffiliations
+  {
+    my ( $id, $data ) = @_;
+    
+    my $count = 1;
+    while ( $data =~ s,(<unparsedAffiliation.*?>(.*?)</unparsedAffiliation>),,si )
+    {
+      my $all_aff = $2;
+
+      if ( $all_aff =~ m,.*University of Michigan.*,si )
+	    {
+	      &ReportToDB ( $id, $count, 'AU', 'contributor.affiliationum', $all_aff );
+	    }
+      else
+	    {
+	      &ReportToDB ( $id, $count, 'AU', 'contributor.affiliationother', $all_aff );
+	    }
+    }
+  }
+
+sub CleanupData
+  {
+    my ( $data ) = @_;
+
+    $data =~ s,<.*?>,tagtagjose,gs;
+    $data =~ s,tagtagjose,,gs;
+
+    # Basic Latin
+    $data =~ s,\?,\&\#63\;,gs;
+    $data =~ s,\&quot\;,\&\#34\;,gs;
+    $data =~ s,\&amp\;,\&\#38\;,gs;
+    $data =~ s,\&lt\;,\&\#60\;,gs;
+    $data =~ s,\&gt\;,\&\#62\;,gs;
+
+    #Latin-1 Supplement
+    $data =~ s,\&nbsp\;,\&\#160\;,gs;
+
+    #special for our collection
+    $data =~ s,\&blank\;,\&\#160\;,gs;
+
+    #special for our collection
+    $data =~ s,\&iexcla\;,\&\#161\;,gs;
+
+    $data =~ s,\&cent\;,\&\#162\;,gs;
+    $data =~ s,\&pound\;,\&\#163\;,gs;
+    $data =~ s,\&curren\;,\&\#164\;,gs;
+    $data =~ s,\&yen\;,\&\#165\;,gs;
+    $data =~ s,\&brvbar;,\&\#166\;,gs;
+    $data =~ s,\&sect\;,\&\#167\;,gs;
+    $data =~ s,\&uml;,\&\#168\;,gs;
+    $data =~ s,\&copy\;,\&\#169\;,gs;
+    $data =~ s,\&ordf\;,\&\#170\;,gs;
+    $data =~ s,\&laquo\;,\&\#171\;,gs;
+
+    $data =~ s,\&not\;,\&\#172\;,gs;
+    $data =~ s,\&shy\;,\&\#173\;,gs;
+    $data =~ s,\&reg\;,\&\#174\;,gs;
+    $data =~ s,\&macr\;,\&\#175\;,gs;
+    $data =~ s,\&deg\;,\&\#176\;,gs;
+    $data =~ s,\&plusmn\;,\&\#177\;,gs;
+    $data =~ s,\&sup2\;,\&\#178\;,gs;
+    $data =~ s,\&sup3\;,\&\#179\;,gs;
+    $data =~ s,\&acute\;,\&\#180\;,gs;
+    $data =~ s,\&micro\;,\&\#181\;,gs;
+    $data =~ s,\&para\;,\&\#182\;,gs;
+    $data =~ s,\&middot\;,\&\#183\;,gs;
+    $data =~ s,\&cedil\;,\&\#184\;,gs;
+    $data =~ s,\&sup1\;,\&\#185\;,gs;
+    $data =~ s,\&ordm\;,\&\#186\;,gs;
+    $data =~ s,\&raquo\;,\&\#187\;,gs;
+    $data =~ s,\&frac14\;,\&\#188\;,gs;
+    $data =~ s,\&frac12\;,\&\#189\;,gs;
+    $data =~ s,\&frac34\;,\&\#190\;,gs;
+    $data =~ s,\&iquest\;,\&\#191\;,gs;
+    $data =~ s,\&Agrave\;,\&\#192\;,gs;
+    $data =~ s,\&Aacute\;,\&\#193\;,gs;
+    $data =~ s,\&Acirc\;,\&\#194\;,gs;
+    $data =~ s,\&Atilde\;,\&\#195\;,gs;
+    $data =~ s,\&Auml\;,\&\#196\;,gs;
+    $data =~ s,\&Aring\;,\&\#197\;,gs;
+    $data =~ s,\&AElig,\&\#198\;,gs;
+    $data =~ s,\&Ccedil\;,\&\#199\;,gs;
+    $data =~ s,\&Egrave\;,\&\#200\;,gs;
+    $data =~ s,\&Eacute\;,\&\#201\;,gs;
+    $data =~ s,\&Ecirc\;,\&\#202\;,gs;
+    $data =~ s,\&Euml\;,\&\#203\;,gs;
+    $data =~ s,\&Igrave\;,\&\#204\;,gs;
+    $data =~ s,\&Iacute\;,\&\#205\;,gs;
+    $data =~ s,\&Icirc\;,\&\#206\;,gs;
+    $data =~ s,\&Iuml\;,\&\#207\;,gs;
+    $data =~ s,\&ETH\;,\&\#208\;,gs;
+    $data =~ s,\&Ntilde\;,\&\#209\;,gs;
+    $data =~ s,\&Ograve\;,\&\#210\;,gs;
+    $data =~ s,\&Oacute\;,\&\#211\;,gs;
+    $data =~ s,\&Ocirc\;,\&\#212\;,gs;
+    $data =~ s,\&Otilde\;,\&\#213\;,gs;
+    $data =~ s,\&Ouml\;,\&\#214\;,gs;
+    $data =~ s,\&times\;,\&\#215\;,gs;
+    $data =~ s,\&Oslash\;,\&\#216\;,gs;
+    $data =~ s,\&Ugrave\;,\&\#217\;,gs;
+    $data =~ s,\&Uacute\;,\&\#218\;,gs;
+    $data =~ s,\&Ucirc\;,\&\#219\;,gs;
+    $data =~ s,\&Uuml\;,\&\#220\;,gs;
+    $data =~ s,\&Yacute\;,\&\#221\;,gs;
+    $data =~ s,\&THORN\;,\&\#222\;,gs;
+    $data =~ s,\&szlig\;,\&\#223\;,gs;
+    $data =~ s,\&agrave\;,\&\#224\;,gs;
+    $data =~ s,\&aacute\;,\&\#225\;,gs;
+    $data =~ s,\&acirc\;,\&\#226\;,gs;
+    $data =~ s,\&atilde\;,\&\#227\;,gs;
+    $data =~ s,\&auml\;,\&\#228\;,gs;
+    $data =~ s,\&aring\;,\&\#229\;,gs;
+    $data =~ s,\&aelig\;,\&\#230\;,gs;
+    $data =~ s,\&ccedil\;,\&\#231\;,gs;
+    $data =~ s,\&egrave\;,\&\#232\;,gs;
+    $data =~ s,\&eacute\;,\&\#233\;,gs;
+    $data =~ s,\&ecirc\;,\&\#234\;,gs;
+    $data =~ s,\&euml\;,\&\#235\;,gs;
+    $data =~ s,\&igrave\;,\&\#236\;,gs;
+    $data =~ s,\&iacute\;,\&\#237\;,gs;
+    $data =~ s,\&icirc\;,\&\#238\;,gs;
+    $data =~ s,\&iuml\;,\&\#239\;,gs;
+    $data =~ s,\&eth\;,\&\#240\;,gs;
+    $data =~ s,\&ntilde\;,\&\#241\;,gs;
+    $data =~ s,\&ograve\;,\&\#242\;,gs;
+    $data =~ s,\&oacute\;,\&\#243\;,gs;
+    $data =~ s,\&ocirc\;,\&\#244\;,gs;
+    $data =~ s,\&otilde\;,\&\#245\;,gs;
+    $data =~ s,\&ouml\;,\&\#246\;,gs;
+    $data =~ s,\&divide\;,\&\#247\;,gs;
+    $data =~ s,\&oslash\;,\&\#248\;,gs;
+    $data =~ s,\&ugrave\;,\&\#249\;,gs;
+    $data =~ s,\&uacute\;,\&\#250\;,gs;
+    $data =~ s,\&ucirc\;,\&\#251\;,gs;
+    $data =~ s,\&uuml\;,\&\#252\;,gs;
+    $data =~ s,\&yacute\;,\&\#253\;,gs;
+    $data =~ s,\&thorn\;,\&\#254\;,gs;
+    $data =~ s,\&yuml\;,\&\#255\;,gs;
+
+    #Latin Extended-A
+    $data =~ s,\&OElig\;,\&\#338\;,gs;
+    $data =~ s,\&oelig\;,\&\#339\;,gs;
+    $data =~ s,\&Scaron\;,\&\#352\;,gs;
+    $data =~ s,\&scaron\;,\&\#353\;,gs;
+    $data =~ s,\&Yuml\;,\&\#376\;,gs;
+
+    #Latin Extended-B
+    $data =~ s,\&fnof\;,\&\#402\;,gs;
+    $data =~ s,\&circ\;,\&\#710\;,gs;
+    $data =~ s,\&tilde\;,\&\#732\;,gs;
+
+    #Greek
+    $data =~ s,\&Alpha\;,\&\#913\;,gs;
+    $data =~ s,\&Beta\;,\&\#914\;,gs;
+    $data =~ s,\&Gamma\;,\&\#915\;,gs;
+    $data =~ s,\&Delta\;,\&\#916\;,gs;
+    $data =~ s,\&Epsilon\;,\&\#917\;,gs;
+    $data =~ s,\&Zeta\;,\&\#918\;,gs;
+    $data =~ s,\&Eta\;,\&\#919\;,gs;
+    $data =~ s,\&Theta\;,\&\#920\;,gs;
+    $data =~ s,\&Iota\;,\&\#921\;,gs;
+    $data =~ s,\&Kappa\;,\&\#922\;,gs;
+    $data =~ s,\&Lambda\;,\&\#923\;,gs;
+    $data =~ s,\&Mu\;,\&\#924\;,gs;
+    $data =~ s,\&Nu\;,\&\#925\;,gs;
+    $data =~ s,\&Xi\;,\&\#926\;,gs;
+    $data =~ s,\&Omicron\;,\&\#927\;,gs;
+    $data =~ s,\&Pi\;,\&\#928\;,gs;
+    $data =~ s,\&Rho\;,\&\#929\;,gs;
+    $data =~ s,\&Sigma\;,\&\#931\;,gs;
+    $data =~ s,\&Tau\;,\&\#932\;,gs;
+    $data =~ s,\&Upsilon\;,\&\#933\;,gs;
+    $data =~ s,\&Phi\;,\&\#934\;,gs;
+    $data =~ s,\&Chi\;,\&\#935\;,gs;
+    $data =~ s,\&Psi\;,\&\#936\;,gs;
+    $data =~ s,\&Omega\;,\&\#937\;,gs;
+    $data =~ s,\&alpha\;,\&\#945\;,gs;
+    $data =~ s,\&beta\;,\&\#946\;,gs;
+    $data =~ s,\&gamma\;,\&\#947\;,gs;
+    $data =~ s,\&delta\;,\&\#948\;,gs;
+    $data =~ s,\&epsilon\;,\&\#949\;,gs;
+    $data =~ s,\&zeta\;,\&\#950\;,gs;
+    $data =~ s,\&eta\;,\&\#951\;,gs;
+    $data =~ s,\&theta\;,\&\#952\;,gs;
+    $data =~ s,\&iota\;,\&\#953\;,gs;
+    $data =~ s,\&kappa\;,\&\#954\;,gs;
+    $data =~ s,\&lambda\;,\&\#955\;,gs;
+    $data =~ s,\&mu\;,\&\#956\;,gs;
+    $data =~ s,\&nu\;,\&\#957\;,gs;
+    $data =~ s,\&xi\;,\&\#958\;,gs;
+    $data =~ s,\&omicron\;,\&\#959\;,gs;
+    $data =~ s,\&pi\;,\&\#960\;,gs;
+    $data =~ s,\&rho\;,\&\#961\;,gs;
+    $data =~ s,\&sigmaf\;,\&\#962\;,gs;
+    $data =~ s,\&sigma\;,\&\#963\;,gs;
+    $data =~ s,\&tau\;,\&\#964\;,gs;
+    $data =~ s,\&upsilon\;,\&\#965\;,gs;
+    $data =~ s,\&phi\;,\&\#966\;,gs;
+    $data =~ s,\&chi\;,\&\#967\;,gs;
+    $data =~ s,\&psi\;,\&\#968\;,gs;
+    $data =~ s,\&omega\;,\&\#969\;,gs;
+    $data =~ s,\&thetasym\;,\&\#977\;,gs;
+    $data =~ s,\&upsih\;,\&\#978\;,gs;
+    $data =~ s,\&piv\;,\&\#982\;,gs;
+
+    #General Punctuation
+    $data =~ s,\&ensp\;,\&\#8194\;,gs;
+    $data =~ s,\&emsp\;,\&\#8195\;,gs;
+    $data =~ s,\&thinsp\;,\&\#8201\;,gs;
+    $data =~ s,\&zwnj\;,\&\#8204\;,gs;
+    $data =~ s,\&zwj\;,\&\#8205\;,gs;
+    $data =~ s,\&lrm\;,\&\#8206\;,gs;
+    $data =~ s,\&rlm\;,\&\#8207\;,gs;
+    $data =~ s,\&ndash\;,\&\#8211\;,gs;
+    $data =~ s,\&mdash\;,\&\#8212\;,gs;
+    $data =~ s,\&lsquo\;,\&\#8216\;,gs;
+    $data =~ s,\&rsquo\;,\&\#8217\;,gs;
+    $data =~ s,\&sbquo\;,\&\#8218\;,gs;
+    $data =~ s,\&ldquo\;,\&\#8220\;,gs;
+    $data =~ s,\&rdquo\;,\&\#8221\;,gs;
+    $data =~ s,\&bdquo\;,\&\#8222\;,gs;
+    $data =~ s,\&dagger\;,\&\#8224\;,gs;
+    $data =~ s,\&Dagger\;,\&\#8225\;,gs;
+    $data =~ s,\&bull\;,\&\#8226\;,gs;
+    $data =~ s,\&hellip\;,\&\#8230\;,gs;
+    $data =~ s,\&permil\;,\&\#8240\;,gs;
+    $data =~ s,\&prime\;,\&\#8242\;,gs;
+    $data =~ s,\&Prime\;,\&\#8243\;,gs;
+    $data =~ s,\&lsaquo\;,\&\#8249\;,gs;
+    $data =~ s,\&rsaquo\;,\&\#8250\;,gs;
+    $data =~ s,\&oline\;,\&\#8254\;,gs;
+    $data =~ s,\&frasl\;,\&\#8260\;,gs;
+
+    #Currency Symbols
+    $data =~ s,\&euro\;,\&\#8364\;,gs;
+    $data =~ s,\&image\;,\&\#8465\;,gs;
+    $data =~ s,\&weierp\;,\&\#8472\;,gs;
+    $data =~ s,\&real\;,\&\#8476\;,gs;
+    $data =~ s,\&trade\;,\&\#8482\;,gs;
+    $data =~ s,\&alefsym\;,\&\#8501\;,gs;
+
+    #Arrows
+    $data =~ s,\&larr\;,\&\#8592\;,gs;
+    $data =~ s,\&uarr\;,\&\#8593\;,gs;
+    $data =~ s,\&rarr\;,\&\#8594\;,gs;
+    $data =~ s,\&darr\;,\&\#8595\;,gs;
+    $data =~ s,\&harr\;,\&\#8596\;,gs;
+    $data =~ s,\&crarr\;,\&\#8629\;,gs;
+    $data =~ s,\&lArr\;,\&\#8656\;,gs;
+    $data =~ s,\&uArr\;,\&\#8657\;,gs;
+    $data =~ s,\&rArr\;,\&\#8658\;,gs;
+    $data =~ s,\&dArr\;,\&\#8659\;,gs;
+    $data =~ s,\&hArr\;,\&\#8660\;,gs;
+
+    #Mathematical Operators
+    $data =~ s,\&forall\;,\&\#8704\;,gs;
+    $data =~ s,\&part\;,\&\#8706\;,gs;
+    $data =~ s,\&exist\;,\&\#8707\;,gs;
+    $data =~ s,\&empty\;,\&\#8709\;,gs;
+    $data =~ s,\&nabla\;,\&\#8711\;,gs;
+    $data =~ s,\&isin\;,\&\#8712\;,gs;
+    $data =~ s,\&notin\;,\&\#8713\;,gs;
+    $data =~ s,\&ni\;,\&\#8715\;,gs;
+    $data =~ s,\&prod\;,\&\#8719\;,gs;
+    $data =~ s,\&sum\;,\&\#8721\;,gs;
+    $data =~ s,\&minus\;,\&\#8722\;,gs;
+    $data =~ s,\&lowast\;,\&\#8727\;,gs;
+    $data =~ s,\&radic\;,\&\#8730\;,gs;
+    $data =~ s,\&prop\;,\&\#8733\;,gs;
+    $data =~ s,\&infin\;,\&\#8734\;,gs;
+    $data =~ s,\&ang\;,\&\#8736\;,gs;
+    $data =~ s,\&and\;,\&\#8743\;,gs;
+    $data =~ s,\&or\;,\&\#8744\;,gs;
+    $data =~ s,\&cap\;,\&\#8745\;,gs;
+    $data =~ s,\&cup\;,\&\#8746\;,gs;
+    $data =~ s,\&int\;,\&\#8747\;,gs;
+    $data =~ s,\&there4\;,\&\#8756\;,gs;
+    $data =~ s,\&sim\;,\&\#8764\;,gs;
+    $data =~ s,\&cong\;,\&\#8773\;,gs;
+    $data =~ s,\&asymp\;,\&\#8776\;,gs;
+    $data =~ s,\&ne\;,\&\#8800\;,gs;
+    $data =~ s,\&equiv\;,\&\#8801\;,gs;
+    $data =~ s,\&le\;,\&\#8804\;,gs;
+    $data =~ s,\&ge\;,\&\#8805\;,gs;
+    $data =~ s,\&sub\;,\&\#8834\;,gs;
+    $data =~ s,\&sup\;,\&\#8835\;,gs;
+    $data =~ s,\&nsub\;,\&\#8836\;,gs;
+    $data =~ s,\&sube\;,\&\#8838\;,gs;
+    $data =~ s,\&supe\;,\&\#8839\;,gs;
+    $data =~ s,\&oplus\;,\&\#8853\;,gs;
+    $data =~ s,\&otimes\;,\&\#8855\;,gs;
+    $data =~ s,\&perp\;,\&\#8869\;,gs;
+    $data =~ s,\&sdot\;,\&\#8901\;,gs;
+
+    #Miscellaneous Technical
+    $data =~ s,\&lceil\;,\&\#8968\;,gs;
+    $data =~ s,\&rceil\;,\&\#8969\;,gs;
+    $data =~ s,\&lfloor\;,\&\#8970\;,gs;
+    $data =~ s,\&rfloor\;,\&\#8971\;,gs;
+    $data =~ s,\&lang\;,\&\#9001\;,gs;
+    $data =~ s,\&rang\;,\&\#9002\;,gs;
+
+    #Geometric Shapes
+    $data =~ s,\&loz\;,\&\#9674\;,gs;
+
+    #Miscellaneous Symbols
+    $data =~ s,\&spades\;,\&\#9824\;,gs;
+    $data =~ s,\&clubs\;,\&\#9827\;,gs;
+    $data =~ s,\&hearts\;,\&\#9829\;,gs;
+    $data =~ s,\&diams\;,\&\#9830\;,gs;
+
+    #Special for our collection
+    $data =~ s,\&initzzz\;,1,gs;
+    $data =~ s,\&grdot\;,.,gs;
+    $data =~ s,\&dash\;,-,gs;
+    $data =~ s,\&plus\;,+,gs;
+    $data =~ s,\&nldr\;,..,gs;
+    $data =~ s,\&mldr\;,...,gs;
+    $data =~ s,\&hyphen\;,-,gs;
+    $data =~ s,\&slash\;,/,gs;
+    $data =~ s,\&lslash\;,l,gs;
+    $data =~ s,\&llslash\;,ll,gs;
+    $data =~ s,\&long-s\;,s,gs;
+    $data =~ s,\&ijlig\;,ij,gs;
+    $data =~ s,\&OEli\;,\&338\;,gs;
+    $data =~ s,\&esse\;,\&223\;,gs;
+    $data =~ s,\&esset\;,\&223\;,gs;
+    $data =~ s,\&szli\;,\&223\;,gs;
+    $data =~ s,\&grdquo\;,' ',gs;
+    $data =~ s,\&grsqu\;,' ',gs;
+    $data =~ s,\&inch\;,' ',gs;
+    $data =~ s,\&lcub\;,{,gs;
+    $data =~ s,\&ldqu\;,' ',gs;
+    $data =~ s,\&lsqu\;,`,gs;
+    $data =~ s,\&lsquor\;,`,gs;
+    $data =~ s,\&oeli\;,\&338;,gs;
+    $data =~ s,\&rcub\;,},gs;
+    $data =~ s,\&quest\;,\?,gs;
+    $data =~ s,\&rdqu\;,' ',gs;
+    $data =~ s,\&rdquo\;,\' ',gs;
+    $data =~ s,\&rsqu\;,\',gs;
+    $data =~ s,\&frac12\;,1/2,gs;
+    $data =~ s,\&frac13\;,1/3,gs;
+    $data =~ s,\&frac14\;,1/4,gs;
+    $data =~ s,\&frac15\;,1/5,gs;
+    $data =~ s,\&frac16\;,1/6,gs;
+    $data =~ s,\&frac18\;,1/8,gs;
+    $data =~ s,\&frac23\;,2/3,gs;
+    $data =~ s,\&frac25\;,2/5,gs;
+    $data =~ s,\&frac34\;,3/4,gs;
+    $data =~ s,\&frac35\;,3/5,gs;
+    $data =~ s,\&frac38\;,3/8,gs;
+    $data =~ s,\&frac58\;,5/8,gs;
+    $data =~ s,\&frac78\;,7/8,gs;
+    $data =~ s,\&cir\;,\&\#710\;,gs;
+    $data =~ s,\&angst\;,\&\#176\;,gs;
+
+    $data =~ s,\&dollar\;,\$,gs;
+    $data =~ s,\&lpar\;,(,gs;
+    $data =~ s,\&rpar\;,),gs;
+    $data =~ s,\&sol\;,/,gs;
+    $data =~ s,\&percnt\;,%,gs;
+    $data =~ s,\&lsqb\;,[,gs;
+    $data =~ s,\&rsqb\;,],gs;
+    $data =~ s,\&muml\;,M,gs;
+    $data =~ s,\&apos\;,',gs;
+    $data =~ s,\&equals\;,=,gs;
+    $data =~ s,\&mgr\;,&#x03bc;,gs;
+    $data =~ s,\&ccirc\;,&#x0109;,gs;
+    $data =~ s,\&Ccirc\;,&#x0108;,gs;
+    $data =~ s,\&thetas\;,&#x03b8;,gs;
+    $data =~ s,\&ocaron\;,&#x01d2;,gs;
+    $data =~ s,\&Ocaron\;,&#x01d1;,gs;
+    $data =~ s,\&ggr\;,&#x03b3;,gs;
+    $data =~ s,\&lsim\;,&#x2272;,gs;
+    $data =~ s,\&ell\;,&#x2113;,gs;
+    $data =~ s,\&Zcaron\;,&#x17e;,gs;
+    $data =~ s,\&starf\;,&#x2605;,gs;
+    $data =~ s,\&Ggr\;,&#x0393;,gs;
+    $data =~ s,\&num\;,#,gs;
+    $data =~ s,\&dgr\;,&#x03b4;,gs;
+    $data =~ s,\&Dgr\;,&#x03b4;,gs;
+    $data =~ s,\&egr\;,&#x03b5;,gs;
+    $data =~ s,\&agr\;,&#x03b1;,gs;
+    $data =~ s,\&zgr\;,&#x03b6;,gs;
+    $data =~ s,\&eegr\;,&#x03b7;,gs;
+    $data =~ s,\&thgr\;,&#x03b8;,gs;
+    $data =~ s,\&igr\;,&#x03b9;,gs;
+    $data =~ s,\&kgr\;,&#x03ba;,gs;
+    $data =~ s,\&lgr\;,&#x03bb;,gs;
+
+
+    $data =~ s,\&xgr\;,&#x03be;,gs;
+    $data =~ s,\&ogr\;,&#x03bf;,gs;
+    $data =~ s,\&pgr\;,&#x03c0;,gs;
+    $data =~ s,\&rgr\;,&#x03c1;,gs;
+    $data =~ s,\&sgr\;,&#x03c3;,gs;
+    $data =~ s,\&sfgr\;,&#x03c2;,gs;
+    $data =~ s,\&tgr\;,&#x03c4;,gs;
+    $data =~ s,\&ugr\;,&#x03c5;,gs;
+    $data =~ s,\&phgr\;,&#x03c6;,gs;
+    $data =~ s,\&khgr\;,&#x03c7;,gs;
+    $data =~ s,\&psgr\;,&#x03c8;,gs;
+    $data =~ s,\&ohgr\;,&#x03c9;,gs;
+    $data =~ s,\&bond\;,[bond],gs;
+    $data =~ s,\&dbond\;,[bouble bond],gs;
+    $data =~ s,\&ast\;,*,gs;
+    $data =~ s,\&ldquor\;,',gs;
+    $data =~ s,\&rdquor\;,',gs;
+    $data =~ s,\&commat\;,@,gs;
+    $data =~ s,\&ges\;,ges;,gs;
+
+    $data =~ s,\&emsp14\;,&#x2003;14,gs;
+
+    $data =~ s,\&epsis\;,&#x03b5;,gs;
+    $data =~ s,\&ominus\;,&#x2296;,gs;
+    $data =~ s,\&phis\;,&#x03c6;,gs;
+    $data =~ s,\&bgr\;,&#x03b2;,gs;
+    $data =~ s,\&rlarr2\;,&#x21c4;,gs;
+    $data =~ s,\&dot\;,&#x02d9;,gs;
+    $data =~ s,\&Mmacr\;,M&#x00af;,gs;
+    $data =~ s,\&half\;,&#x00bd;,gs;
+    $data =~ s,\&Sbreve\;,S&#x00d8;,gs;
+    $data =~ s,\&epsi\;,&#x03b5;,gs;
+    $data =~ s,\&ap\;,&#x2248;,gs;
+    $data =~ s,\&btilde\;,b&#x02dc;,gs;
+    $data =~ s,\&ohacgr\;,&#x03ce;,gs;
+    $data =~ s,\&OHacgr\;,&#x038f;,gs;
+    $data =~ s,\&eng\;,&#x014b;,gs;
+    $data =~ s,\&ENG\;,&#x014a;,gs;
+
+    $data =~ s,\&Vdot\;,V&#x02d9;,gs;
+    $data =~ s,\&Qdot\;,Q&#x02d9;,gs;
+    $data =~ s,\&fcirc\;,f&#x005e;,gs;
+    $data =~ s,\&Xmacr\;,X&#x00af;,gs;
+    $data =~ s,\&ccaron\;,&#x010d;,gs;
+    $data =~ s,\&cacute\;,&#x0107;,gs;
+    $data =~ s,\&cross\;,&#x2717;,gs;
+
+    $data =~ s,\&odot\;,&#x2299;,gs;
+    $data =~ s,\&Odot\;,&#x2299;,gs;
+    $data =~ s,\&lstrok\;,&#x0142;,gs;
+    $data =~ s,\&Lstrok\;,&#x0141;,gs;
+    $data =~ s,\&Sacute\;,&#x015A;,gs;
+    $data =~ s,\&sacute\;,&#x015B;,gs;
+
+    $data =~ s,\&zdot\;,&#x017C;,gs;
+    $data =~ s,\&Zdot\;,&#x017B;,gs;
+    $data =~ s,\&sdot\;,&#x22C5;,gs;
+    $data =~ s,\&Sdot\;,&#x22C5;,gs;
+    $data =~ s,\&gsim\;,&#x2273;,gs;
+    $data =~ s,\&Gsim\;,&#x2273;,gs;
+
+    $data =~ s,\&sime\;,&#x2243;,gs;
+
+    $data =~ s,\&les\;,&#60;,gs;
+    $data =~ s,<,&#60;,gs;
+    $data =~ s,>,&#62;,gs;
+
+
+    $data =~ s,\&acedil\;,a,gs;
+
+    #This gets rid of funny control characters.
+    $data =~ s,\\,,gs;
+
+    $data =~ s,\n,,gs;
+    $data =~ s,\t,,gs;
+    $data =~ s,\r,,gs;
+    #$data =~ s,&#x08;,,gs;
+
+    if ( $data =~ m,(\&\w), )
+    {
+       my $a;
+    }
+
+    print $data . "\n";
+
+    return $data;
+    
+  }
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FHFILE, "<$fileName";
+    binmode FHFILE;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FHFILE, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FHFILE;
+    
+    return $buffer;
+}
+
+
+sub SetEncoding
+{
+  #my $statement = qq{set client_encoding to 'sql_ascii'};
+  #What was here.
+  #my $statement = qq{set client_encoding to 'latin1'};
+  my $statement = qq{set client_encoding to 'UTF8'};
+  
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  $sth->finish;
+}
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+}
+
+
+sub FixDate
+  { 
+    my ( $value ) = @_;
+
+    print $value;
+    print " ";
+
+    my @data = split ( /\//, $value );
+    
+    $value = $data[0];
+    if ( $data[1] < 10 )
+    {
+	    if ( $data[1] )
+	    {
+	      $value .= qq{/0$data[1]};
+	    }
+    }
+    else 
+    {
+	    $value .= qq{/$data[1]};
+    }
+
+    if ( $data[2] < 10 )
+    {
+	    if ( $data[2] )
+	    {
+	      $value .= qq{/0$data[2]};
+	    }
+    }
+    else
+    {
+	    $value .= qq{/$data[2]};
+    }
+
+    print $value;
+    print " ";
+    return $value;
+
+  }
+
+sub ReportToWileyDB
+  {
+    my ( $basedir, $textfile, $pdffile ) = @_;
+    
+    my $id = $basedir;
+    $id =~ s,.*\/(.*),$1,s;
+    if ( $id == 10 )
+      {
+	      my $a;
+      }
+    my $statement = qq{insert into WileyFiles values ( $id, '$basedir', '$textfile', '$pdffile', '$fileNumber', 'scheduled')};
+    
+    print $statement . "\n";
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+
+  }
+
+
+sub ReportToDB
+  {
+    my ( $id, $count, $type, $dublincore, $value ) = @_;
+
+    # To test next time
+
+    unless ( utf8::is_utf8($value) ) 
+    {
+      $value = decode_utf8( $value );
+    }
+    # So that we catch this bad char for every metadata before it makes it to the db
+    # Once in db, I could not find a way to get rid off it.
+    $value =~ s,‐,-,gs;
+
+    my $test = $value;
+
+    my $a = &CleanupData ( $value );
+
+    print $a . "\n";
+
+    $value = &CleanupData ( $value );
+    
+    #I was getting an erro with the old way to do it.
+    #DBD::Pg::st execute failed: execute called with an unbound placeholder at 
+    #$value =~ s,\',\\',gs;
+
+    $value =~ s,\',&#x2019;,gs;
+
+    #print $value . "\n";
+
+    #This was put in for an error I was trying to track down.
+    if ( $value =~ m,.*Heureux.*, )
+    {
+	    my $a= 1;
+	    #$value =~ s,\\',&#x2019;,gs;
+      #$value =~ s,(.*/A):(.*),$1$2,;
+    }
+
+    if ( $value )
+    {
+      my $statement = qq{insert into WileyItems (id, count, type, dc, value, batch) values (  $id, $count, '$type', '$dublincore', E'$value', '$fileNumber' )};
+    
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      $sth->finish;
+    }
+  }
+
+
+sub GetFileName
+{
+  my ( $id, $batch ) = @_;
+
+    my $statement = qq{select pdffile from WileyFiles where batch='$batch' and id = $id};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $fileName, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $fileName = $data[0];
+    }
+    $sth->finish;
+    
+    if ( $fileName )
+    {
+      $fileName =~ s,\;,\n,gs;
+      $fileName =~ s,(.*)\n,$1,s;
+    }
+
+    return $fileName;
+  
+}
+
+sub GetTodaysDate
+{
+  my $newtime = scalar localtime(time());
+  my $year = substr($newtime, 20, 4);
+  my %months = (
+		"Jan" => "01",
+		"Feb" => "02",
+		"Mar" => "03",
+		"Apr" => "04",
+		"May" => "05",
+		"Jun" => "06",
+		"Jul" => "07",
+		"Aug" => "08",
+		"Sep" => "09",
+		"Oct" => "10",
+		"Nov" => "11",
+		"Dec" => "12",
+	       );
+  my $month = $months{substr ($newtime,4, 3)};
+  my $day = substr($newtime, 8, 2);
+  $day =~ s, ,0,g;
+
+  my $responseDate = $year . "/" . $month . "/" . $day;
+    
+  return $responseDate;
+}
+
+
+sub GetEmbargoDate
+{
+  my ( $dateIssued ) = @_;
+
+  my $year = $dateIssued;
+  if ( $year =~ m,(.*?)\/.*, )
+  { 
+     $year =~ s,(.*?)\/.*,$1,;
+     $year = $year + 1;
+     $dateIssued =~ s,.*?\/(.*),$year/$1,;
+  }
+  elsif ( $year =~ m,(.*?)\-.*, )
+  { 
+     $year =~ s,(.*?)\-.*,$1,;
+     $year = $year + 1;
+     $dateIssued =~ s,.*?\-(.*),$year/$1,;
+  }
+  else
+  {
+    $dateIssued = $dateIssued + 1;;
+  }
+
+  return $dateIssued;
+}
+
+sub GetTodayMinusOneYearDate
+{
+  my $newtime = scalar localtime(time());
+  my $year = substr($newtime, 20, 4);
+  $year = $year - 1;
+  my %months = (
+		"Jan" => "01",
+		"Feb" => "02",
+		"Mar" => "03",
+		"Apr" => "04",
+		"May" => "05",
+		"Jun" => "06",
+		"Jul" => "07",
+		"Aug" => "08",
+		"Sep" => "09",
+		"Oct" => "10",
+		"Nov" => "11",
+		"Dec" => "12",
+	       );
+  my $month = $months{substr ($newtime,4, 3)};
+  my $day = substr($newtime, 8, 2);
+  $day =~ s, ,0,g;
+
+  my $responseDate = $year . "/" . $month . "/" . $day;
+    
+  return $responseDate;
+    
+}
+
+
+sub GetTodayMinusHalfYearDate
+{
+  my $newtime = scalar localtime(time() - (86400 * 185 ));
+  my $year = substr($newtime, 20, 4);
+  my %months = (
+		"Jan" => "01",
+		"Feb" => "02",
+		"Mar" => "03",
+		"Apr" => "04",
+		"May" => "05",
+		"Jun" => "06",
+		"Jul" => "07",
+		"Aug" => "08",
+		"Sep" => "09",
+		"Oct" => "10",
+		"Nov" => "11",
+		"Dec" => "12",
+	       );
+  my $month = $months{substr ($newtime,4, 3)};
+  my $day = substr($newtime, 8, 2);
+  $day =~ s, ,0,g;
+
+  my $responseDate = $year . "/" . $month . "/" . $day;
+    
+  return $responseDate;
+    
+}
+
+sub GetTodayMinusNineMonthsDate
+{
+  my $newtime = scalar localtime(time() - (86400 * 275 ));
+  my $year = substr($newtime, 20, 4);
+  my %months = (
+		"Jan" => "01",
+		"Feb" => "02",
+		"Mar" => "03",
+		"Apr" => "04",
+		"May" => "05",
+		"Jun" => "06",
+		"Jul" => "07",
+		"Aug" => "08",
+		"Sep" => "09",
+		"Oct" => "10",
+		"Nov" => "11",
+		"Dec" => "12",
+	       );
+  my $month = $months{substr ($newtime,4, 3)};
+  my $day = substr($newtime, 8, 2);
+  $day =~ s, ,0,g;
+
+  my $responseDate = $year . "/" . $month . "/" . $day;
+    
+  return $responseDate;
+    
+}
+
+sub PrepareCollection
+{
+   my ( $access, $batch ) = @_;
+
+   my $OpenDate = &GetTodayMinusOneYearDate();
+
+   my $statement = qq{select distinct id  from WileyFiles where access='$access' and batch='$batch'  order by id};
+   
+   my $sth = $dbhP->prepare($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+   
+   # Read the matching records and print them out
+   $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+
+   my ( $id, @data );
+   while (@data = $sth->fetchrow_array()) {
+     $id                = $data[0];
+
+     my @doi = &GetDoi ( $id, $batch );
+     if ( &DoiHasBeenLoaded ( @doi ) )
+     {
+	     my $msg = qq{id=$id, batch=$batch with doi=@doi already loaded.\n};
+       print $msg;
+     }
+     else
+     {
+	     my $dateIssued = &GetDateIssued ( $id, $batch );
+	     my $embargovalue = &GetEmbargoValue2 ( $dateIssued );
+	     my $dcData   = &GetMetadataForTheItem ( $id, $batch );
+       if ( $embargovalue )
+	     {
+	       $dcData =~ s,(.*)(\<\/dublin_core\>.*),$1<dcvalue element="date" qualifier="available">$embargovalue</dcvalue>\n$2,gs;
+	     }
+       my $license = qq{By depositing a Work into Deep Blue Documents (the Repository):
+
+I hereby grant to the Regents of the University of Michigan a non-exclusive license to:
+
+  retain, reproduce, display, perform, and distribute the Work in whole or in part, including its abstract and descriptive information in and from its electronic format;
+  keep more than one copy of the Work for purposes of security, back-up, preservation, and/or access;
+  copy, convert, remediate, or migrate the Work to any medium or format for the purpose of accessibility;
+  allow others to access, view, and download the Work, unless access restrictions are in place;
+  and enhance descriptive information about the Works to support access.
+
+These Terms of Deposit do not transfer copyright to the University of Michigan or others.
+
+I represent and warrant to the University of Michigan that:
+
+  the Work is my original work and does not, to the best of my knowledge, infringe or violate the law or any rights of others.
+  the Work deposited was produced or sponsored by a University of Michigan affiliate or unit.
+  the Work can be made publicly available, unless specific access restrictions are requested from the Repository prior to the time of deposit.
+  I have obtained all necessary rights or permissions to permit the University of Michigan to retain, reproduce, display, perform, and distribute the Work and that any third-party content is clearly identified and acknowledged within the Work.
+  I have made my Work as accessible as possible, per Deep Blue Documents requirements for creating accessible Works.
+
+The Repository will:
+  collaborate with authors or their designee to allow Works to be added to, replaced, or removed, to comply with subsequent changes to a Work's access policy or to reflect a revision to the Work;
+  retain a descriptive record of any modifications to a Work;
+  obtain express written permission from the author or their designee to use the Work for any commercial purpose;
+  continue to hold Works unless individual copyright holders request removal or access restriction, including in the event of the dissolution of a research group, center, institute, or any other unit at University of Michigan;
+  continue to hold jointly authored Works as is until all copyright holders jointly request a change in whether or how their Work is represented in the Repository;
+  where appropriate, remove and transfer content to the control of the University Archives.
+
+By granting this license, I acknowledge that I have read and agreed to the Terms of Deposit and all related Deep Blue Documents and University of Michigan policies.
+
+If I’m a proxy depositing on behalf of a University of Michigan affiliate, in addition to the standard Terms above, note that the following Terms apply:
+  I represent and warrant that the affiliate has granted me the authority to deposit a Work on their behalf;
+  I have notified the affiliate of these Terms of Deposit and they have agreed to them.
+
+If I’m requesting a batch deposit of Works into Deep Blue Documents, in addition to the standard Terms above, note that the following Terms apply:
+
+In this situation, a designee, not one of the authors, will prepare the Works for batch deposit and the Deep Blue Documents staff member will upload the batch of Works into Deep Blue Documents.
+
+  I represent and warrant that at least one author of each Work has granted me the authority to prepare the Work for deposit and granted Deep Blue Documents staff the authority to deposit the Work into the Repository;
+  I have notified at least one of the authors of these Terms of Deposit and they have agreed to them;
+  For Works where I cannot get this agreement from one of the authors (such as when Works are entrusted or gifted to a University of Michigan department, unit, institute, etc.), I represent and warrant that making these Works available in the Repository is an appropriate and acceptable extension of its agreement with the originating unit or person, including providing public access to these Works.};
+
+	     my $fileName  = &GetFileName ( $id, $batch );
+	     my $contents = qq{$fileName\nlicense.txt};      
+     
+	     #Only write item if we have  pdf file.
+	     if ( $fileName )
+	     {	
+	       my $msg= qq{id=$id batch=$batch count=$gCount \n};
+	       print $msg;
+	       &MakeItemDir ( $id );	  
+	       &PutDCData   ( $id, $dcData );
+	     
+	       &PutPdfFile  ( $id, $batch, $fileName );
+	       $contents = qq{$fileName\nlicense.txt};
+	     
+	       &PutLicense  ( $id, $license );
+	       &PutContents ( $id, $contents );
+	     
+	       #Since item is being placed for open access, and is no 
+	       #longer scheduled, mark it as open.
+	       &MarkItemAsOpen ( $batch, $id );
+	       $gCount = $gCount + 1;   
+	     }
+     }
+   }
+   $sth->finish;
+}
+
+
+sub GetEmbargoValue 
+{
+  my ( $dateIssued ) = @_;
+
+  my $msg = qq{DateIssued: $dateIssued \n};
+  print $msg;
+
+  my $TodayMinusHalfYear = &GetTodayMinusHalfYearDate ();
+  my $TodayMinusNineMonths = &GetTodayMinusNineMonthsDate ();
+
+  my $embargoStatus;
+  if ( $dateIssued le $TodayMinusNineMonths )
+    {
+      $embargoStatus = qq{WITHHELD_THREE_MONTHS};
+    }
+  elsif ( $dateIssued le $TodayMinusHalfYear )
+    { 
+      $embargoStatus = qq{WITHHELD_HALF_YEAR};
+    }
+  else 
+    {
+      $embargoStatus = qq{WITHHELD_ONE_YEAR};
+    }
+
+  my $msg = qq{DateIssued ($embargoStatus): $dateIssued \n};
+  print $msg;
+
+  return $embargoStatus;
+
+}
+
+
+sub GetEmbargoValue2 
+{
+  my ( $dateIssued ) = @_;
+
+  my $msg = qq{DateIssued: $dateIssued \n};
+  print $msg;
+
+  if ( $dateIssued eq '2008' )
+    {
+      my $a;
+    }
+  
+  my $embargoStatus = '';
+  my $EmbargoDate;
+  my $year = $dateIssued ;
+  $year =~ s,(^[0-9]{4}).*,$1,;
+  if ( $year >2009 )
+  {
+    
+    my $TodaysDate = &GetTodaysDate();
+    $EmbargoDate = &GetEmbargoDate( $dateIssued );
+    
+    my $months = &GetDateDiff ( $TodaysDate, $EmbargoDate );
+
+    if (( $months ) && ( $months > 0 ))
+      {
+       $embargoStatus = qq{WITHHELD_$months\_MONTHS};
+      }
+  }
+
+  my $msg = qq{DateIssued ($embargoStatus): $dateIssued, $EmbargoDate \n};
+  print $msg;
+
+  return $embargoStatus;
+
+}
+
+sub GetDateDiff 
+  {
+    my ( $today, $embargo ) = @_;
+
+    my $EmbargoYear = $embargo;
+    if ( $EmbargoYear =~ m,(.*?)\/.*, )
+      {
+	$EmbargoYear =~ s,(.*?)\/.*,$1,;
+      }
+    else
+      {
+	$EmbargoYear = $embargo;
+      }
+    my $EMonth = $embargo;
+    if ( $EMonth =~ m,.*?\/.*?\/.*, )
+      {
+	$EMonth =~ s,.*?\/(.*?)\/.*,$1,;
+      }
+    elsif ( $EMonth =~ m,.*?\/.*, )
+      {
+	$EMonth =~ s,.*?\/(.*),$1,;
+      }
+    else
+      {
+	$EMonth = 1;
+      }
+
+    my $TodayYear = $today;
+    $TodayYear =~ s,(.*?)\/.*,$1,;
+    my $TMonth = $today;
+    $TMonth =~ s,.*?\/(.*?)\/.*,$1,;
+
+    my $months;
+    if ( $EmbargoYear >= $TodayYear )
+      {
+	      my $diff = $EmbargoYear - $TodayYear;
+	      $months = ($diff * 12) - $TMonth + $EMonth + 1;
+      }
+    else
+      {
+	      #$months = $EMonth - $TMonth + 1;
+	      $months = '';
+      }
+ 
+    return $months;
+
+  }
+
+
+sub DoiHasBeenLoaded 
+  {
+    my ( @doi ) = @_;
+    
+    my $doiLoaded = 0;    
+    foreach my $value ( @doi )
+    {
+      #None of the items we are loading periodically would have access of um
+      my $statement = qq{select WI.id, WI.batch from WileyItems WI, WileyFiles WF where WF.id = WI.id and WF.batch = WI.batch and WI.type='DOI-ARTICLE' and WI.value='$value' and WF.access='open'};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+	      $doiLoaded           = 1;
+      }
+      $sth->finish;
+    }
+    
+    return $doiLoaded;
+  }
+
+sub GetDoi
+  {
+    my ( $id, $batch ) = @_;
+
+    my $statement = qq{select value from WileyItems where batch='$batch' and id=$id and type='DOI-ARTICLE'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @doi, @data );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @doi, $data[0] );
+    }
+    $sth->finish;
+
+    return @doi;
+
+  }
+
+sub GetDateIssued
+  {
+    my ( $id, $batch ) = @_;
+
+    my $statement = qq{select value from wileyitems where dc='date.issued' and id = $id and batch='$batch'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $doi, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $doi           = $data[0];
+    }
+    $sth->finish;
+
+    return $doi;
+
+  }
+
+
+sub MarkItemAsOpen
+{
+  my ( $batch, $id ) = @_;
+
+  my $statement = qq{update WileyFiles set access='open' where batch='$batch' and id=$id};
+  &ProcessSQL ( $statement );
+
+}
+
+sub PutContents
+  {
+    my ( $id, $contents ) = @_;
+
+    my $dir_id = &GetIndexDir ( $id );
+
+    my $fileName = qq{$gCollDir/item_$dir_id/contents};
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $contents;
+    close OUTFILE;
+  }
+
+
+sub GetIndexDir
+{
+  my ( $count ) = @_;
+
+  my $countString;
+
+  if ( $count < 10 )
+    { 
+      $countString = qq{000000$count};
+    }
+  elsif ( $count < 100 )
+    {
+      $countString = qq{00000$count};
+    }
+  elsif ( $count < 1000 )
+    {
+      $countString = qq{0000$count};
+    }
+  elsif ( $count < 10000 )
+    {
+        $countString = qq{000$count};
+      }
+  elsif ( $count < 100000 )
+    {
+      $countString = qq{00$count};
+    }
+  elsif ( $count < 1000000 )
+    {
+      $countString = qq{0$count};
+    }
+  elsif ( $count < 10000000 )
+    {
+      $countString = qq{$count};
+    }
+    else
+      {
+        print "error creating countString\n";
+        exit;
+    }
+
+  return $countString;
+
+}
+
+
+sub PutLicense
+  {
+    my ( $id, $license ) = @_;
+
+    my $dir_id = &GetIndexDir ( $id );
+    my $fileName = qq{$gCollDir/item_$dir_id/license.txt};
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $license;
+    close OUTFILE;
+  }
+
+sub PutPdfFile
+  {
+    my ( $count, $batch, $pdfFile ) = @_;
+
+    if ( $count == 31 )
+      {
+	      my $a;
+      }
+
+    my @sourceFiles;
+    my @files = split ( /\n/, $pdfFile );
+    foreach my $value ( @files )
+    {
+      my @tempFiles = &FindPdfFile ( $count, $batch, $value );
+      push ( @sourceFiles, @tempFiles );
+    }
+
+
+    my $cnt = 0;
+    foreach my $file ( @sourceFiles )
+      {
+	      my $sourceFile = $file;
+	      my $dir_id = &GetIndexDir ( $count );
+	      my $targetDir = qq{$gCollDir/item_$dir_id};
+
+        $file =~ s,.*\/(.*),$1,;
+        if ( $cnt > 0 )
+        {
+            #$file .= qq{-$cnt};
+        }
+
+        $targetDir .= qq{/$file};
+        `cp $sourceFile $targetDir`;
+         $cnt = $cnt + 1;
+      }
+  }
+
+sub FindPdfFile
+  {
+    my ( $count, $batch, $pdfFile ) = @_;
+
+    my $source = qq{$gBaseDataDir/wiley/PeriodicUpdateScripts/data_raw_tar/working/$count/};
+
+    ##??
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testitems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @allitems;
+    foreach my $itemname (@testitems)
+    {
+        my $item = qq{$source/$itemname};
+        push (@allitems, $item);
+    }
+
+
+    #Get a complete list of all directories.
+    my @listOfDirs;
+    my $testCount = 0; 
+    my @testFile;
+    foreach my $itemname (@allitems)
+    {
+      open  (FH, "<$itemname");
+	    if ( not -d FH)
+      {
+	      if ($itemname =~ m,.*$pdfFile, )
+	      {
+	        #close(FH);
+	        #return $itemname;
+          $testCount = $testCount + 1;
+          push ( @testFile, $itemname );
+	      }
+
+      }
+      else  #it must be a directory
+      {
+        opendir FH2, $itemname;
+        #avoid files with . and ..
+        my @allfilesTemp = grep !/^\.\.?$/, readdir FH2;
+        close(FH2);
+        my @itemsToAdd = &CompleteList($itemname, @allfilesTemp);
+        push (@allitems, @itemsToAdd);
+       }
+      close(FH);
+    }    
+  
+    if ( $testCount > 1 )
+    {
+       #Report Error
+       print "more than one file found $count $batch $pdfFile $testCount.\n";
+       return @testFile;
+    }
+    if ( @testFile )
+    {
+       return @testFile;
+    }
+    #Report Error
+    print "ALARM: could not find the pdf file $pdfFile.\n";
+    #exit;
+
+  }
+
+sub CompleteList
+{
+    my ($dir, @list) = @_;
+    
+    my @outdir;
+    
+    foreach my $item (@list)
+    {
+        my $outdir = qq{$dir/$item};
+        push (@outdir, $outdir);
+    }
+    return @outdir;
+}
+
+sub PutDCData
+  {
+    my ( $id, $dcData ) = @_;
+
+    #In misc look at replace-funny-char-for-wiley
+
+    #For funny character
+    #removes non utf8 charecters
+    #my $ustring = decode( 'UTF-8', $dcData );
+
+#This failed.
+#$dcData = decode_utf8( $dcData );
+#$dcData =~ s,‐,-,gs;
+
+    my $dir_id = &GetIndexDir ( $id );
+    my $fileName = qq{$gCollDir/item_$dir_id/dublin_core.xml};
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $dcData;
+    close OUTFILE;
+  }
+
+#Not used
+sub PutDCDataNew
+  {
+
+    my ( $id, $dcData ) = @_;
+
+    my $dir_id = &GetIndexDir ( $id );
+    my $fileName = qq{$gCollDir/item_$dir_id/dublin_core.xml};
+
+    use open ':encoding(utf-8)'; 
+
+    open(my $FH, ">", "$fileName")
+      or die $!;
+    
+    print $FH $dcData;
+
+  }
+
+
+sub MakeRootDir
+  {
+    `rm -r $gCollDir`;
+    `mkdir $gCollDir`;
+    `chmod 777 $gCollDir`;
+
+  }
+
+sub MakeCollectionDir
+  {
+    my ( $author ) = @_;
+
+    `rm -r $gCollDir/$author`;
+    `chmod 777 $gCollDir/$author`;
+
+  }
+
+sub MakeItemDir
+  {
+    my ( $id ) = @_;
+
+    my $dir_id  = &GetIndexDir ( $id );
+    `mkdir $gCollDir/item_$dir_id`;
+    `chmod 777 $gCollDir/item_$dir_id`;
+
+  }
+
+sub GetMetadataForTheItem
+  {
+    my ( $id, $batch ) = @_;
+
+    my $statement = qq{select dc, value, count from WileyItems where batch='$batch' and id=$id order by count};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $dc, $value, $dcData, @data );
+    #$dcData = qq{<?xml version="1.0" encoding="iso-8859-1"?>\n<dublin_core>\n};
+    $dcData = qq{<?xml version="1.0" encoding="utf-8"?>\n<dublin_core>\n};
+    while (@data = $sth->fetchrow_array()) {
+      $dc           = $data[0];
+      $value        = $data[1];
+     
+      my $element = $dc;
+      $element =~ s,(.*?)\..*,$1,;
+      my $qualifier = $dc;
+      $qualifier =~ s,.*?\.(.*),$1,;
+      
+      if ( $qualifier eq 'null' )
+	{
+	  $qualifier = "";
+	}
+      if ( $element eq 'null' )
+	{}
+      elsif ( $value )
+	{
+	  $dcData .= qq{<dcvalue element="$element" qualifier="$qualifier">$value</dcvalue>\n};
+	}
+    }
+    $dcData .= qq{</dublin_core>};
+
+    $sth->finish;
+
+    return $dcData;
+
+  }
+
+
+sub EnhanceSubjectHeadings
+  {
+
+    #Select Journal titles
+    my $statement = qq{select id, value from WileyItems where batch='$fileNumber' and type='JO' order by id};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $id, $title, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $id              = $data[0];
+      $title           = $data[1];
+     
+      #Now get the callno for this title
+      my $callno = &GetCallNo ( $id, $title );
+      
+      #Now update the dc data for this item
+      if ( $callno )
+      {
+         &UpdateSubjectDCData ( $id, $callno );
+      }
+      else
+      {
+          my $msg = qq{CALLNUM: id = $id callno=$callno could not find subjects\n};
+          print $msg,"\n";
+          &ReportToLog  ( $msg );
+      }
+
+    }
+    $sth->finish;
+
+  }
+
+sub EnhanceSubjectHeadingsMore
+  {
+
+    #Select Journal titles
+    my $statement = qq{select id, value from WileyItems where batch='$fileNumber' and type='JO' order by id};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $id, $title, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $id              = $data[0];
+      $title           = $data[1];
+     
+      if ( &ThereIsSubject ( $id ) )
+	{
+	}
+      else
+	{
+	  my @topSubject = &GetTopSubject ( $title );
+	  my @secondSubject = &GetSecondSubject ( $title );
+
+	  foreach my $value (@topSubject)
+	    {
+	      &ReportToDB ( $id, 99, 'dc', 'subject.hlbtoplevel', $value );
+	    } 
+	  foreach my $value (@secondSubject)
+	    {
+	      &ReportToDB ( $id, 99, 'dc', 'subject.hlbsecondlevel', $value );
+	    }
+	}
+
+    }
+    $sth->finish;
+
+  }
+
+
+sub GetTopSubject
+  {
+    my ( $title ) = @_;
+
+    $title =~ s,\',\\',gs;
+    my $statement = qq{select distinct primarysubject from subjectbyjournal where journal= E'$title'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, @subject );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @subject, $data[0] );
+    }
+    $sth->finish;
+
+    return @subject;
+  }
+
+sub GetSecondSubject
+  {
+    my ( $title ) = @_;
+
+    $title =~ s,\',\\',gs;
+    my $statement = qq{select distinct secondarysubject from subjectbyjournal where journal= E'$title'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, @subject );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @subject, $data[0] );
+    }
+    $sth->finish;
+
+    return @subject;
+  }
+
+
+sub ThereIsSubject
+  {
+    my ( $id ) = @_;
+
+    my $statement = qq{select id from WileyItems where id=$id and batch='$fileNumber' and dc like 'subject.hlb%'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data );
+    my $foundSubject = 0;
+    while (@data = $sth->fetchrow_array()) {
+      $foundSubject = 1;
+    }
+    $sth->finish;
+
+    return $foundSubject;
+
+
+  }
+
+
+sub IsNameInFacultyList
+{
+  my ( $id, $name ) = @_;
+
+  my $originalName = $name;
+
+  #Remvoe the period since they are not in the UMFaclulty database
+  $name =~ s,\.,,;
+  $name =~ s,\',\\',gs;
+
+  my $statement = qq{select name from UMFaculty where name like '$name'};
+
+  my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $found = 0;
+  my ( $name_in_db, @data );
+  while (@data = $sth->fetchrow_array()) {
+    $name_in_db           = $data[0];
+    $found = 1;
+  }
+  $sth->finish;
+
+  #See if it was found in the page that was downloaded.
+  my $InUMAuthor = &IsInUMAuthor ( $id, $originalName );
+
+  if ( $InUMAuthor )
+    {
+      $found = 1
+    }
+
+  #if ( $InUMAuthor  && ( ! $found )  )
+  #  {
+  #    my $msg = qq{AUNOTFD: The following name ($name) was not found in the faculty db for id $id.};
+  #    print $msg,"\n";
+  #    &ReportToLog  ( $msg );
+  #  }
+
+  return $found;
+
+}
+
+sub IsInUMAuthor 
+  {
+    my ( $id, $name ) = @_;
+
+    $name =~ s,\',\\',gs;
+    my $statement = qq{select id from UMAuthors where batch='$fileNumber' and id = $id and value like '$name%'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $found = 0;
+    my ( $name_in_db, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $found = 1;
+    }
+    $sth->finish;
+    
+    return $found;
+    
+  }
+
+sub UpdateSubjectDCData
+{
+  my ( $id, $callno ) = @_;
+
+  #Breakup the callno in two parts
+  $callno =~ s,(.*?)\..*,$1,;
+  $callno =~ s, ,,gs;
+  
+  #Now need to extract the number and alpha portion.
+  my $callno_num = $callno;
+  $callno_num =~ s,[A-Z]*([0-9]*),$1,;
+
+  my $callno_alpha = $callno;
+  $callno_alpha =~ s,([A-Z]*)[0-9]*,$1,;
+  $callno_alpha = lc ($callno_alpha);
+
+  #Now that you have the callno brokern up look for the subject headings 
+  my $statement = qq{select subject1, subject2, subject3, subject4 from Categories where (numstart <= $callno_num) and (numend >= $callno_num) and (alphastart <= '$callno_alpha') and (alphaend >= '$callno_alpha')};
+		     
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $found = 0;
+  my ( $subject1, $subject2, $subject3, $subject4, @data, @top, @second );
+  while (@data = $sth->fetchrow_array()) {
+    $subject1           = $data[0];
+    $subject2           = $data[1];
+    $subject3           = $data[2];
+    $subject4           = $data[3];
+
+    #id, count, type, dcvalue, value
+    if ( $subject1 )
+      {
+	unless ( &IsInArray ( $subject1, @top ) )
+	  {
+	    &ReportToDB ( $id, 99, 'dc', 'subject.hlbtoplevel', $subject1 );
+	    push ( @top, $subject1 );
+	  }
+      }
+    if ( $subject2 )
+      {
+	unless ( &IsInArray ( $subject2, @top ) )
+	  {
+	    &ReportToDB ( $id, 99, 'dc', 'subject.hlbtoplevel', $subject2 );
+	    push ( @top, $subject2 );
+	  }
+      }
+    if ( $subject3 )
+      {
+	unless ( &IsInArray ( $subject3, @top ) )
+	  {
+	    &ReportToDB ( $id, 99, 'dc', 'subject.hlbtoplevel', $subject3 );
+	    push ( @top, $subject3 );
+	  }
+      }
+    if ( $subject4 )
+      {
+	unless ( &IsInArray ( $subject4, @second ) )
+	  {
+	    &ReportToDB ( $id, 99, 'dc', 'subject.hlbsecondlevel', $subject4 );
+	    push ( @second, $subject4 );
+	  }
+      }
+    $found = 1;
+  }
+  $sth->finish;
+
+  unless ( $found )
+    {
+      my $msg = qq{CALLNUM: id = $id callno=$callno could not find subjects\n};
+      print $msg,"\n";
+      &ReportToLog  ( $msg );
+    }
+  
+  return $callno;
+  
+}
+
+sub IsInArray
+{
+    my (  $testString, @arrayElement ) = @_;
+    my $NumOfElements = scalar @arrayElement;
+    my $count = 0;
+    while ($count < $NumOfElements)
+    {
+        if ($arrayElement[$count] eq $testString)
+        {
+            return 1;
+        }
+        $count = $count + 1;
+    }
+    return 0;
+}
+sub GetCallNo
+{
+  my ( $id, $title ) = @_;
+
+  $title = lc ( $title );
+  $title =~ s,\',\\',gs;
+  my $statement = qq{select callno from WileyMirlyn where title =  E'$title'};
+
+  my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $callno, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $callno           = $data[0];
+    }
+    $sth->finish;
+
+    return $callno;
+
+}
+
+
+sub GetUrl
+  {
+    my ( $id ) = @_;
+
+    my $statement = qq{select value from ElsevierItems where batch='$fileNumber' and type='UR' and id=$id};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $url, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $url           = $data[0];
+     
+    }
+    $sth->finish;
+
+    return $url;
+
+  }
+
+sub IsUMAuthor
+  {
+    my ($id, $url, $author, $page) = @_;
+
+    #If there is only one author for the item, then it has to be 
+    #a UM author
+    my $statement = qq{select value from ElsevierItems where batch='$fileNumber' and type='AU' and id=$id};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $count, @data );
+    $count = 0;
+    while (@data = $sth->fetchrow_array()) {
+      $count = $count + 1;
+    }
+    $sth->finish;
+
+    if ($count == 1)
+      {
+	my $test = &IsPageFromUM ( $id, $page );
+	return 1;
+      }
+
+    #Now find out if the author on this page is UM
+
+
+  }
+
+sub GetUrlPage
+  {
+    my ( $url ) = @_;
+
+    #Call to LWP to get response.
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout( 300 ); ## timeout for 180 seconds
+    my $req = HTTP::Request->new( GET => $url );
+    # Pass request to the user agent and get a response back
+    my $res = $ua->request( $req );
+
+    # Check the outcome of the response
+    if ($res->is_success)
+    {
+	    #return the data
+      return $res->content;
+    } 
+    else
+    {
+      my $msg = qq{URLCALL: Unsuccessful call to $url \n};
+      print $msg,"\n";
+      &ReportToLog  ( $msg );
+      return;
+    }
+
+    return;
+
+  }
+
+sub  GetSupOfAuthor 
+  {
+    my ( $id, $url, $page, $author ) = @_;
+
+    $author =~ s,\+,,gs;
+    my $first = $author;
+    $first =~ s=.*\, (.*)=$1=;
+    my $last  = $author;
+    $last =~ s=(.*)\, .*=$1=;
+    $author = qq{$first $last};
+
+    if ( $page =~ m=.*$author.*?<sup>(.*?)</sup>.*= )
+      {
+	      $page =~ s=.*$author.*?<sup>(.*?)</sup>.*=$1=s;
+      }
+    else
+      {
+	      $page = qq{jose};
+      }
+    
+    return $page;
+  }
+
+
+sub  GetDepartmentFromSup
+  {
+    my ( $id, $page, $sup ) = @_;
+
+    my $inst = $page;
+
+    $sup =~ s,\*,\\*,gs;
+    $sup =~ s,\+,\\+,gs;
+    $sup =~ s,\),,gs;
+    $sup =~ s,\(,,gs;
+
+    if ( $inst =~ m,.*<sup>$sup<\/sup>(.*?)<.*,s )
+    {
+	    $inst =~ s,.*<sup>$sup<\/sup>(.*?)<.*,$1,s;
+    
+	    if ( $inst =~ m,.*University of Michigan.*, )
+	    {
+	      return ( 1, $inst );
+	    }
+	    else
+	    {
+	      return ( 0, $inst );
+	    }
+    }
+  }
+
+
+sub ReportDepartmentToDB
+{
+
+  my ( $id, $count, $value ) = @_;
+
+  $value =~ s,\',\\',gs;
+
+  my $statement = qq{insert into SchoolDepartment values ('$fileNumber', $id, $count, '$value' )};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  $sth->finish;  
+  
+}
+
+
+sub  IsSupFromAnnArbor
+  {
+    my ( $page, $sup ) = @_;
+
+    my $inst = $page;
+    $inst =~ s,.*<sup>$sup<\/sup>(.*?)<.*,$1,s;
+    
+    if ( $inst =~ m,.*Ann Arbor.*, )
+    {
+	    return 1;
+    }
+    
+    return 0;
+  }
+
+
+sub  IsSupFromDearborn
+  {
+    my ( $page, $sup ) = @_;
+
+    my $inst = $page;
+    $inst =~ s,.*<sup>$sup<\/sup>(.*?)<.*,$1,s;
+    
+    if ( $inst =~ m,.*Dearborn.*, )
+    {
+	    return 1;
+    }
+    
+    return 0;
+  }
+
+sub  IsSupFromFlint
+  {
+    my ( $page, $sup ) = @_;
+
+    my $inst = $page;
+    $inst =~ s,.*<sup>$sup<\/sup>(.*?)<.*,$1,s;
+    
+    if ( $inst =~ m,.*Flint.*, )
+    {
+	    return 1;
+    }
+    
+    return 0;
+  }
+
+sub CreateLogFile
+{
+    my $reporttime = scalar localtime(time());
+    my $status = qq{$reporttime\t\tLog file created\n};
+    my $fileName = qq{$gLogDir/active$fileNumber.log};
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $status;
+    close OUTFILE;
+
+}
+
+sub ReportToLog
+{
+
+    my ( $msg ) = @_;
+
+    my $reporttime = scalar localtime(time());
+    my $fileName = qq{$gLogDir/active$fileNumber.log};
+
+    my $status = qq{$reporttime\t\t$msg\n};
+
+    #Now you want to append this to the file.
+    open ( OUTFILE, ">>$fileName" ) || die();
+    print OUTFILE $status;
+    close OUTFILE;
+
+    return;
+
+}
+
+sub GetPreviousMonthYear
+{
+  #my $newtime = scalar localtime(time()- 86400);
+  my $newtime = scalar localtime(time());
+  my %months = (
+		"Jan" => "Dec",
+		"Feb" => "Jan",
+		"Mar" => "Feb",
+		"Apr" => "Mar",
+		"May" => "Apr",
+		"Jun" => "May",
+		"Jul" => "Jun",
+		"Aug" => "Jul",
+		"Sep" => "Aug",
+		"Oct" => "Sep",
+		"Nov" => "Oct",
+		"Dec" => "Nov",
+	       );
+
+  my %monthsNumeric = (
+		"Jan" => "12",
+		"Feb" => "01",
+		"Mar" => "02",
+		"Apr" => "03",
+		"May" => "04",
+		"Jun" => "05",
+		"Jul" => "06",
+		"Aug" => "07",
+		"Sep" => "08",
+		"Oct" => "09",
+		"Nov" => "10",
+		"Dec" => "11",
+	       );
+
+  my $month = $months{substr ($newtime,4, 3)};
+  my $year = substr ($newtime,20, 4);
+
+  $year = $year + 0;
+
+  if ( $month eq 'Dec' )
+  {
+    $year = $year - 1;
+  }
+
+  $year =~ s,\d\d(.*),$1,;
+  return ( $month, $year );
+    
+}
+
+
+__END__;
+
+
+

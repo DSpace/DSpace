@@ -1,0 +1,452 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+my $gReportFile     = qq{$gBaseDataDir/rackham/dissertation.txt};
+
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my @item_ids = &GetItems( );
+
+my @AllAuthors;
+
+my $report = qq{handle\tcollection name\tAuthors\tTitle\tFileNames\tEmbargoType\tEmbargo_Date\n};
+
+my $count = 0;
+foreach my $item_id ( @item_ids )
+  {
+    $count = $count + 1;
+
+    my $handle = &GetHandle ( $item_id );
+    print $handle . "\n";
+
+    # The dissertations collection = 2027.42/39366
+    my $name = &GetMeta ( 'c5a42028-499d-4e85-9fdc-dc71e2baca26', 64 );
+
+    my $authors = &GetMeta ( $item_id, 1);
+    my $title = &GetMeta ( $item_id, 64);
+    #Date Available
+    my $date = &GetMeta ( $item_id, 12);
+
+    my $status = qq{Free};
+    if ( &IsEmbargo( $item_id ) )
+      {
+	$status = qq{Full Embargo};
+        #Get the date from the umrestricted table
+        $date = &GetReleaseDate ( $item_id );
+      }
+    elsif ( &IsUmEmbargo ( $item_id ) )
+      {
+	      $status = qq{UM Restricted};
+        my @bits = &GetBits ( $item_id );
+        $date = '';
+        my $temp_date = '';
+        foreach my $bit_id  ( @bits )
+        {
+           $temp_date = &GetUmReleaseDate ( $bit_id );
+           $date .= qq{$temp_date; };
+        }
+      }
+
+    my $filenames = &GetFileNames ( $item_id );
+
+
+    $report .= qq{$handle\t$name\t$authors\t$title\t$filenames\t$status\t$date\t\n};
+
+  }
+
+&WriteReportToFile  ($gReportFile, $report);
+
+$dbhP->disconnect;
+
+exit;
+
+
+sub GetFileNames_RunsSlow
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select bitstream_id from bundle2bitstream where bundle_id in (select bundle_id from item2bundle where item_id = '$item_id') and bundle_id in ( select dspace_object_id from metadatavalue where text_value = 'ORIGINAL' and metadata_field_id= 64)};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $fileNames;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      my $name = &GetMeta ( $data[0], 64);
+      $fileNames .= qq{$name; };
+    }
+
+    $sth->finish;
+
+
+    return $fileNames;
+  }
+
+
+sub GetFileNames
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select bitstream_id, bundle_id from bundle2bitstream where bundle_id in (select bundle_id from item2bundle where item_id = '$item_id')};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $fileNames;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      my $bit_id = $data[0];
+      my $bundle_id = $data[1];
+
+      my $original = &inOriginal ( $bundle_id );
+      if ( $original )
+	{
+	  my $name = &GetMeta ( $bit_id, 64);
+          $fileNames .= qq{$name; };
+	}
+    }
+
+    $fileNames =~ s,(.*)\;.*,$1,;
+
+    $sth->finish;
+
+    return $fileNames;
+  }
+
+
+sub inOriginal
+  {  
+    my ( $bundle_id ) = @_;
+
+    my $statement = qq{select dspace_object_id from metadatavalue where text_value = 'ORIGINAL' and metadata_field_id= 64 and dspace_object_id = '$bundle_id'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data );
+    my $found = 0;
+    while (@data = $sth->fetchrow_array()) {
+      $found = 1;
+    }
+
+    $sth->finish;
+
+    return $found;
+  }
+
+
+
+sub GetUmReleaseDate
+  {  
+    my ( $bit_id ) = @_;
+
+    #e8a62d47-3987-437e-9fa9-6060450019fa is Anonymous
+    my $statement = qq{select start_date from resourcepolicy where dspace_object = '$bit_id' and epersongroup_id = 'e8a62d47-3987-437e-9fa9-6060450019fa'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $releaseDate;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $releaseDate = $data[0];
+      
+    }
+
+    $sth->finish;
+
+    return $releaseDate;
+
+
+  }
+
+
+sub GetReleaseDate
+  {  
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select release_date from umrestricted where item_id = '$item_id'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $releaseDate;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $releaseDate = $data[0];
+      
+    }
+
+    $sth->finish;
+
+    return $releaseDate;
+
+
+  }
+
+
+
+sub IsUmEmbargo
+  {  
+    my ( $item_id ) = @_;
+
+
+    # if it had this set to YES then it is UM restricted: dc.restrict.um
+    # I just added the restrict.um to deepblue.  it was not there before.
+    # I used to delete it manually before loading it.
+    my $statement = qq{select text_value from metadatavalue where dspace_object_id = '$item_id' and metadata_field_id=176};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $um = 0;;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      my $value = $data[0];
+      $value = uc $value;
+      if ( $value eq 'YES' )
+      {
+        $um = 1;
+      }
+      
+    }
+
+    $sth->finish;
+
+    return $um;
+
+
+  }
+
+
+sub IsEmbargo
+  {  
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select withdrawn from item where uuid = '$item_id'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $withdrawn;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $withdrawn = $data[0];
+      
+    }
+
+    $sth->finish;
+
+    return $withdrawn;
+
+
+  }
+
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id'};
+
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+      
+    }
+
+    $sth->finish;
+
+    return $handle;
+  }
+
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+  }
+
+sub GetBits
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select bitstream_id from bundle2bitstream where bundle_id in (select bundle_id from item2bundle where item_id = '$item_id') and bundle_id in ( select dspace_object_id from metadatavalue where text_value = 'ORIGINAL' and metadata_field_id= 64)};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my @bits;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @bits, $data[0] );
+    }
+
+    $sth->finish;
+
+    return @bits;
+  }
+
+
+
+sub GetItems
+  {
+
+    #Get Items in accession on this date
+    my $statement = qq{select dspace_object_id from metadatavalue where text_value like '2024-09-03%' and metadata_field_id = 11 and dspace_object_id in ( select uuid from item where owning_collection='c5a42028-499d-4e85-9fdc-dc71e2baca26')};
+    
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my @itemids;
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @itemids, $data[0] ) ;
+    }
+
+    $sth->finish;
+
+    return @itemids;
+  }
+
+
+sub WriteReportToFile 
+  {
+    my ( $filename, $report ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+sub GetMeta
+  {
+    my ( $item_id, $id ) = @_;
+
+    my $statement = qq{select text_value  from metadatavalue where dspace_object_id='$item_id' and metadata_field_id = $id  };
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $type = '';
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $data[0] =~ s,\n, ,gs;
+      $data[0] =~ s,\r, ,gs;
+      $data[0] =~ s,\t, ,gs;
+      $type .= qq{$data[0]; };
+    }
+
+    $sth->finish;
+
+    $type =~ s,(.*)\;,$1,;
+ 
+    return $type;    
+  }

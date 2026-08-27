@@ -1,0 +1,563 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+use Getopt::Std;
+use utf8;
+
+my %opts;
+getopts('d:', \%opts);
+
+my $collDt     = $opts{'d'};
+
+
+#$collDt = '2023/01';
+
+print "collDt = " . $collDt . "\n";
+#print "Looks good (y/n)? ";
+#my $go_on = <STDIN>;
+#chop $go_on;
+#if ( $go_on eq 'y' )
+#  {
+#    print "Going on..." ."\n";
+#  }
+#else
+#  {
+#    print "Task terminated..." ."\n";
+#    exit;
+#  }
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+#my $b = qq{insert into consolidatedstatstable values ( '2016/02', 13, E'Dissertations and Theses (Ph.D. and Master\\'s) (All Collections)', '2027.42/84444', E'Characterization of Mouse Models to Study Protein Trafficking in the Early Secretory Pathway.', E'', 0, 3, 5, 0, 5, 0, 0, 0, 3, E'http://deepblue.lib.umich.edu/; null; null; null; null; ', E'null; null; null; ' )};
+
+#my $a = qq{insert into consolidatedstatstable (colldt, collid, collname,  handle,  title, publisher,  inside_count, out_count, bit_count, bitum, bitnonum, itemuminside, itemnonuminside, itemumoutside, itemnonumoutside, bitreferer, itemoutsidereferer) values ( '2016/02', 13, E'Dissertations and Theses (Ph.D. and Master\\'s) (All Collections)', '2027.42/103420', E'Processing and properties of silicon carbide aluminum  :nitride aluminum :oxide ceramics.', E'', 0, 1, 0, 0, 0, 0, 0, 0, 1, E'', E'null; ' )};
+#&ProcessSQL ( $a );
+
+
+my $statement = qq{delete from consolidatedstatstable where colldt='$collDt'};
+&ProcessSQL ( $statement );
+
+my $statement = qq{delete from  bitspecificdata where colldt='$collDt'};
+&ProcessSQL ( $statement );
+
+&ConsolidateIPData();
+
+&Setupstatsidanddate();
+
+#These tables are not needed, after the stats have been consolidated.
+&CleanupAuxiliaryTables();
+
+$dbhP->disconnect;
+
+exit;
+
+sub CleanupAuxiliaryTables
+  {
+    
+    my $statement = qq{Delete from BitstreamIPStatsData};
+    &ProcessSQL ( $statement );
+
+    my $statement = qq{Delete from ItemIPStatsData};
+    &ProcessSQL ( $statement );
+
+  }
+
+sub GetCollid
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select owning_collection from Item where uuid='$item_id';};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $collid = '0';
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $collid  = $data[0];      
+    }
+    $sth->finish; 
+
+    return $collid;
+
+  }
+
+sub GetCollname 
+  {
+    my ( $collid ) = @_;
+
+    #my $statement = qq{select name from Collection where collection_id=$collid;};
+    my $statement = qq{select text_value from metadatavalue where dspace_object_id='$collid' and metadata_field_id=64};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $collname = '';
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $collname         = qq{$data[0] (All Collections)}; 
+
+
+    }
+    $sth->finish; 
+
+    return $collname;
+
+  }
+
+
+sub GetPublisher
+{
+    my ( $item_id ) = @_;
+
+    #my $statement = qq{select DCValue.text_value from DCValue  where DCValue.dc_type_id = 39 and DCValue.resource_id = $item_id;};
+    my $statement = qq{select text_value from metadatavalue where dspace_object_id='$item_id' and metadata_field_id=39};
+
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $publisher, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $publisher           .= qq{$data[0]; };      
+    }
+    $sth->finish;    
+    
+    if ( $publisher =~ m,.*\; , )
+    {
+	    $publisher =~ s,(.*)\; ,$1,
+    }
+
+    return $publisher;
+}
+
+sub GetTitle
+{
+    my ( $item_id ) = @_;
+
+    #my $statement = qq{select DCValue.text_value from DCValue where DCValue.dc_type_id = 64 and DCValue.resource_id = $item_id;};
+    my $statement = qq{select text_value from metadatavalue where dspace_object_id='$item_id' and metadata_field_id=64};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $title, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $title           = $data[0];
+    }
+    $sth->finish;    
+
+    return $title;
+}
+
+
+sub ConsolidateIPData
+  {
+
+   my $statement = qq{select distinct H.handle, H.resource_id from  handle H, item I where I.uuid = H.resource_id and I.in_archive is true};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $count = 1;
+    my ( $title, $publisher, $collname, $handle, $item_id, $collid, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $handle           = $data[0];
+      $item_id          = $data[1];
+      $collid           = &GetCollid ( $item_id );
+      if ( $collid eq '0' )
+      {
+	      my $msg = qq{This handle=$handle item_id=$item_id had a collid that was not found. Not counting it.\n};
+	      print $msg;
+	      next;
+      }	
+      $collname         = &GetCollname ( $collid );
+      $publisher        = &GetPublisher( $item_id );
+      $title            = &GetTitle ( $item_id );
+
+      my $BitUM = &GetBitUM ( $collDt, $collid, $handle, 1 );
+      my $BitNONUM = &GetBitUM ( $collDt, $collid, $handle, 0 );
+      my $BitTotal = $BitUM + $BitNONUM;
+      my $BitReferer = &GetBitReferer ( $collDt, $collid, $handle );
+      &ProcessBitSpecificData ( $collDt, $handle, $collid );
+
+
+      my $ItemUMInside     = &GetItemUM ( $collDt, $collid, $handle, 1, 1 );
+      my $ItemNONUMInside  = &GetItemUM ( $collDt, $collid, $handle, 1, 0 );
+      my $InsideTotal =  $ItemUMInside  + $ItemNONUMInside;
+
+      my $ItemUMOutside    = &GetItemUM ( $collDt, $collid, $handle, 0, 1 );
+      my $ItemNONUMOutside = &GetItemUM ( $collDt, $collid, $handle, 0, 0 );
+      my $OutsideTotal =  $ItemUMOutside +  $ItemNONUMOutside;
+      my $ItemOutsideReferer = &GetItemReferer ( $collDt, $collid, $handle, 0 );
+
+      if (($BitTotal == 0) && ($InsideTotal == 0) && ($OutsideTotal == 0) )
+	    {
+	    }
+      else
+	    {
+	      &UpdateBitIPData ( $collid, $collname, $handle, $title, $publisher, $BitUM, $BitNONUM, $ItemUMInside, $ItemNONUMInside, $ItemUMOutside, $ItemNONUMOutside, $BitTotal, $InsideTotal, $OutsideTotal, $BitReferer, $ItemOutsideReferer );
+	  
+	      my $msg = qq{print $collDt $handle Processed $count\n};
+	      #print $msg;
+	      $count = $count + 1;
+	    }
+
+    }
+    $sth->finish;    
+
+  }
+
+
+sub ProcessBitSpecificData 
+  {
+    my ( $colldt, $handle, $collid ) = @_;
+
+
+    my $statement = qq{select count(*), filename from bitstreamipstatsdata where date='$colldt' and  handle='$handle' and isumip=0 group by filename};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my @listofFiles;
+    my %isNONUMfile;
+    my $count = 0;
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      my $isnonumcount   = $data[0];
+      my $filename       = $data[1];
+
+      $isNONUMfile{$filename} = $isnonumcount;
+      push ( @listofFiles, $filename );
+    }
+    $sth->finish;
+
+
+    my $statement = qq{select count(*), filename from bitstreamipstatsdata where date='$colldt' and  handle='$handle' and isumip=1 group by filename};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my %isUMfile;
+    my $count = 0;
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      my $isumcount      = $data[0];
+      my $filename       = $data[1];
+
+      $isUMfile{$filename} = $isumcount;
+      push ( @listofFiles, $filename );
+    }
+    $sth->finish; 
+
+    
+    &SortUniquifyList ( \@listofFiles );
+    
+    foreach my $file ( @listofFiles )
+    {
+      my $isumcount = $isUMfile{$file};
+      if ( ! $isumcount ) { $isumcount = 0; }
+      my $isnonumcount = $isNONUMfile{$file};
+      if ( ! $isnonumcount ) { $isnonumcount = 0; }
+
+      my $total = $isumcount + $isnonumcount;
+
+      my $referer = &GetReferer ( $colldt, $handle, $file ); 
+
+      if ( $file )
+      {
+	      $file =~ s,\',\\',gs;
+	      $file =~ s,\?,\&\#63\;,gs;
+	      $referer =~ s,\',\\',gs;
+	      $referer =~ s,\?,\&\#63\;,gs;
+
+	      my $statement = qq{insert into BitSpecificData values ( 0, '$colldt', '$handle', E'$file', $isumcount, $isnonumcount, $total, E'$referer', '$collid' )};
+	      #print $statement . "\n";
+	      &ProcessSQL ( $statement );
+      }
+    }
+  }
+
+sub GetReferer
+{
+  my ( $colldt, $handle, $file ) = @_;
+
+  $file =~ s,\',\\',gs;
+  $file =~ s,\?,\&\#63\;,gs;
+
+  my $statement = qq{select referer from bitstreamipstatsdata where date='$colldt' and  handle='$handle' and filename=E'$file'};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $referer;
+  my ( @data  );
+  while (@data = $sth->fetchrow_array()) {
+    $referer     .= qq{$data[0]; };
+  }
+  $sth->finish; 
+
+  if ( $referer =~ m,.*\; , )
+  {
+    $referer =~ s,(.*)\; ,$1,;
+  }
+  
+  #print $referer . "\n";
+  return $referer;
+
+}
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+}
+
+
+sub Setupstatsidanddate
+  {
+
+    my $statement = qq{delete from statsidanddate};
+
+    &ProcessSQL ( $statement );
+
+    my $statement = qq{insert into statsidanddate select distinct collid, colldt, collid_uuid from consolidatedstatstable;};
+
+    &ProcessSQL ( $statement );
+
+  }
+
+
+sub UpdateBitIPData
+  {
+
+    my ( $collid, $collname, $handle, $title, $publisher, $BitUM, $BitNONUM, $ItemUMInside, $ItemNONUMInside, $ItemUMOutside, $ItemNONUMOutside, $BitTotal, $InsideTotal, $OutsideTotal, $BitReferer, $ItemOutsideReferer ) = @_;
+
+    $title =~ s,\',\\',gs;
+    $title =~ s,\?,\&\#63\;,gs;
+    $publisher =~ s,\',\\',gs;
+    $publisher =~ s,\?,\&\#63\;,gs;
+    $collname =~ s,\',\\',gs;
+    $collname =~ s,\?,\&\#63\;,gs;
+    $BitReferer =~ s,\',\\',gs;
+    $BitReferer =~ s,\?,\&\#63\;,gs;
+    $ItemOutsideReferer =~ s,\',\\',gs;
+    $ItemOutsideReferer =~ s,\?,\&\#63\;,gs;
+
+    #$BitReferer = '?;';
+
+    my $statement = qq{insert into consolidatedstatstable values ( '$collDt', 0, E'$collname', '$handle', E'$title', E'$publisher', $InsideTotal, $OutsideTotal, $BitTotal, $BitUM, $BitNONUM, $ItemUMInside, $ItemNONUMInside, $ItemUMOutside, $ItemNONUMOutside, E'$BitReferer', E'$ItemOutsideReferer', '$collid' )};
+
+    #print $statement . "\n";
+
+    &ProcessSQL ( $statement );
+
+  }
+
+
+sub ProcessSQL
+  {
+    my ( $statement ) = @_;
+
+    my $msg = qq{$statement\n\n};
+    #print $msg;
+
+    $dbhP->do($statement)
+     or print "Couldn't prepare statement: " . $dbhP->errstr;
+
+    #my $sth = $dbhP->prepare($statement)
+    #  or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    #$sth->execute()             # Execute the query
+    #  or die "Couldn't execute statement: " . $sth->errstr;
+    #$sth->finish;
+  }
+
+sub GetItemUM
+  {
+    my ( $colldt, $collid, $handle, $InsideIndicator, $UMIP ) = @_;
+
+    
+    my $statement = qq{select count(*) from itemipstatsdata where date='$colldt' and collid='$collid' and handle='$handle' and isumip=$UMIP and insideindicator=$InsideIndicator};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $count = 0;
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $count   = $data[0];
+    }
+    $sth->finish; 
+
+    return $count;
+    
+  }
+
+
+sub GetItemReferer
+  {
+    my ( $colldt, $collid, $handle, $InsideIndicator ) = @_;
+
+    
+    my $statement = qq{select referer from itemipstatsdata where date='$colldt' and collid='$collid' and handle='$handle' and insideindicator=$InsideIndicator};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $referer;
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $referer   .= qq{$data[0]; };
+    }
+    $sth->finish; 
+
+    return $referer;
+    
+  }
+
+sub GetBitUM
+  {
+    my ( $colldt, $collid, $handle, $UMIP ) = @_;
+
+
+    my $statement = qq{select count(*) from bitstreamipstatsdata where date ='$colldt' and collid='$collid' and handle='$handle' and isumip=$UMIP};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $count = 0;
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $count   = $data[0];
+    }
+    $sth->finish; 
+
+    return $count;
+    
+  }
+
+sub GetBitReferer
+  {
+    my ( $colldt, $collid, $handle ) = @_;
+
+    my $statement = qq{select referer from bitstreamipstatsdata where date ='$colldt' and collid='$collid' and handle='$handle'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $referer;
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $referer   .= qq{$data[0]; };
+    }
+    $sth->finish; 
+
+    return $referer;
+    
+  }
+
+__END__;
+
+
+

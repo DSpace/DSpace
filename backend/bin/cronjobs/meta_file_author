@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dublin_core>
+<dcvalue element="identifier" qualifier="uri">https://hdl.handle.net/$HANDLE</dcvalue>
+<dcvalue element="contributor" qualifier="author">$METAVAKYE</dcvalue>
+</dublin_core>

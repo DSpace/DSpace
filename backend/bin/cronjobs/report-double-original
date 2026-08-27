@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+my $statement = qq{select item_id, count(*) from item2bundle where bundle_id in (select distinct dspace_object_id from metadatavalue M where M.text_value='ORIGINAL' and M.metadata_field_id =64) group by 1 having count(*) > 1};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ($story);
+    my $count = 1;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      my $handle = &GetHandle( $data[0] );
+      $story = qq{$handle has these many ORIGINAL bundles = $data[1]\n};
+    }
+
+$sth->finish;
+
+    my $msg = qq{Report of items that have more than one ORIGINAL bundle listed below (if any): \n};
+    print $msg;
+    print $story;
+
+$dbhP->disconnect;
+
+exit;
+
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id'};
+
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+      
+    }
+
+$sth->finish;
+
+    return $handle;
+  }
+
+__END__;
+
+
+

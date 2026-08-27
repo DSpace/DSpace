@@ -1,0 +1,875 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+#  require "strict.pm";
+#  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+#For Time funcion.
+use POSIX;
+
+#use S3::AWSAuthConnection;
+#use S3::QueryStringAuthGenerator;
+
+#use Paws;
+#use Getopt::Long 'GetOptions';
+use LWP::Simple;
+use LWP::UserAgent;
+use Getopt::Std;
+
+use JSON::XS;
+use Data::Dumper;
+use Getopt::Std;
+
+
+#################################
+
+
+#To use:
+
+# -t test -o status
+# -t test -o upload
+
+# -t prod -o status
+# -t prod -o upload
+
+my %opts;
+getopts('t:o:', \%opts);
+
+my $doTest             = $opts{'t'};
+my $UploadOrStatus     = $opts{'o'};
+
+my $doTest             = 'prod';
+my $UploadOrStatus     = 'nothing';
+
+print "test/prod = " . $doTest . "\n";
+print "load/status = " . $UploadOrStatus . "\n";
+
+#For database connection.
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+
+#my $gRepositoryDir        = $ENV{'BASE_REPOSITORY_DIR'};  # /dspace
+my $gRepositoryDir        = qq{/mnt/prep};
+#my $gBaseDataDir          = $ENV{'BASE_DATA_DIR'};
+my $gBaseDataDir          = qq{/mnt/prep};
+
+
+
+my $gBaseBinDir = $ENV{'BASE_BIN_DIR'}; #/dspace/bin
+
+my $gBagDir = qq{$gBaseDataDir/bags};
+my $gZipDir = qq{$gRepositoryDir/repstore/aip-store};
+
+my $gReplicatorWorkingArea = qq{$gRepositoryDir/replicate/aip-store};
+my $gMetabagXsl = qq{metadata2bag-info.xsl};
+
+my $gToolsDir = qq{$gBaseBinDir/aptrust/};
+
+#For Deposit, default to testing area
+my $gHandlePrefix  = qq{2027.42};
+my $gBucketname = $ENV{'APTRUST_BUCKET_NAME'};
+
+my $gAllIsFine = 1;
+
+#This funciton was used to find items that were missing title in Docs.
+#&ItemsMissingTitles();
+
+&CleanoutDirs ();
+&MoveAllToAPtrust();
+
+$dbhP->disconnect;
+
+exit;
+
+sub CleanoutDirs
+  {    
+    `rm -rf $gReplicatorWorkingArea/*`;
+
+    #Remove from Zip area
+    `rm -rf $gZipDir/*`;
+
+    `rm $gBagDir/*`;
+  }
+
+sub MoveAllToAPtrust
+  {
+    my @handles = &GetItemIdsToUpdateOrAdd();
+
+    foreach my $handle ( @handles )
+    {
+      &DoReplication ( $handle );
+      if ( $gAllIsFine == 1 )
+	    {
+	      &CreateBagFromScratch();
+	    }
+      if ( $gAllIsFine == 1 )
+	    {
+	      &DepositBagToAPTrust();
+	    }
+      &RemoveBag();
+    }
+  }
+
+
+sub GetItemIdsToUpdateOrAdd
+  {
+    
+    my @handles;
+    
+    #To find items that have been updated.
+    my $statement = qq{select handle,  last_modified_date from aptrust_bags_sent};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, $checksum );
+    while (@data = $sth->fetchrow_array()) {
+      my $handle = $data[0];
+      my $mod_date = $data[1];
+
+      my $item_id = &GetItemId ( $handle );
+      if ( $item_id ne '' )
+      {
+        my $curr_mod_date = &GetModDate ( $item_id );
+
+        if ( $mod_date ne $curr_mod_date )
+        {
+         if ( &EligibleToSend ( $handle ) == 1 )
+           {
+             push ( @handles, $handle );
+           }
+        }
+      } else
+      {
+        my $msg = qq{Could not find item_id for $handle\n};
+        print $handle;
+      }
+    }
+    $sth->finish;
+
+
+    #To find new items.
+    #my $statement = qq{select handle from handle where resource_type_id =2 and resource_id is not null};
+
+    my $statement = qq{select handle from handle where resource_type_id =2 and resource_id in (select distinct uuid from item where in_archive = true or withdrawn = true)};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, $checksum );
+    while (@data = $sth->fetchrow_array()) {
+      my $handle = $data[0];
+
+      my $status = &HasBeenSentToAptrust ( $handle );
+      if ( $status == 0 )
+	    {
+	      push ( @handles, $handle );
+	    }
+    }
+    $sth->finish;
+
+    #To find items that have had errors, bbut only send them if it has been more than 3 days since the error.
+    my $statement = qq{select handle from aptrust_object_status where status!='Success' and date_real < NOW() - INTERVAL '3days'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, $checksum );
+    while (@data = $sth->fetchrow_array()) {
+      my $handle = $data[0];
+
+      push ( @handles, $handle );
+
+    }
+    $sth->finish;
+
+    #Just to be sure you don't have any duplicates, should really not have any, but just in case.
+    &SortUniquifyList ( \@handles );    
+
+    return @handles;
+
+  }
+
+# You are eligible, if there is not entry in aptrust_object_status, ie we have never checked the
+#   status of the object
+# You are also elible if the last time the status was checked was over 3 days ago.  This gives 
+#   ApTrust enough time to process the object.
+
+
+sub EligibleToSend
+  {
+    my ( $handle ) = @_;
+
+    my $found = 0;
+
+    my $statement = qq{select date_real from aptrust_object_status where handle='$handle' and date_real < NOW() - INTERVAL '3days'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, $checksum );
+    while (@data = $sth->fetchrow_array()) {
+      my $date = $data[0];
+      
+      $eligible = 1;
+      $found = 1;
+
+    }
+    $sth->finish;
+
+    if ( $found == 0 )
+      {
+	      $eligible = 1;
+      }
+
+    return $eligible;
+
+  }
+
+sub HasBeenSentToAptrust
+  {
+    my ( $handle ) = @_;
+
+    my $statement = qq{select handle from aptrust_bags_sent where handle='$handle'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $InAptrust = 0;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $InAptrust = 1;
+    }
+    $sth->finish;
+    
+    return $InAptrust;
+
+  }
+
+
+#This method was only used to find items missing titles, in order to prevent an error when sending the bag to APTrust.
+sub ItemsMissingTitles
+  {
+
+    my $statement = qq{select uuid from item where in_archive = true or withdrawn = true};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $InAptrust = 0;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      my $item_id = $data[0];
+      my $title = &GetMeta ( $item_id, 64);
+      if ($title eq '' )
+	    {
+	      my $handle = &GetHandle ( $item_id );
+	      my $msg = qq{handle = $handle\n};
+	      print $msg;
+	    }
+    }
+    $sth->finish;
+    
+  }
+
+
+sub GetMeta
+  {
+    my ( $item_id, $id ) = @_;
+
+    my $statement = qq{select text_value  from metadatavalue where metadata_field_id = $id and dspace_object_id ='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $value = '';
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value .= qq{$data[0]; };
+    }
+    $sth->finish;
+
+    $value =~ s, ,,gs;
+
+    return $value;
+  }
+
+
+sub GetHandle
+  {
+    my ( $item_id, $id ) = @_;
+
+    my $statement = qq{select handle  from handle where resource_id='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $handle, $value, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value = qq{$data[0]};
+
+      $handle = qq{https://hdl.handle.net/$value};
+
+    }
+    $sth->finish;
+
+    return $handle;
+    
+  }
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+}
+
+
+sub HasCCLicense
+  {
+    my ( $handle ) = @_;
+
+    #dc.rights.uri	http://creativecommons.org/licenses/by-nc-sa/3.0/
+    my $statement = qq{select text_value from metadatavalue where dspace_object_id in ( select resource_id from handle where handle ='$handle')  and metadata_field_id = 54};
+
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $hasLicense = 0;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      my $value = $data[0];
+      if ( $value =~ m,.*?creativecommons.*,s )
+	    {
+	      $hasLicense = 1;
+	    }
+    }
+    $sth->finish;
+
+    return $hasLicense;
+
+  }
+
+
+sub DoReplication
+  {
+    my ( $handle ) = @_;
+
+    my $statement = qq{$gBaseBinDir/dspace curate -t transmitaip -i  $handle -r - -e fritx\@umich.edu 2>&1};
+
+    my $out = `$statement`;
+    #$out =~ s,log4j:ERROR Unable to delete log file,,gs;
+    $out =~ s,\n,,gs;
+
+    print $out;
+    if (!($out =~ /Curation task: transmitaip performed on:\s*([^ ]+).*?'Created AIP:\s*'([^']+)'/))
+    {
+	    #There has been an error.
+	   $gAllIsFine = 0;
+
+	   #Remove from Zip area
+	   `rm -rf $gZipDir/*`;
+
+	   `rm -rf $gReplicatorWorkingArea/*`;
+
+	   my $msg = qq{Error with Replicator command.};
+
+	   my $statement = qq{delete from aptrust_bagging_error where handle ='$handle'};
+     &ProcessSQL ( $statement );
+
+	   my $statement = qq{insert into aptrust_bagging_error (handle, error) values ('$handle', '$msg')};
+     &ProcessSQL ( $statement );
+
+    }
+
+  }
+
+sub CreateBagFromScratch
+    {
+
+    #Get all the tar files in $gZipDir
+    my $source = $gZipDir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testitems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @allzips;
+    foreach my $itemname (@testitems)
+    {
+      if ( $itemname =~ m,.*zip$, )
+	    {
+	      my $item = qq{$itemname};
+	      push (@allzips, $item);
+	    }
+    }
+
+    foreach my $item (@allzips)
+    {
+      my $file = qq{$gZipDir/$item};
+      `unzip $file -d $gZipDir`;
+
+      my $zipDir = $gZipDir;
+      my $itemDir = $file;
+      $itemDir =~ s,\.zip,,gs;
+
+
+      #You have the itemDir so you 
+      my $bitDir =qq{$itemDir/data/ORIGINAL};
+
+      my @files = &GetAllFilesInDir ( $bitDir );
+
+      foreach my $file ( @files )
+	    {
+	    my $id = $file;
+      $id =~ s,\..*,,gs;
+
+	    $id =~ s,.*\_(.*),$1,;
+	    my $db_checksum = &GetChecksumFromDb ( $id );
+	    my $checksum = `md5sum $itemDir/data/ORIGINAL/$file`;
+	    $checksum =~ s,(.*?)\ .*,$1,s;
+     
+      #To test error condition
+	    #$checksum = "123";
+
+	    if ( $db_checksum ne $checksum )
+	    {
+	      $gAllIsFine =0;
+	      `rm -rf $itemDir`;
+	      `rm $gZipDir/$item`;
+
+	      my $handle = $item;
+        $handle =~ s,.*\-(.*)\.zip$,$1,;
+        $handle = qq{$gHandlePrefix/$handle};
+
+	      my $msg = qq{Checksum issue with file: $file};
+	      my $statement = qq{insert into aptrust_bagging_error (handle, error) values ('$handle', '$msg')};
+        &ProcessSQL ( $statement );
+
+	      #Leave the subroutine; no need to go on.
+        return;
+	    }
+	    }
+
+
+      #Find HandleName
+      my $id = $item;
+      $id =~ s,.*\-(.*)\.zip$,$1,;
+
+      my $bag= qq{deepbluedocs.$id};
+      `/usr/bin/xsltproc -o $itemDir/aptrust-info.txt $gToolsDir/metadata2aptrust-info.xsl $itemDir/data/metadata.xml`;
+      
+      #Payload-Oxum: 2938678.12
+      my $bag_info_file = qq{$itemDir/bag-info.txt};
+      my $payload = &ReadFile ($bag_info_file);
+      $payload =~ s,.*?(Payload\-Oxum.*?)[\t\n\f\r].*,$1,s;
+
+      `java -jar $gToolsDir/saxon9he.jar -s:$itemDir/data/metadata.xml -xsl:$gToolsDir/$gMetabagXsl -o:$itemDir/bag-info.txt`;
+
+      #Add the payload to start of file:
+      my $bag_info_data = &ReadFile ($bag_info_file);
+      $bag_info_data = qq{$payload\n$bag_info_data};
+      &WriteFile($bag_info_file, $bag_info_data);
+      
+      `cp  $itemDir/manifest-md5.txt  $itemDir/docs-files.txt`;
+
+      # Since the bag-info.txt file has changed, we need to get the md5 checksum for it
+      #md5_checksum=$(md5sum  bag-info.txt | sed 's/  bag-info\.txt//')
+      my $md5_checksum_baginfo  = `md5sum $itemDir/bag-info.txt`;
+      my $md5_checksum_manifest = `md5sum $itemDir/manifest-md5.txt`;
+      my $md5_checksum_bagit    = `md5sum $itemDir/bagit.txt`;    
+      my $md5_checksum_aptrust  = `md5sum $itemDir/aptrust-info.txt`;
+      my $md5_checksum_manifest_current = `md5sum $itemDir/docs-files.txt`;
+
+      my $manifest_file = qq{$md5_checksum_manifest$md5_checksum_baginfo$md5_checksum_bagit$md5_checksum_aptrust$md5_checksum_manifest_current};
+      $manifest_file =~ s,$itemDir\/,,gs;
+      my $file = qq{$itemDir/tagmanifest-md5.txt};
+      &WriteFile ( $file, $manifest_file);
+
+      # Once we have that value, we need to update the tagmanifest-md5.txt
+      # Here is an example of what it contains.
+      # more tagmanifest-md5.txt
+      # 0a8e1c51ebff66d2864d1fa951f88be0  bag-info.txt
+      # 3a48f911162784624d4a3a76e6612734  manifest-md5.txt
+      # eaa2c609ff6371712f623f5531945b44  bagit.txt
+
+      # This is moving the ITEM directory
+      `mv $itemDir $gBagDir/$bag`;
+
+      `/usr/bin/tar -cvf $gBagDir/$bag.tar -C $gBagDir $bag `;
+
+      `rm -rf $gBagDir/$bag`;
+      `rm $gZipDir/$item`;
+
+      
+    }
+  }
+
+sub RemoveBag
+  {
+    `rm $gBagDir/*`;
+  }
+
+sub GetChecksumFromDb 
+  {
+    my ( $id ) = @_;
+
+    my $statement = qq{select checksum from bitstream where uuid = '$id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, $checksum );
+    while (@data = $sth->fetchrow_array()) {
+      $checksum = $data[0];
+    }
+    $sth->finish;
+
+    return $checksum;
+  }
+
+
+
+sub GetAllFilesInDir
+  {
+    my ( $dir ) = @_;
+
+    #Get all the tar files in $gBagDir
+    my $source = $dir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @allfiles;
+    foreach my $itemname (@testtems)
+    {
+      if ( ( $itemname =~ m,.*\-[a-z0-9]{12}\..*, ) or ( $itemname =~ m,.*\-[a-z0-9]{12}$, ) )
+	    {
+	      my $item = qq{$itemname};
+	      push (@allfiles, $item);
+	    }
+    }
+
+    return @allfiles;
+      
+  }
+
+sub DepositBagToAPTrust
+  {
+
+    #Get all the tar files in $gBagDir
+    my $source = $gBagDir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @allbags;
+    foreach my $itemname (@testtems)
+    {
+      if ( $itemname =~ m,.*tar$, )
+	    {
+	      my $item = qq{$itemname};
+	      push (@allbags, $item);
+	    }
+    }
+
+    #Now that I have all the bags, send them to APTrust
+    foreach my $bag (@allbags)
+    {
+      #This is where you send one bag at a time and record that in the db.
+      my $out = `/root/.local/bin/aws s3 cp $gBagDir/$bag s3://$gBucketname/$bag 2>&1`;
+      my $msg = qq{Sending $bag to APTurst via aws.\n};
+      print $msg;
+
+      my $handle = $bag;
+      $handle =~ s,.tar,,;
+      $handle =~ s,deepbluedocs\.,,;
+      $handle = qq{$gHandlePrefix/$handle};
+      my $date = &GetTodaysDate();
+      my $last_modified_date = &GetLastModifiedDate ( $handle );
+      my $sent_count = &GetSentCount ( $handle );
+      $sent_count = $sent_count + 1;
+
+      my $statement = qq{delete from aptrust_bags_sent where handle='$handle'};
+      &ProcessSQL ( $statement );
+
+      my $statement = qq{insert into aptrust_bags_sent (handle, bag, date, last_modified_date, sent_count, check_status)  values ('$handle', '$bag', '$date', '$last_modified_date', $sent_count, 'CHECK')};
+      &ProcessSQL ( $statement );
+	
+    }
+
+  }
+
+
+sub GetItemId
+  {
+    my ( $handle ) = @_;
+
+    my $statement = qq{select resource_id from handle where handle='$handle'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $itemid;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+
+    }
+    $sth->finish;
+
+    return $handle;
+  }
+
+
+sub GetModDate
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select last_modified from item where uuid='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $mod_date;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $mod_date = $data[0];
+    }
+    $sth->finish;
+
+    return $mod_date;
+  }
+
+sub GetOriginalBits
+  {
+
+    my ( $item_id ) = @_;
+      
+    my $statement = qq{select bitstream_id from bundle2bitstream where bundle_id in (select bundle_id from item2bundle where item_id = '$item_id') and bundle_id in ( select dspace_object_id from metadatavalue where text_value = 'ORIGINAL' and metadata_field_id= 64)};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my @bits;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @bits, $data[0] );
+    }
+    $sth->finish;
+
+    return @bits;
+
+  }
+
+
+sub GetSentCount
+  {
+    my ( $handle ) = @_;
+      
+    my $statement = qq{select sent_count from aptrust_bags_sent where handle='$handle'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $sent_count = 0;
+    my ( @data, $date );
+    while (@data = $sth->fetchrow_array()) {
+      $sent_count = $data[0];
+    }
+
+    $sth->finish;
+    
+    return $sent_count;
+  }
+
+
+sub GetLastModifiedDate
+  {
+    my ( $handle ) = @_;
+      
+    my $statement = qq{select last_modified from item where uuid in ( select resource_id from handle where handle='$handle')};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, $date );
+    while (@data = $sth->fetchrow_array()) {
+      $date = $data[0];
+    }
+
+    $sth->finish;
+    
+    return $date;
+  }
+
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+  }
+
+
+sub GetTodaysDate
+{
+
+  my $local_time = strftime "%F %T", localtime time;
+
+  return $local_time;
+}
+
+
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub WriteFile 
+  {
+    my ( $filename, $report ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+__END__;
+
+
+

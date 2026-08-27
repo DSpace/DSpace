@@ -1,0 +1,249 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+# Once this is done,  you need to run this to update the metadata.
+#
+# /dir/misc/update-orcid-values-monthly
+#
+#
+
+
+use Encode;
+use utf8;
+use DBI;
+use File::Path;
+
+use LWP::Simple;
+use LWP::UserAgent;
+use Getopt::Std;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $stmt = qq{delete from orcid_info};
+ProcessSQL ( $stmt );
+
+&ProcessId();
+
+$dbhP->disconnect;
+exit;
+
+################################################################################################
+
+sub ProcessId
+  {
+
+    my $report = '';
+
+    my $statement = qq{select dspace_object_id, text_value from metadatavalue where metadata_field_id = 101 and dspace_object_id in (select uuid from item where in_archive = true)};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my ( @data, @bits, @size, @format );
+    while (@data = $sth->fetchrow_array()) {
+      my $resource_id = $data[0];
+      my $orcid = $data[1];
+
+      $orcid =~ s,.*\/(.*),$1,;
+
+      #See if orcid is in name-orcid metadata
+      my $inmeta = &InMeta ( $resource_id, $orcid );
+
+      unless ( $inmeta )
+	    {
+
+	      my $handle = &GetHandle ( $resource_id );
+	      unless ( $handle == '' )
+	      {
+	        my $msg = qq{$handle $orcid\n};
+	        print $msg;
+	      
+	        my $out = `curl -i https://pub.orcid.org/v2.0/$orcid/record`;
+	      
+	        $out =~ s,\n,,gs;
+	        $out =~ s,\t,,gs;
+	        $out =~ s,\r,,gs;
+	      
+	        my $fn = $out;
+	        $fn =~ s,.*?given\-names\>(.*?)\<.*,$1,gs;
+	      
+	        my $ln = $out;
+	        $ln =~ s,.*?family\-name\>(.*?)\<.*,$1,gs;
+	      
+	        my $name = qq{$ln, $fn};
+	        print $name . "\n";
+	      
+	        my $size = length ( $name );
+	        if ( $size > 150 )
+		      {
+		        $report .= qq{$handle had trouble with this ORCID = $orcid \n};
+		        $fn = 'ERROR';
+		        $ln = 'ERROR';
+		      }	
+	      
+	        $ln =~ s,\',&#x2019;,gs;
+	        $fn =~ s,\',&#x2019;,gs;
+	      
+	        my $stmt = qq{insert into orcid_info values ( '$handle', '$orcid', E'$ln', E'$fn')};
+	        &ProcessSQL ( $stmt );
+	      
+	        my $a = 3;
+	        sleep (2);
+	    }
+	  }
+  }
+
+  $sth->finish;
+
+  print $report;
+
+}
+
+sub InMeta
+    {
+      my ( $resource_id, $orcid ) = @_;
+
+      my $statement = qq{select dspace_object_id, text_value from metadatavalue where text_value like '%$orcid%' and metadata_field_id = 173  and dspace_object_id = '$resource_id'};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      my $inmeta = 0;
+      my ( @data, @bits, @size, @format );
+      while (@data = $sth->fetchrow_array()) {
+	      $inmeta = 1;
+      }
+
+      $sth->finish;
+
+      return $inmeta
+
+    }
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id' and resource_type_id = 2};
+
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+    }
+
+    $sth->finish;
+
+    return $handle;
+  }
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub WriteFile 
+  {
+    my ( $report, $filename ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+sub CompleteList
+{
+    my ($dir, @list) = @_;
+    
+    my @outdir;
+    
+    foreach my $item (@list)
+    {
+        my $outdir = qq{$dir/$item};
+        push (@outdir, $outdir);
+    }
+    return @outdir;
+}
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+  }
+
+__END__;
+
+
+

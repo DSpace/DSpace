@@ -1,0 +1,769 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+use LWP::Simple;
+use LWP::UserAgent;
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+my $gNihApi         = $ENV{'NIH_API'};
+my $gNcbiApi        = $ENV{'NCBI_API'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $gToday = &GetToday();
+
+my $gRetrycount = 3;
+my $gTooMany .= qq{NumOfIds\thandle\tpubmedids\n};
+&CreateReport();
+
+$dbhP->disconnect;
+
+exit;
+
+  
+sub GetItemIdsInPR
+  {
+
+   my $statement = qq{select distinct CI.item_id from collection2item CI, Item I where CI.collection_id = '4fdfaf57-d4ad-437f-9cf4-a2070e529d6e' and CI.item_id = I.uuid and I.withdrawn='f' and I.uuid::"varchar" not in ( select item_id_uuid from ItemsInPubMed ) };
+
+   my $sth = $dbhP->prepare($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+   
+   # Read the matching records and print them out
+   $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+
+   my ( @itemids, @data );
+   while (@data = $sth->fetchrow_array()) {
+     push ( @itemids, $data[0] );     
+   }
+   
+   $sth->finish;
+   
+   return @itemids;
+
+  }
+
+
+sub GetValues
+  {
+    my ( $item_id, $field_id ) = @_;
+
+   my $statement = qq{select text_value from metadatavalue where dspace_object_id = '$item_id' and metadata_field_id = $field_id};
+   
+   my $sth = $dbhP->prepare($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+   
+   # Read the matching records and print them out
+   $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+
+   my ( @values, @data );
+   while (@data = $sth->fetchrow_array()) {
+     push ( @values, $data[0] );     
+   }
+   
+   $sth->finish;
+   
+   return @values;
+
+  }
+
+sub GetValue
+  {
+    my ( $item_id, $field_id ) = @_;
+
+   my $statement = qq{select text_value from metadatavalue where dspace_object_id = '$item_id' and metadata_field_id = $field_id};
+   
+   my $sth = $dbhP->prepare($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+   
+   # Read the matching records and print them out
+   $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+
+   my ( $value, @data );
+   while (@data = $sth->fetchrow_array()) {
+     $value = $data[0];
+   }
+   
+   $sth->finish;
+   
+   return $value;
+
+  }
+
+sub GetFirstValue
+  {
+    my ( $item_id, $field_id ) = @_;
+
+   my $statement = qq{select text_value from metadatavalue where dspace_object_id = '$item_id' and metadata_field_id = $field_id};
+   
+   my $sth = $dbhP->prepare($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+   
+   # Read the matching records and print them out
+   $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+
+   my ( $value, @data );
+   my $NotDone = 1;
+   while ((@data = $sth->fetchrow_array()) && ($NotDone )) {
+     $value = $data[0];
+     $NotDone = 1;
+   }
+   
+   $sth->finish;
+   
+   return $value;
+
+  }
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+   my $statement = qq{select handle from Handle where resource_id = '$item_id'};
+   
+   my $sth = $dbhP->prepare($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+   
+   # Read the matching records and print them out
+   $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+
+   my ( $handle, @data );
+   while (@data = $sth->fetchrow_array()) {
+     $handle = $data[0];
+   }
+   
+   $sth->finish;
+   
+   return $handle;    
+    
+  }
+
+
+sub CreateReport
+  {
+
+    my @itemids = &GetItemIdsInPR ();
+
+    my $finalcount = 0;
+    my $seq = 1;
+    my $count = 0;
+
+    my $ReportOut;
+
+    my $report;
+    $report .= qq{count\thandle\tpubmedid\n};
+    foreach my $item_id ( @itemids )
+      {
+	my @issns = &GetValues ( $item_id, 21 );
+	my $issnCat;
+	foreach my $value ( @issns )
+	  {
+	    $issnCat .= qq{$value; };
+	  }
+	my $issnQuery;
+	foreach my $value ( @issns )
+	  {
+	    $issnCat .= qq{$value [] };
+	  }
+
+	my $title = &GetValue ( $item_id, 64 );
+	my $author = &GetFirstValue ( $item_id,  1 );
+	$author =~ s,(.*?)\,.*,$1,s;
+	my $date = &GetValue ( $item_id, 15 );
+	my $pmid = &GetValue ( $item_id, 80 );
+	my $handle = &GetHandle ( $item_id );
+
+	#The year will be the 1st 4 digits
+	$date =~ s,^([0-9]{4}).*,$1,s;
+
+        my $citation = &GetValue ( $item_id, 18);				 
+	
+	#From citation grab the volume and 1st page if in the citation field
+	my $volume = $citation;
+	if ( $volume =~ m,.*\(.*?\):.*?-.*,s )
+         {
+            $volume =~ s,(.*)\(.*?\):.*?-.*,$1,s;
+            $volume =~ s,.* (.*),$1,s;
+         }
+	else
+	  {
+	    $volume = '';
+	  }
+
+	my $page = $citation;
+	if ( $page =~ m,.*\(.*?\):.*?-.*,s )
+         {
+            $page =~ s,.*\(.*?\):(.*?)-.*,$1,s;
+            $page =~ s, ,,s;
+         }
+	else
+	  {
+	    $page = '';
+	  }
+
+	my $fullquery = 1;
+	my $query;
+	my $term_found = 0;
+	my $NumIssn = scalar (@issns );
+	if ( $NumIssn == 0 )
+	  {
+	    $fullquery = 0;
+	  }
+	elsif ( $NumIssn == 1 )
+	  {
+	    $query .= qq{$issns[0]\[ta\]};
+	    $term_found = 1;
+	  }
+	elsif ( $NumIssn == 2 )
+	  {
+	    $query .= qq{($issns[0]\[ta\]+OR+$issns[1]\[ta\])};
+	    $term_found = 1;
+	  }
+	elsif ( $NumIssn > 2 )
+	  {
+	    #print error
+	    my $msg = qq{Issn more than 2 \n};
+	    print $msg;
+	  }
+
+	if ( $date )
+	  {
+	    if ( $term_found )
+	      {
+		$query .= qq{+AND+$date\[year\]};
+	      }
+	    else
+	      {
+		$query .= qq{$date\[year\]};
+	      }
+	    $term_found = 1;
+	  }
+	else
+	  {
+	    $fullquery = 0;
+	  }
+
+	if ( $volume )
+	  {
+	    if ( $term_found )
+	      {
+		$query .= qq{+AND+$volume\[vi\]};
+	      }
+	    else
+	      {
+		$query .= qq{$volume\[vi\]};
+	      }
+	    $term_found = 1;
+	  }
+	else
+	  {
+	    $fullquery = 0;
+	  }
+
+
+	if ( $page )
+	  {
+	    if ( $term_found )
+	      {
+		$query .= qq{+AND+$page\[pg\]};
+	      }
+	    else
+	      {
+		$query .= qq{$page\[pg\]};
+	      }
+	    $term_found = 1;
+	  }
+	else
+	  {
+	    $fullquery = 0;
+	  }
+
+
+	my $authorfound = 1;
+	if ( $author )
+	  {
+	    if ( $term_found )
+	      {
+		$query .= qq{+AND+$author\[auth\]};
+	      }
+	    else
+	      {
+		$query .= qq{$author\[auth\]};
+	      }
+	    $term_found = 1;
+	  }
+	else
+	  {
+	    $fullquery = 0;
+	    $authorfound = 0;
+	  }
+
+
+	#If we happen to have a pmid then do this.
+	my $url;
+	if ( $pmid )
+	  {
+	    $url = qq{$gNihApi\?db=pubmed&term=$pmid\[uid\]&tool=deepblue};
+	  }
+	else
+	  {
+	    $url = qq{$gNihApi\?db=pubmed&term=$query&tool=deepblue};
+	  }
+
+	my $out = &GetResponse ( $url );
+        my $id = &GetId ( $handle, $out );
+
+	      my $valueSize = length $id;
+        if ( ( $id ) and ( $valueSize < 50 ) )
+        {
+           $count = $count + 1;
+           $finalcount = $finalcount + 1;
+           $ReportOut .= &GetReportFileV2 ( $finalcount, $id, $handle );
+	         &PostItemToPubMedTable ( $item_id, $handle, $id );
+           $report .= qq{$finalcount\t$handle\t$id\t$fullquery\t$authorfound\n};
+           my $msg = qq{final count $finalcount $handle $id\n};
+           print $msg;
+        }
+
+        if ( $count == 1000 )
+        {
+          my $filename = qq{$gBaseDataDir/PubMed/data$seq-$gToday\.xml};
+          &WriteReportToFile ( $ReportOut, $filename );
+          $seq = $seq + 1 ;
+          $count = 0;
+        }
+
+      }
+
+      #Write out the final chunk.
+      my $filename = qq{$gBaseDataDir/PubMed/data$seq-$gToday\.csv};
+      &WriteReportToFile ( $ReportOut, $filename );
+
+      $filename = qq{$gBaseDataDir/PubMed/Match};
+      &WriteReportToFile ( $report, $filename );
+      my $msg = qq{final count $finalcount \n};
+
+      $filename = qq{$gBaseDataDir/PubMed/NoMatch};
+      &WriteReportToFile ( $gTooMany, $filename );
+      print $msg;
+  
+  }
+
+sub PostItemToPubMedTable 
+{
+  my ( $item_id, $handle, $pmid ) = @_;
+
+  my $statement = qq{insert into ItemsInPubMed  values ( 0, '$handle', '$pmid', '$gToday', '$item_id' )};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  $sth->finish;
+
+}
+
+
+sub GetReportFile
+{
+  my ( $count, $id, $handle ) = @_;
+
+my $out = qq{
+  <Link>
+    <LinkId>$count</LinkId>      
+    <ProviderId>6501</ProviderId> 
+    <IconUrl>http://deepblue.lib.umich.edu/image/deepbluepmc.jpg</IconUrl>
+    <ObjectSelector> 
+       <Database>PubMed</Database>
+       <ObjectList> 
+          <ObjId>$id</ObjId>
+       </ObjectList> 
+    </ObjectSelector> 
+    <ObjectUrl> 
+    
+       <Rule>http://hdl.handle.net/$handle</Rule> 
+       <UrlName>Full text from the Univ. of Michigan Library</UrlName>
+       <Attribute>electronic full-text</Attribute> 
+    </ObjectUrl>
+ </Link> 
+};
+
+}
+
+sub GetItemId
+{
+  my ( $handle ) = @_;
+
+  $handle =~ s, ,,gs;
+  my $statement = qq{select resource_id from handle where handle = '$handle'};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my ( @data, $item_id );
+  while (@data = $sth->fetchrow_array()) {
+    $item_id = $data[0];
+  }
+  $sth->finish;
+
+  return $item_id;
+}
+
+sub AreEqual 
+{
+  my ( $v1, $v2 ) = @_;
+
+  $v1 = lc($v1);
+  $v2 = lc($v2);
+      
+  my ( @value1, @value2 );
+
+  @value1 = split ( /\ /, $v1 );
+  @value2 = split ( /\ /, $v2 );
+      
+  if (($value1[0] eq $value2[0]) && 
+      ($value1[1] eq $value2[1])) 
+    {
+      return 1;
+    }
+  else
+    {
+      return 0;
+    }
+  
+}
+
+
+
+sub GetReportFileV2
+{
+  my ( $count, $pmid, $handle ) = @_;
+
+  my $url = qq{$gNcbiApi$pmid};
+
+  my $out = &GetResponse ( $url );
+  
+  #title
+  my $item_id = &GetItemId ( $handle );
+
+  my $title = &GetValue ( $item_id, 64 );
+
+
+  $out =~ s,.*?\<title\>(.*?)\<\/title\>.*,$1,s;
+  $title =~ s/^\s+//;
+  $out =~ s/^\s+//;
+  $title =~ s/\s+$//;
+  $out =~ s/\s+$//;
+
+  $title =~ s/[^a-zA-Z0-9, ]//g;
+  $out =~ s/[^a-zA-Z0-9, ]//g;
+
+  my $report;
+  if (&AreEqual ( $title, $out ) )
+    {
+      #print "EQUAL " . "\n\n";
+
+      $report = qq{6501,PubMed,$pmid,http://hdl.handle.net/$handle,https://deepblue.lib.umich.edu/themes/Mirage/images_jsp/deepbluepmc.jpg,Full text from the Univ. of Michigan Library, ,full-text PDF\n};
+    }
+  else
+    {
+
+      my $msg = qq{db=> $title\npm=> $out\n};
+      print $msg;
+      print "NOT EQUAL ($count)- still putting  item in table => ItemsInPubMed.  If it turns out that is should not be there, remove it from file and from table.  Usually it is equal." . "\n\n";
+
+      $report = qq{6501,PubMed,$pmid,http://hdl.handle.net/$handle,https://deepblue.lib.umich.edu/themes/Mirage/images_jsp/deepbluepmc.jpg,Full text from the Univ. of Michigan Library, ,full-text PDF\n};
+    }
+
+  sleep 3;
+
+  return $report;
+
+}
+
+
+sub GetId
+{
+  my ( $handle, $data ) = @_;
+
+  $data =~ s,.*?\<IdList\>(.*?)\<\/IdList.*,$1,s;
+
+  $data =~ s,\cI,,gs;
+  $data =~ s,\n,,gs;
+
+
+  #If there are no ids, return '', if there are more than one id, return ''
+  $data =~ s,<Id>,,gs,;
+  $data =~ s,<\/Id>,;,gs,;
+
+  
+  my @ids = split (/;/, $data);
+  my $NumOfIds = scalar @ids;
+
+  if ( $NumOfIds == 0 )
+  {
+    $gTooMany .= qq{$NumOfIds\t$handle\t\n};
+    my $msg = qq{===> $NumOfIds (ZERO) <==== \n};
+    return '';
+  }
+  elsif ( $NumOfIds > 1 )
+  {
+    $gTooMany .= qq{$NumOfIds\t$handle\t$data\n};
+    my $msg = qq{===> $NumOfIds (TOO MANY) <==== \n};
+    print $msg;
+    return '';
+  }
+  else
+  {
+    return $ids[0];
+  }
+
+
+}
+
+
+
+sub GetResponse
+  {
+   my ( $url ) = @_;
+
+    my $TryCount = 1;
+
+
+TRY_AGAIN:
+    #Call to LWP to get response.
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout( 300 ); ## timeout for 180 seconds
+    my $req = HTTP::Request->new( GET => $url );
+    
+    #$req->content_type('application/x-www-form-urlencoded');
+
+    #$req->header('Accept-Encoding' => '*');
+
+
+    # Pass request to the user agent and get a response back
+    my $res = $ua->request( $req );
+
+    if ( $res->is_success )
+    {
+	#return the data
+        if ( $res->content )
+	  {
+	    return $res->content;
+	  }
+	else
+	  {
+	    if ( $TryCount > $gRetrycount  )
+	      {
+		my $msg = qq{no response for $url \n};
+		print $msg;
+		return 'bad';
+		exit;
+	      }
+	    $TryCount = $TryCount + 1;
+
+	    #delay 3 seconds
+	    sleep (3);
+	    goto TRY_AGAIN;	    
+	  }
+    } 
+    else
+      {
+	if ( $TryCount > $gRetrycount  )
+	  {
+	    my $msg = qq{no response for $url \n};
+	    print $msg;
+	    return 'bad';
+	    exit;
+	  }
+	$TryCount = $TryCount + 1;
+	
+	#delay 3 seconds
+	sleep (3);
+	goto TRY_AGAIN;	    
+      }
+
+    exit;
+
+  }
+
+sub NotUnique
+  {
+    my ( @values ) = @_;
+
+    &SortUniquifyList ( \@values );
+
+    my $size = scalar @values;
+
+    if ( $size > 1 )
+      {
+	return 1;
+      }
+
+    return 0;
+  }
+
+
+sub ConvertToString 
+  {
+    my ( @values ) = @_;
+
+    my $out;
+    foreach my $value ( @values )
+      {      
+       
+      }
+  }
+
+sub GetToday
+  {
+
+    my $newtime = scalar localtime(time());
+    my $year = substr($newtime, 20, 4);
+    my %months = (
+                  "Jan" => "01",
+                  "Feb" => "02",
+                  "Mar" => "03",
+                  "Apr" => "04",
+                  "May" => "05",
+                  "Jun" => "06",
+                  "Jul" => "07",
+                  "Aug" => "08",
+                  "Sep" => "09",
+                  "Oct" => "10",
+                  "Nov" => "11",
+                  "Dec" => "12",
+                 );
+    my $month = $months{substr ($newtime,4, 3)};
+    my $day = substr($newtime, 8, 2);
+    $day =~ s, ,0,g;
+
+    my $today = qq{$month-$day-$year};
+    
+    return $today;
+
+  }
+
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+
+  }
+
+sub IsHandleNew
+{
+  my ( $handle ) = @_;
+
+  my $HandleIsNew = 1;
+  my $statement = qq{select handle from HandleInMirlyn where handle='$handle'};
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my ( @data );
+  while (@data = $sth->fetchrow_array()) {
+    $HandleIsNew = 0;
+  }
+  $sth->finish;
+
+  return $HandleIsNew;
+
+
+}
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+}
+
+sub WriteReportToFile 
+  {
+    my ( $report, $fileName ) = @_;
+
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+__END__;
+
+
+

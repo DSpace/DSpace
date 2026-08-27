@@ -1,0 +1,557 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+my $itemReport = &CreateItemReport ();
+my $bitstreamReport = &CreateBitstreamReport ();
+
+my $report = qq{$itemReport\n$bitstreamReport\n};
+
+print $report;
+
+$dbhP->disconnect;
+
+exit;
+
+sub FormatNumber 
+  {
+    my ( $number ) = @_;
+
+    if ( $number =~ m,.*\.[0-9][0-9]*, )
+      {
+	$number =~ s,(.*\.[0-9])[0-9]*,$1,; 
+      }
+    if ( $number > 0 )
+      {
+	$number = qq{+ $number};
+      }
+    elsif ( $number < 0 )
+      {
+	$number =~ s,\-,- ,;
+      }
+
+    return $number;
+  }
+
+
+
+sub GetLastFY
+  {
+    my ( $month, $year ) = @_;
+
+    my $FYyear = $year - 1;
+    if ( $month eq '07' )
+      {
+	$FYyear = $year;
+      }
+    elsif ( $month eq '08' )
+      {
+	$FYyear = $year;
+      }
+    elsif ( $month eq '09' )
+      {
+	$FYyear = $year;
+      }
+    elsif ( $month eq '10' )
+      {
+	$FYyear = $year;
+      }
+    elsif ( $month eq '11' )
+      {
+	$FYyear = $year;
+      }
+    elsif ( $month eq '12' )
+      {
+	$FYyear = $year;
+      }    
+
+    return ( '07', $FYyear );
+
+
+  }
+
+
+#  A Number of Items Added this month
+#  B Number of Items Added a yearago this month
+#  (A/B) * 100
+#  C Total number of Items in DeepBlue this month
+#  D Total number of Items in DeepBlue this month a year ago.
+#  (C/D) * 100
+
+
+sub CreateItemReport
+  {
+
+    my $report = qq{=========Item Stats ===========================================\n};
+
+    #Pass the rant
+    #start - end 
+
+    my ($month, $year) = &GetLastMonthYear ();
+    my $end = qq{$year-$month-31};
+    my $start = qq{$year-$month-01};
+    my $ItemsAddedThisMonth = &GetItemCount ( $start, $end );
+    $report .= qq{Number of Items Added $year/$month (Reporting Month) => $ItemsAddedThisMonth\n};
+
+    my ($month, $year) = &GetPreviousMonthYear ();
+    my $end = qq{$year-$month-31};
+    my $start = qq{$year-$month-01};
+    my $ItemsAddedLastMonth = &GetItemCount ( $start, $end );
+    $report .= qq{Number of Items Added $year/$month (Previous Month) => $ItemsAddedLastMonth\n};
+
+    #Last FY to now
+    my ($month, $year) = &GetLastMonthYear ();
+    my $end = qq{$year-$month-31};
+    my $Lend = qq{$year/$month};
+    my ($month, $year) = &GetLastFY ( $month, $year);
+    my $start = qq{$year-$month-01};
+    my $Lstart = qq{$year/$month};
+    my $FYTD = &GetItemCount ( $start, $end );
+    $report .= qq{Number of Items Added $Lstart thru $Lend (FYTD) => $FYTD\n};
+
+    my ($month, $year) = &GetLastMonthYear ();
+    my $year = $year - 1;
+    my $end = qq{$year-$month-31};
+    my $start = qq{$year-$month-01};
+    my $ItemsAddedThisMonthAYearAgo = &GetItemCount ( $start, $end );
+    $report .= qq{Number of Items Added $year/$month (Same month last year)=> $ItemsAddedThisMonthAYearAgo\n};
+
+    #Penultimate FY to now
+    my ($month, $year) = &GetLastMonthYear ();
+    $year = $year - 1;
+    my $end = qq{$year-$month-31};
+    my $Lend = qq{$year/$month};
+    my ($month, $year) = &GetLastMonthYear ();
+    my ($month, $year) = &GetLastFY ( $month, $year);
+    $year = $year - 1;
+    my $start = qq{$year-$month-01};
+    my $Lstart = qq{$year/$month};
+    my $FYTDLast = &GetItemCount ( $start, $end );
+    $report .= qq{Number of Items Added $Lstart thru $Lend (FYTD last yr.) => $FYTDLast\n};
+
+
+    #FYTDDiff
+    my $FYTDDiff = ( $FYTD - $FYTDLast );
+    $FYTDDiff = &FormatNumber ( $FYTDDiff )  ;
+    $report .= qq{FYTD +/- diff => $FYTDDiff\n};
+
+    #PercentDiff
+    my $FYTDDiff = qq{FYTD Last Year is zero, can't divide by zero};
+    if ( $FYTDLast != 0 )
+      {
+	      $FYTDDiff = 100 * (( $FYTD - $FYTDLast )/$FYTDLast) ;
+	      $FYTDDiff = &FormatNumber ( $FYTDDiff )  ;
+      }
+    $report .= qq{% diff FYTD => $FYTDDiff\n};
+
+    $report .= qq{=================================================================\n};
+
+    return $report;
+
+  }
+
+
+sub CreateBitstreamReport
+  {
+
+    my $report = qq{=========Bitstream Stats ===========================================\n};
+
+    #Pass the rant
+    #start - end 
+
+    my ($month, $year) = &GetLastMonthYear ();
+    my $end = qq{$year-$month-31};
+    my $start = qq{$year-$month-01};
+    my $BitstreamsAddedThisMonth = &GetBitstreamCount ( $start, $end );
+    $report .= qq{Number of Bitstreams Added $year/$month (Reporting Month) => $BitstreamsAddedThisMonth\n};
+
+    my ($month, $year) = &GetPreviousMonthYear ();
+    my $end = qq{$year-$month-31};
+    my $start = qq{$year-$month-01};
+    my $BitstreamsAddedLastMonth = &GetBitstreamCount ( $start, $end );
+    $report .= qq{Number of Bitstreams Added $year/$month (Previous Month) => $BitstreamsAddedLastMonth\n};
+
+    #Last FY to now
+    my ($month, $year) = &GetLastMonthYear ();
+    my $end = qq{$year-$month-31};
+    my $Lend = qq{$year/$month};
+    my ($month, $year) = &GetLastFY ( $month, $year);
+    my $start = qq{$year-$month-01};
+    my $Lstart = qq{$year/$month};
+    my $FYTD = &GetBitstreamCount ( $start, $end );
+    $report .= qq{Number of Bitstreams Added $Lstart thru $Lend (FYTD) => $FYTD\n};
+
+    my ($month, $year) = &GetLastMonthYear ();
+    my $year = $year - 1;
+    my $end = qq{$year-$month-31};
+    my $start = qq{$year-$month-01};
+    my $BitstreamsAddedThisMonthAYearAgo = &GetBitstreamCount ( $start, $end );
+    $report .= qq{Number of Bitstreams Added $year/$month (Same month last year)=> $BitstreamsAddedThisMonthAYearAgo\n};
+
+    #Penultimate FY to now
+    my ($month, $year) = &GetLastMonthYear ();
+    $year = $year - 1;
+    my $end = qq{$year-$month-31};
+    my $Lend = qq{$year/$month};
+    my ($month, $year) = &GetLastMonthYear ();
+    my ($month, $year) = &GetLastFY ( $month, $year);
+    $year = $year - 1;
+    my $start = qq{$year-$month-01};
+    my $Lstart = qq{$year/$month};
+    my $FYTDLast = &GetBitstreamCount ( $start, $end );
+    $report .= qq{Number of Bitstreams Added $Lstart thru $Lend (FYTD last yr.) => $FYTDLast\n};
+
+
+    #FYTDDiff
+    my $FYTDDiff = ( $FYTD - $FYTDLast );
+    $FYTDDiff = &FormatNumber ( $FYTDDiff )  ;
+    $report .= qq{FYTD +/- diff => $FYTDDiff\n};
+
+    #PercentDiff
+    my $FYTDDiff = qq{FYTD Last Year is zero, can't divide by zero};
+    if ( $FYTDLast != 0 )
+      {
+	      $FYTDDiff = 100 * (( $FYTD - $FYTDLast )/$FYTDLast) ;
+	      $FYTDDiff = &FormatNumber ( $FYTDDiff )  ;
+      }
+    $report .= qq{% diff FYTD => $FYTDDiff\n};
+
+    $report .= qq{=================================================================\n};
+
+    return $report;
+
+  }
+
+
+sub GetItemCount
+  {
+
+    my ( $start, $end ) = @_;
+
+    my $statement = &GetStatement( $start, $end );
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $count = 0;
+    my ( $item_id, $accession, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $item_id = $data[0];
+      $accession = $data[1];
+      #my $msg = qq{$accession   $item_id\n};
+      #print $msg;
+      $count = $count + 1;
+    }
+    $sth->finish; 
+    
+    return $count;
+
+  }
+
+
+sub GetBitstreamCount
+  {
+
+    my ( $start, $end ) = @_;
+
+    my $statement = &GetStatement ( $start, $end );
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $count = 0;
+    my ( $item_id, $accession, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $item_id = $data[0];
+      $accession = $data[1];
+      #my $msg = qq{$accession   $item_id\n};
+      #print $msg;
+      my $BitCount = &GetBitCount ( $item_id );
+      $count = $count + $BitCount;
+    }
+    $sth->finish; 
+    
+    return $count;
+
+  }
+
+sub GetStatement
+  {
+    my ( $start, $end ) = @_;
+
+    my $statement;
+
+    $statement = qq{select M.dspace_object_id, M.text_value from metadatavalue M, item I  where I.in_archive='t' AND M.dspace_object_id = I.uuid AND M.metadata_field_id = 11 AND M.text_value <= '$end' AND M.text_value >= '$start'};
+
+    return $statement;
+  }
+
+
+sub GetBitCount 
+{
+  my ( $item_id ) = @_;
+
+  #my $statement = qq{select count(*) from bundle B, item2bundle IB, Bundle2Bitstream BB, Bitstream Bi where Bi.bitstream_id = BB.bitstream_id and IB.bundle_id = BB.bundle_id and B.bundle_id = IB.bundle_id and IB.item_id = $item_id and B.name = 'ORIGINAL'};
+
+  my $statement = qq{select count(*) from metadatavalue M, bundle B, item2bundle IB, Bundle2Bitstream BB, Bitstream Bi where Bi.uuid = BB.bitstream_id and IB.bundle_id = BB.bundle_id and B.uuid = IB.bundle_id and IB.item_id = '$item_id' and B.uuid = M.dspace_object_id and M.text_value='ORIGINAL'};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $count = 0;
+  my @data;
+  while (@data = $sth->fetchrow_array()) {
+    $count = $data[0];
+
+  }
+  $sth->finish; 
+
+  return $count;
+    
+}
+
+
+sub GetPreviousMonthYear
+  {
+    my $newtime = scalar localtime(time());
+    my $year = substr($newtime, 20, 4);
+    my %months = (
+                  "Jan" => "01",
+                  "Feb" => "02",
+                  "Mar" => "03",
+                  "Apr" => "04",
+                  "May" => "05",
+                  "Jun" => "06",
+                  "Jul" => "07",
+                  "Aug" => "08",
+                  "Sep" => "09",
+                  "Oct" => "10",
+                  "Nov" => "11",
+                  "Dec" => "12",
+                 );
+    my $month = $months{substr ($newtime,4, 3)};
+
+    if ( $month eq '01' )
+      {
+	$month = '11';
+	$year = $year - 1;
+      }
+    elsif ( $month eq '02' )
+      {
+	$month = '12';
+	$year = $year - 1;
+      }
+    elsif ( $month eq '03' )
+      {
+	$month = '01';
+      }
+    elsif ( $month eq '04' )
+      {
+	$month = '02';
+      }
+    elsif ( $month eq '05' )
+      {
+	$month = '03';
+      }
+    elsif ( $month eq '06' )
+      {
+	$month = '04';
+      }
+    elsif ( $month eq '07' )
+      {
+	$month = '05';
+      }
+    elsif ( $month eq '08' )
+      {
+	$month = '06';
+      }
+    elsif ( $month eq '09' )
+      {
+	$month = '07';
+      }
+    elsif ( $month eq '10' )
+      {
+	$month = '08';
+      }
+    elsif ( $month eq '11' )
+      {
+	$month = '09';
+      }
+    elsif ( $month eq '12' )
+      {
+	$month = '10';
+      }
+
+    return ( $month, $year );
+
+  }
+
+sub GetLastMonthYear
+  {
+    my $newtime = scalar localtime(time());
+    my $year = substr($newtime, 20, 4);
+    my %months = (
+                  "Jan" => "01",
+                  "Feb" => "02",
+                  "Mar" => "03",
+                  "Apr" => "04",
+                  "May" => "05",
+                  "Jun" => "06",
+                  "Jul" => "07",
+                  "Aug" => "08",
+                  "Sep" => "09",
+                  "Oct" => "10",
+                  "Nov" => "11",
+                  "Dec" => "12",
+                 );
+    my $month = $months{substr ($newtime,4, 3)};
+
+    if ( $month eq '01' )
+      {
+	$month = '12';
+	$year = $year - 1;
+      }
+    elsif ( $month eq '02' )
+      {
+	$month = '01';
+      }
+    elsif ( $month eq '03' )
+      {
+	$month = '02';
+      }
+    elsif ( $month eq '04' )
+      {
+	$month = '03';
+      }
+    elsif ( $month eq '05' )
+      {
+	$month = '04';
+      }
+    elsif ( $month eq '06' )
+      {
+	$month = '05';
+      }
+    elsif ( $month eq '07' )
+      {
+	$month = '06';
+      }
+    elsif ( $month eq '08' )
+      {
+	$month = '07';
+      }
+    elsif ( $month eq '09' )
+      {
+	$month = '08';
+      }
+    elsif ( $month eq '10' )
+      {
+	$month = '09';
+      }
+    elsif ( $month eq '11' )
+      {
+	$month = '10';
+      }
+    elsif ( $month eq '12' )
+      {
+	$month = '11';
+      }
+
+    return ( $month, $year );
+
+  }
+
+#Leave this routine in case we need it later.  Not used
+#currently.
+sub GetMonthYear
+  {
+    my $newtime = scalar localtime(time());
+    my $year = substr($newtime, 20, 4);
+    my %months = (
+                  "Jan" => "01",
+                  "Feb" => "02",
+                  "Mar" => "03",
+                  "Apr" => "04",
+                  "May" => "05",
+                  "Jun" => "06",
+                  "Jul" => "07",
+                  "Aug" => "08",
+                  "Sep" => "09",
+                  "Oct" => "10",
+                  "Nov" => "11",
+                  "Dec" => "12",
+                 );
+    my $month = $months{substr ($newtime,4, 3)};
+
+    return ( $month, $year );
+
+  }
+
+
+
+sub WriteBufferToFile 
+  {
+
+    my ( $report, $fileName ) = @_;
+    
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+__END__;
+
+
+

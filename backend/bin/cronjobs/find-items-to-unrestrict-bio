@@ -1,0 +1,156 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use Encode;
+use utf8;
+use DBI;
+use File::Path;
+
+use LWP::Simple;
+use LWP::UserAgent;
+use Getopt::Std;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+#all items older than 75 years old need to be set free.
+#So, for example, in Jan 2014 all items from 1939 should be set free.
+#This script outputs the handles of the items to set free.
+&SetItemsFree();
+
+$dbhP->disconnect;
+exit;
+
+################################################################################################
+
+
+sub SetItemsFree
+  {
+
+    #Find the year.
+    my $year = &GetYear;
+    $year = $year - 75;
+
+    my $statement = qq{select handle from handle where resource_type_id = 2 and resource_id in (select dspace_object_id from metadatavalue where text_value='$year' and metadata_field_id =15  and dspace_object_id in ( select uuid from item where owning_collection = '2ede3a84-200e-485d-8f39-d666f177378c'))};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $out = qq{Theese Bio Station items are 75 years old, please set them FREE!\n\nUse this script to double check your work /dir/misc/check-permissions\n\n};
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $out .= qq{$data[0]\n};
+    }
+    $sth->finish;
+    
+    print $out;
+
+  }
+
+sub GetYear
+{
+
+  my $newtime = scalar localtime(time());
+  my $year = substr ($newtime,20, 4);
+  $year = $year + 0;
+
+  return $year;
+    
+}
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub WriteFile 
+  {
+    my ( $report, $filename ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+sub CompleteList
+{
+    my ($dir, @list) = @_;
+    
+    my @outdir;
+    
+    foreach my $item (@list)
+    {
+        my $outdir = qq{$dir/$item};
+        push (@outdir, $outdir);
+    }
+    return @outdir;
+}
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+  }
+
+__END__;
+
+
+

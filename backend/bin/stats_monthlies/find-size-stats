@@ -1,0 +1,192 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use Encode;
+use utf8;
+use DBI;
+use File::Path;
+
+use LWP::Simple;
+use LWP::UserAgent;
+use Getopt::Std;
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+&FindSize();
+
+$dbhP->disconnect;
+
+exit;
+
+################################################################################################
+
+sub ReportMsg
+{
+  my ( $msg ) = @_;
+
+  my $newtime = scalar (localtime(time()));
+
+  $msg = qq{$newtime : $msg};
+  print "$msg","\n";
+
+}
+
+sub FindSize
+  {
+    
+   # Get current date info
+   my ($sec, $min, $hour, $mday, $mon, $year) = localtime();
+
+   # Adjust for previous month
+   if ($mon == 0) {           # If current month is January
+    $mon = 11;             # Previous month is December (11)
+    $year -= 1;            # And one year earlier
+   } else {
+    $mon -= 1;
+   }
+
+   my $prev_month_year = $year + 1900;  # localtime years since 1900
+
+    my $statement = qq{select text_value, dspace_object_id from metadatavalue where metadata_field_id =11 and text_value like '$prev_month_year%' order by 1 asc};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $total = 0;
+    my $old_date = "";
+    my $size = 0;
+    my ( @data, $date, $item_id  );
+    while (@data = $sth->fetchrow_array()) {
+      $date = $data[0];
+      $date =~ s,(.*?\-.*?)\-.*,$1,;
+      $item_id = $data[1];
+
+      #print $old_date . " " . $date . "\n";
+      $size = &GetSize ( $item_id );
+      
+      if ( $old_date eq $date )
+	{
+	  my $msg = qq{$total $size \n};
+	  #print $msg;
+	  $total = $size + $total;
+	}
+      else
+	{ 
+
+	  #Put commas as needed
+	  my $text = reverse $total;
+	  $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+	  $text = scalar reverse $text;
+
+
+	  my $msg = qq{$old_date => $text bytes\n};
+	  print $msg;
+
+
+	  $total = 0;
+	  $total = $size + $total;
+	}
+      
+      $old_date = $date;      
+
+    }
+    $sth->finish; 
+   
+    #Put commas as needed
+    my $text = reverse $total;
+    $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+    $text = scalar reverse $text;
+
+    my $msg = qq{$old_date => $text bytes\n};
+    print $msg;
+}
+
+sub GetSize
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select size_bytes from bitstream where uuid in ( select bitstream_id from bundle2bitstream where bundle_id in (select bundle_id from item2bundle where item_id ='$item_id'))};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $total = 0;
+    my ( @data, $size, $name  );
+    while (@data = $sth->fetchrow_array()) {
+      $size = $data[0];
+      #$name = $data[1];
+
+      #my $msg = qq{name = $name, size=>$size\n};
+      #print $msg;
+      $total = $total + $size;
+      
+    }
+    $sth->finish; 
+
+    return $total;
+
+  }
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+  }
+
+
+__END__;
+
+
+

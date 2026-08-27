@@ -1,0 +1,251 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+my $gBaseBinDir     = $ENV{'BASE_BIN_DIR'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $coll_id = 1234;  #In prod it's 14
+
+# ./dspace itemupdate -e fritx@umich.edu -s /uri_delete -d dc.identifier.uri 2>&1 | tee outfile_delete
+# ./dspace itemupdate -e fritx@umich.edu -s /uri -a dc.identifier.uri 2>&1 | tee outfile_add
+&ReportMsg ( 'Starting To Fix Uri.' );
+
+&FixMeta();
+
+&ReportMsg ( 'Done Fixing Uri.' );
+
+$dbhP->disconnect;
+
+exit;
+
+################################################################################################
+
+sub ReportMsg
+{
+  my ( $msg ) = @_;
+
+  my $newtime = scalar (localtime(time()));
+
+  $msg = qq{$newtime : $msg};
+  print "$msg","\n";
+
+}
+
+sub FixMeta
+  {
+    my $count = 1;
+
+    my $dir = qq{$gBaseDataDir/items-missing-types_MSedits.txt};
+    my $buffer = &ReadFile ( $dir );
+
+    my @lines = split ( /josejose/, $buffer );
+    my $dir;
+
+    $dir = qq{$gBaseDataDir/meta};
+    `rm -r $dir`;
+    `mkdir  $dir`;
+
+    $dir = qq{$gBaseDataDir/meta_delete};
+    `rm -r $dir`;
+    `mkdir  $dir`;
+
+    $dir = qq{$gBaseDataDir/meta};
+
+    foreach my $line ( @lines )
+    {
+	
+	    $line =~ s,\n,,;
+	    my @data = split ( /\t/, $line );
+       
+	    my $handle = $data[0];
+	    my $type = $data[3];
+
+	    $type =~ s,\",,gs;
+	
+	    $handle =~ s,.*(2027.*),$1,;
+
+	    if ( $handle =~ m,2027.*, )
+	    { 
+
+	      my $msg = qq{$count $handle $type \n};
+	      print $msg;
+
+	      my $dir_file = qq{$dir/$count};
+	      &PrepDir ($dir_file, $handle, $type);
+
+	      &PrepDirDelete ( $count, $handle );
+	
+	      $count = $count + 1;
+	    }
+
+    }
+    
+  }
+
+sub GetTypes
+    {
+      my ( $item_id, $count ) = @_;
+
+      my $statement = qq{select text_value from metadatavalue where metadata_field_id = 66 and resource_type_id=2 and resource_id = $item_id;};
+    
+      my $sth = $dbhP->prepare($statement)
+        or die "Couldn't prep9are statement: " . $dbhP->errstr;
+      
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+        or die "Couldn't execute statement: " . $sth->errstr;
+      
+      my ( @types, $value, @data );
+      while (@data = $sth->fetchrow_array()) {
+        my $value = qq{$data[0]}; 
+	
+        my @all_values = split ( /\;/, $value );
+	      push ( @types, @all_values );
+	
+      }
+      $sth->finish;
+
+      my @types_clean;
+      foreach my $value ( @types )
+	    {
+	      $value =~ s/^\s+|\s+$//g;
+	  
+	      push ( @types_clean, $value );
+	      my $msg = qq{$count $value\n};
+	      print $msg;
+	    }
+
+      return @types;
+
+    }
+
+
+sub PrepDir
+  {
+    my ( $dir, $handle, $meta ) = @_;
+
+    my $file = qq{$gBaseBinDir/meta_file};
+    my $dub_file = &ReadFile ( $file );
+    $dub_file =~ s,\$HANDLE,$handle,s;
+    $dub_file =~ s,\$METAVAKYE,$meta,s;
+
+    `mkdir $dir`;
+
+    my $file = qq{$dir/dublin_core.xml};
+    &WriteFile ( $dub_file, $file );
+  }
+
+
+sub PrepDirDelete
+  {
+    my ( $count, $handle ) = @_;
+
+    my $file = qq{$gBaseBinDir/meta_file_delete};
+    my $dub_file = &ReadFile ( $file );
+    $dub_file =~ s,\$HANDLE,$handle,s;
+
+    my $dir = qq{$gBaseDataDir/meta_delete/$count};
+    `mkdir $dir`;
+
+    $file = qq{$gBaseDataDir/meta_delete/$count/dublin_core.xml};
+    &WriteFile ( $dub_file, $file );
+  }
+
+
+sub GetHandle
+  {
+    my ( $item_id, $id ) = @_;
+   
+    my $statement = qq{select handle  from handle where resource_id=$item_id};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+      
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+      
+    my ( $handle, $value, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value = qq{$data[0]}; 
+
+      $handle = qq{http://hdl.handle.net/$value};
+
+    }
+    $sth->finish;
+    
+    return $handle;
+    
+  }
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub WriteFile 
+  {
+    my ( $report, $filename ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+__END__;
+
+
+

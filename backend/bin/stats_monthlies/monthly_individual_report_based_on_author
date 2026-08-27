@@ -1,0 +1,394 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+use Encode qw(encode);
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gMailServer     = $ENV{'mail__P__server'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my ( $date, $gMonth, $gYear ) = &GetDate ();
+
+my %users = &GetIndividuals ();
+
+&ProcessReports ( %users );
+
+$dbhP->disconnect;
+
+exit;
+
+sub ProcessReports 
+{
+  my ( %users ) = @_;
+
+  foreach my $name (keys %users)
+  {
+    my ( @handles ) = &GetHandles ( $name );
+    my $email = $users{$name};
+    
+    #$date = '2015/07';
+    my ( $report, $count ) = &GetReport ( $date, @handles );
+    
+	  &EmailReport ( $email, $count, $report );
+  }
+
+}
+
+
+sub ProcessReportsNoStats
+{
+  my ( @emails ) = @_;
+
+  foreach my $email ( @emails )
+  {
+
+    my $report;
+    &EmailReportNoStats ( $email, 0, $report );
+
+  }
+
+}
+
+
+sub GetReport
+{
+  my ( $date, @handles ) = @_;
+
+  my $report = qq{Handle\tNumber of times file(s) downloaded\tTitle\tAuthors\n};
+
+  my $count = 0;
+  foreach my $handle ( @handles )
+  {
+
+    my $statement = qq{select handle, title, bit_count from consolidatedstatstable where handle = '$handle' and colldt = '$date' and bit_count > 0 order by title};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      my $authors = &GetAuthors ( $handle );
+      $report .= qq{$data[0]\t$data[2]\t$data[1]\t$authors\n};
+      $count = $count + 1;
+    }
+    $sth->finish; 
+
+  }
+
+  return ( $report, $count );
+
+}
+
+sub GetAuthors
+{
+  my ( $handle ) = @_;
+
+  my $statement = qq{select display_authors  from statsdata where handle = '$handle'};
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my ( $authors, @data );
+  while (@data = $sth->fetchrow_array()) {
+    $authors = qq{$data[0]};
+  }
+  $sth->finish;
+
+  return $authors;
+
+}
+
+
+sub GetHandles
+{
+  my ( $name  ) = @_;
+
+  
+  my $statement = qq{select dspace_object_id from metadatavalue where metadata_field_id =1  and text_value = '$name'};
+
+  my $sth = $dbhP->prepare($statement)
+	or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+      
+  my ( @data, @handles );
+  while (@data = $sth->fetchrow_array()) {
+   my $handle = &GetHandle ( $data[0] );
+   push ( @handles, $handle );
+  }
+  $sth->finish; 
+
+  &SortUniquifyList ( \@handles );
+
+  return @handles;    
+}
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+}
+
+sub GetHandle
+{
+  my ( $item_id ) = @_;
+   
+  my $statement = qq{select handle  from Handle where resource_id = '$item_id'};
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my ( $handle, @data );
+  while (@data = $sth->fetchrow_array()) {
+    $handle = qq{$data[0]};
+  }
+  $sth->finish;
+  
+  return $handle;
+    
+}
+
+
+sub GetDate
+{
+  my $newtime = scalar localtime(time());
+  my $year = substr($newtime, 20, 4);
+  my %months = (
+		"Jan" => "01",
+		"Feb" => "02",
+		"Mar" => "03",
+		"Apr" => "04",
+		"May" => "05",
+		"Jun" => "06",
+		"Jul" => "07",
+		"Aug" => "08",
+		"Sep" => "09",
+		"Oct" => "10",
+		"Nov" => "11",
+		"Dec" => "12",
+	       );
+
+  my %displaymonths = (
+		       "01" => "January",
+		       "02" => "February",
+		       "03" => "March",
+		       "04" => "April",
+		       "05" => "May",
+		       "06" => "June",
+		       "07" => "July",
+		       "08" => "August",
+		       "09" => "September",
+		       "10" => "October",
+		       "11" => "November",
+		       "12" => "December",
+		      );
+
+  my $month = $months{substr ($newtime,4, 3)};
+
+  $month = $month - 1;
+  if ( $month == 0 )
+    {
+      $month = 12;
+    }
+  if ( $month == 12 )
+  {
+    $year = $year - 1;
+  }
+  if ( $month < 10 )
+  {
+    $month = qq{0$month}
+  }
+
+  my $probability_date = qq{$year/$month};
+  
+  my $display_month = $displaymonths { $month };
+  
+  return ( $probability_date, $display_month, $year );
+  
+}
+
+
+sub EmailReport 
+{
+  my ( $to, $count, $report ) = @_;
+
+  if ( $count != 0 )
+  {
+
+    my $subject = qq{$gMonth $gYear download report from Deep Blue};    
+
+    use Mail::Mailer;
+    my $mailer = Mail::Mailer->new('smtp', Server => $gMailServer);
+
+    $mailer->open(
+		  {
+		   'To'       => $to,
+		   'From'     => 'deepblue@umich.edu',
+		   'Subject'  => $subject,
+ 		  }
+ 		 );
+
+    $report = qq{This is your monthly download report from Deep Blue Documents. While we attempt to filter out activity by automated web crawlers, it is not possible to completely exclude them. Therefore, item download counts may  reflect both human and crawler activity.\n\n$report}; 
+
+    print $mailer encode("utf8", $report);
+    $mailer->close;
+  }
+
+}
+
+sub EmailReportNoStats
+{
+  my ( $to, $count, $report ) = @_;
+
+  my $subject = qq{$gMonth $gYear download report from Deep Blue};    
+
+  use Mail::Mailer;
+
+  my $server = $gMailServer;
+  my $mailer = new Mail::Mailer->new('smtp', Server => $server);
+  $mailer->open(
+		{
+		 'To'       => $to,
+		 'From'     => 'deepblue@umich.edu',
+		 'Subject'  => $subject,
+ 		  }
+ 		 );
+  if ( $count == 0 )
+  {
+    $report = qq{There were no downloads/views of any items this month.};
+
+    $report = qq{A quick note to let you know that we do not have download statistics 
+from Deep Blue for June, 2010. A problem with our web logs occurred early on and we 
+did not identify it and correct it in time to provide reliable information for this 
+past month. Deep Blue itself was fully operational -- and together we added thousands 
+of items to it last month -- but information about views and downloads of those items 
+is not available.
+
+We apologize for this, and are working to make sure it doesn't happen again.
+};
+  } 
+  
+  print $mailer( $report );
+  $mailer->close;
+
+}
+
+
+sub EmailReportCorrection
+{
+  my ( $to, $count, $report ) = @_;
+
+  my $subject = qq{CORRECTION on 2009/09 download report from Deep Blue};    
+
+  use Mail::Mailer;
+  my $server = $gMailServer;
+  my $mailer = new Mail::Mailer->new('smtp', Server => $server);
+  $mailer->open(
+		{
+		 'To'       => $to,
+		 'From'     => 'deepblue@umich.edu',
+		 'Subject'  => $subject,
+ 		  }
+ 		 );
+  if ( $count == 0 )
+  {
+    $report = qq{There were no downloads/views of any items this month.};
+  } 
+  
+  $report = qq{We have discovered an error that took place during the processing of usage statistics for the $gMonth $gYear, so below you will find the corrected information for that period.
+
+We apologize for the error, and any inconvenience it may have caused.
+
+Jim Ottaviani
+Deep Blue
+
+$report};
+
+  print $mailer( $report );
+  $mailer->close;
+
+}
+
+
+
+sub GetIndividuals
+{
+    
+  my %users = (
+        'De Young, Raymond', 'rdeyoung@umich.edu',
+        'Epstein, David L.', 'davideps@umich.edu',
+	   );
+
+  
+  return %users;
+
+}
+
+__END__;
+
+
+

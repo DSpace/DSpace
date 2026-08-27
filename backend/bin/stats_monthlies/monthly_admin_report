@@ -1,0 +1,509 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+BEGIN
+{
+  require "strict.pm";
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+use lib '.';
+use StatsUtils;
+use Encode qw(encode);
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gMailServer     = $ENV{'mail__P__server'};
+my $gBaseDataDir    = qq{/mnt/prep};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my ( $date, $gMonth, $gYear ) = &GetLastMonthDate ();
+
+my @admins = &GetAdmins ();
+
+&ProcessReports ( @admins );
+
+$dbhP->disconnect;
+
+exit;
+
+sub ProcessReports 
+{
+  my ( @admins ) = @_;
+
+  foreach my $admin ( @admins )
+  {
+    # the data is in the following format collid : email
+    # so ....
+    my $collid = $admin;
+    $collid =~ s,(.*?) \: .*,$1,;
+    my $email = $admin;
+    $email =~ s,.*? \: (.*),$1,;
+   
+    if ( $email eq 'deromedi@umich.edu' )
+    {
+      #Mike asked me to not send him these report.  Sept 2015.
+      #$email = qq{deromedi\@umich.edu, shallcro\@umich.edu, gkinney\@umich.edu, volga\@umich.edu};
+    }
+    &CreateAndSendReport ( $date, $email, $collid );
+  }
+
+}
+
+sub CreateAndSendReport
+{
+  my ( $date, $email, $collid ) = @_;
+
+  my $collname = &StatsUtils::GetCollname ( $dbhP, $collid );
+
+
+  my $statement = qq{select C.colldt, C.collid, C.collname, C.handle, C.title, C.publisher, C.inside_count, C.out_count, C.bit_count,  C.itemuminside, C.itemnonuminside,  C.itemumoutside, C.itemnonumoutside, C.bitum, C.bitnonum, C.itemoutsidereferer, C.bitreferer from consolidatedstatstable C , collection2item CI, handle H where CI.collection_id='$collid' and CI.item_id = H.resource_id and H.handle =C.handle and C.colldt='$date' order by C.title, C.handle};
+
+  my ( $data, $RecCount, $Total ) = &GetDownloadDataAccess ( $dbhP, $collid, $date, $statement );
+
+  if ( $data )
+  {
+    my $file = &PrepareZipFile ( $data );
+    &EmailZipFileData ( $collid, $file, $email );
+  }
+
+}
+
+
+sub GetDownloadDataAccess
+{
+  my ( $dbhP, $collid, $dateRange, $statement ) = @_;
+
+   my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $SHandle;
+    my $PHandle;
+    my $PTitle;
+    my $PInside = 0;
+    my $POutside = 0;
+    my $PBit = 0;
+
+    my $PInsideUM = 0;
+    my $POutsideUM = 0;
+    my $PBitUM = 0;
+    my $PInsideNONUM = 0;
+    my $POutsideNONUM = 0;
+    my $PBitNONUM = 0;
+
+    my $PPublisher = '';
+    my $Line;
+    my $CreateLine = 0;
+    my $RecCount = 0;
+
+    my $PItemOutsideReferer;
+    my $PBitReferer;
+
+    if ( $collid == 6 )
+    {
+	    $Line =  qq{Handle\tTitle\tAuthors\tItemViews\tBitDownloads\n};
+    }
+    else
+    {
+	    $Line =  qq{Handle\tTitle\tAuthors\tItemViews\tBitDownloads\n};
+    }
+    my $buffer;
+    $buffer = $Line;
+
+    my ( $colldt, $collid, $collname, $handle, $title, $publisher, $inside_count, $out_count, $bit_count,  $insideum_count, $insidenonum_count, $outum_count,  $outnonum_count, $bitum_count, $bitnonum_count, $itemoutsidereferer, $bitreferer, @data );
+    while ( @data = $sth->fetchrow_array() )  {
+      $colldt           = $data[0];
+      $collid           = $data[1];
+      $collname         = $data[2];
+      $publisher        = $data[5];
+
+      $handle           = $data[3];
+      $title            = $data[4];
+      $inside_count     = $data[6];
+      $out_count        = $data[7];
+      $bit_count        = $data[8];
+
+      $insideum_count        = $data[9];
+      $insidenonum_count     = $data[10];
+      $outum_count           = $data[11];
+      $outnonum_count        = $data[12];
+      $bitum_count           = $data[13];
+      $bitnonum_count        = $data[14];
+
+      $itemoutsidereferer    = $data[15];
+      $bitreferer            = $data[16];
+
+      if ( $PHandle eq $handle )
+      {
+	      $PPublisher = $publisher;
+	      $PInside = $PInside + $inside_count;
+	      $POutside = $POutside + $out_count;
+	      $PBit = $PBit + $bit_count;
+
+	      $PInsideUM = $PInsideUM + $insideum_count;
+	      $PInsideNONUM = $PInsideNONUM + $insidenonum_count;
+	      $POutsideUM = $POutsideUM + $outum_count;
+	      $POutsideNONUM = $POutsideNONUM + $outnonum_count;
+	      $PBitUM = $PBitUM + $bitum_count;
+	      $PBitNONUM = $PBitNONUM + $bitnonum_count;
+
+	      $PItemOutsideReferer = qq{$PItemOutsideReferer $itemoutsidereferer};
+	      $PBitReferer = qq{$PBitReferer $bitreferer};
+
+	      $SHandle = $handle;
+
+	      $CreateLine = 1;
+      }
+      else
+      {
+	      if ( $CreateLine )
+	      {
+	        if ( $dateRange ne 'count' )
+	        {
+		        $Line = &GetLineAccessForDownload ( $dbhP, $collid, $dateRange, $PHandle, $PHandle,  $PInside, $PInsideUM, $PInsideNONUM, $POutside, $POutsideUM, $POutsideNONUM, $PBit, $PBitUM, $PBitNONUM, $PPublisher, $PItemOutsideReferer, $PBitReferer ) ;
+		        $buffer .= $Line;
+	        }
+	        $RecCount = $RecCount + 1;
+	      }
+
+	      $PPublisher = $publisher;
+	      $PInside = $inside_count;
+	      $POutside = $out_count;
+	      $PBit = $bit_count;
+
+	      $PInsideUM = $insideum_count;
+	      $PInsideNONUM = $insidenonum_count;
+	      $POutsideUM = $outum_count;
+	      $POutsideNONUM = $outnonum_count;
+	      $PBitUM = $bitum_count;
+	      $PBitNONUM = $bitnonum_count;
+
+	      $PItemOutsideReferer = $itemoutsidereferer;
+	      $PBitReferer = $bitreferer;
+
+	      $CreateLine = 1;
+      }
+        $PHandle = $handle;
+    }
+    $sth->finish;
+
+    #The last record has not been put in
+    $RecCount = $RecCount + 1;
+  
+     my $TotalPages = $RecCount/&StatsUtils::GetTotalPerPage();
+     $TotalPages = int ( $TotalPages );
+     if ( $RecCount % &StatsUtils::GetTotalPerPage() )
+     {
+       $TotalPages = $TotalPages + 1;
+     }
+
+    if ( $CreateLine )
+      {
+	      if ( $PHandle eq $SHandle )
+	      {
+	        $PPublisher = $publisher;
+	        $PInside = $PInside + $inside_count;
+	        $POutside = $POutside + $out_count;
+	        $PBit = $PBit + $bit_count;
+	    
+	        $PInsideUM = $PInsideUM + $insideum_count;
+	        $PInsideNONUM = $PInsideNONUM + $insidenonum_count;
+	        $POutsideUM = $POutsideUM + $outum_count;
+	        $POutsideNONUM = $POutsideNONUM + $outnonum_count;
+	        $PBitUM = $PBitUM + $bitum_count;
+	        $PBitNONUM = $PBitNONUM + $bitnonum_count;
+
+	        $PItemOutsideReferer = qq{$PItemOutsideReferer $itemoutsidereferer};
+          $PBitReferer = qq{$PBitReferer $bitreferer};
+	      }
+
+	      if ( $dateRange ne 'count' )
+	      {
+	        $Line = &GetLineAccessForDownload ( $dbhP, $collid, $dateRange, $PHandle, $PHandle,  $PInside, $PInsideUM, $PInsideNONUM, $POutside, $POutsideUM, $POutsideNONUM, $PBit, $PBitUM, $PBitNONUM, $PPublisher, $PItemOutsideReferer, $PBitReferer ) ;
+	        $buffer .= $Line;
+	      }
+      }
+  
+  return ( $buffer, $RecCount, $TotalPages );
+
+}
+
+
+sub GetLineAccessForDownload
+  {
+    my ( $dbhP, $collid, $dateRange, $PHandle, $PHandle,  $PInside, $PInsideUM, $PInsideNONUM, $POutside, $POutsideUM, $POutsideNONUM, $PBit, $PBitUM, $PBitNONUM, $PPublisher, $PItemOutsideReferer, $PBitReferer ) = @_;
+
+    $PItemOutsideReferer =~ s,null\; ,,gs;
+    $PItemOutsideReferer =~ s,\;+ *,;,gs;
+    $PItemOutsideReferer =~ s,\;+,;,gs;
+    if ( $PItemOutsideReferer =~ m,^\;.*, )
+    {
+        $PItemOutsideReferer =~ s,^\;(.*),$1,s;
+    }
+    $PItemOutsideReferer =~ s,\;, \; ,gs;
+    
+
+    $PBitReferer =~ s,null\; ,,gs;
+    $PBitReferer =~ s,\;+ *,;,gs;
+    $PBitReferer =~ s,\;+,;,gs;
+    if ( $PBitReferer =~ m,^\;.*, )
+    {
+        $PBitReferer =~ s,^\;(.*),$1,s;
+    }
+    $PBitReferer =~ s,\;, \; ,gs;
+
+    my $Line;
+    my ( $authors, $title, $dateAdded, $bitCount ) = &StatsUtils::GetRestOfData ( $dbhP, $PHandle );
+    if ( $collid == 6 )
+      {
+	      my ( $doi, $issn ) = &StatsUtils::GetRestOfDataForPR ( $dbhP, $PHandle );
+
+	      my $ItemCount = $PInside + $POutside;
+
+	      $Line =  qq{http://hdl.handle.net/$PHandle\t$title\t$authors\t$ItemCount\t$PBit\n};
+      }
+    else
+      {
+	      my $ItemCount = $PInside + $POutside;
+
+	      $Line =  qq{http://hdl.handle.net/$PHandle\t$title\t$authors\t$ItemCount\t$PBit\n};
+      }
+
+    return $Line;
+  }
+
+
+sub EmailZipFileData
+{
+
+    my ( $collid, $file, $to ) = @_;
+    
+    my $collname = &StatsUtils::GetCollname ( $dbhP, $collid );
+    my $subject = qq{Monthly Stats for $collname.};
+    my $msg = qq{\nThis is your monthly download report from Deep Blue Documents. While we attempt to filter out activity by automated web crawlers, it is not possible to completely exclude them. Therefore, item download counts may  reflect both human and crawler activity.\n\nStats for $collname for $gMonth $gYear attached.};
+
+    use MIME::Lite;
+    my $cc = '';
+    my $from = 'deepblue@umich.edu';
+
+    my $email = MIME::Lite ->new(
+       From => $from,
+       To => $to,
+       Cc => $cc,
+       Subject => $subject,
+       Type => 'multipart/mixed'
+    );
+
+    my $encoded_report = encode('UTF-8', $msg);
+
+    # Add your text message.
+    $email->attach(
+         Type => 'TEXT',
+         Data => $encoded_report,
+         Encoding => 'quoted-printable',  # safer for email
+         Charset => 'UTF-8'               # declare the charset
+    );
+
+    # Specify your file as attachement.
+    $email->attach(Type => 'application/gzip',
+       Path => $file,
+       Filename => 'data.txt.gz',
+       Disposition => 'attachment'
+    );       
+
+    $email->send('smtp', $gMailServer);
+    print "Email Sent Successfully\n";
+
+}
+
+
+sub PrepareZipFile
+{
+
+    my ( $buffer ) = @_;
+    
+    my $count = &StatsUtils::GetCount( $dbhP );
+
+    my $baseDir = qq{$gBaseDataDir/stats/email};
+    my $DirName = qq{output$count};
+    my $destination = qq{$gBaseDataDir/stats/email/output$count};
+
+    if ( -d $destination )
+      {
+	`rm -r $destination`;
+      }
+    my @args = ("mkdir", "$destination");
+    system (@args) == 0 or &errorBail("Could not make destination directory.  Program has terminated");
+    my @args = ("chmod", "777", "$destination");
+    system (@args) == 0 or &errorBail("Could not grant permissions to destination dir.  Program has terminated");
+
+    my $dataFile = qq{$destination/data.txt};
+    &WriteFile ( $dataFile, $buffer );
+
+    #Call Unix to Zip the files
+    `/bin/gzip  $destination/data.txt`;
+    my $ZipFile = $destination . '/' . 'data.txt.gz';
+
+    return $ZipFile;
+}
+
+
+sub WriteFile
+{
+
+    my ( $fileName, $buffer ) = @_;
+
+    #Now you want to append this to the file.
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $buffer;
+    close OUTFILE;
+
+    return;
+
+}
+
+sub GetAuthors
+{
+  my ( $handle ) = @_;
+
+  my $statement = qq{select display_authors  from statsdata where handle = '$handle'};
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my ( $authors, @data );
+  while (@data = $sth->fetchrow_array()) {
+    $authors = qq{$data[0]};
+  }
+  $sth->finish;
+
+  return $authors;
+
+}
+
+
+
+sub GetLastMonthDate
+{
+  my $newtime = scalar localtime(time());
+  my $year = substr($newtime, 20, 4);
+  my %months = (
+		"Jan" => "01",
+		"Feb" => "02",
+		"Mar" => "03",
+		"Apr" => "04",
+		"May" => "05",
+		"Jun" => "06",
+		"Jul" => "07",
+		"Aug" => "08",
+		"Sep" => "09",
+		"Oct" => "10",
+		"Nov" => "11",
+		"Dec" => "12",
+	       );
+
+  my %displaymonths = (
+		       "01" => "January",
+		       "02" => "February",
+		       "03" => "March",
+		       "04" => "April",
+		       "05" => "May",
+		       "06" => "June",
+		       "07" => "July",
+		       "08" => "August",
+		       "09" => "September",
+		       "10" => "October",
+		       "11" => "November",
+		       "12" => "December",
+		      );
+
+  my $month = $months{substr ($newtime,4, 3)};
+
+  $month = $month - 1;
+  if ( $month == 0 )
+    {
+      $month = 12;
+    }
+  if ( $month == 12 )
+  {
+    $year = $year - 1;
+  }
+  if ( $month < 10 )
+  {
+    $month = qq{0$month}
+  }
+
+  my $probability_date = qq{$year/$month};
+  
+  my $display_month = $displaymonths { $month };
+  
+  return ( $probability_date, $display_month, $year );
+  
+}
+
+
+sub GetAdmins
+{
+    
+  my $statement = qq{select collemail from admin_stats};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my ( @data, @individuals );
+  while (@data = $sth->fetchrow_array()) {
+    push ( @individuals, $data[0] );
+  }
+  $sth->finish; 
+  
+  return @individuals;
+
+}
+
+__END__;
+
+
+

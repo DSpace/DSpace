@@ -1,0 +1,143 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my ( $month, $year ) = &GetPreviousMonthYear();
+
+my $gBaseLogDir        = $ENV{'BASE_LOG_DIR'};
+
+my $dir = qq{$gBaseLogDir/$month\_20$year};
+
+my $msg = qq{\nDoing... $dir\n\n};
+print $msg;
+
+&GetAliciaStats();
+
+exit;
+
+sub GetAliciaStats
+  {
+
+    my @files;
+    push (@files, 'Workbook_Full_1.0.0.pdf');
+    push (@files, 'Workbook_1_CollaborativeCareIntroduction_1.0.0.pdf');
+    push (@files, 'Workbook_2_FactsSymptomsPrevention_1.0.0.pdf');
+    push (@files, 'Workbook_3_ExposureTestingQuarantine_1.0.0.pdf');
+    push (@files, 'Workbook_4_PreparingToGoToED_V1.1.1.pdf');
+    push (@files, 'Workbook_5_CommunicatingWithCareTeam_1.1.0.pdf');
+    push (@files, 'Workbook_6_HelpingStayConnected_1.0.0.pdf');
+    push (@files, 'Workbook_7_PreparingToGoHome_V1.1.1.pdf');
+    push (@files, 'Workbook_8_RecoveringAtHome_V1.1.1.pdf');
+    push (@files, 'Workbook_A_BuildingYourSupportNetwork_1.0.0.pdf');
+    push (@files, 'COVIDCaregivingWorkbookTemplate.zip');
+    push (@files, 'Workbook_4_PreparingToGoToED_1.0.0.pdf');
+    push (@files, 'Workbook_7_PreparingToGoHome_1.0.0.pdf');
+    push (@files, 'Workbook_8_RecoveringAtHome_1.0.0.pdf');
+
+    my $total = `grep  view_bitstream_details $dir/* | grep "handle=2027.42/163715:" | wc -l`;
+    my $msg = qq{2027.42/163715 total => $total\n\n};
+    print $msg;
+
+    my $run = 0;
+    foreach my $file ( @files )
+    {
+      my $cnt = `grep  view_bitstream_details $dir/* | grep "handle=2027.42/163715:" | grep "$file" | wc -l`;
+      my $msg = qq{$file => $cnt\n};
+      $run = $run + $cnt;
+      print $msg;
+    }
+
+    my $msg = qq{Original total = $total AND running total = $run\n};
+    print $msg;
+
+
+  }
+
+
+
+sub GetPreviousMonthYear
+{
+  #my $newtime = scalar localtime(time()- 86400);
+  my $newtime = scalar localtime(time());
+  my %months = (
+		"Jan" => "Dec",
+		"Feb" => "Jan",
+		"Mar" => "Feb",
+		"Apr" => "Mar",
+		"May" => "Apr",
+		"Jun" => "May",
+		"Jul" => "Jun",
+		"Aug" => "Jul",
+		"Sep" => "Aug",
+		"Oct" => "Sep",
+		"Nov" => "Oct",
+		"Dec" => "Nov",
+	       );
+
+  my %monthsNumeric = (
+		"Jan" => "12",
+		"Feb" => "01",
+		"Mar" => "02",
+		"Apr" => "03",
+		"May" => "04",
+		"Jun" => "05",
+		"Jul" => "06",
+		"Aug" => "07",
+		"Sep" => "08",
+		"Oct" => "09",
+		"Nov" => "10",
+		"Dec" => "11",
+	       );
+
+  my $month = $months{substr ($newtime,4, 3)};
+  my $year = substr ($newtime,20, 4);
+
+  $year = $year + 0;
+
+  if ( $month eq 'Dec' )
+    {
+      $year = $year - 1;
+    }
+
+  $year =~ s,\d\d(.*),$1,;
+  return ( $month, $year );
+    
+}
+
+
+
+__END__;
+
+
+

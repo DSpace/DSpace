@@ -1,0 +1,163 @@
+---
+# Docker Compose v2 – Local Development Environment
+# Prerequisites: build the shared source image first (see README or `make build`).
+# Copy .env.example to .env and adjust values before building.
+
+services:
+  frontend:
+    depends_on:
+      backend:
+        condition: service_healthy
+    build:
+      dockerfile: frontend.dockerfile
+      context: .
+    environment:
+      # HOST controls the Node.js SSR server bind address.
+      # Must be 0.0.0.0 so Docker port-mapping (4000:4000) works from the host.
+      HOST: '0.0.0.0'
+      DSPACE_UI_SSL: 'false'
+      # DSPACE_UI_HOST must be 0.0.0.0 for Node.js 18+ in Docker: 'localhost' resolves
+      # to ::1 (IPv6 loopback only), breaking Docker port-mapping.  Angular's client-side
+      # router uses the browser URL for navigation so 0.0.0.0 does not appear in page links.
+      # Override in .env with the public hostname for staging/production.
+      DSPACE_UI_HOST: ${DSPACE_UI_HOST:-0.0.0.0}
+      DSPACE_UI_PORT: '4000'
+      DSPACE_UI_NAMESPACE: /
+      DSPACE_REST_SSL: 'false'
+      # DSPACE_REST_HOST must be the Docker service name 'backend' so that the Angular SSR
+      # server (running inside the frontend container) can reach the backend over Docker's
+      # internal DNS.  The browser-side Angular re-uses the dspaceServer URL returned by
+      # the HAL root, which points to localhost:8080 (the Docker host port).
+      DSPACE_REST_HOST: ${DSPACE_REST_HOST:-backend}
+      DSPACE_REST_PORT: 8080
+      DSPACE_REST_NAMESPACE: /server
+      NODE_OPTIONS: "--max-old-space-size=4096"
+    ports:
+      - "4000:4000"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  backend:
+    depends_on:
+      db:
+        condition: service_healthy
+      solr:
+        condition: service_healthy
+    build:
+      dockerfile: backend.dockerfile
+      context: .
+      args:
+        DSPACE_VERSION: ${DSPACE_VERSION:-7.6}
+        JDK_VERSION: ${JDK_VERSION:-17}
+    environment:
+      - dspace__P__dir=/dspace
+      - dspace__P__name=DSpace Demo
+      - db__P__url=jdbc:postgresql://db:5432/dspace
+      - solr__P__server=http://solr:8983/solr
+      - filestorage__P__dir=/dspace
+      # dspace.server.url MUST match the Angular DSPACE_REST_HOST:PORT/NAMESPACE so that
+      # HAL root links use the same hostname Angular is configured with.  A mismatch causes
+      # Angular SSR's URL normalizer to recurse infinitely (Maximum call stack size exceeded).
+      # Each "." in the property key is represented by "__P__" in the env var name.
+      - dspace__P__server__P__url=http://backend:8080/server
+      # dspace.ui.url is used by the backend to generate frontend links (e.g. e-mail alerts).
+      - dspace__P__ui__P__url=http://localhost:4000
+      # Disable OIDC authentication for local dev; use password auth only.
+      # In production/staging this is set via the external Kubernetes ConfigMap.
+      - plugin__P__sequence__P__org__P__dspace__P__authenticate__P__AuthenticationMethod=org.dspace.authenticate.PasswordAuthentication
+      # OidcAuthenticationBean is instantiated by Spring even when removed from the plugin
+      # sequence above.  It calls String.split() on ip.bioIPsRange1/2 unconditionally, so
+      # provide harmless non-routable CIDR placeholders to prevent NullPointerException.
+      # In production/staging real IP ranges are supplied via the Kubernetes ConfigMap.
+      - ip__P__bioIPsRange1=192.0.2.0/24
+      - ip__P__bioIPsRange2=192.0.2.0/24
+    ports:
+      - "8080:8080"
+    volumes:
+      - dspace-assetstore:/dspace/assetstore
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf --max-time 5 http://localhost:8080/server/ > /dev/null"]
+      # DSpace (Spring Boot + Flyway migrations) takes 3-8 minutes to start on a
+      # 2-core CI runner.  start_period gives it breathing room before the probe
+      # is even evaluated; retries × interval cover the remaining startup window.
+      # Total budget: 120s start + 24 × 15s = ~6 minutes.
+      interval: 15s
+      timeout: 10s
+      retries: 24
+      start_period: 120s
+    restart: unless-stopped
+
+  db:
+    build:
+      dockerfile: db.dockerfile
+      context: .
+      args:
+        DSPACE_VERSION: ${DSPACE_VERSION:-7.6}
+    environment:
+      - POSTGRES_USER=dspace
+      - POSTGRES_PASSWORD=dspace
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dspace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  solr:
+    build:
+      dockerfile: solr.dockerfile
+      context: .
+    environment:
+      - SOLR_JAVA_MEM=-Xms1024m -Xmx1024m
+      - SOLR_HEAP=1024m
+    volumes:
+      - solr-data:/var/solr
+    ports:
+      - "8983:8983"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8983/solr/admin/info/system || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    command:
+      - "/bin/bash"
+      - "-c"
+      - "init-var-solr; precreate-core authority /opt/solr/server/solr/configsets/authority; cp -r -u /opt/solr/server/solr/configsets/authority/* authority; precreate-core oai /opt/solr/server/solr/configsets/oai; cp -r -u /opt/solr/server/solr/configsets/oai/* oai; precreate-core search /opt/solr/server/solr/configsets/search; cp -r -u /opt/solr/server/solr/configsets/search/* search; precreate-core statistics /opt/solr/server/solr/configsets/statistics; cp -r -u /opt/solr/server/solr/configsets/statistics/* statistics; exec solr start -f -V -p 8983"
+    restart: unless-stopped
+
+  # Optional Apache service for local testing (CGI stats scripts, etc.)
+  apache:
+    build:
+      dockerfile: apache.dockerfile
+      context: .
+    ports:
+      - "8888:8888"
+    profiles:
+      - optional
+
+  # Optional Express metrics service – exposes Prometheus metrics on :3000
+  express:
+    build:
+      dockerfile: express.dockerfile
+      context: .
+    ports:
+      - "3000:3000"
+    profiles:
+      - optional
+
+volumes:
+
+  dspace-assetstore:
+  db-data:
+  solr-data:
+
+networks:
+  default:

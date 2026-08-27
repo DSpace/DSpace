@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+use Encode;
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $year_month = &prev_month_string();
+
+my $fileNumber = qq{NewAfterEmbargoFix$year_month};
+
+#Sample select
+#select id, value from wileyitems where type='JO' and batch = 'NewAfterEmbargoFixOct25' and id in (select distinct id from WileyItems 
+#where batch='NewAfterEmbargoFixOct25' and id not in (select id from wileyitems where batch='NewAfterEmbargoFixOct25' and dc='subject.hlbtoplevel'));
+
+my $statement = qq{select id, value from wileyitems where type='JO' and batch = '$fileNumber' and id in (select distinct id from WileyItems where batch='$fileNumber' and id not in (select id from wileyitems where batch='$fileNumber' and dc='subject.hlbtoplevel'));};
+print $statement . "\n";
+
+my $sth = $dbhP->prepare($statement)
+  or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+# Read the matching records and print them out
+$sth->execute()             # Execute the query
+  or die "Couldn't execute statement: " . $sth->errstr;
+
+my ( @batches, @data );
+while (@data = $sth->fetchrow_array()) {
+  my $msg = qq{$data[0] ==> $data[1]\n};
+  print $msg;
+}
+$sth->finish;
+    
+
+$dbhP->disconnect;
+
+exit;
+
+################################################################################################
+
+sub prev_month_string {
+    my @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+    my ($sec,$min,$hour,$mday,$mon,$year) = localtime();
+
+    # Find previous month
+    $mon--;
+    if ($mon < 0) {
+        $mon = 11;    # December
+        $year--;      # Previous year
+    }
+    $year += 1900;        # Adjust year
+    my $yy = $year % 100; # Last two digits
+
+    return $months[$mon] . sprintf("%02d", $yy);
+}
+
+__END__;
+
+
+

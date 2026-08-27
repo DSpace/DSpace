@@ -1,0 +1,260 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my @item_ids = &GetActiveItems( );
+
+my @AllAuthors;
+my $report = qq{handle\tcollection handle\tcollection name\n};
+
+my $report2 = qq{handle\ttype\tcollection handle\tcollection name\n};
+my $count = 0;
+foreach my $item_id ( @item_ids )
+  {
+    $count = $count + 1;
+
+    my $handle = &GetHandle ( $item_id );
+    print $handle . "\n";
+    my $type = &GetMetaType ( $item_id, 66);
+    print $type . "\n";
+
+    if ($type eq '' )
+    {
+	    my ( $collid, $coll_handle ) = &GetOwningCollection ( $item_id );
+	    my $name = &GetCollName ( $collid, 3);
+	    $report .= qq{$handle\t$coll_handle\t$name\n};
+    }
+    else
+    {
+	    my ( $collid, $coll_handle ) = &GetOwningCollection ( $item_id );
+	    my $name = &GetCollName ( $collid, 3);
+	    $report2 .= qq{$handle\t$type\t$coll_handle\t$name\n};
+    }
+  }
+
+my $file = qq{$gBaseDataDir/items-missing-types.txt};
+&WriteReportToFile  ($file, $report);
+
+$file = qq{$gBaseDataDir/items-having-types.txt};
+&WriteReportToFile  ($file, $report2);
+
+$dbhP->disconnect;
+
+exit;
+
+sub GetOwningCollection
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select owning_collection from item where uuid='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $collid;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $collid = $data[0];
+    }
+
+    $sth->finish;
+
+    my $handle = &GetHandleForColl ( $collid );
+
+    return ( $collid, $handle );
+  }
+
+sub GetHandleForColl
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id' and resource_type_id = 3};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+    }
+
+    $sth->finish;
+
+    return $handle;
+  }
+
+sub GetCollName 
+    {
+      my ( $resource_id, $type ) = @_;
+
+      my $statement = qq{select text_value  from metadatavalue where dspace_object_id='$resource_id' and metadata_field_id = 64};
+
+      my $sth = $dbhP->prepare($statement)
+        or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+        or die "Couldn't execute statement: " . $sth->errstr;
+
+      my $name = '';
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+        $name = qq{$data[0]};
+      }
+
+      return $name;
+
+    }
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id'};
+
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+      
+    }
+
+    return $handle;
+  }
+
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+  }
+
+
+sub GetActiveItems
+  {
+
+    my $statement = qq{select uuid from item where in_archive=true};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my @itemids;
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @itemids, $data[0] ) ;
+    }
+
+    $sth->finish;
+
+    return @itemids;
+  }
+
+
+sub WriteReportToFile 
+  {
+    my ( $filename, $report ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+sub GetMetaType
+  {
+    my ( $item_id, $id ) = @_;
+
+    my $statement = qq{select text_value  from metadatavalue where dspace_object_id='$item_id' and metadata_field_id = $id };
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $type = '';
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $type .= qq{$data[0]; };
+    }
+ 
+    return $type;    
+  }

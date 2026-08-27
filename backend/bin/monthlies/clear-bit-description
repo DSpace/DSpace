@@ -1,0 +1,332 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my @gAllHandles;
+
+my $statement = qq{select distinct dspace_object_id from metadatavalue where text_value like '%Restricted to U%'  and metadata_field_id = 26 and dspace_object_id is not null};
+
+my $sth = $dbhP->prepare($statement)
+  or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+# Read the matching records and print them out
+$sth->execute()             # Execute the query
+  or die "Couldn't execute statement: " . $sth->errstr;
+
+my $bit_id;
+my ( @data );
+while (@data = $sth->fetchrow_array()) {
+  $bit_id = $data[0];
+
+  if ( $bit_id ne '' )
+  {
+
+    #Find out what item this bitstream belong to;
+    my $handle = &FindBitHandle ( $bit_id );
+ 
+    my $item_id = &FindItemId ( $handle );
+
+    #Find out if this item is free
+    my $ItsFree = &IsBitFree ( $bit_id, $handle, $item_id );
+  
+
+    #my $msg = qq{$handle \n};
+    #print $msg;
+
+    if ( ( $ItsFree ) && ( $handle ne '' ) )
+    {
+      my $msg = qq{It's free but has message: $handle is free now, no need for the restriction message\n};
+      print $msg;
+    }
+  }
+}
+      
+$sth->finish;
+
+
+
+foreach my $value ( @gAllHandles )
+  {
+    my $msg = qq{handles that where checked $value\n};
+    print $msg;
+  }
+
+
+$dbhP->disconnect;
+
+exit;
+
+
+sub IsBitFree
+  {
+    my ( $bit_id, $handle, $item_id ) = @_;
+
+
+    my $current_date = `date +"%Y-%m-%d"`;
+
+    # Remove newline character
+    $current_date = substr($current_date,0,-1);
+
+    # Find end date fro anonymous
+    my $statement = qq{select start_date from resourcepolicy where dspace_object = '$bit_id' and epersongroup_id = 'e8a62d47-3987-437e-9fa9-6060450019fa' and resource_type_id = 0 };
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $start_date='no date';
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      if ( $data[0] eq '')
+	    {
+          $start_date='no date';
+	    }
+      else
+	    {
+          $start_date = $data[0];
+	    }
+    }
+      
+    $sth->finish;
+
+    my $coll = &GetOwningColl ( $item_id );
+
+    if ( $start_date ne 'no date' )
+      {
+       if ( &InDissertation ( $item_id ) && &IsActive( $item_id ) == 1 )
+       {
+         if ( &InArray($handle, @gAllHandles ) == 1 ) {
+	       }
+	      else
+	      {
+	        push ( @gAllHandles, $handle );
+	      }
+       }       
+       my $msg = qq{$coll DEBUG:  $handle current_date = $current_date AND start_date = $start_date \n};
+       print $msg;
+     }
+
+    if ( $start_date eq 'no date' )
+      {
+       return 0;
+      }
+    elsif ( $start_date lt $current_date )
+      {
+	      return 1;
+      }
+    else
+      {
+        return 0;
+      }
+    
+  }
+
+
+sub InArray
+    {
+      my ($test, @array) = @_;
+
+      my $inArray = 0;
+      foreach my $value ( @array)
+	{
+	  if ( $value eq $test )
+	    {
+	      $inArray = 1;
+	    }
+	}
+
+      return $inArray;
+    }
+
+sub IsActive
+    {
+      my ( $item_id ) = @_;      
+
+    my $statement = qq{select count(*) from item where uuid ='$item_id' and withdrawn = false};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $count  = 0;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $count = $data[0];
+    }
+    
+    $sth->finish;
+
+    return $count;
+
+      
+    }
+
+
+
+sub InDissertation
+  {
+    my ( $item_id ) = @_;      
+
+    my $statement = qq{select owning_collection from item where uuid ='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $collid;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $collid = $data[0];
+    }
+    
+    $sth->finish;
+
+    #Dissertation collection : 2027.42/39366  c5a42028-499d-4e85-9fdc-dc71e2baca26
+    if ( $collid eq 'c5a42028-499d-4e85-9fdc-dc71e2baca26' )
+      {
+	      return 1;
+      }
+      
+    return 0;
+   
+  }
+
+
+
+
+sub FindBitHandle
+  {
+    my ( $bit_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id in ( select item_id from item2bundle where bundle_id in ( select bundle_id from bundle2bitstream where bitstream_id = '$bit_id' ))};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+    }
+    
+    $sth->finish;
+
+    return $handle;
+    
+  }
+
+
+sub GetOwningColl
+  {
+    my ( $item_id ) = @_;
+
+    if ( $item_id eq '')
+    {
+      return "no_coll";
+    }
+
+    my $statement = qq{select owning_collection from item where uuid ='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $coll;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $coll = $data[0];
+    }
+    
+    $sth->finish;
+
+    return $coll;
+    
+  }
+
+
+sub FindItemId
+  {
+    my ( $handle ) = @_;
+
+    my $statement = qq{select resource_id from handle where handle ='$handle'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $item_id;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $item_id = $data[0];
+    }
+    
+    $sth->finish;
+
+    return $item_id;
+    
+  }
+
+
+__END__;
+
+
+

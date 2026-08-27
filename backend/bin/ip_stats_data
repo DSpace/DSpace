@@ -1,0 +1,533 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+use utf8;
+use DBI;
+use File::Path;
+use Getopt::Std;
+
+my %opts;
+getopts('d:l:', \%opts);
+
+my $IPDate     = $opts{'d'};
+my $logDir     = $opts{'l'};
+
+#my $IPDate = '2020/07';
+#my $logDir = qq{/dir/log/Jul_2020};
+
+print "IPDate = " . $IPDate . "\n";
+print "logDir = " . $logDir . "\n";
+#print "Looks good (y/n)? ";
+#my $go_on = <STDIN>;
+#chop $go_on;
+#if ( $go_on eq 'y' )
+#  {
+#    print "Going on..." ."\n";
+#  }
+#else
+#  {
+#    print "Task terminated..." ."\n";
+#    exit;
+#  }
+
+
+my @umIPs;
+push ( @umIPs,      '141.211.');
+push ( @umIPs, 	    '141.212.');
+push ( @umIPs, 	    '141.213.');
+push ( @umIPs, 	    '141.214.');
+push ( @umIPs, 	    '198.108.200.');
+push ( @umIPs, 	    '198.111.224.');
+push ( @umIPs, 	    '198.111.225.');
+push ( @umIPs, 	    '198.111.226.');
+push ( @umIPs, 	    '198.111.227.');
+push ( @umIPs, 	    '207.75.144.');
+push ( @umIPs, 	    '207.75.145.');
+push ( @umIPs, 	    '207.75.146.');
+push ( @umIPs, 	    '207.75.147.');
+push ( @umIPs, 	    '207.75.148.');
+push ( @umIPs, 	    '207.75.149.');
+push ( @umIPs, 	    '207.75.150.');
+push ( @umIPs, 	    '207.75.151.');
+push ( @umIPs, 	    '207.75.152.');
+push ( @umIPs, 	    '207.75.153.');
+push ( @umIPs, 	    '207.75.154.');
+push ( @umIPs, 	    '207.75.155.');
+push ( @umIPs, 	    '207.75.156.');
+push ( @umIPs, 	    '207.75.157.');
+push ( @umIPs, 	    '207.75.158.');
+push ( @umIPs, 	    '207.75.159.');
+push ( @umIPs, 	    '207.75.176.');
+push ( @umIPs, 	    '207.75.177.');
+push ( @umIPs, 	    '207.75.178.');
+push ( @umIPs, 	    '207.75.179.');
+push ( @umIPs, 	    '207.75.180.');
+push ( @umIPs, 	    '207.75.181.');
+push ( @umIPs, 	    '207.75.182.');
+push ( @umIPs, 	    '207.75.183.');
+push ( @umIPs, 	    '141.215.');
+push ( @umIPs, 	    '141.216.');
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+my $statement = qq{set client_encoding to 'latin1'};
+&ProcessSQL ( $statement );
+
+my $statement = qq{delete from  BitstreamIPstatsdata where date='$IPDate'};
+&ProcessSQL ( $statement );
+
+my $statement = qq{delete from  ItemIPstatsdata where date='$IPDate'};
+&ProcessSQL ( $statement );
+
+&GetIPData ();
+
+#Now drop the index and recreate it.  For some reason the indexes are destroyed
+#when the items are deleted and the table is repopulated.  That should not happen.
+
+
+my $statement = qq{drop index bitip_idx};
+&ProcessSQL ( $statement );
+my $statement = qq{drop index itemip_idx};
+&ProcessSQL ( $statement );
+
+my $statement = qq{create index bitip_idx on bitstreamipstatsdata (date, collid, handle, isumip)};
+&ProcessSQL ( $statement );
+my $statement = qq{create index itemip_idx on itemipstatsdata ( date, collid, handle, isumip, insideindicator)};
+&ProcessSQL ( $statement );
+
+
+$dbhP->disconnect;
+
+exit;
+
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    #open ( FH, "<$fileName" ) || die();
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub GetIPAddress
+  {
+    my ( $line ) = @_;
+
+    my $ip = $line;
+    
+    $ip =~ s,.*ip_addr=(.*?)\:.*,$1,;
+
+    return $ip;
+  }
+
+sub GetRefererForItem
+  {
+    my ( $line ) = @_;
+
+    my $referer = $line;
+    
+    if ( $referer =~ m,.*referer=(.*?)\:collection=.*, )
+      {
+	$referer =~ s,.*referer=(.*?)\:collection.*,$1,;
+      }
+    else
+      {
+	$referer = '';
+      }
+
+    return $referer;
+  }
+
+sub GetRefererForBit
+  {
+    my ( $line ) = @_;
+
+    my $referer = $line;
+    
+    if ( $referer =~ m,.*referer=(.*?)\:handle.*, )
+      {
+        $referer =~ s,.*referer=(.*?)\:handle=.*,$1,;
+      }
+    else        
+      {
+        $referer = '';
+      }
+
+    return $referer;
+  }
+
+
+sub GetInsideIndicator
+  {
+    my ( $line ) = @_;
+
+    if ( $line =~ m,.*=INSIDE.*, )
+      {
+	return 1;
+      }
+    elsif ( $line =~ m,.*=OUTSIDE.*, )
+      {
+	return 0;
+      }
+
+  }
+
+sub GetHandle
+  {
+    my ( $line ) = @_;
+
+    my $handle = $line;
+    
+    $handle =~ s,.*handle=(.*?),$1,;
+    $handle =~ s,\n,,;
+
+    if ($handle eq '2027.42/41244' )
+      {
+	my $a;
+      }
+
+    return $handle;
+
+  }
+
+sub GetFilename
+  {
+    my ( $line ) = @_;
+
+    my $filename = $line;
+    
+    if ( $filename =~ m,.*filename=(.*), )
+    {
+       $filename =~ s,.*filename\=(.*),$1,;
+       $filename =~ s,\n,,;
+    }
+    else
+    {
+       $filename = "";
+    }
+  
+    return $filename;
+
+  }
+
+sub GetHandleForBit
+  {
+    my ( $line ) = @_;
+
+    my $handle = $line;
+    
+    #To make it revers compatible
+    if ( $handle =~ m,.*\:handle=.*?\:.*, )
+      {
+	$handle =~ s,.*\:handle=(.*?)\:.*,$1,;
+      }
+    else
+      {
+        $handle =~ s,.*\:(.*?),$1,;
+      }
+
+
+    $handle =~ s,\n,,;
+
+    if ($handle eq '2027.42/41244' )
+      {
+	my $a;
+      }
+
+    return $handle;
+
+  }
+
+sub GetDate
+  {
+    my ( $line ) = @_;
+
+    my $date = $line;
+    
+    $date =~ s,(.*?) .*,$1,;
+
+    return $date;
+
+  }
+
+
+
+sub IsIPUM
+  {
+    my ( $ip ) = @_;
+    
+    my $fromUM = 0;
+    foreach my $umip ( @umIPs )
+    {
+      if ( $ip =~ m,$umip.*, )
+	{
+	 $fromUM = 1;
+	}
+    }
+
+    return $fromUM
+
+  }
+
+sub GetFileList 
+  {
+     
+    my $source = $logDir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @logfiles;
+    foreach my $itemname (@testtems)
+    {
+      if ( $itemname =~ m,.*dspace\.log..*, )
+	{
+	  my $item = qq{$source/$itemname};
+	  push (@logfiles, $item);
+	}
+    }
+
+    return @logfiles;
+    
+  }
+
+
+sub GetIPData
+  {
+    my @files = &GetFileList ( );
+
+    foreach my $file ( sort @files )
+      {
+
+        print $file . "\n";
+
+	my $buffer = &ReadFile ( $file );
+
+	my @lines = split (/\n/, $buffer );
+
+	foreach my $line ( @lines )
+	  {
+	    #2006-10-27 22:31:17,403 INFO  org.dspace.app.webui.servlet.DSpaceServlet @ anonymous:session_id=7759D272BD53DC87342BBA1E61EAFE73:ip_addr=66.249.72.111:view_item_details:collection=OUTSIDE Transportation Research Institute (UMTRI) (All Collections), handle=2027.42/583
+	    if ( $line =~ m,.*view_item_details.*, )
+	      {
+		my $ip = &GetIPAddress ( $line );
+		my $referer = &GetRefererForItem ( $line );
+		my $ipIsUM =  &IsIPUM ( $ip );
+		my $InsideIndicator = &GetInsideIndicator ( $line );
+		my $handle = &GetHandle ( $line );
+		my ( $item_id, $collid );
+		if ( $handle )
+		  {
+		    $item_id = &GetItemId ( $handle );
+		  }
+		if ( $item_id )
+		  {
+		    $collid = &GetCollId ( $item_id );
+		  }
+		my $date = &GetDate ( $line );
+		$date =~ s,(.*?)\-(.*?)-.*,$1/$2,;
+
+		if ( ( ( $collid ) && ( $item_id ) ) && ( $date eq $IPDate ) )
+		  {
+		    &ReportItemData ( $date, $collid, $item_id, $handle, $InsideIndicator, $ipIsUM, $referer );
+		  }
+		elsif ( $date eq $IPDate )
+		{
+		  my $msg = qq{item $handle not counted\n};
+                  print $msg;
+		}
+	      }
+	    
+	    #2006-10-27 22:22:51,664 INFO  org.dspace.app.webui.servlet.DSpaceServlet @ anonymous:session_id=0012961896DEAB5EF4F1321EAC6E2B77:ip_addr=66.249.72.111:filename=a.pdf:view_bitstream_details:2027.42/6085
+	    elsif ( $line =~ m,.*view_bitstream_details.*, )
+	      {
+		my $ip = &GetIPAddress ( $line );
+		my $referer = &GetRefererForBit ( $line );
+		my $ipIsUM =  &IsIPUM ( $ip );
+		my $handle = &GetHandleForBit ( $line );
+		my $filename = &GetFilename ( $line );
+		my ( $item_id, $collid );
+		if ( $handle )
+		  {
+		    $item_id = &GetItemId ( $handle );
+		  }
+		if ( $item_id )
+		  {
+		    $collid = &GetCollId ( $item_id );
+		  }
+		my $date = &GetDate ( $line );
+		$date =~ s,(.*?)\-(.*?)-.*,$1/$2,;
+
+		if ( ( ( $collid ) && ( $item_id ) ) && ( $date eq $IPDate ) )
+		  {
+		    &ReportBitstreamData ( $date, $collid, $item_id, $handle, $ipIsUM, $referer, $filename );
+		  }
+                  elsif ( $date eq $IPDate )
+                  {
+ 		    my $msg = qq{bitstreams $handle not counted\n};
+                    print $msg;
+                  }
+	      }    
+	  } 
+      }
+  }
+
+sub GetCollId
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select owning_collection from Item where uuid='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $collid, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $collid  = $data[0];      
+    }
+    $sth->finish; 
+
+    return $collid;
+
+  }
+
+
+sub GetItemId 
+  {
+    my ( $handle ) = @_;
+
+   my $statement = qq{select resource_id from Handle where handle='$handle';};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $item_id, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $item_id     = $data[0];      
+    }
+    $sth->finish; 
+
+    return $item_id;
+    
+  }
+
+
+sub ReportBitstreamData 
+{
+  my ( $date, $collid, $item_id, $handle, $ipIsUM, $referer, $filename ) = @_;
+
+  if ( $referer =~ m,.*\'.*, )
+    {
+      my $a;
+    }
+
+  #$referer =~ s,\',\\',gs;
+  #$filename =~ s,\',\\',gs;
+
+  $referer =~ s,\','',gs;
+  $filename =~ s,\','',gs;
+
+  #print $filename . "\n";
+  my $statement = qq{insert into BitstreamIPstatsdata values ( '$date', '$collid', '$item_id', '$handle', $ipIsUM, '$referer', '$filename' )};
+
+  my $msg = qq{$statement\n};
+  #print $msg;
+
+
+  &ProcessSQL ( $statement );
+
+}
+
+
+
+sub ReportItemData 
+  {
+    my ( $date, $collid, $item_id, $handle, $InsideOutsideIndicator, $ipIsUM, $referer ) = @_;
+
+    #$referer =~ s,\',\\',gs;
+    $referer =~ s,\','',gs;
+
+    my $statement = qq{insert into ItemIPstatsdata values ('$date', '$collid', '$item_id', '$handle', $InsideOutsideIndicator, $ipIsUM, '$referer' )};
+
+    &ProcessSQL ( $statement );
+  }
+
+
+sub ProcessSQL
+  {
+    my ( $statement ) = @_;
+
+    $dbhP->do($statement)
+     or print "ERROR: Couldn't prepare statement: " . $statement . "\n";
+
+
+    #my $sth = $dbhP->prepare($statement)
+    #  or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    #$sth->execute()             # Execute the query
+    #  or print "Couldn't execute statement: " . $sth->errstr;
+    #$sth->finish;          
+
+
+  }
+
+
+__END__;
+
+
+

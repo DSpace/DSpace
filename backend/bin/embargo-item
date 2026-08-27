@@ -1,0 +1,220 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+use strict;
+use warnings;
+use DBI;
+use File::Path;
+use Getopt::Std;
+
+#my $opt_h="2027.42/195144";
+#my $opt_d="2028-10-10";
+
+getopts("h:d:");
+our ($opt_h, $opt_d);
+
+my ($handle, $date);
+
+if ( ($opt_h) && ($opt_d) )
+{
+    $handle = $opt_h;
+    $date   = $opt_d;
+
+    &ValidateDate ( $date );
+}
+else
+{
+    print "EXAMPLE: ./embargo-item -h handle_value -d YYYY-MM-DD, like ./embargo-item -h 2027.42/199784 -d 2027-09-01\n";
+    exit;
+}
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $item_id = &GetItemId ( $handle );
+
+if ( $item_id eq 'notvalid' )
+{
+  my $msg = qq{Handle provided $handle does not exists in Deep Blue \n};
+  print $msg;
+
+  $dbhP->disconnect;
+  exit;
+}
+
+my $msg;
+if ( &IsItemInTable ( $item_id ) )
+{
+  my $old_date = &GetOldEmbargoDate ( $item_id );
+
+  #If Item is in table, then update the date
+  &UpdateItemInTable ( $item_id, $date );
+  $msg = qq{REQUEST NOT COMPLETED: $handle was previously embargoed for $old_date, but will now be embargoed till $date\n};
+}
+else
+{
+  #Tell User it all finished successfully.
+  &StoreItemInTable ( $item_id, $date );
+  $msg = qq{REQUEST COMPLETED: $handle has been embargoed and will be released on $date\n};
+}
+
+print $msg;
+
+$dbhP->disconnect;
+
+exit;
+
+sub StoreItemInTable 
+{
+  my ( $item_id, $date ) = @_;
+
+  my $sql = qq{INSERT into umrestricted (item_id, release_date) values ('$item_id', '$date')};
+  &ProcessSQL ( $sql );
+
+}
+
+sub UpdateItemInTable 
+{
+  my ( $item_id, $date ) = @_;
+
+  my $sql = qq{UPDATE umrestricted set release_date='$date' where item_id ='$item_id'};
+  &ProcessSQL ( $sql );
+
+}
+
+sub ValidateDate
+{
+  my ( $date ) = @_;
+
+  if ( $date =~ m/^(\d{4})-(\d{2})-(\d{2})$/ )
+  {
+  }
+  else
+  {
+    print "Bad date string provided: $date Should be YYYY-MM-DD\n";
+    exit;
+  }
+
+  return 1;
+  
+}
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+  }
+
+sub GetItemId
+  {
+    my ( $handle ) = @_;
+
+    my $statement = qq{select resource_id from handle where handle='$handle'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $item_id = 'notvalid';
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $item_id = $data[0];
+    }
+
+    $sth->finish;
+
+    return $item_id;
+  }
+
+sub GetOldEmbargoDate
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select release_date from umrestricted where item_id='$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $date;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $date = $data[0];
+    }
+
+    $sth->finish;
+
+    return $date;
+  }
+
+sub IsItemInTable 
+{
+  my ( $item_id ) = @_;
+
+  my $statement = qq{select item_id from umrestricted where item_id = '$item_id'};
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $in_table = 0;
+  my ( @data );
+  while (@data = $sth->fetchrow_array()) {
+    $in_table = 1;
+  }
+
+  return $in_table;
+
+}
+
+__END__;
+

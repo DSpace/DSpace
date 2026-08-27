@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+#
+# This has not been tested.
+#
+
+
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use Encode;
+use utf8;
+use DBI;
+use File::Path;
+
+use LWP::Simple;
+use LWP::UserAgent;
+
+
+use DBI;
+use Mail::Mailer;
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gMailServer     = $ENV{'mail__P__server'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $report = &GetItems();
+
+#my $size = @items;
+
+
+if ( $report ne '' )
+  {
+    &SendEmail( $report );
+    #my $msg = qq{count is $count};
+    #print $msg;
+  }
+
+$dbhP->disconnect;
+
+
+exit;
+
+sub GetItems
+    {
+      #my $statement = qq{select dspace_object_id, count(*) from metadatavalue where metadata_field_id =1 and dspace_object_id in (select uuid from item where submitter_id ='61180f42-efde-4ac2-9630-10793834eafb') group by 1 having count(*) >= 100 order by 2 desc;};
+    
+      my $statement = qq{select dspace_object_id, count(*) from metadatavalue where metadata_field_id =1 group by 1 having count(*) > 100 order by 2 desc};
+
+      my $sth = $dbhP->prepare($statement)
+        or die "Couldn't prep9are statement: " . $dbhP->errstr;
+      
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+        or die "Couldn't execute statement: " . $sth->errstr;
+
+      my $report = qq{};
+      my ( @items, $value, @data );
+      while (@data = $sth->fetchrow_array()) {
+
+	if ( &isInArchive ( $data[0]) == 1 )
+	{
+	  push ( @items, $data[0] );
+	  $report .= qq{item = $data[0], count = $data[1]\n};
+	  #print $msg;
+	}
+	else
+	{
+	  my $msg = qq{Item Is Not IN ARCHIVE\n};
+	  print $msg;
+	}
+
+
+
+
+      }
+      $sth->finish;
+
+      return $report;
+
+    }
+
+
+sub isInArchive
+  {
+    my ( $item_id ) = @_;
+
+   my $statement = qq{select item_id from item where in_archive=true and uuid ='$item_id'};
+
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my ( @data, @bit );
+    while (@data = $sth->fetchrow_array()) {
+      return 1;
+    }
+
+    $sth->finish;
+
+    return 0;
+
+  }
+
+sub SendEmail
+  {
+
+    my ( $report ) = @_;
+
+    my $msg = qq{You may want to use: misc/update_author_list_too_long to eliminate the number of authors for the following items, because these items have more than 100 authors and in the past that has lead to locked in transactions connections in the database.  Here is the list: \n\n $report};
+
+    my $to = qq{ulib-deepblue-documents-cron-reporting\@umich.edu};
+    use Mail::Mailer;
+    my $server = $gMailServer;
+    my $mailer = new Mail::Mailer->new('smtp', Server => $server);
+    $mailer->open(
+                  {
+                   'To'       => $to,
+                   'From'     => 'ulib-deepblue-documents-cron-reporting@umich.edu',
+                    'Subject'  => 'These items have more than 100 authors.',
+                  }
+                 );
+    print $mailer( $msg );
+    $mailer->close;
+}
+
+__END__;
+
+
+

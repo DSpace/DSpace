@@ -1,0 +1,416 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use utf8;
+use DBI;
+use File::Path;
+use Getopt::Std;
+
+my $gBaseLogDir    = $ENV{'BASE_LOG_DIR'};
+my $gTempLogFile = qq{$gBaseLogDir/temp_log_file};
+
+my %opts;
+getopts('d:l:', \%opts);
+
+my $IPDate     = $opts{'d'};
+my $logDir     = $opts{'l'};
+
+#my $IPDate = '2024/01';
+#my $logDir = qq{/dir/log/Jan_2024_test};
+
+print "IPDate = " . $IPDate . "\n";
+print "logDir = " . $logDir . "\n";
+#print "Looks good (y/n)? ";
+#my $go_on = <STDIN>;
+#chop $go_on;
+#if ( $go_on eq 'y' )
+#  {
+#    print "Going on..." ."\n";
+#  }
+#else
+#  {
+#    print "Task terminated..." ."\n";
+#    exit;
+#  }
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+my @CrawlerIPs = &GetCrawlerIPs;
+
+&CleanIPData ();
+
+$dbhP->disconnect;
+exit;
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+}
+
+sub GetCrawlerIPs
+  {
+
+    my @ips;
+    my $statement = qq{select count(*), ip from crawlerip where view_type='view_bitstream_details' group by ip having count(*) >= 300};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my (  @data  );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @ips, $data[1] );
+      my $msg = qq{crawler ip ====> $data[1]\n};
+      #print $msg;
+
+    }
+    $sth->finish;     
+
+    #Second part is get suspicious sites.
+    my $statement = qq{select distinct ip from crawlerip where site like '%crawl%' or site like '%msnbot%' or site like '%spider%' or site like '%googleusercontent%'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my (  @data  );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @ips, $data[0] );
+      my $msg = qq{crawler ip ====> $data[0]};
+      #print $msg;
+
+    }
+    $sth->finish;
+
+    #Get all crawlers identified by dspace
+    my $statement = qq{select distinct ip from crawlers_dspace};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my (  @data  );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @ips, $data[0] );
+      my $msg = qq{crawler ip ====> $data[0]\n};
+      #print $msg;
+
+    }
+    $sth->finish;     
+
+    &SortUniquifyList ( \@ips ) ;   
+    
+    return @ips;
+
+  }
+
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    #open ( FH, "<$fileName" ) || die();
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+
+sub GetFileList 
+  {
+     
+    my $source = $logDir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @logfiles;
+    foreach my $itemname (@testtems)
+    {
+      #if ( $itemname =~ m,.*dspace\.log\.10[0-9][0-9], )
+      if ( $itemname =~ m,.*dspace\.log\-.*, )
+	    {
+	      my $item = qq{$source/$itemname};
+	      push (@logfiles, $item);
+	    }
+    }
+
+    return @logfiles;
+    
+  }
+
+
+sub CleanIPData
+  {
+    my @files = &GetFileList ( );
+
+    my $total_item_view = 0;
+    my $total_bit_view = 0;
+
+    foreach my $file ( @files )
+      {
+
+        my $tempLogFile = $gTempLogFile;
+        `touch $tempLogFile`;
+        #Clear the file
+	      &WriteFile ( $tempLogFile, '' );
+
+	      my $first_time = 1;		      
+
+	      my $buffer = &ReadFile ( $file );
+
+	      my @lines = split (/\n/, $buffer );
+
+	      my $msg = qq{ Doing File $file \n};
+	      print $msg;
+
+	my $new_buffer;
+	foreach my $line ( @lines )
+	  {
+	    #2006-10-27 22:31:17,403 INFO  org.dspace.app.webui.servlet.DSpaceServlet @ anonymous:session_id=7759D272BD53DC87342BBA1E61EAFE73:ip_addr=66.249.72.111:view_item_details:collection=OUTSIDE Transportation Research Institute (UMTRI) (All Collections),  handle=2027.42/583
+
+
+	    my $ip = $line;
+
+	    if ( $line =~ m,.*referer\=file\:\/\/C.*, )
+	      {
+		my $msg = qq{bad line => $line \n};
+                print $msg;
+	      }
+	    elsif ( ( $ip =~ m,.*ip_addr=(([0-9]|\.)+)\:.*, )  && ( $ip =~ m,.*view\_.*, ) )
+               {
+  
+	          $ip =~ s,.*ip_addr=(.*?)\:.*,$1,s;
+
+	          $line =~ s,\',,gs;
+	          $ip =~ s,\',,gs;
+
+	          my $size = length $ip;
+	          if (( $size < 100 ) && ( $size > 0 ))
+	          {
+
+                    #Only store it if it's not a crawler
+		    if ( grep( /^$ip$/, @CrawlerIPs ) ) {
+		      #a crawler, don't count it.
+                      #print $ip . "\n";
+		    }
+                    else
+		    {
+		      if ( $first_time )
+		      {
+			$line = qq{$line\n};
+		        #print $line;	
+                        &WriteFile ( $tempLogFile, $line );
+
+			$first_time = 0;
+		      }
+		      else
+		      {
+			$line = qq{$line\n};
+                        #print $line;
+			&ContWriteFile ( $tempLogFile, $line );
+		      }
+      
+		    }
+
+
+		    #Now we want to keep track of view_item_details, adn view_btstream_details counts for the entire ssytem 
+		    if ( $line =~ m,.*view_item_details.*, )
+		      {
+			$total_item_view = $total_item_view + 1;
+		      }
+		    elsif ( $line =~ m,.*view_bitstream_details.*, )
+		      {
+			$total_bit_view = $total_bit_view + 1;
+		      }
+	          }
+	          else
+	          {
+		    my $a;
+	          }
+                }
+
+	  }
+
+	#Not needed any longer.  Check done before storing it.
+	#foreach my $ip ( @CrawlerIPs )
+	#  {
+	#    
+	#    my $statement = qq{delete from statsfile where ip = '$ip'};
+	#    &ProcessSQL ( $statement );
+        #	
+	#  } 
+
+
+	#Now creat the file
+	#my $statement = qq{select line from statsfile};
+	
+	#my $sth = $dbhP->prepare($statement)
+	#  or die "Couldn't prepare statement: " . $dbhP->errstr;
+	
+	# Read the matching records and print them out
+	#$sth->execute()             # Execute the query
+	#  or die "Couldn't execute statement: " . $sth->errstr;
+		
+	#my $first_time = 1;
+	#my (  $line, @data  );
+	#while (@data = $sth->fetchrow_array()) {
+	#  $line = $data[0];
+	#  
+	#  if ( $first_time )
+	#    {
+	#      $line = qq{$line\n};
+	#      &WriteFile ( $file, $line );
+	#      $first_time = 0;
+	#    }
+	#  else
+	#    {
+	#      $line = qq{$line\n};
+	#      &ContWriteFile ( $file, $line );
+	#    }
+        #
+	#}
+	#$sth->finish;     
+
+	#Clean the table
+	#my $statement = qq{delete from statsfile};
+	#&ProcessSQL ( $statement );
+
+        my $msg = qq{cp $tempLogFile to $file \n};
+        print $msg;
+	`cp $tempLogFile $file`;
+
+      }
+
+    #Report the total_item_view, and total_bit_view
+    my $msg = qq{Total Item Views $total_item_view \n};
+    print $msg;
+    my $msg = qq{Total Bitstream Views $total_bit_view \n};
+    print $msg;
+
+    #Store this information in a table.
+    #my $statement = qq{delete from rawstats where colldt='$IPDate'};
+    #&ProcessSQL ( $statement );
+
+    #my $statement = qq{insert into rawstats values ( '$IPDate', $total_item_view, $total_bit_view)};
+    #&ProcessSQL ( $statement );
+  }
+
+sub ProcessSQL
+  {
+    my ( $statement ) = @_;
+
+
+    $dbhP->do($statement)
+     or print "Couldn't prepare statement: " . $dbhP->errstr;
+
+    my $msg = qq{$statement\n};
+    #print $msg;
+
+    #my $sth = $dbhP->prepare($statement)
+    #  or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    #$sth->execute()             # Execute the query
+    #  or print "Couldn't execute statement: " . $sth->errstr;
+    #$sth->finish;          
+
+  }
+
+
+sub WriteFile
+{
+    my ( $fileName, $value ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $value;
+    close OUTFILE;
+
+}
+
+sub ContWriteFile
+{
+    my ( $fileName, $value ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">>$fileName" ) || die();
+    print OUTFILE $value;
+    close OUTFILE;
+
+}
+
+
+
+__END__;
+
+
+

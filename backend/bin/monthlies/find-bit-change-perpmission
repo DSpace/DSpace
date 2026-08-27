@@ -1,0 +1,566 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $report = qq{Handle\tTitle\tAuthor\tCollecton\tSubmitterEmail\tDate\n};
+
+my @item_ids = &GetItemIds();
+
+my $count = 0;
+foreach my $item_id ( @item_ids )
+  {
+    my @bits = &GetBits ( $item_id );
+    
+    foreach my $bit ( @bits )
+    {
+	
+	    my $group = &FindGroup ( $bit );
+	    # Update the resouce policy
+      my $msg = qq{$count $bit  $group \n};
+	    my $handle = &GetHandle ( $item_id );
+      if ( $group != '185b90c6-b6cf-43fe-b7db-59a51cd673fb' )
+	    {
+	      my $msg = qq{$handle\n};
+	      print $msg;
+        #This has not been tested on 63.  The id used to be 63 for NotBio Be careful when you run this.
+	      my $msg = qq{update resourcepolicy set epersongroup_id = '185b90c6-b6cf-43fe-b7db-59a51cd673fb'  where dspace_object = '$bit';\n};
+	      #print $msg;
+	      $count = $count + 1;
+	    }
+    }
+    
+  }
+
+print $count . "\n";
+
+$dbhP->disconnect;
+
+exit;
+
+sub FindGroup
+  {
+    my ( $resource_id ) = @_;
+
+    my $statement = qq{select epersongroup_id from resourcepolicy where dspace_object = '$resource_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my $group = "no group";
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+       $group = $data[0];
+
+    }
+
+    $sth->finish;
+
+    return $group;
+  }
+
+sub GetBits
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select bundle_id from item2bundle where item_id = '$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my $count = 0;
+    my ( @data, $bundle_id, @bits );
+    while (@data = $sth->fetchrow_array()) {
+       $bundle_id = $data[0];
+
+       my $original = &IsBundleOriginal ( $bundle_id );
+       if ( $original )
+	 {
+	   @bits = &GetBitsForBundle ( $bundle_id );
+	 }
+    }
+
+    $sth->finish;
+
+    return @bits;
+  }
+
+sub IsBundleOriginal 
+    {
+      my ( $bundle_id ) = @_;
+
+
+      my $statement = qq{select dspace_object_id from metadatavalue where metadata_field_id = 64 and text_value='ORIGINAL' and dspace_object_id = '$bundle_id'};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+      
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      my $original = 0;
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+         $original = 1
+      }
+      
+      $sth->finish;
+
+      return $original;
+
+    }
+
+sub GetBitsForBundle
+    {
+      my ( $bundle_id ) = @_;
+
+      my $statement = qq{select bitstream_id from bundle2bitstream where bundle_id = '$bundle_id'};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+      
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      my ( @data, @bits );
+      while (@data = $sth->fetchrow_array()) {
+	      push ( @bits, $data[0] );
+      }
+      
+      $sth->finish;
+
+      return @bits
+
+    }
+
+sub FindCount
+  {
+
+    my ( $handle ) = @_;
+
+    #$handle = '2027.42/58319';
+  
+    my @dates;
+    push ( @dates, '2014/07' );
+    push ( @dates, '2014/08' );
+    push ( @dates, '2014/09' );
+    push ( @dates, '2014/10' );
+    push ( @dates, '2014/11' );
+    push ( @dates, '2014/12' );
+    push ( @dates, '2015/01' );
+    push ( @dates, '2015/02' );
+    push ( @dates, '2015/03' );
+    push ( @dates, '2015/04' );
+    push ( @dates, '2015/05' );
+    push ( @dates, '2015/06' );
+
+    my $total = 0;
+    foreach my $date ( @dates )
+    {
+      my $statement = qq{select bit_count from consolidatedstatstable where colldt = '$date' and handle='$handle' and bit_count > 0 order by title};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+
+      my $value;
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+	      $total = $data[0] + $total;
+      }
+      
+      $sth->finish;
+    }
+
+    return $total;
+
+  }
+
+sub GetItemIds
+  {
+
+    #Items with request copy.
+    my $statement = qq{select dspace_object_id from metadatavalue where metadata_field_id = 88};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my @itemids;
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      push ( @itemids, $data[0] ) ;
+    }
+
+    $sth->finish;
+
+    return @itemids;
+  }
+
+
+sub GetSubmitterEmail
+  {
+
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select email from eperson where eperson_id in (select submitter_id from item where item_id = $item_id)};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my @itemids;
+    my ( @data, $email );
+    while (@data = $sth->fetchrow_array()) {
+        $email = $data[0];
+    }
+
+    $sth->finish;
+
+    return $email;
+  }
+
+
+sub GetOwningColl
+  {
+
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select owning_collection from item where item_id = $item_id};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my @itemids;
+    my ( @data, $coll );
+    while (@data = $sth->fetchrow_array()) {
+        $coll = $data[0];
+    }
+
+    $sth->finish;
+
+    return $coll;
+  }
+
+
+sub ItemInDearborn
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select text_value  from metadatavalue where resource_id=$item_id and metadata_field_id = 77 and text_value like '%Dearborn%' and resource_type_id=2};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    $sth->finish;
+
+    my $value=0;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value .= qq{$data[0]; };
+
+      print $value . "\n";
+    }
+ 
+    if ( $value )
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;    
+    }
+
+
+  }
+
+
+sub GetItemId
+  {
+    my ( $handle ) = @_;
+
+    my $statement = qq{select resource_id from handle where handle='$handle'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      $item_id = $data[0];
+    }
+
+    $sth->finish;
+
+    return $item_id;
+  }
+
+sub GetSubmitter 
+{
+    my ( $handle ) = @_;
+
+    my $statement = qq{select submitter_id from item where item_id in (select resource_id from handle where handle='$handle')};
+
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my ( @data, $sub );
+    while (@data = $sth->fetchrow_array()) {
+      $sub = $data[0];
+    }
+
+    $sth->finish;
+
+    return $sub;
+
+}
+
+sub GetHandleForBit 
+{
+  my ( $bit_id ) = @_;
+
+  my $statement = qq{select handle from handle where resource_id in ( select item_id from item2bundle where bundle_id in (select bundle_id from bundle2bitstream where bitstream_id='$bit_id'))};
+
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my ( @data, $handle );
+  while (@data = $sth->fetchrow_array()) {
+    $handle = $data[0];
+  }
+
+  $sth->finish;
+
+  return $handle;
+
+}
+
+sub FindGroupForBit 
+{
+  my ( $bit_id ) = @_;
+
+  my $statement = qq{select epersongroup_id from resourcepolicy where resource_id=$bit_id and resource_type_id=0};
+  #my $statement = qq{select epersongroup_id from resourcepolicy where resource_id=$bit_id};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my @group;
+  my ( @data );
+  while (@data = $sth->fetchrow_array()) {
+     push ( @group, $data[0]);
+  }
+
+  $sth->finish;
+
+  return @group;
+
+}
+
+sub GetGroup 
+{
+  my ( $res_id ) = @_;
+
+  my $statement = qq{select epersongroup_id from resourcepolicy where resource_id=$res_id};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my @group;
+  my ( @data );
+  while (@data = $sth->fetchrow_array()) {
+    push ( @group, $data[0]);
+  }
+
+  $sth->finish;
+
+  return @group;
+
+}
+
+
+sub WriteReportToFile 
+  {
+    my ( $report, $filename ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+sub GetMeta
+  {
+    my ( $item_id, $id ) = @_;
+
+    my $statement = qq{select text_value  from metadatavalue where resource_id=$item_id and metadata_field_id = $id and resource_type_id=2 };
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $value;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value .= qq{$data[0]; };
+    }
+ 
+    $sth->finish;
+
+    $value =~ s,(.*)\;.*,$1,;
+
+    return $value;    
+  }
+
+
+
+sub GetCollname
+  {
+    my ( $resource_id, $id ) = @_;
+
+    my $statement = qq{select text_value  from metadatavalue where resource_id=$resource_id and metadata_field_id = $id and resource_type_id=3 };
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $value;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value .= qq{$data[0]; };
+    }
+
+    $sth->finish;
+ 
+    $value =~ s,(.*)\;.*,$1,;
+
+    return $value;    
+  }
+
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+      
+    }
+    $sth->finish;
+
+    return $handle;
+  }
+
+__END__;
+
+
+

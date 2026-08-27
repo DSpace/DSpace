@@ -1,0 +1,522 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use open ':std', ':encoding(UTF-8)';
+use DBI;
+use File::Path;
+use lib '.';
+use StatsUtils;
+use Encode qw(encode);
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gMailServer     = $ENV{'mail__P__server'};
+my $gBaseDataDir    = qq{/mnt/prep};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my ( $date, $gMonth, $gYear ) = &GetDate ();
+
+#To Fix - for a fix for Mindy from umtri
+#$date = '2016/01';
+#$gMonth = 'Jan';
+#$gYear = '2016';
+#my @individuals;
+#push (@individuals,  'bsweet@umich.edu' );
+
+my @individuals = &GetIndividuals ();
+
+&ProcessReports ( @individuals );
+
+$dbhP->disconnect;
+
+exit;
+
+sub ProcessReports 
+{
+  my ( @emails ) = @_;
+
+  foreach my $email ( @emails )
+  {
+      my $msg = qq{email is $email \n};
+      print $msg;
+      my ( @handles ) = &GetHandles ( $email );
+
+      my ( $report, $count ) = &GetReport ( $date, @handles );
+
+      my $file = &PrepareZipFile ( $report );
+
+      &EmailZipFileData ( $email, $count, $report, $file );
+  }
+
+}
+
+
+sub PrepareZipFile
+{
+
+    my ( $buffer ) = @_;
+    
+    my $count = &StatsUtils::GetCount( $dbhP );
+
+    my $baseDir = qq{$gBaseDataDir/stats/email};
+    my $DirName = qq{output$count};
+    my $destination = qq{$gBaseDataDir/stats/email/output$count};
+
+    if ( -d $destination )
+      {
+	      `rm -r $destination`;
+      }
+    my @args = ("mkdir", "$destination");
+    system (@args) == 0 or &errorBail("Could not make destination directory.  Program has terminated");
+    my @args = ("chmod", "777", "$destination");
+    system (@args) == 0 or &errorBail("Could not grant permissions to destination dir.  Program has terminated");
+
+    my $dataFile = qq{$destination/data.txt};
+    &WriteFile ( $dataFile, $buffer );
+
+    #Call Unix to Zip the files
+    `/bin/gzip  $destination/data.txt`;
+    my $ZipFile = $destination . '/' . 'data.txt.gz';
+
+    return $ZipFile;
+}
+
+
+sub PrepareFile
+{
+
+    my ( $buffer ) = @_;
+    
+    my $count = &StatsUtils::GetCount( $dbhP );
+
+    my $baseDir = qq{$gBaseDataDir/stats/email};
+    my $DirName = qq{output$count};
+    my $destination = qq{$gBaseDataDir/stats/email/output$count};
+
+    if ( -d $destination )
+    {
+	     `rm -r $destination`;
+    }
+
+    my @args = ("mkdir", "$destination");
+    system (@args) == 0 or &errorBail("Could not make destination directory.  Program has terminated");
+    my @args = ("chmod", "777", "$destination");
+    system (@args) == 0 or &errorBail("Could not grant permissions to destination dir.  Program has terminated");
+
+    my $dataFile = qq{$destination/data.txt};
+    &WriteFile ( $dataFile, $buffer );
+
+    return $dataFile;
+
+}
+
+
+sub GetReport
+{
+  my ( $date, @handles ) = @_;
+
+  my $report = qq{Handle\tNumber of times file(s) downloaded\tTitle\tAuthors\n};
+  
+  my $count = 0;
+  foreach my $handle ( @handles )
+  {
+
+    my $statement = qq{select handle, title, bit_count from consolidatedstatstable where handle = '$handle' and colldt = '$date' and bit_count > 0 order by title};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      my $authors = &GetAuthors ( $handle );
+      $report .= qq{$data[0]\t$data[2]\t$data[1]\t$authors\n};
+      $count = $count + 1;
+    }
+    $sth->finish; 
+
+  }
+
+  return ( $report, $count );
+
+}
+
+sub GetTotalSinceStart
+{
+  my ( $handle ) = @_;
+
+  my $statement = qq{select handle, sum(bit_count) from consolidatedstatstable where handle = '$handle' group by handle};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my $total = 0;
+  my ( @data  );
+  while (@data = $sth->fetchrow_array()) {
+    $total = $data[1];
+  }
+  $sth->finish; 
+
+  return ( $total );
+
+}
+
+
+sub GetAuthors
+{
+  my ( $handle ) = @_;
+
+  my $statement = qq{select display_authors  from statsdata where handle = '$handle'};
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my ( $authors, @data );
+  while (@data = $sth->fetchrow_array()) {
+    $authors = qq{$data[0]};
+  }
+  $sth->finish;
+
+  return $authors;
+
+}
+
+sub GetEPersonId 
+{
+  my ( $email ) = @_;
+
+  my $statement = qq{select uuid from eperson where email = '$email'};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+      
+  my ( @data, $epersonid );
+  while (@data = $sth->fetchrow_array()) {
+    $epersonid = $data[0];
+  }
+  $sth->finish;
+
+  return $epersonid;
+
+}
+
+
+sub GetHandles
+{
+  my ( $email  ) = @_;
+
+  my $eperson_id = GetEPersonId ( $email );
+
+  my @handles;
+  if ( $email eq 'malguire@umich.edu' || $email eq 'bsweet@umich.edu' )
+    {
+
+      my $statement = qq{select dspace_object_id from metadatavalue where metadata_field_id = 28 and (text_value like 'Deposited by%(malguire\@umich.edu)%' or text_value like 'Submitted by%(malguire\@umich.edu)%')};
+
+      my $sth = $dbhP->prepare($statement)
+	      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+      
+      my ( @data, $handle );
+      while (@data = $sth->fetchrow_array()) {
+	      my $handle = &GetHandle ( $data[0] );
+	      push ( @handles, $handle );
+      }
+      $sth->finish; 
+
+      my $statement = qq{select dspace_object_id from metadatavalue where metadata_field_id = 28 and (text_value like 'Deposited by%(bsweet\@umich.edu)%' or text_value like 'Submitted by%(bsweet\@umich.edu)%')};
+     
+      my $sth = $dbhP->prepare($statement)
+	       or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+	      or die "Couldn't execute statement: " . $sth->errstr;
+      
+      my ( @data, $handle );
+      while (@data = $sth->fetchrow_array()) {
+	      my $handle = &GetHandle ( $data[0] );
+	      push ( @handles, $handle );
+      }
+      
+      $sth->finish; 
+      
+    }
+  else
+    {
+
+      if ( $eperson_id ne '' )
+	    { 
+	      my $statement = qq{select uuid from item  where submitter_id = '$eperson_id'};
+
+	      my $sth = $dbhP->prepare($statement)
+	        or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+	      # Read the matching records and print them out
+	      $sth->execute()             # Execute the query
+	        or die "Couldn't execute statement: " . $sth->errstr;
+      
+	      my ( @data, $handle );
+	      while (@data = $sth->fetchrow_array()) {
+	        my $handle = &GetHandle ( $data[0] );
+	        push ( @handles, $handle );
+	      }
+	      $sth->finish; 
+	    }
+      else
+	    {
+	      my $msg = qq{Erperon not valid\n};
+	      print $msg;
+	   }
+    }
+
+  &SortUniquifyList ( \@handles );
+
+  return @handles;    
+}
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+}
+
+sub GetHandle
+{
+  my ( $item_id ) = @_;
+   
+  my $statement = qq{select handle  from Handle where resource_id = '$item_id'};
+    
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my ( $handle, @data );
+  while (@data = $sth->fetchrow_array()) {
+    $handle = qq{$data[0]};
+  }
+  $sth->finish;
+  
+  return $handle;
+    
+}
+
+
+sub GetDate
+{
+  my $newtime = scalar localtime(time());
+  my $year = substr($newtime, 20, 4);
+  my %months = (
+		"Jan" => "01",
+		"Feb" => "02",
+		"Mar" => "03",
+		"Apr" => "04",
+		"May" => "05",
+		"Jun" => "06",
+		"Jul" => "07",
+		"Aug" => "08",
+		"Sep" => "09",
+		"Oct" => "10",
+		"Nov" => "11",
+		"Dec" => "12",
+	       );
+
+  my %displaymonths = (
+		       "01" => "January",
+		       "02" => "February",
+		       "03" => "March",
+		       "04" => "April",
+		       "05" => "May",
+		       "06" => "June",
+		       "07" => "July",
+		       "08" => "August",
+		       "09" => "September",
+		       "10" => "October",
+		       "11" => "November",
+		       "12" => "December",
+		      );
+
+  my $month = $months{substr ($newtime,4, 3)};
+
+  $month = $month - 1;
+  if ( $month == 0 )
+    {
+      $month = 12;
+    }
+  if ( $month == 12 )
+  {
+    $year = $year - 1;
+  }
+  if ( $month < 10 )
+  {
+    $month = qq{0$month}
+  }
+
+  my $probability_date = qq{$year/$month};
+  
+  my $display_month = $displaymonths { $month };
+  
+  return ( $probability_date, $display_month, $year );
+  
+}
+
+
+
+sub EmailZipFileData
+{
+
+    my ( $to, $count, $report, $file ) = @_;
+
+    if ( $count != 0 )
+    {
+
+      my $actualto = $to;
+      my $subject = qq{$gMonth $gYear download report from Deep Blue};
+      $report = qq{\nThis is your monthly download report from Deep Blue Documents. While we attempt to filter out activity by automated web crawlers, it is not possible to completely exclude them. Therefore, item download counts may  reflect both human and crawler activity.\n\nThe same information is also available in the attached file.\n\n$report};
+
+      use MIME::Lite;
+      my $cc = '';
+      my $from = 'deepblue@umich.edu';
+
+      my $email = MIME::Lite ->new(
+         From => $from,
+         To => $to,
+         Cc => $cc,
+         Subject => $subject,
+         Type => 'multipart/mixed'
+      );
+
+      my $encoded_report = encode('UTF-8', $report);
+
+      # Add your text message.
+      $email->attach(
+         Type => 'TEXT',
+         Data => $encoded_report,
+         Encoding => 'quoted-printable',  # safer for email
+         Charset => 'UTF-8'               # declare the charset
+      );
+
+      # Specify your file as attachement.
+      $email->attach(Type => 'application/gzip',
+         Path => $file,
+         Filename => 'data.txt.gz',
+         Disposition => 'attachment'
+      );       
+
+      $email->send('smtp', $gMailServer);
+      print "Email Sent Successfully\n";
+
+     }
+
+}
+
+
+sub GetIndividuals
+{
+    
+  my $statement = qq{select email from individual_stats};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+  
+  my ( @data, @individuals );
+  while (@data = $sth->fetchrow_array()) {
+    push ( @individuals, $data[0] );
+  }
+  $sth->finish; 
+  
+  return @individuals;
+
+}
+
+
+sub WriteFile
+{
+    my ( $fileName, $buffer ) = @_;
+
+    #Now you want to append this to the file.
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $buffer;
+    close OUTFILE;
+
+    return;
+
+}
+
+__END__;
+
+
+

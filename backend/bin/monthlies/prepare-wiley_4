@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+use Encode;
+
+
+my $prevMonth = &prev_month_string();
+
+my $gSource = qq{/mnt/prep/wiley/PeriodicUpdateScripts/data/NewAfterEmbargoFix$prevMonth\-open};
+my $msg = qq{fixing characters in $gSource\n};
+print $msg;
+
+&FixMeta();
+
+exit;
+
+################################################################################################
+
+sub prev_month_string {
+    my @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+    my ($sec,$min,$hour,$mday,$mon,$year) = localtime();
+
+    # Find previous month
+    $mon--;
+    if ($mon < 0) {
+        $mon = 11;    # December
+        $year--;      # Previous year
+    }
+    $year += 1900;        # Adjust year
+    my $yy = $year % 100; # Last two digits
+
+    return $months[$mon] . sprintf("%02d", $yy);
+}
+
+
+
+sub FixMeta
+  {
+
+    opendir FH, $gSource;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @allitems;
+    foreach my $itemname (@testtems)
+    {
+        my $item = qq{$gSource/$itemname};
+        push (@allitems, $item);
+    }
+
+    my $FileCount = 1;
+    #Get a complete list of all directories.
+    my @listOfDirs;
+    foreach my $itemname (@allitems)
+    {
+        $itemname .= qq{/dublin_core.xml};
+        open  (FH, "<$itemname");
+        if ( not -d FH)
+        {
+          if ($itemname =~ m,.*dublin_core.xml, )
+            {
+	            print $itemname . "\n";
+	            my $data = &ReadFile ( $itemname );
+              #$data =~ s,â.*?[a-zA-Z0-9],-,gs;
+              my $ustring = decode( 'UTF-8', $data );
+              $ustring =~ s,â,-,gs;
+              &WriteFile ( $itemname, $ustring );
+            }
+
+        }
+        else  #it must be a directory
+        {
+            my $a =2;
+        }
+        close(FH);
+
+     }
+
+    my $a = 2;
+  }
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub WriteFile 
+  {
+    my ( $filename, $report ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+__END__;
+
+
+

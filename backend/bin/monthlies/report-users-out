@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+use LWP::Simple;
+use LWP::UserAgent;
+
+my $gUsers = qq{hellpop\n};
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $statement = qq{select uuid, email from eperson};
+
+my $sth = $dbhP->prepare($statement)
+  or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+# Read the matching records and print them out
+$sth->execute()             # Execute the query
+  or die "Couldn't execute statement: " . $sth->errstr;
+
+my ( @data, @bits, @size, $handles );
+while (@data = $sth->fetchrow_array()) {
+  my $eperson_id = $data[0];
+  my $email = $data[1];
+
+  my $userid = $email;
+  $userid =~ s,(.*?)\@.*,$1,;
+
+  if ( $userid eq 'ndjouyep' )
+	{
+	  my $a = 2;
+	}
+
+  my $groupid = &GetGroupId( $eperson_id );
+
+  if ( $groupid )
+	{
+	  # Store the userid name
+	  $gUsers .= qq{$userid\n};
+  }
+}
+
+$sth->finish;
+    
+$dbhP->disconnect;
+
+my $file = qq{$gBaseDataDir/users.txt};
+&WriteReportToFile ($file, $gUsers);
+
+exit;
+
+sub GetGroupId
+{
+  my ( $eperson_id ) = @_;
+
+
+  my $statement = qq{select eperson_group_id from epersongroup2eperson where eperson_id = '$eperson_id'};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  
+  my ( @data, $group_id, $group_name );
+  while (@data = $sth->fetchrow_array()) {
+    $group_id = $data[0];
+    my $name = &GetGroupName ( $group_id );
+    $group_name .= qq{$name; };
+  
+  }
+  
+  $sth->finish;
+
+  if ( $group_name =~ m,.*ADMIN.*, )
+  {
+     print $group_name , "\n";
+     return $group_name;
+  }
+  else
+  {
+     return 0;
+  }
+}
+
+sub GetGroupName 
+  {
+    my ( $group_id ) = @_;
+
+    my $statement = qq{select name  from epersongroup where uuid = '$group_id'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+  
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+  
+    my ( @data, $name, $group_name );
+    while (@data = $sth->fetchrow_array()) {
+      $name = $data[0];
+      
+    }
+  
+    $sth->finish;
+    
+    return $name;
+
+  }
+
+
+sub WriteReportToFile 
+  {
+    my ( $filename, $report ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+__END__;
+
+
+

@@ -1,0 +1,322 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+#  require "strict.pm";
+#  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+#For Time funcion.
+use POSIX;
+
+#use S3::AWSAuthConnection;
+#use S3::QueryStringAuthGenerator;
+
+#use Paws;
+#use Getopt::Long 'GetOptions';
+use LWP::Simple;
+use LWP::UserAgent;
+use Getopt::Std;
+
+use JSON::XS;
+use Data::Dumper;
+use Getopt::Std;
+
+
+#################################
+
+#To use:
+
+# -t test -o status
+# -t test -o upload
+
+# -t prod -o status
+# -t prod -o upload
+
+
+my %opts;
+getopts('t:o:', \%opts);
+
+
+my $doTest             = $opts{'t'};
+my $UploadOrStatus     = $opts{'o'};
+
+my $doTest             = 'prod';
+my $UploadOrStatus     = 'nothing';
+
+print "test/prod = " . $doTest . "\n";
+print "load/status = " . $UploadOrStatus . "\n";
+
+#For database connection.
+$dbhP;
+
+
+#For Deposit, default to testing area
+my $gHandlePrefix  = qq{TEMP-BOGUS};
+
+
+#For Api, default to testing area
+my $gApiUser = $ENV{'APTRUST_API_USER_DEV'};
+my $gApiKey  = $ENV{'APTRUST_API_KEY_DEV'};
+my $gApiUrl  = $ENV{'APTRUST_API_URL_DEV'};
+
+if ($doTest eq 'test')
+{
+  $dbhP = DBI->connect("db", "user", "password");
+  
+  #For Deposit
+  $gHandlePrefix = qq{TEMP-BOGUS};
+
+  $gApiUser = $ENV{'APTRUST_API_USER_DEV'};
+  $gApiKey  = $ENV{'APTRUST_API_KEY_DEV'};
+  $gApiUrl  = $ENV{'APTRUST_API_URL_DEV'};
+
+} elsif ($doTest eq 'prod' )
+{
+
+  my $gDbName         = $ENV{'DB_NAME'};
+  my $gDbUser         = $ENV{'DB_USER'};
+  my $gDbPassword     = $ENV{'DB_PASSWORD'};
+  my $gDbService      = $ENV{'DB_SERVICE'};
+  my $gDbPort         = $ENV{'DB_PORT'};
+
+  $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+  #For Deposit
+  $gHandlePrefix = qq{2027.42};
+
+  #For Api
+  $gApiUser = $ENV{'APTRUST_API_USER_PROD'};
+  $gApiKey  = $ENV{'APTRUST_API_KEY_PROD'};
+  $gApiUrl  = $ENV{'APTRUST_API_URL_PROD'};
+
+}
+
+&CheckStatusOfBags();
+
+$dbhP->disconnect;
+
+exit;
+
+sub CheckStatusOfBags
+    {
+      
+      #my $statement = qq{select handle, bag, date_real from aptrust_bags_sent where handle not in ( select handle from aptrust_object_status ) order by date_real asc limit 1000000};
+
+      # Blank stautus
+      #my $statement = qq{select handle, bag, date_real from aptrust_bags_sent where handle ='2027.42/164737'};
+
+      #Success
+      #my $statement = qq{select handle, bag, date_real from aptrust_bags_sent where handle ='2027.42/105208'};
+
+      #I just picked 20,000 latest.  As long as this is run every week this should be fine.
+
+
+      my $statement = qq{select handle, bag, date_real from aptrust_bags_sent where check_status ='CHECK'};
+
+      my $sth = $dbhP->prepare($statement)
+        or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+        or die "Couldn't execute statement: " . $sth->errstr;
+
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+	      my $handle = $data[0];
+	      my $bag = $data[1];
+        my $date = $data[2];
+	
+	      my $object_identifier = $handle;
+	      $object_identifier =~ s,$gHandlePrefix\/,,;
+	      $object_identifier = qq{umich.edu/deepbluedocs.$object_identifier};
+       
+        &RecordStatusOfBag ( $handle, $object_identifier );
+
+      }
+      $sth->finish;
+
+      #And Check any objects whos status is not Success.
+      my $statement = qq{select handle from aptrust_object_status where status !='Success'};
+
+      my $sth = $dbhP->prepare($statement)
+        or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+      # Read the matching records and print them out
+      $sth->execute()             # Execute the query
+        or die "Couldn't execute statement: " . $sth->errstr;
+
+      my ( @data );
+      while (@data = $sth->fetchrow_array()) {
+        my $handle = $data[0];
+  
+        my $object_identifier = $handle;
+        $object_identifier =~ s,$gHandlePrefix\/,,;
+        $object_identifier = qq{umich.edu/deepbluedocs.$object_identifier};
+       
+        &RecordStatusOfBag ( $handle, $object_identifier );
+
+      }
+      $sth->finish;
+
+    }
+
+
+sub RecordStatusOfBag 
+  {
+    my ( $handle, $object_identifier ) = @_;
+    
+    my $url = qq{$gApiUrl\items?object_identifier=$object_identifier&action=Ingest};
+
+    my $ua = LWP::UserAgent->new;
+
+    #Was gettubg 403 without this.
+    $ua->agent('Mozilla/5.0');
+    $ua->timeout( 300 );
+    my $res = $ua->get( $url,  'Accept' => 'application/json',
+          'content_type' => 'application/json',
+          'X-Pharos-API-User' => $gApiUser,
+          'X-Pharos-API-Key' => $gApiKey);
+
+
+    my $status = $res->status_line;
+    my $msg = qq{$status\n};
+    print $msg;
+
+    if ($res->is_success)
+    {
+        # record the status of the object_identifier
+        my $content= $res->content;
+        my $hashref = decode_json $content;
+        my %results = %$hashref;
+        my @more = $results{'results'};
+
+        my $action = $more[0][0]{'action'};
+        my $status = $more[0][0]{'status'};
+        my $storage_option = $more[0][0]{'storage_option'};  #Standard or Glacier.
+        my $updated_at = $more[0][0]{'updated_at'}; 
+
+        my $date = &GetTodaysDate();
+
+
+	      my $statement = qq{delete from aptrust_object_status where handle='$handle'};
+        print $statement . "\n";
+        print $status . "\n";
+	      &ProcessSQL ( $statement );
+
+	  
+	      my $statement = qq{insert into aptrust_object_status (handle, object_identifier, action, status, storage_option, updated_at, date) values ('$handle', '$object_identifier', '$action', '$status', '$storage_option', '$updated_at', '$date')};
+        print $statement . "\n";
+	      &ProcessSQL ( $statement );
+
+
+	      my $statement = qq{update aptrust_bags_sent set check_status='DONE' where handle ='$handle'};
+        print $statement . "\n";
+	      &ProcessSQL ( $statement );
+
+    }
+    else
+    {
+	      my $statement = qq{delete from aptrust_object_status where handle='$handle'};
+        print $statement . "\n";
+	      &ProcessSQL ( $statement );
+
+        my $date = &GetTodaysDate();
+	  
+	      my $statement = qq{insert into aptrust_object_status (handle, object_identifier, action, status, storage_option, updated_at, date) values ('$handle', '$object_identifier', '', 'FAILD to SEND', '', '', '$date')};
+        print $statement . "\n";
+	      &ProcessSQL ( $statement );
+
+	      my $statement = qq{update aptrust_bags_sent set check_status='DONE' where handle ='$handle'};
+        print $statement . "\n";
+	      &ProcessSQL ( $statement );
+
+	      my $msg = qq{URLCALL: Unsuccessful call to $url \n};
+	      print $msg,"\n";
+    }
+
+  }
+
+
+sub ProcessSQL 
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;
+  }
+
+
+sub GetTodaysDate
+{
+
+  my $local_time = strftime "%F %T", localtime time;
+
+  return $local_time;
+}
+
+
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub WriteFile 
+  {
+    my ( $filename, $report ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+__END__;
+
+
+

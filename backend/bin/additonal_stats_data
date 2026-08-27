@@ -1,0 +1,290 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use utf8;
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+&GetAdditionalData ();
+
+$dbhP->disconnect;
+
+exit;
+
+sub GetAdditionalData
+  {
+    
+    #Clear the stats data table
+    my $statement = qq{delete from statsdata};
+    &ProcessSQL ( $statement );
+
+    my $statement = qq{select handle, resource_id from Handle where resource_type_id = 2};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $handle, $item_id, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+      $item_id = $data[1];
+
+      if ( &ItemActive ( $item_id ) )
+	    {
+	      my $authors   = &GetValues ( $item_id, 1 );
+	      my $titles   = &GetValues ( $item_id, 64 );
+	      my $DateAdded = &GetValues ( $item_id, 11 );
+	      my $publisher = &GetValues ( $item_id, 39 );
+	      my $BitCount  = &GetBitCount ( $item_id );
+	      my $collid  = &GetCollid ( $item_id );
+
+	      my $a;
+	      &UpdateStatsDataTable ( $item_id, $handle, $authors, $titles, $DateAdded, $BitCount, $publisher, $collid );
+	    }
+    }
+    $sth->finish; 
+  }
+
+sub ProcessSQL
+  {
+    my ( $statement ) = @_;
+
+    $dbhP->do($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+
+    #my $sth = $dbhP->prepare($statement)
+    #  or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    #$sth->execute()             # Execute the query
+    #  or die "Couldn't execute statement: " . $sth->errstr;
+    #$sth->finish;
+  }
+
+sub UpdateStatsDataTable 
+  {
+    my ( $item_id, $handle, $authors, $title, $DateAdded, $BitCount, $publisher, $collid ) = @_;
+
+    $title =~ s,\',\\',gs;
+    $authors =~ s,\',\\',gs;
+
+    $publisher =~ s,\',\\',gs;
+
+    my $lc_title = lc ( $title );
+    my $lc_authors = lc ( $authors );
+
+    my $statement = qq{insert into statsdata values ( 0, '$handle', E'$lc_authors', E'$lc_title', '$DateAdded', $BitCount, E'$authors', E'$title', E'$publisher', 0, '$collid', '$item_id' )};
+    
+    $dbhP->do($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+
+
+    #my $sth = $dbhP->prepare($statement)
+    #  or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    #$sth->execute()             # Execute the query
+    #  or die "Couldn't execute statement: " . $sth->errstr;
+    #$sth->finish;
+
+  }
+
+sub ItemActive
+  {
+    my ( $item_id ) = @_;
+
+    if ( ! $item_id )
+    {
+	    return 0;
+    }
+      
+    my $statement = qq{select in_archive from Item where uuid='$item_id' AND Item.uuid::"varchar" not in ( select item_uuid from statsdata )};
+      
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+      
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+      
+    my ( $in_archive, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $in_archive = $data[0];
+    }
+    $sth->finish;
+      
+    if ( $in_archive )
+    {
+	    return 1;
+    }
+   
+    #Things that were being tombstoned were not being displayed.
+    #so always return 1,
+    return 1;
+
+  }
+
+
+sub GetCollid
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select owning_collection  from Item where uuid='$item_id'};
+      
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+      
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+      
+    my ( $collid, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $collid = $data[0];
+    }
+    $sth->finish;
+      
+    return $collid;
+    
+  }
+
+
+sub GetValues 
+  {
+    my ( $item_id, $id ) = @_;
+
+    my $statement = qq{select text_value, place  from metadatavalue where dspace_object_id='$item_id' and metadata_field_id=$id  order by place};
+      
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+      
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+      
+    my ( $value, @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value .= $data[0] . ' ; ';
+    }
+    $sth->finish;
+      
+    $value =~ s,(.*)\; ,$1,;
+    return $value;
+    
+  }
+
+sub GetBitCount 
+{
+  my ( $item_id ) = @_;
+
+  my $BitCount = 0;
+
+  #my $statement = qq{select count(*) from bundle B, item2bundle IB, Bundle2Bitstream BB, Bitstream Bi where Bi.bitstream_id = BB.bitstream_id and IB.bundle_id = BB.bundle_id and B.bundle_id = IB.bundle_id and IB.item_id = $item_id and (B.name = 'ORIGINAL' or B.name='THUMBNAIL')};
+
+  #my $statement = qq{select count(*) from metadatavalue M, bundle B, item2bundle IB, Bundle2Bitstream BB, Bitstream Bi where Bi.bitstream_id = BB.bitstream_id and IB.bundle_id = BB.bundle_id and B.bundle_id = IB.bundle_id and IB.item_id = $item_id and B.bundle_id = M.resource_id and M.resource_type_id= 1 and M.text_value='ORIGINAL'};
+
+  my $statement = qq{select count(*) from metadatavalue M, bundle B, item2bundle IB, Bundle2Bitstream BB, Bitstream Bi where Bi.uuid = BB.bitstream_id and IB.bundle_id = BB.bundle_id and B.uuid = IB.bundle_id and IB.item_id = '$item_id' and B.uuid = M.dspace_object_id and M.text_value='ORIGINAL'};
+
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $count = 0;
+  my @data;
+  while (@data = $sth->fetchrow_array()) {
+    $count = $data[0];
+
+  }
+  $sth->finish; 
+
+  return $count;
+    
+}
+
+sub GetMonthYear
+  {
+    my $newtime = scalar localtime(time());
+    my $year = substr($newtime, 20, 4);
+    my %months = (
+                  "Jan" => "01",
+                  "Feb" => "02",
+                  "Mar" => "03",
+                  "Apr" => "04",
+                  "May" => "05",
+                  "Jun" => "06",
+                  "Jul" => "07",
+                  "Aug" => "08",
+                  "Sep" => "09",
+                  "Oct" => "10",
+                  "Nov" => "11",
+                  "Dec" => "12",
+                 );
+    my $month = $months{substr ($newtime,4, 3)};
+
+    return ( $month, $year );
+
+  }
+
+
+
+sub WriteBufferToFile 
+{
+  my ( $report, $fileName ) = @_;
+    
+  #Now you want to create the file
+  open ( OUTFILE, ">$fileName" ) || die();
+  print OUTFILE $report;
+  close OUTFILE;
+}
+
+__END__;
+
+
+

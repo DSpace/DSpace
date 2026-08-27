@@ -1,0 +1,180 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+my $gBaseBinDir     = $ENV{'BASE_BIN_DIR'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $coll_id = 1234;
+
+# ./dspace itemupdate -e fritx@umich.edu -s /meta_delete -d dc.identifier.name-orcid 2>&1 | tee outfile_delete
+# ./dspace itemupdate -e fritx@umich.edu -s /meta -a dc.identifier.name-orcid 2>&1 | tee outfile_add
+&ReportMsg ( 'Prepare ORCID name metadata.' );
+
+&FixMeta();
+
+&ReportMsg ( 'Done!' );
+
+$dbhP->disconnect;
+
+exit;
+
+################################################################################################
+
+sub ReportMsg
+{
+  my ( $msg ) = @_;
+
+  my $newtime = scalar (localtime(time()));
+
+  $msg = qq{$newtime : $msg};
+  print "$msg","\n";
+
+}
+
+sub FixMeta
+  {
+
+    my $count = 1;
+
+    my $dir = qq{$gBaseDataDir/meta};
+    `rm -r $dir`;
+    `mkdir $dir`;
+
+    $dir = qq{$gBaseDataDir/meta_delete};
+    `rm -r $dir`;
+    `mkdir $dir`;
+
+    $dir = qq{$gBaseDataDir/meta};
+
+    my $count = 1;
+
+    my $statement = qq{select handle, orcid, last_name, first_name from orcid_info where last_name != 'ERROR'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+      
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+      
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      my $handle = $data[0]; 
+      my $orcid = $data[1]; 
+      my $ln = $data[2]; 
+      my $fn = $data[3]; 
+
+      my $value = qq{$ln, $fn; $orcid};
+
+      my $dir_file = qq{$dir/$count};
+      &PrepDir ($dir_file, $handle, $value);
+      &PrepDirDelete ( $count, $handle );
+	
+      $count = $count + 1;
+    }
+    $sth->finish;
+  }
+
+sub PrepDir
+  {
+    my ( $dir, $handle, $meta ) = @_;
+
+    my $file = qq{$gBaseBinDir/meta_file_orcid};
+    my $dub_file = &ReadFile ( $file );
+    $dub_file =~ s,\$HANDLE,$handle,s;
+    $dub_file =~ s,\$METAVAKYE,$meta,s;
+
+    `mkdir $dir`;
+
+    my $file = qq{$dir/dublin_core.xml};
+    &WriteFile ( $dub_file, $file );
+  }
+
+
+sub PrepDirDelete
+  {
+    my ( $count, $handle ) = @_;
+
+    my $file = qq{$gBaseBinDir/meta_file_delete};
+    my $dub_file = &ReadFile ( $file );
+    $dub_file =~ s,\$HANDLE,$handle,s;
+
+    my $dir = qq{$gBaseDataDir/meta_delete/$count};
+    `mkdir $dir`;
+
+    my $file = qq{$gBaseDataDir/meta_delete/$count/dublin_core.xml};
+    &WriteFile ( $dub_file, $file );
+  }
+
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub WriteFile 
+  {
+    my ( $report, $filename ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+
+__END__;
+
+
+

@@ -1,0 +1,579 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use utf8;
+use DBI;
+use File::Path;
+use Getopt::Std;
+use Error qw(:try);
+
+
+my %opts;
+getopts('d:l:', \%opts);
+
+my $IPDate     = $opts{'d'};
+my $logDir     = $opts{'l'};
+
+
+#my $IPDate = '2024/01';
+#my $logDir = qq{/dir/log/Jan_2024_test};
+
+
+print "IPDate = " . $IPDate . "\n";
+print "logDir = " . $logDir . "\n";
+#print "Looks good (y/n)? ";
+#my $go_on = <STDIN>;
+#;
+#if ( $go_on =~ m,.*y.*, )
+#  {
+#    print "Going on..." ."\n";
+#  }
+#else
+#  {
+#    print "Task terminated..." ."\n";
+#    exit;
+#  }
+
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+
+my $statement = qq{delete from crawlerip};
+&ProcessSQL ( $statement );
+
+&FindIPData();
+
+&ReportSites ();
+
+$dbhP->disconnect;
+exit;
+
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    #open ( FH, "<$fileName" ) || die();
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) ) 
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+    
+    return $buffer;
+}
+
+sub GetFileList 
+  {
+     
+    my $source = $logDir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @logfiles;
+    foreach my $itemname (@testtems)
+    {
+      if ( $itemname =~ m,.*dspace\.log.*, )
+	    {
+	      my $item = qq{$source/$itemname};
+	      push (@logfiles, $item);
+	    }
+    }
+
+    return @logfiles;
+    
+  }
+
+sub FindIPData
+  {
+    my @files = &GetFileList ( );
+
+    foreach my $file ( @files )
+    {
+	    my $statement = qq{$file \n};
+	    print $statement;
+
+	    my $buffer = &ReadFile ( $file );
+	    my @lines = split (/\n/, $buffer );
+
+	    my $new_buffer;
+	    foreach my $line ( @lines )
+	    {
+	      #2006-10-27 22:31:17,403 INFO  org.dspace.app.webui.servlet.DSpaceServlet @ anonymous:session_id=7759D272BD53DC87342BBA1E61EAFE73:ip_addr=66.249.72.111:view_item_details:collection=OUTSIDE Transportation Research Institute (UMTRI) (All Collections),  handle=2027.42/583
+	    
+	      if ( $line =~ m,.*view_.*, )
+	      {
+		      my $view_type = $line;
+		      if ( $view_type =~ m,.*view_bitstream_details.*, )
+		      {
+		        $view_type = qq{view_bitstream_details};
+		      }
+		      elsif ( $view_type =~ m,.*view_item_details.*, )
+		      {
+		        $view_type = qq{view_item_details};
+		      }
+		      else 
+		      {
+		        $view_type = qq{CANT_DETERMINE};
+		      }
+
+          #print $line . "\n";
+		      my $ip = &GetIPAddress ( $line );
+		      if ( $ip eq '' )
+		      {
+		      }
+		      else
+		      {
+		        &StoreIP ( $ip, '', 1, $view_type );
+		      }
+	     }
+	   }
+    }
+  }
+
+#This method does not seem to be used. 
+sub FindCount
+  {
+    my ( $ip ) = @_;
+
+    my $statement = qq{select ipcount from crawlerip where date='$IPDate' and ip='$ip'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $ipcount, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $ipcount = $data[0];
+    }
+    $sth->finish; 
+
+    return $ipcount;
+
+  }
+
+#This method is not in use presently.
+#I guess at some time it was used.
+sub UpdateIP
+  {
+    my ( $ip, $count ) = @_;
+
+    my $stmt = qq{update crawlerip set ipcount=$count where date='$IPDate' and ip='$ip'};
+
+    &ProcessSQL ( $stmt );
+
+  }
+
+sub StoreIP 
+  {
+    my ( $ip, $site, $count, $view_type ) = @_;
+
+    $site =~ s,\',\\',gs;
+    $site =~ s,\n, ',gs;
+    $site =~ s,\r, ',gs;
+
+    my $stmt = qq{insert into crawlerip values ( '$IPDate', '$ip', E'$site', $count,  '$view_type')};
+
+    &ProcessSQL ( $stmt );
+
+  }
+
+sub ReportSites
+{
+  my $statement = qq{select distinct ip from crawlerip};
+
+  my $statement = qq{select count(*), ip from crawlerip where view_type='view_bitstream_details' group by ip having count(*) >= 1};
+
+  my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $count;
+    my ( $ip, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $count = $data[0];
+      $ip = $data[1];
+      if ( $count < 300 )
+	    {
+	      #This is not working, I think we between what we have from
+	      #DSpace and filtering out counts greater than 1000 we ar OK.
+
+        #Just changed the way hostname is computed.
+
+	      my $hostname;
+	      my $crawler = &IsCrawler ( $ip );
+	      if ( $crawler )
+	      {
+          $hostname = "spider";
+	        #print $hostname . "\n";
+	      }	
+	      else
+	      {
+	        $hostname = &FindHostnameFromDB ( $ip );
+          if ( $hostname eq 'NOTFOUND' )
+	        {
+		        $hostname = ''
+            #my $stmt = qq{insert into all_ips (ip, hostname, stat_date) values('$ip', E'$hostname', '$IPDate' )};
+            #&ProcessSQL ( $stm );	
+	        }
+	      }	
+      
+	      &UpdateHostName ( $ip, $hostname );
+
+	  }
+
+  }
+  
+  $sth->finish; 
+}
+
+sub IsCrawler
+{
+    my ( $ip ) = @_;
+
+    my $statement = qq{select ip  from crawlers_dspace where ip = '$ip'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $found = 0;
+    my ( $ip, @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $ip = $data[0];
+      $found = 1;
+
+    }
+    $sth->finish;
+
+    return $found;
+
+}	
+
+sub UpdateHostName
+  {
+    my ( $ip, $hostname ) = @_;
+
+    $hostname =~ s,\',\\',gs;
+    $hostname =~ s,\n, ',gs;
+    $hostname =~ s,\r, ',gs;
+    
+    my $stmt = qq{update crawlerip set site =E'$hostname' where ip='$ip'};
+
+    &ProcessSQL ( $stmt );
+  }
+
+
+sub OldFindHostnameUsingUnix 
+  {
+    my ( $ip ) = @_;
+
+    my $hostname = `/usr/bin/nslookup -timeout=5 $ip`;
+    if ( $hostname =~ m,.*name =(.*?)\n.*, )
+      {
+        $hostname =~ s,.*name =(.*?)\n.*,$1,si;
+      }
+    else
+      {
+	      $hostname = "";
+      }
+    #$msg = qq{$ip has hostname $hostname\n};
+    #print $msg;
+
+    return $hostname;
+    
+  }
+
+
+sub FindHostnameUsingUnix 
+  {
+    my ( $ip ) = @_;
+
+
+   $SIG{ALRM} = sub {
+     my $sig_name = shift;
+     die "Timeout by signal [$sig_name]\n";
+   };
+
+   my $command = "/usr/bin/nslookup -timeout=5  $ip";
+   my $hostname = backtick( 
+                 command => $command, 
+                 timeout => 5, 
+                 verbose => 0 
+             );
+
+    if ( $hostname =~ m,.*name =(.*?)\n.*, )
+      {
+        $hostname =~ s,.*name =(.*?)\n.*,$1,si;
+      }
+    else
+      {
+    	  $hostname = "";
+      }
+
+    return $hostname;
+    
+  }
+
+
+sub backtick {
+
+    my %arg = (
+        command => undef,
+        timeout => 900,
+        verbose => 1,
+        @_,
+    );
+
+    my @output;
+
+    defined( my $pid = open( KID, "-|" ) )
+        or die "Can't fork: $!\n";
+
+    if ($pid) {
+
+        # parent
+
+        # print "parent: child pid [$pid]\n" if $arg{verbose};
+
+        try {
+            alarm( $arg{timeout} );
+            while (<KID>) {
+                chomp;
+                push @output, $_;
+            }
+
+            alarm(0);
+        }
+        catch Error with {
+            my $err = shift;
+            print $err->{-text} . "\n";
+
+            print "Killing child process [$pid] ...\n" if $arg{verbose};
+            kill -9, $pid;
+            print "Killed\n" if $arg{verbose};
+
+            alarm(0);
+        }
+        finally {};
+    }
+    else {
+
+        # child
+
+        # set the child process to be a group leader, so that
+        # kill -9 will kill it and all its descendents
+        setpgrp( 0, 0 );
+
+        # print "child: pid [$pid]\n" if $arg{verbose};
+        exec $arg{command};
+        exit;
+    }
+
+    wantarray ? @output : join( "\n", @output );
+}
+
+
+sub FindHostnameFromDB
+  {
+    my ( $ip ) = @_;
+
+    my $statement = qq{select hostname  from all_ips where ip = '$ip'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $hostname = "NOTFOUND";
+    my ( @data  );
+    while (@data = $sth->fetchrow_array()) {
+      $hostname = $data[0];
+
+    }
+    $sth->finish;
+
+    return $hostname;
+    
+  }
+
+
+
+sub FindHostname 
+  {
+    my ( $ip ) = @_;
+
+    use LWP::Simple;    
+    use LWP::UserAgent;
+
+    my $url = qq{http://www.webyield.net/cgi-bin/ipwhois.cgi?addr=$ip};
+
+    #Call to LWP to get response.
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout( 300 ); ## timeout for 180 seconds
+    my $req = HTTP::Request->new( GET => $url );
+    # Pass request to the user agent and get a response back
+    my $res = $ua->request( $req );
+
+    # Check the outcome of the response
+    if ($res->is_success)
+    {
+	#return the data
+        my $data = $res->content;
+	if ( $data =~ m,.*Hostname:.*?(.*?)<.*,s )
+	{
+	  $data =~ s,.*Hostname:.*?(.*?)<.*,$1,s;
+	  $data =~ s,\n,,gs;
+	  $data =~ s,\t,,gs;
+	  return $data;
+	}
+	else
+	{
+	  my $msg = qq{URLCALL: bad hostname $url \n};
+	  print $msg,"\n";
+	  return;
+	}
+    } 
+    else
+    {
+      my $msg = qq{URLCALL: Unsuccessful call to $url \n};
+      print $msg,"\n";
+      return;
+    }
+
+    return;
+
+  }
+
+sub  GetSupOfAuthor 
+  {
+    my ( $id, $url, $page, $author ) = @_;
+
+    $author =~ s,\+,,gs;
+    my $first = $author;
+    $first =~ s=.*\, (.*)=$1=;
+    my $last  = $author;
+    $last =~ s=(.*)\, .*=$1=;
+    $author = qq{$first $last};
+
+    if ( $page =~ m=.*$author.*?<sup>(.*?)</sup>.*= )
+      {
+	$page =~ s=.*$author.*?<sup>(.*?)</sup>.*=$1=s;
+      }
+    else
+      {
+	$page = qq{jose};
+      }
+    
+    return $page;
+
+  }
+
+sub ProcessSQL
+  {
+    my ( $statement ) = @_;
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+    $sth->finish;          
+
+
+  }
+
+
+sub GetIPAddress
+  {
+    my ( $line ) = @_;
+
+    $line =~ s,\n, ,;
+    $line =~ s,\r, ,;
+    $line =~ s,\t, ,;
+
+    my $ip = $line;
+    
+    if ( $ip =~ m,.*ip_addr=(([0-9]|\.)+)\:.*, )
+      {
+	$ip =~ s,.*ip_addr=(.*?)\:.*,$1,;
+      }
+    else
+      {
+	$ip = '';
+      }
+
+    #print $ip . "\n";
+
+    return $ip;
+  }
+sub WriteFile
+{
+    my ( $fileName, $value ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $value;
+    close OUTFILE;
+
+}
+
+
+
+__END__;
+
+
+

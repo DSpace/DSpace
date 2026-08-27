@@ -1,0 +1,181 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $statement = qq{select dspace_object_id from metadatavalue where text_value like 'Removed from%'};
+
+my $sth = $dbhP->prepare($statement)
+  or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+# Read the matching records and print them out
+  $sth->execute()             # Execute the query
+  or die "Couldn't execute statement: " . $sth->errstr;
+
+my ($report, $report2);
+my $count = 1;
+my ( @data );
+while (@data = $sth->fetchrow_array()) {
+  my $item_id = $data[0];
+
+  &GetBits ( $item_id );
+      
+}
+
+$sth->finish;
+
+my $msg = qq{If any tombsone items that need start date set to 2500 were found, \n};
+print $msg;
+
+my $msg = qq{they would be listed above this message.\n};
+print $msg;
+
+$dbhP->disconnect;
+
+exit;
+
+
+  sub GetBits 
+  {
+    my ( $item_id ) = @_;
+
+    my $handle = &GetHandle ($item_id);
+
+    #my $statement = qq{select bitstream_id,  internal_id  from bitstream where bitstream_id in (select bitstream_id from bundle2bitstream where bundle_id in (select bundle_id from item2bundle where item_id = $item_id and bundle_id in (select b.bundle_id from bundle b, metadatavalue m where m.resource_id = b.bundle_id and m.resource_type_id = 1 and m.text_value='ORIGINAL')))};
+
+    my $statement = qq{select Bi.uuid from metadatavalue M, bundle B, item2bundle IB, Bundle2Bitstream BB, Bitstream Bi where Bi.uuid = BB.bitstream_id and IB.bundle_id = BB.bundle_id and B.uuid = IB.bundle_id and IB.item_id = '$item_id' and B.uuid = M.dspace_object_id and M.text_value='ORIGINAL'};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( @data, @bit );
+    while (@data = $sth->fetchrow_array()) {
+     my $bitstream_id = $data[0];
+
+     my ($group, $start_date) = &FindGroupForBit ( $bitstream_id );
+
+     if ( $group ne '274aeb37-1de4-49ef-acff-bfa5f0fe3186' )
+     {
+	     if ( $start_date ne '2500-01-01' )
+	     {
+	       my $msg = qq{$handle:$item_id => group:$group  ==> $start_date\n};
+	       print $msg;
+	     }
+     }
+   }
+
+   $sth->finish;
+
+
+  }
+
+sub FindGroupForBit 
+{
+  my ( $bit_id ) = @_;
+
+  my $statement = qq{select epersongroup_id, start_date from resourcepolicy where dspace_object::varchar = '$bit_id' and resource_type_id=0};
+
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my ( $group, $start_date );
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $group = $data[0];
+      $start_date = $data[1];
+
+    }
+
+    $sth->finish;
+
+    return ( $group, $start_date );
+
+}
+
+sub WriteReportToFile 
+  {
+    my ( $report, $filename ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id'};
+
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+      
+    }
+
+    $sth->finish;
+
+    return $handle;
+  }
+
+__END__;
+
+
+

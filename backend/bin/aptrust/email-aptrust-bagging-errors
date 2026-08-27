@@ -1,0 +1,158 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+#use Mail::Sender;
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $gMailServer     = $ENV{'mail__P__server'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+&FindBaggingErrors();
+
+$dbhP->disconnect;
+
+exit;
+
+sub FindBaggingErrors
+{
+
+  my $statement = qq{select count(*) from aptrust_bagging_error};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $count;
+  my ( @data );
+  while (@data = $sth->fetchrow_array()) {
+    $count = $data[0];
+  }
+  $sth->finish;
+
+  $count = $count + 0;
+  if ( $count > 0 )
+    {
+      my $email = qq{ulib-deepblue-documents-cron-reporting\@umich.edu};    
+      &EmailErrorMsg ( $email );
+    }
+
+
+  my $statement = qq{select object_identifier from aptrust_object_status where status != 'Success'};
+
+  my $sth = $dbhP->prepare($statement)
+    or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+    or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $objects = '';
+  my ( @data );
+  while (@data = $sth->fetchrow_array()) {
+    $objects .= qq{$data[0]; };
+  }
+  $sth->finish;
+
+  if ( $objects ne '' )
+    {
+      my $email = qq{ulib-deepblue-documents-cron-reporting\@umich.edu};    
+      &EmailErrorMsgTwo ( $email, $objects );
+    }
+
+}
+
+sub EmailErrorMsg
+  {
+    my ( $to ) = @_;
+    
+    my $subject = qq{There has been a bagging error.};
+    my $msg = qq{While sending bags to APTrust a bagging error was encountered.  Check the table aptrust_bagging_error.  The cause of the error is either (1) the Dspace Replicator Failed, or (2) the checksum in dspace does not match the checksum computed while sending the bag.};
+
+
+    use Mail::Mailer;
+    my $server = $gMailServer;
+    my $mailer = new Mail::Mailer->new('smtp', Server => $server);
+    $mailer->open(
+                  {
+                   'To'       => $to,
+                   'From'     => 'deepblue@umich.edu',
+                   'Subject'  => $subject,
+                  }
+                 );
+
+    print $mailer( $msg );
+    $mailer->close;
+
+}
+
+
+sub EmailErrorMsgTwo
+  {
+    my ( $to, $objects ) = @_;
+    
+    my $subject = qq{We have a status error from APTrust.};
+    my $msg = qq{The following object(s) gave us status that was not Success: $objects. Check the aptrust_object_status tatble.};
+
+
+    use Mail::Mailer;
+    my $server = $gMailServer;
+    my $mailer = new Mail::Mailer->new('smtp', Server => $server);
+    $mailer->open(
+                  {
+                   'To'       => $to,
+                   'From'     => 'deepblue@umich.edu',
+                   'Subject'  => $subject,
+                  }
+                 );
+
+    print $mailer( $msg );
+    $mailer->close;
+
+}
+
+
+__END__;
+
+
+

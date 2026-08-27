@@ -1,0 +1,529 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use DBI;
+use File::Path;
+use POSIX qw(strftime);
+
+my $gDbName         = $ENV{'DB_NAME'};
+my $gDbUser         = $ENV{'DB_USER'};
+my $gDbPassword     = $ENV{'DB_PASSWORD'};
+my $gDbService      = $ENV{'DB_SERVICE'};
+my $gDbPort         = $ENV{'DB_PORT'};
+
+my $dbhP = DBI->connect("dbi:Pg:dbname=$gDbName;host=$gDbService;port=$gDbPort", "$gDbUser", "$gDbPassword");
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+my $gMailServer     = $ENV{'mail__P__server'};
+
+my $report = qq{Handle\tcollections\t};
+my @metadata_ids = &GetMetadataIds();
+foreach my $meta_id ( @metadata_ids )
+{
+   my $code = &FindCode ( $meta_id );
+   $report .= qq{$code\t};
+}
+
+$report .= qq{\n};
+
+my @item_ids = &GetItemIdsForDearborn( );
+my $count = 0;
+foreach my $item_id ( @item_ids )
+{
+  my $embargo   = &IsEmbargo ( $item_id );
+  my $withdrawn = &IsWithdrawn ( $item_id );
+ 
+  if ( ( $embargo eq 'NO' ) && ( $withdrawn eq 'NO' ) )
+  {
+    my $handle = &GetHandle ( $item_id );
+    my $msg = qq{$handle\n};
+    print $msg;
+
+    $report .= qq{$handle\t};
+
+    my $collections = &GetCollections ( $item_id );
+    $report .= qq{$collections\t};
+
+    foreach my $meta_id ( @metadata_ids )
+    {
+      my $meta_value = &GetMeta ( $item_id, $meta_id );
+	    $report .= qq{$meta_value\t};
+    }
+
+    $report .= qq{\n};
+  }
+}
+
+my $date_str = strftime("%b%Y", localtime);  # e.g., "Sep2025"
+my $filename = qq{dissertation-report-$date_str.txt};
+my $file = qq{$gBaseDataDir/$filename};
+my $subject = qq{Dearborn Items Metadta for $date_str};
+my $msg = qq{Attached is a text delimimted file containing metadata of all the Dearborn papers in DeepBlue Docs for $date_str};
+
+&WriteReportToFile  ($file, $report);
+    
+my $email = qq{ml-tech-systems\@umich.edu};
+&EmailZipFileData ( $email, $subject, $msg, $filename, $file );
+    
+my $msg = qq{DONE\n};
+print $msg;
+
+$dbhP->disconnect;
+
+exit;
+
+sub GetMetadataIds
+{
+
+  my @ids;
+
+  push ( @ids, 171 );
+  push ( @ids, 170 );
+  push ( @ids, 2 );
+  push ( @ids, 1 );
+  push ( @ids, 15 );
+  push ( @ids, 20 );
+  push ( @ids, 21 );
+  push ( @ids, 25 );
+  push ( @ids, 26 );
+  push ( @ids, 27 );
+  push ( @ids, 101 );
+  push ( @ids, 34 );
+  push ( @ids, 38 );
+  push ( @ids, 57 );
+  push ( @ids, 68 );
+  push ( @ids, 69 );
+  push ( @ids, 67 );
+  push ( @ids, 64 );
+  push ( @ids, 75 );
+  push ( @ids, 66 );
+  push ( @ids, 77 );
+  push ( @ids, 76 );
+  push ( @ids, 83 );
+  push ( @ids, 85 );
+  push ( @ids, 97 );
+  push ( @ids, 29 );
+
+  return @ids;
+}
+
+sub FindCode
+  {
+    my ( $meta_id ) = @_;
+
+    my $statement = qq{select element, qualifier from metadatafieldregistry where metadata_field_id = $meta_id and metadata_schema_id=1};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $value;
+    my ( @data, $code );
+    while (@data = $sth->fetchrow_array()) {
+      $code = qq{$data[0].$data[1]};
+    }
+
+
+    $sth->finish;
+
+    return $code;
+  }
+
+sub GetMeta
+  {
+    my ( $item_id, $id ) = @_;
+
+    my $statement = qq{select text_value  from metadatavalue where dspace_object_id='$item_id' and metadata_field_id = $id };
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $value;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $value .= qq{$data[0]| };
+    }
+ 
+    $value =~ s,\t, ,gs;
+    $value =~ s,\n, ,gs;
+    $value =~ s,\r, ,gs;
+
+    $value =~ s,(.*)\|.*,$1,s;;
+
+    return $value;    
+  }
+
+sub GetBentCollids 
+{
+  my @collids;
+  
+  my $statement = qq{select distinct collection_id from community2collection where community_id in ( 4, 5)};
+
+  my $sth = $dbhP->prepare($statement)
+     or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+  # Read the matching records and print them out
+  $sth->execute()             # Execute the query
+     or die "Couldn't execute statement: " . $sth->errstr;
+
+  my $value;
+  my ( @data );
+  while (@data = $sth->fetchrow_array()) {
+     push ( @collids, $data[0] );
+  }
+      
+  $sth->finish;
+
+  return @collids;
+
+}
+
+sub EmailZipFileData
+{
+  my ( $to,  $subject, $body_text, $filename, $file ) = @_;
+
+  my $actualto = $to;
+
+  use MIME::Lite;
+  my $cc = '';
+  my $from = 'deepblue@umich.edu';
+
+  my $msg = MIME::Lite ->new(
+    From => $from,
+    To => $to,
+    Cc => $cc,
+    Subject => $subject,
+    Type => 'multipart/mixed'
+  );
+
+  # Add your text message.
+  $msg->attach(
+    Type => 'TEXT',
+    Data => $body_text
+  );
+
+  # Specify your file as attachement.
+  $msg->attach(Type => 'text/plain',
+    Path => $file,
+    Filename => $filename,
+    Disposition => 'attachment'
+  );       
+
+  $msg->send('smtp', $gMailServer);
+  print "Email Sent Successfully\n";
+
+}
+
+
+sub GetHandle
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select handle from handle where resource_id = '$item_id'};
+
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $handle;
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $handle = $data[0];
+    }
+
+    $sth->finish;
+
+    return $handle;
+  }
+
+sub GetItemIdsForDearborn
+  {
+
+    my @itemids;
+
+    #Get all items in dearbor collections
+    my $statement = qq{select uuid from item where in_archive=true AND uuid in (select distinct item_id from collection2item where collection_id in (select dspace_object_id from metadatavalue where metadata_field_id = 64 and LOWER(text_value) LIKE '%dearborn%' and dspace_object_id in (select resource_id from handle where resource_type_id=3)))};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      my $value = &IsTombstoned ( $data[0] );
+      if ( $value eq 'YES' )
+      {}
+      else
+      {
+        push ( @itemids, $data[0] ) ;
+      }
+    }
+
+    $sth->finish;
+
+    my $statement = qq{select uuid from item where in_archive=true AND uuid in (select distinct dspace_object_id from metadatavalue where  metadata_field_id = 77 and LOWER(text_value) LIKE '%dearborn%' and dspace_object_id in (select resource_id from handle where resource_type_id=2))};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      my $value = &IsTombstoned ( $data[0] );
+      if ( $value eq 'YES' )
+      {}
+      else
+      {
+        push ( @itemids, $data[0] ) ;
+      }
+    }
+
+    $sth->finish;
+
+    my $statement = qq{select uuid from item where in_archive=true AND uuid in (select distinct dspace_object_id from metadatavalue where  metadata_field_id = 69 and LOWER(text_value) LIKE '%dearborn%' and dspace_object_id in (select resource_id from handle where resource_type_id=2))};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      my $value = &IsTombstoned ( $data[0] );
+      if ( $value eq 'YES' )
+      {}
+      else
+      {
+        push ( @itemids, $data[0] ) ;
+      }
+    }
+
+    $sth->finish;
+
+    &SortUniquifyList (\@itemids);
+
+    return @itemids;
+  }
+
+
+sub SortUniquifyList
+{
+    my ( $aRef, $numeric ) = @_;
+    my %hash;
+
+    foreach my $item ( @$aRef )
+    {      $hash{$item}++;     }
+
+    if ( defined ( $numeric ) )
+    {
+        @$aRef = sort { $a <=> $b } ( keys %hash );
+    }
+    else
+    {
+        @$aRef = sort ( keys %hash );
+    }
+  }
+
+
+sub IsTombstoned
+  {
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select text_value from metadatavalue where dspace_object_id = '$item_id' and metadata_field_id  = 82};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $tombstoned = 'NO';
+    my ( @data );
+    while (@data = $sth->fetchrow_array()) {
+      $tombstoned = 'YES';
+    }
+
+    $sth->finish;
+
+    return $tombstoned;
+  }
+
+sub GetCollections
+  {
+
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select collection_id from collection2item where item_id ='$item_id'};
+    
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+    my $collections;
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      my $coll_id = $data[0];
+      my $coll_name = &GetCollName ( $coll_id );
+      $collections .= qq{$coll_name| };
+    }
+
+    $sth->finish;
+
+    $collections =~ s,(.*)\|.*,$1,s;
+
+    return $collections;
+  }
+
+
+sub GetCollName
+  {
+
+    my ( $coll_id ) = @_;
+
+    my $statement = qq{select text_value from metadatavalue where metadata_field_id = 64 and dspace_object_id ='$coll_id'};
+    
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my $name;
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      $name = $data[0];
+    }
+
+    $sth->finish;
+
+    return $name;
+  }
+
+sub IsEmbargo
+  {
+
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select item_id from umrestricted where item_id = '$item_id'};
+    
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my $result = 'NO';
+    my @itemids;
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      $result = 'YES';
+    }
+
+    $sth->finish;
+
+    return $result;
+  }
+
+
+sub IsWithdrawn
+  {
+
+    my ( $item_id ) = @_;
+
+    my $statement = qq{select uuid from item where uuid = '$item_id' and withdrawn = true};
+
+    my $sth = $dbhP->prepare($statement)
+      or die "Couldn't prepare statement: " . $dbhP->errstr;
+    
+    # Read the matching records and print them out
+    $sth->execute()             # Execute the query
+      or die "Couldn't execute statement: " . $sth->errstr;
+
+
+    my $result = 'NO';
+    my @itemids;
+    my ( @data, $item_id );
+    while (@data = $sth->fetchrow_array()) {
+      $result = 'YES';
+    }
+
+    $sth->finish;
+
+    return $result;
+  }
+
+sub WriteReportToFile 
+  {
+    my ( $filename, $report ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$filename" ) || die();
+    print OUTFILE $report;
+    close OUTFILE;
+  }
+
+__END__;
+
+
+

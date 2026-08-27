@@ -1,0 +1,315 @@
+#!/usr/bin/perl
+#
+# Copyright 2000, The Regents of The University of Michigan, All Rights Reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject
+# to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BEGIN
+{
+  require "strict.pm";
+  strict::import();
+}
+
+# ----------------------------------------------------------------------
+#               start of MAIN
+# ----------------------------------------------------------------------
+
+use Encode;
+use utf8;
+use DBI;
+use File::Path;
+
+use LWP::Simple;
+use LWP::UserAgent;
+
+
+#  Remember:
+#  Make note of when teh UM Restricted ones will need to be avaliable, because the dates will
+#    have to be updated via the UI.  Can't be done by the script.
+#
+#  Once the load completes:
+#  The free ones will be completed once the load is finished.
+#  The fully embargo ones wiill be completed once the load is finished.
+#  The UM restricted ones, will have the right file description, and UM Users group, but the
+#      the date range will have to be updated using the UI.  You can use mapfile to find the 
+#      handles to change.
+#
+#  When you reply to Dan, thell him the counts
+#     Free              ( Verify count with grep "NO_RESTRICTION"
+#     UM restricted     ( Verify count with grep "<dcvalue element="restrict" qualifier="um">YES", <dcvalue element="date" qualifier="available">)
+#     Fully Embargoed.  ( verify count with umrestricted table, and grep )
+#     Verify the number of pdfs in Feb2021 is the same as archive dir
+#
+#  I always load from archive ( FREE and fully restrecited ), and archive_um ( the UM restricted, this dir is manually created and items
+#   that should be there are brought over from archive. )
+
+
+
+#  The report to run once this finishes:
+#     ...misc/report-for-rackham
+#
+
+
+my $gBaseDataDir    = $ENV{'BASE_DATA_DIR'};
+
+
+my $gDataDir = qq{$gBaseDataDir/rackham/Sep2024};
+my $gArchiveDir = qq{$gBaseDataDir/rackham/archive};
+
+&ClearInputDir();
+
+my @xml_files = &GetListOfXmlFiles();
+
+my $um_count = 0;
+my $count = 1;
+foreach my $xml_file ( @xml_files )
+  {
+    my @pdf_files = &GetPdfFiles ( $xml_file );
+    my $license = qq{By depositing a Work into Deep Blue Documents (the Repository):
+
+I hereby grant to the Regents of the University of Michigan a non-exclusive license to:
+
+  retain, reproduce, display, perform, and distribute the Work in whole or in part, including its abstract and descriptive information in and from its electronic format;
+  keep more than one copy of the Work for purposes of security, back-up, preservation, and/or access;
+  copy, convert, remediate, or migrate the Work to any medium or format for the purpose of accessibility;
+  allow others to access, view, and download the Work, unless access restrictions are in place;
+  and enhance descriptive information about the Works to support access.
+
+These Terms of Deposit do not transfer copyright to the University of Michigan or others.
+
+I represent and warrant to the University of Michigan that:
+
+  the Work is my original work and does not, to the best of my knowledge, infringe or violate the law or any rights of others.
+  the Work deposited was produced or sponsored by a University of Michigan affiliate or unit.
+  the Work can be made publicly available, unless specific access restrictions are requested from the Repository prior to the time of deposit.
+  I have obtained all necessary rights or permissions to permit the University of Michigan to retain, reproduce, display, perform, and distribute the Work and that any third-party content is clearly identified and acknowledged within the Work.
+  I have made my Work as accessible as possible, per Deep Blue Documents requirements for creating accessible Works.
+
+The Repository will:
+  collaborate with authors or their designee to allow Works to be added to, replaced, or removed, to comply with subsequent changes to a Work's access policy or to reflect a revision to the Work;
+  retain a descriptive record of any modifications to a Work;
+  obtain express written permission from the author or their designee to use the Work for any commercial purpose;
+  continue to hold Works unless individual copyright holders request removal or access restriction, including in the event of the dissolution of a research group, center, institute, or any other unit at University of Michigan;
+  continue to hold jointly authored Works as is until all copyright holders jointly request a change in whether or how their Work is represented in the Repository;
+  where appropriate, remove and transfer content to the control of the University Archives.
+
+By granting this license, I acknowledge that I have read and agreed to the Terms of Deposit and all related Deep Blue Documents and University of Michigan policies.
+
+If I’m a proxy depositing on behalf of a University of Michigan affiliate, in addition to the standard Terms above, note that the following Terms apply:
+  I represent and warrant that the affiliate has granted me the authority to deposit a Work on their behalf;
+  I have notified the affiliate of these Terms of Deposit and they have agreed to them.
+
+If I’m requesting a batch deposit of Works into Deep Blue Documents, in addition to the standard Terms above, note that the following Terms apply:
+
+In this situation, a designee, not one of the authors, will prepare the Works for batch deposit and the Deep Blue Documents staff member will upload the batch of Works into Deep Blue Documents.
+
+  I represent and warrant that at least one author of each Work has granted me the authority to prepare the Work for deposit and granted Deep Blue Documents staff the authority to deposit the Work into the Repository;
+  I have notified at least one of the authors of these Terms of Deposit and they have agreed to them;
+  For Works where I cannot get this agreement from one of the authors (such as when Works are entrusted or gifted to a University of Michigan department, unit, institute, etc.), I represent and warrant that making these Works available in the Repository is an appropriate and acceptable extension of its agreement with the originating unit or person, including providing public access to these Works.};
+
+    my $um_item = 0;
+    my $content;
+    foreach my $pdf_file ( @pdf_files )
+    {
+
+      # if the file has a um indicator in the xml you want to set the permisions to "UM Users"
+      # and the description to "Access Restricted to UM users only."
+      if ( &IsUM ( $xml_file ) )
+	{
+          $um_item = 1;
+	  $content .= qq{$pdf_file\tpermissions:-r 'UM Users'\tdescription:Access Restricted to UM users only.\n};
+	}
+      else
+	{
+	  $content .= qq{$pdf_file\n};
+	}
+    }
+
+    if ( $um_item )
+      {
+	$um_count = $um_count + 1;	  
+      }
+    $content .= qq{license.txt\n};
+
+    &CreateDir ( $count, $xml_file, \@pdf_files, $content, $license );
+
+    $count = $count + 1;
+  }
+
+  my $msg = qq{Number of items that are UM Restricted:  $um_count \n};
+  print $msg;
+
+
+
+
+exit;
+
+
+sub IsUM
+  {
+    my ( $file ) = @_;
+
+    my $file_name = qq{$gDataDir/$file};
+    my $dc_data = &ReadFile ( $file_name );
+
+    my $um = 0;
+    if ( $dc_data =~ m,.*?qualifier\=\"um\"\>YES.*,gs )
+      {
+	$um = 1;
+      }
+    return $um;
+
+  }
+
+
+sub GetListOfXmlFiles
+  {
+
+    my $source = $gDataDir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @xml_files;
+    foreach my $itemname (@testtems)
+    {
+      if ( $itemname =~ m ,.*\.xml, )
+      {
+        push (@xml_files, $itemname);
+      }
+    }
+
+    return @xml_files;
+  }
+
+
+sub GetPdfFiles
+  {
+    my ( $xml_file ) = @_;
+
+    $xml_file = lc ( $xml_file );
+    $xml_file =~ s,\.xml,,gs;
+
+    my $source = $gDataDir;
+
+    opendir FH, $source;
+    #avoid files with . and ..
+    my @testtems = grep !/^\.\.?$/, readdir FH;
+    closedir FH;
+
+    my @pdf_files;
+    foreach my $itemname (@testtems)
+    {
+      if ( $itemname =~ m ,^$xml_file\_.*\.pdf, )
+      {
+	my $msg = qq{$xml_file ==> $itemname \n};
+	print $msg;
+
+        push (@pdf_files, $itemname);
+      }
+    }
+
+    return @pdf_files;
+  }
+
+sub CreateDir 
+  {
+    my ( $count, $xml_file, $pdf_files_Ref, $content, $license ) = @_;
+
+
+    if ($count == 173)
+      {
+	my $a;
+      }
+
+
+    `mkdir $gArchiveDir/$count`;
+    my $filename = qq{$gArchiveDir/$count/contents};
+    &WriteFile ( $filename, $content );
+    my $filename = qq{$gArchiveDir/$count/license.txt};
+    &WriteFile ( $filename, $license );
+     
+    #Create dublin core file
+    `cp $gDataDir/$xml_file $gArchiveDir/$count/dublin_core.xml`;
+
+    #Create the pdf files
+    my $fileFound = 0;
+    my $fileName;
+    my @pdf_files = @$pdf_files_Ref;
+    foreach my $file ( @pdf_files )
+      {
+	`cp $gDataDir/$file $gArchiveDir/$count`;
+         $fileFound = 1;
+	 $fileName = $file;
+      }
+
+    if ( ! $fileFound )
+      {
+	my $msg = qq{ERROR: This dir - $count "$fileName" - does not have ANY FILES!!! \n};
+        print $msg;
+      }
+
+
+  }
+
+
+sub ReadFile
+{
+    my ( $fileName ) = @_;
+
+    open FH, "<$fileName";
+    binmode FH;
+    my ($bytesRead, $buffer, $chunk);
+    while ( $bytesRead = read(FH, $chunk, 1024) )
+    {
+        $buffer .= $chunk;
+    }
+    close FH;
+
+    return $buffer;
+}
+
+
+sub WriteFile
+  {
+    my ( $fileName, $value ) = @_;
+
+    #Now you want to create the file
+    open ( OUTFILE, ">$fileName" ) || die();
+    print OUTFILE $value;
+    close OUTFILE;
+  }
+
+
+
+sub ClearInputDir 
+  {
+
+    `rm -r $gArchiveDir`;
+    `mkdir  $gArchiveDir`;
+    
+  }
+
+
+__END__;
+
+
+
