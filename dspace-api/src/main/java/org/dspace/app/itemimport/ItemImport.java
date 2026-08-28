@@ -362,7 +362,14 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
 
             workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
                     + File.separator + context.getCurrentUser().getID());
-            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+
+            try {
+                sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+            } catch (Exception e) {
+                // avoid removing user files
+                sourcedir = null;
+                throw e;
+            }
         } finally {
             optionalFileStream.ifPresent(IOUtils::closeQuietly);
             validationFileStream.ifPresent(IOUtils::closeQuietly);
