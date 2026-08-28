@@ -9,7 +9,7 @@ package org.dspace.qaevent.script;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
-import org.dspace.utils.DSpace;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * Extensions of {@link OpenaireEventsImport} to run the script on console.
@@ -17,13 +17,16 @@ import org.dspace.utils.DSpace;
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsImportCli extends OpenaireEventsImport {
+public class OpenaireEventsImportCli<T extends ScriptConfiguration<?>> extends OpenaireEventsImport<T> {
 
-    @Override
-    @SuppressWarnings({ "rawtypes" })
-    public OpenaireEventsImportCliScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-            .getServiceByName("import-openaire-events", OpenaireEventsImportCliScriptConfiguration.class);
+    /**
+     * Constructor for OpenaireEventsImportCli.
+     * Command-line interface wrapper for OpenaireEventsImport script.
+     * 
+     * @param scriptConfiguration The CLI script configuration with command-line options
+     */
+    public OpenaireEventsImportCli(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override

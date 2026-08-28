@@ -59,7 +59,6 @@ public class DSpaceObjectDeletionProcessIT extends AbstractEntityIntegrationTest
 
     @Autowired
     private IndexingService indexingService;
-
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();

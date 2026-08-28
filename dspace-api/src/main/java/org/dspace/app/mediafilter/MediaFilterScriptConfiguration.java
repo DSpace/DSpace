@@ -11,7 +11,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
-public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends ScriptConfiguration<T> {
+public class MediaFilterScriptConfiguration<T extends MediaFilterScript<?>> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
 

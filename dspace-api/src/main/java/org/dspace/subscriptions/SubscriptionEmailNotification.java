@@ -18,6 +18,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.FrequencyType;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.utils.DSpace;
 
 /**
@@ -25,17 +26,20 @@ import org.dspace.utils.DSpace;
  *
  * @author alba aliu
  */
-public class SubscriptionEmailNotification
-        extends DSpaceRunnable<SubscriptionEmailNotificationConfiguration<SubscriptionEmailNotification>> {
+public class SubscriptionEmailNotification<T extends ScriptConfiguration<?>>  extends DSpaceRunnable<T> {
 
     private Context context;
     private SubscriptionEmailNotificationService subscriptionEmailNotificationService;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public SubscriptionEmailNotificationConfiguration<SubscriptionEmailNotification> getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("subscription-send",
-                SubscriptionEmailNotificationConfiguration.class);
+    /**
+     * Constructor for SubscriptionEmailNotification script.
+     * Sends subscription email notifications to users about new content
+     * in their subscribed collections and search queries.
+     * 
+     * @param scriptConfiguration The script configuration defining notification frequency and delivery settings
+     */
+    public SubscriptionEmailNotification(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
 
     @Override

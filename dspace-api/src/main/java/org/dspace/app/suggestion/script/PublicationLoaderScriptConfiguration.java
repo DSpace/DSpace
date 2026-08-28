@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @param <T> The specific type of {@link PublicationLoaderRunnable} that this configuration supports.
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  */
-public class PublicationLoaderScriptConfiguration<T extends PublicationLoaderRunnable>
+public class PublicationLoaderScriptConfiguration<T extends PublicationLoaderRunnable<?>>
     extends ScriptConfiguration<T> {
 
     @Autowired

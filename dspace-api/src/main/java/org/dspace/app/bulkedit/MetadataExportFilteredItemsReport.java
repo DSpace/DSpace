@@ -35,6 +35,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
@@ -43,8 +44,7 @@ import org.dspace.utils.DSpace;
  *
  * @author Jean-François Morin (Université Laval)
  */
-public class MetadataExportFilteredItemsReport extends DSpaceRunnable
-        <MetadataExportFilteredItemsReportScriptConfiguration<MetadataExportFilteredItemsReport>> {
+public class MetadataExportFilteredItemsReport<T extends ScriptConfiguration<?>> extends DSpaceRunnable<T> {
 
     private static final String EXPORT_CSV = "exportCSV";
     public static final String DEFAULT_FILENAME = "metadataExportFilteredItems.csv";
@@ -58,14 +58,17 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
     private EPersonService ePersonService;
     private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public MetadataExportFilteredItemsReportScriptConfiguration<MetadataExportFilteredItemsReport>
-            getScriptConfiguration() {
-        return new DSpace().getServiceManager()
-            .getServiceByName("metadata-export-filtered-items-report",
-                    MetadataExportFilteredItemsReportScriptConfiguration.class);
+    /**
+     * Constructor for MetadataExportFilteredItemsReport script.
+     * Exports metadata from items that match specified filtering criteria
+     * to CSV format for reporting and analysis purposes.
+     * 
+     * @param scriptConfiguration The script configuration defining filter criteria and export parameters
+     */
+    public MetadataExportFilteredItemsReport(T scriptConfiguration) {
+        super(scriptConfiguration);
     }
+
 
     @Override
     public void setup() throws ParseException {

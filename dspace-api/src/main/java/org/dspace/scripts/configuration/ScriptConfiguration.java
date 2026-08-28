@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * By default script are available only to repository administrators script that have a broader audience
  * must override the {@link #isAllowedToExecute(Context, List)} method.
  */
-public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements BeanNameAware {
+public abstract class ScriptConfiguration<T extends DSpaceRunnable<?>> implements BeanNameAware {
 
     @Autowired
     protected AuthorizeService authorizeService;
