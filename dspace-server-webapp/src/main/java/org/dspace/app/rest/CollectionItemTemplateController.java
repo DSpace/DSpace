@@ -146,7 +146,7 @@ public class CollectionItemTemplateController {
      * @return          The template item from the Collection in the request
      * @throws SQLException
      */
-    @PreAuthorize("isAuthenticated() && hasPermission(#uuid, 'COLLECTION', 'ADD')")
+    @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'ADD')")
     @RequestMapping(method = RequestMethod.GET)
     public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
             throws SQLException {
