@@ -30,22 +30,18 @@ import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
 public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationTest {
-
-    @Autowired
-    ResourcePolicyService  resourcePolicyService;
 
     private ObjectMapper mapper;
     private String adminAuthToken;
@@ -168,14 +164,54 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void getTemplateItemFromCollectionForbiddenTest() throws Exception {
+    public void getTemplateItemFromCollectionNotLoggedIn() throws Exception {
         setupTestTemplate();
-        String itemUuidString = installTestTemplate();
+        installTestTemplate();
 
-        resourcePolicyService.removePolicies(context, childCollection, Constants.READ);
+        getClient().perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getTemplateItemFromCollectionNoRights() throws Exception {
+        setupTestTemplate();
+        installTestTemplate();
+
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getTemplateItemFromCollectionAsSubmitter() throws Exception {
+        setupTestTemplate();
+        installTestTemplate();
+
+        GroupBuilder.createCollectionSubmitterGroup(context, childCollection)
+                    .addMember(eperson)
+                    .build();
+        String submitterToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(submitterToken)
+            .perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.type", is("itemtemplate")));
+    }
+
+    @Test
+    public void getTemplateItemFromCollectionAsCollectionAdmin() throws Exception {
+        setupTestTemplate();
+        installTestTemplate();
+
+        GroupBuilder.createCollectionAdminGroup(context, childCollection)
+                    .addMember(eperson)
+                    .build();
+        String collectionAdminToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(collectionAdminToken)
+            .perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.type", is("itemtemplate")));
     }
 
     @Test
