@@ -10,6 +10,7 @@ package org.dspace.xoai.tests.stylesheets;
 import static org.dspace.xoai.tests.support.XmlMatcherBuilder.xml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 import org.dspace.xoai.tests.support.XmlMatcherBuilder;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class OpenAireXslTest extends AbstractXSLTest {
         // first author shouldn't have an ORCID ID
         assertThat(result, openAire().withXPath(
                 "/oaire:resource/datacite:creators/datacite:creator[1]/datacite:nameIdentifier" +
-                        "[@schemeURI='http://orcid.org']", containsString("")));
+                        "[@schemeURI='http://orcid.org']", equalTo("")));
         assertThat(result, openAire().withXPath(
                 "/oaire:resource/datacite:creators/datacite:creator[2]/datacite:nameIdentifier" +
                         "[@schemeURI='http://orcid.org']", containsString("0000-0000-0000-1234")));
@@ -52,8 +53,8 @@ public class OpenAireXslTest extends AbstractXSLTest {
                         "[@schemeURI='http://orcid.org']", containsString("0000-0000-0000-5678")));
         // final author shouldn't have an ORCID ID
         assertThat(result, openAire().withXPath(
-                "/oaire:resource/datacite:creators/datacite:creator[1]/datacite:nameIdentifier" +
-                        "[@schemeURI='http://orcid.org']", containsString("")));
+                "/oaire:resource/datacite:creators/datacite:creator[4]/datacite:nameIdentifier" +
+                        "[@schemeURI='http://orcid.org']", equalTo("")));
 
     }
 
