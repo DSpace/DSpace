@@ -7,7 +7,7 @@
  */
 package org.dspace.curate;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -15,10 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 /**
  * Represents an exclusive lock on a curation queue.
@@ -30,9 +27,7 @@ import jakarta.persistence.TemporalType;
  * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 @Entity
-@Table(name = "curation_queue_lock", indexes = {
-    @Index(name = "idx_cql_queue_name", columnList = "queue_name", unique = true)
-})
+@Table(name = "curation_queue_lock")
 public class CurationQueueLock {
 
     @Id
@@ -48,9 +43,8 @@ public class CurationQueueLock {
     @Column(name = "owner_id", length = 256)
     private String ownerId;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "lock_date", nullable = false)
-    private Date lockDate;
+    private Instant lockDate;
 
     /**
      * Default constructor required by JPA.
@@ -70,7 +64,7 @@ public class CurationQueueLock {
         this.queueName = queueName;
         this.ticket = ticket;
         this.ownerId = ownerId;
-        this.lockDate = new Date();
+        this.lockDate = Instant.now();
     }
 
     public Integer getId() {
@@ -101,11 +95,11 @@ public class CurationQueueLock {
         this.ownerId = ownerId;
     }
 
-    public Date getLockDate() {
+    public Instant getLockDate() {
         return lockDate;
     }
 
-    public void setLockDate(Date lockDate) {
+    public void setLockDate(Instant lockDate) {
         this.lockDate = lockDate;
     }
 

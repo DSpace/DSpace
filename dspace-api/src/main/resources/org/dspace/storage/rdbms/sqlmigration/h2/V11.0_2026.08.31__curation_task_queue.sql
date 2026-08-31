@@ -7,30 +7,29 @@
 --
 
 -- =======================================================================
---  DSpace Database Migration
---  Version: 10.0
---  Date: 2026-02-10
+--  DSpace Database Migration (H2)
+--  Version: 11.0
+--  Date: 2026-08-31
 --  Description: Create table to persist curation task queue entries migrated
 --               from previous file-based implementation (DBTaskQueue).
 --               Each row represents a TaskQueueEntry.
---
 -- =======================================================================
 
 CREATE TABLE IF NOT EXISTS curation_task_queue (
-    id SERIAL PRIMARY KEY,
-    queue_name TEXT NOT NULL,
-    eperson TEXT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    queue_name VARCHAR(128) NOT NULL,
+    eperson VARCHAR(256),
     submit_time BIGINT NOT NULL,
-    tasks TEXT NOT NULL,
-    object_id TEXT,
+    tasks VARCHAR(1024) NOT NULL,
+    object_id VARCHAR(512),
     UNIQUE (queue_name, tasks, object_id)
 );
 -- New table to manage locks on curation queues
 CREATE TABLE IF NOT EXISTS curation_queue_lock (
-    id SERIAL PRIMARY KEY,
-    queue_name TEXT NOT NULL,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    queue_name VARCHAR(128) NOT NULL,
     ticket BIGINT NOT NULL,
-    owner_id TEXT,
+    owner_id VARCHAR(256),
     lock_date TIMESTAMP NOT NULL
 );
 

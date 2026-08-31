@@ -14,7 +14,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 /**
@@ -24,9 +23,7 @@ import jakarta.persistence.Table;
  * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 @Entity
-@Table(name = "curation_task_queue", indexes = {
-    @Index(name = "idx_ctq_queue", columnList = "queue_name")
-})
+@Table(name = "curation_task_queue")
 public class CurationQueueEntry {
 
     @Id
