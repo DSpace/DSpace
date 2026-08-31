@@ -144,7 +144,7 @@
             <!-- datacite.creator -->
             <xsl:for-each select="./doc:element/doc:field[@name='value']">
                 <!-- set 'orcid' variable if there is an 'orcid_id' field and if the first preceding 'value' field matches the text of the current node -->
-                <xsl:variable name="orcid" select="../doc:field[@name='orcid_id' and preceding-sibling::doc:field[@name='value'][ 1]/text() = current()/text()]" />
+                <xsl:variable name="orcid" select="../doc:field[@name='orcid_id' and generate-id(preceding-sibling::doc:field[@name='value'][1]) = generate-id(current())]" />
                 <xsl:variable name="isRelatedEntity">
                     <xsl:call-template name="isRelatedEntity">
                         <xsl:with-param name="element" select="."/>
