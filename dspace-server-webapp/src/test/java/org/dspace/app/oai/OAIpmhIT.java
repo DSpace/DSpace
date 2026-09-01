@@ -8,7 +8,8 @@
 
 package org.dspace.app.oai;
 
-import static org.hamcrest.Matchers.startsWith;
+import static com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration.readConfiguration;
+import static org.dspace.xoai.services.impl.context.DSpaceXOAIManagerResolver.XOAI_CONFIGURATION_FILE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -173,7 +174,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void listSetsWithLessSetsThenMaxSetsPerPage() throws Exception {
+    public void listAllSetsAndCheckForExistenceOfDefaultSets() throws Exception {
         //Turn off the authorization system, otherwise we can't make the objects
         context.turnOffAuthorisationSystem();
 
@@ -186,23 +187,28 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
                          .build();
         context.restoreAuthSystemState();
 
+        var xoaiConfig = readConfiguration(resourceResolver.getResource(XOAI_CONFIGURATION_FILE));
+        // set a max list set size of 200 to get all sets
+        xoaiConfig.withMaxListSetsSize(200);
+        // When xoaiManagerResolver.getManager() is called, return a XOAIManager based on the above configuration
+        doReturn(new XOAIManager(filterResolver, resourceResolver, xoaiConfig)).when(xoaiManagerResolver).getManager();
+
         // Call ListSets verb, and verify both Collection & Community are listed as sets
         getClient().perform(get(DEFAULT_CONTEXT).param("verb", "ListSets"))
                    // Expect 200 response, with valid response date and verb=ListSets
                    .andExpect(status().isOk())
                    .andExpect(xpath("OAI-PMH/responseDate").exists())
                    .andExpect(xpath("OAI-PMH/request/@verb").string("ListSets"))
-                   // Expect two Sets to be returned
-                   .andExpect(xpath("//set").nodeCount(2))
-                   // First setSpec should start with "com_" (Community)
-                   .andExpect(xpath("(//set/setSpec)[1]").string(startsWith("com_")))
-                   // First set name should be Community name
-                   .andExpect(xpath("(//set/setName)[1]").string("Parent Community"))
-                   // Second setSpec should start with "col_" (Collection)
-                   .andExpect(xpath("(//set/setSpec)[2]").string(startsWith("col_")))
-                   // Second set name should be Collection name
-                   .andExpect(xpath("(//set/setName)[2]").string("Child Collection"))
-                   // No resumption token should be returned
+                   // Community set should exist
+                   .andExpect(xpath("(//set/setSpec[contains(.,'com_')])").exists())
+                   .andExpect(xpath("(//set/setName[contains(.,'Parent Community')])").exists())
+                   // Collection set should exist
+                   .andExpect(xpath("(//set/setSpec[contains(.,'col_')])").exists())
+                   .andExpect(xpath("(//set/setName[contains(.,'Child Collection')])").exists())
+                   // At least one ddc set should exist
+                   .andExpect(xpath("(//set/setSpec[contains(.,'ddc')])").exists())
+                   .andExpect(xpath("(//set/setName[contains(.,'DDC')])").exists())
+                   // No resumption token should be returned, we configured this test to list 200 sets
                    .andExpect(xpath("//resumptionToken").doesNotExist())
         ;
     }
