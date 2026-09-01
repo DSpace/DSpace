@@ -37,8 +37,11 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.SolrAuthority;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -82,6 +85,9 @@ public class ItemUtils {
 
     private static final MetadataAuthorityService metadataAuthorityService
             = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
+    private static final ChoiceAuthorityService choiceAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
 
     /**
      * Default constructor
@@ -360,10 +366,17 @@ public class ItemUtils {
     }
 
     private static boolean isOrcidAuthorityControlled(MetadataField field) {
-        String solrAuthorAuthority = configurationService.getProperty("choices.plugin." + field.toString('.'));
-        return metadataAuthorityService.isAuthorityControlled(metadataAuthorityService.makeFieldKey(field))
-                && solrAuthorAuthority != null
-                && solrAuthorAuthority.equals("SolrAuthorAuthority");
+        String fieldKey = metadataAuthorityService.makeFieldKey(field);
+        if (!metadataAuthorityService.isAuthorityControlled(fieldKey)) {
+            return false;
+        }
+        ChoiceAuthority choiceAuthority = null;
+        try {
+            choiceAuthority = choiceAuthorityService.getAuthorityByFieldKeyCollection(fieldKey, Constants.ITEM, null);
+        } catch (IllegalStateException ignored) {
+            // ignored: choiceAuthority should stay null on failure
+        }
+        return choiceAuthority instanceof SolrAuthority;
     }
 
     /**
