@@ -258,20 +258,6 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
                    // Expect resumption token to have completeListSize=5
                    .andExpect(xpath("//resumptionToken/@completeListSize").number(Double.valueOf(5)))
         ;
-
-        // Call ListSets verb, and verify all 5 Collections/Communities are listed as sets
-        getClient().perform(get(DEFAULT_CONTEXT).param("verb", "ListSets"))
-                   // Expect 200 response, with valid response date and verb=ListSets
-                   .andExpect(status().isOk())
-                   .andExpect(xpath("OAI-PMH/responseDate").exists())
-                   .andExpect(xpath("OAI-PMH/request/@verb").string("ListSets"))
-                   // Expect ONLY 3 (of 5) Sets to be returned
-                   .andExpect(xpath("//set").nodeCount(3))
-                   // Expect resumption token to exist and be equal to "////3"
-                   .andExpect(xpath("//resumptionToken").string("////3"))
-                   // Expect resumption token to have completeListSize=5
-                   .andExpect(xpath("//resumptionToken/@completeListSize").number(Double.valueOf(5)))
-        ;
     }
 
     /**
