@@ -21,6 +21,10 @@
                     <field name="authority">376bbd13-dac5-4a32-9d35-70742e3f84c5</field>
                     <field name="confidence">600</field>
                     <field name="orcid_id">0000-0000-0000-1234</field>
+                    <field name="value">Smith, John</field>
+                    <field name="authority">c4e8f2a1-9b07-4d6e-a3c5-1f8e0d7b6a29</field>
+                    <field name="confidence">600</field>
+                    <field name="orcid_id">0000-0000-0000-2610</field>
                     <field name="value">Doe, Jane</field>
                     <field name="authority">102616ab-95dd-4974-af1a-8f587c61eed1</field>
                     <field name="confidence">600</field>

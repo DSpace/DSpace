@@ -33,11 +33,15 @@ public class OpenAireXslTest extends AbstractXSLTest {
         assertThat(result, openAire().withXPath(
                 "/oaire:resource/datacite:creators/datacite:creator[2]/datacite:creatorName",
                 containsString("Smith, John")));
+        // two authors share a name; each must keep their own ORCID
         assertThat(result, openAire().withXPath(
                 "/oaire:resource/datacite:creators/datacite:creator[3]/datacite:creatorName",
-                containsString("Doe, Jane")));
+                containsString("Smith, John")));
         assertThat(result, openAire().withXPath(
                 "/oaire:resource/datacite:creators/datacite:creator[4]/datacite:creatorName",
+                containsString("Doe, Jane")));
+        assertThat(result, openAire().withXPath(
+                "/oaire:resource/datacite:creators/datacite:creator[5]/datacite:creatorName",
                 containsString("PlainText, Two")));
 
         // match ORCID IDs
@@ -50,10 +54,13 @@ public class OpenAireXslTest extends AbstractXSLTest {
                         "[@schemeURI='http://orcid.org']", containsString("0000-0000-0000-1234")));
         assertThat(result, openAire().withXPath(
                 "/oaire:resource/datacite:creators/datacite:creator[3]/datacite:nameIdentifier" +
+                        "[@schemeURI='http://orcid.org']", containsString("0000-0000-0000-2610")));
+        assertThat(result, openAire().withXPath(
+                "/oaire:resource/datacite:creators/datacite:creator[4]/datacite:nameIdentifier" +
                         "[@schemeURI='http://orcid.org']", containsString("0000-0000-0000-5678")));
         // final author shouldn't have an ORCID ID
         assertThat(result, openAire().withXPath(
-                "/oaire:resource/datacite:creators/datacite:creator[4]/datacite:nameIdentifier" +
+                "/oaire:resource/datacite:creators/datacite:creator[5]/datacite:nameIdentifier" +
                         "[@schemeURI='http://orcid.org']", equalTo("")));
 
     }
