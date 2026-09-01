@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.util.Optional;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -87,7 +88,10 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
         try (InputStream is = this.getClass().getResourceAsStream(
             "/org/dspace/app/rest/simple-article.pdf.tei.xml")) {
             assertNotNull("Test TEI XML resource should exist", is);
-            return XMLUtils.getDocumentBuilder().parse(is);
+
+            DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
+            dbf.setNamespaceAware(true);
+            return dbf.newDocumentBuilder().parse(is);
         }
     }
 
@@ -95,7 +99,9 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
         try (InputStream is = this.getClass().getResourceAsStream(
             "/org/dspace/app/rest/full-example.pdf.tei.xml")) {
             assertNotNull("Test TEI XML resource should exist", is);
-            return XMLUtils.getDocumentBuilder().parse(is);
+            DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
+            dbf.setNamespaceAware(true);
+            return dbf.newDocumentBuilder().parse(is);
         }
     }
 
@@ -225,6 +231,10 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
                                             is("GROBID"),
                                             is("Metadata Extraction")
                                         )
+                                    )
+                                ).andExpect(
+                                    grobidMetadataMatcher(
+                                        "dc.language.iso", is("en")
                                     )
                                 )
                                 // we can just check that the pdf is stored in the item

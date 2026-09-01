@@ -32,6 +32,7 @@
     <util:map id="grobidPrefixToNamespaceMapping" map-class="java.util.HashMap"
               key-type="java.lang.String" value-type="java.lang.String">
         <entry key="http://www.tei-c.org/ns/1.0" value="tei"/>
+        <entry key="http://www.w3.org/XML/1998/namespace" value="xml"/>
     </util:map>
 
     <bean id="grobidTitleContrib"

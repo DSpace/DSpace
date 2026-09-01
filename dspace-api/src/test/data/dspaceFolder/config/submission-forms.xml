@@ -1964,7 +1964,19 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Subject field that can be associated with an authority providing lookup</hint>
          <required></required>
        </field>
-     </row>
+      </row>
+      <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>language</dc-element>
+         <dc-qualifier>iso</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Language</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the language of the publication.</hint>
+         <required></required>
+       </field>
+     </row>    
    </form>
 
 
