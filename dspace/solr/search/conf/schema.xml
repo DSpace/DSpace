@@ -69,8 +69,14 @@
          These fields must NOT pass through the stopword-filtered "text" chain:
          eight valid ISO 639-1 codes (an, as, be, is, it, no, or, to) are
          English stopwords, so values like dc.language.iso=it are dropped at
-         index AND query time (DSpace/DSpace#12245). -->
-    <fieldType name="text_identifier" class="solr.TextField" omitNorms="true" positionIncrementGap="100">
+         index AND query time (DSpace/DSpace#12245).
+         Norms are kept on purpose (the TextField default): these fields used to
+         fall through the "*" dynamicField, so existing cores already hold them
+         with norms, and Lucene 9 refuses to change omitNorms for an existing
+         field at index time. Keeping the default lets an existing core keep
+         indexing after this change; a reindex is only needed to make the
+         affected codes searchable. -->
+    <fieldType name="text_identifier" class="solr.TextField" positionIncrementGap="100">
         <analyzer>
             <tokenizer class="solr.KeywordTokenizerFactory"/>
             <filter class="solr.TrimFilterFactory"/>
