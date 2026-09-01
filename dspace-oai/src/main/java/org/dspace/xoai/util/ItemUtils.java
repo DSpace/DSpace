@@ -364,8 +364,12 @@ public class ItemUtils {
         }
         ChoiceAuthority choiceAuthority = null;
         try {
-            choiceAuthority = choiceAuthorityService.getAuthorityByFieldKeyCollection(fieldKey, Constants.ITEM, null);
-        } catch (IllegalStateException ignored) {
+            String authorityName = choiceAuthorityService.getChoiceAuthorityName(
+                field.getMetadataSchema().getName(), field.getElement(), field.getQualifier(), Constants.ITEM, null);
+            if (authorityName != null) {
+                choiceAuthority = choiceAuthorityService.getChoiceAuthorityByAuthorityName(authorityName);
+            }
+        } catch (IllegalArgumentException | IllegalStateException ignored) {
             // ignored: choiceAuthority should stay null on failure
         }
         return choiceAuthority instanceof SolrAuthority;
