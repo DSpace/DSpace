@@ -121,8 +121,6 @@ public class BitstreamRestController {
      * @throws SQLException if database error occurs
      * @throws AuthorizeException if user lacks permission and author bypass is disabled
      */
-    // Keep this condition aligned with the isNotBlank checks in the method body. If preauthorization accepts a
-    // token that the body ignores, the request reaches the response handling without a Bitstream READ check.
     @PreAuthorize("T(org.apache.commons.lang3.StringUtils).isNotBlank(#accessToken)" +
         " || hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
@@ -142,8 +140,7 @@ public class BitstreamRestController {
         Bitstream bit = bitstreamService.find(context, uuid);
 
         // If an access token is found, immediately authenticate it if request a copy is enabled
-        // Though, if we do further "has to be loggd in requester" checks we'll have to check here anyway
-        // Even if eperson is not null and has access, we will treat this token as the primary means of
+        // Even if EPerson is not null and has access, we will treat this token as the primary means of
         // authorizing bitstream download access
         boolean authorizedByAccessToken = false;
         // There may be a way of checking enabled in preauth
@@ -155,7 +152,7 @@ public class BitstreamRestController {
             authorizedByAccessToken = true;
             log.debug("Authorize access by token={} bitstream={}", accessToken, bit.getID());
         }
-        // If an authorization error was encountered it will be rethrown by this method even if the eperson
+        // If an authorization error was encountered it will be rethrown by the above method even if the eperson
         // could technically READ the bitstream normally. This is for consistency and clarify of usage - if we
         // want a fallback we will need to reauthenticate as otherwise any eperson could have supplied a non-blank
         // access token here
@@ -188,8 +185,6 @@ public class BitstreamRestController {
             // Check if a citation coverpage is valid for this download
             long filesize = bit.getSizeBytes();
             Boolean citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
-
-
 
             // Generate a special bitstream resource stream depending on whether we are accessing by token
             // or eperson / group access
