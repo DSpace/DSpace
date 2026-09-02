@@ -33,6 +33,7 @@ import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.rest.repository.RegistrationRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.core.Email;
 import org.dspace.eperson.CaptchaServiceImpl;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.RegistrationData;
@@ -40,7 +41,12 @@ import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -53,6 +59,29 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     private ConfigurationService configurationService;
     @Autowired
     private RegistrationRestRepository registrationRestRepository;
+    @Autowired
+    private ObjectMapper mapper;
+
+    private static MockedStatic<Email> emailMockedStatic;
+
+    @After
+    public void tearDown() throws Exception {
+        Iterator<RegistrationData> iterator = registrationDataDAO.findAll(context, RegistrationData.class).iterator();
+        while (iterator.hasNext()) {
+            RegistrationData registrationData = iterator.next();
+            registrationDataDAO.delete(context, registrationData);
+        }
+    }
+
+    @BeforeClass
+    public static void init() throws Exception {
+        emailMockedStatic = Mockito.mockStatic(Email.class);
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        emailMockedStatic.close();
+    }
 
     @Test
     public void findByTokenTestExistingUserTest() throws Exception {
@@ -119,6 +148,33 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                 .content(mapper.writeValueAsBytes(registrationRest))
                                 .contentType(contentType))
                    .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void findByTokenWithoutToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithEmptyToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", ""))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithBlankToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", "  "))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithTooLongToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", "t".repeat(49))) // token length cannot be longer than 48 characters
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -472,4 +528,51 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void registrationWithInvalidEmailFormatTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("invalid-email!!!!");
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithEmptyEmailTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("");
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithNullEmailTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(null);
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
 }
