@@ -377,7 +377,7 @@ public class DOIOrganiser {
             do {
                 batch = doiService.getDOIsByStatus(context, statuses, batchSize, stuck);
                 if (firstBatch && batch.isEmpty()) {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                                            + "that could be processed for " + processName + ".");
                 }
                 firstBatch = false;
