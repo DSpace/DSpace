@@ -221,7 +221,7 @@ public class DOIOrganiser {
                 List<DOI> dois = doiService
                     .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_RESERVED));
                 if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                                            + "that could be reserved.");
                 }
 
@@ -248,7 +248,7 @@ public class DOIOrganiser {
                 List<DOI> dois = doiService
                     .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_REGISTERED));
                 if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                                            + "that could be registered.");
                 }
                 for (DOI doi : dois) {
@@ -278,7 +278,7 @@ public class DOIOrganiser {
                     DOIIdentifierProvider.UPDATE_RESERVED,
                     DOIIdentifierProvider.UPDATE_REGISTERED));
                 if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                                            + "whose metadata needs an update.");
                 }
 
@@ -298,7 +298,7 @@ public class DOIOrganiser {
                 List<DOI> dois = doiService
                     .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_DELETED));
                 if (dois.isEmpty()) {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                                            + "that could be deleted.");
                 }
 
