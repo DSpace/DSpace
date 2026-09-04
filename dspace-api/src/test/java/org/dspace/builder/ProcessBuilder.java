@@ -79,6 +79,10 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
                                                                   .atZone(ZoneId.systemDefault()).toInstant());
         return this;
     }
+    public ProcessBuilder withHeartbeat(Instant heartbeat) {
+        process.setHeartbeat(heartbeat);
+        return this;
+    }
 
     @Override
     public void cleanup() throws Exception {

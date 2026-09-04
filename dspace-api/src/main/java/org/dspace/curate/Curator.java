@@ -533,9 +533,12 @@ public class Curator {
                 statusCode = task.perform(context, dso);
                 logInfo(logMessage(id));
                 visit(context);
+                // Register a heartbeat after the visit to indicate the process is still running
+                if (handler != null) {
+                    handler.registerHeartbeat();
+                }
                 return !suspend(statusCode);
             } catch (IOException ioe) {
-                //log error & pass exception upwards
                 System.out.println("Error executing curation task '" + task.getName() + "'; " + ioe);
                 throw ioe;
             }

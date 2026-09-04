@@ -35,6 +35,7 @@ import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.dspace.storage.rdbms.ObjectBoundHibernateDBConnection;
 import org.dspace.utils.DSpace;
 import org.hibernate.Session;
 import org.springframework.util.CollectionUtils;
@@ -141,6 +142,8 @@ public class Context implements AutoCloseable {
      */
     private Mode mode;
 
+    private Type type;
+
     /**
      * Cache that is only used the context is in READ_ONLY mode
      */
@@ -159,6 +162,11 @@ public class Context implements AutoCloseable {
         READ_ONLY,
         READ_WRITE,
         BATCH_EDIT
+    }
+
+    public enum Type {
+        THREAD_BOUND,
+        OBJECT_BOUND
     }
 
     protected Context(EventService eventService, DBConnection dbConnection) {
@@ -187,19 +195,34 @@ public class Context implements AutoCloseable {
         init();
     }
 
+    public Context(Type type) {
+        this(type, Mode.READ_WRITE);
+    }
+
+    public Context(Type type, Mode mode) {
+        this.mode = mode;
+        this.type = type;
+        init();
+    }
+
     /**
      * Initializes a new context object.
      */
     protected void init() {
         updateDatabase();
-
+        if (type == null) {
+            type = Type.THREAD_BOUND;
+        }
         if (eventService == null) {
             eventService = EventServiceFactory.getInstance().getEventService();
         }
         if (dbConnection == null) {
-            // Obtain a non-auto-committing connection
-            dbConnection = new DSpace().getServiceManager()
-                                       .getServiceByName(null, DBConnection.class);
+            if (type == Type.OBJECT_BOUND) {
+                dbConnection = new ObjectBoundHibernateDBConnection();
+            } else {
+                dbConnection = new DSpace().getServiceManager()
+                        .getServiceByName(null, DBConnection.class);
+            }
             if (dbConnection == null) {
                 log.fatal("Cannot obtain the bean which provides a database connection. " +
                               "Check previous entries in the dspace.log to find why the db failed to initialize.");
@@ -223,7 +246,6 @@ public class Context implements AutoCloseable {
         if (this.mode != null) {
             setMode(this.mode);
         }
-
     }
 
     /**

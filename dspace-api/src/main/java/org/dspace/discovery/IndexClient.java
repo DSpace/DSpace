@@ -87,7 +87,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 break;
             case CLEAN:
                 handler.logInfo("Cleaning Index");
-                indexer.cleanIndex();
+                indexer.cleanIndex(handler);
                 break;
             case DELETE:
                 handler.logInfo("Deleting Index");
@@ -99,7 +99,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 if (StringUtils.isNotBlank(type)) {
                     handler.logWarning(String.format(
                             "Type option, %s, not applicable for entire index rebuild option, b"
-                                    + ", type will be ignored",
+                            + ", type will be ignored",
                             TYPE_OPTION));
                 }
                 indexer.deleteIndex();
@@ -119,15 +119,15 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
                 final long startTimeMillis = Instant.now().toEpochMilli();
                 final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
-                    indexableObject.get());
+                        indexableObject.get());
                 final long seconds = (Instant.now().toEpochMilli() - startTimeMillis) / 1000;
                 handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") +
-                                " in " + seconds + " seconds");
+                        " in " + seconds + " seconds");
                 break;
             case UPDATE:
             case UPDATEANDSPELLCHECK:
                 handler.logInfo("Updating Index");
-                indexer.updateIndex(context, false, type);
+                indexer.updateIndex(context, false, type, handler);
                 if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
                     checkRebuildSpellCheck(commandLine, indexer);
                 }
@@ -135,7 +135,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             case FORCEUPDATE:
             case FORCEUPDATEANDSPELLCHECK:
                 handler.logInfo("Updating Index");
-                indexer.updateIndex(context, true, type);
+                indexer.updateIndex(context, true, type, handler);
                 if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
                     checkRebuildSpellCheck(commandLine, indexer);
                 }
@@ -144,7 +144,6 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 handler.handleException("Invalid index client option.");
                 break;
         }
-
         handler.logInfo("Done with indexing");
     }
 
