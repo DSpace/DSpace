@@ -10,7 +10,7 @@ package org.dspace.discovery;
 import java.sql.SQLException;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.access.status.DefaultAccessStatusHelper;
+import org.dspace.access.status.AccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.AccessStatus;
@@ -38,7 +38,7 @@ public class SolrServiceIndexAccessStatusPlugin implements SolrServiceIndexPlugi
             try {
                 accessStatus = retrieveItemAccessStatus(context,item);
             } catch (SQLException e) {
-                accessStatus = DefaultAccessStatusHelper.UNKNOWN;
+                accessStatus = AccessStatusHelper.UNKNOWN;
             }
 
             // _keyword and _filter because
