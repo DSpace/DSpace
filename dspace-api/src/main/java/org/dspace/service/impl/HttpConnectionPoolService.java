@@ -25,6 +25,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.SolrAuthUtils;
 
 /**
  * Factory for HTTP clients sharing a pool of connections.
@@ -112,11 +113,11 @@ public class HttpConnectionPoolService {
      * @return the client.
      */
     public CloseableHttpClient getClient() {
-        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().builder(true).create()
-                .setKeepAliveStrategy(keepAliveStrategy)
-                .setConnectionManager(connManager)
-                .build();
-        return httpClient;
+        return DSpaceHttpClientFactory.getInstance().build(builder -> {
+            builder.setKeepAliveStrategy(keepAliveStrategy)
+                    .setConnectionManager(connManager);
+            SolrAuthUtils.addAuthenticationIfConfigured(builder, configPrefix, configurationService);
+        });
     }
 
     /**
