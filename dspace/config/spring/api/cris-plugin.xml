@@ -160,6 +160,11 @@
 				<!-- ISSN: Fetches Journal data from SHERPA/RoMEO API using ISSN identifier.
 				     Example: Creates Journal with OA policy data for ISSN 0028-0836 -->
 				<entry key="ISSN" value-ref="opfImportFiller"/>
+				<!-- ROR-ID: Fetches OrgUnit data from the ROR API using the ROR identifier.
+				     Applies when the authority uses the "will be generated::ROR-ID::" prefix
+				     (configurable via ror.authority.OrgUnitAuthorityprefix). Populates the created
+				     OrgUnit from the full ROR record (organization.legalName, ...) not just dc.title. -->
+				<entry key="ROR-ID" value-ref="rorImportFiller"/>
 			</map>
 		</property>
 	</bean>
@@ -304,6 +309,15 @@
 		<constructor-arg name="externalDataProvider"
 						 ref="org.dspace.external.provider.impl.OpenPolicyFinderJournalISSNDataProvider"/>
 		<constructor-arg name="authorityIdentifier" value="ISSN"/>
+	</bean>
+
+	<!-- ROR import filler: Fetches OrgUnit entity data from the ROR API and populates the
+	     newly created OrgUnit (organization.legalName, organization.identifier.ror, dc.type, ...).
+	     Backed by the rorDataProvider bean (see external-services.xml). Selected when the
+	     authority uses the "will be generated::ROR-ID::" prefix. -->
+	<bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="rorImportFiller">
+		<constructor-arg name="externalDataProvider" ref="rorDataProvider"/>
+		<constructor-arg name="authorityIdentifier" value="ROR-ID"/>
 	</bean>
 
 	<!-- ================================================================================ -->

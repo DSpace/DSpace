@@ -222,4 +222,28 @@
         <copyToLeft>true</copyToLeft>
         <copyToRight>true</copyToRight>
     </type>
+    <type>
+        <leftType>Funding</leftType>
+        <rightType>Project</rightType>
+        <leftwardType>isProjectOfFunding</leftwardType>
+        <rightwardType>isFundingOfProject</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <leftType>Funding</leftType>
+        <rightType>OrgUnit</rightType>
+        <leftwardType>isOrgUnitOfFunding</leftwardType>
+        <rightwardType>isFundingOfOrgUnit</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
 </relationships>

@@ -1524,6 +1524,237 @@
                 </field>
             </row>
         </form>
+
+        <!-- Form which defines the metadata page/section for depositing Funding Entities -->
+        <form name="fundingStep">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <label>Name</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required>You must enter the funding name.</required>
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>acronym</dc-element>
+                    <label>Acronym</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>internalid</dc-element>
+                    <label>Internal Funding code</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>project</dc-qualifier>
+                    <label>Funded project</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>funder</dc-element>
+                    <label>Funder</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>fundingParent</dc-element>
+                    <label>Program</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint>Link this funding with its upper level if applicable</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>crisfund</dc-schema>
+                    <dc-element>award</dc-element>
+                    <dc-qualifier>url</dc-qualifier>
+                    <label>Award Url</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required>The url preferably on the funder website of the award notice</required>
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>crisfund</dc-schema>
+                    <dc-element>award</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <label>Award URI</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required>The Award URI</required>
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>oamandate</dc-element>
+                    <label>OA Mandate</label>
+                    <input-type value-pairs-name="truefalse">dropdown</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>oamandate</dc-element>
+                    <dc-qualifier>url</dc-qualifier>
+                    <label>OA Policy URL</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <label>Amount</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <dc-qualifier>currency</dc-qualifier>
+                    <label>Currency</label>
+                    <input-type value-pairs-name="currency">dropdown</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>funding</dc-element>
+                    <dc-qualifier>identifier</dc-qualifier>
+                    <label>Grant number</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>funding</dc-element>
+                    <dc-qualifier>startDate</dc-qualifier>
+                    <label>Start date</label>
+                    <input-type>date</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+                <field>
+                    <dc-schema>oairecerif</dc-schema>
+                    <dc-element>funding</dc-element>
+                    <dc-qualifier>endDate</dc-qualifier>
+                    <label>End date</label>
+                    <input-type>date</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <label>Type</label>
+                    <input-type value-pairs-name="funding_types">dropdown</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <label>Funding Description</label>
+                    <input-type>textarea</input-type>
+                    <repeatable>false</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>crisfund</dc-schema>
+                    <dc-element>investigators</dc-element>
+                    <label>Investigator(s)</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>true</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>crisfund</dc-schema>
+                    <dc-element>coinvestigators</dc-element>
+                    <label>Co-Investigator(s)</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>true</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>crisfund</dc-schema>
+                    <dc-element>leadorganizations</dc-element>
+                    <label>Lead Organization(s)</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>true</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>crisfund</dc-schema>
+                    <dc-element>leadcoorganizations</dc-element>
+                    <label>Lead Co-Organization(s)</label>
+                    <input-type>onebox</input-type>
+                    <repeatable>true</repeatable>
+                    <required />
+                    <hint />
+                </field>
+            </row>
+        </form>
     </form-definitions>
 
 
@@ -2178,6 +2409,168 @@
             <pair>
                 <displayed-value>Neither</displayed-value>
                 <stored-value>neither</stored-value>
+            </pair>
+        </value-pairs>
+        <value-pairs value-pairs-name="funding_types" dc-term="funding_types">
+            <pair>
+                <displayed-value>Unspecified</displayed-value>
+                <stored-value />
+            </pair>
+            <pair>
+                <displayed-value>Gift</displayed-value>
+                <stored-value>Gift</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Internal Funding</displayed-value>
+                <stored-value>Internal Funding</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Contract</displayed-value>
+                <stored-value>Contract</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Award</displayed-value>
+                <stored-value>Award</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Grant</displayed-value>
+                <stored-value>Grant</stored-value>
+            </pair>
+        </value-pairs>
+        <value-pairs value-pairs-name="truefalse" dc-term="truefalse">
+            <pair>
+                <displayed-value>True</displayed-value>
+                <stored-value>true</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>False</displayed-value>
+                <stored-value>false</stored-value>
+            </pair>
+        </value-pairs>
+        <value-pairs value-pairs-name="currency" dc-term="currency">
+            <pair>
+                <displayed-value>Euro</displayed-value>
+                <stored-value>Euro</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Albanian lek</displayed-value>
+                <stored-value>Albanian lek</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Armenian dram</displayed-value>
+                <stored-value>Armenian dram</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Azerbaijan manat</displayed-value>
+                <stored-value>Azerbaijan manat</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Belarusian ruble</displayed-value>
+                <stored-value>Belarusian ruble</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bosnia and Herzegovina convertible mark</displayed-value>
+                <stored-value>Bosnia and Herzegovina convertible mark</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bulgarian lev</displayed-value>
+                <stored-value>Bulgarian lev</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Croatian kuna</displayed-value>
+                <stored-value>Croatian kuna</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Czech koruna</displayed-value>
+                <stored-value>Czech koruna</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Danish krone</displayed-value>
+                <stored-value>Danish krone</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Faroese krona</displayed-value>
+                <stored-value>Faroese krona</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Georgian lari</displayed-value>
+                <stored-value>Georgian lari</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Gibraltar pound</displayed-value>
+                <stored-value>Gibraltar pound</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Guernsey pound</displayed-value>
+                <stored-value>Guernsey pound</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hungarian forint</displayed-value>
+                <stored-value>Hungarian forint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Icelandic krona</displayed-value>
+                <stored-value>Icelandic krona</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Manx pound</displayed-value>
+                <stored-value>Manx pound</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Jersey pound</displayed-value>
+                <stored-value>Jersey pound</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Kazakhstani tenge</displayed-value>
+                <stored-value>Kazakhstani tenge</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Moldovan leu</displayed-value>
+                <stored-value>Moldovan leu</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Macedonian denar</displayed-value>
+                <stored-value>Macedonian denar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Norwegian krone</displayed-value>
+                <stored-value>Norwegian krone</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Polish zloty</displayed-value>
+                <stored-value>Polish zloty</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Romanian leu</displayed-value>
+                <stored-value>Romanian leu</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Russian ruble</displayed-value>
+                <stored-value>Russian ruble</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Serbian dinar</displayed-value>
+                <stored-value>Serbian dinar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Swedish krona</displayed-value>
+                <stored-value>Swedish krona</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Swiss franc</displayed-value>
+                <stored-value>Swiss franc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Turkish lira</displayed-value>
+                <stored-value>Turkish lira</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Ukrainian hryvnia</displayed-value>
+                <stored-value>Ukrainian hryvnia</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Pound sterling</displayed-value>
+                <stored-value>Pound sterling</stored-value>
             </pair>
         </value-pairs>
 
