@@ -3859,6 +3859,51 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isForbidden());
     }
 
+    /**
+     * This test verifies the functionality of the `findIsMemberOf` endpoint.
+     * 
+     * - It creates an EPerson (user) and a Group.
+     * - Adds the user to the Group.
+     * - Sends a request to check if the user is a member of the specified Group.
+     * - Validates the API response:
+     *   - Ensures the request returns a successful HTTP 200 status.
+     *   - Checks that the response content type is correct.
+     *   - Confirms that the user appears in the returned list.
+     *   - Verifies that the pagination metadata correctly reflects the expected number of elements.
+     * 
+     * @throws Exception if any unexpected error occurs during execution.
+     */
+    @Test
+    public void testFindIsMemberOf() throws Exception {
+        // create testing data
+        String testEPersonMail = "Johndoe@example.com";
+        context.turnOffAuthorisationSystem();
+        EPerson testEPerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail(testEPersonMail)
+                                        .build();
+        Group testGroup = GroupBuilder.createGroup(context)
+                          .withName("TestingGroup")
+                          .addMember(testEPerson)
+                          .build();
+        context.restoreAuthSystemState();
+
+        // test request
+        String authToken = getAuthToken(admin.getEmail(), password);
+        String query = testEPersonMail;
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isMemberOf")
+                        .param("group", testGroup.getID().toString())
+                        .param("query", query))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                        EPersonMatcher.matchEPersonEntry(testEPerson)
+                    )))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
     private String buildPasswordAddOperationPatchBody(String password, String currentPassword) {
 
         Map<String, String> value = new HashMap<>();
