@@ -18,8 +18,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.AbstractUnitTest;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.content.MetadataValue;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
@@ -35,6 +37,7 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
     private HttpServletRequest request;
     private SamlAuthentication samlAuth;
     private EPerson testUser;
+    private Group testGroup;
 
     @BeforeClass
     public static void beforeAll() {
@@ -51,6 +54,7 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         request = new MockHttpServletRequest();
         samlAuth = new SamlAuthentication();
         testUser = null;
+        testGroup = null;
     }
 
     @After
@@ -58,6 +62,12 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         if (testUser != null) {
             EPersonBuilder.deleteEPerson(testUser.getID());
         }
+
+        if (testGroup != null) {
+            GroupBuilder.deleteGroup(testGroup.getID());
+        }
+
+        configurationService.setProperty("authentication-saml.login.specialgroup", null);
     }
 
     @AfterClass
@@ -507,5 +517,78 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
 
         assertEquals(AuthenticationMethod.BAD_ARGS, result);
         assertEquals(originalUser, context.getCurrentUser());
+    }
+
+    @Test
+    public void testGetSpecialGroupsWithoutLoggedInUser() throws Exception {
+        configurationService.setProperty("authentication-saml.login.specialgroup", "saml-users");
+
+        context.setCurrentUser(null);
+
+        List<Group> specialGroups = samlAuth.getSpecialGroups(context, request);
+
+        assertEquals(List.of(), specialGroups);
+    }
+
+    @Test
+    public void testGetSpecialGroupsWithoutConfiguredGroup() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        testUser = EPersonBuilder.createEPerson(context)
+            .withEmail("alyssa@dspace.org")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        context.setCurrentUser(testUser);
+
+        List<Group> specialGroups = samlAuth.getSpecialGroups(context, request);
+
+        assertEquals(List.of(), specialGroups);
+    }
+
+    @Test
+    public void testGetSpecialGroupsWithConfiguredGroupThatDoesNotExist() throws Exception {
+        configurationService.setProperty("authentication-saml.login.specialgroup", "saml-users-that-do-not-exist");
+
+        context.turnOffAuthorisationSystem();
+
+        testUser = EPersonBuilder.createEPerson(context)
+            .withEmail("alyssa@dspace.org")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        context.setCurrentUser(testUser);
+
+        List<Group> specialGroups = samlAuth.getSpecialGroups(context, request);
+
+        assertEquals(List.of(), specialGroups);
+    }
+
+    @Test
+    public void testGetSpecialGroupsWithConfiguredGroup() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        testGroup = GroupBuilder.createGroup(context)
+            .withName("saml-users")
+            .build();
+
+        testUser = EPersonBuilder.createEPerson(context)
+            .withEmail("alyssa@dspace.org")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("authentication-saml.login.specialgroup", "saml-users");
+
+        context.setCurrentUser(testUser);
+
+        List<Group> specialGroups = samlAuth.getSpecialGroups(context, request);
+
+        assertEquals(List.of(testGroup), specialGroups);
     }
 }
