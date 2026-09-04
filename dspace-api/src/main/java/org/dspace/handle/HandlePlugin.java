@@ -307,10 +307,17 @@ public class HandlePlugin implements HandleStorage {
     }
 
     /**
-     * Return true if we have this handle in storage.
+     * Return true if this Handle server is responsible for the given naming
+     * authority handle.
+     * <p>
+     * Naming authority handles are of the form {@code 0.NA/<prefix>}. When
+     * {@code handle.plugin.checknameauthority} is true (the default), this
+     * matches {@code handle.prefix} and any {@code handle.additional.prefixes}.
+     * When that property is false, this method always returns true so the
+     * server will answer for any naming authority.
      *
      * @param theHandle byte array representation of handle
-     * @return True if we have this handle in storage
+     * @return True if this server should answer for the naming authority
      * @throws HandleException If an error occurs while calling the Handle API.
      */
     @Override
@@ -322,32 +329,31 @@ public class HandlePlugin implements HandleStorage {
         /*
          * Naming authority Handles are in the form: 0.NA/1721.1234
          *
-         * 0.NA is basically the naming authority for naming authorities. For
-         * this simple implementation, we will just check that the prefix
-         * configured in dspace.cfg is the one in the request, returning true if
-         * this is the case, false otherwise.
-         *
-         * FIXME: For more complex Handle situations, this will need enhancing.
+         * 0.NA is the naming authority for naming authorities. When
+         * handle.plugin.checknameauthority is true (default), we accept the
+         * primary handle.prefix and every handle.additional.prefixes entry.
+         * That covers merged repositories that still need to resolve more than
+         * one prefix. Set handle.plugin.checknameauthority = false only if this
+         * server must answer for prefixes that are not listed in those
+         * properties.
          */
-
-        // This parameter allows the dspace handle server to be capable of having multiple
-        // name authorities assigned to it. So long as the handle table the alternative prefixes
-        // defined the dspace will answer for those handles prefixes. This is not ideal and only
-        // works if the dspace instances assumes control over all the items in a prefix, but it
-        // does allow the admin to merge together two previously separate dspace instances each
-        // with their own prefixes and have the one instance handle both prefixes. In this case
-        // all new handle would be given a unified prefix but all old handles would still be
-        // resolvable.
         if (configurationService.getBooleanProperty("handle.plugin.checknameauthority", true)) {
-            // First, construct a string representing the naming authority Handle
-            // we'd expect.
-            String expected = "0.NA/" + handleService.getPrefix();
-
-            // Which authority does the request pertain to?
             String received = Util.decodeString(theHandle);
 
-            // Return true if they match
-            return expected.equals(received);
+            if (("0.NA/" + handleService.getPrefix()).equals(received)) {
+                return true;
+            }
+
+            String[] additionalPrefixes = handleService.getAdditionalPrefixes();
+            if (additionalPrefixes != null) {
+                for (String additionalPrefix : additionalPrefixes) {
+                    if (("0.NA/" + additionalPrefix).equals(received)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         } else {
             return true;
         }
