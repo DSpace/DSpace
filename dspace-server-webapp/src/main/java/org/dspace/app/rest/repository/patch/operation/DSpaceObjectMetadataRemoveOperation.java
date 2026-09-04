@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
@@ -44,6 +45,9 @@ public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
     @Autowired
     DSpaceObjectMetadataPatchUtils metadataPatchUtils;
 
+    @Autowired
+    private ItemConverter itemConverter;
+
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
         DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
@@ -67,6 +71,12 @@ public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
                         String index) {
         metadataPatchUtils.checkMetadataFieldNotNull(metadataField);
         try {
+            if (dso instanceof Item) {
+                if (!itemConverter.checkMetadataFieldVisibility(context, (Item) dso, metadataField)) {
+                    throw new UnprocessableEntityException(
+                            "Current user has not permession to esecute patch peration on " + metadataField);
+                }
+            }
             if (index == null) {
                 // remove all metadata of this type
                 dsoService.clearMetadata(context, dso, metadataField.getMetadataSchema().getName(),

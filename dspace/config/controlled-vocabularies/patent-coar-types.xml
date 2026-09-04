@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML was automatically generated from the SKOS sources for the COAR Vocabulary. It follows the schema developed by 4Science (https://www.4science.it/) for DSpace -->
+<node id="http://purl.org/coar/resource_type/scheme" label="Resource Types">
+  <isComposedBy>
+    <node id="c_15cd" label="patent">
+      <hasNote>A set of exclusive rights granted by law to applicants for inventions that are
+new, non-obvious and commercially applicable. A patent is valid for a limited
+period (generally 20 years), during which time patent holders can commercially
+exploit their inventions on an exclusive basis. [Source: https://www.wipo.int/edocs/pubdocs/en/wipo_pub_943_2018.pdf]
+      </hasNote>
+      <isComposedBy>
+        <node id="SB3Y-W4EH" label="PCT application">
+          <hasNote>A patent application filed through the WIPO-administered Patent Cooperation Treaty (PCT), also known as an international application. [Source: Adapted from https://www.wipo.int/edocs/pubdocs/en/wipo_pub_943_2018.pdf]
+          </hasNote>
+        </node>
+        <node id="C53B-JCY5" label="design patent">
+          <hasNote>A patent granted to any person who has invented any new and non-obvious ornamental design for an article of manufacture. The design patent protects only the appearance of an article, but not its structural or functional features. [Source: Adapted from https://www.uspto.gov/patents/basics/types-patent-applications/design-patent-application-guide#def]
+          </hasNote>
+        </node>
+        <node id="Z907-YMBB" label="plant patent">
+          <hasNote>A patent granted to anyone who has invented or discovered and asexually reproduced any distinct and new variety of plant, including cultivated sports, mutants, hybrids, and newly found seedlings, other than a tuber-propagated plant or a plant found in an uncultivated state. [Source: Adapted from https://www.uspto.gov/patents/basics/types-patent-applications/general-information-about-35-usc-161#heading-1]
+          </hasNote>
+        </node>
+        <node id="GPQ7-G5VE" label="plant variety protection">
+          <hasNote>Plant variety protection, also called a "plant breeder's right" (PBR), is a form of intellectual property right granted to the breeder of a new plant variety . According to this right, certain acts concerning the exploitation of the protected variety require the prior authorization of the breeder. Plant variety protection is an independent sui generis form of protection, tailored to protect new plant varieties and has certain features in common with other intellectual property rights. [Source: https://www.wipo.int/edocs/pubdocs/en/wipo_pub_943_2018.pdf]
+          </hasNote>
+        </node>
+        <node id="MW8G-3CR8" label="software patent">
+          <hasNote>In order to obtain a patent, a software invention must not fall under other non-patentable subject matter (for example, abstract ideas or mathematical theories) and has to fulfill the other substantive patentability criteria (for example, novelty, inventive step [non-obviousness] and industrial applicability [usefulness]). [Source: https://www.wipo.int/patents/en/faq_patents.html]
+          </hasNote>
+        </node>
+        <node id="9DKX-KSAF" label="utility model">
+          <hasNote>A special form of patent right granted by a state or jurisdiction to an inventor or the inventor’s assignee for a fixed period of time. The terms and conditions for granting a utility model are slightly different from those for normal patents (including a shorter term of protection and less stringent patentability requirements). The term can also describe what are known in certain countries as “petty patents,” “short-term patents” or “innovation patents.” [Source: https://www.wipo.int/edocs/pubdocs/en/wipo_pub_943_2018.pdf]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+  </isComposedBy>
+</node>

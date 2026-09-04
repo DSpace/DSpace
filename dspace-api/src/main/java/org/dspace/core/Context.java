@@ -986,6 +986,15 @@ public class Context implements AutoCloseable {
         dbConnection.uncacheEntity(entity);
     }
 
+    /**
+     * Force this session to flush.
+     *
+     * @throws SQLException passed through.
+     */
+    public void flush() throws SQLException {
+        dbConnection.flush();
+    }
+
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
         if (isReadOnly()) {
             return readOnlyCache.getCachedAuthorizationResult(dspaceObject, action, eperson);

@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.audit.MetadataEvent;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -42,6 +43,9 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
 
     @Autowired
     DSpaceObjectMetadataPatchUtils metadataPatchUtils;
+
+    @Autowired
+    private ItemConverter itemConverter;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -79,6 +83,12 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      */
     private void replace(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
                          MetadataValueRest metadataValue, String index, String propertyOfMd, String valueMdProperty) {
+        if (dso instanceof Item) {
+            if (!itemConverter.checkMetadataFieldVisibility(context, (Item) dso, metadataField)) {
+                throw new UnprocessableEntityException(
+                    "Current user has not permession to esecute patch peration on " + metadataField);
+            }
+        }
         // replace entire set of metadata
         if (metadataField == null) {
             this.replaceAllMetadata(context, dso, dsoService);
