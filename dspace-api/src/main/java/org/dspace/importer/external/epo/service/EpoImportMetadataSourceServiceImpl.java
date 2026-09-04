@@ -282,6 +282,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             this.bearer = bearer;
         }
 
+        @Override
         public Integer call() throws Exception {
             return countDocument(bearer, query);
         }
@@ -303,6 +304,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             this.bearer = bearer;
         }
 
+        @Override
         public List<ImportRecord> call() throws Exception {
             int positionToSplit = id.indexOf(":");
             String docType = EpoDocumentId.EPODOC;

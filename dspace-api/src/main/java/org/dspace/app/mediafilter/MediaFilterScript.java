@@ -64,11 +64,13 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private Map<String, List<String>> filterFormats = new HashMap<>();
     private LocalDate fromDate = null;
 
+    @Override
     public MediaFilterScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
                            .getServiceByName("filter-media", MediaFilterScriptConfiguration.class);
     }
 
+    @Override
     public void setup() throws ParseException {
 
         // set headless for non-gui workstations
@@ -122,6 +124,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
     }
 
+    @Override
     public void internalRun() throws Exception {
         if (help) {
             printHelp();

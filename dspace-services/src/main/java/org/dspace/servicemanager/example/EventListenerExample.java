@@ -29,6 +29,7 @@ public final class EventListenerExample implements EventListener {
     /**
      * @return null
      */
+    @Override
     public String[] getEventNamePrefixes() {
         return null;
     }
@@ -36,10 +37,12 @@ public final class EventListenerExample implements EventListener {
     /**
      * @return null
      */
+    @Override
     public String getResourcePrefix() {
         return null;
     }
 
+    @Override
     public void receiveEvent(Event event) {
         log.info(event.toString());
     }

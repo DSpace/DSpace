@@ -49,6 +49,7 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
      * @param jsonNode a JsonNode containing the JSON Patch
      * @return a {@link Patch}
      */
+    @Override
     public Patch convert(JsonNode jsonNode) {
 
         if (!(jsonNode instanceof ArrayNode)) {
@@ -95,6 +96,7 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
      * @param patch the patch
      * @return a {@link JsonNode} containing JSON Patch.
      */
+    @Override
     public JsonNode convert(Patch patch) {
 
         List<Operation> operations = patch.getOperations();

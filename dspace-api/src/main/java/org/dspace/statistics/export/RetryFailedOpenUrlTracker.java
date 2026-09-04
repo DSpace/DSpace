@@ -33,6 +33,7 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrl
      *
      * @throws Exception
      */
+    @Override
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
@@ -53,6 +54,7 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrl
         context.complete();
     }
 
+    @Override
     public RetryFailedOpenUrlTrackerScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager().getServiceByName("retry-tracker",
                                                                  RetryFailedOpenUrlTrackerScriptConfiguration.class);
@@ -63,6 +65,7 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrl
      *
      * @throws ParseException
      */
+    @Override
     public void setup() throws ParseException {
         openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
 

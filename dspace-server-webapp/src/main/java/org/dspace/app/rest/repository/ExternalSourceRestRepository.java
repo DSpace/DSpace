@@ -119,6 +119,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
         return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
     }
 
+    @Override
     public Class<ExternalSourceRest> getDomainClass() {
         return ExternalSourceRest.class;
     }

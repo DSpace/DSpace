@@ -48,6 +48,7 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
         this.mandatory = mandatory;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }

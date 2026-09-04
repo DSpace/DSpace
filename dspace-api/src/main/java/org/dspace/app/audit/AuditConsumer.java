@@ -30,6 +30,7 @@ public class AuditConsumer implements Consumer {
     private List<Integer> meaningfulEvents;
 
 
+    @Override
     public void initialize() throws Exception {
         auditService = AuditServiceFactory.getInstance().getAuditService();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();

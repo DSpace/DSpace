@@ -12,6 +12,7 @@ import org.apache.commons.cli.Options;
 
 public class HarvestCliScriptConfiguration extends HarvestScriptConfiguration {
 
+    @Override
     public Options getOptions() {
         Options options = super.getOptions();
         options.addOption("e", "eperson", true,

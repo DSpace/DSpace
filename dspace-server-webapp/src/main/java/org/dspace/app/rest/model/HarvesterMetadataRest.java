@@ -34,11 +34,13 @@ public class HarvesterMetadataRest extends BaseObjectRest {
     }
 
     @JsonIgnore
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
     @JsonIgnore
+    @Override
     public String getType() {
         return NAME;
     }
@@ -52,6 +54,7 @@ public class HarvesterMetadataRest extends BaseObjectRest {
     }
 
 
+    @Override
     public Class getController() {
         return HarvesterMetadataController.class;
     }
