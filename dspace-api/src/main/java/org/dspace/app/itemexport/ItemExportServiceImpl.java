@@ -11,18 +11,19 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -61,6 +63,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
+import org.dspace.storage.secure.SecureFileAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -115,11 +118,33 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     }
 
+    /**
+     * Get the configured list of allowed base directories for item export.
+     * @return list of absolute allowed base paths, or null
+     */
+    protected List<String> getAllowedExportBaseDirs() {
+        String[] configured =
+            configurationService.getArrayProperty("org.dspace.app.itemexport.allowed.dir");
+        if (configured == null || configured.length == 0) {
+            return null;
+        }
+        return Arrays.stream(configured)
+                     .map(String::trim)
+                     .collect(Collectors.toList());
+    }
 
     @Override
     public void exportItem(Context c, Iterator<Item> i,
                            String destDirName, int seqStart, boolean migrate,
                            boolean excludeBitstreams) throws Exception {
+        // Validate dest dir argument against a base path, if configured
+        // (otherwise trust user input)
+        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
+        if (allowedBaseDirs != null) {
+            destDirName = SecureFileAccess.validatePathForWrite(
+                destDirName, allowedBaseDirs, "itemexport").toString();
+        }
+
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
         int subDirSuffix = 0;
@@ -232,13 +257,11 @@ public class ItemExportServiceImpl implements ItemExportService {
             filename = "metadata_" + schema + ".xml";
         }
 
-        File outFile = new File(destDir, filename);
+        logInfo("Attempting to create metadata file " + filename + " in " + destDir);
 
-        logInfo("Attempting to create file " + outFile);
-
-        if (outFile.createNewFile()) {
-            BufferedOutputStream out = new BufferedOutputStream(
-                new FileOutputStream(outFile));
+        try (BufferedOutputStream out = new BufferedOutputStream(SecureFileAccess.getOutputStream(
+                new File(destDir, filename).getPath(),
+                List.of(destDir.getPath()), "itemexport"))) {
 
             List<MetadataValue> dcorevalues = itemService.getMetadata(i, schema, Item.ANY, Item.ANY,
                                                                       Item.ANY);
@@ -315,10 +338,8 @@ public class ItemExportServiceImpl implements ItemExportService {
 
             utf8 = "</dublin_core>\n".getBytes("UTF-8");
             out.write(utf8, 0, utf8.length);
-
-            out.close();
-        } else {
-            throw new Exception("Cannot create dublin_core.xml in " + destDir);
+        } catch (IOException e) {
+            throw new IOException("Cannot create " + filename + " in " + destDir, e);
         }
     }
 
@@ -337,18 +358,10 @@ public class ItemExportServiceImpl implements ItemExportService {
         }
         String filename = "handle";
 
-        File outFile = new File(destDir, filename);
-
-        if (outFile.createNewFile()) {
-            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
-
+        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
+                new File(destDir, filename).getPath(),
+                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
             out.println(i.getHandle());
-
-            // close the contents file
-            out.close();
-        } else {
-            throw new Exception("Cannot create file " + filename + " in "
-                                    + destDir);
         }
     }
 
@@ -362,22 +375,19 @@ public class ItemExportServiceImpl implements ItemExportService {
      */
     protected void writeCollections(Item item, File destDir)
             throws IOException {
-        File outFile = new File(destDir, "collections");
-        if (outFile.createNewFile()) {
-            try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-                Collection owningCollection = item.getOwningCollection();
-                // The owning collection is null for workspace and workflow items
-                if (owningCollection != null) {
-                    out.println(owningCollection.getHandle());
-                }
-                for (Collection collection : item.getCollections()) {
-                    if (!collection.equals(owningCollection)) {
-                        out.println(collection.getHandle());
-                    }
+        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
+                new File(destDir, "collections").getPath(),
+                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
+            Collection owningCollection = item.getOwningCollection();
+            // The owning collection is null for workspace and workflow items
+            if (owningCollection != null) {
+                out.println(owningCollection.getHandle());
+            }
+            for (Collection collection : item.getCollections()) {
+                if (!collection.equals(owningCollection)) {
+                    out.println(collection.getHandle());
                 }
             }
-        } else {
-            throw new IOException("Cannot create 'collections' in " + destDir);
         }
     }
 
@@ -396,10 +406,9 @@ public class ItemExportServiceImpl implements ItemExportService {
      */
     protected void writeBitstreams(Context c, Item i, File destDir,
                                    boolean excludeBitstreams) throws Exception {
-        File outFile = new File(destDir, "contents");
-
-        if (outFile.createNewFile()) {
-            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
+        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
+                new File(destDir, "contents").getPath(),
+                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
 
             List<Bundle> bundles = i.getBundles();
 
@@ -431,33 +440,26 @@ public class ItemExportServiceImpl implements ItemExportService {
                     // written
 
                     while (!excludeBitstreams && !isDone) {
-                        if (myName.contains(File.separator)) {
-                            String dirs = myName.substring(0, myName
-                                .lastIndexOf(File.separator));
-                            File fdirs = new File(destDir + File.separator
-                                                      + dirs);
-                            if (!fdirs.exists() && !fdirs.mkdirs()) {
-                                logError("Unable to create destination directory");
-                            }
+                        File fout = SecureFileAccess.validatePathForWrite(
+                            new File(destDir, myName).getPath(),
+                            List.of(destDir.getPath()), "itemexport").toFile();
+                        // Allow nested dirs in file name but still validate to parent file dir
+                        File parentDir = fout.getParentFile();
+                        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
+                            logError("Unable to create destination directory");
                         }
 
-                        File fout = new File(destDir, myName);
-
-                        if (fout.createNewFile()) {
-                            InputStream is = bitstreamService.retrieve(c, bitstream);
-                            FileOutputStream fos = new FileOutputStream(fout);
-                            Utils.bufferedCopy(is, fos);
-                            // close streams
-                            is.close();
-                            fos.close();
-
+                        // Filename collision detection.
+                        if (!Files.exists(fout.toPath())) {
+                            try (InputStream is = bitstreamService.retrieve(c, bitstream);
+                                 OutputStream fos = SecureFileAccess.getOutputStream(
+                                     fout.getPath(), List.of(destDir.getPath()), "itemexport")) {
+                                Utils.bufferedCopy(is, fos);
+                            }
                             isDone = true;
                         } else {
-                            myName = myPrefix + "_" + oldName; // keep
-                            // appending
-                            // numbers to the
-                            // filename until
-                            // unique
+                            myName = myPrefix + "_" + oldName;
+                            // keep appending numbers to the filename until unique
                             myPrefix++;
                         }
                     }
@@ -475,11 +477,6 @@ public class ItemExportServiceImpl implements ItemExportService {
 
                 }
             }
-
-            // close the contents file
-            out.close();
-        } else {
-            throw new Exception("Cannot create contents in " + destDir);
         }
     }
 
