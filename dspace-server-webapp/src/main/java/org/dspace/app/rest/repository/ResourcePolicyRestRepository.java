@@ -230,6 +230,37 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection());
     }
 
+    /**
+     * Find the resource policies matching embargo date presence criteria
+     *
+     * @param hasStartDate optional, filter for start date presence
+     * @param hasEndDate   optional, filter for end date presence
+     * @param pageable     contains the pagination information
+     * @return a Page of ResourcePolicyRest instances matching the embargo criteria
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "embargo")
+    public Page<ResourcePolicyRest> findByDate(
+            @Parameter(value = "hasStartDate", required = false) Boolean hasStartDate,
+            @Parameter(value = "hasEndDate", required = false) Boolean hasEndDate,
+            Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+
+            List<ResourcePolicy> policies;
+            int total;
+
+            policies = resourcePolicyService.findByDate(context, hasStartDate, hasEndDate,
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getPageSize()));
+            total = resourcePolicyService.countByDate(context, hasStartDate, hasEndDate);
+            return converter.toRestPage(policies, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException("Database error while searching embargo policies: " + e.getMessage(), e);
+        }
+    }
+
     @Override
     @PreAuthorize("isAuthenticated()")
     protected ResourcePolicyRest createAndReturn(Context context) throws AuthorizeException, SQLException {

@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
@@ -4163,4 +4164,152 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(status().isUnprocessableEntity());
     }
 
+    /**
+     * Setups test data for embargo policy tests including:
+     * - Community, Collection, and Item
+     * - ResourcePolicies with different date combinations
+     * - Predefined start and end dates for consistency
+     *
+     * @throws Exception if test data creation fails
+     */
+    private void setupEmbargoTestData() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        try {
+            // Create test hierarchy
+            Community community = CommunityBuilder.createCommunity(context)
+                    .withName("Test Community").build();
+            Collection collection = CollectionBuilder.createCollection(context, community)
+                    .withName("Test Collection").build();
+            Item item = ItemBuilder.createItem(context, collection)
+                    .withTitle("Item with Embargo").build();
+
+            // Create consistent embargo dates
+            LocalDate embargoStartLocalDate = LocalDate.of(2019, 10, 31);
+            LocalDate embargoEndLocalDate = LocalDate.of(2200, 10, 31);
+
+            // Create ResourcePolicies with different date combinations
+            ResourcePolicy rpWithStartDate = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
+                    .withAction(Constants.READ)
+                    .withDspaceObject(item)
+                    .withStartDate(embargoStartLocalDate)
+                    .build();
+
+            ResourcePolicy rpWithEndDate = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
+                    .withAction(Constants.READ)
+                    .withDspaceObject(item)
+                    .withEndDate(embargoEndLocalDate)
+                    .build();
+
+            ResourcePolicy rpWithEndDate2 = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
+                    .withAction(Constants.READ)
+                    .withDspaceObject(item)
+                    .withEndDate(embargoEndLocalDate)
+                    .build();
+
+            ResourcePolicy rpWithBothDates = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
+                    .withAction(Constants.READ)
+                    .withDspaceObject(item)
+                    .withStartDate(embargoStartLocalDate)
+                    .withEndDate(embargoEndLocalDate)
+                    .build();
+
+            ResourcePolicy rpWithoutDates = ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
+                    .withAction(Constants.READ)
+                    .withDspaceObject(item)
+                    .build();
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    @Test
+    public void findEmbargoForbiddenForNonAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson eperson = EPersonBuilder.createEPerson(context)
+            .withEmail("nonAdmin@mail.com")
+            .withPassword(password)
+            .build();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(get("/api/authz/resourcepolicies/search/embargo"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findEmbargoWithStartDate() throws Exception {
+        // Baseline count
+        int baselineCount = this.resourcePolicyService.countByDate(context, true, null);
+
+        setupEmbargoTestData();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken)
+                .perform(get("/api/authz/resourcepolicies/search/embargo?hasStartDate=true"))
+                .andExpect(jsonPath("$.page.totalElements", is(baselineCount + 2)));
+                // rpWithStartDate + rpWithBothDates
+    }
+
+    @Test
+    public void findEmbargoWithEndDate() throws Exception {
+        // Baseline count
+        int baselineCount = this.resourcePolicyService.countByDate(context, null, true);
+
+        setupEmbargoTestData();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken)
+                .perform(get("/api/authz/resourcepolicies/search/embargo?hasEndDate=true"))
+                .andExpect(jsonPath("$.page.totalElements", is(baselineCount + 3)));
+                // rpWithEndDate + rpWithEndDate2 + rpWithBothDates
+    }
+
+    @Test
+    public void findEmbargoWithoutDates() throws Exception {
+        // Baseline count
+        int baselineCount = this.resourcePolicyService.countByDate(context, false, false);
+
+        setupEmbargoTestData();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken)
+                .perform(get("/api/authz/resourcepolicies/search/embargo?hasStartDate=false&hasEndDate=false"))
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(baselineCount + 1)));
+                // rpWithoutDates
+    }
+
+    @Test
+    public void findEmbargoWithAnyDate() throws Exception {
+        // Baseline count
+        int baselineCount = this.resourcePolicyService.countByDate(context, null, null);
+
+        setupEmbargoTestData();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken)
+                .perform(get("/api/authz/resourcepolicies/search/embargo"))
+                .andExpect(jsonPath("$.page.totalElements", is(baselineCount + 4)));
+                // All our rps except rpWithoutDates
+    }
+
+    @Test
+    public void findEmbargoWithBothDates() throws Exception {
+        // Baseline count
+        int baselineCount = this.resourcePolicyService.countByDate(context, true, true);
+
+        setupEmbargoTestData();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken)
+                .perform(get("/api/authz/resourcepolicies/search/embargo?hasStartDate=true&hasEndDate=true"))
+                .andExpect(jsonPath("$.page.totalElements", is(baselineCount + 1)));
+                // rpWithBothDates
+    }
 }
