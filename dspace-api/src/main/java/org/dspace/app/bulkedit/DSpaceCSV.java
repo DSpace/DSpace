@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.dspace.app.util.MetadataExposureServiceImpl;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -39,6 +38,7 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
@@ -362,9 +362,9 @@ public class DSpaceCSV implements Serializable {
                 .getBooleanProperty("bulkedit.ignore-on-export.include-metadata-hide", true);
         if (ignoreHiddenMetadata) {
             List<String> hiddenMetadata = DSpaceServicesFactory.getInstance().getConfigurationService()
-                    .getPropertyKeys(MetadataExposureServiceImpl.CONFIG_PREFIX);
+                    .getPropertyKeys(MetadataSecurityService.LEGACY_HIDE_PREFIX);
             for (String hiddenMetadataKey : hiddenMetadata) {
-                String key = hiddenMetadataKey.split(MetadataExposureServiceImpl.CONFIG_PREFIX)[1];
+                String key = hiddenMetadataKey.substring(MetadataSecurityService.LEGACY_HIDE_PREFIX.length());
                 ignore.put(key.trim(), key.trim());
             }
         }
