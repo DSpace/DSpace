@@ -28,9 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -41,6 +43,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import jakarta.mail.Message;
+import jakarta.mail.Transport;
 import jakarta.servlet.http.Cookie;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -51,6 +55,7 @@ import org.dspace.app.rest.repository.RequestItemRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -65,6 +70,9 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -106,9 +114,12 @@ public class RequestItemRepositoryIT
 
     private Map<String, Object> altchaPayload;
 
+    private static MockedStatic<Transport> transportMock;
+
     @After
     public void tearDown() {
         configurationService.setProperty("captcha.provider", "google");
+        transportMock.close();
     }
 
     @Before
@@ -131,9 +142,11 @@ public class RequestItemRepositoryIT
         item = ItemBuilder
                 .createItem(context, collection)
                 .withTitle("Item")
+                .inArchive()
                 .build();
 
-        InputStream is = new ByteArrayInputStream(new byte[0]);
+        String content = "RequestItemRepositoryIT test content";
+        InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         bitstream = BitstreamBuilder
                 .createBitstream(context, item, is)
                 .withName("Bitstream")
@@ -152,6 +165,9 @@ public class RequestItemRepositoryIT
         configurationService.setProperty("altcha.hmac.key", "onetwothreesecret");
 
         context.restoreAuthSystemState();
+
+        transportMock = Mockito.mockStatic(Transport.class);
+        transportMock.when(() -> Transport.send(Mockito.any(Message.class))).thenAnswer(inv -> null);
     }
 
     /**
@@ -404,6 +420,269 @@ public class RequestItemRepositoryIT
                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void testCreateAndReturnWithInvalidBitstreamId() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId("1".repeat(33));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidItemId() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId("2".repeat(33));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidEmailAddress() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(65 - hostPart.length()) + hostPart);
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidRequesterMessage() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(64 - hostPart.length()) + hostPart);
+        rir.setRequestMessage("m".repeat(1001));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithInvalidRequesterName() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(64 - hostPart.length()) + hostPart);
+        rir.setRequestMessage("m".repeat(1000));
+        rir.setRequestName("n".repeat(65));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithValidMaximumPayload() throws Exception {
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        String hostPart = "@example.org";
+        rir.setRequestEmail("e".repeat(64 - hostPart.length()) + hostPart);
+        rir.setRequestMessage("m".repeat(1000));
+        rir.setRequestName("n".repeat(64));
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testCreateAndReturnWithNotArchivedItemId() throws Exception {
+        item = ItemBuilder
+                .createItem(context, collection)
+                .build();
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithWithdrawnItemId() throws Exception {
+        item = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .withdrawn()
+                .build();
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithBitstreamNotInOriginalBundle() throws Exception {
+        String content = "RequestItemRepositoryIT test content";
+        InputStream is = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        bitstream = BitstreamBuilder
+                .createBitstream(context, item, is, "TEXT")
+                .withName("Bitstream")
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithPublicBitstream() throws Exception {
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithEmbargoedBitstream() throws Exception {
+        bitstream = BitstreamBuilder
+                .createBitstream(context, item,
+                        new ByteArrayInputStream("Embargoed content".getBytes(StandardCharsets.UTF_8)))
+                .withName("Embargoed Bitstream")
+                .withEmbargoPeriod(Period.ofYears(1))
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        rir.setRequestEmail("doe@example.org");
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testCreateAndReturnWithBitstreamNotInOriginalBundleOfItem() throws Exception {
+        Item anotherItem = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, anotherItem, bitstream)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(anotherItem.getID().toString());
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithAllItemsAndItemWithoutOriginalBundle() throws Exception {
+        Item anotherItem = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, anotherItem, bitstream)
+                .withAllFiles(true)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setItemId(anotherItem.getID().toString());
+        rir.setAllfiles(true);
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testCreateAndReturnWithAllItemsAndItemWithEmptyOriginalBundle() throws Exception {
+        Item anotherItem = ItemBuilder
+                .createItem(context, collection)
+                .inArchive()
+                .build();
+        BundleBuilder.createBundle(context, anotherItem)
+                .withName("ORIGINAL")
+                .build();
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, anotherItem, bitstream)
+                .withAllFiles(true)
+                .build();
+
+        RequestItemRest rir = new RequestItemRest();
+        rir.setToken(request.getToken());
+        rir.setItemId(anotherItem.getID().toString());
+        rir.setAllfiles(true);
+        getClient()
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
     /**
      * Verify that Spring Security's CSRF protection is working as we expect.
      * We must test this using a simple non-GET request, as CSRF Tokens are not
@@ -454,10 +733,7 @@ public class RequestItemRepositoryIT
     }
 
     @Test
-    public void testDelete()
-            throws Exception {
-        System.out.println("delete");
-
+    public void testDelete() throws Exception {
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
@@ -471,9 +747,7 @@ public class RequestItemRepositoryIT
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testUntrustedOrigin()
-            throws Exception {
-        System.out.println("testUntrustedOrigin");
+    public void testUntrustedOrigin() throws Exception {
 
         // First, get a valid login token
         String token = getAuthToken(eperson.getEmail(), password);
@@ -503,10 +777,7 @@ public class RequestItemRepositoryIT
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testPut()
-            throws Exception {
-        System.out.println("put");
-
+    public void testPut() throws Exception {
         // Create an item request to approve.
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -542,9 +813,7 @@ public class RequestItemRepositoryIT
     }
 
     @Test
-    public void testPutUnauthenticated()
-            throws Exception {
-        System.out.println("put unauthenticated request");
+    public void testPutUnauthenticated() throws Exception {
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
@@ -576,7 +845,6 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
-        String authToken;
         Map<String, String> parameters;
         String content;
 
@@ -587,8 +855,7 @@ public class RequestItemRepositoryIT
                 "subject", "subject",
                 "responseMessage", "Request accepted");
         content = mapperWriter.writeValueAsString(parameters);
-        authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isUnprocessableEntity());
@@ -611,11 +878,136 @@ public class RequestItemRepositoryIT
                 "responseMessage", "Request accepted");
         ObjectWriter mapperWriter = mapper.writer();
         String content = mapperWriter.writeValueAsString(parameters);
-        String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testPutWithoutToken() throws Exception {
+        getClient().perform(put(URI_ROOT + '/')
+                .contentType(contentType))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithoutTokenAndMissingContentType() throws Exception {
+        getClient().perform(put(URI_ROOT + '/'))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithInvalidFormatToken() throws Exception {
+        getClient().perform(put(URI_ROOT + "/invalid-token-format")
+                .contentType(contentType))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithInvalidFormatTokenAndMissingContentType() throws Exception {
+        getClient().perform(put(URI_ROOT + "/invalid-token-format"))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithTokenUUID() throws Exception {
+        // passing UUIDs is not supported
+        getClient().perform(put(URI_ROOT + "/" + "1".repeat(8) + "-1111-1111-1111-" + "1".repeat(12))
+                .contentType(contentType)
+                .content("{}"))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void testPutWithTokenUUIDWithoutJsonPayload() throws Exception {
+        // passing UUIDs is not supported, but we should return a 500 error rather than a 405 error
+        getClient().perform(put(URI_ROOT + "/" + "1".repeat(8) + "-1111-1111-1111-" + "1".repeat(12)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPutWithUnknownTokenHex32() throws Exception {
+        getClient().perform(put(URI_ROOT + "/" + "f".repeat(32)) // maximum token length is 32 hex characters
+                .contentType(contentType)
+                .content("{}"))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testPutWithUnknownTokenHex32AndMissingContent() throws Exception {
+        getClient().perform(put(URI_ROOT + "/" + "f".repeat(32)) // maximum token length is 32 hex characters
+                .contentType(contentType))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPutWithUnknownTokenInteger() throws Exception {
+        getClient().perform(put(URI_ROOT + "/1234567890")
+                .contentType(contentType)
+                .content("{}"))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void testPutWithTooLongToken() throws Exception {
+        getClient().perform(put(URI_ROOT + "/" + "a".repeat(33)) // maximum token length is 32 hex characters
+                .contentType(contentType))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testPutWithLongSubjectAndResponseMessage() throws Exception {
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        Map<String, String> parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "s".repeat(200), // maximum subject length is 200 characters
+                "responseMessage", "m".repeat(1000), // maximum responseMessage length is 1000 characters
+                "suggestOpenAccess", "true");
+        String content = mapper
+                .writer()
+                .writeValueAsString(parameters);
+
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testPutWithTooLongSubjectAndTooLongResponseMessage() throws Exception {
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .withAccessToken("12345")
+                .build();
+
+        ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
+        transportMock.when(() -> Transport.send(messageCaptor.capture())).thenAnswer(inv -> null);
+
+        Map<String, String> parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "s".repeat(201), // maximum subject length is 200 characters
+                "responseMessage", "m".repeat(1001), // maximum responseMessage length is 1000 characters
+                "suggestOpenAccess", "false");
+        String content = mapper
+                .writer()
+                .writeValueAsString(parameters);
+
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isOk());
+
+        Message message = messageCaptor.getValue();
+
+        assertEquals(200, message.getSubject().length());
+
+        String messageBody = message.getContent().toString();
+        assertTrue(messageBody.contains("m".repeat(1000)));
+        assertFalse(messageBody.contains("m".repeat(1001)));
     }
 
     /**
@@ -706,4 +1098,61 @@ public class RequestItemRepositoryIT
         Iterator<RequestItem> randomResults = requestItemService.findByBitstreamId(context, UUID.randomUUID());
         assertFalse("Should find no request items for nonexistent bitstream", randomResults.hasNext());
     }
+
+    @Test
+    public void testFindOneWithMissingToken() throws Exception {
+        final String uri = URI_ROOT + "/";
+        getClient().perform(get(uri))
+                   .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testFindOneWithEmptyToken() throws Exception {
+        final String uri = URI_ROOT + "/  ";
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFindOneWithTooLongToken() throws Exception {
+        final String uri = URI_ROOT + '/' + "t".repeat(49); // maximum token length is 48 characters
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFindOneWithInvalidToken() throws Exception {
+        final String uri = URI_ROOT + "/foo";
+        getClient().perform(get(uri))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithMissingToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken";
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithEmptyToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=  ";
+        getClient().perform(get(uri))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithTooLongToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=" + "t".repeat(49); // max token length is 48
+        getClient().perform(get(uri))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFindByAccessTokenWithInvalidToken() throws Exception {
+        final String uri = URI_ROOT + "/search/byAccessToken?accessToken=foo";
+        getClient().perform(get(uri))
+                   .andExpect(status().isNotFound());
+    }
+
 }
