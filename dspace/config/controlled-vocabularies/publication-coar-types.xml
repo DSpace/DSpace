@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML was automatically generated from the SKOS sources for the COAR Vocabulary. It follows the schema developed by 4Science (https://www.4science.it/) for DSpace -->
+<node id="http://purl.org/coar/resource_type/scheme" label="Resource Types">
+  <isComposedBy>
+    <node id="c_18cf" label="text">
+      <hasNote>A resource consisting primarily of words for reading. Examples include books, letters, dissertations, poems, newspapers, articles, archives of mailing lists. Note that facsimiles or images of texts are still of the genre Text. [Source: http://purl.org/dc/dcmitype/Text]
+      </hasNote>
+      <isComposedBy>
+        <node id="c_1162" label="annotation">
+          <hasNote>An annotation in the sense of a legal note is a legally explanatory comment on a decision handed down by a court or arbitral tribunal. [Source: DRIVER info:eu-repo definition]
+          </hasNote>
+        </node>
+        <node id="c_86bc" label="bibliography">
+          <hasNote>A list of the books and articles that have been used by someone when writing a particular book or article [Source: https://dictionary.cambridge.org/dictionary/english/bibliography]
+          </hasNote>
+        </node>
+        <node id="c_6947" label="blog post">
+          <hasNote>A piece of writing or other item of content published on a blog. [Source: https://www.lexico.com/definition/blog_post]
+          </hasNote>
+        </node>
+        <node id="c_2f33" label="book">
+          <hasNote>A non-serial publication that is complete in one volume or a designated finite number of volumes. [Source: Adapted from http://purl.org/eprint/type/Book]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_3248" label="book part">
+              <hasNote>A defined chapter or section of a book, usually with a separate title or number. [Source: http://purl.org/spar/fabio/BookChapter]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_c94f" label="conference output">
+          <hasNote>All kind of digital resources contributed to a conference, like conference presentation (slides), conference report, conference lecture, abstracts, demonstrations. For conference papers, posters or proceedings the specific sub-concepts should be used. [COAR definition]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_18cp" label="conference paper not in proceedings">
+              <hasNote>A paper, typically the realization of a research paper reporting original research findings. Use this label when the paper is not published in a proceeding. [Source: Adapted from http://purl.org/spar/fabio/ConferencePaper]
+              </hasNote>
+            </node>
+            <node id="c_18co" label="conference poster not in proceedings">
+              <hasNote>A display poster, typically containing text with illustrative figures and/or tables, usually reporting research results or proposing hypotheses, submitted for acceptance to and/or presented at a conference, seminar, symposium, workshop or similar event. Use this label when the poster is not published in a proceeding. [Source: http://purl.org/spar/fabio/ConferencePoster]
+              </hasNote>
+            </node>
+            <node id="R60J-J5BD" label="conference presentation">
+              <hasNote>A set of slides containing text, tables or figures, designed to communicate ideas or research results, for projection and viewing by an audience at a conference, symposium, seminar, lecture, workshop or other gatherings. [Source: Adapted from http://purl.org/spar/fabio/Presentation]
+              </hasNote>
+            </node>
+            <node id="c_f744" label="conference proceedings">
+              <hasNote>Conference proceedings is the official record of a conference meeting. It is a collection of documents which corresponds to the presentations given at the conference. It may include additional content. [Source: http://www.ieee.org/documents/confprocdefined.pdf ]
+              </hasNote>
+              <isComposedBy>
+                <node id="c_5794" label="conference paper">
+                  <hasNote>A paper, published within a conference proceeding, typically the realization of a research paper reporting original research findings. [Source: Adapted from http://purl.org/spar/fabio/ConferencePaper]
+                  </hasNote>
+                </node>
+                <node id="c_6670" label="conference poster">
+                  <hasNote>A display poster, published within a conference proceeding, typically containing text with illustrative figures and/or tables, usually reporting research results or proposing hypotheses, submitted for acceptance to and/or presented at a conference, seminar, symposium, workshop or similar event. [Source: Adapted http://purl.org/spar/fabio/ConferencePoster]
+                  </hasNote>
+                </node>
+              </isComposedBy>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_0640" label="journal">
+          <hasNote>A journal is a serial publication devoted to disseminating original research and current developments on a subject. (Adapted from ODLIS) [Source: http://dspacecris.eurocris.org/cris/classcerif/classcerif00422]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_b239" label="editorial">
+              <hasNote>A brief essay expressing the opinion or position of the chief editor(s) of a (academic) journal with respect to a current political, social, cultural, or professional issue. [Source: Adapted from ODLIS [Source: http://www.abc-clio.com/ODLIS/odlis_e.aspx ]
+              </hasNote>
+            </node>
+            <node id="c_6501" label="journal article">
+              <hasNote>An article, typically the realization of a research paper reporting original research findings, published in a journal issue. [Source: http://purl.org/spar/fabio/JournalArticle]
+              </hasNote>
+              <isComposedBy>
+                <node id="c_7acd" label="corrigendum">
+                  <hasNote>A formal correction to an error introduced by the author into a previously published document. (adapted from https://sparontologies.github.io/fabio/current/fabio.html#d4e2712)
+                  </hasNote>
+                </node>
+                <node id="c_beb9" label="data paper">
+                  <hasNote>A data paper is a scholarly publication describing a particular dataset or group of dataset, published in the form of a peer-reviewed article in a scholarly journal. The main purpose of a data paper is to describe data, the circumstances of their collection, and information related to data features, access and potential reuse. Adapted from https://en.wikipedia.org/wiki/Data_paper and http://www.gbif.org/publishing-data/data-papers
+                  </hasNote>
+                </node>
+                <node id="c_2df8fbb1" label="research article">
+                  <hasNote>A research article is a primary source, that is, it reports the methods and results of an original study performed by the authors. (adapted from http://apus.libanswers.com/faq/2324)
+                  </hasNote>
+                </node>
+                <node id="c_dcae04bc" label="review article">
+                  <hasNote>A review article is a secondary source, that is, it is written about other articles, and does not report original research of its own. [Source: Adapted from http://apus.libanswers.com/faq/2324]
+                  </hasNote>
+                </node>
+                <node id="c_7bab" label="software paper">
+                  <hasNote>A software paper should include the rationale for the development of the tool and details of the code used for its construction. [Source: Adapted from https://f1000research.com/for-authors/article-guidelines/software-tool-articles ]
+                  </hasNote>
+                </node>
+              </isComposedBy>
+            </node>
+            <node id="c_545b" label="letter to the editor">
+              <hasNote>A letter addressed to the editor and comments on or discussed an item previously published by that periodical, or of interest to its readership. [Source: Adapted from http://purl.org/spar/fabio/Letter]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_8544" label="lecture">
+          <hasNote>Transcription of an oral presentation/talk intended to present information or teach people about a particular subject, for example by a university or college teacher. [Source: Adopted from https://en.wikipedia.org/wiki/Lecture]
+          </hasNote>
+        </node>
+        <node id="c_0857" label="letter">
+          <hasNote>A brief description of important new research, also known as “communication”. [Source: https://cerif.eurocris.org/vocab/html/OutputTypes.html#Letter]
+          </hasNote>
+        </node>
+        <node id="c_2cd9" label="magazine">
+          <hasNote>A popular interest periodical usually containing articles on a variety of topics, written by various authors in a nonscholarly style or a trade publication, unlike a consumer publication, covers a specific topic for people who work in that particular field or industry. [Source: Adapted from https://www.thebalance.com/what-is-a-trade-publication-exactly-2316039 and http://www.abc-clio.com/ODLIS/odlis_m.aspx]
+          </hasNote>
+        </node>
+        <node id="c_0040" label="manuscript">
+          <hasNote>A manuscript is a work of any kind (text, inscription, music score, map, etc.) written entirely by hand. [Source: https://products.abc-clio.com/ODLIS/odlis_m.aspx]
+          </hasNote>
+        </node>
+        <node id="c_18cw" label="musical notation">
+          <hasNote>Symbols used to write music, as in a music score, and to express mathematical concepts.
+[Source: Adapted from https://products.abc-clio.com/ODLIS/odlis_n.aspx]
+          </hasNote>
+        </node>
+        <node id="c_2fe3" label="newspaper">
+          <hasNote>A non-peer reviewed periodical, usually published daily or weekly, consisting primarily of editorials and news items concerning current or recent events and matters of public interest. [Source: http://purl.org/spar/fabio/Newspaper]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_998f" label="newspaper article">
+              <hasNote>Work consisting of a news item appearing in a general-interest newspaper or other general news periodical, containing information of current and timely interest in a field. (Adapted from http://www.reference.md/files/D018/mD018431.html )
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="QX5C-AR31" label="other periodical">
+          <hasNote>A resource type that is not included in existing terms under the top concept "Text". [COAR definition]
+          </hasNote>
+        </node>
+        <node id="c_816b" label="preprint">
+          <hasNote>A preprint is a scientific manuscript without peer-review and has not yet been accepted by a journal, typicaly submitted to a public server/ repository by the author. [Source: Adapted from https://asapbio.org/preprint-info/preprint-faq#qaef-637]
+          </hasNote>
+        </node>
+        <node id="c_93fc" label="report">
+          <hasNote>A report is a separately published record of research findings, research still in progress, policy developments and events, or other technical findings, usually bearing a report number and sometimes a grant number assigned by the funding agency. Also, an official record of the activities of a committee or corporate entity, the proceedings of a government body, or an investigation by an agency, whether published or private, usually archived or submitted to a higher authority, voluntarily or under mandate. In a more general sense, any formal account of facts or information related to a specific event or phenomenon, sometimes given at regular intervals. [Source: http://lu.com/odlis/odlis_R.cfm#report ]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_7877" label="clinical study">
+              <hasNote>A work that reports on the results of a research study to evaluate interventions or exposures on biomedical or health-related outcomes. The two main types of clinical studies are interventional studies (clinical trials) and observational studies. While most clinical studies concern humans, this publication type may be used for clinical veterinary articles meeting the requisites for humans. [Source: https://www.ncbi.nlm.nih.gov/mesh/2009830]
+              </hasNote>
+            </node>
+            <node id="c_ab20" label="data management plan">
+              <hasNote>A formal statement describing how research data will be managed and documented throughout a research project and the terms regarding the subsequent deposit of the data with a data repository for long-term management and preservation. [Source: https://casrai.org/rdm-glossary]
+              </hasNote>
+            </node>
+            <node id="c_18wz" label="memorandum">
+              <hasNote>A formal note distributed internally to one or more persons in a company, agency, organization, or institution, with a header indicating the date it was sent and stating to whom it is addressed (To:), from whom it is sent (From:), and the subject of the text (Re:). Unlike a letter, a memo does not require a full salutation or signature at the end of the text--the sender may simply initial his or her name in the header. [Source: https://products.abc-clio.com/ODLIS/odlis_m.aspx#memorandum]
+              </hasNote>
+            </node>
+            <node id="c_186u" label="policy report">
+              <hasNote>A policy report presents what is known about a particular issue or problem. It assembles facts and evidence to help readers understand complex issues and form a response. It might aim to be neutral, or it might aim to persuade readers in a particular direction. [Source: https://www.uow.edu.au/student/learning-co-op/assessments/policy-report/#]
+              </hasNote>
+            </node>
+            <node id="c_18op" label="project deliverable">
+              <hasNote>A document containing a project report, intended to be delivered to a customer or funding agency describing the results achieved within a specific project. [Source: http://purl.org/spar/fabio/ProjectReportDocument]
+              </hasNote>
+            </node>
+            <node id="YZ1N-ZFT9" label="research protocol">
+              <hasNote>The protocol is a detailed plan of the research study including a project summary, project description covering the rationale, objectives, methodology, data management and analysis, ethical considerations, gender issues and references. [Source: Adapted from https://www.who.int/publications/i/item/a-practical-guide-for-health-researchers]
+              </hasNote>
+            </node>
+            <node id="c_18ws" label="research report">
+              <hasNote>It is publication that reports on the findings of a research project or alternatively scientific observations on or about a subject. [Source: Adapted from https://en.wikipedia.org/wiki/Research_report]
+              </hasNote>
+            </node>
+            <node id="c_18gh" label="technical report">
+              <hasNote>A document that describes the process, progress, or results of technical or scientific research or the state of a technical or scientific research problem. It might also include recommendations and conclusions of the research. [Source: http://guides.library.cornell.edu/ecommons/types]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_baaf" label="research proposal">
+          <hasNote>A research proposal is a document proposing a research project, generally in the sciences or academia, and generally constitutes a request for sponsorship of that research. [Source: https://en.wikipedia.org/wiki/Research_proposal]
+          </hasNote>
+        </node>
+        <node id="c_efa0" label="review">
+          <hasNote>A review of others' published work. [Source: Adapted from http://purl.org/spar/fabio/Review]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_ba08" label="book review">
+              <hasNote>A written review and critical analysis of the content, scope and quality of a book or other monographic work. [Source: http://purl.org/spar/fabio/BookReview]
+              </hasNote>
+            </node>
+            <node id="D97F-VB57" label="commentary">
+              <hasNote>A commentary is a more in-depth analysis written to draw attention to a work already published. Commentaries are somewhat like “reviews” in that the author presents his or her analysis of a work and why it  would be of interest to a specific audience. [Source: https://www.enago.com/academy/perspective-opinion-and-commentary-pieces]
+              </hasNote>
+            </node>
+            <node id="H9BQ-739P" label="peer review">
+              <hasNote>An evaluation of scientific, academic, or professional work by others working in the same field. [Source: Adopted from https://schema.datacite.org/meta/kernel-4.4/doc/DataCite-MetadataKernel_v4.4.pdf]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="c_71bd" label="technical documentation">
+          <hasNote>Technical documentation refers to any type of documentation that describes handling, functionality and architecture of a technical product or a product under development or use. [Source: https://en.wikipedia.org/wiki/Technical_documentation]
+          </hasNote>
+        </node>
+        <node id="c_46ec" label="thesis">
+          <hasNote>A book authored by a student containing a formal presentations of research outputs submitted for examination in completion of a course of study at an institution of higher education, to fulfil the requirements for an academic degree. Also know as a dissertation. [Source: http://purl.org/spar/fabio/Thesis]
+          </hasNote>
+          <isComposedBy>
+            <node id="c_7a1f" label="bachelor thesis">
+              <hasNote>A thesis reporting a research project undertaken as part of an undergraduate course of education leading to a bachelor's degree. [Source: http://purl.org/spar/fabio/BachelorsThesis]
+              </hasNote>
+            </node>
+            <node id="c_db06" label="doctoral thesis">
+              <hasNote>A thesis reporting the research undertaken during a period of graduate study leading to a doctoral degree. [Source: http://purl.org/spar/fabio/DoctoralThesis]
+              </hasNote>
+            </node>
+            <node id="c_bdcc" label="master thesis">
+              <hasNote>A thesis reporting a research project undertaken as part of a graduate course of education leading to a master's degree. [Source: http://purl.org/spar/fabio/MastersThesis]
+              </hasNote>
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="6NC7-GK9S" label="transcription">
+          <hasNote>A written record of words spoken in court proceedings or in a speech, interview, broadcast, or sound recording. [Source: Adapted from https://products.abc-clio.com/ODLIS/odlis_t.aspx]
+          </hasNote>
+        </node>
+        <node id="c_8042" label="working paper">
+          <hasNote>A working or discussion paper circulated publicly or among a group of peers. Certain disciplines, for example economics, issue working papers in series. [Source: http://www.ukoln.ac.uk/repositories/digirep/index/Eprints_Type_Vocabulary_Encoding_Scheme#:~:text=http%3A//purl.org/eprint/type/WorkingPaper]
+          </hasNote>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="c_1843" label="other">
+      <hasNote>A resource type that is not included in existing terms. [COAR definition]
+      </hasNote>
+    </node>
+  </isComposedBy>
+</node>
