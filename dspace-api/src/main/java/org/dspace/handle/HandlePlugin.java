@@ -25,6 +25,8 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.handleredirect.factory.HandleRedirectServiceFactory;
+import org.dspace.handleredirect.service.HandleRedirectService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.ConfigurationService;
@@ -61,6 +63,7 @@ public class HandlePlugin implements HandleStorage {
     /**
      * References to DSpace Services
      **/
+    protected HandleRedirectService handleRedirectService;
     protected HandleService handleService;
     protected ConfigurationService configurationService;
 
@@ -104,6 +107,7 @@ public class HandlePlugin implements HandleStorage {
         }
 
         // Get a reference to the HandleService & ConfigurationService
+        handleRedirectService = HandleRedirectServiceFactory.getInstance().getHandleRedirectService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
@@ -252,10 +256,15 @@ public class HandlePlugin implements HandleStorage {
 
             context = new Context();
 
-            String url = handleService.resolveToURL(context, handle);
+            // check if the handle should be redirected before solve
+            // it as DSpace handle
 
+            String url = handleRedirectService.resolveToURL(context, handle);
             if (url == null) {
-                return null;
+                url = handleService.resolveToURL(context, handle);
+                if (url == null) {
+                    return null;
+                }
             }
 
             HandleValue value = new HandleValue();
