@@ -563,6 +563,176 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
         return mode;
     }
 
+    @Test
+    public void testHasAccessWithAllConfig() throws SQLException {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.ALL);
+
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, null, accessMode), is(true));
+    }
+
+    @Test
+    public void testHasAccessWithNoneConfig() throws SQLException {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.NONE);
+
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, null, accessMode), is(false));
+    }
+
+    @Test
+    public void testHasAccessWithAnonymousUser() throws SQLException {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .withDspaceObjectOwner("Owner", owner.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        assertThat(crisSecurityService.hasAccess(context, item, null,
+            buildAccessItemMode(CrisSecurity.ADMIN)), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, null,
+            buildAccessItemMode(CrisSecurity.ITEM_ADMIN)), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, null,
+            buildAccessItemMode(CrisSecurity.OWNER)), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, null,
+            buildAccessItemMode(CrisSecurity.SUBMITTER)), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, null,
+            buildAccessItemMode(CrisSecurity.SUBMITTER_GROUP)), is(false));
+
+        AccessItemMode groupMode = buildAccessItemMode(CrisSecurity.GROUP);
+        when(groupMode.getGroups()).thenReturn(List.of("Group 1"));
+        assertThat(crisSecurityService.hasAccess(context, item, null, groupMode), is(false));
+
+        AccessItemMode customMode = buildAccessItemMode(CrisSecurity.CUSTOM);
+        when(customMode.getUserMetadataFields()).thenReturn(List.of("dc.contributor.author"));
+        when(customMode.getGroupMetadataFields()).thenReturn(List.of("dspace.policy.group"));
+        when(customMode.getItemMetadataFields()).thenReturn(List.of("dc.contributor.author"));
+        assertThat(crisSecurityService.hasAccess(context, item, null, customMode), is(false));
+    }
+
+    @Test
+    public void testHasAccessWithCustomConfigAndAdditionalFilter() throws Exception {
+
+        choiceAuthorityService.getChoiceAuthoritiesNames();
+        pluginService.clearNamedPluginClasses();
+
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.EPersonAuthority = EPersonAuthority"
+                                         });
+        configurationService.setProperty("choices.plugin.dspace.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("choices.presentation.dspace.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.eperson", "true");
+
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson authorizedUser = EPersonBuilder.createEPerson(context)
+            .withEmail("authorized@mail.it")
+            .build();
+
+        Item accessibleItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Accessible item")
+            .withPolicyEPerson("Authorized", authorizedUser.getID().toString())
+            .build();
+
+        Item blockedItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Blocked item")
+            .withPolicyEPerson("Authorized", authorizedUser.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.CUSTOM);
+        when(accessMode.getUserMetadataFields()).thenReturn(List.of("dspace.policy.eperson"));
+        when(accessMode.getAdditionalFilter()).thenReturn(new Filter() {
+            @Override
+            public boolean getResult(Context context, Item item) throws LogicalStatementException {
+                return item.getName().equals("Accessible item");
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public void setBeanName(String s) {}
+        });
+
+        assertThat(crisSecurityService.hasAccess(context, accessibleItem, authorizedUser, accessMode),
+                   is(true));
+        assertThat(crisSecurityService.hasAccess(context, blockedItem, authorizedUser, accessMode),
+                   is(false));
+        assertThat(crisSecurityService.hasAccess(context, accessibleItem, eperson, accessMode),
+                   is(false));
+    }
+
+    @Test
+    public void testHasAccessWithGroupConfigAndNonExistentGroup() throws SQLException {
+
+        context.turnOffAuthorisationSystem();
+
+        Group existingGroup = GroupBuilder.createGroup(context)
+            .withName("Existing Group")
+            .build();
+
+        EPerson groupMember = EPersonBuilder.createEPerson(context)
+            .withEmail("member@mail.it")
+            .withGroupMembership(existingGroup)
+            .build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.GROUP);
+        when(accessMode.getGroups()).thenReturn(
+            List.of("Non Existent Group", "00000000-0000-0000-0000-000000000000"));
+        assertThat(crisSecurityService.hasAccess(context, item, groupMember, accessMode), is(false));
+
+        when(accessMode.getGroups()).thenReturn(
+            List.of("Non Existent Group", "Existing Group"));
+        assertThat(crisSecurityService.hasAccess(context, item, groupMember, accessMode), is(true));
+    }
+
     private CrisSecurityService getCrisSecurityService() {
         return new DSpace().getServiceManager().getApplicationContext().getBean(CrisSecurityService.class);
     }

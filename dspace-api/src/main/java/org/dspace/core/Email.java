@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -44,18 +43,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Builder representing an e-mail message.  The {@link send} method causes the
+ * Builder representing an e-mail message.  The {@link #send} method causes the
  * assembled message to be formatted and sent.
  * <p>
  * Typical use:
@@ -72,7 +69,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Apache Velocity</a>.  They may contain VTL directives and property
  * placeholders.
  * <p>
- * {@link addArgument(string)} adds a property to the {@code params} array
+ * {@link #addArgument(Object)} adds a property to the {@code params} array
  * in the Velocity context, which can be used to replace placeholder tokens
  * in the message.  These arguments are indexed by number in the order they were
  * added to the message.
@@ -80,9 +77,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * The DSpace configuration properties are also available to templates as the
  * array {@code config}, indexed by name.  Example:  {@code ${config.get('dspace.name')}}
  * <p>
- * Recipients and attachments may be added as needed.  See {@link addRecipient},
- * {@link addAttachment(File, String)}, and
- * {@link addAttachment(InputStream, String, String)}.
+ * Recipients and attachments may be added as needed.  See {@link #addRecipient},
+ * {@link #addAttachment(File, String)}, and
+ * {@link #addAttachment(InputStream, String, String)}.
  * <p>
  * Headers such as Subject may be supplied by the template, by defining them
  * using the VTL directive {@code #set()}.  Only headers named in the DSpace
@@ -125,8 +122,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * </pre>
  * <p>
  * There are two ways to load a message body.  One can create an instance of
- * {@link Email} and call {@link setContent} on it, passing the body as a String.  Or
- * one can use the static factory method {@link getEmail} to load a file by its
+ * {@link Email} and call {@link #setContent} on it, passing the body as a String.  Or
+ * one can use the static factory method {@link #getEmail} to load a file by its
  * complete filesystem path.  In either case the text will be loaded into a
  * Velocity template.
  *
@@ -180,18 +177,6 @@ public class Email {
 
     /** Velocity template settings. */
     private static final String RESOURCE_REPOSITORY_NAME = "Email";
-    private static final Properties VELOCITY_PROPERTIES = new Properties();
-    static {
-        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADERS, "string");
-        VELOCITY_PROPERTIES.put("resource.loader.string.description",
-                "Velocity StringResource loader");
-        VELOCITY_PROPERTIES.put("resource.loader.string.class",
-                StringResourceLoader.class.getName());
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.name",
-                RESOURCE_REPOSITORY_NAME);
-        VELOCITY_PROPERTIES.put("resource.loader.string.repository.static",
-                "false");
-    }
 
     /** Velocity template for a message body */
     private Template template;
@@ -212,6 +197,13 @@ public class Email {
         template = null;
         replyTo = null;
         charset = null;
+    }
+
+    /**
+     * Get configuration service
+     */
+    private static ConfigurationService getConfigurationService() {
+        return DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
     /**
@@ -236,7 +228,7 @@ public class Email {
         arguments.clear();
 
         VelocityEngine templateEngine = new VelocityEngine();
-        templateEngine.init(VELOCITY_PROPERTIES);
+        templateEngine.init(Utils.getSecureVelocityProperties(RESOURCE_REPOSITORY_NAME));
 
         StringResourceRepository repo = (StringResourceRepository)
                 templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
@@ -355,8 +347,7 @@ public class Email {
     public void send() throws MessagingException, IOException {
         build();
 
-        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
-        if (isMailServerDisabled(config)) {
+        if (isMailServerDisabled(getConfigurationService())) {
             LOG.info(format(message, body));
         } else {
             Transport.send(message);
@@ -369,7 +360,7 @@ public class Email {
      * {@code mail.message.headers} then that name and its value will be added
      * to the message's headers.
      *
-     * <p>"subject" is treated specially:  if {@link setSubject()} has not been
+     * <p>"subject" is treated specially:  if {@link #setSubject} has not been
      * called, the value of any "subject" property will be used as if setSubject
      * had been called with that value.  Thus a template may define its subject,
      * but the caller may override it.
@@ -384,15 +375,12 @@ public class Email {
             throw new MessagingException("Email has no body");
         }
 
-        ConfigurationService config
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-
         // Get the mail configuration properties
-        String from = config.getProperty("mail.from.address");
+        String from = getConfigurationService().getProperty("mail.from.address");
 
         // If no character set specified, attempt to retrieve a default
         if (charset == null) {
-            charset = config.getProperty("mail.charset");
+            charset = getConfigurationService().getProperty("mail.charset");
         }
 
         // Get session
@@ -402,14 +390,16 @@ public class Email {
         message = new MimeMessage(session);
 
         // Get the mail configuration properties for catchAllRecipient
-        String[] catchAllRecipient = getCatchAllRecipient(config);
+        String[] catchAllRecipient = getCatchAllRecipient(getConfigurationService());
 
         // Get headers defined by the template.
-        String[] templateHeaders = config.getArrayProperty("mail.message.headers");
+        String[] templateHeaders = getConfigurationService().getArrayProperty("mail.message.headers");
 
         // Format the mail message body
         VelocityContext vctx = new VelocityContext();
-        vctx.put("config", new UnmodifiableConfigurationService(config));
+        // Pass a restricted (via configuration) list of resolved Configuration keys and values, for
+        // template lookup
+        vctx.put("config", Utils.getAllowedTemplateConfig());
         vctx.put("params", Collections.unmodifiableList(arguments));
 
         StringWriter writer = new StringWriter();
@@ -758,33 +748,6 @@ public class Email {
         @Override
         public OutputStream getOutputStream() throws IOException {
             throw new IOException("Cannot write to this read-only resource");
-        }
-    }
-
-    /**
-     * Wrap ConfigurationService to prevent templates from modifying
-     * the configuration.
-     */
-    public static class UnmodifiableConfigurationService {
-        private final ConfigurationService configurationService;
-
-        /**
-         * Swallow an instance of ConfigurationService.
-         *
-         * @param cs the real instance, to be wrapped.
-         */
-        public UnmodifiableConfigurationService(ConfigurationService cs) {
-            configurationService = cs;
-        }
-
-        /**
-         * Look up a key in the actual ConfigurationService.
-         *
-         * @param key to be looked up in the DSpace configuration.
-         * @return whatever value ConfigurationService associates with {@code key}.
-         */
-        public String get(String key) {
-            return configurationService.getProperty(key);
         }
     }
 }

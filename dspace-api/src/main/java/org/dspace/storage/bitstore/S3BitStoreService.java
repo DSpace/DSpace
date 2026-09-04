@@ -93,7 +93,9 @@ public class S3BitStoreService extends BaseBitStoreService {
     private double targetThroughputGbps = 10.0;
     private long minPartSizeBytes = 8 * 1024 * 1024L;
     private ChecksumAlgorithm s3ChecksumAlgorithm = ChecksumAlgorithm.CRC32;
-    private Integer maxConcurrency = null;
+    private Integer maxConcurrency;
+    private Double memoryUsageFactor;
+    private Long initialReadBufferSizeInBytes;
 
     /**
      * container for all the assets
@@ -116,24 +118,32 @@ public class S3BitStoreService extends BaseBitStoreService {
     /**
      * Utility method for generate AmazonS3 builder
      *
-     * @param regions wanted regions in client
-     * @param awsCredentials credentials of the client
+     * @param region wanted regions in client
+     * @param credentialsProvider credentials of the client
      * @param endpoint custom AWS endpoint
      * @param targetThroughput target throughput in Gbps
      * @param minPartSize minimum part size in bytes
-     * @param maxConcurrency maximum number of concurrent requests
+     * @param concurrency maximum number of concurrent requests
+     * @param memoryUsageFactor factor to determine memory usage for read buffer size, as a percentage of max memory.
+     * @param initialReadBufferSizeInBytes initial read buffer size in bytes,
+     *                                     used if memoryUsageFactor is not set or out of bounds
      * @return builder with the specified parameters
      */
     protected static Supplier<S3AsyncClient> amazonClientBuilderBy(
-            Region region,
-            AwsCredentialsProvider credentialsProvider,
-            String endpoint,
-            double targetThroughput,
-            long minPartSize,
-            Integer maxConcurrency
+        Region region,
+        AwsCredentialsProvider credentialsProvider,
+        String endpoint,
+        double targetThroughput,
+        long minPartSize,
+        Integer concurrency,
+        Double memoryUsageFactor,
+        Long initialReadBufferSizeInBytes
     ) {
         return () -> {
-            S3CrtAsyncClientBuilder crtBuilder = S3AsyncClient.crtBuilder();
+            S3CrtAsyncClientBuilder crtBuilder =
+                S3AsyncClient.crtBuilder()
+                             .targetThroughputInGbps(targetThroughput)
+                             .minimumPartSizeInBytes(minPartSize);
 
             if (credentialsProvider != null) {
                 crtBuilder.credentialsProvider(credentialsProvider);
@@ -143,16 +153,67 @@ public class S3BitStoreService extends BaseBitStoreService {
                 crtBuilder.region(region);
             }
 
-            if (maxConcurrency != null) {
-                crtBuilder.maxConcurrency(maxConcurrency);
-            }
-
             if (StringUtils.isNotBlank(endpoint)) {
                 crtBuilder.endpointOverride(URI.create(endpoint));
                 crtBuilder.forcePathStyle(true);
             }
 
-            return crtBuilder.targetThroughputInGbps(targetThroughput).minimumPartSizeInBytes(minPartSize).build();
+            if (memoryUsageFactor == null) {
+                log.warn("custom heuristic cannot be applied!");
+
+                if (initialReadBufferSizeInBytes != null) {
+                    crtBuilder.initialReadBufferSizeInBytes(initialReadBufferSizeInBytes);
+                }
+
+                if (concurrency != null) {
+                    crtBuilder.maxConcurrency(concurrency);
+                }
+
+                return crtBuilder.build();
+            }
+
+            int maxConcurrency;
+            if (concurrency == null) {
+                log.warn("maxConcurrency is not set, defaulting to number of available processors");
+                maxConcurrency = Runtime.getRuntime().availableProcessors();
+            } else {
+                maxConcurrency = concurrency;
+            }
+
+            long maxMemory;
+            if (memoryUsageFactor <= 0 || memoryUsageFactor > 1) {
+                log.warn("memoryUsageFactor is not set or out of bounds (0,1], defaulting to 0.1");
+                maxMemory = Math.round(Math.floor(Runtime.getRuntime().maxMemory() * 0.1));
+            } else {
+                maxMemory = Math.round(Math.floor(Runtime.getRuntime().maxMemory() * memoryUsageFactor));
+            }
+
+            final long readBuffer = Math.round(
+                Math.floor((((double) maxMemory / maxConcurrency / minPartSize) - 1) * minPartSize)
+            );
+
+            final long maxReadBuffer;
+            if (readBuffer < minPartSize) {
+                log.warn(
+                    "Calculated read buffer size is less than the minimum part size. Adjusting to minimum part " +
+                    "size."
+                );
+                maxReadBuffer = minPartSize;
+                maxConcurrency = Math.max((int) Math.floor((double) maxMemory / (maxReadBuffer + minPartSize)), 1);
+                log.warn("Adjusted maxConcurrency to {} to fit memory constraints.", maxConcurrency);
+            } else {
+                maxReadBuffer = readBuffer;
+            }
+
+            log.info(
+                "Calculated read buffer size: {} bytes, max concurrency: {}, based on memory usage factor: {} " +
+                "and max memory: {} bytes",
+                maxReadBuffer, maxConcurrency, memoryUsageFactor, maxMemory
+            );
+
+            return crtBuilder.maxConcurrency(maxConcurrency)
+                             .initialReadBufferSizeInBytes(maxReadBuffer)
+                             .build();
         };
     }
 
@@ -202,18 +263,24 @@ public class S3BitStoreService extends BaseBitStoreService {
                 s3AsyncClient = FunctionalUtils.getDefaultOrBuild(
                         this.s3AsyncClient,
                         amazonClientBuilderBy(
-                                region,
-                                StaticCredentialsProvider.create(AwsBasicCredentials.create(getAwsAccessKey(),
-                                        getAwsSecretKey())), endpoint, targetThroughputGbps,
-                                minPartSizeBytes, maxConcurrency)
-                        );
+                            region,
+                            StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create(getAwsAccessKey(), getAwsSecretKey())
+                            ),
+                            endpoint, targetThroughputGbps, minPartSizeBytes, maxConcurrency, memoryUsageFactor,
+                            initialReadBufferSizeInBytes
+                        )
+                );
                 log.warn("S3 Region set to: " + region.id());
             } else {
                 log.info("Using a IAM role or aws environment credentials");
                 s3AsyncClient = FunctionalUtils.getDefaultOrBuild(
                         this.s3AsyncClient,
-                        amazonClientBuilderBy(null, null , endpoint, targetThroughputGbps,
-                                minPartSizeBytes, maxConcurrency));
+                        amazonClientBuilderBy(
+                            null, null, endpoint, targetThroughputGbps,
+                            minPartSizeBytes, maxConcurrency, memoryUsageFactor, initialReadBufferSizeInBytes
+                        )
+                );
             }
 
             // bucket name
@@ -551,6 +618,22 @@ public class S3BitStoreService extends BaseBitStoreService {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public Double getMemoryUsageFactor() {
+        return memoryUsageFactor;
+    }
+
+    public void setMemoryUsageFactor(Double memoryUsageFactor) {
+        this.memoryUsageFactor = memoryUsageFactor;
+    }
+
+    public Long getInitialReadBufferSizeInBytes() {
+        return initialReadBufferSizeInBytes;
+    }
+
+    public void setInitialReadBufferSizeInBytes(Long initialReadBufferSizeInBytes) {
+        this.initialReadBufferSizeInBytes = initialReadBufferSizeInBytes;
     }
 
     /**

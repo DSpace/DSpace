@@ -12,9 +12,15 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.time.Period;
 
 import jakarta.mail.Address;
 import jakarta.mail.Message;
@@ -40,10 +46,14 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 
 /**
@@ -306,6 +316,122 @@ public class RequestItemEmailNotifierTest
         String content = (String)myMessage.getContent();
         assertThat("Should contain access link", content, containsString(responseLink));
         assertThat("Should not contain attachment marker", content, not(containsString("Attachment")));
+    }
+
+    @Test
+    public void testEmailGenerationClosesInputStreamsWhenAllFiles() throws Exception {
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream)
+                                              .withName("small.txt")
+                                              .withEmbargoPeriod(Period.ofMonths(6))
+                                              .build();
+        context.restoreAuthSystemState();
+
+        // Make bitstreamService return the spyStream
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            RequestItem request = RequestItemBuilder
+                    .createRequestItem(context, item, bitstream)
+                    .withAllFiles(true)
+                    .withAcceptRequest(true)
+                    .build();
+
+            // Install a fake transport for RFC2822 email addresses.
+            Session session = DSpaceServicesFactory.getInstance().getEmailService().getSession();
+            Provider transportProvider = new Provider(Provider.Type.TRANSPORT,
+                                                      DUMMY_PROTO, JavaMailTestTransport.class.getCanonicalName(),
+                                                      "DSpace", "1.0");
+            session.addProvider(transportProvider);
+            session.setProvider(transportProvider);
+            session.setProtocolForAddress("rfc822", DUMMY_PROTO);
+            requestItemEmailNotifier.sendResponse(context, request, "Subject", "Message");
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1).description(
+                        "InputStream should have been closed after RequestItemEmailNotifier.sendResponse() call"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
+    }
+
+    @Test
+    public void testEmailGenerationClosesInputStreamsWhenNotAllFiles() throws Exception {
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream)
+                                              .withName("small.txt")
+                                              .withEmbargoPeriod(Period.ofMonths(6))
+                                              .build();
+        context.restoreAuthSystemState();
+
+        // Make bitstreamService return the spyStream
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            RequestItem request = RequestItemBuilder
+                    .createRequestItem(context, item, bitstream)
+                    .withAllFiles(false)
+                    .withAcceptRequest(true)
+                    .build();
+
+            // Install a fake transport for RFC2822 email addresses.
+            Session session = DSpaceServicesFactory.getInstance().getEmailService().getSession();
+            Provider transportProvider = new Provider(Provider.Type.TRANSPORT,
+                                                      DUMMY_PROTO, JavaMailTestTransport.class.getCanonicalName(),
+                                                      "DSpace", "1.0");
+            session.addProvider(transportProvider);
+            session.setProvider(transportProvider);
+            session.setProtocolForAddress("rfc822", DUMMY_PROTO);
+            requestItemEmailNotifier.sendResponse(context, request, "Subject", "Message");
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1).description(
+                        "InputStream should have been closed after RequestItemEmailNotifier.sendResponse() call"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
     }
 
 

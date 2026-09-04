@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
@@ -133,7 +132,7 @@ public class ItemArchive {
     protected Transformer getTransformer()
         throws TransformerConfigurationException {
         if (transformer == null) {
-            transformer = TransformerFactory.newInstance().newTransformer();
+            transformer = XMLUtils.getTransformerFactory().newTransformer();
         }
         return transformer;
     }
@@ -254,7 +253,7 @@ public class ItemArchive {
         this.addUndoMetadataField(dtom);  //seed the undo list with the identifier field
 
         Iterator<Item> itr = itemService
-            .findByMetadataField(context, dtom.schema, dtom.element, dtom.qualifier, dtom.value);
+            .findArchivedByMetadataField(context, dtom.schema, dtom.element, dtom.qualifier, dtom.value);
         int count = 0;
         while (itr.hasNext()) {
             item = itr.next();

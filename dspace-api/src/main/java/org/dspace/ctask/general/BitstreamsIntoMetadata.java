@@ -16,6 +16,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 
@@ -43,7 +44,7 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
      * @return The curation task status of the checking
      */
     @Override
-    public int perform(DSpaceObject dso) {
+    public int perform(Context context, DSpaceObject dso) {
         // The results that we'll return
         StringBuilder results = new StringBuilder();
 
@@ -54,24 +55,24 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
         if (dso instanceof Item) {
             try {
                 Item item = (Item) dso;
-                itemService.clearMetadata(Curator.curationContext(), item, "dc", "format", Item.ANY, Item.ANY);
+                itemService.clearMetadata(context, item, "dc", "format", Item.ANY, Item.ANY);
                 for (Bundle bundle : item.getBundles()) {
                     if ("ORIGINAL".equals(bundle.getName())) {
                         for (Bitstream bitstream : bundle.getBitstreams()) {
                             // Add the metadata and update the item
-                            addMetadata(item, bitstream, "original");
+                            addMetadata(context, item, bitstream, "original");
                             changed = true;
                         }
                     } else if ("THUMBNAIL".equals(bundle.getName())) {
                         for (Bitstream bitstream : bundle.getBitstreams()) {
                             // Add the metadata and update the item
-                            addMetadata(item, bitstream, "thumbnail");
+                            addMetadata(context, item, bitstream, "thumbnail");
                             changed = true;
                         }
                     }
 
                     if (changed) {
-                        itemService.update(Curator.curationContext(), item);
+                        itemService.update(context, item);
                         status = Curator.CURATE_SUCCESS;
                     }
                 }
@@ -113,8 +114,8 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
      * @param type      The type of bitstream
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    protected void addMetadata(Item item, Bitstream bitstream, String type) throws SQLException {
-        String value = bitstream.getFormat(Curator.curationContext()).getMIMEType() + "##";
+    protected void addMetadata(Context context, Item item, Bitstream bitstream, String type) throws SQLException {
+        String value = bitstream.getFormat(context).getMIMEType() + "##";
         value += bitstream.getName() + "##";
         value += bitstream.getSizeBytes() + "##";
         value += item.getHandle() + "##";
@@ -123,6 +124,6 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
         if (bitstream.getDescription() != null) {
             value += bitstream.getDescription();
         }
-        itemService.addMetadata(Curator.curationContext(), item, "dc", "format", type, "en", value);
+        itemService.addMetadata(context, item, "dc", "format", type, "en", value);
     }
 }

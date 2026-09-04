@@ -22,6 +22,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -88,8 +89,8 @@ public class CuratorReportTest
         ListReporter reporter = new ListReporter();
         Curator curator = new Curator();
         curator.setReporter(reporter);
-        curator.addTask("task1");
-        curator.addTask("task2");
+        curator.addTask(context, "task1");
+        curator.addTask(context, "task2");
         curator.curate(context, site);
 
         // Validate the results.
@@ -138,7 +139,7 @@ public class CuratorReportTest
         }
 
         @Override
-        public int perform(DSpaceObject dso)
+        public int perform(Context context, DSpaceObject dso)
                 throws IOException {
             curator.report(String.format(
                     "Task1 received 'perform' on taskId '%s' for object '%s'%n",
@@ -157,7 +158,7 @@ public class CuratorReportTest
         }
 
         @Override
-        public int perform(DSpaceObject dso) throws IOException {
+        public int perform(Context context, DSpaceObject dso) throws IOException {
             curator.report(String.format(
                     "Task2 received 'perform' on taskId '%s' for object '%s'%n",
                     taskId, dso.getHandle()));

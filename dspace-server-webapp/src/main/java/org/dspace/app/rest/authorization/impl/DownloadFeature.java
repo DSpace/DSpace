@@ -20,6 +20,7 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class DownloadFeature implements AuthorizationFeature {
     private BitstreamCrisSecurityService bitstreamCrisSecurityService;
 
     @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
     private Utils utils;
 
     @Override
@@ -61,7 +65,10 @@ public class DownloadFeature implements AuthorizationFeature {
                 return false;
             }
 
-            if (dSpaceObject instanceof Bitstream && bitstreamCrisSecurityService
+            boolean skipAuth = configurationService.getBooleanProperty(
+                "core.authorization.bitstream.author.bypass-restrictions", false);
+
+            if (skipAuth && dSpaceObject instanceof Bitstream && bitstreamCrisSecurityService
                     .isBitstreamAccessAllowedByCrisSecurity(context, context.getCurrentUser(),
                             (Bitstream) dSpaceObject)) {
                 return true;

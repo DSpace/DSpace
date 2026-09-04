@@ -379,10 +379,10 @@ public class BrowseIndex {
     /**
      * Generate a sequence name from the given base
      *
-     * @param baseName
-     * @param isDistinct
-     * @param isMap
-     * @return
+     * @param baseName   the base name of the sequence
+     * @param isDistinct is a distinct table
+     * @param isMap      is a map table
+     * @return the name of the sequence
      */
     private static String getSequenceName(String baseName, boolean isDistinct, boolean isMap) {
         if (isDistinct) {

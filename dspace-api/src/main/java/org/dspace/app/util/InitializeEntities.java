@@ -160,9 +160,13 @@ public class InitializeEntities {
     private void parseXMLToRelations(Context context, String fileLocation) throws AuthorizeException {
         try {
             File fXmlFile = new File(fileLocation);
+            String inputFileDir = fXmlFile.toPath().normalize().getParent().toString();
+
             // This XML builder will allow external entities, so the relationship types XML should
-            // be considered trusted by administrators
-            DocumentBuilder dBuilder = XMLUtils.getTrustedDocumentBuilder();
+            // be considered trusted by administrators. However, it will
+            // restrict them to be within the directory that the
+            // current input form XML file exists (or a sub-directory)
+            DocumentBuilder dBuilder = XMLUtils.getTrustedDocumentBuilder(inputFileDir);
             Document doc = dBuilder.parse(fXmlFile);
 
             doc.getDocumentElement().normalize();

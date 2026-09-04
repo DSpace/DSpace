@@ -105,28 +105,58 @@ public class BitstreamRestController {
 
     /**
      * Retrieve bitstream. An access token (created by request a copy for some files, if enabled) can optionally
-     * be used for authorization instead of current user/group
+     * be used for authorization instead of current user/group.
+     * <P>
+     * Authorization behavior is controlled by the configuration property
+     * {@code core.authorization.bitstream.author.bypass-restrictions}. When enabled (true), authors/submitters
+     * can download restricted bitstreams even if they lack explicit READ permissions. When disabled (false - default),
+     * normal authorization rules apply to all users including authors.
      *
      * @param uuid bitstream ID
      * @param accessToken request-a-copy access token (optional)
      * @param response HTTP response
      * @param request HTTP request
      * @return response entity with bitstream content
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if an I/O error occurs
+     * @throws SQLException if database error occurs
+     * @throws AuthorizeException if user lacks permission and author bypass is disabled
      */
-    @PreAuthorize("#accessToken != null|| hasPermission(#uuid, 'BITSTREAM', 'READ')")
+    @PreAuthorize("T(org.apache.commons.lang3.StringUtils).isNotBlank(#accessToken)" +
+        " || hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
     public ResponseEntity retrieve(@PathVariable UUID uuid,
                                    @Parameter(value = "accessToken", required = false) String accessToken,
                                    HttpServletResponse response,
                                    HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
-
+        // Any non-null access token will skip the preauthorize check above so we can
+        // quickly check here to see if the feature is even enabled. If it is not, throw
+        // an authorize exception.
+        if (StringUtils.isNotBlank(accessToken) && !requestACopyEnabled()) {
+            throw new AuthorizeException("Access by token is not allowed");
+        }
         // Obtain context
         Context context = ContextUtil.obtainContext(request);
         // Find bitstream
         Bitstream bit = bitstreamService.find(context, uuid);
+
+        // If an access token is found, immediately authenticate it if request a copy is enabled
+        // Even if EPerson is not null and has access, we will treat this token as the primary means of
+        // authorizing bitstream download access
+        boolean authorizedByAccessToken = false;
+        // There may be a way of checking enabled in preauth
+        if (StringUtils.isNotBlank(accessToken) && requestACopyEnabled()) {
+            RequestItem requestItem = requestItemService.findByAccessToken(context, accessToken);
+            // Try authorize by token. An AuthorizeException will be thrown if the token is invalid, expired,
+            // for the wrong bitstream, or does not match (see RequestItemService)
+            requestItemService.authorizeAccessByAccessToken(context, requestItem, bit, accessToken);
+            authorizedByAccessToken = true;
+            log.debug("Authorize access by token={} bitstream={}", accessToken, bit.getID());
+        }
+        // If an authorization error was encountered it will be rethrown by the above method even if the eperson
+        // could technically READ the bitstream normally. This is for consistency and clarify of usage - if we
+        // want a fallback we will need to reauthenticate as otherwise any eperson could have supplied a non-blank
+        // access token here
+
         if (bit == null || bit.isDeleted()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -139,26 +169,6 @@ public class BitstreamRestController {
         BitstreamFormat format = bit.getFormat(context);
         String mimetype = format.getMIMEType();
         String name = getBitstreamName(bit, format);
-
-        // If an access token is found, immediately authenticate it if request a copy is enabled
-        // Though, if we do further "has to be loggd in requester" checks we'll have to check here anyway
-        // Even if eperson is not null and has access, we will treat this token as the primary means of
-        // authorizing bitstream download access
-        boolean authorizedByAccessToken = false;
-        // There may be a way of checking enabled in preauth
-        if (StringUtils.isNotBlank(accessToken) && requestACopyEnabled()) {
-            RequestItem requestItem = requestItemService.findByAccessToken(context, accessToken);
-            // Try authorize by token. An AuthorizeException will be thrown if the token is invalid, expired,
-            // for the wrong bitstream, or does not match (see RequestItemService)
-            requestItemService.authorizeAccessByAccessToken(context, requestItem, bit, accessToken);
-            authorizedByAccessToken = true;
-            log.debug("Authorize access by token={} bitstream={}", accessToken, bit.getID());
-        }
-        // If an authorization error was encountered it will be rethrown by this method even if the eperson
-        // could technically READ the bitstream normally. This is for consistency and clarify of usage - if we
-        // want a fallback we will need to reauthenticate as otherwise any eperson could have supplied a non-blank
-        // access token here
-
         if (StringUtils.isBlank(request.getHeader("Range"))) {
             //We only log a download request when serving a request without Range header. This is because
             //a browser always sends a regular request first to check for Range support.
@@ -176,8 +186,6 @@ public class BitstreamRestController {
             long filesize = bit.getSizeBytes();
             Boolean citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
 
-
-
             // Generate a special bitstream resource stream depending on whether we are accessing by token
             // or eperson / group access
             org.dspace.app.rest.utils.BitstreamResource bitstreamResource;
@@ -188,12 +196,13 @@ public class BitstreamRestController {
                                 context.getSpecialGroupUuids(), citationEnabledForBitstream, accessToken);
             } else {
                 // Get input stream using default user/group authorization
-                // skipAuth=true because @PreAuthorize already performed authorization security checks (allowing
-                // submitters and authors/owners to access embargoed bitstreams).
+                // Check configuration to determine if authors can bypass authorization for restricted bitstreams
+                boolean skipAuth = configurationService.getBooleanProperty(
+                        "core.authorization.bitstream.author.bypass-restrictions", false);
                 bitstreamResource =
                         new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
                                 currentUser != null ? currentUser.getID() : null,
-                                context.getSpecialGroupUuids(), citationEnabledForBitstream, true);
+                                context.getSpecialGroupUuids(), citationEnabledForBitstream, skipAuth);
             }
 
             // We have all the data we need, close the connection to the database so that it doesn't stay open during
@@ -243,8 +252,6 @@ public class BitstreamRestController {
         } catch (ClientAbortException ex) {
             log.debug("Client aborted the request before the download was completed. " +
                           "Client is probably switching to a Range request.", ex);
-        } catch (Exception e) {
-            throw e;
         }
         return null;
     }

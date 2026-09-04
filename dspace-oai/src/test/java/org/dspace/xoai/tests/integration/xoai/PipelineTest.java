@@ -19,16 +19,16 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.lyncode.xoai.util.XSLPipeline;
 import org.apache.commons.io.IOUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.xoai.tests.support.XmlMatcherBuilder;
 import org.junit.Test;
 
 public class PipelineTest {
-    private static TransformerFactory factory = TransformerFactory.newInstance();
-
     @Test
     public void pipelineTest() throws Exception {
         InputStream input = PipelineTest.class.getClassLoader().getResourceAsStream("item.xml");
         InputStream xslt = PipelineTest.class.getClassLoader().getResourceAsStream("oai_dc.xsl");
+        TransformerFactory factory = XMLUtils.getTransformerFactory();
         String output = IOUtils.toString(new XSLPipeline(input, true)
                                              .apply(factory.newTemplates(new StreamSource(xslt)))
                                              .getTransformed(), Charset.defaultCharset());

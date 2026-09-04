@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.NotFoundException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -38,11 +39,13 @@ import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.content.edit.EditItem;
 import org.dspace.content.edit.EditItemMode;
 import org.dspace.content.edit.service.EditItemModeService;
 import org.dspace.content.edit.service.EditItemService;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -87,6 +90,9 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
 
     @Autowired
     ItemService itemService;
+
+    @Autowired
+    BitstreamService bitstreamService;
 
     @Autowired
     private ValidationService validationService;
@@ -253,6 +259,7 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
             submissionConfigReader.getSubmissionConfigByName(source.getMode().getSubmissionDefinition());
         context.turnOffAuthorisationSystem();
         boolean hasUploadableStep = false;
+        Bitstream newBitstream = null;
         for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
             SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
 
@@ -269,9 +276,13 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
                 if (UploadableStep.class.isAssignableFrom(stepClass)) {
                     hasUploadableStep = true;
                     UploadableStep uploadableStep = (UploadableStep) stepInstance;
-                    ErrorRest err = uploadableStep.upload(context, submissionService, stepConfig, source, file);
-                    if (err != null) {
-                        errors.add(err);
+                    Pair<Bitstream, ErrorRest> pair = uploadableStep.upload(
+                        context, submissionService, stepConfig, source, file
+                    );
+                    if (pair.getRight() != null) {
+                        errors.add(pair.getRight());
+                    } else {
+                        newBitstream = pair.getLeft();
                     }
                 }
 
@@ -279,6 +290,20 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, S
                 log.error(e.getMessage(), e);
             }
 
+        }
+
+        // If replaceFile parameter (bitstream UUID) is provided and upload succeeded, replace the original bitstream.
+        String replaceFileUuid = request.getParameter("replaceFile");
+        if (replaceFileUuid != null && !replaceFileUuid.isBlank() && newBitstream != null && errors.isEmpty()) {
+            try {
+                Bitstream originalBitstream = bitstreamService.find(context, UUID.fromString(replaceFileUuid));
+                if (originalBitstream != null) {
+                    boolean replaceName = Boolean.parseBoolean(request.getParameter("replaceName"));
+                    bitstreamService.replace(context, originalBitstream, newBitstream, replaceName);
+                }
+            } catch (Exception e) {
+                log.error("Error replacing bitstream with UUID " + replaceFileUuid, e);
+            }
         }
 
         if (!hasUploadableStep) {

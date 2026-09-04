@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>10.0-SNAPSHOT</version>
+        <version>11.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -353,7 +353,7 @@
             <version>${ehcache.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
-             Caching dependencies for sherpa service. -->
+             Caching dependencies for Open Policy Finder service. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
@@ -414,6 +414,11 @@
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
+                <!-- Excluded because this library is incompatible with Jakarta EE. -->
+                <exclusion>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -431,6 +436,13 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <!-- Use version provided by Postgres or Solr -->
+                <exclusion>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -632,7 +644,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>3.6.4</version>
+            <version>3.6.5</version>
         </dependency>
 
         <dependency>
@@ -683,16 +695,6 @@
             <version>${flyway.version}</version>
         </dependency>
 
-        <!-- FindBugs -->
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>jakarta.inject</groupId>
             <artifactId>jakarta.inject-api</artifactId>
@@ -726,7 +728,7 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.42.26</version>
+            <version>2.49.4</version>
             <exclusions>
               <exclusion>
                 <groupId>software.amazon.awssdk</groupId>
@@ -736,13 +738,21 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>apache-client</artifactId>
               </exclusion>
+              <!-- Exclude apache5-client (Apache HttpClient 5): added transitively by the AWS SDK
+                   from v2.46.x onward. DSpace uses the CRT based client (S3AsyncClient.crtBuilder()),
+                   so this client is unused, and it drags in conflicting httpcore5 versions that break
+                   dependency convergence. See https://github.com/DSpace/DSpace/issues/12690 -->
+              <exclusion>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>apache5-client</artifactId>
+              </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>software.amazon.awssdk.crt</groupId>
             <artifactId>aws-crt</artifactId>
-            <version>0.44.0</version>
+            <version>0.48.1</version>
         </dependency>
 
         <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
@@ -798,7 +808,7 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>2.11.0</version>
+            <version>2.12.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -860,7 +870,7 @@
         <dependency>
             <groupId>com.adobe.testing</groupId>
             <artifactId>s3mock-testcontainers</artifactId>
-            <version>4.11.0</version>
+            <version>4.12.4</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -875,7 +885,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>2.0.4</version>
+            <version>2.0.5</version>
             <scope>test</scope>
         </dependency>
 
@@ -932,7 +942,7 @@
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
-            <version>3.1.3.RELEASE</version>
+            <version>3.1.5.RELEASE</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.javassist</groupId>
@@ -957,6 +967,12 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.6.15</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

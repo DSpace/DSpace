@@ -11,28 +11,28 @@
         <property name="sourceIdentifier" value="mock"/>
     </bean>
 
-    <!-- SHERPA data providers set up to use mock SHERPA service -->
-    <bean class="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider" init-method="init">
-        <property name="sourceIdentifier" value="sherpaJournalIssn"/>
-        <property name="sherpaService" ref="org.dspace.app.sherpa.MockSHERPAService" />
+    <!-- Open Policy Finder data providers set up to use mock service -->
+    <bean class="org.dspace.external.provider.impl.OpenPolicyFinderJournalISSNDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="opfJournalIssn"/>
+        <property name="openPolicyFinderService" ref="org.dspace.app.openpolicyfinder.MockOpenPolicyFinderService" />
         <property name="supportedEntityTypes">
             <list>
                 <value>Journal</value>
             </list>
         </property>
     </bean>
-    <bean class="org.dspace.external.provider.impl.SHERPAv2JournalDataProvider" init-method="init">
-        <property name="sourceIdentifier" value="sherpaJournal"/>
-        <property name="sherpaService" ref="org.dspace.app.sherpa.MockSHERPAService" />
+    <bean class="org.dspace.external.provider.impl.OpenPolicyFinderJournalDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="opfJournal"/>
+        <property name="openPolicyFinderService" ref="org.dspace.app.openpolicyfinder.MockOpenPolicyFinderService" />
         <property name="supportedEntityTypes">
             <list>
                 <value>Journal</value>
             </list>
         </property>
     </bean>
-    <bean class="org.dspace.external.provider.impl.SHERPAv2PublisherDataProvider" init-method="init">
-        <property name="sourceIdentifier" value="sherpaPublisher"/>
-        <property name="sherpaService" ref="org.dspace.app.sherpa.MockSHERPAService" />
+    <bean class="org.dspace.external.provider.impl.OpenPolicyFinderPublisherDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="opfPublisher"/>
+        <property name="openPolicyFinderService" ref="org.dspace.app.openpolicyfinder.MockOpenPolicyFinderService" />
         <property name="supportedEntityTypes">
             <list>
                 <value>OrgUnit</value>

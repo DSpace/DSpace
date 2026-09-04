@@ -20,13 +20,13 @@ import java.util.Map;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -119,7 +119,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         jurisdiction = configurationService.getProperty("cc.license.jurisdiction", "");
 
         try {
-            templates = TransformerFactory.newInstance().newTemplates(
+            templates = XMLUtils.getTransformerFactory().newTemplates(
                     new StreamSource(CreativeCommonsServiceImpl.class
                                              .getResourceAsStream("CreativeCommons.xsl")));
         } catch (TransformerConfigurationException e) {

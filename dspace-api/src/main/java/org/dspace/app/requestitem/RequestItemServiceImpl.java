@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -183,6 +184,11 @@ public class RequestItemServiceImpl implements RequestItemService {
     @Override
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
         return requestItemDAO.findByItem(context, item);
+    }
+
+    @Override
+    public Iterator<RequestItem> findByBitstreamId(Context context, UUID bitstreamId) throws SQLException {
+        return requestItemDAO.findByBitstreamId(context, bitstreamId);
     }
 
     @Override

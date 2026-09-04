@@ -764,8 +764,8 @@ public class BrowseInfo {
      * A utility method for generating a string to represent a single item's
      * entry in the browse
      *
-     * @param config
-     * @return
+     * @param config the item list configuration
+     * @return string representation of the full item listing
      * @throws SQLException if database error
      */
     private String fullListingString(ItemListConfig config)
@@ -813,7 +813,7 @@ public class BrowseInfo {
     /**
      * A utility method for representing a single value in the browse
      *
-     * @return
+     * @return string representation of the value listing
      */
     private String valueListingString() {
         // report on all the results contained herein

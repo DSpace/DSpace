@@ -20,6 +20,10 @@ public class CurationCliScriptConfiguration extends CurationScriptConfiguration<
         options = super.getOptions();
         options.addOption("e", "eperson", true, "email address of curating eperson");
         options.getOption("e").setRequired(true);
+        options.addOption("r", "reporter", true,
+            "relative or absolute path to the desired report file. Use '-' to report to console. If absent, no " +
+            "reporting");
+        options.addOption("T", "taskfile", true, "file containing curation task names");
         return options;
     }
 }
