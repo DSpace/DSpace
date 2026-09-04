@@ -488,32 +488,290 @@ public class ItemExportServiceImpl implements ItemExportService {
                             String destDirName, String zipFileName,
                             int seqStart, boolean migrate,
                             boolean excludeBitstreams) throws Exception {
-        String workDir = getExportWorkDirectory() +
-            System.getProperty("file.separator") +
-            zipFileName;
-
-        File wkDir = new File(workDir);
-        if (!wkDir.exists() && !wkDir.mkdirs()) {
-            logError("Unable to create working directory");
-        }
-
         File dnDir = new File(destDirName);
         if (!dnDir.exists() && !dnDir.mkdirs()) {
             logError("Unable to create destination directory");
         }
 
-        try {
-            // export the items using normal export method (this exports items to our workDir)
-            exportItem(context, items, workDir, seqStart, migrate, excludeBitstreams);
+        String targetPath = destDirName + File.separator + zipFileName;
+        String tempPath = targetPath + "_tmp";
 
-            // now zip up the workDir directory created above
-            zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
-        } finally {
-            // Cleanup workDir created above, if it still exists
-            if (wkDir.exists()) {
-                deleteDirectory(wkDir);
+        logInfo("Beginning export");
+
+        try (ZipOutputStream zos = new ZipOutputStream(
+                new BufferedOutputStream(new FileOutputStream(tempPath)))) {
+            zos.setLevel(9);
+            int seq = seqStart;
+            while (items.hasNext()) {
+                Item item = items.next();
+                logInfo("Exporting item to " + seq);
+                exportItemToZip(context, item, Integer.toString(seq), migrate, excludeBitstreams, zos);
+                context.uncacheEntity(item);
+                seq++;
             }
         }
+
+        // Atomic rename from temp to final
+        if (!new File(tempPath).renameTo(new File(targetPath))) {
+            logError("Unable to rename temp export file to " + targetPath);
+        }
+    }
+
+    /**
+     * Export a single item directly into a ZipOutputStream.
+     * Creates entries like {@code entryDir/dublin_core.xml}, {@code entryDir/contents}, etc.
+     *
+     * @param c                 DSpace context
+     * @param item              the item to export
+     * @param entryDir          directory name within the ZIP (e.g. "1" or "collection_uuid/1")
+     * @param migrate           whether to use migrate option
+     * @param excludeBitstreams whether to exclude bitstreams
+     * @param zos               the ZipOutputStream to write to
+     * @throws Exception if error
+     */
+    protected void exportItemToZip(Context c, Item item, String entryDir,
+                                   boolean migrate, boolean excludeBitstreams,
+                                   ZipOutputStream zos) throws Exception {
+        String prefix = entryDir + "/";
+
+        logInfo("Exporting Item " + item.getID()
+                    + (item.getHandle() != null ? ", handle " + item.getHandle() : "")
+                    + " to zip entry " + prefix);
+
+        writeMetadataToZip(c, item, prefix, migrate, zos);
+        writeBitstreamsToZip(c, item, prefix, excludeBitstreams, zos);
+        writeCollectionsToZip(item, prefix, zos);
+        if (!migrate) {
+            writeHandleToZip(item, prefix, zos);
+        }
+    }
+
+    /**
+     * Write all metadata XML files for an item into a ZipOutputStream.
+     *
+     * @param c       DSpace context
+     * @param item    the item
+     * @param prefix  ZIP entry prefix (e.g. "1/")
+     * @param migrate whether to use migrate option
+     * @param zos     the ZipOutputStream
+     * @throws Exception if error
+     */
+    protected void writeMetadataToZip(Context c, Item item, String prefix,
+                                      boolean migrate, ZipOutputStream zos) throws Exception {
+        Set<String> schemas = new HashSet<>();
+        List<MetadataValue> dcValues = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue metadataValue : dcValues) {
+            schemas.add(metadataValue.getMetadataField().getMetadataSchema().getName());
+        }
+
+        for (String schema : schemas) {
+            writeMetadataToZip(c, schema, item, prefix, migrate, zos);
+        }
+    }
+
+    /**
+     * Write a single metadata schema's XML into a ZipOutputStream entry.
+     *
+     * @param c       DSpace context
+     * @param schema  the metadata schema name
+     * @param item    the item
+     * @param prefix  ZIP entry prefix (e.g. "1/")
+     * @param migrate whether to use migrate option
+     * @param zos     the ZipOutputStream
+     * @throws Exception if error
+     */
+    protected void writeMetadataToZip(Context c, String schema, Item item,
+                                      String prefix, boolean migrate,
+                                      ZipOutputStream zos) throws Exception {
+        String filename;
+        if (schema.equals(MetadataSchemaEnum.DC.getName())) {
+            filename = "dublin_core.xml";
+        } else {
+            filename = "metadata_" + schema + ".xml";
+        }
+
+        zos.putNextEntry(new ZipEntry(prefix + filename));
+
+        List<MetadataValue> dcorevalues = itemService.getMetadata(item, schema, Item.ANY, Item.ANY, Item.ANY);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n");
+        sb.append("<dublin_core schema=\"").append(schema).append("\">\n");
+
+        String dateIssued = null;
+        String dateAccessioned = null;
+
+        for (MetadataValue dcv : dcorevalues) {
+            MetadataField metadataField = dcv.getMetadataField();
+            String qualifier = metadataField.getQualifier();
+
+            if (qualifier == null) {
+                qualifier = "none";
+            }
+
+            String language = dcv.getLanguage();
+            String langAttr = "";
+            if (language != null) {
+                langAttr = " language=\"" + language + "\"";
+            }
+
+            String entry = "  <dcvalue element=\"" + metadataField.getElement() + "\" "
+                + "qualifier=\"" + qualifier + "\""
+                + langAttr + ">"
+                + Utils.addEntities(dcv.getValue()) + "</dcvalue>\n";
+
+            if (!migrate
+                || !(("date".equals(metadataField.getElement()) && "issued".equals(qualifier))
+                    || ("date".equals(metadataField.getElement()) && "accessioned".equals(qualifier))
+                    || ("date".equals(metadataField.getElement()) && "available".equals(qualifier))
+                    || ("identifier".equals(metadataField.getElement()) && "uri".equals(qualifier)
+                        && (dcv.getValue() != null && dcv.getValue().startsWith(
+                            handleService.getCanonicalPrefix() + handleService.getPrefix() + "/")))
+                    || ("description".equals(metadataField.getElement()) && "provenance".equals(qualifier))
+                    || ("format".equals(metadataField.getElement()) && "extent".equals(qualifier))
+                    || ("format".equals(metadataField.getElement()) && "mimetype".equals(qualifier)))) {
+                sb.append(entry);
+            }
+
+            if ("date".equals(metadataField.getElement()) && "issued".equals(qualifier)) {
+                dateIssued = dcv.getValue();
+            }
+            if ("date".equals(metadataField.getElement()) && "accessioned".equals(qualifier)) {
+                dateAccessioned = dcv.getValue();
+            }
+        }
+
+        if (migrate && dateIssued != null && dateAccessioned != null
+            && !dateIssued.equals(dateAccessioned)) {
+            sb.append("  <dcvalue element=\"date\" qualifier=\"issued\">");
+            sb.append(Utils.addEntities(dateIssued));
+            sb.append("</dcvalue>\n");
+        }
+
+        sb.append("</dublin_core>\n");
+
+        zos.write(sb.toString().getBytes(StandardCharsets.UTF_8));
+        zos.closeEntry();
+    }
+
+    /**
+     * Write the 'handle' file for an item into a ZipOutputStream.
+     *
+     * @param item   the item
+     * @param prefix ZIP entry prefix (e.g. "1/")
+     * @param zos    the ZipOutputStream
+     * @throws IOException if error
+     */
+    protected void writeHandleToZip(Item item, String prefix,
+                                    ZipOutputStream zos) throws IOException {
+        if (item.getHandle() == null) {
+            return;
+        }
+        zos.putNextEntry(new ZipEntry(prefix + "handle"));
+        zos.write((item.getHandle() + "\n").getBytes(StandardCharsets.UTF_8));
+        zos.closeEntry();
+    }
+
+    /**
+     * Write the 'collections' file for an item into a ZipOutputStream.
+     *
+     * @param item   the item
+     * @param prefix ZIP entry prefix (e.g. "1/")
+     * @param zos    the ZipOutputStream
+     * @throws IOException if error
+     */
+    protected void writeCollectionsToZip(Item item, String prefix,
+                                         ZipOutputStream zos) throws IOException {
+        zos.putNextEntry(new ZipEntry(prefix + "collections"));
+
+        StringBuilder sb = new StringBuilder();
+        Collection owningCollection = item.getOwningCollection();
+        if (owningCollection != null) {
+            sb.append(owningCollection.getHandle()).append('\n');
+        }
+        for (Collection collection : item.getCollections()) {
+            if (!collection.equals(owningCollection)) {
+                sb.append(collection.getHandle()).append('\n');
+            }
+        }
+
+        zos.write(sb.toString().getBytes(StandardCharsets.UTF_8));
+        zos.closeEntry();
+    }
+
+    /**
+     * Write the 'contents' manifest and bitstream data for an item into a ZipOutputStream.
+     *
+     * @param c                 DSpace context
+     * @param item              the item
+     * @param prefix            ZIP entry prefix (e.g. "1/")
+     * @param excludeBitstreams whether to exclude bitstream data
+     * @param zos               the ZipOutputStream
+     * @throws Exception if error
+     */
+    protected void writeBitstreamsToZip(Context c, Item item, String prefix,
+                                        boolean excludeBitstreams,
+                                        ZipOutputStream zos) throws Exception {
+        StringBuilder contents = new StringBuilder();
+        Set<String> usedNames = new HashSet<>();
+
+        for (Bundle bundle : item.getBundles()) {
+            String bundleName = bundle.getName();
+
+            for (Bitstream bitstream : bundle.getBitstreams()) {
+                String myName = bitstream.getName();
+                String originalName = myName;
+
+                String description = bitstream.getDescription();
+                if (!StringUtils.isEmpty(description)) {
+                    description = "\tdescription:" + description;
+                } else {
+                    description = "";
+                }
+
+                String primary = "";
+                if (bitstream.equals(bundle.getPrimaryBitstream())) {
+                    primary = "\tprimary:true ";
+                }
+
+                // Handle filename collisions
+                int myPrefix = 1;
+                while (usedNames.contains(myName)) {
+                    myName = myPrefix + "_" + originalName;
+                    myPrefix++;
+                }
+                usedNames.add(myName);
+
+                // Write the bitstream data
+                if (!excludeBitstreams) {
+                    zos.putNextEntry(new ZipEntry(prefix + myName));
+                    try (InputStream is = bitstreamService.retrieve(c, bitstream)) {
+                        byte[] buf = new byte[2048];
+                        int len;
+                        while ((len = is.read(buf)) != -1) {
+                            zos.write(buf, 0, len);
+                        }
+                    }
+                    zos.closeEntry();
+                }
+
+                // Write the manifest entry
+                if (bitstreamService.isRegisteredBitstream(bitstream)) {
+                    contents.append("-r -s ").append(bitstream.getStoreNumber())
+                        .append(" -f ").append(myName)
+                        .append("\tbundle:").append(bundleName)
+                        .append(primary).append(description).append('\n');
+                } else {
+                    contents.append(myName).append("\tbundle:").append(bundleName)
+                        .append(primary).append(description).append('\n');
+                }
+            }
+        }
+
+        // Write the contents manifest file
+        zos.putNextEntry(new ZipEntry(prefix + "contents"));
+        zos.write(contents.toString().getBytes(StandardCharsets.UTF_8));
+        zos.closeEntry();
     }
 
     @Override
@@ -567,161 +825,87 @@ public class ItemExportServiceImpl implements ItemExportService {
 
         // before we create a new export archive lets delete the 'expired'
         // archives
-        //deleteOldExportArchives(eperson.getID());
         deleteOldExportArchives();
 
-        // keep track of the commulative size of all bitstreams in each of the
-        // items
-        // it will be checked against the config file entry
-        double size = 0;
+        // Build itemsMap: collect item UUIDs grouped by collection/item key
         final HashMap<String, List<UUID>> itemsMap = new HashMap<>();
         for (DSpaceObject dso : dsObjects) {
             if (dso.getType() == Constants.COMMUNITY) {
                 Community community = (Community) dso;
-                // get all the collections in the community
                 List<Collection> collections = communityService.getAllCollections(context, community);
                 for (Collection collection : collections) {
                     ArrayList<UUID> items = new ArrayList<>();
-                    // get all the items in each collection
                     Iterator<Item> iitems = itemService.findByCollection(context, collection);
-                    try {
-                        while (iitems.hasNext()) {
-                            Item item = iitems.next();
-                            // get all the bundles in the item
-                            List<Bundle> bundles = item.getBundles();
-                            for (Bundle bundle : bundles) {
-                                // get all the bitstreams in each bundle
-                                List<Bitstream> bitstreams = bundle.getBitstreams();
-                                for (Bitstream bitstream : bitstreams) {
-                                    // add up the size
-                                    size += bitstream.getSizeBytes();
-                                }
-                            }
-                            items.add(item.getID());
-                        }
-                    } finally {
-                        if (items.size() > 0) {
-                            itemsMap.put("collection_" + collection.getID(), items);
-                        }
+                    while (iitems.hasNext()) {
+                        items.add(iitems.next().getID());
+                    }
+                    if (!items.isEmpty()) {
+                        itemsMap.put("collection_" + collection.getID(), items);
                     }
                 }
             } else if (dso.getType() == Constants.COLLECTION) {
                 Collection collection = (Collection) dso;
                 ArrayList<UUID> items = new ArrayList<>();
-
-                // get all the items in the collection
                 Iterator<Item> iitems = itemService.findByCollection(context, collection);
-                try {
-                    while (iitems.hasNext()) {
-                        Item item = iitems.next();
-                        // get all thebundles in the item
-                        List<Bundle> bundles = item.getBundles();
-                        for (Bundle bundle : bundles) {
-                            // get all the bitstreams in the bundle
-                            List<Bitstream> bitstreams = bundle.getBitstreams();
-                            for (Bitstream bitstream : bitstreams) {
-                                // add up the size
-                                size += bitstream.getSizeBytes();
-                            }
-                        }
-                        items.add(item.getID());
-                    }
-                } finally {
-                    if (items.size() > 0) {
-                        itemsMap.put("collection_" + collection.getID(), items);
-                    }
+                while (iitems.hasNext()) {
+                    items.add(iitems.next().getID());
+                }
+                if (!items.isEmpty()) {
+                    itemsMap.put("collection_" + collection.getID(), items);
                 }
             } else if (dso.getType() == Constants.ITEM) {
                 Item item = (Item) dso;
-                // get all the bundles in the item
-                List<Bundle> bundles = item.getBundles();
-                for (Bundle bundle : bundles) {
-                    // get all the bitstreams in the bundle
-                    List<Bitstream> bitstreams = bundle.getBitstreams();
-                    for (Bitstream bitstream : bitstreams) {
-                        // add up the size
-                        size += bitstream.getSizeBytes();
-                    }
-                }
                 ArrayList<UUID> items = new ArrayList<>();
                 items.add(item.getID());
                 itemsMap.put("item_" + item.getID(), items);
-            } else {
-                // nothing to do just ignore this type of DSpaceObject
-            }
-        }
-
-        // check the size of all the bitstreams against the configuration file
-        // entry if it exists
-        String megaBytes = configurationService
-            .getProperty("org.dspace.app.itemexport.max.size");
-        if (megaBytes != null) {
-            float maxSize = 0;
-            try {
-                maxSize = Float.parseFloat(megaBytes);
-            } catch (Exception e) {
-                // ignore...configuration entry may not be present
-            }
-
-            if (maxSize > 0 && maxSize < (size / 1048576.00)) { // a megabyte
-                throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
-                                              "The overall size of this export is too large.  Please contact your " +
-                                                  "administrator for more information.");
             }
         }
 
         // if we have any items to process then kick off anonymous thread
-        if (itemsMap.size() > 0) {
+        if (!itemsMap.isEmpty()) {
             Thread go = new Thread() {
                 @Override
                 public void run() {
                     Context context = new Context();
-                    Iterator<Item> iitems = null;
                     try {
                         // ignore auths
                         context.turnOffAuthorisationSystem();
 
                         String fileName = assembleFileName("item", eperson,
                                                            LocalDate.now());
-                        String workParentDir = getExportWorkDirectory()
-                            + System.getProperty("file.separator")
-                            + fileName;
                         String downloadDir = getExportDownloadDirectory(eperson);
                         File dnDir = new File(downloadDir);
                         if (!dnDir.exists() && !dnDir.mkdirs()) {
                             logError("Unable to create download directory");
                         }
 
-                        Iterator<String> iter = itemsMap.keySet().iterator();
-                        while (iter.hasNext()) {
-                            String keyName = iter.next();
-                            List<UUID> uuids = itemsMap.get(keyName);
-                            List<Item> items = new ArrayList<>();
-                            for (UUID uuid : uuids) {
-                                items.add(itemService.find(context, uuid));
+                        String targetPath = downloadDir + File.separator + fileName + ".zip";
+                        String tempPath = targetPath + "_tmp";
+
+                        // Write all items directly to ZIP — no temp directory needed
+                        try (ZipOutputStream zos = new ZipOutputStream(
+                                new BufferedOutputStream(new FileOutputStream(tempPath)))) {
+                            zos.setLevel(9);
+
+                            for (String keyName : itemsMap.keySet()) {
+                                List<UUID> uuids = itemsMap.get(keyName);
+                                int seq = 1;
+                                for (UUID uuid : uuids) {
+                                    Item item = itemService.find(context, uuid);
+                                    exportItemToZip(context, item, keyName + "/" + seq,
+                                                    migrate, false, zos);
+                                    context.uncacheEntity(item);
+                                    seq++;
+                                }
                             }
-                            iitems = items.iterator();
-
-                            String workDir = workParentDir
-                                + System.getProperty("file.separator")
-                                + keyName;
-
-                            File wkDir = new File(workDir);
-                            if (!wkDir.exists() && !wkDir.mkdirs()) {
-                                logError("Unable to create working directory");
-                            }
-
-
-                            // export the items using normal export method
-                            exportItem(context, iitems, workDir, 1, migrate, false);
                         }
 
-                        // now zip up the export directory created above
-                        zip(workParentDir, downloadDir
-                            + System.getProperty("file.separator")
-                            + fileName + ".zip");
-                        // email message letting user know the file is ready for
-                        // download
+                        // Atomic rename from temp to final
+                        if (!new File(tempPath).renameTo(new File(targetPath))) {
+                            logError("Unable to rename temp export file to " + targetPath);
+                        }
+
+                        // email message letting user know the file is ready for download
                         emailSuccessMessage(context, eperson, fileName + ".zip");
                         // return to enforcing auths
                         context.restoreAuthSystemState();
