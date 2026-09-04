@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.exception.NotImplementedException;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,7 @@ public class SearchService extends AbstractResourceService {
         if (searchPlugin != null) {
             for (SearchAnnotationService service : annotationService) {
                 if (service.useSearchPlugin(searchPlugin)) {
-                    service.initializeQuerySettings(IIIF_ENDPOINT, getManifestId(uuid));
+                    service.initializeQuerySettings(IIIF_ENDPOINT, IIIFSharedUtils.getManifestId(uuid));
                     return service.getSearchResponse(uuid, query);
                 }
             }
