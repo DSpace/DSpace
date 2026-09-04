@@ -15,12 +15,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.codec.CharEncoding;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -76,13 +75,13 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
     /**
      * Test the getBaseParameters method
      */
-    public void testGetBaseParameters() throws UnsupportedEncodingException {
+    public void testGetBaseParameters() {
 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
-        String encodedHandle = URLEncoder.encode(item.getHandle(), CharEncoding.UTF_8);
+        String encodedHandle = URLEncoder.encode(item.getHandle(), StandardCharsets.UTF_8);
         context.restoreAuthSystemState();
 
         ExportEventProcessor exportEventProcessor = new ItemEventProcessor(context, request, item);

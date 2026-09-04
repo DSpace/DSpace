@@ -10,6 +10,7 @@ package org.dspace.saml2;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
@@ -275,7 +276,7 @@ public class DSpaceRelyingPartyRegistrationRepository implements RelyingPartyReg
             return null;
         }
 
-        try (Reader reader = new InputStreamReader(resource.getInputStream())) {
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
             String key = CharStreams.toString(reader);
 
             String privateKeyPEM = key

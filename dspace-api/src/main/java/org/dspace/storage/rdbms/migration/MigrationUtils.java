@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +20,6 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.dspace.core.Constants;
 import org.springframework.util.FileCopyUtils;
 
 /**
@@ -276,7 +276,7 @@ public class MigrationUtils {
         try (Reader reader =
                  new InputStreamReader(
                      Objects.requireNonNull(MigrationUtils.class.getClassLoader().getResourceAsStream(resourcePath)),
-                     Constants.DEFAULT_ENCODING)) {
+                     StandardCharsets.UTF_8)) {
             return FileCopyUtils.copyToString(reader);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

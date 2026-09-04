@@ -7,7 +7,6 @@
  */
 package org.dspace.app.itemmarking;
 
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -72,11 +70,7 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
                     + item.getHandle() + "/"
                     + bitstream.getSequenceID() + "/";
 
-                try {
-                    bsLink = bsLink + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
-                } catch (UnsupportedEncodingException e) {
-                    LOG.warn("DSpace uses an unsupported encoding", e);
-                }
+                bsLink = bsLink + Util.encodeBitstreamName(bitstream.getName());
 
                 signInfo.setLink(bsLink);
 
