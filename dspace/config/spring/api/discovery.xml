@@ -292,6 +292,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- Uncomment to enable Advisor relationship filter for discovery searches
+                <ref bean="searchFilterIsAdvisorOfPublicationRelation"/>
+                -->
                 <ref bean="searchFilterGeospatialPoint"/>
             </list>
         </property>
@@ -475,6 +478,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- Uncomment to enable Advisor relationship filter for discovery searches
+                <ref bean="searchFilterIsAdvisorOfPublicationRelation"/>
+                -->
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -614,6 +620,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- Uncomment to enable Advisor relationship filter for discovery searches
+                <ref bean="searchFilterIsAdvisorOfPublicationRelation"/>
+                -->
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -760,6 +769,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- Uncomment to enable Advisor relationship filter for discovery searches
+                <ref bean="searchFilterIsAdvisorOfPublicationRelation"/>
+                -->
                 <ref bean="searchFilterNotifyRelation" />
                 <ref bean="searchFilterNotifyEndorsement" />
                 <ref bean="searchFilterNotifyReview" />
@@ -1564,6 +1576,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- Uncomment to enable Advisor relationship filter for discovery searches
+                <ref bean="searchFilterIsAdvisorOfPublicationRelation"/>
+                -->
                 <ref bean="searchFilterIsDatasetOfPublicationRelation"/>
             </list>
         </property>
@@ -1635,6 +1650,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- Uncomment to enable Advisor relationship filter for discovery searches
+                <ref bean="searchFilterIsAdvisorOfPublicationRelation"/>
+                -->
                 <ref bean="searchFilterIsDatasetOfPublicationRelation"/>
             </list>
         </property>
@@ -3717,6 +3735,28 @@
         <property name="metadataFields">
             <list>
                 <value>relation.isPublicationOfProject.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsAdvisorOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isAdvisorOfPublication"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isAdvisorOfPublication.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfAdvisorRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfAdvisor"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfAdvisor.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
