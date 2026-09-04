@@ -740,11 +740,14 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 fromCSV[v] = value;
             }
 
-            if ((value != null) && (!"".equals(value)) && (!contains(value, dcvalues))) {
+            String existingValue = findMatchingValue(value, dcvalues);
+            if ((value != null) && (!"".equals(value)) && (existingValue == null)) {
                 changes.registerAdd(dcv);
             } else {
-                // Keep it
-                changes.registerConstant(dcv);
+                // Keep the exact stored value so rebuilding the field cannot normalize untouched metadata.
+                BulkEditMetadataValue constant = existingValue == null ? dcv
+                    : getBulkEditValueFromCSV(c, language, schema, element, qualifier, existingValue, null);
+                changes.registerConstant(constant);
             }
         }
 
@@ -840,8 +843,13 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
                 if (!values.isEmpty()) {
-                    itemService.addMetadata(c, item, schema, element, qualifier,
-                                            language, values, authorities, confidences);
+                    List<MetadataValue> added = itemService.addMetadata(c, item, schema, element, qualifier,
+                                                                       language, values, authorities, confidences);
+                    for (int i = 0; i < added.size(); i++) {
+                        // DSpaceObjectService trims values before persisting them. Restore the exact imported
+                        // representation so meaningful newlines are not lost when a sibling value changes.
+                        added.get(i).setValue(values.get(i));
+                    }
                 }
                 itemService.update(c, item);
             }
@@ -1235,13 +1243,24 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      * @return Whether or not it is contained
      */
     protected boolean contains(String needle, String[] haystack) {
+        return findMatchingValue(needle, haystack) != null;
+    }
+
+    /**
+     * Find the exact stored value which is equivalent to the supplied value for import comparison.
+     *
+     * @param needle   The String to look for
+     * @param haystack The array of Strings to search through
+     * @return The matching stored value, or null when no value matches
+     */
+    protected String findMatchingValue(String needle, String[] haystack) {
         // Look for the needle in the haystack
         for (String examine : haystack) {
             if (clean(examine).equals(clean(needle))) {
-                return true;
+                return examine;
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -1256,8 +1275,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             return null;
         }
 
-        // Remove newlines as different operating systems sometimes use different formats
-        return in.replaceAll("\r\n", "").replaceAll("\n", "").trim();
+        // Normalize line endings across operating systems without discarding meaningful newlines
+        return in.replace("\r\n", "\n").replace('\r', '\n');
     }
 
     /**
