@@ -10,6 +10,8 @@ package org.dspace.content.security.service;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
@@ -47,6 +49,13 @@ public interface MetadataSecurityService {
      */
     <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso);
 
+    <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context, T dso,
+                                                                                     boolean preventBoxSecurityCheck);
+
+    <T extends DSpaceObject> List<MetadataValue> getPermissionFilteredMetadataValues(Context context,
+                                                                                     T dso,
+                                                                                     String metadataField);
+
     /**
      * Returns all the metadata values of the given dso filtered by permission
      * evaluations and language preferences.
@@ -60,5 +69,19 @@ public interface MetadataSecurityService {
      * @param  dso                     the dso
      * @return                         the metadata values filtered by both permissions and language
      */
-    <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(Context context, T dso);
+    <T extends DSpaceObject> List<MetadataValue> getPermissionAndLangFilteredMetadataFields(
+        Context context,
+        T dso,
+        boolean preventBoxSecurityCheck);
+
+    /**
+     * Check if the given metadata field is visible for the given item.
+     *
+     * @param  context                 the DSpace Context
+     * @param  item                    the item
+     * @param  metadataField           the metadata field
+     * @return                         true if the metadata field is visible, false
+     *                                 otherwise
+     */
+    boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField);
 }
