@@ -22,11 +22,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,6 +43,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
 import org.apache.solr.client.solrj.response.json.BucketJsonFacet;
 import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
@@ -1005,6 +1010,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
                           solrSearchCore.REQUEST_METHOD);
             if (solrQueryResponse != null) {
+                SpellCheckResponse spellCheckResponse = solrQueryResponse.getSpellCheckResponse();
+                if (spellCheckResponse != null) {
+                    result.setSpellCheckSuggestions(getSpellCheckSuggestions(spellCheckResponse));
+                }
                 result.setSearchTime(solrQueryResponse.getQTime());
                 result.setStart(query.getStart());
                 result.setMaxResults(query.getMaxResults());
@@ -1090,6 +1099,71 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             throw new RuntimeException(message);
         }
         return result;
+    }
+
+    /**
+     * Extracts the "did you mean" suggestions out of the given Solr spellcheck response.
+     * <p>
+     * The collated queries come first, since they are corrections of the query as a whole, followed by the single
+     * term alternatives sorted by descending frequency in the index. Suggestions must be unique while preserving
+     * that ordering, hence the {@link LinkedHashSet}.
+     *
+     * @param spellCheckResponse the spellcheck section of the Solr response
+     * @return the ordered, deduplicated list of suggestions, empty if the response holds none
+     */
+    private List<String> getSpellCheckSuggestions(SpellCheckResponse spellCheckResponse) {
+        Set<String> suggestions = new LinkedHashSet<>();
+
+        List<SpellCheckResponse.Collation> collations = spellCheckResponse.getCollatedResults();
+        if (CollectionUtils.isNotEmpty(collations)) {
+            collations.stream()
+                      .map(collation -> collation.getCollationQueryString().trim())
+                      .forEach(suggestions::add);
+        }
+
+        List<SpellCheckResponse.Suggestion> alternatives = spellCheckResponse.getSuggestions();
+        if (CollectionUtils.isNotEmpty(alternatives)) {
+            alternatives.stream()
+                        .flatMap(this::getAlternativesByFrequency)
+                        .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                        .map(Map.Entry::getKey)
+                        .forEach(suggestions::add);
+        }
+
+        return new ArrayList<>(suggestions);
+    }
+
+    /**
+     * Pairs each spellcheck alternative of the given suggestion with its frequency in the index.
+     * <p>
+     * Solr only returns the alternative frequencies when the {@code spellcheck.extendedResults} parameter is
+     * enabled, so {@link SpellCheckResponse.Suggestion#getAlternativeFrequencies()} may be {@code null}. When the
+     * frequencies are missing, or their amount does not match the amount of alternatives, all the alternatives are
+     * paired with a frequency of 0: this keeps the ordering returned by Solr (which is already sorted by relevance)
+     * since the sorting applied by the caller is stable.
+     *
+     * @param suggestion the spellcheck suggestion to process
+     * @return a stream of alternative / frequency pairs, empty if the suggestion has no alternatives
+     */
+    private Stream<Map.Entry<String, Integer>> getAlternativesByFrequency(SpellCheckResponse.Suggestion suggestion) {
+        List<String> alternatives = suggestion.getAlternatives();
+        if (CollectionUtils.isEmpty(alternatives)) {
+            return Stream.empty();
+        }
+
+        List<Integer> frequencies = suggestion.getAlternativeFrequencies();
+        boolean hasFrequencies = frequencies != null && frequencies.size() == alternatives.size();
+
+        return IntStream.range(0, alternatives.size())
+                        .filter(i -> StringUtils.isNotBlank(alternatives.get(i)))
+                        .mapToObj(i -> Map.entry(alternatives.get(i), getFrequency(frequencies, hasFrequencies, i)));
+    }
+
+    private int getFrequency(List<Integer> frequencies, boolean hasFrequencies, int index) {
+        if (!hasFrequencies || frequencies.get(index) == null) {
+            return 0;
+        }
+        return frequencies.get(index);
     }
 
     /**
