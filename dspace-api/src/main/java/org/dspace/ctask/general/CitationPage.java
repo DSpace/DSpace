@@ -7,7 +7,6 @@
  */
 package org.dspace.ctask.general;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -170,12 +169,12 @@ public class CitationPage extends AbstractCurationTask {
                             .append(" is citable.");
                     try {
                         //Create the cited document
-                        InputStream citedInputStream =
-                            new ByteArrayInputStream(
-                                citationDocument.makeCitedDocument(context, bitstream).getLeft());
-                        //Add the cited document to the appropriate bundle
-                        this.addCitedPageToItem(context, citedInputStream, bundle, pBundle,
-                                                dBundle, item, bitstream);
+                        try (var citedDocument = citationDocument.makeCitedDocumentStream(context, bitstream);
+                             InputStream citedInputStream = citedDocument.getInputStream()) {
+                            //Add the cited document to the appropriate bundle
+                            this.addCitedPageToItem(context, citedInputStream, bundle, pBundle,
+                                                    dBundle, item, bitstream);
+                        }
                         // now set the policies of the preservation and display bundle
                         clonePolicies(context, original, pBundle);
                         clonePolicies(context, original, dBundle);
