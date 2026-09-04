@@ -35,7 +35,10 @@
         "sorg:ScholarlyArticle"
       ]
     },
-    "type": "sorg:AboutPage"
+    "type": [
+      "Page",
+      "sorg:AboutPage"
+    ]
   },
   "id": "${params[9]}",
   "object": {
