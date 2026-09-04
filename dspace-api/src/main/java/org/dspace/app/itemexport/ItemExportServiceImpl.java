@@ -485,9 +485,17 @@ public class ItemExportServiceImpl implements ItemExportService {
                             String destDirName, String zipFileName,
                             int seqStart, boolean migrate,
                             boolean excludeBitstreams) throws Exception {
+        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
+        if (allowedBaseDirs != null) {
+            destDirName = SecureFileAccess.validatePathForWrite(
+                destDirName, allowedBaseDirs, "itemexport").toString();
+        }
+
         String workDir = getExportWorkDirectory() +
             System.getProperty("file.separator") +
             zipFileName;
+        workDir = SecureFileAccess.validatePathForWrite(
+            workDir, List.of(getExportWorkDirectory()), "itemexport").toString();
 
         File wkDir = new File(workDir);
         if (!wkDir.exists() && !wkDir.mkdirs()) {
@@ -999,6 +1007,14 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void zip(String strSource, String target) throws Exception {
         ZipOutputStream cpZipOutputStream = null;
         String tempFileName = target + "_tmp";
+        // TODO: is this out of scope for the specific fix?
+        //  and adds extra docs since download, cli export etc must now share a base path
+        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
+        if (allowedBaseDirs == null) {
+            File parent = new File(target).getParentFile();
+            allowedBaseDirs = List.of(parent != null ? parent.getPath() : ".");
+        }
+        SecureFileAccess.validatePathForWrite(target, allowedBaseDirs, "itemexport");
         try {
             File cpFile = new File(strSource);
             if (!cpFile.isFile() && !cpFile.isDirectory()) {
@@ -1009,7 +1025,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 logWarn("Target file already exists: " + targetFile.getName());
             }
 
-            FileOutputStream fos = new FileOutputStream(tempFileName);
+            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, allowedBaseDirs, "itemexport");
             cpZipOutputStream = new ZipOutputStream(fos);
             cpZipOutputStream.setLevel(9);
             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
