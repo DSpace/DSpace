@@ -84,12 +84,14 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
 
         String token = getAuthToken(admin.getEmail(), password);
 
-//        When no projection is requested
+//        When no projection is requested. Language-neutral (null language) values are always
+//        returned alongside the values matching the requested locale.
         getClient(token).perform(get("/api/core/items/" + item.getID())
                             .header("Accept-Language", Locale.ENGLISH.getLanguage()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
-                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 0, "en")))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Item", 0, null)))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 1, "en")))
                         .andExpect(jsonPath("$.metadata",
                             matchMetadata("dc.contributor.author", "english author1", 0, "en")))
                         .andExpect(jsonPath("$.metadata",
@@ -107,7 +109,8 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
                             .header("Accept-Language", "en_US"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
-                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 0, "en")))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Item", 0, null)))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 1, "en")))
                         .andExpect(jsonPath("$.metadata",
                             matchMetadata("dc.contributor.author", "english author1", 0, "en")))
                         .andExpect(jsonPath("$.metadata",
@@ -125,7 +128,8 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
                             .header("Accept-Language", Locale.GERMAN.getLanguage()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
-                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "german title", 0, "de")))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Item", 0, null)))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "german title", 1, "de")))
                         .andExpect(jsonPath("$.metadata",
                             matchMetadata("dc.contributor.author", "german author1", 0, "de")))
                         .andExpect(jsonPath("$.metadata",
@@ -167,6 +171,32 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
 
     }
 
+    /**
+     * A metadata value without a language (language-neutral, e.g. dc.description.provenance or any
+     * value added through the REST API without a language) must remain visible in the default
+     * projection even when the same field also contains a value matching the active locale.
+     */
+    @Test
+    public void testNullLanguageValuesRemainVisibleAlongsideLocalizedValues() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withTitle("Item")
+                               .withTitleForLanguage("english title", "en")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID())
+                            .header("Accept-Language", Locale.ENGLISH.getLanguage()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Item", 0, null)))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 1, "en")));
+    }
+
     @Test
     public void testFindCollection() throws Exception {
 
@@ -185,9 +215,9 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
                        .header("Accept-Language", Locale.ENGLISH.getLanguage()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 0, "en")))
-                   .andExpect(jsonPath("$.metadata", matchMetadataLanguageDoesNotExist("dc.title", "de")))
-                   .andExpect(jsonPath("$.metadata", matchMetadataLanguageDoesNotExist("dc.title", null)));
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "collection", 0, null)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 1, "en")))
+                   .andExpect(jsonPath("$.metadata", matchMetadataLanguageDoesNotExist("dc.title", "de")));
 
 //        When allLanguages projection is requested
         getClient().perform(get("/api/core/collections/" + collection.getID())
@@ -217,9 +247,9 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
                        .header("Accept-Language", Locale.ENGLISH.getLanguage()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 0, "en")))
-                   .andExpect(jsonPath("$.metadata", matchMetadataLanguageDoesNotExist("dc.title", "de")))
-                   .andExpect(jsonPath("$.metadata", matchMetadataLanguageDoesNotExist("dc.title", null)));
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "community", 0, null)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "english title", 1, "en")))
+                   .andExpect(jsonPath("$.metadata", matchMetadataLanguageDoesNotExist("dc.title", "de")));
 
 //        When allLanguages projection is requested
         getClient().perform(get("/api/core/communities/" + community.getID())
@@ -260,13 +290,13 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$._embedded.item",
                                             ItemMatcher.matchItemProperties(workspaceItem.getItem())))
                         .andExpect(jsonPath("$._embedded.item.metadata",
-                                            matchMetadata("dc.title", "english title", 0, "en")))
+                                            matchMetadata("dc.title", "workspaceItem title", 0, null)))
+                        .andExpect(jsonPath("$._embedded.item.metadata",
+                                            matchMetadata("dc.title", "english title", 1, "en")))
                         .andExpect(jsonPath("$._embedded.item.metadata",
                                             matchMetadata("dspace.entity.type", "Publication", 0, null)))
                         .andExpect(jsonPath("$._embedded.item.metadata",
                                             matchMetadata("dc.subject", "german subject", 0, "de")))
-                        .andExpect(jsonPath("$._embedded.item.metadata",
-                                            matchMetadataLanguageDoesNotExist("dc.title", null)))
                         .andExpect(jsonPath("$._embedded.item.metadata",
                                             matchMetadataLanguageDoesNotExist("dc.title", "de")))
                         .andExpect(jsonPath("$._embedded.item.metadata",
@@ -328,13 +358,13 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$._embedded.item",
                                             ItemMatcher.matchItemProperties(workflowItem.getItem())))
                         .andExpect(jsonPath("$._embedded.item.metadata",
-                                            matchMetadata("dc.title", "english title", 0, "en")))
+                                            matchMetadata("dc.title", "workflowItem title", 0, null)))
+                        .andExpect(jsonPath("$._embedded.item.metadata",
+                                            matchMetadata("dc.title", "english title", 1, "en")))
                         .andExpect(jsonPath("$._embedded.item.metadata",
                                             matchMetadata("dspace.entity.type", "Publication", 0, null)))
                         .andExpect(jsonPath("$._embedded.item.metadata",
                                             matchMetadata("dc.subject", "german subject", 0, "de")))
-                        .andExpect(jsonPath("$._embedded.item.metadata",
-                                            matchMetadataLanguageDoesNotExist("dc.title", null)))
                         .andExpect(jsonPath("$._embedded.item.metadata",
                                             matchMetadataLanguageDoesNotExist("dc.title", "de")))
                         .andExpect(jsonPath("$._embedded.item.metadata",
