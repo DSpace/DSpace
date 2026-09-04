@@ -120,14 +120,12 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     /**
      * Get the configured list of allowed base directories for item export.
-     * @return list of absolute allowed base paths, or null
+     * @return list of absolute allowed base paths. If this is an empty list, it will forbid all exports
      */
-    protected List<String> getAllowedExportBaseDirs() {
+    protected List<String> getAllowedExportBaseDirs() throws Exception {
+        String workDir = getExportWorkDirectory();
         String[] configured =
-            configurationService.getArrayProperty("org.dspace.app.itemexport.allowed.dir");
-        if (configured == null || configured.length == 0) {
-            return null;
-        }
+            configurationService.getArrayProperty("org.dspace.app.itemexport.allowed.dir", new String[]{workDir});
         return Arrays.stream(configured)
                      .map(String::trim)
                      .collect(Collectors.toList());
@@ -137,13 +135,8 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void exportItem(Context c, Iterator<Item> i,
                            String destDirName, int seqStart, boolean migrate,
                            boolean excludeBitstreams) throws Exception {
-        // Validate dest dir argument against a base path, if configured
-        // (otherwise trust user input)
-        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
-        if (allowedBaseDirs != null) {
-            destDirName = SecureFileAccess.validatePathForWrite(
-                destDirName, allowedBaseDirs, "itemexport").toString();
-        }
+        destDirName = SecureFileAccess.validatePathForWrite(
+            destDirName, getAllowedExportBaseDirs(), "itemexport").toString();
 
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
@@ -485,11 +478,8 @@ public class ItemExportServiceImpl implements ItemExportService {
                             String destDirName, String zipFileName,
                             int seqStart, boolean migrate,
                             boolean excludeBitstreams) throws Exception {
-        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
-        if (allowedBaseDirs != null) {
-            destDirName = SecureFileAccess.validatePathForWrite(
-                destDirName, allowedBaseDirs, "itemexport").toString();
-        }
+        destDirName = SecureFileAccess.validatePathForWrite(
+            destDirName, getAllowedExportBaseDirs(), "itemexport").toString();
 
         String workDir = getExportWorkDirectory() +
             System.getProperty("file.separator") +
@@ -1007,14 +997,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void zip(String strSource, String target) throws Exception {
         ZipOutputStream cpZipOutputStream = null;
         String tempFileName = target + "_tmp";
-        // TODO: is this out of scope for the specific fix?
-        //  and adds extra docs since download, cli export etc must now share a base path
-        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
-        if (allowedBaseDirs == null) {
-            File parent = new File(target).getParentFile();
-            allowedBaseDirs = List.of(parent != null ? parent.getPath() : ".");
-        }
-        SecureFileAccess.validatePathForWrite(target, allowedBaseDirs, "itemexport");
+        SecureFileAccess.validatePathForWrite(target, getAllowedExportBaseDirs(), "itemexport");
         try {
             File cpFile = new File(strSource);
             if (!cpFile.isFile() && !cpFile.isDirectory()) {
@@ -1025,7 +1008,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 logWarn("Target file already exists: " + targetFile.getName());
             }
 
-            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, allowedBaseDirs, "itemexport");
+            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, getAllowedExportBaseDirs(), "itemexport");
             cpZipOutputStream = new ZipOutputStream(fos);
             cpZipOutputStream.setLevel(9);
             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
