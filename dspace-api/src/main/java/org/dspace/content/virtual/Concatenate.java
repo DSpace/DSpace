@@ -109,12 +109,13 @@ public class Concatenate implements VirtualMetadataConfiguration {
      * this method will retrieve the metadata values from the given item for all the metadata fields listed
      * in the fields property and it'll concatenate all those values together with the separator specified
      * in this class
-     * @param context   The relevant DSpace context
-     * @param item      The item that will be used to either retrieve metadata values from
+     *
+     * @param context The relevant DSpace context
+     * @param item    The item that will be used to either retrieve metadata values from
      * @return The String value for all of the retrieved metadatavalues combined with the separator
      */
     @Override
-    public List<String> getValues(Context context, Item item) {
+    public List<ValueResult> getValues(Context context, Item item) {
 
         List<String> resultValues = new LinkedList<>();
         List<String> value = this.getFields();
@@ -146,8 +147,8 @@ public class Concatenate implements VirtualMetadataConfiguration {
         }
 
         String result = StringUtils.join(resultValues, this.getSeparator());
-        List<String> listToReturn = new LinkedList<>();
-        listToReturn.add(result);
+        List<ValueResult> listToReturn = new LinkedList<>();
+        listToReturn.add(new ValueResult(result));
         return listToReturn;
     }
 
