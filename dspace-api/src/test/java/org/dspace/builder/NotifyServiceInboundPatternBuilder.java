@@ -15,7 +15,6 @@ import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 /**
  * Builder for {@link NotifyServiceInboundPattern} entities.
@@ -51,7 +50,6 @@ public class NotifyServiceInboundPatternBuilder
                 delete(notifyServiceInboundPattern);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -69,8 +67,7 @@ public class NotifyServiceInboundPatternBuilder
             inboundPatternService.update(context, notifyServiceInboundPattern);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException e) {
+        } catch (SQLException e) {
             log.error(e);
         }
         return notifyServiceInboundPattern;
@@ -86,7 +83,6 @@ public class NotifyServiceInboundPatternBuilder
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     public static NotifyServiceInboundPatternBuilder createNotifyServiceInboundPatternBuilder(

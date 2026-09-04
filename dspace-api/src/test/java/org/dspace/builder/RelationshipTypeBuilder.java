@@ -16,7 +16,6 @@ import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, RelationshipTypeService> {
 
@@ -45,7 +44,6 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
                 delete(c, relationshipType);
             }
             c.complete();
-            indexingService.commit();
         }
 
     }
@@ -64,8 +62,7 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
             relationshipTypeService.update(context, relationshipType);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException | AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error(e);
         }
         return relationshipType;
@@ -81,7 +78,6 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     public static RelationshipTypeBuilder createRelationshipTypeBuilder(Context context, EntityType leftType,
