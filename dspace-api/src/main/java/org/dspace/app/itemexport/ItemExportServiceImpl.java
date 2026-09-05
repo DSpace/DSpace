@@ -20,9 +20,9 @@ import java.nio.file.Files;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -120,6 +120,8 @@ public class ItemExportServiceImpl implements ItemExportService {
     /**
      * Get the configured list of allowed base directories for item export.
      * @return list of absolute allowed base paths. If this is an empty list, it will forbid all exports
+     *         but in practice, it will always at least default to workDir, and
+     *         {@link getExportWorkDirectory} throws an Exception if not set
      */
     protected List<String> getAllowedExportBaseDirs() throws Exception {
         String workDir = getExportWorkDirectory();
