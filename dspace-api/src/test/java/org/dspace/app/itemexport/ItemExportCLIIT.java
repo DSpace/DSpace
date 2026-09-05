@@ -88,7 +88,6 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
     @After
     @Override
     public void destroy() throws Exception {
-        configurationService.setProperty("org.dspace.app.itemexport.allowed.dir", null);
         PathUtils.deleteOnExit(tempDir);
         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
             PathUtils.deleteOnExit(path);
@@ -362,7 +361,7 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty(
                 "org.dspace.app.itemexport.allowed.dir", workDir.toString());
 
-        Path notAllowed = Files.createTempDirectory("");
+        Path notAllowed = Files.createTempDirectory("notSafExportDir");
 
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
@@ -381,6 +380,34 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
         // File should never have been written
         assertFalse(Files.list(notAllowed).findAny().isPresent());
         PathUtils.deleteOnExit(notAllowed);
+    }
+
+    @Test
+    public void allowedDirDefaultsToExportWorkDir() throws Exception {
+        // default array property is workDir, used on null or empty value set
+        configurationService.setProperty(
+                "org.dspace.app.itemexport.allowed.dir", new String[]{});
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .build();
+        context.restoreAuthSystemState();
+
+        // Work dir should be allowed
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", workDir.toString(), "-n", "1" };
+        perfomExportScript(args);
+        assertTrue(Files.list(workDir).findAny().isPresent());
+
+        String[] args2 = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+        // Exception should be thrown at validation
+        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args2));
+        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
+        // File should never have been written
+        assertFalse(Files.list(workDir).findAny().isPresent());
     }
 
     /**
