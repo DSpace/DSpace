@@ -43,6 +43,8 @@
         <errorprone.version>2.50.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
         <jackson.version>3.0.3</jackson.version>
+        <!-- Jackson 2 remains required by third-party libraries. -->
+        <jackson2.version>2.22.1</jackson2.version>
         <jackson-annotations.version>2.22</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.5</jaxb-api.version>
@@ -1927,12 +1929,12 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.18.0</version>
+                <version>${jackson2.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.18.0</version>
+                <version>${jackson2.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -1942,17 +1944,17 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-smile</artifactId>
-                <version>2.18.0</version>
+                <version>${jackson2.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-cbor</artifactId>
-                <version>2.18.0</version>
+                <version>${jackson2.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-parameter-names</artifactId>
-                <version>2.18.0</version>
+                <version>${jackson2.version}</version>
             </dependency>
             <dependency>
                 <groupId>tools.jackson.core</groupId>

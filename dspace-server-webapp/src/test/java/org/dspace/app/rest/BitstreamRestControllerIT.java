@@ -1654,8 +1654,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         int unknownStatus = getClient().perform(head(unknownUrl).param("accessToken", "invalid_token"))
                                        .andReturn().getResponse().getStatus();
 
-        assertEquals("An unauthorized caller must not be able to tell an existing restricted Bitstream apart "
-                         + "from a nonexistent one", restrictedStatus, unknownStatus);
+        assertEquals(restrictedStatus, unknownStatus,
+                     "An unauthorized caller must not be able to tell an existing restricted Bitstream apart "
+                         + "from a nonexistent one");
     }
 
     @Test

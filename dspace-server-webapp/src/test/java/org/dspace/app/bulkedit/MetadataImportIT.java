@@ -8,9 +8,9 @@
 package org.dspace.app.bulkedit;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,9 +48,9 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.service.ProcessService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -73,7 +73,7 @@ public class MetadataImportIT extends AbstractEntityIntegrationTest {
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -85,7 +85,7 @@ public class MetadataImportIT extends AbstractEntityIntegrationTest {
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void after() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         List<Relationship> relationships = relationshipService.findAll(context);

@@ -48,9 +48,9 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.service.ProcessService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -75,7 +75,7 @@ public class BulkImportIT extends AbstractEntityIntegrationTest {
 
     private Community community;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -84,7 +84,7 @@ public class BulkImportIT extends AbstractEntityIntegrationTest {
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void after() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         List<Relationship> relationships = relationshipService.findAll(context);

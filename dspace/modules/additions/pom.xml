@@ -349,7 +349,7 @@
       <dependency>
          <groupId>com.fasterxml.jackson.dataformat</groupId>
          <artifactId>jackson-dataformat-cbor</artifactId>
-         <version>2.18.0</version>
+         <version>${jackson2.version}</version>
          <scope>test</scope>
       </dependency>
       <!-- HPPC is required by Solr 10.x EmbeddedSolrServer -->

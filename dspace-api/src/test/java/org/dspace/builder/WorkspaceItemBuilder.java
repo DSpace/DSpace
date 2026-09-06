@@ -311,13 +311,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return this;
     }
 
-    public WorkspaceItemBuilder withCustomUrl(String url) {
-        return setMetadataSingleValue("dspace", "customurl", null, url);
-    }
 
-    public WorkspaceItemBuilder withOldCustomUrl(String url) {
-        return addMetadataValue("dspace", "customurl", "old", url);
-    }
 
     protected WorkspaceItemBuilder addMetadataValue(String schema, String element, String qualifier, String language,
                                                     String value) {
@@ -339,9 +333,6 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "title", null, language, title);
     }
 
-    public WorkspaceItemBuilder withSubjectForLanguage(final String subject, final String language) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, language, subject);
-    }
 
     public WorkspaceItemBuilder withAuthor(String authorName, String authority) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", null, authorName, authority,
@@ -353,13 +344,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
                                 600);
     }
 
-    public WorkspaceItemBuilder withOrcidIdentifier(String orcid) {
-        return addMetadataValue("person", "identifier", "orcid", orcid);
-    }
 
-    public WorkspaceItemBuilder withCustomIdentifierUrl(String url, String authority) {
-        return addMetadataValue("oairecerif", "identifier", "url", Item.ANY, url, authority, 600);
-    }
 
     public WorkspaceItemBuilder withFulltext(String name, String source, byte[] content) {
         return withFulltext(name, source, new ByteArrayInputStream(content));

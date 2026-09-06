@@ -325,9 +325,6 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "title", null, language, title);
     }
 
-    public WorkflowItemBuilder withSubjectForLanguage(final String subject, final String language) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, language, subject);
-    }
 
     public WorkflowItemBuilder withAuthor(String authorName, String authority) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", null, authorName, authority,
@@ -338,8 +335,5 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
     }
 
-    public WorkflowItemBuilder withEntityType(String entityType) {
-        return addMetadataValue("dspace", "entity", "type", entityType);
-    }
 
 }

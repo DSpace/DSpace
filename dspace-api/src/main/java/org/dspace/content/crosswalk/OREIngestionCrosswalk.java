@@ -25,12 +25,12 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
@@ -203,20 +203,21 @@ public class OREIngestionCrosswalk
                 }
                 // Generate a request for the aggregated resource
                 HttpGet httpGet = new HttpGet(processedURL);
-                HttpResponse response = httpClient.execute(httpGet);
-                if (response == null || response.getEntity() == null) {
-                    throw new FileNotFoundException(processedURL + " returned a null response or body");
-                }
-                if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    throw new FileNotFoundException(processedURL
-                            + " returned a " + response.getStatusLine() + " response");
-                }
-                if (response.getEntity() == null || response.getEntity().getContent() == null) {
-                    throw new FileNotFoundException(processedURL + " returned an empty body");
-                }
-                // ingest and update
-                try (InputStream in = response.getEntity().getContent()) {
-                    ingestStreamAsBitstream(context, in, targetBundle, resource, entryId);
+                try (ClassicHttpResponse response = httpClient.executeOpen(null, httpGet, null)) {
+                    if (response == null || response.getEntity() == null) {
+                        throw new FileNotFoundException(processedURL + " returned a null response or body");
+                    }
+                    if (response.getCode() != HttpStatus.SC_OK) {
+                        throw new FileNotFoundException(processedURL
+                                + " returned a " + response.getCode() + " response");
+                    }
+                    if (response.getEntity() == null || response.getEntity().getContent() == null) {
+                        throw new FileNotFoundException(processedURL + " returned an empty body");
+                    }
+                    // ingest and update
+                    try (InputStream in = response.getEntity().getContent()) {
+                        ingestStreamAsBitstream(context, in, targetBundle, resource, entryId);
+                    }
                 }
             }
         }
