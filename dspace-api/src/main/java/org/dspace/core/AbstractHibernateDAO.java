@@ -95,6 +95,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         if (isEntityRemoved(context, t)) {
             return;
         }
+        getHibernateSession(context).remove(t);
         // Track the deleted entity's UUID in the context for Hibernate 7 compatibility.
         // This is needed because Hibernate 7 may return deleted entities from session.get()
         // even after they've been scheduled for removal.
@@ -104,7 +105,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
                 context.markEntityDeleted((UUID) id);
             }
         }
-        getHibernateSession(context).remove(t);
     }
 
     @Override

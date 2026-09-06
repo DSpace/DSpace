@@ -79,12 +79,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
             sessionFactory.getCurrentSession().beginTransaction();
             configureDatabaseMode();
         } else if (getTransaction().getStatus() == TransactionStatus.MARKED_ROLLBACK) {
-            // In Hibernate 7, a MARKED_ROLLBACK transaction is considered "active" by isActive(),
-            // but the ThreadLocalSessionContext proxy rejects operations (e.g. getCriteriaBuilder).
-            // Roll back the doomed transaction and start a fresh one.
-            getTransaction().rollback();
-            sessionFactory.getCurrentSession().beginTransaction();
-            configureDatabaseMode();
+            // Recovery must be explicit: restarting here could commit only part of a business operation.
+            throw new SQLException("Transaction is marked for rollback; roll back the context before continuing");
         }
         // Return the current Hibernate Session object (Hibernate will create one if it doesn't yet exist)
         return sessionFactory.getCurrentSession();
@@ -160,8 +156,10 @@ public class HibernateDBConnection implements DBConnection<Session> {
      */
     @Override
     public void commit() throws SQLException {
-        if (isTransActionAlive() && !getTransaction().getStatus().isOneOf(TransactionStatus.MARKED_ROLLBACK,
-                                                                          TransactionStatus.ROLLING_BACK)) {
+        if (getTransaction().getStatus().isOneOf(TransactionStatus.MARKED_ROLLBACK, TransactionStatus.ROLLING_BACK)) {
+            throw new SQLException("Cannot commit a transaction marked for rollback");
+        }
+        if (isTransActionAlive()) {
             // Flush synchronizes the database with in-memory objects in Session (and frees up that memory)
             getSession().flush();
             // Commit those results to the database & ends the Transaction
@@ -368,9 +366,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
      */
     @Override
     public void flushSession() throws SQLException {
-        // Skip flush if the transaction is not active (e.g. MARKED_ROLLBACK).
-        // In Hibernate 7, session.isDirty() throws when the transaction is
-        // in MARKED_ROLLBACK state.
+        // getSession() rejects rollback-only transactions rather than silently discarding their changes.
         if (isTransActionAlive() && getSession().isDirty()) {
             getSession().flush();
         }

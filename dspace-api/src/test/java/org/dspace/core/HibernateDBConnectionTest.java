@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
@@ -161,6 +162,23 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
 
         // A second rollback should be a no-op (no error thrown)
         connection.rollback();
+    }
+
+    /**
+     * A failed transaction remains failed until the caller explicitly rolls it back.
+     */
+    @Test
+    public void testExplicitRecoveryAfterRollbackOnlyTransaction() throws SQLException {
+        connection.getSession();
+        connection.getTransaction().markRollbackOnly();
+
+        assertThrows(SQLException.class, connection::getSession);
+        assertThrows(SQLException.class, connection::commit);
+
+        connection.rollback();
+        assertFalse(connection.getTransaction().isActive());
+        assertNotNull(connection.getSession());
+        assertTrue(connection.getTransaction().isActive());
     }
 
     /**
