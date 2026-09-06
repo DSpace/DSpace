@@ -456,6 +456,7 @@ public class Context implements AutoCloseable {
                 // Commit our changes (this closes the transaction but
                 // leaves database connection open)
                 dbConnection.commit();
+                clearDeletedEntityIds();
                 reloadContextBoundEntities();
             }
         }
@@ -613,6 +614,7 @@ public class Context implements AutoCloseable {
             // Rollback ONLY if we have a database transaction, and it is NOT Read Only
             if (!isReadOnly() && isTransactionAlive()) {
                 dbConnection.rollback();
+                clearDeletedEntityIds();
                 reloadContextBoundEntities();
             }
         } finally {
@@ -764,7 +766,7 @@ public class Context implements AutoCloseable {
 
     /**
      * Clear the set of deleted entity IDs.
-     * This should be called after a successful commit.
+     * This should be called after a successful commit or rollback.
      */
     public void clearDeletedEntityIds() {
         deletedEntityIds.clear();
