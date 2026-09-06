@@ -7,10 +7,10 @@
  */
 package org.dspace.identifier.doi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -35,9 +35,9 @@ import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the batch processing of {@link DOIOrganiser}, which drives the bulk options of the
@@ -95,7 +95,7 @@ public class DOIOrganiserTest extends AbstractUnitTest {
      */
     private String testRunId;
 
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -105,7 +105,7 @@ public class DOIOrganiserTest extends AbstractUnitTest {
         invocations = 0;
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         // The batch processing commits after every DOI, so the test data survives the rollback
@@ -142,8 +142,8 @@ public class DOIOrganiserTest extends AbstractUnitTest {
                                     registrationSimulation(Collections.emptyList(), false),
                                     "registration", 2);
 
-        assertEquals("Every queued DOI must be attempted exactly once",
-                     doisOf(queuedDOIs), attemptedDOIs);
+        assertEquals(doisOf(queuedDOIs), attemptedDOIs,
+                     "Every queued DOI must be attempted exactly once");
         for (DOI doi : queuedDOIs) {
             assertStatus("A processed DOI must not be queued anymore",
                          doi, DOIIdentifierProvider.IS_REGISTERED);
@@ -166,8 +166,8 @@ public class DOIOrganiserTest extends AbstractUnitTest {
                                     registrationSimulation(failingDOIs, false),
                                     "registration", 2);
 
-        assertEquals("Every queued DOI must be attempted exactly once, including the failing ones",
-                     doisOf(queuedDOIs), attemptedDOIs);
+        assertEquals(doisOf(queuedDOIs), attemptedDOIs,
+                     "Every queued DOI must be attempted exactly once, including the failing ones");
         for (DOI doi : queuedDOIs) {
             if (failingDOIs.contains(doi.getDoi())) {
                 assertStatus("A DOI that could not be processed stays queued for the next run",
@@ -194,8 +194,8 @@ public class DOIOrganiserTest extends AbstractUnitTest {
                                     registrationSimulation(failingDOIs, true),
                                     "registration", 2);
 
-        assertEquals("Every queued DOI must be attempted exactly once, including the failing ones",
-                     doisOf(queuedDOIs), attemptedDOIs);
+        assertEquals(doisOf(queuedDOIs), attemptedDOIs,
+                     "Every queued DOI must be attempted exactly once, including the failing ones");
         for (DOI doi : queuedDOIs) {
             if (failingDOIs.contains(doi.getDoi())) {
                 assertStatus("A DOI whose processing threw stays queued for the next run",
@@ -222,8 +222,8 @@ public class DOIOrganiserTest extends AbstractUnitTest {
                                     registrationSimulation(doisOf(queuedDOIs), false),
                                     "registration", 2);
 
-        assertEquals("Every queued DOI must be attempted exactly once",
-                     doisOf(queuedDOIs), attemptedDOIs);
+        assertEquals(doisOf(queuedDOIs), attemptedDOIs,
+                     "Every queued DOI must be attempted exactly once");
         for (DOI doi : queuedDOIs) {
             assertStatus("A DOI that could not be processed stays queued for the next run",
                          doi, DOIIdentifierProvider.TO_BE_REGISTERED);
@@ -241,8 +241,7 @@ public class DOIOrganiserTest extends AbstractUnitTest {
                                     registrationSimulation(Collections.emptyList(), false),
                                     "registration", 2);
 
-        assertTrue("Nothing was queued, so no DOI of this test may be attempted",
-                   attemptedDOIs.isEmpty());
+        assertTrue(attemptedDOIs.isEmpty(), "Nothing was queued, so no DOI of this test may be attempted");
     }
 
     /**
@@ -346,7 +345,7 @@ public class DOIOrganiserTest extends AbstractUnitTest {
 
     private void assertStatus(String message, DOI doi, Integer expectedStatus) throws SQLException {
         DOI reloadedDOI = context.reloadEntity(doi);
-        assertNotNull("DOI " + doi.getDoi() + " disappeared from the database", reloadedDOI);
-        assertEquals(message + " (" + doi.getDoi() + ")", expectedStatus, reloadedDOI.getStatus());
+        assertNotNull(reloadedDOI, "DOI " + doi.getDoi() + " disappeared from the database");
+        assertEquals(expectedStatus, reloadedDOI.getStatus(), message + " (" + doi.getDoi() + ")");
     }
 }

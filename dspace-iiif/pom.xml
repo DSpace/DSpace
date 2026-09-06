@@ -156,7 +156,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.18.0</version>
+            <version>${jackson2.version}</version>
         </dependency>
 
         <!-- Internal -->

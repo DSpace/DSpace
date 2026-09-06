@@ -167,7 +167,8 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
         OrcidRestConnector orcidConnector = Mockito.mock(OrcidRestConnector.class);
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
         orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
-        when(orcidConnector.get(ArgumentMatchers.eq("0000-0002-9029-1854"), ArgumentMatchers.any()))
+        String entry = "0000-0002-9029-1854";
+        when(orcidConnector.get(ArgumentMatchers.eq(entry), ArgumentMatchers.any()))
                 .thenAnswer(new Answer<InputStream>() {
                     public InputStream answer(InvocationOnMock invocation) {
                         return getClass().getResourceAsStream("orcid-person-record.xml");

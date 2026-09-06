@@ -1348,6 +1348,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void move(Context context, Item item, Collection from, Collection to)
         throws SQLException, AuthorizeException, IOException {
 
+        // If the two collections are the same, do nothing.
+        if (from.equals(to)) {
+            return;
+        }
+
         // Use the normal move method, and default to not inherit permissions
         this.move(context, item, from, to, false);
     }
@@ -1474,6 +1479,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery, String q)
         throws SearchServiceException {
         if (StringUtils.isNotBlank(q)) {
+            // Use the title field for autocomplete, as on the standard item search.
+            q = searchService.formatAutoCompleteQuery(q, "dc.title_sort");
             discoverQuery.setQuery(q);
         }
         discoverQuery.addRequiredAuthorization(Constants.WRITE);
@@ -1759,9 +1766,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values,
-                                                List<String> authorities, List<Integer> confidences, int i) {
-        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, null);
+    protected void getAuthoritiesAndConfidences(String fieldKey, int dsoType, Collection collection,
+                                                List<String> values, List<String> authorities,
+                                                List<Integer> confidences, int i) {
+        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), dsoType, collection, null);
         authorities.add(c.values.length > 0 && c.values[0] != null ? c.values[0].authority : null);
         confidences.add(c.confidence);
     }
