@@ -755,6 +755,15 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Clear deletion bookkeeping for an entity that has been successfully recreated.
+     *
+     * @param entityId the UUID of the newly persisted entity
+     */
+    void clearDeletedEntityId(UUID entityId) {
+        deletedEntityIds.remove(entityId);
+    }
+
+    /**
      * Check if an entity UUID has been marked as deleted in this context.
      *
      * @param entityId the UUID to check
