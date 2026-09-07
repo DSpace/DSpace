@@ -202,6 +202,35 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void createWithExistingEmailConflictTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson existingUser = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("existing-email@example.com")
+                                        .build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        EPersonRest data = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        data.setEmail(existingUser.getEmail());
+        data.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("Jane");
+        metadataRest.put("eperson.firstname", firstname);
+        data.setMetadata(metadataRest);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/epersons")
+                                        .content(mapper.writeValueAsBytes(data))
+                                        .contentType(contentType))
+                            .andExpect(status().isConflict());
+    }
+
+    @Test
     public void testCreateWithInvalidPassword() throws Exception {
 
         context.turnOffAuthorisationSystem();
