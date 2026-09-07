@@ -9,8 +9,8 @@ package org.dspace.layout.dao;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.layout.DynamicLayoutField;
