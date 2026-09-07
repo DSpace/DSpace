@@ -150,6 +150,8 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
     @Test
     public void testEPersonAuthorityWithAnonymousUser() throws Exception {
 
+        configurationService.setProperty("authority.EPersonAuthority.public", true);
+
         context.turnOffAuthorisationSystem();
         createEPerson("Luca", "Giamminonni");
         createEPerson("Andrea", "Bollini");
