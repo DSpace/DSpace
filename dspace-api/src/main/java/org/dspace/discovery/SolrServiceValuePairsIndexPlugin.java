@@ -204,7 +204,11 @@ public class SolrServiceValuePairsIndexPlugin implements SolrServiceIndexPlugin 
         String filterField = appendAuthorityIfNotBlank(valueLowerCase + separator + value, authority);
         String prefixField = appendAuthorityIfNotBlank(valueLowerCase + separator + value, authority);
 
-        document.addField(fieldNameWithLanguage + "_keyword", keywordField);
+        // Equality filters use the display label, including when an authority key is present.
+        document.addField(fieldNameWithLanguage + "_keyword", value);
+        if (StringUtils.isNotBlank(authority)) {
+            document.addField(fieldNameWithLanguage + "_keyword", keywordField);
+        }
         document.addField(fieldNameWithLanguage + "_acid", acidField);
         document.addField(fieldNameWithLanguage + "_filter", filterField);
         document.addField(fieldNameWithLanguage + SOLR_FIELD_SUFFIX_FACET_PREFIXES, prefixField);
