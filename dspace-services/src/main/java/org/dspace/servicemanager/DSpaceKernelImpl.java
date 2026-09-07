@@ -7,10 +7,8 @@
  */
 package org.dspace.servicemanager;
 
-import java.lang.ref.Cleaner;
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
@@ -55,24 +53,6 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
     private static final Logger log = LogManager.getLogger();
 
     /**
-     * Cleaner for Java 21+ compatibility (replaces deprecated finalize() method).
-     * Used to clean up kernel resources if DSpaceKernelImpl is garbage-collected without being properly destroyed.
-     */
-    private static final Cleaner cleaner = Cleaner.create();
-
-    /**
-     * Handle to the registered cleanup action. Used to prevent double-cleanup when destroy() is called normally.
-     */
-    private Cleaner.Cleanable cleanable;
-
-    /**
-     * Holder for the kernel reference, used by the Cleaner.
-     * Using AtomicReference allows the cleanup action to safely access the kernel
-     * without preventing GC of the DSpaceKernelImpl object.
-     */
-    private final AtomicReference<DSpaceKernelImpl> kernelHolder = new AtomicReference<>();
-
-    /**
      * Creates a DSpace Kernel, does not do any checks though.
      * Do not call this; use {@link DSpaceKernelInit#getKernel(String)}.
      *
@@ -80,9 +60,6 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
      */
     protected DSpaceKernelImpl(String name) {
         this.mBeanName = DSpaceKernelManager.checkName(name);
-        // Register this kernel with the Cleaner for cleanup if GC'd without proper destruction
-        kernelHolder.set(this);
-        cleanable = cleaner.register(this, new KernelCleanup(kernelHolder));
     }
 
     private String mBeanName = MBEAN_NAME;
@@ -265,12 +242,6 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
             }
 
             this.destroyed = true;
-
-            // Clear the holder and unregister the Cleaner to prevent double-cleanup
-            kernelHolder.set(null);
-            if (cleanable != null) {
-                cleanable.clean();
-            }
         }
     }
 
@@ -283,36 +254,8 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
         }
     }
 
-    /**
-     * Static cleanup class for use with java.lang.ref.Cleaner (Java 21+ replacement for finalize()).
-     * This class must be static to avoid preventing garbage collection of the DSpaceKernelImpl object.
-     * It holds a reference to the AtomicReference containing the kernel, which is cleared
-     * when destroy() is called normally, preventing double-cleanup.
-     */
-    private static class KernelCleanup implements Runnable {
-        private static final Logger cleanupLog = LogManager.getLogger(KernelCleanup.class);
-        private final AtomicReference<DSpaceKernelImpl> kernelRef;
-
-        KernelCleanup(AtomicReference<DSpaceKernelImpl> kernelRef) {
-            this.kernelRef = kernelRef;
-        }
-
-        @Override
-        public void run() {
-            // Get and clear the reference atomically
-            DSpaceKernelImpl kernel = kernelRef.getAndSet(null);
-            if (kernel != null && !kernel.destroyed) {
-                cleanupLog.warn("DSpaceKernelImpl was garbage-collected without being properly destroyed. " +
-                    "Attempting cleanup.");
-                try {
-                    kernel.doDestroy();
-                } catch (Exception e) {
-                    cleanupLog.error("Failure attempting to cleanup the DSpace kernel during GC: {}",
-                        e.getMessage(), e);
-                }
-            }
-        }
-    }
+    // Note: finalize() method removed for Java 21 compatibility.
+    // Cleanup is handled by the JVM shutdown hook registered in registerShutdownHook()
 
     @Override
     public String toString() {

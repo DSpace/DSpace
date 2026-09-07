@@ -10,13 +10,14 @@ package org.dspace.scripts.handler.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
@@ -96,8 +97,12 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public void printHelp(Options options, String name) {
         if (options != null) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(name, options);
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    name, null, options, null, false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 

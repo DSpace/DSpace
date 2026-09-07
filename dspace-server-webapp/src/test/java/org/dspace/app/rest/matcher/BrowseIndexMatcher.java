@@ -89,8 +89,7 @@ public class BrowseIndexMatcher {
     }
 
     public static Matcher<? super Object> matchBrowseIndex(BrowseIndex bi) {
-        if (bi instanceof DSpaceControlledVocabularyIndex) {
-            DSpaceControlledVocabularyIndex vocbi = (DSpaceControlledVocabularyIndex) bi;
+        if (bi instanceof DSpaceControlledVocabularyIndex vocbi) {
             return allOf(
                     hasJsonPath("$.metadata", contains(getIndexMetadata(vocbi))),
                     hasJsonPath("$.browseType", equalToIgnoringCase(BROWSE_TYPE_HIERARCHICAL)),
@@ -98,17 +97,17 @@ public class BrowseIndexMatcher {
                     hasJsonPath("$.facetType", equalToIgnoringCase(vocbi.getFacetConfig().getIndexFieldName())),
                     hasJsonPath("$.vocabulary", equalToIgnoringCase(vocbi.getVocabulary().getPluginInstanceName())),
                     hasJsonPath("$._links.vocabulary.href",
-                                is(REST_SERVER_URL + String.format("submission/vocabularies/%s/",
-                                                                   vocbi.getVocabulary().getPluginInstanceName()))),
+                                is(REST_SERVER_URL + "submission/vocabularies/%s/".formatted(
+                                    vocbi.getVocabulary().getPluginInstanceName()))),
                     hasJsonPath("$._links.items.href",
-                                is(REST_SERVER_URL + String.format("discover/browses/%s/items",
-                                                                   vocbi.getVocabulary().getPluginInstanceName()))),
+                                is(REST_SERVER_URL + "discover/browses/%s/items".formatted(
+                                    vocbi.getVocabulary().getPluginInstanceName()))),
                     hasJsonPath("$._links.entries.href",
-                                is(REST_SERVER_URL + String.format("discover/browses/%s/entries",
-                                                                   vocbi.getVocabulary().getPluginInstanceName()))),
+                                is(REST_SERVER_URL + "discover/browses/%s/entries".formatted(
+                                    vocbi.getVocabulary().getPluginInstanceName()))),
                     hasJsonPath("$._links.self.href",
-                                is(REST_SERVER_URL + String.format("discover/browses/%s",
-                                                                   vocbi.getVocabulary().getPluginInstanceName())))
+                                is(REST_SERVER_URL + "discover/browses/%s".formatted(
+                                    vocbi.getVocabulary().getPluginInstanceName())))
             );
         } else {
             return allOf(
@@ -128,8 +127,7 @@ public class BrowseIndexMatcher {
     }
 
     private static String[] getIndexMetadata(BrowseIndex bi) {
-        if (bi instanceof DSpaceControlledVocabularyIndex) {
-            DSpaceControlledVocabularyIndex vocObj = (DSpaceControlledVocabularyIndex) bi;
+        if (bi instanceof DSpaceControlledVocabularyIndex vocObj) {
             return vocObj.getMetadataFields().toArray(new String[0]);
         } else if (bi.isMetadataIndex()) {
             return bi.getMetadata().split(",");
@@ -209,13 +207,13 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.facetType", equalToIgnoringCase("subject")),
             hasJsonPath("$.vocabulary", equalToIgnoringCase(vocabulary)),
             hasJsonPath("$._links.vocabulary.href",
-                        is(REST_SERVER_URL + String.format("submission/vocabularies/%s/", vocabulary))),
+                        is(REST_SERVER_URL + "submission/vocabularies/%s/".formatted(vocabulary))),
             hasJsonPath("$._links.items.href",
-                        is(REST_SERVER_URL + String.format("discover/browses/%s/items", vocabulary))),
+                        is(REST_SERVER_URL + "discover/browses/%s/items".formatted(vocabulary))),
             hasJsonPath("$._links.entries.href",
-                        is(REST_SERVER_URL + String.format("discover/browses/%s/entries", vocabulary))),
+                        is(REST_SERVER_URL + "discover/browses/%s/entries".formatted(vocabulary))),
             hasJsonPath("$._links.self.href",
-                        is(REST_SERVER_URL + String.format("discover/browses/%s", vocabulary)))
+                        is(REST_SERVER_URL + "discover/browses/%s".formatted(vocabulary)))
         );
     }
 }

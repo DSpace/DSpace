@@ -9,8 +9,6 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -24,9 +22,9 @@ import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.impl.OrcidV3AuthorDataProvider;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -54,13 +52,13 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
 
     public void onlyRunIfConfigExists() {
         if (StringUtils.isBlank(configurationService.getProperty("orcid.application-client-id"))) {
-            Assume.assumeNoException(new IllegalStateException("Missing ORCID credentials"));
+            Assumptions.assumeTrue(false, "Missing ORCID credentials");
         }
     }
 
     String token;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -170,7 +168,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
         orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
         String entry = "0000-0002-9029-1854";
-        when(orcidConnector.get(eq(entry), any()))
+        when(orcidConnector.get(ArgumentMatchers.eq(entry), ArgumentMatchers.any()))
                 .thenAnswer(new Answer<InputStream>() {
                     public InputStream answer(InvocationOnMock invocation) {
                         return getClass().getResourceAsStream("orcid-person-record.xml");
@@ -206,13 +204,13 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
         orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
         try {
-            when(orcidConnector.get(ArgumentMatchers.startsWith("search?"), any()))
+            when(orcidConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
                     .thenAnswer(new Answer<InputStream>() {
                         public InputStream answer(InvocationOnMock invocation) {
                             return getClass().getResourceAsStream("orcid-search.xml");
                         }
                     });
-            when(orcidConnector.get(eq("0000-0002-9029-1854"), ArgumentMatchers.any()))
+            when(orcidConnector.get(ArgumentMatchers.eq("0000-0002-9029-1854"), ArgumentMatchers.any()))
                     .thenAnswer(new Answer<InputStream>() {
                         public InputStream answer(InvocationOnMock invocation) {
                             return getClass().getResourceAsStream("orcid-person-record.xml");
@@ -259,13 +257,13 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
         OrcidRestConnector realConnector = orcidV3AuthorDataProvider.getOrcidRestConnector();
         orcidV3AuthorDataProvider.setOrcidRestConnector(orcidConnector);
         try {
-            when(orcidConnector.get(ArgumentMatchers.startsWith("search?"), any()))
+            when(orcidConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
                     .thenAnswer(new Answer<InputStream>() {
                         public InputStream answer(InvocationOnMock invocation) {
                             return getClass().getResourceAsStream("orcid-search.xml");
                         }
                     });
-            when(orcidConnector.get(eq("0000-0002-9029-1854"), any()))
+            when(orcidConnector.get(ArgumentMatchers.eq("0000-0002-9029-1854"), ArgumentMatchers.any()))
                     .thenAnswer(new Answer<InputStream>() {
                         public InputStream answer(InvocationOnMock invocation) {
                             return getClass().getResourceAsStream("orcid-person-record.xml");

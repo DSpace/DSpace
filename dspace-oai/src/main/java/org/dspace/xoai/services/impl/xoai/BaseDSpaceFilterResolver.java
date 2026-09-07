@@ -39,14 +39,13 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
     ContextService contextService;
 
     public DSpaceFilter getFilter(Condition condition) {
-        if (condition instanceof AndCondition) {
-            return (DSpaceFilter) getFilter((AndCondition) condition);
-        } else if (condition instanceof OrCondition) {
-            return (DSpaceFilter) getFilter((OrCondition) condition);
-        } else if (condition instanceof NotCondition) {
-            return (DSpaceFilter) getFilter((NotCondition) condition);
-        } else if (condition instanceof CustomCondition) {
-            CustomCondition customCondition = (CustomCondition) condition;
+        if (condition instanceof AndCondition andCondition) {
+            return (DSpaceFilter) getFilter(andCondition);
+        } else if (condition instanceof OrCondition orCondition) {
+            return (DSpaceFilter) getFilter(orCondition);
+        } else if (condition instanceof NotCondition notCondition) {
+            return (DSpaceFilter) getFilter(notCondition);
+        } else if (condition instanceof CustomCondition customCondition) {
             return (DSpaceFilter) customCondition.getFilter();
         } else {
             return (DSpaceFilter) condition.getFilter();
@@ -73,11 +72,11 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
         Filter result = null;
         try {
             result = filterClass.newInstance();
-            if (result instanceof DSpaceFilter) {
+            if (result instanceof DSpaceFilter filter) {
                 // add the DSpace filter specific objects
-                ((DSpaceFilter) result).setConfiguration(configuration);
-                ((DSpaceFilter) result).setContext(contextService.getContext());
-                ((DSpaceFilter) result).setFieldResolver(fieldResolver);
+                filter.setConfiguration(configuration);
+                filter.setContext(contextService.getContext());
+                filter.setFieldResolver(fieldResolver);
             }
         } catch (InstantiationException | IllegalAccessException
             | ContextServiceException e) {

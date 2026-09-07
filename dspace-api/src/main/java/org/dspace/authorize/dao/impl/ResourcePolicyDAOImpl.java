@@ -8,6 +8,7 @@
 package org.dspace.authorize.dao.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,6 +92,74 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
+    /**
+     * Find ResourcePolicies by DSpaceObject and Group.
+     * Used for Hibernate 7 compatible entity-based deletion.
+     */
+    public List<ResourcePolicy> findByDsoAndGroup(Context context, DSpaceObject dso, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group)
+        ));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+    }
+
+    /**
+     * Find ResourcePolicies by DSpaceObject and EPerson.
+     * Used for Hibernate 7 compatible entity-based deletion.
+     */
+    public List<ResourcePolicy> findByDsoAndEPerson(Context context, DSpaceObject dso, EPerson ePerson)
+            throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson)
+        ));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+    }
+
+    /**
+     * Find ResourcePolicies by DSpaceObject where type does not equal the specified value.
+     * Used for Hibernate 7 compatible entity-based deletion.
+     */
+    public List<ResourcePolicy> findByDsoAndTypeNotEquals(Context context, DSpaceObject dso, String type)
+            throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+            criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.rptype), type)
+        ));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+    }
+
+    /**
+     * Find ResourcePolicies by DSpaceObject, type, and action.
+     * Used for Hibernate 7 compatible entity-based deletion.
+     */
+    public List<ResourcePolicy> findByDsoAndTypeAndAction(Context context, DSpaceObject dso, String type, int actionId)
+            throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.rptype), type),
+            criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), actionId)
+        ));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+    }
+
     @Override
     public List<ResourcePolicy> findByDSoAndAction(Context context, DSpaceObject dso, int actionId)
         throws SQLException {
@@ -126,14 +195,12 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     @Override
     public void deleteByDsoAndTypeAndAction(Context context, DSpaceObject dso, String type, int actionId)
         throws SQLException {
-        String queryString = "delete from ResourcePolicy where dSpaceObject.id = :dsoId "
-            + "AND rptype = :rptype AND actionId= :actionId";
-        Query query = createQuery(context, queryString);
-        query.setParameter("dsoId", dso.getID());
-        query.setParameter("rptype", type);
-        query.setParameter("actionId", actionId);
-        query.executeUpdate();
-
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<ResourcePolicy> policies = findByDsoAndTypeAndAction(context, dso, type, actionId);
+        dso.getResourcePolicies().removeAll(policies);
+        for (ResourcePolicy policy : policies) {
+            delete(context, policy);
+        }
     }
 
     @Override
@@ -204,75 +271,111 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     @Override
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException {
-        String queryString = "delete from ResourcePolicy where dSpaceObject= :dSpaceObject";
-        Query query = createQuery(context, queryString);
-        query.setParameter("dSpaceObject", dso);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: use entity-based deletion instead of a bulk HQL delete.
+        // removeAllPolicies must delete EVERY policy of the DSO. We query the DB (findByDso) AND also
+        // collect any policy still attached to the DSO only in memory. The DB query must run with the
+        // session's normal (auto) flush mode so that not-yet-flushed pending policy inserts are flushed
+        // and therefore visible/deletable: e.g. when a bitstream is replaced, the new bitstream inherits a
+        // (nameless) default policy whose dSpaceObject is set but which is neither added to the DSO's
+        // in-memory resourcePolicies collection nor yet flushed. Main's bulk "delete ... where
+        // dSpaceObject = ?" deleted such rows because executeUpdate auto-flushes first; skipping that flush
+        // here silently leaves a stray policy behind (it then sorts ahead of the real ones). Clearing the
+        // in-memory collection also prevents a later REMOVE cascade from re-deleting an already-gone policy
+        // (Hibernate 7 StaleObjectStateException). delete() is idempotent for already-removed entities.
+        List<ResourcePolicy> policies = findByDso(context, dso);
+        List<ResourcePolicy> toDelete = new ArrayList<>(policies);
+        for (ResourcePolicy inMemory : dso.getResourcePolicies()) {
+            if (!toDelete.contains(inMemory)) {
+                toDelete.add(inMemory);
+            }
+        }
+        dso.getResourcePolicies().clear();
+        for (ResourcePolicy policy : toDelete) {
+            delete(context, policy);
+        }
     }
 
     @Override
     public void deleteByDsoAndAction(Context context, DSpaceObject dso, int actionId) throws SQLException {
-        String queryString = "delete from ResourcePolicy where dSpaceObject= :dSpaceObject AND actionId= :actionId";
-        Query query = createQuery(context, queryString);
-        query.setParameter("dSpaceObject", dso);
-        query.setParameter("actionId", actionId);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        // Also remove from the DSO's resourcePolicies collection to keep Hibernate's
+        // in-memory state consistent with the database.
+        List<ResourcePolicy> policies = findByDSoAndAction(context, dso, actionId);
+        dso.getResourcePolicies().removeAll(policies);
+        for (ResourcePolicy policy : policies) {
+            delete(context, policy);
+        }
     }
 
     @Override
     public void deleteByDsoAndType(Context context, DSpaceObject dso, String type) throws SQLException {
-        String queryString = "delete from ResourcePolicy where dSpaceObject.id = :dsoId AND rptype = :rptype";
-        Query query = createQuery(context, queryString);
-        query.setParameter("dsoId", dso.getID());
-        query.setParameter("rptype", type);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<ResourcePolicy> policies = findByDsoAndType(context, dso, type);
+        dso.getResourcePolicies().removeAll(policies);
+        for (ResourcePolicy policy : policies) {
+            delete(context, policy);
+        }
     }
 
     @Override
     public void deleteByGroup(Context context, Group group) throws SQLException {
-        String queryString = "delete from ResourcePolicy where epersonGroup= :epersonGroup";
-        Query query = createQuery(context, queryString);
-        query.setParameter("epersonGroup", group);
-        query.executeUpdate();
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<ResourcePolicy> policies = findByGroup(context, group);
+        for (ResourcePolicy policy : policies) {
+            removePolicyFromDso(policy);
+            delete(context, policy);
+        }
     }
 
     @Override
     public void deleteByDsoGroupPolicies(Context context, DSpaceObject dso, Group group) throws SQLException {
-        String queryString = "delete from ResourcePolicy where dSpaceObject = :dso AND epersonGroup= :epersonGroup";
-        Query query = createQuery(context, queryString);
-        query.setParameter("dso", dso);
-        query.setParameter("epersonGroup", group);
-        query.executeUpdate();
-
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<ResourcePolicy> policies = findByDsoAndGroup(context, dso, group);
+        dso.getResourcePolicies().removeAll(policies);
+        for (ResourcePolicy policy : policies) {
+            delete(context, policy);
+        }
     }
 
     @Override
     public void deleteByDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException {
-        String queryString = "delete from ResourcePolicy where dSpaceObject= :dso AND eperson= :eperson";
-        Query query = createQuery(context, queryString);
-        query.setParameter("dso", dso);
-        query.setParameter("eperson", ePerson);
-        query.executeUpdate();
-
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<ResourcePolicy> policies = findByDsoAndEPerson(context, dso, ePerson);
+        dso.getResourcePolicies().removeAll(policies);
+        for (ResourcePolicy policy : policies) {
+            delete(context, policy);
+        }
     }
 
     @Override
     public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException {
-        String queryString = "delete from ResourcePolicy where eperson= :eperson";
-        Query query = createQuery(context, queryString);
-        query.setParameter("eperson", ePerson);
-        query.executeUpdate();
-
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<ResourcePolicy> policies = findByEPerson(context, ePerson);
+        for (ResourcePolicy policy : policies) {
+            removePolicyFromDso(policy);
+            delete(context, policy);
+        }
     }
 
     @Override
     public void deleteByDsoAndTypeNotEqualsTo(Context context, DSpaceObject dso, String type) throws SQLException {
+        // For Hibernate 7 compatibility: Use entity-based deletion instead of bulk delete.
+        List<ResourcePolicy> policies = findByDsoAndTypeNotEquals(context, dso, type);
+        dso.getResourcePolicies().removeAll(policies);
+        for (ResourcePolicy policy : policies) {
+            delete(context, policy);
+        }
+    }
 
-        String queryString = "delete from ResourcePolicy where dSpaceObject=:dso AND rptype <> :rptype";
-        Query query = createQuery(context, queryString);
-        query.setParameter("dso", dso);
-        query.setParameter("rptype", type);
-        query.executeUpdate();
+    /**
+     * Remove a ResourcePolicy from its associated DSpaceObject's in-memory collection.
+     * This keeps Hibernate's in-memory state consistent after entity-based deletion.
+     */
+    private void removePolicyFromDso(ResourcePolicy policy) {
+        DSpaceObject dso = policy.getdSpaceObject();
+        if (dso != null) {
+            dso.getResourcePolicies().remove(policy);
+        }
     }
 
     @Override

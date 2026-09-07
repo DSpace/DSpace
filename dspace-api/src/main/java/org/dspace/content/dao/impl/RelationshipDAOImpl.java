@@ -282,10 +282,10 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             );
 
             // return the UUIDs of the right item
-            criteriaQuery.multiselect(
+            criteriaQuery.multiselect(List.of(
                 relationshipRoot.get(Relationship_.id).alias(relationshipIdAlias),
                 relationshipRoot.get(Relationship_.rightItem).get(Item_.id).alias(itemUuidAlias)
-            );
+            ));
         } else {
             // match relationships based on the right item
             predicates.add(
@@ -301,10 +301,10 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             );
 
             // return the UUIDs of the left item
-            criteriaQuery.multiselect(
+            criteriaQuery.multiselect(List.of(
                 relationshipRoot.get(Relationship_.id).alias(relationshipIdAlias),
                 relationshipRoot.get(Relationship_.leftItem).get(Item_.id).alias(itemUuidAlias)
-            );
+            ));
         }
 
         // all predicates are chained with the AND operator

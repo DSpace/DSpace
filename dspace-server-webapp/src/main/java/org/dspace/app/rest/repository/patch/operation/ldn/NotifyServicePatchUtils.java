@@ -7,13 +7,11 @@
  */
 package org.dspace.app.rest.repository.patch.operation.ldn;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -21,6 +19,8 @@ import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Util class for shared methods between the NotifyServiceEntity Operations
@@ -56,7 +56,7 @@ public final class NotifyServicePatchUtils {
                         NotifyServiceInboundPattern.class);
                 }
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new DSpaceBadRequestException("IOException: trying to map json from operation.value" +
                 " to NotifyServiceInboundPattern class.", e);
         }
@@ -83,7 +83,7 @@ public final class NotifyServicePatchUtils {
                             NotifyServiceInboundPattern.class));
                 }
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new DSpaceBadRequestException("IOException: trying to map json from operation.value" +
                 " to List of NotifyServiceInboundPattern class.", e);
         }

@@ -11,7 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -48,10 +48,10 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -83,7 +83,7 @@ public class RequestItemEmailNotifierTest
         super();
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         AbstractBuilder.init(); // AbstractUnitTest doesn't do this for us.
 
@@ -109,7 +109,7 @@ public class RequestItemEmailNotifierTest
         requestItemEmailNotifier.requestItemService = requestItemService;
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         // AbstractUnitTest doesn't do this for us.
         AbstractBuilder.cleanupObjects();
@@ -120,7 +120,7 @@ public class RequestItemEmailNotifierTest
      * Test of sendRequest method, of class RequestItemEmailNotifier.
      * @throws Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testSendRequest() throws Exception {
     }
@@ -175,13 +175,13 @@ public class RequestItemEmailNotifierTest
 
         // Check the To: address.
         Address[] myAddresses = JavaMailTestTransport.getAddresses();
-        assertEquals("Should have one To: address.",
-                myAddresses.length, 1);
+        assertEquals(myAddresses.length,
+                1, "Should have one To: address.");
         assertThat("To: should be an Internet address",
                 myAddresses[0], instanceOf(InternetAddress.class));
         String address = ((InternetAddress)myAddresses[0]).getAddress();
-        assertEquals("To: address should match requester.",
-                ri.getReqEmail(), address);
+        assertEquals(ri.getReqEmail(),
+                address, "To: address should match requester.");
 
         // Check the message body.
         Message myMessage = JavaMailTestTransport.getMessage();
@@ -248,13 +248,13 @@ public class RequestItemEmailNotifierTest
 
         // Check the To: address.
         Address[] myAddresses = JavaMailTestTransport.getAddresses();
-        assertEquals("Should have one To: address.",
-                myAddresses.length, 1);
+        assertEquals(myAddresses.length,
+                1, "Should have one To: address.");
         assertThat("To: should be an Internet address",
                 myAddresses[0], instanceOf(InternetAddress.class));
         String address = ((InternetAddress)myAddresses[0]).getAddress();
-        assertEquals("To: address should match requester.",
-                ri.getReqEmail(), address);
+        assertEquals(ri.getReqEmail(),
+                address, "To: address should match requester.");
 
         // Check the message body.
         Message myMessage = JavaMailTestTransport.getMessage();
@@ -439,7 +439,7 @@ public class RequestItemEmailNotifierTest
      * Test of requestOpenAccess method, of class RequestItemEmailNotifier.
      * @throws Exception passed through.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testRequestOpenAccess() throws Exception {
     }

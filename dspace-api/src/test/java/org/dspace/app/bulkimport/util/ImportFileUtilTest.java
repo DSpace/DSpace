@@ -22,7 +22,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link ImportFileUtil}, focused on the allowed-host validation that

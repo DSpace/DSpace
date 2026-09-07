@@ -23,8 +23,8 @@ import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.RelationshipType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 /**
@@ -35,7 +35,7 @@ import org.springframework.http.MediaType;
 public class LeftTiltedRelationshipRestRepositoryIT extends RelationshipRestRepositoryIT {
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
@@ -68,7 +68,7 @@ public class LeftTiltedRelationshipRestRepositoryIT extends RelationshipRestRepo
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath(
-                    String.format("$.metadata['%s.isPublicationOfAuthor']", MetadataSchemaEnum.RELATION.getName())
+                    "$.metadata['%s.isPublicationOfAuthor']".formatted(MetadataSchemaEnum.RELATION.getName())
                 ).doesNotExist()
             );
 
@@ -79,7 +79,7 @@ public class LeftTiltedRelationshipRestRepositoryIT extends RelationshipRestRepo
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-                String.format("%s.isAuthorOfPublication", MetadataSchemaEnum.RELATION.getName()),
+            "%s.isAuthorOfPublication".formatted(MetadataSchemaEnum.RELATION.getName()),
                 author1.getID().toString()
             )));
     }

@@ -19,20 +19,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
+import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -44,10 +39,13 @@ import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 
 /**
@@ -71,11 +69,11 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
      * 
      * @return solr client
      */
-    public SolrClient getSolr() {
+    protected SolrClient getSolr() {
         if (solrSuggestionClient == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("suggestion.solr.server", "http://localhost:8983/solr/suggestion");
-            solrSuggestionClient = new HttpSolrClient.Builder(solrService).build();
+            solrSuggestionClient = new HttpJettySolrClient.Builder(solrService).build();
         }
         return solrSuggestionClient;
     }
@@ -85,7 +83,6 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             throws SolrServerException, IOException {
         if (force || !exist(suggestion)) {
             ObjectMapper jsonMapper = new JsonMapper();
-            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             SolrInputDocument document = new SolrInputDocument();
             document.addField(SOURCE, suggestion.getSource());
             // suggestion id is written as concatenation of
@@ -106,14 +103,14 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             document.addField(EVIDENCES, jsonMapper.writeValueAsString(suggestion.getEvidences()));
             getSolr().add(document);
             if (commit) {
-                getSolr().commit();
+                getSolr().commit(true, true, true);
             }
         }
     }
 
     @Override
     public void commit() throws SolrServerException, IOException {
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     private List<String> getAllValues(Suggestion suggestion, String schema, String element, String qualifier) {
@@ -143,7 +140,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     @Override
     public void deleteSuggestion(Suggestion suggestion) throws SolrServerException, IOException {
         getSolr().deleteById(suggestion.getID());
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
@@ -154,7 +151,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         fieldModifier.put("set", true);
         sdoc.addField(PROCESSED, fieldModifier); // add the map as the field value
         getSolr().add(sdoc);
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
@@ -173,14 +170,14 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
                 getSolr().add(sdoc);
             }
         }
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
     public void deleteTarget(SuggestionTarget target) throws SolrServerException, IOException {
         getSolr().deleteByQuery(
                 SOURCE + ":" + target.getSource() + " AND " + TARGET_ID + ":" + target.getTarget().getID().toString());
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
@@ -316,18 +313,12 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
         Suggestion suggestion = new Suggestion(sourceName, target, (String) solrDoc.getFieldValue(SUGGESTION_ID));
         suggestion.setDisplay((String) solrDoc.getFieldValue(DISPLAY));
-        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(TITLE))) {
-            suggestion.getMetadata()
-                      .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
-        }
-        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(DATE))) {
-            suggestion.getMetadata()
-                      .add(new MetadataValueDTO("dc", "date", "issued", null, (String) solrDoc.getFieldValue(DATE)));
-        }
-        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(ABSTRACT))) {
-            suggestion.getMetadata().add(
-                new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
-        }
+        suggestion.getMetadata()
+            .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
+        suggestion.getMetadata()
+            .add(new MetadataValueDTO("dc", "date", "issued", null, (String) solrDoc.getFieldValue(DATE)));
+        suggestion.getMetadata().add(
+            new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
 
         suggestion.setExternalSourceUri((String) solrDoc.getFieldValue(EXTERNAL_URI));
         if (solrDoc.containsKey(CATEGORY)) {
@@ -344,11 +335,10 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         }
         String evidencesJson = (String) solrDoc.getFieldValue(EVIDENCES);
         ObjectMapper jsonMapper = new JsonMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         List<SuggestionEvidence> evidences = new LinkedList<SuggestionEvidence>();
         try {
             evidences = jsonMapper.readValue(evidencesJson, new TypeReference<List<SuggestionEvidence>>() {});
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error(e);
         }
         suggestion.getEvidences().addAll(evidences);
@@ -359,7 +349,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         try {
             return itemService.find(context, itemId);
         } catch (SQLException e) {
-            throw new SQLRuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 

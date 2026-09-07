@@ -10,12 +10,12 @@ package org.dspace.content.service;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -66,8 +66,8 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemServiceIT.class);
@@ -107,7 +107,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      */
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -993,7 +993,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void testIsLatestVersion() throws Exception {
-        assertTrue("Original should be the latest version", this.itemService.isLatestVersion(context, item));
+        assertTrue(this.itemService.isLatestVersion(context, item), "Original should be the latest version");
 
         context.turnOffAuthorisationSystem();
 
@@ -1005,8 +1005,8 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         context.restoreAuthSystemState();
 
-        assertTrue("First version should be valid", this.itemService.isLatestVersion(context, firstPublication));
-        assertFalse("Original version should not be valid", this.itemService.isLatestVersion(context, item));
+        assertTrue(this.itemService.isLatestVersion(context, firstPublication), "First version should be valid");
+        assertFalse(this.itemService.isLatestVersion(context, item), "Original version should not be valid");
 
         context.turnOffAuthorisationSystem();
 
@@ -1018,9 +1018,9 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         context.restoreAuthSystemState();
 
-        assertTrue("Second version should be valid", this.itemService.isLatestVersion(context, secondPublication));
-        assertFalse("First version should not be valid", this.itemService.isLatestVersion(context, firstPublication));
-        assertFalse("Original version should not be valid", this.itemService.isLatestVersion(context, item));
+        assertTrue(this.itemService.isLatestVersion(context, secondPublication), "Second version should be valid");
+        assertFalse(this.itemService.isLatestVersion(context, firstPublication), "First version should not be valid");
+        assertFalse(this.itemService.isLatestVersion(context, item), "Original version should not be valid");
 
         context.turnOffAuthorisationSystem();
     }

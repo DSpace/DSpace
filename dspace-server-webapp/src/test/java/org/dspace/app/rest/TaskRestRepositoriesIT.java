@@ -10,8 +10,8 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -62,7 +62,7 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
@@ -106,7 +106,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -165,7 +165,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -218,8 +218,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer)
-                .withWorkflowGroup(2, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer)
+                .withWorkflowGroup("editor", reviewer2).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -288,11 +288,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // 3. two collections at different level of our communities structure with different reviewers
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer1, reviewer2).build();
 
         // reviewer2 and admin are only in the wf of one collection
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, reviewer1, admin).build();
+                .withWorkflowGroup("reviewer", reviewer1, admin).build();
 
         //4. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -432,11 +432,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // 3. two collections at different level of our communities structure with different reviewers
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer1, reviewer2).build();
 
         // reviewer2 and admin are only in the wf of one collection
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, reviewer1, admin).build();
+                .withWorkflowGroup("reviewer", reviewer1, admin).build();
 
         //4. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -508,7 +508,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, admin).build();
+                .withWorkflowGroup("reviewer", admin).build();
 
         //2. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -562,7 +562,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -638,7 +638,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -701,8 +701,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer)
-                .withWorkflowGroup(2, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer)
+                .withWorkflowGroup("editor", reviewer2).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -769,7 +769,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -834,7 +834,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -893,7 +893,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer, reviewer2).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -949,7 +949,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1015,7 +1015,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1076,7 +1076,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1121,7 +1121,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer, reviewer2).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1187,9 +1187,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer1, reviewer2).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, reviewer2, admin).build();
+                .withWorkflowGroup("reviewer", reviewer2, admin).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1326,9 +1326,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1, reviewer2).build();
+                .withWorkflowGroup("reviewer", reviewer1, reviewer2).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, reviewer2, admin).build();
+                .withWorkflowGroup("reviewer", reviewer2, admin).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1408,7 +1408,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1478,12 +1478,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         // the reviewer2 is a reviewer in a different step for the colAA1 and with the same role than reviewer1 for
         // another collection
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1)
-                .withWorkflowGroup(2, reviewer2)
+                .withWorkflowGroup("reviewer", reviewer1)
+                .withWorkflowGroup("editor", reviewer2)
                 .build();
 
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, reviewer2)
+                .withWorkflowGroup("reviewer", reviewer2)
                 .build();
 
         //3. create a normal user to use as submitter
@@ -1549,7 +1549,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1652,12 +1652,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         // the reviewer2 is a reviewer in a different step for the colAA1 and with the same role than reviewer1 for
         // another collection
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1)
-                .withWorkflowGroup(2, reviewer2)
+                .withWorkflowGroup("reviewer", reviewer1)
+                .withWorkflowGroup("editor", reviewer2)
                 .build();
 
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
-                .withWorkflowGroup(1, reviewer2)
+                .withWorkflowGroup("reviewer", reviewer2)
                 .build();
 
         //3. create a normal user to use as submitter
@@ -1727,7 +1727,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer).build();
+                .withWorkflowGroup("reviewer", reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -1804,9 +1804,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                .withWorkflowGroup(1, reviewer1)
-                .withWorkflowGroup(2, reviewer2)
-                .withWorkflowGroup(3, reviewer3)
+                .withWorkflowGroup("reviewer", reviewer1)
+                .withWorkflowGroup("editor", reviewer2)
+                .withWorkflowGroup("finaleditor", reviewer3)
                 .build();
 
         //3. create a normal user to use as submitter
@@ -1982,7 +1982,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(1, reviewer1)
+            .withWorkflowGroup("reviewer", reviewer1)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2082,7 +2082,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(1, reviewer1)
+            .withWorkflowGroup("reviewer", reviewer1)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2166,7 +2166,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(2, reviewer2)
+            .withWorkflowGroup("editor", reviewer2)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2264,7 +2264,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(2, reviewer2)
+            .withWorkflowGroup("editor", reviewer2)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2358,7 +2358,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(3, reviewer3)
+            .withWorkflowGroup("finaleditor", reviewer3)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2451,7 +2451,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(3, reviewer3)
+            .withWorkflowGroup("finaleditor", reviewer3)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2534,7 +2534,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(3, reviewer3)
+            .withWorkflowGroup("finaleditor", reviewer3)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2625,7 +2625,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(1, reviewer1)
+            .withWorkflowGroup("reviewer", reviewer1)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2684,7 +2684,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(2, reviewer2)
+            .withWorkflowGroup("editor", reviewer2)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2765,7 +2765,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(1, reviewer1)
+            .withWorkflowGroup("reviewer", reviewer1)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2830,8 +2830,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(1, reviewer1)
-            .withWorkflowGroup(2, reviewer2)
+            .withWorkflowGroup("reviewer", reviewer1)
+            .withWorkflowGroup("editor", reviewer2)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2919,7 +2919,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withName("Sub Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-            .withWorkflowGroup(1, reviewer1)
+            .withWorkflowGroup("reviewer", reviewer1)
             .build();
 
         //3. create a normal user to use as submitter
@@ -2969,7 +2969,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1, admin).build();
+                                           .withWorkflowGroup("reviewer", reviewer1, admin).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3037,7 +3037,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1, admin).build();
+                                           .withWorkflowGroup("reviewer", reviewer1, admin).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3076,7 +3076,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1, admin).build();
+                                           .withWorkflowGroup("reviewer", reviewer1, admin).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3123,7 +3123,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1, admin).build();
+                                           .withWorkflowGroup("reviewer", reviewer1, admin).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3166,7 +3166,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1, admin).build();
+                                           .withWorkflowGroup("reviewer", reviewer1, admin).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3216,11 +3216,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 2")
-                                           .withWorkflowGroup(1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer2).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3289,11 +3289,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 2")
-                                           .withWorkflowGroup(1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer2).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3350,7 +3350,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3389,7 +3389,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3434,11 +3434,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 2")
-                                           .withWorkflowGroup(1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer2).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3479,7 +3479,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         Item publicItem = ItemBuilder.createItem(context, col1)
                                      .withTitle("Public item")
@@ -3510,7 +3510,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         Item publicItem = ItemBuilder.createItem(context, col1)
                                      .withTitle("Public item")
@@ -3551,10 +3551,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withWorkflowGroup(1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer2).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3618,10 +3618,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withWorkflowGroup(1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer2).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3670,7 +3670,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3706,7 +3706,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3742,7 +3742,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3784,7 +3784,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         Item publicItem = ItemBuilder.createItem(context, col1)
                                      .withTitle("Public item")
@@ -3823,10 +3823,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer1, reviewer2).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withWorkflowGroup(1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer2).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3896,10 +3896,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer1, reviewer2).build();
         Collection col2 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 2")
-                                           .withWorkflowGroup(1, reviewer2).build();
+                                           .withWorkflowGroup("reviewer", reviewer2).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -3969,7 +3969,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -4006,7 +4006,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -4044,7 +4044,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -4088,7 +4088,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1).build();
+                                           .withWorkflowGroup("reviewer", reviewer1).build();
 
         Item publicItem = ItemBuilder.createItem(context, col1)
                                      .withTitle("Public item")
@@ -4120,7 +4120,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer).build();
+                                           .withWorkflowGroup("reviewer", reviewer).build();
 
         // create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)
@@ -4200,8 +4200,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
-                                           .withWorkflowGroup(1, reviewer1)
-                                           .withWorkflowGroup(2, reviewer2)
+                                           .withWorkflowGroup("reviewer", reviewer1)
+                                           .withWorkflowGroup("editor", reviewer2)
                                            .build();
 
         Group firstWorkflowGroup = col1.getWorkflowStep1(context);

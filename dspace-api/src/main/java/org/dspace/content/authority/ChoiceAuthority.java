@@ -23,20 +23,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @see MetadataAuthorityServiceImpl
  */
 public interface ChoiceAuthority extends NameAwarePlugin {
-
-    /**
-     * Checks if this authority control mechanism is accessible to the public.
-     * It reads the configuration property <code>authority.<plugin-name>.public</code>
-     * to determine if anonymous users can search or retrieve entries from this authority.
-     * * @return <code>true</code> if the authority is configured as public,
-     * <code>false</code> otherwise (default).
-     */
-    default boolean isPublic() {
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String authorityName = getPluginInstanceName();
-        return configurationService.getBooleanProperty("authority." + authorityName + ".public");
-    }
-
     /**
      * Get all values from the authority that match the preferred value.
      * Note that the offering was entered by the user and may contain
@@ -57,7 +43,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale     explicit localization key if available, or null
      * @return a Choices object (never null).
      */
-    Choices getMatches(String text, int start, int limit, String locale);
+    public Choices getMatches(String text, int start, int limit, String locale);
 
     /**
      * Get the single "best" match (if any) of a value in the authority
@@ -72,7 +58,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale     explicit localization key if available, or null
      * @return a Choices object (never null) with 1 or 0 values.
      */
-    Choices getBestMatch(String text, String locale);
+    public Choices getBestMatch(String text, String locale);
 
     /**
      * Get the canonical user-visible "label" (i.e. short descriptive text)
@@ -86,7 +72,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale explicit localization key if available, or null
      * @return descriptive label - should always return something, never null.
      */
-    String getLabel(String key, String locale);
+    public String getLabel(String key, String locale);
 
     /**
      * Get the canonical value to store for a key in the authority. Can be localized
@@ -124,7 +110,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
     /**
      * Scrollable authorities allows the scroll of the entries without applying
      * filter/query to the
-     * {@code #getMatches(String, String, Collection, int, int, String)}
+     * {@link #getMatches(String, String, Collection, int, int, String)}
      * 
      * @return <code>true</code> if scrollable, default <code>false</code>
      */
@@ -154,7 +140,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale  explicit localization key if available, or null
      * @return the preferred choice for this authKey and locale
      */
-    default Choice getChoice(String authKey, String locale) {
+    default public Choice getChoice(String authKey, String locale) {
         Choice result = new Choice();
         result.authority = authKey;
         result.label = getLabel(authKey, locale);
@@ -172,7 +158,19 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @return <code>true</code> if the authority provided in any choice of this
      *         authority should be stored in the metadata value
      */
-    default boolean storeAuthorityInMetadata() {
+    default public boolean storeAuthorityInMetadata() {
         return true;
+    }
+
+    /**
+     * Whether the authority and its choices are considered public, i.e. browsable by
+     * anonymous users. Controlled via the {@code authority.<name>.public} configuration property.
+     *
+     * @return <code>true</code> if this authority is public
+     */
+    default boolean isPublic() {
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String authorityName = getPluginInstanceName();
+        return configurationService.getBooleanProperty("authority." + authorityName + ".public");
     }
 }

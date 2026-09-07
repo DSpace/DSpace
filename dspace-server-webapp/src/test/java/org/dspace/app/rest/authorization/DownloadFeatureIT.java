@@ -50,8 +50,8 @@ import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DownloadFeatureIT extends AbstractControllerIntegrationTest {
@@ -98,7 +98,7 @@ public class DownloadFeatureIT extends AbstractControllerIntegrationTest {
     private Bitstream bitstreamB;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();

@@ -28,7 +28,6 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <!-- SWORDv2 Java implementation -->
         <dependency>
             <groupId>io.gdcc</groupId>

@@ -7,6 +7,7 @@
  */
 package org.dspace.qaevent.service.dto;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -18,6 +19,7 @@ import java.io.Serializable;
  */
 public class CorrectionTypeMessageDTO implements QAMessageDTO, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 2718151302291303796L;
 
     private String reason;

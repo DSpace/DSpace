@@ -50,7 +50,7 @@ public class OrcidEntityFactoryServiceImpl implements OrcidEntityFactoryService 
     public Activity createOrcidObject(Context context, Item item) {
         OrcidEntityFactory factory = getOrcidEntityType(item)
             .map(entityType -> entityFactories.get(entityType))
-            .orElseThrow(() -> new IllegalArgumentException(String.format(INVALID_ENTITY_MSG, item.getID())));
+            .orElseThrow(() -> new IllegalArgumentException(INVALID_ENTITY_MSG.formatted(item.getID())));
 
         return factory.createOrcidObject(context, item);
     }

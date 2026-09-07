@@ -71,7 +71,6 @@ public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, S
             }
             item = itemBuilder.build();
             context.dispatchEvents();
-            indexingService.commit();
         } catch (Exception e) {
             return handleException(e);
         }

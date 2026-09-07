@@ -19,8 +19,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.apache.commons.lang3.function.FailableFunction;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -55,6 +55,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexingService;
@@ -65,10 +66,10 @@ import org.dspace.versioning.Version;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -104,7 +105,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     protected Community community;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
@@ -118,9 +119,37 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     @Override
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         super.destroy();
+    }
+
+    /**
+     * Force a full reindex of all items using a fresh context.
+     * In Hibernate 7, reusing the test's context for a full index rebuild can cause
+     * "Detached entity passed to persist" or "MARKED_ROLLBACK" errors because the
+     * test's session may contain stale/detached entities.
+     * After reindexing, the test's context is replaced with a fresh one so that
+     * subsequent entity access doesn't hit LazyInitializationException.
+     */
+    private void forceReindex() throws Exception {
+        // Commit the test's data so the fresh context can see it
+        context.commit();
+        // Use a fresh context for the index rebuild to avoid Hibernate session issues
+        Context reindexContext = new Context(Context.Mode.READ_ONLY);
+        try {
+            indexingService.deleteIndex();
+            indexingService.createIndex(reindexContext);
+        } finally {
+            reindexContext.abort();
+        }
+        // Replace the test context with a fresh one so entities can be re-loaded.
+        // The old context's session was cleared by commit(), leaving entities detached.
+        context = new Context(Context.Mode.READ_WRITE);
+        // Reload eperson into the new context's session to avoid LazyInitializationException
+        // when the search service checks group membership via EPerson.getFullName().
+        eperson = context.reloadEntity(eperson);
+        context.setCurrentUser(eperson);
     }
 
     protected Matcher<? super Object> matchSearchResult(Item item, String title) {
@@ -194,29 +223,28 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     protected DiscoverResult getItemSearchResult(Item item) throws Exception {
         DiscoverQuery query = new DiscoverQuery();
-        query.setQuery(String.format(
-            "search.resourcetype:\"Item\" AND search.resourceid:\"%s\"", item.getID()
+        query.setQuery("search.resourcetype:\"Item\" AND search.resourceid:\"%s\"".formatted(item.getID()
         ));
         return searchService.search(context, query);
     }
 
     protected void verifyIndexed(Item item) throws Exception {
         DiscoverResult searchResult = getItemSearchResult(item);
-        Assert.assertEquals(1, searchResult.getTotalSearchResults());
+        Assertions.assertEquals(1, searchResult.getTotalSearchResults());
     }
 
     protected void verifyNotIndexed(Item item) throws Exception {
         DiscoverResult searchResult = getItemSearchResult(item);
-        Assert.assertEquals(0, searchResult.getTotalSearchResults());
+        Assertions.assertEquals(0, searchResult.getTotalSearchResults());
     }
 
     protected void verifySolrField(Item item, String fieldName, List<Object> expectedValues) throws Exception {
-        QueryResponse result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
-            "search.resourcetype:\"Item\" AND search.resourceid:\"%s\"", item.getID()
-        )));
+        String solrQuery = "search.resourcetype:\"Item\" AND search.resourceid:\"%s\""
+            .formatted(item.getID());
+        QueryResponse result = solrSearchCore.getSolr().query(new SolrQuery(solrQuery));
 
         SolrDocumentList docs = result.getResults();
-        Assert.assertEquals(1, docs.size());
+        Assertions.assertEquals(1, docs.size());
         SolrDocument doc = docs.get(0);
 
         java.util.Collection<Object> actualValues = doc.getFieldValues(fieldName);
@@ -239,7 +267,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Version v2 = VersionBuilder.createVersion(context, currentItem, "create: " + newTitle)
             .build();
         Item newItem = v2.getItem();
-        Assert.assertNotEquals(currentItem, newItem);
+        Assertions.assertNotEquals(currentItem, newItem);
 
         if (isDiscoverable != null) {
             newItem.setDiscoverable(isDiscoverable);
@@ -1157,28 +1185,28 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // init - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs1 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs1.size());
+        Assertions.assertEquals(1, mdvs1.size());
         assertEquals(pro1_1.getID().toString(), mdvs1.get(0).getValue());
         assertEquals(0, mdvs1.get(0).getPlace());
 
         // init - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs1a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs1a.size());
+        Assertions.assertEquals(1, mdvs1a.size());
         assertEquals(pro1_1.getID().toString(), mdvs1a.get(0).getValue());
         assertEquals(-1, mdvs1a.get(0).getPlace());
 
         // init - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs2 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs2.size());
+        Assertions.assertEquals(1, mdvs2.size());
         assertEquals(pub1_1.getID().toString(), mdvs2.get(0).getValue());
         assertEquals(0, mdvs2.get(0).getPlace());
 
         // init - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs2a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs2a.size());
+        Assertions.assertEquals(1, mdvs2a.size());
         assertEquals(pub1_1.getID().toString(), mdvs2a.get(0).getValue());
         assertEquals(-1, mdvs2a.get(0).getPlace());
 
@@ -1206,7 +1234,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         String idPub1_2 = pub1_2.getID().toString();
         context.commit();
         indexingService.commit();
-        Assert.assertNotEquals(pub1_1, pub1_2);
+        Assertions.assertNotEquals(pub1_1, pub1_2);
         installItemService.installItem(context, workspaceItemService.findByItem(context, pub1_2));
         context.commit();
         indexingService.commit();
@@ -1245,7 +1273,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs3 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs3.size());
+        Assertions.assertEquals(1, mdvs3.size());
         assertEquals(pro1_1.getID().toString(), mdvs3.get(0).getValue());
         assertEquals(0, mdvs3.get(0).getPlace());
         verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1255,13 +1283,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs3a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs3a.size());
+        Assertions.assertEquals(0, mdvs3a.size());
         verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after archive pub 1.2 - test relation.* metadata of publication 1.2
         List<MetadataValue> mdvs4 = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs4.size());
+        Assertions.assertEquals(1, mdvs4.size());
         assertEquals(pro1_1.getID().toString(), mdvs4.get(0).getValue());
         assertEquals(0, mdvs4.get(0).getPlace());
         verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1271,7 +1299,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.*.latestForDiscovery metadata of publication 1.2
         List<MetadataValue> mdvs4a = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs4a.size());
+        Assertions.assertEquals(1, mdvs4a.size());
         assertEquals(pro1_1.getID().toString(), mdvs4a.get(0).getValue());
         assertEquals(-1, mdvs4a.get(0).getPlace());
         verifySolrField(
@@ -1281,7 +1309,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs5 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs5.size());
+        Assertions.assertEquals(1, mdvs5.size());
         assertEquals(pub1_2.getID().toString(), mdvs5.get(0).getValue());
         assertEquals(0, mdvs5.get(0).getPlace());
         verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -1291,7 +1319,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs5a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs5a.size());
+        Assertions.assertEquals(2, mdvs5a.size());
         assertThat(mdvs5a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pub1_1.getID().toString())),
@@ -1340,7 +1368,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         String idPro1_2 = pro1_2.getID().toString();
         context.commit();
         indexingService.commit();
-        Assert.assertNotEquals(pro1_1, pro1_2);
+        Assertions.assertNotEquals(pro1_1, pro1_2);
         context.restoreAuthSystemState();
 
         // cache busting
@@ -1386,7 +1414,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs6 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs6.size());
+        Assertions.assertEquals(1, mdvs6.size());
         assertEquals(pro1_1.getID().toString(), mdvs6.get(0).getValue());
         assertEquals(0, mdvs6.get(0).getPlace());
         verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1396,13 +1424,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs6a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs6a.size());
+        Assertions.assertEquals(0, mdvs6a.size());
         verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after create pro 1.2 - test relation.* metadata of publication 1.2
         List<MetadataValue> mdvs7 = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs7.size());
+        Assertions.assertEquals(1, mdvs7.size());
         assertEquals(pro1_1.getID().toString(), mdvs7.get(0).getValue());
         assertEquals(0, mdvs7.get(0).getPlace());
         verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1412,7 +1440,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.2
         List<MetadataValue> mdvs7a = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs7a.size());
+        Assertions.assertEquals(2, mdvs7a.size());
         assertThat(mdvs7a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pro1_1.getID().toString())),
@@ -1431,7 +1459,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs8 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs8.size());
+        Assertions.assertEquals(1, mdvs8.size());
         assertEquals(pub1_2.getID().toString(), mdvs8.get(0).getValue());
         assertEquals(0, mdvs8.get(0).getPlace());
         verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -1441,7 +1469,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs8a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs8a.size());
+        Assertions.assertEquals(2, mdvs8a.size());
         assertThat(mdvs8a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pub1_1.getID().toString())),
@@ -1460,7 +1488,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.* metadata of project 1.2
         List<MetadataValue> mdvs9 = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs9.size());
+        Assertions.assertEquals(1, mdvs9.size());
         assertEquals(pub1_2.getID().toString(), mdvs9.get(0).getValue());
         assertEquals(0, mdvs9.get(0).getPlace());
         // NOTE: project 1.2 is still in the workspace,
@@ -1470,7 +1498,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.2
         List<MetadataValue> mdvs9a = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs9a.size());
+        Assertions.assertEquals(0, mdvs9a.size());
         // NOTE: project 1.2 is still in the workspace,
         //       so it should not be indexed as an item (see ItemIndexFactory#getIndexableObjects)
         verifyNotIndexed(pro1_2);
@@ -1562,7 +1590,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs10 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs10.size());
+        Assertions.assertEquals(1, mdvs10.size());
         assertEquals(pro1_1.getID().toString(), mdvs10.get(0).getValue());
         assertEquals(0, mdvs10.get(0).getPlace());
         verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1572,13 +1600,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs10a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs10a.size());
+        Assertions.assertEquals(0, mdvs10a.size());
         verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after archive pro 1.2 - test relation.* metadata of publication 1.2
         List<MetadataValue> mdvs11 = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs11.size());
+        Assertions.assertEquals(1, mdvs11.size());
         assertEquals(pro1_2.getID().toString(), mdvs11.get(0).getValue());
         assertEquals(0, mdvs11.get(0).getPlace());
         verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_2.getID().toString()));
@@ -1588,7 +1616,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.2
         List<MetadataValue> mdvs11a = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs11a.size());
+        Assertions.assertEquals(2, mdvs11a.size());
         assertThat(mdvs11a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pro1_1.getID().toString())),
@@ -1607,7 +1635,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs12 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs12.size());
+        Assertions.assertEquals(1, mdvs12.size());
         assertEquals(pub1_2.getID().toString(), mdvs12.get(0).getValue());
         assertEquals(0, mdvs12.get(0).getPlace());
         verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -1617,7 +1645,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs12a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs12a.size());
+        Assertions.assertEquals(1, mdvs12a.size());
         assertEquals(pub1_1.getID().toString(), mdvs12a.get(0).getValue());
         assertEquals(-1, mdvs12a.get(0).getPlace());
         verifySolrField(
@@ -1627,7 +1655,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.* metadata of project 1.2
         List<MetadataValue> mdvs13 = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs13.size());
+        Assertions.assertEquals(1, mdvs13.size());
         assertEquals(pub1_2.getID().toString(), mdvs13.get(0).getValue());
         assertEquals(0, mdvs13.get(0).getPlace());
         verifySolrField(pro1_2, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -1637,7 +1665,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.2
         List<MetadataValue> mdvs13a = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs13a.size());
+        Assertions.assertEquals(1, mdvs13a.size());
         assertEquals(pub1_2.getID().toString(), mdvs13a.get(0).getValue());
         assertEquals(-1, mdvs13a.get(0).getPlace());
         verifySolrField(
@@ -1744,28 +1772,28 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // init - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs1 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs1.size());
+        Assertions.assertEquals(1, mdvs1.size());
         assertEquals(pro1_1.getID().toString(), mdvs1.get(0).getValue());
         assertEquals(0, mdvs1.get(0).getPlace());
 
         // init - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs1a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs1a.size());
+        Assertions.assertEquals(1, mdvs1a.size());
         assertEquals(pro1_1.getID().toString(), mdvs1a.get(0).getValue());
         assertEquals(-1, mdvs1a.get(0).getPlace());
 
         // init - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs2 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs2.size());
+        Assertions.assertEquals(1, mdvs2.size());
         assertEquals(pub1_1.getID().toString(), mdvs2.get(0).getValue());
         assertEquals(0, mdvs2.get(0).getPlace());
 
         // init - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs2a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs2a.size());
+        Assertions.assertEquals(1, mdvs2a.size());
         assertEquals(pub1_1.getID().toString(), mdvs2a.get(0).getValue());
         assertEquals(-1, mdvs2a.get(0).getPlace());
 
@@ -1793,7 +1821,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         String idPub1_2 = pub1_2.getID().toString();
         context.commit();
         indexingService.commit();
-        Assert.assertNotEquals(pub1_1, pub1_2);
+        Assertions.assertNotEquals(pub1_1, pub1_2);
         installItemService.installItem(context, workspaceItemService.findByItem(context, pub1_2));
         context.commit();
         indexingService.commit();
@@ -1832,7 +1860,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs3 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs3.size());
+        Assertions.assertEquals(1, mdvs3.size());
         assertEquals(pro1_1.getID().toString(), mdvs3.get(0).getValue());
         assertEquals(0, mdvs3.get(0).getPlace());
         verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1842,13 +1870,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs3a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs3a.size());
+        Assertions.assertEquals(0, mdvs3a.size());
         verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after archive pub 1.2 - test relation.* metadata of publication 1.2
         List<MetadataValue> mdvs4 = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs4.size());
+        Assertions.assertEquals(1, mdvs4.size());
         assertEquals(pro1_1.getID().toString(), mdvs4.get(0).getValue());
         assertEquals(0, mdvs4.get(0).getPlace());
         verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1858,7 +1886,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.*.latestForDiscovery metadata of publication 1.2
         List<MetadataValue> mdvs4a = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs4a.size());
+        Assertions.assertEquals(1, mdvs4a.size());
         assertEquals(pro1_1.getID().toString(), mdvs4a.get(0).getValue());
         assertEquals(-1, mdvs4a.get(0).getPlace());
         verifySolrField(
@@ -1868,7 +1896,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs5 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs5.size());
+        Assertions.assertEquals(1, mdvs5.size());
         assertEquals(pub1_2.getID().toString(), mdvs5.get(0).getValue());
         assertEquals(0, mdvs5.get(0).getPlace());
         verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -1878,7 +1906,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pub 1.2 - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs5a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs5a.size());
+        Assertions.assertEquals(2, mdvs5a.size());
         assertThat(mdvs5a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pub1_1.getID().toString())),
@@ -1927,7 +1955,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         String idPro1_2 = pro1_2.getID().toString();
         context.commit();
         indexingService.commit();
-        Assert.assertNotEquals(pro1_1, pro1_2);
+        Assertions.assertNotEquals(pro1_1, pro1_2);
         context.restoreAuthSystemState();
 
         // cache busting
@@ -1980,7 +2008,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs6 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs6.size());
+        Assertions.assertEquals(1, mdvs6.size());
         assertEquals(pro1_1.getID().toString(), mdvs6.get(0).getValue());
         assertEquals(0, mdvs6.get(0).getPlace());
         verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -1990,13 +2018,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs6a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs6a.size());
+        Assertions.assertEquals(0, mdvs6a.size());
         verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after create pro 1.2 - test relation.* metadata of publication 1.2
         List<MetadataValue> mdvs7 = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs7.size());
+        Assertions.assertEquals(1, mdvs7.size());
         assertEquals(pro1_1.getID().toString(), mdvs7.get(0).getValue());
         assertEquals(0, mdvs7.get(0).getPlace());
         verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -2006,7 +2034,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.2
         List<MetadataValue> mdvs7a = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs7a.size());
+        Assertions.assertEquals(2, mdvs7a.size());
         assertThat(mdvs7a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pro1_1.getID().toString())),
@@ -2025,7 +2053,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs8 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs8.size());
+        Assertions.assertEquals(1, mdvs8.size());
         assertEquals(pub1_2.getID().toString(), mdvs8.get(0).getValue());
         assertEquals(0, mdvs8.get(0).getPlace());
         verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -2035,7 +2063,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs8a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs8a.size());
+        Assertions.assertEquals(2, mdvs8a.size());
         assertThat(mdvs8a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pub1_1.getID().toString())),
@@ -2054,7 +2082,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.* metadata of project 1.2
         List<MetadataValue> mdvs9 = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs9.size());
+        Assertions.assertEquals(1, mdvs9.size());
         assertEquals(pub1_2.getID().toString(), mdvs9.get(0).getValue());
         assertEquals(0, mdvs9.get(0).getPlace());
         // NOTE: project 1.2 is still in the workspace,
@@ -2064,7 +2092,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.2
         List<MetadataValue> mdvs9a = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs9a.size());
+        Assertions.assertEquals(0, mdvs9a.size());
         // NOTE: project 1.2 is still in the workspace,
         //       so it should not be indexed as an item (see ItemIndexFactory#getIndexableObjects)
         verifyNotIndexed(pro1_2);
@@ -2156,7 +2184,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.* metadata of publication 1.1
         List<MetadataValue> mdvs10 = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs10.size());
+        Assertions.assertEquals(1, mdvs10.size());
         assertEquals(pro1_1.getID().toString(), mdvs10.get(0).getValue());
         assertEquals(0, mdvs10.get(0).getPlace());
         verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
@@ -2166,13 +2194,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.1
         List<MetadataValue> mdvs10a = itemService
             .getMetadata(pub1_1, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(0, mdvs10a.size());
+        Assertions.assertEquals(0, mdvs10a.size());
         verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after archive pro 1.2 - test relation.* metadata of publication 1.2
         List<MetadataValue> mdvs11 = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
-        Assert.assertEquals(1, mdvs11.size());
+        Assertions.assertEquals(1, mdvs11.size());
         assertEquals(pro1_2.getID().toString(), mdvs11.get(0).getValue());
         assertEquals(0, mdvs11.get(0).getPlace());
         verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_2.getID().toString()));
@@ -2182,7 +2210,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of publication 1.2
         List<MetadataValue> mdvs11a = itemService
             .getMetadata(pub1_2, "relation", "isProjectOfPublication", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(2, mdvs11a.size());
+        Assertions.assertEquals(2, mdvs11a.size());
         assertThat(mdvs11a, containsInAnyOrder(
             allOf(
                 hasProperty("value", is(pro1_1.getID().toString())),
@@ -2201,7 +2229,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.* metadata of project 1.1
         List<MetadataValue> mdvs12 = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs12.size());
+        Assertions.assertEquals(1, mdvs12.size());
         assertEquals(pub1_2.getID().toString(), mdvs12.get(0).getValue());
         assertEquals(0, mdvs12.get(0).getPlace());
         verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -2211,7 +2239,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs12a = itemService
             .getMetadata(pro1_1, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs12a.size());
+        Assertions.assertEquals(1, mdvs12a.size());
         assertEquals(pub1_1.getID().toString(), mdvs12a.get(0).getValue());
         assertEquals(-1, mdvs12a.get(0).getPlace());
         verifySolrField(
@@ -2221,7 +2249,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.* metadata of project 1.2
         List<MetadataValue> mdvs13 = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", null, Item.ANY);
-        Assert.assertEquals(1, mdvs13.size());
+        Assertions.assertEquals(1, mdvs13.size());
         assertEquals(pub1_2.getID().toString(), mdvs13.get(0).getValue());
         assertEquals(0, mdvs13.get(0).getPlace());
         verifySolrField(pro1_2, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
@@ -2231,7 +2259,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // after archive pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.2
         List<MetadataValue> mdvs13a = itemService
             .getMetadata(pro1_2, "relation", "isPublicationOfProject", "latestForDiscovery", Item.ANY);
-        Assert.assertEquals(1, mdvs13a.size());
+        Assertions.assertEquals(1, mdvs13a.size());
         assertEquals(pub1_2.getID().toString(), mdvs13a.get(0).getValue());
         assertEquals(-1, mdvs13a.get(0).getPlace());
         verifySolrField(
@@ -2371,9 +2399,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
             pub1_1.getID().toString(), pub1_2.getID().toString(), pub1_3.getID().toString(), pub1_4.getID().toString()
         ));
 
-        // force reindex all items
-        indexingService.deleteIndex();
-        indexingService.createIndex(context);
+        // force reindex all items using a fresh context to avoid Hibernate 7 session issues
+        forceReindex();
 
         // after reindex - verify publication 1.1
         verifyIndexed(pub1_1);
@@ -2428,9 +2455,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         verifyNotIndexed(wsi.getItem());
 
-        // force reindex all items
-        indexingService.deleteIndex();
-        indexingService.createIndex(context);
+        // force reindex all items using a fresh context to avoid Hibernate 7 session issues
+        forceReindex();
 
         verifyNotIndexed(wsi.getItem());
     }
@@ -2460,9 +2486,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         verifyNotIndexed(wfi.getItem());
 
-        // force reindex all items
-        indexingService.deleteIndex();
-        indexingService.createIndex(context);
+        // force reindex all items using a fresh context to avoid Hibernate 7 session issues
+        forceReindex();
 
         verifyNotIndexed(wfi.getItem());
     }
@@ -2478,9 +2503,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         verifyNotIndexed(templateItem);
 
-        // force reindex all items
-        indexingService.deleteIndex();
-        indexingService.createIndex(context);
+        // force reindex all items using a fresh context to avoid Hibernate 7 session issues
+        forceReindex();
 
         verifyNotIndexed(templateItem);
     }

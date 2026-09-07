@@ -10,9 +10,9 @@ package org.dspace.content;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests DCPersonName class
@@ -34,7 +34,7 @@ public class DCPersonNameTest {
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     public void init() {
         dc = new DCPersonName("");
     }
@@ -46,7 +46,7 @@ public class DCPersonNameTest {
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     public void destroy() {
         dc = null;
     }

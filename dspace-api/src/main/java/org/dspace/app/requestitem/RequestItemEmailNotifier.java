@@ -16,8 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.ManagedBean;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.mail.MessagingException;
 import org.apache.logging.log4j.LogManager;
@@ -47,7 +47,7 @@ import org.dspace.services.ConfigurationService;
  * @author Mark H. Wood <mwood@iupui.edu>
  */
 @Singleton
-@ManagedBean
+@Named
 public class RequestItemEmailNotifier {
     private static final Logger LOG = LogManager.getLogger();
 

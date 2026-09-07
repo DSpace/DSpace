@@ -37,8 +37,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -84,7 +84,7 @@ public class BundleUploadBitstreamController {
      *
      * @return The created BitstreamResource
      */
-    @RequestMapping(method = RequestMethod.POST, headers = "content-type=multipart/form-data")
+    @PostMapping( headers = "content-type=multipart/form-data")
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'ADD') && hasPermission(#uuid, 'BUNDLE', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> uploadBitstream(
             HttpServletRequest request,

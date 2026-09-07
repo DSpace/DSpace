@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,16 +30,19 @@ import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.domain.BlobBuilder;
 import org.jclouds.blobstore.domain.BlobBuilder.PayloadBlobBuilder;
 import org.jclouds.io.Payload;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * @author Nathan Buckingham
  *
  */
+@ExtendWith(MockitoExtension.class)
 public class JCloudBitStoreServiceTest extends AbstractUnitTest {
 
 
@@ -54,7 +57,7 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
     @Mock
     private Bitstream bitstream;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.jCloudBitStoreService = new JCloudBitStoreService(blobStoreContext, "filesystem");
     }
@@ -226,7 +229,7 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
     // We use 'Paths' instead of splitting on slashes because these OSes use different path separators.
     private int countPathElements(String stringPath) {
         List<String> pathElements = new ArrayList<>();
-        Paths.get(stringPath).forEach(p -> pathElements.add(p.toString()));
+        Path.of(stringPath).forEach(p -> pathElements.add(p.toString()));
         return pathElements.size();
     }
 

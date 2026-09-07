@@ -27,9 +27,9 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -56,7 +56,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
     /**
      * Build the relationships using the standard test XML with the initialize-entities script
      */
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         //Set up the database for the next test
@@ -66,7 +66,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
 
     }
 
-    @After
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         //Clean up the database for the next test
@@ -141,6 +141,10 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         String pathToFile = configurationService.getProperty("dspace.dir") +
             File.separator + "config" + File.separator + "entities" + File.separator + "relationship-types-update.xml";
         runDSpaceScript("initialize-entities", "-f", pathToFile);
+
+        // After runDSpaceScript, the context is a fresh one. Reload the relationship types from the
+        // database so we have up-to-date objects attached to the current session.
+        relationshipTypes = relationshipTypeService.findAll(context);
 
         // This is a helper object to compare whether the update was successful. We're simply taking the first
         // RelationshipType object in the list and altering this by setting the LeftMinCardinality on 10. We've

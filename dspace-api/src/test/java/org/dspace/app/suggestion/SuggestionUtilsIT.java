@@ -12,7 +12,7 @@ import static org.dspace.app.suggestion.SuggestionUtils.getFirstEntryByMetadatum
 import static org.dspace.orcid.model.OrcidProfileSectionType.EXTERNAL_IDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -52,9 +52,9 @@ import org.dspace.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
@@ -85,7 +85,7 @@ public class SuggestionUtilsIT extends AbstractIntegrationTestWithDatabase  {
     @Autowired
     private SuggestionService suggestionService;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -143,7 +143,7 @@ public class SuggestionUtilsIT extends AbstractIntegrationTestWithDatabase  {
             .then((invocation) -> unmarshallWorkBulk(invocation.getArgument(1)));
     }
 
-    @After
+    @AfterEach
     public void after() {
         dataProvider.setOrcidClient(orcidClient);
         orcidConfiguration.setClientId(originalClientId);

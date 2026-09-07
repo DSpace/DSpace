@@ -17,14 +17,14 @@ import java.util.Map;
 
 import org.dspace.app.rest.configuration.ActuatorConfiguration;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.Status;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.Status;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -32,7 +32,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Unit tests for {@link SEOHealthIndicator}.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SEOHealthIndicatorTest {
 
     private static final String BASE_URL = "https://demo.dspace.org";
@@ -46,7 +46,7 @@ public class SEOHealthIndicatorTest {
     @InjectMocks
     private SEOHealthIndicator seoHealthIndicator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(configurationService.getProperty("dspace.ui.url")).thenReturn(BASE_URL);
     }

@@ -64,8 +64,8 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                     .map((indexFactory -> indexFactory.getType())).collect(Collectors.toList());
             type = commandLine.getOptionValue(TYPE_OPTION);
             if (!indexableObjectTypes.contains(type)) {
-                handler.handleException(String.format("%s is not a valid indexable object type, options: %s",
-                        type, Arrays.toString(indexableObjectTypes.toArray())));
+                handler.handleException("%s is not a valid indexable object type, options: %s".formatted(
+                    type, Arrays.toString(indexableObjectTypes.toArray())));
             }
         }
 
@@ -75,7 +75,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             final String param = indexClientOptions == IndexClientOptions.REMOVE ? commandLine.getOptionValue('r')
                     : commandLine.getOptionValue('i');
             indexableObject = resolveIndexableObject(context, param);
-            if (!indexableObject.isPresent()) {
+            if (indexableObject.isEmpty()) {
                 throw new IllegalArgumentException("Cannot resolve " + param + " to a DSpace object");
             }
         }

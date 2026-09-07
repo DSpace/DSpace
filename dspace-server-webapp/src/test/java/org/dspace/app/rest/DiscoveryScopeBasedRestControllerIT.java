@@ -26,8 +26,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -84,7 +84,7 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     private Collection collection221;
     private Collection collection222;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 

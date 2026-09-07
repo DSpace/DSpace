@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.CombinableMatcher.both;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -104,8 +104,8 @@ import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link BulkImport}.
@@ -161,7 +161,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void beforeTests() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();

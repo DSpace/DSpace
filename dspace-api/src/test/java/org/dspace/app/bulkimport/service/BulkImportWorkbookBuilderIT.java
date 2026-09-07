@@ -73,8 +73,8 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link BulkImportWorkbookBuilder}.
@@ -109,7 +109,7 @@ public class BulkImportWorkbookBuilderIT extends AbstractIntegrationTestWithData
 
     private BulkImportWorkbookBuilder builder;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException, AuthorizeException {
 
         builder = new DSpace().getServiceManager().getServicesByType(BulkImportWorkbookBuilder.class).get(0);

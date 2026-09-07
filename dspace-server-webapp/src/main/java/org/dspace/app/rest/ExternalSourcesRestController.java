@@ -18,9 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,7 +54,7 @@ public class ExternalSourcesRestController {
      * @param assembler     The assembler object
      * @return              A paginated list of ExternalSourceEntryResource objects that comply with the params
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/entries")
+    @GetMapping("/entries")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public PagedModel<ExternalSourceEntryResource> getExternalSourceEntries(
         @PathVariable("externalSourceName") String externalSourceName,
@@ -82,7 +82,7 @@ public class ExternalSourcesRestController {
      * @param entryId       The entryId used for the lookup
      * @return              An ExternalSourceEntryResource that complies with the above params
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/entryValues/{entryId}")
+    @GetMapping("/entryValues/{entryId}")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ExternalSourceEntryResource getExternalSourceEntryValue(@PathVariable("externalSourceName") String
                                                                            externalSourceName,

@@ -14,16 +14,12 @@ import static org.dspace.core.Constants.ITEM;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import eu.dnetlib.broker.BrokerClient;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +39,9 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Implementation of {@link DSpaceRunnable} to perform a QAEvents import from a
@@ -108,7 +107,6 @@ public class OpenaireEventsImport
     public void setup() throws ParseException {
 
         jsonMapper = new JsonMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         DSpace dspace = new DSpace();
         handleService = dspace.getSingletonService(HandleServiceImpl.class);
@@ -331,9 +329,13 @@ public class OpenaireEventsImport
 
     private URL getOpenaireBrokerUri() {
         try {
-            return new URL(configurationService.getProperty("qaevents.openaire.broker-url", "http://api.openaire.eu/broker"));
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("The configured OPENAIRE broker URL is not valid.", e);
+            String brokerUrl = configurationService
+                .getProperty("qaevents.openaire.broker-url",
+                             "http://api.openaire.eu/broker");
+            return URI.create(brokerUrl).toURL();
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                "The configured OPENAIRE broker URL is not valid.", e);
         }
     }
 

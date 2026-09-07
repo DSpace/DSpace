@@ -31,6 +31,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -353,7 +354,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             super.setMetadataSingleValue(context, collection, field, null, value);
         }
 
-        collection.addDetails(field.toString());
     }
 
     @Override
@@ -554,7 +554,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // register this as the admin group
         collection.setAdmins(admins);
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
-                                              null, getIdentifiers(context, collection)));
+                                   null, DetailType.INFO, getIdentifiers(context, collection)));
         return admins;
     }
 
@@ -572,7 +572,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Remove the link to the collection table.
         collection.setAdmins(null);
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
-                                              null, getIdentifiers(context, collection)));
+                                   null, DetailType.INFO, getIdentifiers(context, collection)));
     }
 
     @Override
@@ -688,7 +688,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (collection.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION,
-                                       collection.getID(), null, getIdentifiers(context, collection)));
+                                       collection.getID(), null, DetailType.INFO,
+                                       getIdentifiers(context, collection)));
             collection.clearModified();
         }
         if (collection.isMetadataModified()) {
@@ -741,6 +742,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void delete(Context context, Collection collection) throws SQLException, AuthorizeException, IOException {
+        // Reload collection to ensure it's attached to the current session
+        // (Required for Hibernate 7 which may have detached entities during test cleanup)
+        collection = context.reloadEntity(collection);
+        if (collection == null) {
+            return;
+        }
+
         log.info(LogHelper.getHeader(context, "delete_collection",
                                       "collection_id=" + collection.getID()));
 
@@ -776,7 +784,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
 
-
         // Delete bitstream logo
         setLogo(context, collection, null);
 
@@ -798,8 +805,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Remove any workflow roles
         collectionRoleService.deleteByCollection(context, collection);
 
-        collection.getResourcePolicies().clear();
-
         // Remove default administrators group
         Group g = collection.getAdministrators();
 
@@ -819,9 +824,20 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Iterator<Community> owningCommunities = collection.getCommunities().iterator();
         while (owningCommunities.hasNext()) {
             Community owningCommunity = owningCommunities.next();
+            // Reload community to ensure it's attached to the current session
+            // (Required for Hibernate 7 which may have detached entities during test cleanup)
+            owningCommunity = context.reloadEntity(owningCommunity);
             collection.removeCommunity(owningCommunity);
-            owningCommunity.removeCollection(collection);
+            if (owningCommunity != null) {
+                owningCommunity.removeCollection(collection);
+            }
         }
+
+        // Remove all resource policies right before removing the collection entity.
+        // Must happen after all authorization checks but before collectionDAO.delete() to prevent
+        // Hibernate 7 TransientPropertyValueException when managed ResourcePolicies reference
+        // a removed Collection entity during auto-flush.
+        authorizeService.removeAllPolicies(context, collection);
 
         collectionDAO.delete(context, collection);
     }
@@ -987,7 +1003,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public void updateLastModified(Context context, Collection collection) throws SQLException, AuthorizeException {
         //Also fire a modified event since the collection HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION,
-                                   collection.getID(), null, getIdentifiers(context, collection)));
+                                   collection.getID(), null, DetailType.INFO,
+                                   getIdentifiers(context, collection)));
     }
 
     @Override
@@ -1107,8 +1124,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             discoverQuery.addFilterQueries("search.entitytype:" + entityType);
         }
         if (StringUtils.isNotBlank(q)) {
-            q = searchService.formatAutoCompleteQuery(q, "dc.title_sort");
-            discoverQuery.setQuery(q);
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(q);
+            buildQuery.append("(").append(escapedQuery).append(" OR dc.title_sort:*")
+                .append(escapedQuery).append("*").append(")");
+            discoverQuery.setQuery(buildQuery.toString());
         }
         discoverQuery.addRequiredAuthorization(Constants.ADD);
         DiscoverResult resp = searchService.search(context, discoverQuery);

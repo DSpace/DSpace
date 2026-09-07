@@ -36,8 +36,8 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrationTest {
@@ -50,7 +50,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
 
     String token;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -224,7 +224,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -280,7 +280,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
@@ -335,7 +335,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup(1, admin).build();
+                                           .withWorkflowGroup("reviewer", admin).build();
 
         //2. a workflow item
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)

@@ -27,9 +27,10 @@ import org.dspace.harvest.service.HarvestedCollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -71,7 +72,7 @@ public class CollectionHarvestSettingsController {
      * @return a HarvesterMetadataResource containing all available metadata formats
      */
     @PreAuthorize("hasPermission(#collectionUuid, 'COLLECTION', 'WRITE')")
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public HarvestedCollectionResource get(@PathVariable UUID collectionUuid,
                                            HttpServletRequest request,
                                            HttpServletResponse response) throws SQLException {
@@ -98,7 +99,7 @@ public class CollectionHarvestSettingsController {
      * @throws SQLException
      */
     @PreAuthorize("hasPermission(#collectionUuid, 'COLLECTION', 'WRITE')")
-    @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
+    @PutMapping( consumes = {"application/json"})
     public HarvestedCollectionResource updateHarvestSettingsEndpoint(@PathVariable UUID collectionUuid,
                                               HttpServletResponse response,
                                               HttpServletRequest request) throws SQLException {

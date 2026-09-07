@@ -7,10 +7,11 @@
  */
 package org.dspace.app.bulkedit;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,9 +50,9 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
@@ -68,7 +69,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     private Collection publicationCollection;
     private Collection personCollection;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -84,7 +85,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void after() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         List<Relationship> relationships = relationshipService.findAll(context);
@@ -173,25 +174,28 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void metadataImportWithoutEPersonParameterTest()
-        throws IllegalAccessException, InstantiationException, ParseException {
-        String fileLocation = new File(testProps.get("test.importcsv").toString()).getAbsolutePath();
-        String[] args = new String[] {"metadata-import", "-f", fileLocation, "-s"};
-        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        throws IllegalAccessException, InstantiationException {
+        assertThrows(ParseException.class, () -> {
+            String fileLocation = new File(testProps.get("test.importcsv").toString()).getAbsolutePath();
+            String[] args = new String[]{"metadata-import", "-f", fileLocation, "-s"};
+            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
-        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+            ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+            ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
 
-        DSpaceRunnable script = null;
-        if (scriptConfiguration != null) {
-            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
-        }
-        if (script != null) {
-            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
-                script.run();
+            DSpaceRunnable script = null;
+            if (scriptConfiguration != null) {
+                script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
             }
-        }
+            if (script != null) {
+                if (DSpaceRunnable.StepResult.Continue.equals(
+                    script.initialize(args, testDSpaceRunnableHandler, null))) {
+                    script.run();
+                }
+            }
+        });
     }
 
     @Test
@@ -345,15 +349,15 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             ScriptLauncher.handleScript(
                 args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
 
-            assertNotNull("The handler should contain an exception",
-                testDSpaceRunnableHandler.getException());
+            assertNotNull(testDSpaceRunnableHandler.getException(),
+                "The handler should contain an exception");
 
-            assertTrue("The exception cause should be a MetadataImportException",
-                testDSpaceRunnableHandler.getException().getCause() instanceof MetadataImportException);
+            assertTrue(testDSpaceRunnableHandler.getException().getCause() instanceof MetadataImportException,
+                "The exception cause should be a MetadataImportException");
 
             String exceptionMessage = testDSpaceRunnableHandler.getException().getCause().getMessage();
-            assertTrue("The error message does not contain the expected text.",
-                    exceptionMessage.contains("exceeds the configured maximum of 1"));
+            assertTrue(exceptionMessage.contains("exceeds the configured maximum of 1"),
+                    "The error message does not contain the expected text.");
         } finally {
             csvFile.delete();
         }
@@ -368,8 +372,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         Item importedItem1 = findItemByName("Title 1");
         Item importedItem2 = findItemByName("Title 2");
-        assertNotNull("Should have imported Title 1", importedItem1);
-        assertNotNull("Should have imported Title 2", importedItem2);
+        assertNotNull(importedItem1, "Should have imported Title 1");
+        assertNotNull(importedItem2, "Should have imported Title 2");
     }
 
     @Test
@@ -381,8 +385,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         performImportScript(csv);
         Item importedItem1 = findItemByName("Title 1");
         Item importedItem2 = findItemByName("Title 2");
-        assertNotNull("Should have imported Title 1 with limit disabled", importedItem1);
-        assertNotNull("Should have imported Title 2 with limit disabled", importedItem2);
+        assertNotNull(importedItem1, "Should have imported Title 1 with limit disabled");
+        assertNotNull(importedItem2, "Should have imported Title 2 with limit disabled");
     }
 
     @Test

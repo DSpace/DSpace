@@ -367,12 +367,12 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                                  "\", qdc=" + qdc);
                 }
                 for (Object match: matches) {
-                    if (match instanceof Element) {
-                        ((Element) match).setText(checkedString(value));
-                    } else if (match instanceof Attribute) {
-                        ((Attribute) match).setValue(checkedString(value));
-                    } else if (match instanceof Text) {
-                        ((Text) match).setText(checkedString(value));
+                    if (match instanceof Element element) {
+                        element.setText(checkedString(value));
+                    } else if (match instanceof Attribute attribute) {
+                        attribute.setValue(checkedString(value));
+                    } else if (match instanceof Text text) {
+                        text.setText(checkedString(value));
                     } else {
                         log.warn("Got unknown object from XPath, class=" + match.getClass().getName());
                     }

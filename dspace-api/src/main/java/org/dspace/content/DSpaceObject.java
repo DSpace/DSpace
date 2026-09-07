@@ -18,7 +18,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -31,7 +30,6 @@ import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.handle.Handle;
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Abstract base class for DSpace objects
@@ -41,8 +39,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "dspaceobject")
 public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID> {
     @Id
-    @GeneratedValue(generator = "predefined-uuid")
-    @GenericGenerator(name = "predefined-uuid", strategy = "org.dspace.content.PredefinedUUIDGenerator")
+    @PredefinedUUID
     @Column(name = "uuid", unique = true, nullable = false, insertable = true, updatable = false)
     protected java.util.UUID id;
 
@@ -63,7 +60,8 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      * ordering while the list has been modified and not yet persisted
      * and reloaded.
      */
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", orphanRemoval = true,
+               cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     @OrderBy("metadataField, place")
     private List<MetadataValue> metadata = new ArrayList<>();
 
@@ -75,7 +73,8 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     @OrderBy("id ASC")
     private List<Handle> handles = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject",
+               cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     private final List<ResourcePolicy> resourcePolicies = new ArrayList<>();
 
     /**

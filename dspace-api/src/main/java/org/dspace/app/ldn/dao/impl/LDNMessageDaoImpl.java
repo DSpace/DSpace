@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.LDNMessageEntity_;
 import org.dspace.app.ldn.dao.LDNMessageDao;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -168,5 +169,20 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
             log.debug("No LDN messages found");
         }
         return result;
+    }
+
+    @Override
+    public List<LDNMessageEntity> findByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<LDNMessageEntity> criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
+        Root<LDNMessageEntity> root = criteriaQuery.from(LDNMessageEntity.class);
+        criteriaQuery.select(root);
+        criteriaQuery.where(
+            criteriaBuilder.or(
+                criteriaBuilder.equal(root.get(LDNMessageEntity_.object), dso),
+                criteriaBuilder.equal(root.get(LDNMessageEntity_.context), dso)
+            )
+        );
+        return list(context, criteriaQuery, false, LDNMessageEntity.class, -1, -1);
     }
 }

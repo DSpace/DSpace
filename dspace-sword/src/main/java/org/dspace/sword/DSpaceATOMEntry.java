@@ -94,8 +94,8 @@ public abstract class DSpaceATOMEntry {
 
         // NOTE: initially this exists just for the purposes of responding to media-link
         // requests, so should only ever respond to entries on Bitstreams
-        if (dso instanceof Bitstream) {
-            this.bitstream = (Bitstream) dso;
+        if (dso instanceof Bitstream bitstream1) {
+            this.bitstream = bitstream1;
         } else {
             throw new DSpaceSWORDException(
                 "Can only recover a sword entry for a bitstream via this method");

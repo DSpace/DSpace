@@ -7,9 +7,9 @@
  */
 package org.dspace.app.openpolicyfinder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -17,18 +17,18 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderPublisherResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderResponse;
 import org.dspace.app.openpolicyfinder.v2.OpenPolicyFinderUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for Open Policy Finder service
@@ -51,19 +51,19 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
 
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -78,13 +78,13 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
         OpenPolicyFinderResponse opfResponse = openPolicyFinderService.searchByJournalISSN(validISSN);
 
         // This response should NOT contain an error (isError() should be false)
-        assertFalse("Response contained an error flag / message: " + opfResponse.getMessage(),
-            opfResponse.isError());
+        assertFalse(opfResponse.isError(),
+            "Response contained an error flag / message: " + opfResponse.getMessage());
 
         // This response should contain a single journal called The Lancet
         String expectedTitle = "The Lancet";
-        assertTrue("Response did not contain a journal with the expected title '" + expectedTitle + '"',
-            expectedTitle.equals(opfResponse.getJournals().get(0).getTitles().get(0)));
+        assertTrue(expectedTitle.equals(opfResponse.getJournals().get(0).getTitles().get(0)),
+            "Response did not contain a journal with the expected title '" + expectedTitle + '"');
     }
 
     /**
@@ -106,24 +106,26 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
         String invalidISSN = "{TEST}";
 
         // Characters like { and } that conflict with JSON should be stripped from the filter query
-        assertEquals("JSON filter query sanitisation not stripping special characters",
-            "TEST", OpenPolicyFinderUtils.sanitiseQuery(invalidISSN));
+        assertEquals("TEST", OpenPolicyFinderUtils.sanitiseQuery(invalidISSN),
+            "JSON filter query sanitisation not stripping special characters");
 
         // The valid string should look like this (assuming default configuration)
         // https://api.openpolicyfinder.jisc.ac.uk/retrieve?item-type=publication&...&format=Json
         String validUrl = new URIBuilder(buildUrlString(validISSN, endpoint)).toString();
-        assertEquals("Built and expected valid URLs differ", validUrl,
+        assertEquals(validUrl,
             openPolicyFinderService.constructHttpGet("publication", "issn", "equals", validISSN)
-                .getURI().toASCIIString());
+                .getUri().toASCIIString(),
+            "Built and expected valid URLs differ");
 
         // The invalid string should look like this (assuming default configuration)
         // https://api.openpolicyfinder.jisc.ac.uk/retrieve?item-type=publication&...&format=Json
         // Note - it should return 0 results from the API, but these services are not intended to validate the ISSN
         // query, though they do sanitise it for the JSON input type, hence expecting the braces to be stripped
         String invalidUrl = new URIBuilder(buildUrlString(invalidISSN, endpoint)).toString();
-        assertEquals("Built and expected invalid URLs differ", invalidUrl,
+        assertEquals(invalidUrl,
             openPolicyFinderService.constructHttpGet("publication", "issn", "equals", invalidISSN)
-                .getURI().toASCIIString());
+                .getUri().toASCIIString(),
+            "Built and expected invalid URLs differ");
 
 
         // The null query string should look like this (assuming default configuration)
@@ -131,9 +133,10 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
         // Note - it should return 0 results from the API, but all we do is log a warning, this is not considered
         // a fatal URI syntax exception (the remote call does work, and returns 0 items as valid JSON)
         String nullUrl = new URIBuilder(buildUrlString(null, endpoint)).toString();
-        assertEquals("Built and expected invalid URLs differ", nullUrl,
+        assertEquals(nullUrl,
             openPolicyFinderService.constructHttpGet("publication", "issn", "equals", null)
-                .getURI().toASCIIString());
+                .getUri().toASCIIString(),
+            "Built and expected invalid URLs differ");
 
     }
 
@@ -147,39 +150,41 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
         OpenPolicyFinderResponse response = openPolicyFinderService.searchByJournalISSN(validISSN);
 
         // Assert response is not error, or fail with message
-        assertFalse("Response was flagged as 'isError'", response.isError());
+        assertFalse(response.isError(), "Response was flagged as 'isError'");
 
         // Assert response has at least one journal result, or fail with message
-        assertTrue("List of journals did not contain at least one parsed journal",
-            CollectionUtils.isNotEmpty(response.getJournals()));
+        assertTrue(CollectionUtils.isNotEmpty(response.getJournals()),
+            "List of journals did not contain at least one parsed journal");
 
         // Assert response has a journal with title "The Lancet", or fail with message
         String expectedTitle = "The Lancet";
-        assertTrue("Journal title did not match expected '" + expectedTitle + "' value",
-            CollectionUtils.isNotEmpty(response.getJournals().get(0).getTitles())
-                && expectedTitle.equals(response.getJournals().get(0).getTitles().get(0)));
+        assertTrue(CollectionUtils.isNotEmpty(response.getJournals().get(0).getTitles())
+                && expectedTitle.equals(response.getJournals().get(0).getTitles().get(0)),
+            "Journal title did not match expected '" + expectedTitle + "' value");
 
         // Assert response has expected publication (metadata) URI
         String expectedSystemMetadataUri = "https://openpolicyfinder.jisc.ac.uk/id/publication/23803";
-        assertTrue("Response metadata URI did not match expected '" + expectedSystemMetadataUri
-            + "' value", expectedSystemMetadataUri.equals(response.getMetadata().getUri()));
+        assertTrue(expectedSystemMetadataUri.equals(response.getMetadata().getUri()),
+            "Response metadata URI did not match expected '" + expectedSystemMetadataUri + "' value");
 
         // Assert response has at least one policy
-        assertTrue("Response did not contain at least one archiving policy",
-            CollectionUtils.isNotEmpty(response.getJournals().get(0).getPolicies()));
+        assertTrue(CollectionUtils.isNotEmpty(response.getJournals().get(0).getPolicies()),
+            "Response did not contain at least one archiving policy");
 
         // Assert response has at least one permitted version
-        assertTrue("Response did not contain at least one permitted version",
-            CollectionUtils.isNotEmpty(response.getJournals().get(0).getPolicies().get(0).getPermittedVersions()));
+        assertTrue(
+            CollectionUtils.isNotEmpty(response.getJournals().get(0)
+                .getPolicies().get(0).getPermittedVersions()),
+            "Response did not contain at least one permitted version");
 
         // Assert journal has at least one publisher
-        assertTrue("Response did not contain at least one publisher",
-            CollectionUtils.isNotEmpty(response.getJournals().get(0).getPublishers()));
+        assertTrue(CollectionUtils.isNotEmpty(response.getJournals().get(0).getPublishers()),
+            "Response did not contain at least one publisher");
 
         // Assert first publisher has name 'Elsevier'
         String expectedPublisherName = "Elsevier";
-        assertTrue("Response did not contain expected publisher name '" + expectedPublisherName + "'",
-            expectedPublisherName.equals(response.getJournals().get(0).getPublisher().getName()));
+        assertTrue(expectedPublisherName.equals(response.getJournals().get(0).getPublisher().getName()),
+            "Response did not contain expected publisher name '" + expectedPublisherName + "'");
     }
 
     /**
@@ -194,26 +199,32 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
             "publisher", "name", "equals", publisherName, 0, 1);
 
         // Assert response is not error, or fail with message
-        assertFalse("Response was flagged as 'isError'", response.isError());
+        assertFalse(response.isError(), "Response was flagged as 'isError'");
 
         // Assert response has at least one publisher result, or fail with message
-        assertTrue("List of publishers did not contain at least one parsed publisher",
-            CollectionUtils.isNotEmpty(response.getPublishers()));
+        assertTrue(CollectionUtils.isNotEmpty(response.getPublishers()),
+            "List of publishers did not contain at least one parsed publisher");
 
         // Assert response has a publisher with name "Public Library of Science", or fail with message
         String expectedName = "Public Library of Science";
-        assertEquals("Publisher name did not match expected '" + expectedName + "' value",
-            expectedName, response.getPublishers().get(0).getName());
+        assertEquals(expectedName,
+            response.getPublishers().get(0).getName(),
+            "Publisher name did not match expected '"
+                + expectedName + "' value");
 
         // Assert response has expected publisher URL
         String expectedUrl = "http://www.plos.org/";
-        assertEquals("Response metadata URI did not match expected '" + expectedUrl
-            + "' value", expectedUrl, response.getPublishers().get(0).getUri());
+        assertEquals(expectedUrl,
+            response.getPublishers().get(0).getUri(),
+            "Response metadata URI did not match expected '"
+                + expectedUrl + "' value");
 
         // Assert response has at expected publisher ID
         String expectedId = "112";
-        assertEquals("Response publisher ID did not match expected ID " + expectedId,
-            expectedId, response.getPublishers().get(0).getIdentifier());
+        assertEquals(expectedId,
+            response.getPublishers().get(0).getIdentifier(),
+            "Response publisher ID did not match expected ID "
+                + expectedId);
     }
 
     /**

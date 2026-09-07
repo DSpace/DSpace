@@ -7,6 +7,7 @@
  */
 package org.dspace.matomo.model;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
@@ -17,8 +18,7 @@ import java.util.Map;
 
 import org.dspace.AbstractUnitTest;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MatomoRequestDetailsSplitterTest extends AbstractUnitTest {
 
@@ -31,11 +31,11 @@ public class MatomoRequestDetailsSplitterTest extends AbstractUnitTest {
                     .addParameter("param1", "value1")
             )
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.keySet(),
             CoreMatchers.hasItem("first")
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.get("first").get(0).parameters,
             CoreMatchers.allOf(
                 hasEntry("_id", "first"), hasEntry("param1", "value1")
@@ -52,11 +52,11 @@ public class MatomoRequestDetailsSplitterTest extends AbstractUnitTest {
                     .addParameter("param2", "value2")
             )
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.keySet(),
             CoreMatchers.hasItem("default")
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.get("default").get(0).parameters,
             CoreMatchers.allOf(
                 hasEntry("param2", "value2"), hasEntry("param1", "value1")
@@ -77,22 +77,22 @@ public class MatomoRequestDetailsSplitterTest extends AbstractUnitTest {
                     .addParameter("param1", "value1")
             )
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.keySet(),
             hasItem("first")
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.keySet(),
             not(hasItem("default"))
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.get("first").get(0).parameters,
             allOf(
                 hasEntry("param2", "value2"),
                 hasEntry("_id", "first")
             )
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.get("first").get(1).parameters,
             allOf(
                 hasEntry("param1", "value1"),
@@ -116,29 +116,29 @@ public class MatomoRequestDetailsSplitterTest extends AbstractUnitTest {
                     .addParameter("param4", "value4")
             )
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.keySet(),
             hasItem("first")
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.keySet(),
             hasItem("default")
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.get("first").get(0).parameters,
             allOf(
                 hasEntry("param2", "value2"),
                 hasEntry("_id", "first")
             )
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.get("first").get(1).parameters,
             allOf(
                 hasEntry("param1", "value1"),
                 hasEntry("_id", "first")
             )
         );
-        MatcherAssert.assertThat(
+        assertThat(
             split.get("default").get(0).parameters,
             allOf(
                 hasEntry("param3", "value3"),

@@ -7,14 +7,14 @@
  */
 package org.dspace.identifier;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -54,9 +54,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link DOIIdentifierProvider}.
@@ -99,7 +99,7 @@ public class DOIIdentifierProviderTest
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
      */
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -153,7 +153,7 @@ public class DOIIdentifierProviderTest
      * Other methods can be annotated with @After here or in subclasses
      * but no execution order is guaranteed
      */
-    @After
+    @AfterEach
     @Override
     public void destroy() {
         community = null;
@@ -279,7 +279,7 @@ public class DOIIdentifierProviderTest
     @Test
     public void testSupports_Class() {
         Class<? extends Identifier> identifier = DOI.class;
-        assertTrue("DOI should be supported", provider.supports(identifier));
+        assertTrue(provider.supports(identifier), "DOI should be supported");
     }
 
     @Test
@@ -293,7 +293,7 @@ public class DOIIdentifierProviderTest
         };
 
         for (String doi : validDOIs) {
-            assertTrue("DOI " + doi + " should be supported", provider.supports(doi));
+            assertTrue(provider.supports(doi), "DOI " + doi + " should be supported");
         }
     }
 
@@ -307,8 +307,8 @@ public class DOIIdentifierProviderTest
         };
 
         for (String notADoi : invalidDOIs) {
-            assertFalse("Invalid DOIs shouldn't be supported",
-                        provider.supports(notADoi));
+            assertFalse(provider.supports(notADoi),
+                        "Invalid DOIs shouldn't be supported");
         }
     }
 
@@ -334,7 +334,7 @@ public class DOIIdentifierProviderTest
                 result = true;
             }
         }
-        assertTrue("Cannot store DOI as item metadata value.", result);
+        assertTrue(result, "Cannot store DOI as item metadata value.");
     }
 
     @Test
@@ -355,8 +355,8 @@ public class DOIIdentifierProviderTest
         itemService.update(context, item);
         context.restoreAuthSystemState();
 
-        assertEquals("Failed to recognize DOI in item metadata.",
-                doi, provider.getDOIOutOfObject(item));
+        assertEquals(doi,
+                provider.getDOIOutOfObject(item), "Failed to recognize DOI in item metadata.");
     }
 
     @Test
@@ -376,8 +376,8 @@ public class DOIIdentifierProviderTest
         itemService.update(context, item);
         context.restoreAuthSystemState();
 
-        assertEquals("Failed to recognize DOI in item metadata.",
-                     doi, provider.getDOIOutOfObject(item));
+        assertEquals(doi, provider.getDOIOutOfObject(item),
+                     "Failed to recognize DOI in item metadata.");
     }
 
     @Test
@@ -405,8 +405,8 @@ public class DOIIdentifierProviderTest
 
         context.restoreAuthSystemState();
 
-        assertEquals("Failed to recognize DOI in item metadata.",
-            doi, provider.getDOIOutOfObject(item));
+        assertEquals(doi, provider.getDOIOutOfObject(item),
+            "Failed to recognize DOI in item metadata.");
     }
 
     @Test
@@ -440,7 +440,7 @@ public class DOIIdentifierProviderTest
                 foundDOI = true;
             }
         }
-        assertFalse("Cannot remove DOI from item metadata.", foundDOI);
+        assertFalse(foundDOI, "Cannot remove DOI from item metadata.");
     }
 
     @Test
@@ -452,8 +452,8 @@ public class DOIIdentifierProviderTest
 
         String retrievedDOI = provider.getDOIByObject(context, item);
 
-        assertNotNull("Failed to load DOI by DSpaceObject.", retrievedDOI);
-        assertTrue("Loaded wrong DOI by DSpaceObject.", doi.equals(retrievedDOI));
+        assertNotNull(retrievedDOI, "Failed to load DOI by DSpaceObject.");
+        assertTrue(doi.equals(retrievedDOI), "Loaded wrong DOI by DSpaceObject.");
     }
 
     @Test
@@ -465,8 +465,8 @@ public class DOIIdentifierProviderTest
 
         String retrievedDOI = provider.lookup(context, (DSpaceObject) item);
 
-        assertNotNull("Failed to loookup doi.", retrievedDOI);
-        assertTrue("Loaded wrong DOI on lookup.", doi.equals(retrievedDOI));
+        assertNotNull(retrievedDOI, "Failed to loookup doi.");
+        assertTrue(doi.equals(retrievedDOI), "Loaded wrong DOI on lookup.");
     }
 
     @Test
@@ -478,7 +478,7 @@ public class DOIIdentifierProviderTest
 
         DSpaceObject dso = provider.getObjectByDOI(context, doi);
 
-        assertNotNull("Failed to load DSpaceObject by DOI.", dso);
+        assertNotNull(dso, "Failed to load DSpaceObject by DOI.");
         if (item.getType() != dso.getType() || ObjectUtils.notEqual(item.getID(), dso.getID())) {
             fail("Object loaded by DOI was another object then expected!");
         }
@@ -493,7 +493,7 @@ public class DOIIdentifierProviderTest
 
         DSpaceObject dso = provider.resolve(context, doi);
 
-        assertNotNull("Failed to resolve DOI.", dso);
+        assertNotNull(dso, "Failed to resolve DOI.");
         if (item.getType() != dso.getType() || ObjectUtils.notEqual(item.getID(), dso.getID())) {
             fail("Object return by DOI lookup was another object then expected!");
         }
@@ -534,8 +534,8 @@ public class DOIIdentifierProviderTest
             }
 
         }
-        assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
-        assertTrue("Removed wrong DOI from item metadata.", foundDOI2);
+        assertFalse(foundDOI1, "Cannot remove DOI from item metadata.");
+        assertTrue(foundDOI2, "Removed wrong DOI from item metadata.");
 
         // remove the otherone as well.
         context.turnOffAuthorisationSystem();
@@ -559,8 +559,8 @@ public class DOIIdentifierProviderTest
             }
 
         }
-        assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
-        assertFalse("Cannot remove DOI from item metadata.", foundDOI2);
+        assertFalse(foundDOI1, "Cannot remove DOI from item metadata.");
+        assertFalse(foundDOI2, "Cannot remove DOI from item metadata.");
     }
 
     @Test
@@ -577,8 +577,8 @@ public class DOIIdentifierProviderTest
             fail("Got an IdentifierException: " + e.getMessage());
         }
 
-        assertNotNull("Minted DOI is null!", doi);
-        assertFalse("Minted DOI is empty!", doi.isEmpty());
+        assertNotNull(doi, "Minted DOI is null!");
+        assertFalse(doi.isEmpty(), "Minted DOI is empty!");
 
         try {
             doiService.formatIdentifier(doi);
@@ -597,8 +597,8 @@ public class DOIIdentifierProviderTest
 
         String retrievedDOI = provider.mint(context, item);
 
-        assertNotNull("Minted DOI is null?!", retrievedDOI);
-        assertEquals("Mint did not returned an existing DOI!", doi, retrievedDOI);
+        assertNotNull(retrievedDOI, "Minted DOI is null?!");
+        assertEquals(doi, retrievedDOI, "Mint did not returned an existing DOI!");
     }
 
     /**
@@ -625,7 +625,7 @@ public class DOIIdentifierProviderTest
             fail("Got an IdentifierException: " + e.getMessage());
         }
         // Fail the test if the filter didn't throw a "not applicable" exception
-        assertTrue("DOI minting attempt was not filtered by filter service", wasFiltered);
+        assertTrue(wasFiltered, "DOI minting attempt was not filtered by filter service");
     }
 
     /**
@@ -655,11 +655,11 @@ public class DOIIdentifierProviderTest
             fail("Got an IdentifierException: " + e.getMessage());
         }
         // If the attempt was filtered, fail
-        assertFalse("DOI minting attempt was incorrectly filtered by filter service", wasFiltered);
+        assertFalse(wasFiltered, "DOI minting attempt was incorrectly filtered by filter service");
 
         // Continue with regular minting tests
-        assertNotNull("Minted DOI is null!", doi);
-        assertFalse("Minted DOI is empty!", doi.isEmpty());
+        assertNotNull(doi, "Minted DOI is null!");
+        assertFalse(doi.isEmpty(), "Minted DOI is empty!");
         try {
             doiService.formatIdentifier(doi);
         } catch (Exception e) {
@@ -679,10 +679,10 @@ public class DOIIdentifierProviderTest
         provider.reserve(context, item, doi);
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow);
+        assumeTrue(doiRow != null);
 
-        assertTrue("Reservation of DOI did not set the correct DOI status.",
-                   DOIIdentifierProvider.TO_BE_RESERVED.equals(doiRow.getStatus()));
+        assertTrue(DOIIdentifierProvider.TO_BE_RESERVED.equals(doiRow.getStatus()),
+                   "Reservation of DOI did not set the correct DOI status.");
     }
 
     @Test
@@ -695,10 +695,10 @@ public class DOIIdentifierProviderTest
         provider.register(context, item, doi);
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow);
+        assumeTrue(doiRow != null);
 
-        assertTrue("Registration of DOI did not set the correct DOI status.",
-                   DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()));
+        assertTrue(DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()),
+                   "Registration of DOI did not set the correct DOI status.");
     }
 
     @Test
@@ -711,10 +711,10 @@ public class DOIIdentifierProviderTest
         provider.register(context, item, doi);
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow);
+        assumeTrue(doiRow != null);
 
-        assertTrue("Registration of DOI did not set the correct DOI status.",
-                   DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()));
+        assertTrue(DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()),
+                   "Registration of DOI did not set the correct DOI status.");
     }
 
     @Test
@@ -731,13 +731,13 @@ public class DOIIdentifierProviderTest
         // we want the created DOI to be returned in the following format:
         // doi:10.<prefix>/<suffix>.
         String formated_doi = doiService.formatIdentifier(doi);
-        assertTrue("DOI was not in the expected format!", doi.equals(formated_doi));
+        assertTrue(doi.equals(formated_doi), "DOI was not in the expected format!");
 
         DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
-        assertNotNull("Created DOI was not stored in database.", doiRow);
+        assertNotNull(doiRow, "Created DOI was not stored in database.");
 
-        assertTrue("Registration of DOI did not set the correct DOI status.",
-                   DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()));
+        assertTrue(DOIIdentifierProvider.TO_BE_REGISTERED.equals(doiRow.getStatus()),
+                   "Registration of DOI did not set the correct DOI status.");
     }
 
     @Test
@@ -769,18 +769,18 @@ public class DOIIdentifierProviderTest
                 foundDOI2 = true;
             }
         }
-        assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
-        assertTrue("Removed wrong DOI from item metadata.", foundDOI2);
+        assertFalse(foundDOI1, "Cannot remove DOI from item metadata.");
+        assertTrue(foundDOI2, "Removed wrong DOI from item metadata.");
 
         DOI doiRow1 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow1);
-        assertTrue("Status of deleted DOI was not set correctly.",
-                   DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()));
+        assumeTrue(doiRow1 != null);
+        assertTrue(DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()),
+                   "Status of deleted DOI was not set correctly.");
 
         DOI doiRow2 = doiService.findByDoi(context, doi2.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow2);
-        assertTrue("While deleting a DOI the status of another changed.",
-                   DOIIdentifierProvider.IS_REGISTERED.equals(doiRow2.getStatus()));
+        assumeTrue(doiRow2 != null);
+        assertTrue(DOIIdentifierProvider.IS_REGISTERED.equals(doiRow2.getStatus()),
+                   "While deleting a DOI the status of another changed.");
     }
 
     @Test
@@ -812,18 +812,18 @@ public class DOIIdentifierProviderTest
                 foundDOI2 = true;
             }
         }
-        assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
-        assertFalse("Did not removed all DOIs from item metadata.", foundDOI2);
+        assertFalse(foundDOI1, "Cannot remove DOI from item metadata.");
+        assertFalse(foundDOI2, "Did not removed all DOIs from item metadata.");
 
         DOI doiRow1 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow1);
-        assertTrue("Status of deleted DOI was not set correctly.",
-                   DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()));
+        assumeTrue(doiRow1 != null);
+        assertTrue(DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()),
+                   "Status of deleted DOI was not set correctly.");
 
         DOI doiRow2 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
-        assumeNotNull(doiRow2);
-        assertTrue("Did not set the status of all deleted DOIs as expected.",
-                   DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow2.getStatus()));
+        assumeTrue(doiRow2 != null);
+        assertTrue(DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow2.getStatus()),
+                   "Did not set the status of all deleted DOIs as expected.");
     }
 
     @Test
@@ -841,8 +841,8 @@ public class DOIIdentifierProviderTest
         // Get the DOI from the service
         DOI doi = doiService.findDOIByDSpaceObject(context, item);
         // Ensure it is still PENDING
-        assertEquals("Status of updated DOI did not remain PENDING",
-                DOIIdentifierProvider.PENDING, doi.getStatus());
+        assertEquals(DOIIdentifierProvider.PENDING,
+                doi.getStatus(), "Status of updated DOI did not remain PENDING");
         context.restoreAuthSystemState();
     }
 
@@ -860,7 +860,7 @@ public class DOIIdentifierProviderTest
         // Get the DOI from the service
         DOI doi = doiService.findDOIByDSpaceObject(context, item1);
         // ensure DOI has no state
-        assertNull("Orphaned DOI was not set deleted", doi);
+        assertNull(doi, "Orphaned DOI was not set deleted");
         // create a new item and a new DOI
         Item item2 = newItem();
         String doi2 = null;
@@ -872,9 +872,9 @@ public class DOIIdentifierProviderTest
             fail("Got an IdentifierException: " + e.getMessage());
         }
 
-        assertNotNull("Minted DOI is null?!", doi2);
-        assertFalse("Minted DOI is empty!", doi2.isEmpty());
-        assertNotEquals("Minted DOI equals previously orphaned DOI.", doi1, doi2);
+        assertNotNull(doi2, "Minted DOI is null?!");
+        assertFalse(doi2.isEmpty(), "Minted DOI is empty!");
+        assertNotEquals(doi1, doi2, "Minted DOI equals previously orphaned DOI.");
 
         try {
             doiService.formatIdentifier(doi2);
@@ -901,8 +901,8 @@ public class DOIIdentifierProviderTest
         // Get the DOI from the service
         DOI doi = doiService.findDOIByDSpaceObject(context, item);
         // Ensure it is still MINTED
-        assertEquals("Status of updated DOI did not remain PENDING",
-                DOIIdentifierProvider.MINTED, doi.getStatus());
+        assertEquals(DOIIdentifierProvider.MINTED,
+                doi.getStatus(), "Status of updated DOI did not remain PENDING");
         context.restoreAuthSystemState();
     }
 
@@ -916,12 +916,12 @@ public class DOIIdentifierProviderTest
                 .getServiceManager().getServiceByName("always_true_filter", TrueFilter.class));
         DOI doi = doiService.findByDoi(context, mintedDoi.substring(DOI.SCHEME.length()));
         // This should be minted
-        assertEquals("DOI is not of 'minted' status", DOIIdentifierProvider.MINTED, doi.getStatus());
+        assertEquals(DOIIdentifierProvider.MINTED, doi.getStatus(), "DOI is not of 'minted' status");
         provider.updateMetadata(context, item, mintedDoi);
         DOI secondFind = doiService.findByDoi(context, mintedDoi.substring(DOI.SCHEME.length()));
         // After an update, this should still be minted
-        assertEquals("DOI is not of 'minted' status",
-                DOIIdentifierProvider.MINTED, secondFind.getStatus());
+        assertEquals(DOIIdentifierProvider.MINTED,
+                secondFind.getStatus(), "DOI is not of 'minted' status");
 
     }
 

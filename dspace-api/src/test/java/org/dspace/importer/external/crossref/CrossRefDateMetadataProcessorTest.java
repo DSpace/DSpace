@@ -7,11 +7,11 @@
  */
 package org.dspace.importer.external.crossref;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -31,8 +31,8 @@ public class CrossRefDateMetadataProcessorTest {
                 + "[1957]"
                 + "]}");
         String[] metadataValues = (String[]) metadata.toArray(new String[3]);
-        assertEquals("[yyyy, MM, dd] should parse", "1957-01-27", metadataValues[0]);
-        assertEquals("[yyyy, MM] should parse", "1957-01", metadataValues[1]);
-        assertEquals("[yyyy] should parse", "1957", metadataValues[2]);
+        assertEquals("1957-01-27", metadataValues[0], "[yyyy, MM, dd] should parse");
+        assertEquals("1957-01", metadataValues[1], "[yyyy, MM] should parse");
+        assertEquals("1957", metadataValues[2], "[yyyy] should parse");
     }
 }

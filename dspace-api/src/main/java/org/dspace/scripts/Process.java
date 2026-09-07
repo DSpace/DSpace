@@ -245,16 +245,16 @@ public class Process implements ReloadableEntity<Integer> {
      */
     @Override
     public boolean equals(Object other) {
-        return (other instanceof Process &&
-            new EqualsBuilder().append(this.getID(), ((Process) other).getID())
-                               .append(this.getName(), ((Process) other).getName())
-                               .append(this.getBitstreams(), ((Process) other).getBitstreams())
-                               .append(this.getProcessStatus(), ((Process) other).getProcessStatus())
-                               .append(this.getFinishedTime(), ((Process) other).getFinishedTime())
-                               .append(this.getStartTime(), ((Process) other).getStartTime())
-                               .append(this.getParameters(), ((Process) other).getParameters())
-                               .append(this.getCreationTime(), ((Process) other).getCreationTime())
-                               .append(this.getEPerson(), ((Process) other).getEPerson())
+        return (other instanceof Process p &&
+            new EqualsBuilder().append(this.getID(), p.getID())
+                               .append(this.getName(), p.getName())
+                               .append(this.getBitstreams(), p.getBitstreams())
+                               .append(this.getProcessStatus(), p.getProcessStatus())
+                               .append(this.getFinishedTime(), p.getFinishedTime())
+                               .append(this.getStartTime(), p.getStartTime())
+                               .append(this.getParameters(), p.getParameters())
+                               .append(this.getCreationTime(), p.getCreationTime())
+                               .append(this.getEPerson(), p.getEPerson())
                                .isEquals());
     }
 

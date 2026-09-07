@@ -61,7 +61,7 @@ public class RegexPatternUtils {
             regexFlags =
                 Optional.ofNullable(inputMatcher.group(3))
                     .filter(StringUtils::isNotBlank)
-                    .map(flags -> String.format(REGEX_FLAGS, flags))
+                    .map(flags -> REGEX_FLAGS.formatted(flags))
                     .orElse("")
                     .replaceAll("g", "");
         }

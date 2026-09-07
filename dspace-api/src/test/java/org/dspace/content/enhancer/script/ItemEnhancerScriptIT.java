@@ -51,10 +51,10 @@ import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
@@ -78,11 +78,11 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
 
     /**
-     * This method will be run before the first test as per @BeforeClass. It will
+     * This method will be run before the first test as per @BeforeAll. It will
      * configure the event.dispatcher.default.consumers property to remove the
      * ItemEnhancerConsumer.
      */
-    @BeforeClass
+    @BeforeAll
     public static void initConsumers() {
         consumers = configService.getArrayProperty("event.dispatcher.default.consumers");
         Set<String> consumersSet = new HashSet<String>(Arrays.asList(consumers));
@@ -96,13 +96,13 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
     /**
      * Reset the event.dispatcher.default.consumers property value.
      */
-    @AfterClass
+    @AfterAll
     public static void resetDefaultConsumers() {
         configService.setProperty("event.dispatcher.default.consumers", consumers);
         eventService.reloadConfiguration();
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         choiceAuthorityService.getChoiceAuthoritiesNames();
         configService.setProperty("authority.controlled.dc.contributor.author", "true");

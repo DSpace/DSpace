@@ -40,9 +40,9 @@ import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.factory.OrcidServiceFactoryImpl;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -70,14 +70,14 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
 
     private OrcidClient orcidClientMock = mock(OrcidClient.class);
 
-    @Before
+    @BeforeEach
     public void setup() {
         choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
         ((OrcidServiceFactoryImpl) OrcidServiceFactory.getInstance()).setOrcidClient(orcidClientMock);
         when(orcidClientMock.expandedSearch(any(), anyInt(), anyInt())).thenReturn(new ExpandedSearch());
     }
 
-    @After
+    @AfterEach
     public void after() {
         ((OrcidServiceFactoryImpl) OrcidServiceFactory.getInstance()).setOrcidClient(orcidClient);
     }
@@ -1193,7 +1193,7 @@ public class ItemAuthorityIT extends AbstractControllerIntegrationTest {
     }
 
     @Override
-    @After
+    @AfterEach
     // We need to cleanup the authorities cache once than the configuration has been restored
     public void destroy() throws Exception {
         super.destroy();

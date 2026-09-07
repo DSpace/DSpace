@@ -45,8 +45,7 @@ public class SimpleXpathMetadatumAndAttributeContributor extends SimpleXpathMeta
                 namespaces);
         List<Object> nodes = xpath.evaluate(t);
         for (Object el : nodes) {
-            if (el instanceof Element) {
-                Element element = (Element) el;
+            if (el instanceof Element element) {
                 String attributeValue = element.getAttributeValue(this.attribute);
                 if (StringUtils.isNotBlank(attributeValue)) {
                     values.add(metadataFieldMapping.toDCValue(this.field, attributeValue));

@@ -78,7 +78,8 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     @CollectionIdJavaType(IntegerJavaType.class)
     @SequenceGenerator(name = "fileextension_seq", sequenceName = "fileextension_seq", allocationSize = 1)
     @Column(name = "extension")
-    @Cascade( {org.hibernate.annotations.CascadeType.ALL, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
+    @SuppressWarnings("deprecation")
+    @Cascade({org.hibernate.annotations.CascadeType.ALL, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
     private List<String> fileExtensions;
 
     @Transient

@@ -9,6 +9,7 @@ package org.dspace.app.rest.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -68,14 +69,14 @@ public class URLUtils {
         URL candidateURL;
 
         try {
-            patternURL = new URL(pattern);
-        } catch (MalformedURLException e) {
+            patternURL = URI.create(pattern).toURL();
+        } catch (MalformedURLException | IllegalArgumentException | NullPointerException e) {
             throw new IllegalArgumentException("The pattern URL is not valid:  " + pattern);
         }
 
         try {
-            candidateURL = new URL(candidate);
-        } catch (MalformedURLException e) {
+            candidateURL = URI.create(candidate).toURL();
+        } catch (MalformedURLException | IllegalArgumentException | NullPointerException e) {
             throw new IllegalArgumentException("The candidate URL is not valid:  " + candidate);
         }
 

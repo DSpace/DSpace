@@ -7,8 +7,11 @@
  */
 package org.dspace.qaevent.script;
 
-import org.apache.commons.cli.HelpFormatter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.utils.DSpace;
 
 /**
@@ -32,8 +35,13 @@ public class OpenaireEventsImportCli extends OpenaireEventsImport {
 
         // in case of CLI we show the help prompt
         if (commandLine.hasOption('h')) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Import Notification event json file", getScriptConfiguration().getOptions());
+            try {
+                HelpFormatter.builder().get().printHelp(
+                    "Import Notification event json file",
+                    null, getScriptConfiguration().getOptions(), null, false);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
             System.exit(0);
         }
 

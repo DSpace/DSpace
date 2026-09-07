@@ -19,7 +19,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +35,6 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
 
     private final SiteService sitesv;
 
-    @Autowired
     public SiteRestRepository(SiteService dsoService) {
         super(dsoService);
         this.sitesv = dsoService;

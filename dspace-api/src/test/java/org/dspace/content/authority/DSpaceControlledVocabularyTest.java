@@ -7,19 +7,19 @@
  */
 package org.dspace.content.authority;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for DSpaceControlledVocabulary.
@@ -30,21 +30,21 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
     public DSpaceControlledVocabularyTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
         throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass()
         throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -87,7 +87,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
             CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
         Choices result = instance.getMatches(text, start, limit, locale);
-        assertNotEquals("At least one match expected", 0, result.values.length);
+        assertNotEquals(0, result.values.length, "At least one match expected");
         assertEquals("north 40", result.values[0].value);
     }
 
@@ -112,7 +112,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
                 "countries");
         assertNotNull(instance);
         Choices result = instance.getMatches(labelPart, start, limit, null);
-        assertNotEquals("At least one match expected", 0, result.values.length);
+        assertNotEquals(0, result.values.length, "At least one match expected");
         assertEquals(idValue, result.values[0].value);
         assertEquals("Algeria", result.values[0].label);
     }
@@ -135,7 +135,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
                 "countries");
         assertNotNull(instance);
         Choices result = instance.getBestMatch(idValue, null);
-        assertNotEquals("At least one match expected", 0, result.values.length);
+        assertNotEquals(0, result.values.length, "At least one match expected");
         assertEquals(idValue, result.values[0].value);
         assertEquals("Algeria", result.values[0].label);
     }
@@ -162,7 +162,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
                 "countries");
         assertNotNull(instance);
         Choices result = instance.getMatches(labelPart, start, limit, "de");
-        assertNotEquals("At least one match expected", 0, result.values.length);
+        assertNotEquals(0, result.values.length, "At least one match expected");
         assertEquals(idValue, result.values[0].value);
         assertEquals("Algerien", result.values[0].label);
     }
@@ -186,7 +186,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
                 "countries");
         assertNotNull(instance);
         Choices result = instance.getBestMatch(idValue, "de");
-        assertNotEquals("At least one match expected", 0, result.values.length);
+        assertNotEquals(0, result.values.length, "At least one match expected");
         assertEquals(idValue, result.values[0].value);
         assertEquals("Algerien", result.values[0].label);
     }

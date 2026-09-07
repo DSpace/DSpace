@@ -271,10 +271,10 @@ public class BrowseInfo {
      */
     public void setBrowseContainer(DSpaceObject dso)
         throws BrowseException {
-        if (dso instanceof Collection) {
-            this.collection = (Collection) dso;
-        } else if (dso instanceof Community) {
-            this.community = (Community) dso;
+        if (dso instanceof Collection collection1) {
+            this.collection = collection1;
+        } else if (dso instanceof Community community1) {
+            this.community = community1;
         } else {
             throw new BrowseException("The container must be a community or a collection");
         }

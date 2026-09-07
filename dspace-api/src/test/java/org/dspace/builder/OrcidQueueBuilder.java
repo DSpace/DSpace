@@ -92,7 +92,6 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
             getService().update(context, orcidQueue);
             context.dispatchEvents();
 
-            indexingService.commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -140,7 +139,6 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
             }
             c.complete();
         }
-        indexingService.commit();
     }
 
 }

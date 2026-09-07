@@ -7,6 +7,8 @@
  */
 package org.dspace.iiif.canvasdimension;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.UUID;
@@ -14,10 +16,10 @@ import java.util.UUID;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -106,10 +108,12 @@ public class CanvasDimensionCLI {
                                   .hasArgs()
                                   .valueSeparator(',')
                                   .desc(
-                                      "SKIP the bitstreams belonging to identifier\n" +
-                                          "Separate multiple identifiers with a comma (,)\n" +
-                                          "(e.g. -s \n 123456789/34,123456789/323)")
-                                  .build();
+                                      """
+                                      SKIP the bitstreams belonging to identifier
+                                      Separate multiple identifiers with a comma (,)
+                                      (e.g. -s\s
+                                       123456789/34,123456789/323)""")
+                                  .get();
         options.addOption(skipOption);
 
         CommandLine line = null;
@@ -118,20 +122,22 @@ public class CanvasDimensionCLI {
             line = parser.parse(options, argv);
         } catch (MissingArgumentException e) {
             System.out.println("ERROR: " + e.getMessage());
-            HelpFormatter help = new HelpFormatter();
-            help.printHelp("CanvasDimension processor\n", options);
+            printCliHelp("CanvasDimension processor", options);
             return;
         }
 
         if (line.hasOption('h')) {
-            HelpFormatter help = new HelpFormatter();
-            help.printHelp("CanvasDimension processor\n", options);
+            printCliHelp("CanvasDimension processor", options);
             System.out
-                .println("\nUUID example:    iiif-canvas-dimensions -e user@email.org " +
-                    "-i 1086306d-8a51-43c3-98b9-c3b00f49105f");
+                .println("""
+
+                    UUID example:    iiif-canvas-dimensions -e user@email.org \
+                    -i 1086306d-8a51-43c3-98b9-c3b00f49105f""");
             System.out
-                .println("\nHandle example:    iiif-canvas-dimensions -e user@email.org " +
-                        "-i 123456789/12");
+                .println("""
+
+                        Handle example:    iiif-canvas-dimensions -e user@email.org \
+                        -i 123456789/12""");
             return;
         }
 
@@ -147,8 +153,7 @@ public class CanvasDimensionCLI {
         if (line.hasOption('i')) {
             identifier = line.getOptionValue('i');
         } else {
-            HelpFormatter help = new HelpFormatter();
-            help.printHelp("CanvasDimension processor\n", options);
+            printCliHelp("CanvasDimension processor", options);
             System.out.println("An identifier for a Community, Collection, or Item must be provided.");
             return;
         }
@@ -167,11 +172,13 @@ public class CanvasDimensionCLI {
             skipIds = line.getOptionValues('s');
 
             if (skipIds == null || skipIds.length == 0) {   //display error, since no identifiers specified to skip
-                System.err.println("\nERROR: -s (-skip) option requires at least one identifier to SKIP.\n" +
-                    "Make sure to separate multiple identifiers with a comma!\n" +
-                    "(e.g. -s 123456789/34,123456789/323)\n");
-                HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp("Canvas Dimensions\n", options);
+                System.err.println("""
+
+                    ERROR: -s (-skip) option requires at least one identifier to SKIP.
+                    Make sure to separate multiple identifiers with a comma!
+                    (e.g. -s 123456789/34,123456789/323)
+                    """);
+                printCliHelp("Canvas Dimensions", options);
                 return;
             }
             canvasProcessor.setSkipList(Arrays.asList(skipIds));
@@ -247,4 +254,18 @@ public class CanvasDimensionCLI {
         System.out.println(processed + " IIIF items were processed.");
     }
 
+    /**
+     * Print CLI help for the given options.
+     *
+     * @param cmdSyntax the command syntax
+     * @param options   the options
+     */
+    private static void printCliHelp(String cmdSyntax, Options options) {
+        try {
+            HelpFormatter.builder().get().printHelp(
+                cmdSyntax, null, options, null, false);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }

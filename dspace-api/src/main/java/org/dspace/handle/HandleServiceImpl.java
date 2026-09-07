@@ -9,7 +9,6 @@ package org.dspace.handle;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +24,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -212,25 +212,24 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public void unbindHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        Iterator<Handle> handles = dso.getHandles().iterator();
-        if (handles.hasNext()) {
-            while (handles.hasNext()) {
-                final Handle handle = handles.next();
-                handles.remove();
+        // Use a direct query to find handles by DSO, rather than accessing the lazy
+        // collection on the entity (which may trigger LazyInitializationException in Hibernate 7).
+        List<Handle> handles = handleDAO.getHandlesByDSpaceObject(context, dso);
+        if (!handles.isEmpty()) {
+            for (Handle handle : handles) {
                 //Only set the "resouce_id" column to null when unbinding a handle.
                 // We want to keep around the "resource_type_id" value, so that we
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 handle.setDSpaceObject(null);
 
-
-                handleDAO.save(context, handle);
-
                 log.debug("Unbound Handle {} from object {} id={}",
                     () -> handle.getHandle(),
                     () -> Constants.typeText[dso.getType()],
                     () -> dso.getID());
             }
+            // No explicit flush needed: Hibernate's default flush order processes
+            // UPDATEs (handle FK nullification) before DELETEs (DSpaceObject removal).
         } else {
             log.trace(
                 "Cannot find Handle entry to unbind for object {} id={}. Handle could have been unbound before.",
@@ -251,13 +250,19 @@ public class HandleServiceImpl implements HandleService {
             return null;
         }
 
-        return dbhandle.getDSpaceObject();
+        // Unproxy to get the actual subclass (Item, Collection, etc.) instead
+        // of a DSpaceObject proxy. With Handle.dso mapped as FetchType.LAZY,
+        // Hibernate returns a proxy typed as DSpaceObject. Callers typically
+        // cast the result to a specific subclass, which would fail on a proxy.
+        return (DSpaceObject) Hibernate.unproxy(dbhandle.getDSpaceObject());
     }
 
     @Override
     public String findHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        List<Handle> handles = dso.getHandles();
+        // Use DAO query instead of lazy collection to avoid
+        // LazyInitializationException in Hibernate 7
+        List<Handle> handles = handleDAO.getHandlesByDSpaceObject(context, dso);
         if (CollectionUtils.isEmpty(handles)) {
             return null;
         } else {

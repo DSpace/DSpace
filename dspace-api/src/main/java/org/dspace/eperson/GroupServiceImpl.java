@@ -35,6 +35,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.MetadataField;
+import org.dspace.content.dao.ProcessDAO;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
@@ -47,6 +48,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.scripts.Process;
 import org.dspace.util.UUIDUtils;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -57,6 +59,7 @@ import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -93,6 +96,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     protected ResourcePolicyService resourcePolicyService;
 
     @Autowired(required = true)
+    protected ProcessDAO processDAO;
+    @Autowired(required = true)
     protected PoolTaskService poolTaskService;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
@@ -117,7 +122,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         log.info(LogHelper.getHeader(context, "create_group", "group_id="
             + g.getID()));
 
-        context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null, getIdentifiers(context, g)));
+        context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null, DetailType.INFO,
+                                   getIdentifiers(context, g)));
         update(context, g);
 
         return g;
@@ -563,8 +569,22 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         // Remove any ResourcePolicies that reference this group
         authorizeService.removeGroupPolicies(context, group);
+        // Flush to ensure ResourcePolicy deletions are executed before Group deletion
+        // (Required for Hibernate 7 which may not auto-flush in correct FK order)
+        context.flush();
 
+        // Properly synchronize bidirectional ManyToMany relationships before clearing
+        // (Required for Hibernate 7 which strictly enforces JPA spec during auto-flush)
+        // Remove this group from all child groups' parentGroups list
+        for (Group childGroup : new ArrayList<>(group.getMemberGroups())) {
+            childGroup.removeParentGroup(group);
+        }
         group.getMemberGroups().clear();
+
+        // Remove this group from all parent groups' groups list
+        for (Group parentGroup : new ArrayList<>(group.getParentGroups())) {
+            parentGroup.remove(group);
+        }
         group.getParentGroups().clear();
 
         //Remove all eperson references from this group
@@ -573,6 +593,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             EPerson ePerson = ePeople.next();
             ePeople.remove();
             ePerson.getGroups().remove(group);
+        }
+
+        // Remove this group from all Process.groups lists
+        // (Process owns the ManyToMany, so we must update the owning side for Hibernate 7 compatibility)
+        for (Process process : processDAO.findByGroup(context, group)) {
+            process.getGroups().remove(group);
         }
 
         // empty out group2groupcache table (if we do it after we delete our object we get an issue with references)
@@ -820,22 +846,26 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
 
                             Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> Strings.CS.equals(
-                                    collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
+                                    collectionService.getDefaultReadGroupName(
+                                        (Collection) Hibernate.unproxy(p.getdSpaceObject()), "ITEM"),
                                     group.getName())).findFirst();
 
                             if (defaultPolicy.isPresent()) {
-                                return defaultPolicy.get().getdSpaceObject();
+                                return (DSpaceObject) Hibernate.unproxy(
+                                    defaultPolicy.get().getdSpaceObject());
                             }
                             policies = resourcePolicyService.find(context, null, groups,
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
 
                             defaultPolicy = policies.stream()
                                     .filter(p -> Strings.CS.equals(collectionService.getDefaultReadGroupName(
-                                            (Collection) p.getdSpaceObject(), "BITSTREAM"), group.getName()))
+                                            (Collection) Hibernate.unproxy(p.getdSpaceObject()),
+                                            "BITSTREAM"), group.getName()))
                                     .findFirst();
 
                             if (defaultPolicy.isPresent()) {
-                                return defaultPolicy.get().getdSpaceObject();
+                                return (DSpaceObject) Hibernate.unproxy(
+                                    defaultPolicy.get().getdSpaceObject());
                             }
                         }
                     }

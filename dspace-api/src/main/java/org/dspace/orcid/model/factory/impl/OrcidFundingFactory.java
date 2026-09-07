@@ -98,8 +98,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
         FundingContributors fundingContributors = new FundingContributors();
         getMetadataValues(context, item, fieldMapping.getContributorFields().keySet()).stream()
             .map(metadataValue -> getFundingContributor(context, metadataValue))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(Optional::stream)
             .forEach(fundingContributors.getContributor()::add);
         return fundingContributors;
     }
