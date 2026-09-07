@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -109,6 +110,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     // Suffix of the solr field used to index the facet/filter so that the facet search can search all word in a
     // facet by indexing "each word to end of value' partial value
     public static final String SOLR_FIELD_SUFFIX_FACET_PREFIXES = "_prefix";
+
+    /**
+     * The characters that "." in a regular expression never matches.
+     */
+    private static final Pattern LINE_TERMINATOR = Pattern.compile("[\\n\\r\\u0085\\u2028\\u2029]");
 
     @Autowired
     protected ContentServiceFactory contentServiceFactory;
@@ -1313,7 +1319,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             filterQuery.append(":");
             if ("equals".equals(operator) || "notequals".equals(operator)) {
                 //DO NOT ESCAPE RANGE QUERIES !
-                if (!value.matches("\\[.*TO.*\\]")) {
+                if (!isRangeQuery(value)) {
                     value = ClientUtils.escapeQueryChars(value);
                     filterQuery.append(value);
                 } else {
@@ -1326,7 +1332,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             } else {
                 //DO NOT ESCAPE RANGE QUERIES !
-                if (!value.matches("\\[.*TO.*\\]")) {
+                if (!isRangeQuery(value)) {
                     value = ClientUtils.escapeQueryChars(value);
                     filterQuery.append("\"").append(value).append("\"");
                 } else {
@@ -1339,6 +1345,22 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         result.setFilterQuery(filterQuery.toString());
         return result;
+    }
+
+    /**
+     * Determine whether a filter value is a Solr range query, i.e. <code>[x TO y]</code>.
+     * <p>
+     * This replaces the regular expression <code>\[.*TO.*\]</code>, whose two unbounded
+     * wildcards around the literal <code>TO</code> allowed a crafted filter value to drive
+     * matching into quadratic time (CodeQL <code>java/polynomial-redos</code>). The three
+     * conditions below accept exactly the same values in linear time.
+     *
+     * @param value the filter value to inspect
+     * @return true if the value is shaped like a range query and must not be escaped
+     */
+    protected static boolean isRangeQuery(String value) {
+        return value.startsWith("[") && value.endsWith("]") && value.contains("TO")
+            && !LINE_TERMINATOR.matcher(value).find();
     }
 
     @Override
