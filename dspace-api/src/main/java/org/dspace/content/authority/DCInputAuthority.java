@@ -49,6 +49,8 @@ import org.dspace.core.SelfNamedPlugin;
  * fields.
  */
 public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority {
+    public static final String UNKNOWN_KEY = "UNKNOWN KEY ";
+
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputAuthority.class);
 
     /**
@@ -107,6 +109,8 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
                     }
                 }
                 DCInputsReader dcirDefault = new DCInputsReader();
+                // Lookups without an explicit locale use the default, even when it is not a supported UI locale.
+                dcis.putIfAbsent(I18nUtil.getDefaultLocale(), dcirDefault);
                 Iterator pi = dcirDefault.getPairsNameIterator();
                 while (pi.hasNext()) {
                     names.add((String) pi.next());
@@ -197,18 +201,21 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             locale = I18nUtil.getDefaultLocale().getLanguage();
         }
 
+        String[] valuesLocale = values.get(locale);
         String[] labelsLocale = labels.get(locale);
         int pos = -1;
-        for (int i = 0; i < labelsLocale.length; i++) {
-            if (labelsLocale[i].equals(key)) {
+        // search in the values to return the label
+        for (int i = 0; valuesLocale != null && i < valuesLocale.length; i++) {
+            if (valuesLocale[i].equals(key)) {
                 pos = i;
                 break;
             }
         }
-        if (pos != -1) {
+        if (pos != -1 && labelsLocale != null) {
+            // return the label in the same position where we found the value
             return labelsLocale[pos];
         } else {
-            return "UNKNOWN KEY " + key;
+            return UNKNOWN_KEY + key;
         }
     }
 
