@@ -280,8 +280,15 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <artifactId>spring-boot-starter-tomcat-runtime</artifactId>
             <scope>provided</scope>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- External Tomcat provides the servlet container, but not Boot's WebServer API,
+             which is also referenced by the packaged Tomcat metrics integration. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-web-server</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
 
