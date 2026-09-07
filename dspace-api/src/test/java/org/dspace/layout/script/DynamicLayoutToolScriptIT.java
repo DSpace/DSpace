@@ -226,6 +226,41 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
     }
 
     /**
+     * Verifies that importing a workbook that defines more than one leading tab for the same
+     * entity type is rejected by validation and no layout is persisted. Only one leading tab per
+     * entity type is allowed.
+     * <p>
+     * The {@code duplicated-tab-leading-layout.xls} fixture flags both the Person {@code details}
+     * and {@code publications} tabs as leading.
+     */
+    @Test
+    public void testWithDuplicateLeadingTabs() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createEntityType("Publication");
+        createEntityType("Person");
+        GroupBuilder.createGroup(context)
+            .withName("Researchers")
+            .build();
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), empty());
+
+        String fileLocation = getXlsFilePath("duplicated-tab-leading-layout.xls");
+        String[] args = new String[] { "dynamic-layout-tool", "-f", fileLocation };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        assertThat(handler.getInfoMessages(), empty());
+        assertThat(handler.getErrorMessages(),
+            hasItem(startsWith("The sheet tab contains more than one leading tab for entity type 'Person'")));
+
+        // The import must have been aborted, so no layout is persisted.
+        assertThat(tabService.findAll(context), empty());
+    }
+
+    /**
      * Verifies that when a box shortname is referenced from multiple cells (i.e. multiple box
      * instances share the same entity + shortname), the export writes a single box row and keeps
      * a tab2box reference for each cell. This is the export-side de-duplication that prevents box

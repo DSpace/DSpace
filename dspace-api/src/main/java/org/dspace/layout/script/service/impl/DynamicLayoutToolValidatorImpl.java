@@ -123,10 +123,52 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
             result.addError("The sheet " + TAB_SHEET + " has no " + LABEL_COLUMN + " column");
         }
 
+        int leadingColumn = getCellIndexFromHeaderName(tabSheet, LEADING_COLUMN);
+        if (entityTypeColumn != -1 && leadingColumn != -1) {
+            validateDuplicateLeadingTabs(tabSheet, result, entityTypeColumn, leadingColumn);
+        }
+
         if (entityTypeColumn != -1 && shortnameColumn != -1) {
             validatePresenceInTab2BoxSheet(result, tabSheet, TAB_COLUMN, entityTypeColumn, shortnameColumn);
         }
 
+    }
+
+    /**
+     * Validates that at most one leading tab is defined for each entity type in the tab sheet. If
+     * more than one row with a truthy {@link #LEADING_COLUMN} value is found for the same entity
+     * type, an error is added to the given result.
+     *
+     * @param tabSheet         the tab sheet to validate
+     * @param result           the validation result to populate with errors
+     * @param entityTypeColumn the index of the entity type column
+     * @param leadingColumn    the index of the leading column
+     */
+    private void validateDuplicateLeadingTabs(Sheet tabSheet, DynamicLayoutToolValidationResult result,
+        int entityTypeColumn, int leadingColumn) {
+
+        Map<String, List<Integer>> leadingRowsByEntityType = new HashMap<>();
+
+        for (Row row : getNotEmptyRowsSkippingHeader(tabSheet)) {
+            String entityType = getEntityTypeCellValue(row, entityTypeColumn);
+            String leading = getCellValue(row, leadingColumn);
+
+            if (StringUtils.isNotBlank(entityType) && isTruthyBoolean(leading)) {
+                leadingRowsByEntityType.computeIfAbsent(entityType, k -> new ArrayList<>())
+                    .add(row.getRowNum() + 1);
+            }
+        }
+
+        leadingRowsByEntityType.entrySet().stream()
+            .filter(entry -> entry.getValue().size() > 1)
+            .forEach(entry -> result.addError("The sheet " + TAB_SHEET + " contains more than one leading tab for "
+                + "entity type '" + entry.getKey() + "' at rows " + entry.getValue()
+                + ". Only one leading tab per entity type is allowed"));
+
+    }
+
+    private boolean isTruthyBoolean(String value) {
+        return "yes".equalsIgnoreCase(value) || "y".equalsIgnoreCase(value);
     }
 
     private void validateBoxSheet(Workbook workbook, DynamicLayoutToolValidationResult result,
