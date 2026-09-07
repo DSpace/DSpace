@@ -94,72 +94,85 @@
             "onclick" : function() { toastr.remove(); }
         }
 
-        // retrieves a valid CSRF token (please note that this method works both in DS 7 and DS 8)
-        // HTTP response code 403 is expected at this point (the response contains the DSPACE-XSRF-TOKEN header)
-        $.ajax({
-            url : window.location.href.replace("login.html", "") + 'api/authn/login',
-            type : 'POST',
-            error : function(xhr) {
-                // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
-                checkForUpdatedCSRFTokenInResponse(xhr);
-            }
-        });
+        var csrfReady = false;
+        $("#login").prop("disabled", true);
 
-        // When the login page loads, we do *two* AJAX requests.
-        // (1) Call GET /api/authn/status. This call checks to see if you are logged in
-        //     (if not, WWW-Authenticate will return login options).
-        // (2) If that /api/authn/status call finds authentication data, call POST /api/authn/login.
-        //     This scenario occurs when you log in via an external authentication system (e.g. Shibboleth)
-        //     in which case the main role of /api/authn/login is to simply ensure the "Authorization" header
-        //     is sent back to the client (based on your authentication data).
+        // Acquire the CSRF token before either password or external authentication can submit a login.
         $.ajax({
-            url : window.location.href.replace("login.html", "") + 'api/authn/status',
+            url : window.location.href.replace("login.html", "") + 'api/security/csrf',
             type : 'GET',
             success : function(result, status, xhr) {
-
-                // Check for WWW-Authenticate header. If found, this means we are not yet authenticated, and
-                // therefore we need to display available authentication options.
-                var authenticate = xhr.getResponseHeader("WWW-Authenticate");
-                if (authenticate !== null && authenticate.includes('location=')) {
-                    var element = $('div.other-login-methods');
-                    var realms = authenticate.match(/(\w+ (\w+=((".*?")|[^,]*)(, )?)*)/g);
-                    if (realms.length === 1){
-                        var loc = /location="([^,]*)"/.exec(authenticate);
-                        if (loc !== null && loc.length === 2) {
-                            document.location = loc[1];
-                        }
-                    } else if (realms.length > 1){
-                        for (var i = 0; i < realms.length; i++){
-                            addLocationButton(realms[i], element);
-                        }
-                    }
+                checkForUpdatedCSRFTokenInResponse(xhr);
+                csrfReady = getCSRFToken() != null;
+                if (csrfReady) {
+                    $("#login").prop("disabled", false);
+                    loadAuthenticationStatus();
                 } else {
-                    // If Authentication data was found, do a POST /api/authn/login to ensure that data's JWT
-                    // is sent back in the "Authorization" header. This simply completes an external authentication
-                    // process (e.g. Shibboleth)
-                    $.ajax({
-                        url : window.location.href.replace("login.html", "") + 'api/authn/login',
-                        type : 'POST',
-                        beforeSend: function (xhr) {
-                            // If CSRF token found in cookie, send it back as X-XSRF-Token header
-                            var csrfToken = getCSRFToken();
-                            if (csrfToken != null) {
-                                xhr.setRequestHeader('X-XSRF-Token', csrfToken);
-                            }
-                        },
-                        success : successHandler,
-                        error : function(xhr) {
-                            // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
-                            checkForUpdatedCSRFTokenInResponse(xhr);
-                            toastr.error('Failed to logged in. Please check for errors in Javascript console.', 'Login Failed');
-                        }
-                    });
+                    toastr.error('Could not obtain a CSRF token. Please reload this page.', 'Could Not Load');
                 }
             },
             error : function() {
-                toastr.error('Failed to connect with backend. Please check for errors in Javascript console.', 'Could Not Load');
+                toastr.error('Failed to connect with backend. Please reload this page.', 'Could Not Load');
             }
         });
+
+        function loadAuthenticationStatus() {
+            // Once the CSRF token is available, check authentication status.
+            // (1) Call GET /api/authn/status. This call checks to see if you are logged in
+            //     (if not, WWW-Authenticate will return login options).
+            // (2) If that /api/authn/status call finds authentication data, call POST /api/authn/login.
+            //     This scenario occurs when you log in via an external authentication system (e.g. Shibboleth)
+            //     in which case the main role of /api/authn/login is to simply ensure the "Authorization" header
+            //     is sent back to the client (based on your authentication data).
+            $.ajax({
+                url : window.location.href.replace("login.html", "") + 'api/authn/status',
+                type : 'GET',
+                success : function(result, status, xhr) {
+
+                    // Check for WWW-Authenticate header. If found, this means we are not yet authenticated, and
+                    // therefore we need to display available authentication options.
+                    var authenticate = xhr.getResponseHeader("WWW-Authenticate");
+                    if (authenticate !== null && authenticate.includes('location=')) {
+                        var element = $('div.other-login-methods');
+                        var realms = authenticate.match(/(\w+ (\w+=((".*?")|[^,]*)(, )?)*)/g);
+                        if (realms.length === 1){
+                            var loc = /location="([^,]*)"/.exec(authenticate);
+                            if (loc !== null && loc.length === 2) {
+                                document.location = loc[1];
+                            }
+                        } else if (realms.length > 1){
+                            for (var i = 0; i < realms.length; i++){
+                                addLocationButton(realms[i], element);
+                            }
+                        }
+                    } else if (result.authenticated === true) {
+                        // If Authentication data was found, do a POST /api/authn/login to ensure that data's JWT
+                        // is sent back in the "Authorization" header. This simply completes an external authentication
+                        // process (e.g. Shibboleth)
+                        $.ajax({
+                            url : window.location.href.replace("login.html", "") + 'api/authn/login',
+                            type : 'POST',
+                            beforeSend: function (xhr) {
+                                // If CSRF token found in cookie, send it back as X-XSRF-Token header
+                                var csrfToken = getCSRFToken();
+                                if (csrfToken != null) {
+                                    xhr.setRequestHeader('X-XSRF-Token', csrfToken);
+                                }
+                            },
+                            success : successHandler,
+                            error : function(xhr) {
+                                // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+                                checkForUpdatedCSRFTokenInResponse(xhr);
+                                toastr.error('Failed to logged in. Please check for errors in Javascript console.', 'Login Failed');
+                            }
+                        });
+                    }
+                },
+                error : function() {
+                    toastr.error('Failed to connect with backend. Please check for errors in Javascript console.', 'Could Not Load');
+                }
+            });
+        }
 
         function addLocationButton(realm, element){
             element.removeClass("d-none");
@@ -203,6 +216,9 @@
         // This logs the user in and ensures the "Authorization" header is set with the JWT.
         $("#login-form").submit(function(event) {
             event.preventDefault();
+            if (!csrfReady) {
+                return;
+            }
             $.ajax({
                 //This depends on this file to be called login.html
                 url : window.location.href.replace("login.html", "") + 'api/authn/login',
