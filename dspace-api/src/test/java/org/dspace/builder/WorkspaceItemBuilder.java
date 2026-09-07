@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.dspace.app.ldn.NotifyPatternToTrigger;
@@ -110,6 +111,9 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
      * @throws IOException
      */
     public static void deleteWorkspaceItem(Integer id) throws SQLException, IOException {
+        if (Objects.isNull(id)) {
+            return;
+        }
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             WorkspaceItem workspaceItem = workspaceItemService.find(c, id);
@@ -173,7 +177,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     protected WorkspaceItemBuilder addMetadataValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, null, value);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -188,7 +192,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     protected WorkspaceItemBuilder setMetadataSingleValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, null,
                     value);
         } catch (Exception e) {
             return handleException(e);
@@ -238,7 +242,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     }
 
     public WorkspaceItemBuilder withEntityType(final String entityType) {
-        return addMetadataValue("dspace", "entity", "type", entityType);
+        return setMetadataSingleValue("dspace", "entity", "type", entityType);
     }
 
     public WorkspaceItemBuilder withOrcidIdentifier(String orcid) {

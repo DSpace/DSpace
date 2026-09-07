@@ -142,7 +142,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     protected WorkflowItemBuilder addMetadataValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, null, value);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -152,7 +152,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     protected WorkflowItemBuilder setMetadataSingleValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, null,
                     value);
         } catch (Exception e) {
             return handleException(e);
