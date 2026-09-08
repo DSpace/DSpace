@@ -67,6 +67,7 @@
         <jena.version>4.10.0</jena.version>
         <!-- JClouds is used by dspace-api -->
         <jclouds.version>2.7.0</jclouds.version>
+        <owasp-html-sanitizer.version>20240325.1</owasp-html-sanitizer.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1877,6 +1878,12 @@
                         <artifactId>checker-qual</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+                <artifactId>owasp-java-html-sanitizer</artifactId>
+                <version>${owasp-html-sanitizer.version}</version>
             </dependency>
 
             <dependency>

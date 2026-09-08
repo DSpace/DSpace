@@ -247,6 +247,21 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         return super.handleTypeMismatch(ex, headers, HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler({PreconditionFailedException.class, PreconditionRequiredException.class})
+    protected void handlePreconditionException(HttpServletRequest request, HttpServletResponse response,
+                                               Exception ex) throws IOException {
+        ResponseStatus responseStatus = AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
+        int status = responseStatus != null ? responseStatus.code().value()
+            : HttpStatus.PRECONDITION_FAILED.value();
+        sendErrorResponse(request, response, ex, ex.getMessage(), status);
+    }
+
+    @ExceptionHandler(NotModifiedException.class)
+    protected void handleNotModifiedException(HttpServletRequest request, HttpServletResponse response,
+                                              Exception ex) {
+        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    }
+
     @ExceptionHandler(Exception.class)
     protected void handleGenericException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
