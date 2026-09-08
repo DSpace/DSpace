@@ -41,9 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/layout/tabs" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/securitymetadata")
-public class DynamicLayoutTabMetadatasecurityRestController {
+public class DynamicLayoutTabMetadataSecurityRestController {
 
-    private static Logger log = LogManager.getLogger(DynamicLayoutTabMetadatasecurityRestController.class);
+    private static Logger log = LogManager.getLogger(DynamicLayoutTabMetadataSecurityRestController.class);
 
     @Autowired
     private Utils utils;
