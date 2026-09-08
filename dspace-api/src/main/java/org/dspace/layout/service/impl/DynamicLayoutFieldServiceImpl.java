@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.layout.DynamicLayoutField;
@@ -30,6 +31,9 @@ public class DynamicLayoutFieldServiceImpl implements DynamicLayoutFieldService 
     @Autowired
     private DynamicLayoutFieldDAO dao;
 
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
+
     @Override
     public DynamicLayoutField create(Context context) throws SQLException, AuthorizeException {
         return dao.create(context, new DynamicLayoutField());
@@ -42,6 +46,10 @@ public class DynamicLayoutFieldServiceImpl implements DynamicLayoutFieldService 
 
     @Override
     public void update(Context context, DynamicLayoutField field) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to update a Field");
+        }
         dao.save(context, field);
     }
 
