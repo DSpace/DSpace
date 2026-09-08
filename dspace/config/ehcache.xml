@@ -44,10 +44,10 @@
             <offheap unit="MB">4</offheap>
         </resources>
     </cache-template>
-    <cache-template name="sherpa-default">
+    <cache-template name="opf-default">
         <listeners>
             <listener>
-                <class>org.dspace.app.sherpa.cache.SherpaCacheLogger</class>
+                <class>org.dspace.app.openpolicyfinder.cache.OpenPolicyFinderCacheLogger</class>
                 <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
                 <event-ordering-mode>UNORDERED</event-ordering-mode>
                 <events-to-fire-on>CREATED</events-to-fire-on>
@@ -64,6 +64,6 @@
 
     <cache alias="manifests" uses-template="iiif-default"/>
     <cache alias="canvasdimensions" uses-template="iiif-canvas"/>
-    <cache alias="sherpa.searchByJournalISSN" uses-template="sherpa-default"/>
+    <cache alias="opf.searchByJournalISSN" uses-template="opf-default"/>
 
 </config>

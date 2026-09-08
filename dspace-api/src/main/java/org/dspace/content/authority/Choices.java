@@ -68,7 +68,7 @@ public class Choices {
     /**
      * descriptive labels for confidence values
      */
-    private static final int confidenceValue[] = {
+    private static final int[] confidenceValue = {
         CF_UNSET,
         CF_NOVALUE,
         CF_REJECTED,
@@ -78,7 +78,7 @@ public class Choices {
         CF_UNCERTAIN,
         CF_ACCEPTED,
     };
-    private static final String confidenceText[] = {
+    private static final String[] confidenceText = {
         "UNSET",
         "NOVALUE",
         "REJECTED",
@@ -94,7 +94,7 @@ public class Choices {
     /**
      * The set of values returned by the authority
      */
-    public Choice values[] = null;
+    public Choice[] values = null;
 
     /**
      * The confidence level that applies to all values in this result set
@@ -133,9 +133,9 @@ public class Choices {
      * @param confidence confidence level
      * @param more       whether more values
      */
-    public Choices(Choice values[], int start, int total, int confidence, boolean more) {
+    public Choices(Choice[] values, int start, int total, int confidence, boolean more) {
         super();
-        this.values = (Choice[]) ArrayUtils.clone(values);
+        this.values = ArrayUtils.clone(values);
         this.start = start;
         this.total = total;
         this.confidence = confidence;
@@ -152,9 +152,9 @@ public class Choices {
      * @param more            whether more values
      * @param defaultSelected default selected value
      */
-    public Choices(Choice values[], int start, int total, int confidence, boolean more, int defaultSelected) {
+    public Choices(Choice[] values, int start, int total, int confidence, boolean more, int defaultSelected) {
         super();
-        this.values = (Choice[]) ArrayUtils.clone(values);
+        this.values = ArrayUtils.clone(values);
         this.start = start;
         this.total = total;
         this.confidence = confidence;

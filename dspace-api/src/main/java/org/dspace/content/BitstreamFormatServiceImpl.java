@@ -49,7 +49,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      * translate support-level ID to string.  MUST keep this table in sync
      * with support level definitions above.
      */
-    protected final String supportLevelText[] =
+    protected final String[] supportLevelText =
         {"UNKNOWN", "KNOWN", "SUPPORTED"};
 
 

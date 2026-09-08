@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -57,6 +58,7 @@ import org.dspace.builder.RequestItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
@@ -626,5 +628,82 @@ public class RequestItemRepositoryIT
         assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
     }
 
+    /**
+     * Test that deleting a bitstream also removes any {@link RequestItem} entities associated with it.
+     */
+    @Test
+    public void testDeleteBitstreamRemovesRequestItem() throws Exception {
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setAllfiles(false);
+        rir.setItemId(item.getID().toString());
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setRequestEmail(eperson.getEmail());
+        rir.setRequestName(eperson.getFullName());
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
 
+        // Create it and see if it was created correctly.
+        ObjectMapper mapper = new ObjectMapper();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken)
+            .perform(post(URI_ROOT)
+                         .content(mapper.writeValueAsBytes(rir))
+                         .contentType(contentType))
+            .andExpect(status().isCreated())
+            // verify the body is empty
+            .andExpect(jsonPath("$").doesNotExist());
+
+        // Verify the request item exists via findByBitstreamId before deletion
+        Iterator<RequestItem> bitstreamRequests = requestItemService.findByBitstreamId(context, bitstream.getID());
+        assertTrue("Request item should exist before bitstream deletion", bitstreamRequests.hasNext());
+
+        // Delete associated Bitstream
+        ContentServiceFactory.getInstance().getBitstreamService().delete(context, bitstream);
+
+        // Verify that all RequestItems related to this bitstream have been removed
+        Iterator<RequestItem> itemRequests = requestItemService.findByItem(context, item);
+        assertFalse(itemRequests.hasNext());
+
+        // Also verify via findByBitstreamId
+        Iterator<RequestItem> remaining = requestItemService.findByBitstreamId(context, bitstream.getID());
+        assertFalse("Request items should be removed after bitstream deletion", remaining.hasNext());
+    }
+
+    /**
+     * Test that findByBitstreamId returns matching request items and does not return items for other bitstreams.
+     */
+    @Test
+    public void testFindByBitstreamId() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create a request item for the existing bitstream
+        RequestItemBuilder.createRequestItem(context, item, bitstream)
+            .build();
+
+        // Create a second bitstream with no request items
+        InputStream is2 = new ByteArrayInputStream("other content".getBytes());
+        Bitstream bitstream2 = BitstreamBuilder
+            .createBitstream(context, item, is2)
+            .withName("Other Bitstream")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // findByBitstreamId should return the request for the first bitstream
+        Iterator<RequestItem> results = requestItemService.findByBitstreamId(context, bitstream.getID());
+        assertTrue("Should find request item for bitstream", results.hasNext());
+        RequestItem found = results.next();
+        assertEquals("Request item should reference correct bitstream",
+            bitstream.getID(), found.getBitstream().getID());
+        assertFalse("Should only find one request item", results.hasNext());
+
+        // findByBitstreamId should return nothing for the second bitstream
+        Iterator<RequestItem> noResults = requestItemService.findByBitstreamId(context, bitstream2.getID());
+        assertFalse("Should find no request items for bitstream without requests", noResults.hasNext());
+
+        // findByBitstreamId should return nothing for a random UUID
+        Iterator<RequestItem> randomResults = requestItemService.findByBitstreamId(context, UUID.randomUUID());
+        assertFalse("Should find no request items for nonexistent bitstream", randomResults.hasNext());
+    }
 }

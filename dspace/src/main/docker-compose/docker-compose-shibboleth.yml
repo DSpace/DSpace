@@ -21,7 +21,7 @@ services:
     container_name: dspace-shibboleth
     depends_on:
       - dspace
-    image: dspace/dspace-shibboleth
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-shibboleth"
     build:
       # Must be relative to root, so that it can be built alongside [src]/docker-compose.yml
       context: ./dspace/src/main/docker/dspace-shibboleth
@@ -30,8 +30,6 @@ services:
         target: 80
       - published: 443
         target: 443
-    stdin_open: true
-    tty: true
     environment:
       # Default to using "localhost" for Apache & Shibboleth
       # However, you can override this via the "DSPACE_HOSTNAME" environment variable.

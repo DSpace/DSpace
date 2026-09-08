@@ -53,7 +53,7 @@ public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implemen
         orderList.add(criteriaBuilder.desc(entityTypeRoot.get(EntityType_.label)));
         criteriaQuery.select(entityTypeRoot).orderBy(orderList);
         criteriaQuery.where(entityTypeRoot.get(EntityType_.LABEL).in(names));
-        return list(context, criteriaQuery, false, EntityType.class, limit, offset);
+        return list(context, criteriaQuery, true, EntityType.class, limit, offset);
     }
 
     @Override

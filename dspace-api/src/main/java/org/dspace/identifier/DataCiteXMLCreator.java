@@ -49,6 +49,8 @@ public class DataCiteXMLCreator {
         = "identifier.doi.prefix";
     private static final String CFG_PUBLISHER
         = "crosswalk.dissemination.DataCite.publisher";
+    private static final String CFG_PUBLISHER_ROR
+        = "crosswalk.dissemination.DataCite.publisherRor";
     private static final String CFG_DATAMANAGER
         = "crosswalk.dissemination.DataCite.dataManager";
     private static final String CFG_HOSTINGINSTITUTION
@@ -84,6 +86,9 @@ public class DataCiteXMLCreator {
         }
         if (cfg.hasProperty(CFG_PUBLISHER)) {
             parameters.put("publisher", cfg.getProperty(CFG_PUBLISHER));
+        }
+        if (cfg.hasProperty(CFG_PUBLISHER_ROR)) {
+            parameters.put("publisherRor", cfg.getProperty(CFG_PUBLISHER_ROR));
         }
         if (cfg.hasProperty(CFG_DATAMANAGER)) {
             parameters.put("datamanager", cfg.getProperty(CFG_DATAMANAGER));

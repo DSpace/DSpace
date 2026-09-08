@@ -8,9 +8,9 @@
 package org.dspace.app.util.factory;
 
 import org.dspace.app.util.service.DSpaceObjectUtils;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.util.service.WebAppService;
+import org.dspace.content.security.service.MetadataSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -22,13 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UtilServiceFactoryImpl extends UtilServiceFactory {
 
     @Autowired(required = true)
-    private MetadataExposureService metadataExposureService;
-    @Autowired(required = true)
     private OpenSearchService openSearchService;
     @Autowired(required = true)
     private WebAppService webAppService;
     @Autowired(required = true)
     private DSpaceObjectUtils dSpaceObjectUtils;
+    @Autowired(required = true)
+    private MetadataSecurityService metadataSecurityService;
 
     @Override
     public WebAppService getWebAppService() {
@@ -41,12 +41,12 @@ public class UtilServiceFactoryImpl extends UtilServiceFactory {
     }
 
     @Override
-    public MetadataExposureService getMetadataExposureService() {
-        return metadataExposureService;
+    public DSpaceObjectUtils getDSpaceObjectUtils() {
+        return dSpaceObjectUtils;
     }
 
     @Override
-    public DSpaceObjectUtils getDSpaceObjectUtils() {
-        return dSpaceObjectUtils;
+    public MetadataSecurityService getMetadataSecurityService() {
+        return metadataSecurityService;
     }
 }

@@ -81,7 +81,7 @@ public class DSpaceMETSIngester
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
                                    METSManifest manifest,
                                    MdrefManager callback,
-                                   Element dmds[], PackageParameters params)
+                                   Element[] dmds, PackageParameters params)
         throws CrosswalkException, PackageValidationException,
         AuthorizeException, SQLException, IOException {
         int found = -1;
@@ -185,7 +185,7 @@ public class DSpaceMETSIngester
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
         // get the MediaFilter that would create this bundle:
-        String mfNames[] = pluginService.getAllPluginNames(MediaFilter.class);
+        String[] mfNames = pluginService.getAllPluginNames(MediaFilter.class);
 
         for (int i = 0; i < mfNames.length; ++i) {
             MediaFilter mf = (MediaFilter) pluginService.getNamedPlugin(MediaFilter.class, mfNames[i]);

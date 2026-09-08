@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -1083,13 +1085,17 @@ public class LogAnalyser {
 
 
     /**
-     * Take the date object and convert it into a string of the form YYYY-MM-DD
+     * Take the date object and convert it into an Instant datetime object of the form YYYY-MM-DDTHH:MM:SSZ
      *
      * @param date the date to be converted
-     * @return A string of the form YYYY-MM-DD
+     * @return An Instant datetime object of the form YYYY-MM-DDTHH:MM:SSZ
      */
-    public static String unParseDate(LocalDate date) {
-        return DateTimeFormatter.ISO_LOCAL_DATE.format(date);
+    public static Instant convertDate(LocalDate date, boolean startOfDay) {
+        if (startOfDay) {
+            return date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        } else {
+            return date.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant();
+        }
     }
 
 
@@ -1219,13 +1225,13 @@ public class LogAnalyser {
         StringBuilder accessionedQuery = new StringBuilder();
         accessionedQuery.append("dc.date.accessioned_dt:[");
         if (startDate != null) {
-            accessionedQuery.append(unParseDate(startDate));
+            accessionedQuery.append(convertDate(startDate, true));
         } else {
             accessionedQuery.append("*");
         }
         accessionedQuery.append(" TO ");
         if (endDate != null) {
-            accessionedQuery.append(unParseDate(endDate));
+            accessionedQuery.append(convertDate(endDate, false));
         } else {
             accessionedQuery.append("*");
         }

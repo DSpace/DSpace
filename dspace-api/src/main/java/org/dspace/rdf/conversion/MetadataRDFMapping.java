@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -139,7 +140,7 @@ public class MetadataRDFMapping {
     }
 
     public boolean matchesName(String name) {
-        return StringUtils.equalsIgnoreCase(this.name, name);
+        return Strings.CI.equals(this.name, name);
     }
 
     public boolean fulfills(String value) {

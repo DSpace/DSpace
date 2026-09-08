@@ -224,7 +224,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
 
         return findRelationshipsByItem(context, profile).stream()
             .map(relationship -> getRelatedItem(relationship, profile))
-            .filter(item -> entityType.equals(itemService.getEntityTypeLabel(item)))
+            .filter(item -> item.isArchived() && entityType.equals(itemService.getEntityTypeLabel(item)))
             .collect(Collectors.toList());
 
     }

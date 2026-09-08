@@ -80,7 +80,7 @@ public class Report {
     // create check list
     public static LinkedHashMap<String, Check> checks() {
         LinkedHashMap<String, Check> checks = new LinkedHashMap<>();
-        String check_names[] = DSpaceServicesFactory.getInstance().getConfigurationService()
+        String[] check_names = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                     .getArrayProperty("healthcheck.checks");
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
         for (String check_name : check_names) {

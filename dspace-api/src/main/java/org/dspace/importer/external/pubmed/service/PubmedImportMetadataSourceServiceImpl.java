@@ -25,6 +25,7 @@ import java.util.concurrent.Callable;
 import com.google.common.io.CharStreams;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -55,6 +56,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private String urlFetch;
     private String urlSearch;
+    private String apiKey;
 
     private int attempt = 3;
 
@@ -210,6 +212,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         @Override
         public Integer call() throws Exception {
             URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("term", query.getParameterAsClass("query", String.class));
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
@@ -234,11 +239,10 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         String value = null;
 
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // Disallow external entities & entity expansion to protect against XXE attacks
-            // (NOTE: We receive errors if we disable all DTDs for PubMed, so this is the best we can do)
-            saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            saxBuilder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
+            // To properly parse PubMed responses, we must allow DOCTYPEs overall. But, we can still apply all the
+            // other default XXE protections, including disabling external entities and entity expansion.
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
             Document document = saxBuilder.build(new StringReader(src));
             Element root = document.getRootElement();
 
@@ -287,6 +291,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             List<ImportRecord> records = new LinkedList<ImportRecord>();
 
             URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("retstart", start.toString());
             uriBuilder.addParameter("retmax", count.toString());
@@ -317,6 +324,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String webEnv = getSingleElementValue(response, "WebEnv");
 
             URIBuilder uriBuilder2 = new URIBuilder(urlFetch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder2.addParameter("api_key", apiKey);
+            }
             uriBuilder2.addParameter("db", "pubmed");
             uriBuilder2.addParameter("retstart", start.toString());
             uriBuilder2.addParameter("retmax", count.toString());
@@ -355,12 +365,10 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private List<Element> splitToRecords(String recordsSrc) {
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            // Disallow external entities & entity expansion to protect against XXE attacks
-            // (NOTE: We receive errors if we disable all DTDs for PubMed, so this is the best we can do)
-            saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            saxBuilder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            saxBuilder.setExpandEntities(false);
+            SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
+            // To properly parse PubMed responses, we must allow DOCTYPEs overall. But, we can still apply all the
+            // other default XXE protections, including disabling external entities and entity expansion.
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
 
@@ -391,6 +399,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         public ImportRecord call() throws Exception {
 
             URIBuilder uriBuilder = new URIBuilder(urlFetch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("retmode", "xml");
             uriBuilder.addParameter("id", query.getParameterAsClass("id", String.class));
@@ -431,6 +442,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         public Collection<ImportRecord> call() throws Exception {
 
             URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("usehistory", "y");
             uriBuilder.addParameter("term", query.getParameterAsClass("term", String.class));
@@ -460,6 +474,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String queryKey = getSingleElementValue(response, "QueryKey");
 
             URIBuilder uriBuilder2 = new URIBuilder(urlFetch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder2.addParameter("db", "pubmed");
             uriBuilder2.addParameter("retmode", "xml");
             uriBuilder2.addParameter("WebEnv", webEnv);
@@ -533,6 +550,10 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     public void setUrlSearch(String urlSearch) {
         this.urlSearch = urlSearch;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
 }

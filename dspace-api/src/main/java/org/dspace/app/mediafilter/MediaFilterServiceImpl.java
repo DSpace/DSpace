@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -329,23 +330,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         String newName = formatFilter.getFilteredName(source.getName());
 
         // check if destination bitstream exists
-        Bundle existingBundle = null;
-        List<Bitstream> existingBitstreams = new ArrayList<>();
-        List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
-
-        if (!bundles.isEmpty()) {
-            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
-            for (Bundle bundle : bundles) {
-                List<Bitstream> bitstreams = bundle.getBitstreams();
-
-                for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName().trim().equals(newName.trim())) {
-                        existingBundle = bundle;
-                        existingBitstreams.add(bitstream);
-                    }
-                }
-            }
-        }
+        Pair<List<Bitstream>, Bundle> bitstreamsAndBundle = getBitstreamsDerivedFromFilter(item, source, formatFilter);
+        List<Bitstream> existingBitstreams = bitstreamsAndBundle.getLeft();
+        Bundle existingBundle = bitstreamsAndBundle.getRight();
 
         // if exists and overwrite = false, exit
         if (!overWrite && (!existingBitstreams.isEmpty())) {
@@ -380,6 +367,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 return false;
             }
 
+            List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
             Bundle targetBundle; // bundle we're modifying
             if (bundles.isEmpty()) {
                 // create new bundle if needed
@@ -427,6 +415,28 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     }
 
     @Override
+    public Pair<List<Bitstream>, Bundle> getBitstreamsDerivedFromFilter(Item item, Bitstream sourceBitstream,
+                                                                        FormatFilter formatFilter) throws Exception {
+        Bundle lastBundle = null;
+        String filteredName = formatFilter.getFilteredName(sourceBitstream.getName());
+        List<Bitstream> derivedBitstreams = new ArrayList<>();
+        List<Bundle> bundleList = itemService.getBundles(item, formatFilter.getBundleName());
+        if (!bundleList.isEmpty()) {
+            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
+            for (Bundle bundle : bundleList) {
+                List<Bitstream> bitstreamList = bundle.getBitstreams();
+                for (Bitstream bitstream : bitstreamList) {
+                    if (bitstream.getName().trim().equals(filteredName.trim())) {
+                        lastBundle = bundle;
+                        derivedBitstreams.add(bitstream);
+                    }
+                }
+            }
+        }
+        return Pair.of(derivedBitstreams, lastBundle);
+    }
+
+    @Override
     public void updatePoliciesOfDerivativeBitstreams(Context context, Item item, Bitstream source)
         throws SQLException, AuthorizeException {
 
@@ -460,7 +470,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                       .flatMap(bundle ->
                           bundle.getBitstreams().stream())
                       .filter(bitstream ->
-                          StringUtils.equals(bitstream.getName().trim(), bitstreamName.trim()))
+                          Strings.CS.equals(bitstream.getName().trim(), bitstreamName.trim()))
                       .collect(Collectors.toList());
     }
 
@@ -469,7 +479,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
      * by remove all resource policies and
      * set derivative bitstreams to be publicly accessible or
      * replace derivative bitstreams policies using
-     * the same in the source bitstream.
+     * the same in the source bitstream. If the bundle name
+     * is configured in the list of restricted-bundles it will
+     * have all policies cleared
      *
      * @param context the context
      * @param bitstream derivative bitstream
@@ -482,6 +494,16 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                                                      Bitstream source) throws SQLException, AuthorizeException {
 
         authorizeService.removeAllPolicies(context, bitstream);
+
+        // Return early after clearing policies if any bundle of this bitstream
+        // is in the list of admin-only bundles
+        var restrictedBundles = List.of(configurationService.getArrayProperty(
+                    "core.authorization.restricted-bundle",Constants.DEFAULT_RESTRICTED_BUNDLES));
+        for (Bundle bundle : bitstream.getBundles()) {
+            if (restrictedBundles.contains(bundle.getName())) {
+                return;
+            }
+        }
 
         if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
             Group anonymous = groupService.findByName(context, Group.ANONYMOUS);

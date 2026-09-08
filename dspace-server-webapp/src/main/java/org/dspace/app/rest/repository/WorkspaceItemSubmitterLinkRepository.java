@@ -8,8 +8,8 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
@@ -52,7 +52,7 @@ public class WorkspaceItemSubmitterLinkRepository extends AbstractDSpaceRestRepo
                 throw new ResourceNotFoundException("No such workspace item: " + id);
             }
 
-            return converter.toRest(witem.getSubmitter(), projection);
+            return witem.getSubmitter() != null ? converter.toRest(witem.getSubmitter(), projection) : null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.util.Objects;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,9 +17,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing an EntityType
@@ -26,6 +29,8 @@ import org.dspace.core.ReloadableEntity;
  * This also has a label that will be used to identify what kind of EntityType this object is
  */
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name = "entity_type")
 public class EntityType implements ReloadableEntity<Integer> {
 
@@ -99,7 +104,7 @@ public class EntityType implements ReloadableEntity<Integer> {
             return false;
         }
 
-        return StringUtils.equals(this.getLabel(), entityType.getLabel());
+        return Strings.CS.equals(this.getLabel(), entityType.getLabel());
     }
 
     /**

@@ -3,7 +3,7 @@
 
 <relationships>
 
-	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_creator.html 
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_creator.html
 		The relation between a Publication and a Person regarding the authorship -->
 	<type>
 		<leftType>Publication</leftType>
@@ -17,7 +17,7 @@
 			<min>0</min>
 		</rightCardinality>
 	</type>
-	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_creator.html 
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_creator.html
 		The relation between a Publication and an Organization regarding the authorship -->
 	<type>
 		<leftType>Publication</leftType>
@@ -31,7 +31,7 @@
 			<min>0</min>
 		</rightCardinality>
 	</type>
-	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_contributor.html 
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_contributor.html
 		The relation between a Publication and a Person regarding the contribution -->
 	<type>
 		<leftType>Publication</leftType>
@@ -45,7 +45,7 @@
 			<min>0</min>
 		</rightCardinality>
 	</type>
-	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_contributor.html 
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_contributor.html
 		The relation between a Publication and an Organization regarding the contribution -->
 	<type>
 		<leftType>Publication</leftType>
@@ -59,7 +59,7 @@
 			<min>0</min>
 		</rightCardinality>
 	</type>
-	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_projectid.html 
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_projectid.html
 		The relation between a Publication and an Organization regarding the Funder -->
 	<type>
 		<leftType>Publication</leftType>
@@ -73,7 +73,7 @@
 			<min>0</min>
 		</rightCardinality>
 	</type>
-	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_projectid.html 
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_projectid.html
 		The relation between a Funded Project and an Organization regarding the Funder -->
 	<type>
 		<leftType>Project</leftType>

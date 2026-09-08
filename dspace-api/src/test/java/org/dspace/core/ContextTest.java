@@ -16,8 +16,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,6 +37,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -66,7 +69,9 @@ public class ContextTest extends AbstractUnitTest {
 
         // Initialize our spy of the autowired (global) authorizeService bean.
         // This allows us to customize the bean's method return values in tests below
-        authorizeServiceSpy = spy(authorizeService);
+        Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
+        authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
+            withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
         // "Wire" our spy to be used by the current loaded object services
         // (To ensure these services use the spy instead of the real service)
         ReflectionTestUtils.setField(ePersonService, "authorizeService", authorizeServiceSpy);
@@ -521,20 +526,23 @@ public class ContextTest extends AbstractUnitTest {
     }
 
     /**
-     * Test of finalize method, of class Context.
+     * Test that close() invalidates the Context.
+     * Note: This test replaces the previous testFinalize() test for Java 21 compatibility.
+     * The finalize() method has been replaced with java.lang.ref.Cleaner (JEP 421).
+     * The close() method provides the same cleanup behavior as the old finalize() method.
      */
     @Test
-    public void testFinalize() throws Throwable {
+    public void testCloseInvalidatesContext() throws Throwable {
         // We need a new Context object
         Context instance = new Context();
 
-        instance.finalize();
+        // close() should abort the context and invalidate it
+        instance.close();
 
-        // Finalize is like abort()...should invalidate our context
-        assertThat("testSetSpecialGroup 0", instance.isValid(), equalTo(false));
+        // close() is like abort()...should invalidate our context
+        assertThat("testCloseInvalidatesContext 0", instance.isValid(), equalTo(false));
 
-        // Cleanup our context
-        cleanupContext(instance);
+        // Context is already closed, no need for additional cleanup
     }
 
     /**

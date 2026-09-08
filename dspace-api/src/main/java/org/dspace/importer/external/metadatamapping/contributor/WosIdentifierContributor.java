@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jdom2.Element;
@@ -46,15 +46,18 @@ public class WosIdentifierContributor extends SimpleXpathMetadatumContributor {
         List<Element> nodes = xpath.evaluate(element);
         for (Element el : nodes) {
             String type = el.getAttributeValue("type");
-            setIdentyfier(type, el, values);
+            setIdentifier(type, el, values);
         }
         return values;
     }
 
-    private void setIdentyfier(String type, Element el, List<MetadatumDTO> values) {
+    private void setIdentifier(String type, Element el, List<MetadatumDTO> values) {
         for (String id : identifier2field.keySet()) {
-            if (StringUtils.equals(id, type)) {
+            if (Strings.CS.equals(id, type)) {
                 String value = el.getAttributeValue("value");
+                if (type.equals("doi")) {
+                    value = "https://doi.org/" + value;
+                }
                 values.add(metadataFieldMapping.toDCValue(identifier2field.get(id), value));
             }
         }

@@ -38,11 +38,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * <b>Configuration</b><br>
  * The stack of authentication methods is defined by one property in the DSpace configuration:
  * <pre>
- *   plugin.sequence.org.dspace.eperson.AuthenticationMethod = <em>a list of method class names</em>
+ *   plugin.sequence.org.dspace.authenticate.AuthenticationMethod = <em>a list of method class names</em>
  *     <em>e.g.</em>
- *   plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
- *       org.dspace.eperson.X509Authentication, \
- *       org.dspace.eperson.PasswordAuthentication
+ *   plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
+ *       org.dspace.authenticate.IPAuthentication, \
+ *       org.dspace.authenticate.PasswordAuthentication
  * </pre>
  * <p>
  * The "stack" is always traversed in order, with the methods
@@ -110,6 +110,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 }
                 if (ret == AuthenticationMethod.SUCCESS) {
                     updateLastActiveDate(context);
+                    context.setAuthenticationMethod(aMethodStack.getName());
                     return ret;
                 }
                 if (ret < bestRet) {

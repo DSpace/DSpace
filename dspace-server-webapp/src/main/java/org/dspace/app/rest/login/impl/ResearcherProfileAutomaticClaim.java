@@ -10,6 +10,7 @@ package org.dspace.app.rest.login.impl;
 import static org.apache.commons.collections4.IteratorUtils.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
+import static org.dspace.core.Constants.WRITE;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.login.PostLoggedInAction;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.service.ItemService;
@@ -53,6 +55,9 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     /**
      * The field of the eperson to search for.
@@ -104,6 +109,7 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
         if (item != null) {
             itemService.addMetadata(context, item, "dspace", "object", "owner",
                                     null, fullName, id.toString(), CF_ACCEPTED);
+            authorizeService.addPolicy(context, item, WRITE, currentUser);
         }
 
     }

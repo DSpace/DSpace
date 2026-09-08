@@ -14,7 +14,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.service.DoiCheck;
 import org.junit.Test;
 

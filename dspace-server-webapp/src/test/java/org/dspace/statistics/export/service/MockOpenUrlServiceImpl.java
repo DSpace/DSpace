@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -31,7 +31,7 @@ public class MockOpenUrlServiceImpl extends OpenUrlServiceImpl {
      * @throws IOException
      */
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
-        if (StringUtils.contains(urlStr, "fail")) {
+        if (Strings.CS.contains(urlStr, "fail")) {
             return HttpURLConnection.HTTP_INTERNAL_ERROR;
         } else {
             testProcessedUrls.add(urlStr);

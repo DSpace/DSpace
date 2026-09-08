@@ -12,7 +12,7 @@ import java.util.Objects;
 
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.service.FeedbackService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;

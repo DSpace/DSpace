@@ -107,6 +107,23 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
+    public List<ResourcePolicy> findByDSoAndActionAndType(Context context, DSpaceObject dso, int actionId, String type)
+        throws SQLException {
+
+        CriteriaBuilder builder = getCriteriaBuilder(context);
+        CriteriaQuery<ResourcePolicy> criteriaQuery = getCriteriaQuery(builder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+
+        criteriaQuery.select(resourcePolicyRoot);
+
+        criteriaQuery.where(builder.and(builder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso),
+            builder.and(builder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), actionId),
+                builder.equal(resourcePolicyRoot.get(ResourcePolicy_.rptype), type))));
+
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+    }
+
+    @Override
     public void deleteByDsoAndTypeAndAction(Context context, DSpaceObject dso, String type, int actionId)
         throws SQLException {
         String queryString = "delete from ResourcePolicy where dSpaceObject.id = :dsoId "
@@ -182,7 +199,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                 compareEpersonOrGroups
             )
         );
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override

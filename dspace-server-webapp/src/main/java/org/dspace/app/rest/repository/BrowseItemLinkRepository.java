@@ -14,6 +14,7 @@ import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.projection.Projection;
@@ -99,7 +100,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
                 Order order = orders.next();
                 bs.setOrder(order.getDirection().name());
                 String sortBy;
-                if (!StringUtils.equals("default", order.getProperty())) {
+                if (!Strings.CS.equals("default", order.getProperty())) {
                     sortBy = order.getProperty();
                 } else {
                     sortBy = bi.getDefaultOrder();

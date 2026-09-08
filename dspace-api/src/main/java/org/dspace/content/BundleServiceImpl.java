@@ -36,7 +36,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.Group;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -58,6 +60,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
@@ -111,9 +115,12 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 + bundle.getID()));
 
         // if we ever use the identifier service for bundles, we should
-        // create the bundle before we create the Event and should add all
+         // create the bundle before we create the Event and should add all
         // identifiers to it.
-        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE, bundle.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.BUNDLE,
+            bundle.getID(), Constants.ITEM, item.getID(),
+            bundle.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
+            getIdentifiers(context, bundle)));
 
         return bundle;
     }
@@ -157,6 +164,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.ADD, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
+                getIdentifiers(context, bundle)));
+
         }
 
         bundle.addBitstream(bitstream);
@@ -169,12 +181,37 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
 
         context.addEvent(new Event(Event.ADD, Constants.BUNDLE, bundle.getID(),
-                Constants.BITSTREAM, bitstream.getID(), String.valueOf(bitstream.getSequenceID()),
+                Constants.BITSTREAM, bitstream.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
                 getIdentifiers(context, bundle)));
 
-        // copy authorization policies from bundle to bitstream
-        // FIXME: multiple inclusion is affected by this...
-        authorizeService.inheritPolicies(context, bundle, bitstream);
+        // If this item is archived (not in-progress) and the bundle is restricted
+        // simply clear all policies, otherwise proceed with normal inheritance
+        var restrictedBundles = List.of(configurationService.getArrayProperty(
+                    "core.authorization.restricted-bundle",Constants.DEFAULT_RESTRICTED_BUNDLES));
+        if (owningItem != null && owningItem.isArchived()
+                && restrictedBundles.contains(bundle.getName())) {
+            resourcePolicyService.removeAllPolicies(context, bitstream);
+        } else {
+            // add authorization policies from owning bundle and handle embargoes
+            // hmm, not very "multiple-inclusion" friendly
+            authorizeService.inheritPolicies(context, bundle, bitstream, true);
+            applyDefaultReadPermissionsToBitstream(context, owningItem, bitstream);
+        }
+
+
+        bitstreamService.update(context, bitstream);
+    }
+
+    /**
+     * Ensure that any future start dates on the item or bitstream read policies are honoured
+     * and not overwritten by more "open" owning collection or item policies
+     * @param context DSpace context
+     * @param owningItem the item to which the bitstream belongs
+     * @param bitstream the bitstream to which policies are applied
+     */
+    private void applyDefaultReadPermissionsToBitstream(Context context, Item owningItem, Bitstream bitstream)
+        throws SQLException, AuthorizeException {
         // The next logic is a bit overly cautious but ensures that if there are any future start dates
         // on the item or bitstream read policies, that we'll skip inheriting anything from the owning collection
         // just in case. In practice, the item install process would overwrite these anyway but it may satisfy
@@ -207,9 +244,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 }
             }
         }
-        bitstreamService.update(context, bitstream);
     }
-
     @Override
     public void removeBitstream(Context context, Bundle bundle, Bitstream bitstream)
             throws AuthorizeException, SQLException, IOException {
@@ -221,7 +256,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
 
         context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
-                Constants.BITSTREAM, bitstream.getID(), String.valueOf(bitstream.getSequenceID()),
+            Constants.BITSTREAM, bitstream.getID(),
+            String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
                 getIdentifiers(context, bundle)));
 
         //Ensure that the last modified from the item is triggered !
@@ -229,6 +265,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
+                Constants.ITEM, owningItem.getID(),
+                String.valueOf(bitstream.getSequenceID()), DetailType.BITSTREAM_SEQUENCE_ID,
+                getIdentifiers(context, bundle)));
         }
 
         // In the event that the bitstream to remove is actually
@@ -518,7 +558,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
         if (bundle.isModified() || bundle.isMetadataModified()) {
             if (bundle.isMetadataModified()) {
-                context.addEvent(new Event(Event.MODIFY_METADATA, bundle.getType(), bundle.getID(), bundle.getDetails(),
+                context.addEvent(new Event(Event.MODIFY_METADATA, bundle.getType(), bundle.getID(),
+                        bundle.getMetadataEventDetails(), DetailType.DSO_SUMMARY,
                         getIdentifiers(context, bundle)));
             }
             context.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, bundle.getID(),
@@ -536,7 +577,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         authorizeService.authorizeAction(context, bundle, Constants.DELETE);
 
         context.addEvent(new Event(Event.DELETE, Constants.BUNDLE, bundle.getID(),
-                bundle.getName(), getIdentifiers(context, bundle)));
+                bundle.getName(), DetailType.DSO_NAME, getIdentifiers(context, bundle)));
 
         // Remove bitstreams
         List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -582,5 +623,9 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Override
     public int countTotal(Context context) throws SQLException {
         return bundleDAO.countRows(context);
+    }
+
+    public int countBitstreams(Context context, Bundle bundle) throws SQLException {
+        return bundleDAO.countBitstreams(context, bundle);
     }
 }

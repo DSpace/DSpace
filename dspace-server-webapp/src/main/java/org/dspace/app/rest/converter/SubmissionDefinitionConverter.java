@@ -7,24 +7,16 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.DataProcessingStep;
-import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
-import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.content.Collection;
-import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -74,21 +66,6 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
                                 + " is not found",
                         e);
             }
-        }
-
-        HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        Context context = null;
-        try {
-            context = ContextUtil.obtainContext(request);
-            List<Collection> collections = panelConverter.getSubmissionConfigService()
-                                                         .getCollectionsBySubmissionConfig(context,
-                                                                                           obj.getSubmissionName());
-            DSpaceConverter<Collection, CollectionRest> cc = converter.getConverter(Collection.class);
-            List<CollectionRest> collectionsRest = collections.stream().map((collection) ->
-                    cc.convert(collection, projection)).collect(Collectors.toList());
-            sd.setCollections(collectionsRest);
-        } catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
-            log.error(e.getMessage(), e);
         }
         sd.setPanels(panels);
         return sd;

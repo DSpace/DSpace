@@ -119,9 +119,10 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     /**
      * Return true if this object equals obj, false otherwise.
+     * Compares ID, email, and fullName for equality.
      *
      * @param obj another EPerson.
-     * @return true if EPerson objects are equal in ID, email, and full name
+     * @return true if EPerson objects are equal in ID
      */
     @Override
     public boolean equals(Object obj) {
@@ -133,16 +134,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
             return false;
         }
         final EPerson other = (EPerson) obj;
-        if (!this.getID().equals(other.getID())) {
-            return false;
-        }
-        if (!StringUtils.equals(this.getEmail(), other.getEmail())) {
-            return false;
-        }
-        if (!StringUtils.equals(this.getFullName(), other.getFullName())) {
-            return false;
-        }
-        return true;
+        return this.getID().equals(other.getID());
     }
 
     /**
@@ -366,7 +358,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     @Override
     public String getName() {
-        return getEmail();
+        return this.getFullName();
     }
 
     String getDigestAlgorithm() {

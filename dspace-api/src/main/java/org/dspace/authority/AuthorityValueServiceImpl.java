@@ -14,14 +14,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.authority.SolrAuthority;
-import org.dspace.core.Context;
-import org.dspace.core.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,7 +35,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
 
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityValueServiceImpl.class);
 
-    @Autowired(required = true)
+    @Autowired
     protected AuthorityTypes authorityTypes;
 
     protected AuthorityValueServiceImpl() {
@@ -44,7 +43,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     }
 
     @Override
-    public AuthorityValue generate(Context context, String authorityKey, String content, String field) {
+    public AuthorityValue generate(String authorityKey, String content, String field) {
         AuthorityValue nextValue = null;
 
         nextValue = generateRaw(authorityKey, content, field);
@@ -55,13 +54,13 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
             if (StringUtils.isBlank(authorityKey)) {
                 // An existing metadata without authority is being indexed
                 // If there is an exact match in the index, reuse it before adding a new one.
-                List<AuthorityValue> byValue = findByExactValue(context, field, content);
+                List<AuthorityValue> byValue = findByExactValue(field, content);
                 if (byValue != null && !byValue.isEmpty()) {
                     authorityKey = byValue.get(0).getId();
                 } else {
                     authorityKey = UUID.randomUUID().toString();
                 }
-            } else if (StringUtils.startsWith(authorityKey, GENERATE)) {
+            } else if (Strings.CS.startsWith(authorityKey, GENERATE)) {
                 authorityKey = UUID.randomUUID().toString();
             }
 
@@ -118,71 +117,70 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     /**
      * Item.ANY does not work here.
      *
-     * @param context     Context
      * @param authorityID authority id
      * @return AuthorityValue
      */
     @Override
-    public AuthorityValue findByUID(Context context, String authorityID) {
+    public AuthorityValue findByUID(String authorityID) {
         //Ensure that if we use the full identifier to match on
         String queryString = "id:\"" + authorityID + "\"";
-        List<AuthorityValue> findings = find(context, queryString);
+        List<AuthorityValue> findings = find(queryString);
         return findings.size() > 0 ? findings.get(0) : null;
     }
 
     @Override
-    public List<AuthorityValue> findByValue(Context context, String field, String value) {
+    public List<AuthorityValue> findByValue(String field, String value) {
         String queryString = "value:" + value + " AND field:" + field;
-        return find(context, queryString);
+        return find(queryString);
     }
 
     @Override
-    public AuthorityValue findByOrcidID(Context context, String orcid_id) {
+    public AuthorityValue findByOrcidID(String orcid_id) {
         String queryString = "orcid_id:" + orcid_id;
-        List<AuthorityValue> findings = find(context, queryString);
+        List<AuthorityValue> findings = find(queryString);
         return findings.size() > 0 ? findings.get(0) : null;
     }
 
     @Override
-    public List<AuthorityValue> findByExactValue(Context context, String field, String value) {
+    public List<AuthorityValue> findByExactValue(String field, String value) {
         String queryString = "value:\"" + value + "\" AND field:" + field;
-        return find(context, queryString);
+        return find(queryString);
     }
 
     @Override
-    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier,
+    public List<AuthorityValue> findByValue(String schema, String element, String qualifier,
                                             String value) {
         String field = fieldParameter(schema, element, qualifier);
-        return findByValue(context, field, value);
+        return findByValue(field, value);
     }
 
     @Override
-    public List<AuthorityValue> findByName(Context context, String schema, String element, String qualifier,
+    public List<AuthorityValue> findByName(String schema, String element, String qualifier,
                                            String name) {
         String field = fieldParameter(schema, element, qualifier);
         String queryString = "first_name:" + name + " OR last_name:" + name + " OR name_variant:" + name + " AND " +
             "field:" + field;
-        return find(context, queryString);
+        return find(queryString);
     }
 
     @Override
-    public List<AuthorityValue> findByAuthorityMetadata(Context context, String schema, String element,
+    public List<AuthorityValue> findByAuthorityMetadata(String schema, String element,
                                                         String qualifier, String value) {
         String field = fieldParameter(schema, element, qualifier);
         String queryString = "all_Labels:" + value + " AND field:" + field;
-        return find(context, queryString);
+        return find(queryString);
     }
 
     @Override
-    public List<AuthorityValue> findOrcidHolders(Context context) {
+    public List<AuthorityValue> findOrcidHolders() {
         String queryString = "orcid_id:*";
-        return find(context, queryString);
+        return find(queryString);
     }
 
     @Override
-    public List<AuthorityValue> findAll(Context context) {
+    public List<AuthorityValue> findAll() {
         String queryString = "*:*";
-        return find(context, queryString);
+        return find(queryString);
     }
 
     @Override
@@ -197,14 +195,14 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     public AuthorityValue getAuthorityValueType(String metadataString) {
         AuthorityValue fromAuthority = null;
         for (AuthorityValue type : authorityTypes.getTypes()) {
-            if (StringUtils.startsWithIgnoreCase(metadataString, type.getAuthorityType())) {
+            if (Strings.CI.startsWith(metadataString, type.getAuthorityType())) {
                 fromAuthority = type;
             }
         }
         return fromAuthority;
     }
 
-    protected List<AuthorityValue> find(Context context, String queryString) {
+    protected List<AuthorityValue> find(String queryString) {
         List<AuthorityValue> findings = new ArrayList<AuthorityValue>();
         try {
             SolrQuery solrQuery = new SolrQuery();
@@ -220,8 +218,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
                 }
             }
         } catch (Exception e) {
-            log.error(LogHelper.getHeader(context, "Error while retrieving AuthorityValue from solr",
-                                           "query: " + queryString), e);
+            log.error("Error while retrieving AuthorityValue from solr. query: " + queryString, e);
         }
 
         return findings;

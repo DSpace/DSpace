@@ -20,7 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
 import org.apache.catalina.connector.ClientAbortException;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
@@ -106,44 +105,42 @@ public class BitstreamRestController {
 
     /**
      * Retrieve bitstream. An access token (created by request a copy for some files, if enabled) can optionally
-     * be used for authorization instead of current user/group
+     * be used for authorization instead of current user/group.
+     * <P>
+     * Authorization behavior is controlled by the configuration property
+     * {@code core.authorization.bitstream.author.bypass-restrictions}. When enabled (true), authors/submitters
+     * can download restricted bitstreams even if they lack explicit READ permissions. When disabled (false - default),
+     * normal authorization rules apply to all users including authors.
      *
      * @param uuid bitstream ID
      * @param accessToken request-a-copy access token (optional)
      * @param response HTTP response
      * @param request HTTP request
      * @return response entity with bitstream content
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if an I/O error occurs
+     * @throws SQLException if database error occurs
+     * @throws AuthorizeException if user lacks permission and author bypass is disabled
      */
-    @PreAuthorize("#accessToken != null|| hasPermission(#uuid, 'BITSTREAM', 'READ')")
+    @PreAuthorize("T(org.apache.commons.lang3.StringUtils).isNotBlank(#accessToken)" +
+        " || hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
     public ResponseEntity retrieve(@PathVariable UUID uuid,
                                    @Parameter(value = "accessToken", required = false) String accessToken,
                                    HttpServletResponse response,
                                    HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
-
+        // Any non-null access token will skip the preauthorize check above so we can
+        // quickly check here to see if the feature is even enabled. If it is not, throw
+        // an authorize exception.
+        if (StringUtils.isNotBlank(accessToken) && !requestACopyEnabled()) {
+            throw new AuthorizeException("Access by token is not allowed");
+        }
         // Obtain context
         Context context = ContextUtil.obtainContext(request);
         // Find bitstream
         Bitstream bit = bitstreamService.find(context, uuid);
-        if (bit == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return null;
-        }
-        // Get EPerson
-        EPerson currentUser = context.getCurrentUser();
-
-        // Get bitstream metadata
-        Long lastModified = bitstreamService.getLastModified(bit);
-        BitstreamFormat format = bit.getFormat(context);
-        String mimetype = format.getMIMEType();
-        String name = getBitstreamName(bit, format);
 
         // If an access token is found, immediately authenticate it if request a copy is enabled
-        // Though, if we do further "has to be loggd in requester" checks we'll have to check here anyway
-        // Even if eperson is not null and has access, we will treat this token as the primary means of
+        // Even if EPerson is not null and has access, we will treat this token as the primary means of
         // authorizing bitstream download access
         boolean authorizedByAccessToken = false;
         // There may be a way of checking enabled in preauth
@@ -155,11 +152,23 @@ public class BitstreamRestController {
             authorizedByAccessToken = true;
             log.debug("Authorize access by token={} bitstream={}", accessToken, bit.getID());
         }
-        // If an authorization error was encountered it will be rethrown by this method even if the eperson
+        // If an authorization error was encountered it will be rethrown by the above method even if the eperson
         // could technically READ the bitstream normally. This is for consistency and clarify of usage - if we
         // want a fallback we will need to reauthenticate as otherwise any eperson could have supplied a non-blank
         // access token here
 
+        if (bit == null || bit.isDeleted()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+        // Get EPerson
+        EPerson currentUser = context.getCurrentUser();
+
+        // Get bitstream metadata
+        Long lastModified = bitstreamService.getLastModified(bit);
+        BitstreamFormat format = bit.getFormat(context);
+        String mimetype = format.getMIMEType();
+        String name = getBitstreamName(bit, format);
         if (StringUtils.isBlank(request.getHeader("Range"))) {
             //We only log a download request when serving a request without Range header. This is because
             //a browser always sends a regular request first to check for Range support.
@@ -177,8 +186,6 @@ public class BitstreamRestController {
             long filesize = bit.getSizeBytes();
             Boolean citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
 
-
-
             // Generate a special bitstream resource stream depending on whether we are accessing by token
             // or eperson / group access
             org.dspace.app.rest.utils.BitstreamResource bitstreamResource;
@@ -189,10 +196,13 @@ public class BitstreamRestController {
                                 context.getSpecialGroupUuids(), citationEnabledForBitstream, accessToken);
             } else {
                 // Get input stream using default user/group authorization
+                // Check configuration to determine if authors can bypass authorization for restricted bitstreams
+                boolean skipAuth = configurationService.getBooleanProperty(
+                        "core.authorization.bitstream.author.bypass-restrictions", false);
                 bitstreamResource =
                         new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
                                 currentUser != null ? currentUser.getID() : null,
-                                context.getSpecialGroupUuids(), citationEnabledForBitstream);
+                                context.getSpecialGroupUuids(), citationEnabledForBitstream, skipAuth);
             }
 
             // We have all the data we need, close the connection to the database so that it doesn't stay open during
@@ -214,12 +224,16 @@ public class BitstreamRestController {
                 httpHeadersInitializer.withLastModified(lastModified);
             }
 
-            // Determine if we need to send the file as a download or if the browser can open it inline
-            // The file will be downloaded if its size is larger than the configured threshold,
-            // or if its mimetype/extension appears in the "webui.content_disposition_format" config
-            long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
-            if ((dispositionThreshold >= 0 && filesize > dispositionThreshold)
-                    || checkFormatForContentDisposition(format)) {
+            // Determine if we need to send the file as a download or if the browser can open it inline.
+            // By default, all files will be downloaded as that is more secure. File formats will only be opened inline
+            // if they are listed in the "webui.content_disposition_inline" config and size is less than the
+            // configured "webui.content_disposition_threshold" (default = 8MB)
+            long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold",
+                                                                             8388608);
+            if (checkFormatForContentDispositionInline(format) &&
+                filesize <= dispositionThreshold) {
+                httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_INLINE);
+            } else {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
@@ -238,8 +252,6 @@ public class BitstreamRestController {
         } catch (ClientAbortException ex) {
             log.debug("Client aborted the request before the download was completed. " +
                           "Client is probably switching to a Range request.", ex);
-        } catch (Exception e) {
-            throw e;
         }
         return null;
     }
@@ -274,48 +286,48 @@ public class BitstreamRestController {
     }
 
     /**
-     * Check if a Bitstream of the specified format should always be downloaded (i.e. "content-disposition: attachment")
-     * or can be opened inline (i.e. "content-disposition: inline").
+     * Check if a Bitstream of the specified format should be opened inline (i.e. "content-disposition: inline")
+     * instead of the default behavior of always downloading (i.e. "content-disposition: attachment").
      * <P>
      * NOTE that downloading via "attachment" is more secure, as the user's browser will not attempt to process or
      * display the file. But, downloading via "inline" may be seen as more user-friendly for common formats.
      * @param format BitstreamFormat
-     * @return true if always download ("attachment"). false if can be opened inline ("inline")
+     * @return true if format is configured to be opened inline ("inline"). false if always download ("attachment")
      */
-    private boolean checkFormatForContentDisposition(BitstreamFormat format) {
+    private boolean checkFormatForContentDispositionInline(BitstreamFormat format) {
         // Undefined or Unknown formats should ALWAYS be downloaded for additional security.
         if (format == null || format.getSupportLevel() == BitstreamFormat.UNKNOWN) {
-            return true;
+            return false;
         }
 
-        // Load additional formats configured to require download
-        List<String> configuredFormats = List.of(configurationService.
-                                                     getArrayProperty("webui.content_disposition_format"));
-
-        // If configuration includes "*", then all formats will always be downloaded.
-        if (configuredFormats.contains("*")) {
-            return true;
+        // Return false for BANNED inline formats. Some formats, especially XML / HTML / Javascript based formats,
+        // when loaded inline may be susceptible to XSS attacks. Therefore, we will refuse to allow those formats to be
+        // displayed inline for security purposes.
+        // NOTE: "+xml" in this list will match any MIME Type that ends in "+xml", as those are XML-based formats.
+        List<String> bannedInlineFormats = List.of("text/html", "text/javascript", "text/xml", "application/xml",
+                                             "+xml");
+        for (String bannedInlineFormat : bannedInlineFormats) {
+            // If our format MIME Type contains one of the banned inline formats, we refuse to display it inline
+            if (format.getMIMEType().contains(bannedInlineFormat)) {
+                return false;
+            }
         }
 
-        // Define a download list of formats which DSpace forces to ALWAYS be downloaded.
-        // These formats can embed JavaScript which may be run in the user's browser if the file is opened inline.
-        // Therefore, DSpace blocks opening these formats inline as it could be used for an XSS attack.
-        List<String> downloadOnlyFormats = List.of("text/html", "text/javascript", "text/xml", "rdf");
-
-        // Combine our two lists
-        List<String> formats = ListUtils.union(downloadOnlyFormats, configuredFormats);
+        // Load formats configured to allow inline display
+        List<String> formats = List.of(configurationService.
+                                                     getArrayProperty("webui.content_disposition_inline"));
 
         // See if the passed in format's MIME type or file extension is listed.
-        boolean download = formats.contains(format.getMIMEType());
-        if (!download) {
+        boolean inline = formats.contains(format.getMIMEType());
+        if (!inline) {
             for (String ext : format.getExtensions()) {
                 if (formats.contains(ext)) {
-                    download = true;
+                    inline = true;
                     break;
                 }
             }
         }
-        return download;
+        return inline;
     }
 
     /**

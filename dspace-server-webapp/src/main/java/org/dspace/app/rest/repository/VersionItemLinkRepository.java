@@ -21,6 +21,7 @@ import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +45,7 @@ public class VersionItemLinkRepository extends AbstractDSpaceRestRepository
      * @return                  The ItemRest object that is relevant for the Version
      * @throws SQLException     If something goes wrong
      */
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && hasPermission(#versionId, 'VERSION', 'READ')")
     public ItemRest getVersionItem(@Nullable HttpServletRequest request,
                                    Integer versionId,
                                    @Nullable Pageable optionalPageable,

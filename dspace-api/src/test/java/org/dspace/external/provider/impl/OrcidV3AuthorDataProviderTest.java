@@ -35,9 +35,9 @@ import org.junit.Test;
 public class OrcidV3AuthorDataProviderTest extends AbstractDSpaceTest {
 
     private static final String SEARCH_XML_PATH = "org/dspace/external/provider/orcid-v3-author/search.xml";
-    private static final String PERSON1_XML_PATH = "org/dspace/external/provider/orcid-v3-author/person1.xml";
-    private static final String PERSON2_XML_PATH = "org/dspace/external/provider/orcid-v3-author/person2.xml";
-    private static final String PERSON3_XML_PATH = "org/dspace/external/provider/orcid-v3-author/person3.xml";
+    private static final String PERSON1_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record1.xml";
+    private static final String PERSON2_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record2.xml";
+    private static final String PERSON3_XML_PATH = "org/dspace/external/provider/orcid-v3-author/record3.xml";
 
     public static final String ORCID_SEARCH_QUERY = "search?q=0000-0000-0000-0000";
 
@@ -64,9 +64,9 @@ public class OrcidV3AuthorDataProviderTest extends AbstractDSpaceTest {
 
         when(mockRestConnector.get("search?q=search%3Fq%3D0000-0000-0000-0000&start=0&rows=10", null))
                 .thenReturn(searchXmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0001/person", null)).thenReturn(person1XmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0002/person", null)).thenReturn(person2XmlStream);
-        when(mockRestConnector.get("0000-0000-0000-0003/person", null)).thenReturn(person3XmlStream);
+        when(mockRestConnector.get("0000-0000-0000-0001", null)).thenReturn(person1XmlStream);
+        when(mockRestConnector.get("0000-0000-0000-0002", null)).thenReturn(person2XmlStream);
+        when(mockRestConnector.get("0000-0000-0000-0003", null)).thenReturn(person3XmlStream);
 
     }
 
@@ -126,6 +126,49 @@ public class OrcidV3AuthorDataProviderTest extends AbstractDSpaceTest {
                         hasProperty("element", equalTo("identifier")),
                         hasProperty("qualifier", equalTo("uri")),
                         hasProperty("value", equalTo("https://orcid.org/0000-0000-0000-0001"))
+                )
+        ));
+        // Affiliation metadata
+        assertThat(externalDataObject1.getMetadata(), hasItem(
+                allOf(
+                        hasProperty("schema", equalTo("person")),
+                        hasProperty("element", equalTo("affiliation")),
+                        hasProperty("qualifier", equalTo("name")),
+                        hasProperty("value", equalTo("Test University"))
+                )
+        ));
+        // Other names (variant names) metadata
+        assertThat(externalDataObject1.getMetadata(), hasItem(
+                allOf(
+                        hasProperty("schema", equalTo("crisrp")),
+                        hasProperty("element", equalTo("name")),
+                        hasProperty("qualifier", equalTo("variant")),
+                        hasProperty("value", equalTo("G. FamilyName1"))
+                )
+        ));
+        assertThat(externalDataObject1.getMetadata(), hasItem(
+                allOf(
+                        hasProperty("schema", equalTo("crisrp")),
+                        hasProperty("element", equalTo("name")),
+                        hasProperty("qualifier", equalTo("variant")),
+                        hasProperty("value", equalTo("First Last"))
+                )
+        ));
+        // Researcher URLs metadata
+        assertThat(externalDataObject1.getMetadata(), hasItem(
+                allOf(
+                        hasProperty("schema", equalTo("oairecerif")),
+                        hasProperty("element", equalTo("identifier")),
+                        hasProperty("qualifier", equalTo("url")),
+                        hasProperty("value", equalTo("https://example.com/researcher1"))
+                )
+        ));
+        assertThat(externalDataObject1.getMetadata(), hasItem(
+                allOf(
+                        hasProperty("schema", equalTo("oairecerif")),
+                        hasProperty("element", equalTo("identifier")),
+                        hasProperty("qualifier", equalTo("url")),
+                        hasProperty("value", equalTo("https://github.com/researcher1"))
                 )
         ));
     }

@@ -9,21 +9,29 @@ package org.dspace.app.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.model.UploadConfiguration;
+import org.dspace.submit.model.UploadConfigurationService;
+import org.dspace.utils.DSpace;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -118,15 +126,17 @@ public class DCInputsReader {
         formDefns = new HashMap<String, List<List<Map<String, String>>>>();
         valuePairs = new HashMap<String, List<String>>();
 
-        String uri = "file:" + new File(fileName).getAbsolutePath();
+        File inputFile = new File(fileName);
+        String inputFileDir = inputFile.toPath().normalize().getParent().toString();
+
+        String uri = inputFile.toURI().toString();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);
-
-            DocumentBuilder db = factory.newDocumentBuilder();
+            // This document builder will *not* disable external
+            // entities as they can be useful in managing large forms, but
+            // it will restrict them to be within the directory that the
+            // current input form XML file exists (or a sub-directory)
+            DocumentBuilder db = XMLUtils.getTrustedDocumentBuilder(inputFileDir);
             Document doc = db.parse(uri);
             doNodes(doc);
             checkValues();
@@ -176,6 +186,73 @@ public class DCInputsReader {
         }
     }
 
+    /**
+     * Returns the DC input sets configured for the upload step(s) of the submission
+     * configuration associated with the given collection.
+     *
+     * @param collection the collection for which to retrieve the upload DC input sets
+     * @return the list of DC input sets defined for the upload step(s) of the collection
+     * @throws DCInputsReaderException if no default submission form is defined or the
+     *                                 submission configuration cannot be read
+     */
+    public List<DCInputSet> getInputsUploadByCollection(Collection collection)
+            throws DCInputsReaderException {
+        SubmissionConfig config;
+        try {
+            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collection);
+            String formName = config.getSubmissionName();
+            if (formName == null) {
+                throw new DCInputsReaderException("No form designated as default");
+            }
+            List<DCInputSet> results = new ArrayList<DCInputSet>();
+            for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
+                SubmissionStepConfig step = config.getStep(idx);
+                if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(step.getType())) {
+                    UploadConfigurationService uploadConfigurationService = new DSpace().getServiceManager()
+                            .getServiceByName("uploadConfigurationService", UploadConfigurationService.class);
+                    UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
+                    results.add(getInputsByFormName(uploadConfig.getMetadata()));
+                }
+            }
+            return results;
+        } catch (SubmissionConfigReaderException e) {
+            throw new DCInputsReaderException("No form designated as default", e);
+        }
+
+    }
+
+    /**
+     * Returns the DC input sets of the nested metadata groups defined in the input-form
+     * step(s) of the submission configuration associated with the given collection.
+     *
+     * @param collection the collection for which to retrieve the nested group DC input sets
+     * @return the list of DC input sets of the nested metadata groups configured for the collection
+     * @throws DCInputsReaderException if no default submission form is defined or the
+     *                                 submission configuration cannot be read
+     */
+    public List<DCInputSet> getInputsGroupByCollection(Collection collection)
+            throws DCInputsReaderException {
+        SubmissionConfig config;
+        try {
+            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collection);
+            String formName = config.getSubmissionName();
+            if (formName == null) {
+                throw new DCInputsReaderException("No form designated as default");
+            }
+            List<DCInputSet> results = new ArrayList<DCInputSet>();
+            for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
+                SubmissionStepConfig step = config.getStep(idx);
+                if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
+                    results.addAll(getInputsByGroup(step.getId()));
+                }
+            }
+            return results;
+        } catch (SubmissionConfigReaderException e) {
+            throw new DCInputsReaderException("No form designated as default", e);
+        }
+
+    }
+
     public List<DCInputSet> getInputsBySubmissionName(String name)
         throws DCInputsReaderException {
         SubmissionConfig config;
@@ -217,8 +294,7 @@ public class DCInputsReader {
         if (pages == null) {
             throw new DCInputsReaderException("Missing the " + formName + " form");
         }
-        lastInputSet = new DCInputSet(formName,
-                                      pages, valuePairs);
+        lastInputSet = new DCInputSet(this, formName, pages, valuePairs);
         return lastInputSet;
     }
 
@@ -370,7 +446,7 @@ public class DCInputsReader {
                 // we omit the duplicate validation, allowing multiple
                 // fields definition for
                 // the same metadata and different visibility/type-bind
-            } else if (StringUtils.equalsIgnoreCase(npg.getNodeName(), "relation-field")) {
+            } else if (Strings.CI.equals(npg.getNodeName(), "relation-field")) {
                 Map<String, String> relationField = new HashMap<>();
                 processField(formName, npg, relationField);
                 fields.add(relationField);
@@ -417,7 +493,7 @@ public class DCInputsReader {
                             field.put(PAIR_TYPE_NAME, pairTypeName);
                         }
                     }
-                } else if (StringUtils.equalsIgnoreCase(tagName, "linked-metadata-field")) {
+                } else if (Strings.CI.equals(tagName, "linked-metadata-field")) {
                     for (int j = 0; j < nd.getChildNodes().getLength(); j ++) {
                         Node nestedNode = nd.getChildNodes().item(j);
                         String nestedTagName = nestedNode.getNodeName();
@@ -704,6 +780,213 @@ public class DCInputsReader {
             }
         }
         throw new DCInputsReaderException("No field configuration found!");
+    }
+
+    /**
+     * Returns all the metadata fields configured in the submission form of the
+     * given collection that are not group inputs.
+     *
+     * @param  collection              the collection
+     * @return                         the metadata fields
+     * @throws DCInputsReaderException if an error occurs reading the form
+     *                                 configuration
+     */
+    public List<String> getSubmissionFormMetadata(Collection collection) throws DCInputsReaderException {
+        return getSubmissionFormMetadata(collection, false);
+    }
+
+    /**
+     * Returns all the metadata fields configured in the submission form of the
+     * given collection that are group inputs.
+     *
+     * @param  collection              the collection
+     * @return                         the metadata fields
+     * @throws DCInputsReaderException if an error occurs reading the form
+     *                                 configuration
+     */
+    public List<String> getSubmissionFormMetadataGroups(Collection collection) throws DCInputsReaderException {
+        return getSubmissionFormMetadata(collection, true);
+    }
+
+    private List<String> getSubmissionFormMetadata(Collection collection, boolean group)
+        throws DCInputsReaderException {
+        return getAllInputsByCollection(collection)
+            .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
+            .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput).stream())
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the language values configured for the given metadata field in the
+     * submission form of the provided collection. The field is looked up either among
+     * the standard inputs or the nested metadata group inputs, depending on the
+     * {@code group} flag.
+     *
+     * @param collection the collection whose submission form is inspected
+     * @param metadata the metadata field for which to retrieve the configured languages
+     * @param group {@code true} to look up the field within nested metadata group inputs,
+     *              {@code false} to look it up among the standard inputs
+     * @return the list of configured language values for the metadata field, or an empty
+     *         list if the field is not found
+     * @throws DCInputsReaderException if the submission configuration cannot be read
+     */
+    public List<String> getLanguagesForMetadata(Collection collection, String metadata, boolean group)
+        throws DCInputsReaderException {
+
+        Optional<DCInput> dcInputMetadata = getAllInputsByCollection(collection)
+            .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
+            .filter(dcInput -> {
+                try {
+                    return group
+                        ? getAllNestedMetadataByGroupName(collection, dcInput.getFieldName()).contains(metadata)
+                        : getMetadataFieldsFromDcInput(dcInput).contains(metadata);
+                } catch (DCInputsReaderException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .findFirst();
+        if (dcInputMetadata.isPresent()) {
+            dcInputMetadata.get().getAllLanguageValues();
+        }
+        return List.of();
+
+    }
+
+    /**
+     * Returns all the metadata field names nested under the given metadata group in the
+     * submission form of the provided collection.
+     *
+     * @param collection the collection whose submission form is inspected
+     * @param groupName the name of the nested metadata group
+     * @return the list of metadata field names contained in the given group
+     * @throws DCInputsReaderException if no metadata group with the given name is found or
+     *                                 the submission configuration cannot be read
+     */
+    public List<String> getAllNestedMetadataByGroupName(Collection collection, String groupName)
+        throws DCInputsReaderException {
+
+        DCInputSet groupInputSet = findGroupInputSetByMetadataGroupName(collection, groupName);
+
+        return Arrays.stream(groupInputSet.getFields())
+             .flatMap(dcInputs -> Arrays.stream(dcInputs))
+             .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput).stream())
+             .collect(Collectors.toList());
+
+    }
+
+    private DCInputSet findGroupInputSetByMetadataGroupName(Collection collection, String groupName)
+        throws DCInputsReaderException {
+
+        return getInputsByCollection(collection).stream()
+            .filter(inputSet -> inputSet.isFieldPresent(groupName))
+            .findFirst()
+            .map(inputSet -> getInputByMetadataGroupName(inputSet, groupName))
+            .orElseThrow(() -> new DCInputsReaderException("No nested metadata group found by name: " + groupName));
+
+    }
+
+    private DCInputSet getInputByMetadataGroupName(DCInputSet dcInputSet, String groupName) {
+        try {
+            return getInputsByFormName(dcInputSet.getFormName() + "-" + groupName.replaceAll("\\.", "-"));
+        } catch (DCInputsReaderException ex) {
+            throw new RuntimeException("An error occurs searching a DCInputSet by metadata group name", ex);
+        }
+    }
+
+    private Stream<DCInput> getAllInputsByCollection(Collection collection) throws DCInputsReaderException {
+        return getInputsByCollection(collection).stream()
+            .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
+            .flatMap(dcInputs -> Arrays.stream(dcInputs));
+    }
+
+
+    /**
+     * Resolves and retrieves {@link DCInputSet} definitions for nested metadata groups.
+     * <p>
+     * Scans the parent {@code formName} for fields with {@code input-type} 'group' or 'inline-group'.
+     * For each match, it resolves a sub-form using the naming convention:
+     * {@code [parentFormName]-[schema]-[element]-[qualifier]}
+     * </p>
+     * <ul>
+     * <li><b>group:</b> Standard nested container.</li>
+     * <li><b>inline-group:</b> UI hint for compact/horizontal layout.</li>
+     * </ul>
+     * <b>Example:</b> {@code publicationStepGroup} + {@code dc.contributor.author}
+     * &rarr; {@code publicationStepGroup-dc-contributor-author}
+     *
+     * @param formName The parent form identifier.
+     * @return List of resolved input sets for nested groups.
+     * @throws DCInputsReaderException if sub-form retrieval fails.
+     */
+    public List<DCInputSet> getInputsByGroup(String formName)
+        throws DCInputsReaderException {
+
+        List<DCInputSet> results = new ArrayList<DCInputSet>();
+
+        // cache miss - construct new DCInputSet
+        List<List<Map<String, String>>> pages = formDefns.get(formName);
+        if (pages == null) {
+            return results;
+        }
+
+        Iterator<List<Map<String, String>>> iterator = pages.iterator();
+
+        while (iterator.hasNext()) {
+            List<Map<String, String>> input = iterator.next();
+
+            for (Map<String, String> entry : input) {
+                Set<Map.Entry<String, String>> entrySet =
+                    entry.entrySet();
+
+                for (Map.Entry<String, String> attr : entrySet) {
+                    if (attr.getKey().equals("input-type") &&
+                        (attr.getValue().equals("group") || attr.getValue().equals("inline-group"))) {
+                        String schema = entry.get("dc-schema");
+                        String element = entry.get("dc-element");
+                        String qualifier = entry.get("dc-qualifier");
+                        String subFormName = formName + "-" + Utils.standardize(schema, element, qualifier, "-");
+                        results.add(getInputsByFormName(subFormName));
+                    }
+                }
+            }
+
+        }
+
+        return results;
+    }
+
+    private List<String> getMetadataFieldsFromDcInput(DCInput dcInput) {
+        if (!"qualdrop_value".equals(dcInput.getInputType())) {
+            return List.of(dcInput.getFieldName());
+        }
+
+        return dcInput.getAllStoredValues().stream()
+                      .map(value ->
+                               StringUtils.isNotBlank(value) ?
+                                   dcInput.getFieldName() + '.' + value :
+                                   dcInput.getFieldName())
+                      .collect(Collectors.toList());
+    }
+
+    private boolean isGroupType(DCInput dcInput) {
+        return "group".equals(dcInput.getInputType()) || "inline-group".equals(dcInput.getInputType());
+    }
+
+    /**
+     * Returns all the metadata field names configured in the upload step(s) of the
+     * submission form associated with the given collection.
+     *
+     * @param collection the collection whose upload configuration is inspected
+     * @return the list of metadata field names defined in the upload step(s) of the collection
+     * @throws DCInputsReaderException if the submission configuration cannot be read
+     */
+    public List<String> getUploadMetadataFieldsFromCollection(Collection collection) throws DCInputsReaderException {
+        return getInputsUploadByCollection(collection)
+            .stream()
+            .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
+            .flatMap(dcInputs -> Arrays.stream(dcInputs))
+            .flatMap(dcInput -> getMetadataFieldsFromDcInput(dcInput).stream())
+            .collect(Collectors.toList());
     }
 
 }

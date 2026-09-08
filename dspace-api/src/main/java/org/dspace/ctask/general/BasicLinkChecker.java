@@ -9,18 +9,22 @@ package org.dspace.ctask.general;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.services.ConfigurationService;
@@ -55,12 +59,13 @@ public class BasicLinkChecker extends AbstractCurationTask {
     /**
      * Perform the link checking.
      *
+     * @param context The DSpace Context
      * @param dso The DSpaaceObject to be checked
      * @return The curation task status of the checking
      * @throws java.io.IOException THrown if something went wrong
      */
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
         // The results that we'll return
         StringBuilder results = new StringBuilder();
 
@@ -141,7 +146,8 @@ public class BasicLinkChecker extends AbstractCurationTask {
     protected int getResponseStatus(String url, int redirects) {
         RequestConfig config = RequestConfig.custom().setRedirectsEnabled(true).build();
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config)) {
-            CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(url));
+            URI uri = new URIBuilder(url).build();
+            CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(uri));
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             int maxRedirect = configurationService.getIntProperty("curate.checklinks.max-redirect", 0);
             if ((statusCode == HttpURLConnection.HTTP_MOVED_TEMP || statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
@@ -153,6 +159,9 @@ public class BasicLinkChecker extends AbstractCurationTask {
                 }
             }
             return statusCode;
+        } catch (URISyntaxException e) {
+            log.error("Invalid URL: ", url, e);
+            return 0;
         } catch (IOException ioe) {
             // Must be a bad URL
             log.debug("Bad link: " + ioe.getMessage());

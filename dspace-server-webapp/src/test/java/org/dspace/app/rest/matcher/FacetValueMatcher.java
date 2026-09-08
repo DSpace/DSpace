@@ -113,6 +113,16 @@ public class FacetValueMatcher {
         );
     }
 
+    public static Matcher<? super Object> entryLanguage(String label) {
+        return allOf(
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$.uniqueType", is("discover.discover")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f.language="))
+        );
+    }
+
     public static Matcher<? super Object> entrySupervisedBy(String label, String authority, int count) {
         return allOf(
             hasJsonPath("$.authorityKey", is(authority)),

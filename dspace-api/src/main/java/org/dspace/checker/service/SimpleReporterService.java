@@ -72,7 +72,8 @@ public interface SimpleReporterService {
 
     /**
      * The bitstreams that were set to not be processed report for the specified
-     * date range.
+     * date range. This includes bitstreams that are marked as deleted and bitstreams
+     * that are not found from the assetstore.
      *
      * @param context   context
      * @param startDate the start date range.

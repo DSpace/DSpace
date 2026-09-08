@@ -456,17 +456,37 @@ public abstract class AbstractMETSDisseminator
                                 // contents are unchanged
                                 ze.setTime(DEFAULT_MODIFIED_DATE);
                             }
-                            ze.setSize(auth ? bitstream.getSizeBytes() : 0);
-                            zip.putNextEntry(ze);
+
+                            long bitstreamSize = 0;
+                            // If user is authorized to read this bitstream, attempt to retrieve it.
                             if (auth) {
-                                InputStream input = bitstreamService.retrieve(context, bitstream);
-                                Utils.copy(input, zip);
-                                input.close();
+                                try (final InputStream bitstreamInput = bitstreamService.retrieve(context, bitstream)) {
+                                    // Save bitstream size into Zip entry & put entry in Zip file.
+                                    bitstreamSize = bitstream.getSizeBytes();
+                                    ze.setSize(bitstreamSize);
+                                    zip.putNextEntry(ze);
+
+                                    // Copy bitstream contents to Zip file
+                                    Utils.copy(bitstreamInput, zip);
+                                } catch (Exception e) {
+                                    log.warn("Adding zero-length file for Bitstream, uuid={}."
+                                                 + " Bitstream is unable to be retrieved from assetstore."
+                                                 + " Error={}", bitstream.getID(), e.getMessage());
+                                }
                             } else {
-                                log.warn("Adding zero-length file for Bitstream, uuid="
-                                             + String.valueOf(bitstream.getID())
-                                             + ", not authorized for READ.");
+                                log.warn("Adding zero-length file for Bitstream, uuid={}"
+                                             + ", not authorized for READ.", bitstream.getID());
                             }
+
+                            // If bitstreamSize is still zero, that means either we didn't have READ privileges
+                            // or the bitstream could not be retrieved from storage. Either way, write a zero-length
+                            // file into our Zip entry in place of the bitstream.
+                            if (bitstreamSize == 0) {
+                                ze.setSize(0);
+                                zip.putNextEntry(ze);
+                            }
+
+                            // Close our zip entry
                             zip.closeEntry();
                         } else if (unauth != null && unauth.equalsIgnoreCase("skip")) {
                             log.warn("Skipping Bitstream, uuid=" + String
@@ -560,7 +580,7 @@ public abstract class AbstractMETSDisseminator
             //create our metadata element (dmdSec, techMd, sourceMd, rightsMD etc.)
             MdSec mdSec = (MdSec) mdSecClass.getDeclaredConstructor().newInstance();
             mdSec.setID(gensym(mdSec.getLocalName()));
-            String parts[] = typeSpec.split(":", 2);
+            String[] parts = typeSpec.split(":", 2);
             String xwalkName;
             String metsName;
 
@@ -629,6 +649,13 @@ public abstract class AbstractMETSDisseminator
                         ByteArrayOutputStream disseminateOutput = new ByteArrayOutputStream();
                         sxwalk.disseminate(context, dso, disseminateOutput);
                         disseminateOutput.close();
+
+                        // If our disseminated output has zero size, exit immediately (i.e. return a null mdSec).
+                        // Likely, the outputstream failed to be created, so we cannot include it in this package.
+                        if (disseminateOutput.size() == 0) {
+                            return null;
+                        }
+
                         // Convert output to an inputstream, so we can write to manifest or Zip file
                         ByteArrayInputStream crosswalkedStream = new ByteArrayInputStream(
                             disseminateOutput.toByteArray());
@@ -685,7 +712,7 @@ public abstract class AbstractMETSDisseminator
     // add either a techMd or sourceMd element to amdSec.
     // mdSecClass determines which type.
     // mdTypes[] is array of "[metsName:]PluginName" strings, maybe empty.
-    protected void addToAmdSec(AmdSec fAmdSec, String mdTypes[], Class mdSecClass,
+    protected void addToAmdSec(AmdSec fAmdSec, String[] mdTypes, Class mdSecClass,
                                Context context, DSpaceObject dso,
                                PackageParameters params,
                                MdStreamCache extraStreams)
@@ -708,10 +735,10 @@ public abstract class AbstractMETSDisseminator
             IOException, AuthorizeException, NoSuchMethodException,
             InstantiationException, IllegalAccessException, IllegalArgumentException,
             IllegalArgumentException, InvocationTargetException {
-        String techMdTypes[] = getTechMdTypes(context, dso, params);
-        String rightsMdTypes[] = getRightsMdTypes(context, dso, params);
-        String sourceMdTypes[] = getSourceMdTypes(context, dso, params);
-        String digiprovMdTypes[] = getDigiprovMdTypes(context, dso, params);
+        String[] techMdTypes = getTechMdTypes(context, dso, params);
+        String[] rightsMdTypes = getRightsMdTypes(context, dso, params);
+        String[] sourceMdTypes = getSourceMdTypes(context, dso, params);
+        String[] digiprovMdTypes = getDigiprovMdTypes(context, dso, params);
 
         // only bother if there are any sections to add
         if ((techMdTypes.length + sourceMdTypes.length +
@@ -794,10 +821,10 @@ public abstract class AbstractMETSDisseminator
         // add DMD sections
         // Each type element MAY be either just a MODS-and-crosswalk name, OR
         // a combination "MODS-name:crosswalk-name" (e.g. "DC:qDC").
-        String dmdTypes[] = getDmdTypes(context, dso, params);
+        String[] dmdTypes = getDmdTypes(context, dso, params);
 
         // record of ID of each dmdsec to make DMDID in structmap.
-        String dmdId[] = new String[dmdTypes.length];
+        String[] dmdId = new String[dmdTypes.length];
         for (int i = 0; i < dmdTypes.length; ++i) {
             MdSec dmdSec = makeMdSec(context, dso, DmdSec.class, dmdTypes[i], params, extraStreams);
             if (dmdSec != null) {
@@ -981,7 +1008,7 @@ public abstract class AbstractMETSDisseminator
             // add metadata & info for Template Item, if exists
             Item templateItem = collection.getTemplateItem();
             if (templateItem != null) {
-                String templateDmdId[] = new String[dmdTypes.length];
+                String[] templateDmdId = new String[dmdTypes.length];
                 // index where we should add the first template item <dmdSec>.
                 // Index = number of <dmdSecs> already added + number of <metsHdr> = # of dmdSecs + 1
                 // (Note: in order to be a valid METS file, all dmdSecs must be before the 1st amdSec)
@@ -1239,8 +1266,8 @@ public abstract class AbstractMETSDisseminator
         try {
             // add crosswalk's namespaces and schemaLocation to this element:
             String raw = xwalk.getSchemaLocation();
-            String sloc[] = raw == null ? null : raw.split("\\s+");
-            Namespace ns[] = xwalk.getNamespaces();
+            String[] sloc = raw == null ? null : raw.split("\\s+");
+            Namespace[] ns = xwalk.getNamespaces();
             for (int i = 0; i < ns.length; ++i) {
                 String uri = ns[i].getURI();
                 if (sloc != null && sloc.length > 1 && uri.equals(sloc[0])) {

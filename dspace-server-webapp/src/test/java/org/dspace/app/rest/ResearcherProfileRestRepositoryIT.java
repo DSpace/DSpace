@@ -56,6 +56,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 import com.jayway.jsonpath.JsonPath;
+import org.dspace.app.customurl.consumer.CustomUrlConsumerConfig;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
@@ -88,6 +89,7 @@ import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
+import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -144,6 +146,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         user = EPersonBuilder.createEPerson(context)
             .withEmail("user@example.com")
+            .withNameInMetadata("Example", "User")
             .withPassword(password)
             .build();
 
@@ -321,9 +324,16 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
      */
     @Test
     public void testCreateAndReturn() throws Exception {
+        CustomUrlConsumerConfig customUrlConsumerConfig = new DSpace()
+            .getSingletonService(CustomUrlConsumerConfig.class);
+
+        configurationService.setProperty("dspace.custom-url.consumer.supported-entities", "Person");
+        configurationService.setProperty("dspace.custom-url.consumer.entity-metadata-mapping.Person",
+                                         "person.familyName,person.givenName");
+        customUrlConsumerConfig.reload();
 
         String id = user.getID().toString();
-        String name = user.getName();
+        String name = user.getFullName();
 
         String authToken = getAuthToken(user.getEmail(), password);
 
@@ -342,6 +352,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("item")))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id, 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.givenName", user.getFirstName(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.familyName", user.getLastName(), 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/eperson", id))
@@ -391,7 +403,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testCreateAndReturnWithAdmin() throws Exception {
 
         String id = user.getID().toString();
-        String name = user.getName();
+        String name = user.getFullName();
 
         configurationService.setProperty("researcher-profile.collection.uuid", null);
 
@@ -412,6 +424,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/item", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("item")))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.givenName", user.getFirstName(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("person.familyName", user.getLastName(), 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id, 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
 
@@ -1023,6 +1037,22 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         String secondItemId = getItemIdByProfileId(newUserToken, id);
         assertEquals("The item should be the same", firstItemId, secondItemId);
 
+        getClient(getAuthToken(admin.getEmail(), password))
+                .perform(get("/api/authz/resourcepolicies/search/resource")
+                        .param("uuid", firstItemId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        hasItem(matchResourcePolicyProperties(null, user, itemToBeClaimed, null,
+                                Constants.WRITE, null))));
+
+        getClient(newUserToken)
+                .perform(get("/api/authz/authorizations/search/object")
+                        .param("uri", "http://localhost/api/core/items/" + firstItemId)
+                        .param("feature", "canEditMetadata")
+                        .param("embed", "feature"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.authorizations[0]._embedded.feature.id")
+                        .value("canEditMetadata"));
     }
 
     @Test

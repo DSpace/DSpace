@@ -20,6 +20,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.common.net.MediaType;
+import jakarta.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +39,6 @@ import org.jclouds.blobstore.domain.BlobMetadata;
 import org.jclouds.blobstore.options.ListContainerOptions;
 import org.jclouds.blobstore.options.PutOptions.Builder;
 import org.jclouds.io.ContentMetadata;
-import org.jclouds.javax.annotation.Nullable;
 
 /**
  * JCloudBitstream asset store service

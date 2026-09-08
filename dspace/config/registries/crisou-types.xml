@@ -1,0 +1,68 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris OrgUnit Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>crisou</name>
+        <namespace>http://dspace.org/crisou</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>acronym</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>director</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>relation</element>
+        <qualifier>ispartof</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>date</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>boards</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>crossrefid</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>place</element>
+        <qualifier>city</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisou</schema>
+        <element>place</element>
+        <qualifier>country</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

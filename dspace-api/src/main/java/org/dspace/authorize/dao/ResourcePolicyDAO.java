@@ -42,6 +42,26 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public void deleteByDsoAndTypeAndAction(Context context, DSpaceObject dSpaceObject, String type, int action)
         throws SQLException;
 
+    /**
+     * Retrieves all resource policies for a specific DSpace object filtered by action and policy type.
+     * <p>
+     * This method returns policies that match all three criteria: the DSpace object, the action ID,
+     * and the resource policy type. All conditions must be satisfied for a policy to be included
+     * in the results.
+     *
+     * @param c        the DSpace context object for database access
+     * @param o        the DSpace object whose policies to retrieve
+     * @param actionId the action identifier to filter by (as defined in {@link org.dspace.core.Constants})
+     * @param type     the resource policy type to filter by (e.g., {@link ResourcePolicy#TYPE_SUBMISSION},
+     *                 {@link ResourcePolicy#TYPE_WORKFLOW}, {@link ResourcePolicy#TYPE_CUSTOM},
+     *                 {@link ResourcePolicy#TYPE_INHERITED})
+     * @return a list of ResourcePolicy objects matching all specified criteria; returns an empty list
+     *         if no matching policies are found
+     * @throws SQLException if a database error occurs during the query
+     */
+    public List<ResourcePolicy> findByDSoAndActionAndType(Context c, DSpaceObject o, int actionId, String type)
+        throws SQLException;
+
     public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action)
         throws SQLException;
 

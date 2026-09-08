@@ -1,18 +1,15 @@
 ## E-mail sent to designated address about updates on subscribed items
 ##
-## Parameters: {0} Communities updates
-##             {1} Collections updates
+## Parameters: {0} Main intro
+##             {1} New items section
+##             {2} Modified items section
 #set($subject = "${config.get('dspace.name')} Subscriptions")
 This email is sent from ${config.get('dspace.name')} based on the chosen subscription preferences.
 
 #if( not( "$params[0]" == "" ))
-Community Subscriptions:
-------------------------
-List of changed items : ${params[0]}
-
+${params[0]}
 #end
+
 #if( not( "$params[1]" == "" ))
-Collection Subscriptions:
--------------------------
-List of changed items : ${params[1]}
+${params[1]}
 #end

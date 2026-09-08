@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
@@ -126,8 +127,10 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * @return solr query
      */
     private SolrQuery getSolrQuery(String query, String manifestId) {
+        String safeQuery = ClientUtils.escapeQueryChars(query);
+        String safeManifestId = ClientUtils.escapeQueryChars(manifestId);
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.set("q", "ocr_text:" + query + " AND manifest_url:\"" + manifestId + "\"");
+        solrQuery.set("q", "ocr_text:" + safeQuery + " AND manifest_url:\"" + safeManifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
         solrQuery.set("hl", "true");
         solrQuery.set("hl.ocr.fl", "ocr_text");

@@ -10,7 +10,7 @@ package org.dspace.discovery;
 import java.sql.SQLException;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -55,11 +55,11 @@ public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServic
     public void additionalSearchParameters(
             Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery
     ) throws SearchServiceException {
-        boolean isWorkspace = StringUtils.startsWith(
+        boolean isWorkspace = Strings.CS.startsWith(
                 discoveryQuery.getDiscoveryConfigurationName(),
                 DISCOVER_WORKSPACE_CONFIGURATION_NAME
         );
-        boolean isWorkflow = StringUtils.startsWith(
+        boolean isWorkflow = Strings.CS.startsWith(
                 discoveryQuery.getDiscoveryConfigurationName(),
                 DISCOVER_WORKFLOW_CONFIGURATION_NAME
         );

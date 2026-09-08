@@ -72,7 +72,7 @@ public class PackageUtils {
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
     // to initialize hash tables that convert to and from.
-    protected static final String ccMetadataMap[] = {
+    protected static final String[] ccMetadataMap = {
         // getMetadata()  ->  DC element.term
         "name",                    "dc.title",
         "introductory_text",       "dc.description",

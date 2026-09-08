@@ -20,7 +20,9 @@ import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.event.Consumer;
+import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -118,8 +120,12 @@ public class IndexEventConsumer implements Consumer {
                     if (st == Constants.SITE || st == Constants.LDN_MESSAGE) {
                         // Update the indexable objects of type in event.detail of objects with ids in event.identifiers
                         for (String id : event.getIdentifiers()) {
+                            EventDetail detail = event.getDetail();
+                            if (!detail.getDetailType().equals(DetailType.DSO_TYPE)) {
+                                break;
+                            }
                             IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance().
-                                getIndexFactoryByType(event.getDetail());
+                                getIndexFactoryByType((String)detail.getDetailObject());
                             Optional<IndexableObject> indexableObject = Optional.empty();
                             indexableObject = indexableObjectService.findIndexableObject(ctx, id);
                             if (indexableObject.isPresent()) {

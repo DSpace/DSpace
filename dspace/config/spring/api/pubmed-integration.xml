@@ -24,6 +24,7 @@
         <entry key-ref="dc.date.issued" value-ref="dateContrib"/>
         <entry key-ref="dc.language.iso" value-ref="pubmedLanguageContrib"/>
         <entry key-ref="dc.subject" value-ref="keywordContrib"/>
+        <entry key-ref="dc.relation.hasversion" value-ref="pubmedDoiContrib"/>
 
     </util:map>
 
@@ -56,8 +57,13 @@
         <property name="query" value="descendant::ArticleTitle"/>
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
     </bean>
+    <bean id="pubmedDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.XpathNormalizeDOIMetadatumContributor">  
+        <property name="field" ref="dc.relation.hasversion"/>  
+        <property name="query" value="descendant::ArticleId[@IdType='doi']"/>  
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>  
+    </bean>  
 
-    <bean id="abstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+    <bean id="abstractContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedAbstractMetadatumContributor">
         <property name="field" ref="dc.description.abstract"/>
         <property name="query" value="descendant::AbstractText"/>
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
@@ -145,14 +151,14 @@
         <constructor-arg value="dc.identifier.other"/>
     </bean>
 
+    <bean id="dc.relation.hasversion" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">  
+        <constructor-arg value="dc.relation.hasversion"/>  
+    </bean>  
+
 
     <util:map id="prefixToNamespaceMapping">
     </util:map>
 
-
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="2"/>
-    </bean>
 
     <bean class="org.dspace.importer.external.pubmed.metadatamapping.transform.GeneratePubmedQueryService" id="pubmedService">
         <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of

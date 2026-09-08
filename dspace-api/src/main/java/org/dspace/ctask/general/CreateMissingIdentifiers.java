@@ -38,7 +38,7 @@ public class CreateMissingIdentifiers
     private static final Logger LOG = LogManager.getLogger();
 
     @Override
-    public int perform(DSpaceObject dso)
+    public int perform(Context context, DSpaceObject dso)
             throws IOException {
         // Only some kinds of model objects get identifiers
         if (!(dso instanceof Item)) {
@@ -46,15 +46,6 @@ public class CreateMissingIdentifiers
         }
 
         String typeText = Constants.typeText[dso.getType()];
-
-        // Get a Context
-        Context context;
-        try {
-            context = Curator.curationContext();
-        } catch (SQLException ex) {
-            report("Could not get the curation Context:  " + ex.getMessage());
-            return Curator.CURATE_ERROR;
-        }
 
         // Find the IdentifierService implementation
         IdentifierService identifierService = IdentifierServiceFactory

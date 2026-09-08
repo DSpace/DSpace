@@ -1,107 +1,93 @@
 {
-  "id": "https://ror.org/01sps7q28",
-  "name": "The University of Texas Health Science Center at Tyler",
-  "email_address": null,
-  "ip_addresses": [
-    
+  "admin": {
+    "created": {
+      "date": "2018-11-14",
+      "schema_version": "1.0"
+    },
+    "last_modified": {
+      "date": "2024-12-11",
+      "schema_version": "2.1"
+    }
+  },
+  "domains": [],
+  "established": 1972,
+  "external_ids": [
+    {
+      "all": [
+        "grid.430864.d"
+      ],
+      "preferred": "grid.430864.d",
+      "type": "grid"
+    },
+    {
+      "all": [
+        "0000 0000 9018 7542"
+      ],
+      "preferred": null,
+      "type": "isni"
+    }
   ],
-  "established": 1947,
-  "types": [
-    "Healthcare"
+  "id": "https://ror.org/02437s643",
+  "links": [
+    {
+      "type": "website",
+      "value": "https://www.uillinois.edu"
+    }
+  ],
+  "locations": [
+    {
+      "geonames_details": {
+        "continent_code": "NA",
+        "continent_name": "North America",
+        "country_code": "US",
+        "country_name": "United States",
+        "country_subdivision_code": "IL",
+        "country_subdivision_name": "Illinois",
+        "lat": 42.27113,
+        "lng": -89.094,
+        "name": "Rockford"
+      },
+      "geonames_id": 4907959
+    }
+  ],
+  "names": [
+    {
+      "lang": null,
+      "types": [
+        "acronym"
+      ],
+      "value": "UICOMR"
+    },
+    {
+      "lang": "en",
+      "types": [
+        "ror_display",
+        "label"
+      ],
+      "value": "University of Illinois Chicago, Rockford campus"
+    },
+    {
+      "lang": "en",
+      "types": [
+        "alias"
+      ],
+      "value": "University of Illinois at Rockford"
+    }
   ],
   "relationships": [
     {
-      "label": "The University of Texas System",
-      "type": "Parent",
-      "id": "https://ror.org/01gek1696"
-    }
-  ],
-  "addresses": [
+      "label": "University of Illinois Chicago",
+      "type": "parent",
+      "id": "https://ror.org/02mpq6x41"
+    },
     {
-      "lat": 32.426014,
-      "lng": -95.212728,
-      "state": "Texas",
-      "state_code": "US-TX",
-      "city": "Tyler",
-      "geonames_city": {
-        "id": 4738214,
-        "city": "Tyler",
-        "geonames_admin1": {
-          "name": "Texas",
-          "id": 4736286,
-          "ascii_name": "Texas",
-          "code": "US.TX"
-        },
-        "geonames_admin2": {
-          "name": "Smith County",
-          "id": 4729130,
-          "ascii_name": "Smith County",
-          "code": "US.TX.423"
-        },
-        "license": {
-          "attribution": "Data from geonames.org under a CC-BY 4.0 license",
-          "license": "https://creativecommons.org/licenses/by/4.0/"
-        },
-        "nuts_level1": {
-          "name": null,
-          "code": null
-        },
-        "nuts_level2": {
-          "name": null,
-          "code": null
-        },
-        "nuts_level3": {
-          "name": null,
-          "code": null
-        }
-      },
-      "postcode": null,
-      "primary": false,
-      "line": null,
-      "country_geonames_id": 6252001
+      "label": "Swedish American Hospital",
+      "type": "related",
+      "id": "https://ror.org/05scd7d31"
     }
-  ],
-  "links": [
-    "https://www.utsystem.edu/institutions/university-texas-health-science-center-tyler"
-  ],
-  "aliases": [
-    "East Texas Tuberculosis Sanitarium",
-    "UT Health Northeast"
-  ],
-  "acronyms": [
-    "UTHSCT"
   ],
   "status": "active",
-  "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Texas_Health_Science_Center_at_Tyler",
-  "labels": [
-    
-  ],
-  "country": {
-    "country_name": "United States",
-    "country_code": "US"
-  },
-  "external_ids": {
-    "ISNI": {
-      "preferred": null,
-      "all": [
-        "0000 0000 9704 5790"
-      ]
-    },
-    "OrgRef": {
-      "preferred": null,
-      "all": [
-        "3446655"
-      ]
-    },
-    "Wikidata": {
-      "preferred": null,
-      "all": [
-        "Q7896437"
-      ]
-    },
-    "GRID": {
-      "preferred": "grid.267310.1",
-      "all": "grid.267310.1"
-    }
-  }
+  "types": [
+    "education"
+  ]
 }

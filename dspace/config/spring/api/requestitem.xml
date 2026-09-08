@@ -29,6 +29,24 @@
                          ref='org.dspace.app.requestitem.RequestItemMetadataStrategy'/> 
     </bean>
 
+    <bean class="org.dspace.app.requestitem.RequestPrimaryBitstreamMetadataStrategy"
+          id="org.dspace.app.requestitem.RequestPrimaryBitstreamMetadataStrategy">
+        <description>
+            Get recipients from a bitstream metadata field.
+        </description>
+        <!-- 
+            Uncomment these properties if you want lookup in bitstream's metadata
+            the email and the name of the author for the contact for request copy.
+            If you don't configure that or if the bitstream doesn't have
+            these metadata, the submitter data are used as a fail over.
+        -->
+        <!--
+            <property name="emailMetadata"
+                      value="schema.element.qualifier" />
+            <property name="fullNameMetadata"
+                      value="schema.element.qualifier" />  -->
+    </bean>
+
     <bean class="org.dspace.app.requestitem.RequestItemMetadataStrategy"
           id="org.dspace.app.requestitem.RequestItemMetadataStrategy">
         <description>
@@ -76,6 +94,7 @@
             <list>
               <!-- Example:
                 <ref bean='org.dspace.app.requestitem.RequestItemMetadataStrategy'/>
+                <ref bean='org.dspace.app.requestitem.RequestPrimaryBitstreamMetadataStrategy'/>
                 <ref bean='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'/>
               -->
             </list>

@@ -20,12 +20,18 @@ public class DSpaceConfigurationService implements ConfigurationService {
      * Initialize the OAI Configuration Service
      */
     public DSpaceConfigurationService() {
-        // Check the DSpace ConfigurationService for required OAI-PMH settings.
-        // If they do not exist, set sane defaults as needed.
+        ensureRequiredConfiguration();
+    }
 
-        // Per OAI Spec, "oai.identifier.prefix" should be the hostname / domain name of the site.
-        // This configuration is needed by the [dspace]/config/crosswalks/oai/description.xml template, so if
-        // unspecified we will dynamically set it to the hostname of the "dspace.ui.url" configuration.
+    /**
+     * Check the DSpace ConfigurationService for required OAI-PMH settings.
+     * If they do not exist, set sane defaults as needed.
+     * <br>
+     * Per OAI Spec, "oai.identifier.prefix" should be the hostname / domain name of the site.
+     * This configuration is needed by the [dspace]/config/crosswalks/oai/description.xml template, so if
+     * unspecified we will dynamically set it to the hostname of the "dspace.ui.url" configuration.
+     */
+    public void ensureRequiredConfiguration() {
         if (!configurationService.hasProperty("oai.identifier.prefix")) {
             configurationService.setProperty("oai.identifier.prefix",
                                              Utils.getHostName(configurationService.getProperty("dspace.ui.url")));

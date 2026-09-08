@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -107,7 +108,14 @@ public class DSpaceHttpClientFactoryTest {
 
     @Test
     public void testBuildWithProxyConfiguredAndHostPrefixToIgnoreSet() throws Exception {
-        setHttpProxyOnConfigurationService("local*", "www.test.com");
+        // Get hostname assigned to 127.0.0.1 (usually is "localhost", but not always)
+        InetAddress address = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
+        String hostname = address.getHostName();
+        // Take first 4 characters hostname as the prefix (e.g. "loca" in "localhost")
+        String hostnamePrefix =  hostname.substring(0, 4);
+        // Save hostname prefix to our list of hosts to ignore, followed by an asterisk.
+        // (This should result in our Proxy ignoring our localhost)
+        setHttpProxyOnConfigurationService(hostnamePrefix + "*", "www.test.com");
         CloseableHttpClient httpClient = httpClientFactory.build();
         assertThat(mockProxy.getRequestCount(), is(0));
         assertThat(mockServer.getRequestCount(), is(0));
@@ -122,7 +130,14 @@ public class DSpaceHttpClientFactoryTest {
 
     @Test
     public void testBuildWithProxyConfiguredAndHostSuffixToIgnoreSet() throws Exception {
-        setHttpProxyOnConfigurationService("www.test.com", "*host");
+        // Get hostname assigned to 127.0.0.1 (usually is "localhost", but not always)
+        InetAddress address = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
+        String hostname = address.getHostName();
+        // Take last 4 characters hostname as the suffix (e.g. "host" in "localhost")
+        String hostnameSuffix =  hostname.substring(hostname.length() - 4);
+        // Save hostname suffix to our list of hosts to ignore, preceded by an asterisk.
+        // (This should result in our Proxy ignoring our localhost)
+        setHttpProxyOnConfigurationService("www.test.com", "*" + hostnameSuffix);
         CloseableHttpClient httpClient = httpClientFactory.build();
         assertThat(mockProxy.getRequestCount(), is(0));
         assertThat(mockServer.getRequestCount(), is(0));

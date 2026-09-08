@@ -17,6 +17,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
+import org.dspace.content.authority.DSpaceControlledVocabulary;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +54,19 @@ public class VocabularyEntryDetailsParentLinkRepository extends AbstractDSpaceRe
 
         ChoiceAuthority authority = choiceAuthorityService.getChoiceAuthorityByAuthorityName(vocabularyName);
         Choice choice = null;
+        boolean fix = false;
         if (StringUtils.isNotBlank(id) && authority != null && authority.isHierarchical()) {
+            //FIXME hack to deal with an improper use on the angular side of the node id (otherinformation.id) to
+            // build a vocabulary entry details ID
+            if (authority instanceof DSpaceControlledVocabulary && !StringUtils.startsWith(id, vocabularyName)) {
+                fix = true;
+                id = vocabularyName + DSpaceControlledVocabulary.ID_SPLITTER + id;
+            }
             choice = choiceAuthorityService.getParentChoice(vocabularyName, id, context.getCurrentLocale().toString());
         } else {
             throw new NotFoundException();
         }
-        return authorityUtils.convertEntryDetails(choice, vocabularyName, authority.isHierarchical(),
-                utils.obtainProjection());
+        return authorityUtils.convertEntryDetails(fix, choice, vocabularyName, authority.isHierarchical(),
+                                                  authority.storeAuthorityInMetadata(), utils.obtainProjection());
     }
 }

@@ -19,7 +19,8 @@
             only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
             what metadatafield is generated.
         </description>
-        <entry key-ref="scielo.doi" value-ref="scieloSimpleContrib"/>
+        <entry key-ref="scielo.id" value-ref="scieloSimpleContrib"/>
+        <entry key-ref="scielo.doi" value-ref="scieloDoiContrib"/>
         <entry key-ref="scielo.abstract" value-ref="scieloAbstractContrib"/>
     </util:map>
 
@@ -32,13 +33,21 @@
         <constructor-arg value="dc.description.abstract"/>
     </bean>
 
+    <bean id="scieloDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.RisNormalizeDOIMetadatumContributor">
+        <property name="tag" value="DO"/>
+        <property name="metadata" ref="scielo.doi"/>
+    </bean>
+
+    <bean id="scielo.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.hasversion"/>
+    </bean>
+
     <bean id="scieloSimpleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleRisToMetadataContributor">
         <property name="fieldToMetadata" ref="tag2metadata"/>
     </bean>
 
     <util:map id="tag2metadata" map-class="java.util.HashMap"
         key-type="java.lang.String" value-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <entry key="DO" value-ref="scielo.doi"/>
         <entry key="AU" value-ref="scielo.author"/>
         <entry key="TI" value-ref="scielo.title"/>
         <entry key="SN" value-ref="scielo.issn"/>
@@ -52,10 +61,6 @@
         <entry key="PY" value-ref="scielo.publicationYear"/>
         <entry key="JO" value-ref="scielo.isPartOf"/>
     </util:map>
-
-    <bean id="scielo.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
-    </bean>
 
     <bean id="scielo.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.contributor.author"/>

@@ -45,6 +45,19 @@ public class Configuration {
      * @param argv the command line arguments given
      */
     public static void main(String[] argv) {
+        int exitCode = runConfiguration(argv);
+        System.exit(exitCode);
+    }
+
+    /**
+     * Run the configuration tool and return an exit code.
+     * This method is separated from main() to make the class testable without
+     * relying on SecurityManager to intercept System.exit() calls.
+     *
+     * @param argv the command line arguments
+     * @return exit code (0 for success, non-zero for errors)
+     */
+    public static int runConfiguration(String[] argv) {
         // Build a description of the command line
         Options options = new Options();
         options.addOption("p", "property", true, "name of the desired property");
@@ -64,7 +77,7 @@ public class Configuration {
             cmd = parser.parse(options, argv);
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
-            System.exit(1);
+            return 1;
         }
 
         // Give help if asked
@@ -75,13 +88,13 @@ public class Configuration {
                                           "If --module is omitted, then --property gives the entire" +
                                               " name of the property.  Otherwise the name is" +
                                               " composed of module.property.");
-            System.exit(0);
+            return 0;
         }
 
         // Check for missing required values
         if (!cmd.hasOption('p')) {
             System.err.println("Error:  -p is required");
-            System.exit(1);
+            return 1;
         }
 
         // Figure out the property's full name
@@ -123,6 +136,6 @@ public class Configuration {
             }
         }
 
-        System.exit(0);
+        return 0;
     }
 }

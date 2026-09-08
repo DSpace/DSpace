@@ -10,7 +10,6 @@ package org.dspace.authorize;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,7 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -56,7 +55,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "resourcepolicy_seq", sequenceName = "resourcepolicy_seq", allocationSize = 1)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 
@@ -121,7 +120,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
             return false;
         }
         final ResourcePolicy other = (ResourcePolicy) obj;
-        if (!StringUtils.equals(getRpName(), other.getRpName())) {
+        if (!Strings.CS.equals(getRpName(), other.getRpName())) {
             return false;
         }
         if (getAction() != other.getAction()) {

@@ -25,6 +25,7 @@ import jakarta.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authority.AuthorityValue;
@@ -42,6 +43,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityService;
@@ -163,6 +166,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                                    .getAuthorityValueService();
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
+        .getInstance()
+        .getMetadataAuthorityService();
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -359,6 +365,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
         // Process each change
         rowCount = 1;
+
+        int maxItems = configurationService.getIntProperty("bulkedit.import.max.items", 1000);
+        int numItems = toImport.size();
+        if (numItems > maxItems && maxItems > 0) {
+            throw new MetadataImportException(
+                "Import contains " + numItems + " items, which exceeds the configured "
+                + "maximum of " + maxItems + ". You can change this limit by setting "
+                + "'bulkedit.import.max.items' in your local configuration.");
+        }
+
         for (DSpaceCSVLine line : toImport) {
             // Resolve target references to other items
             populateRefAndRowMap(line, line.getID());
@@ -495,7 +511,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                 // Check it has an owning collection
                 List<String> collections = line.get("collection");
-                if (collections == null) {
+                if (collections == null || collections.isEmpty()) {
                     throw new MetadataImportException(
                         "New items must have a 'collection' assigned in the form of a handle");
                 }
@@ -552,7 +568,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                     // Add the metadata to the item
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (!StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (!Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             itemService.addMetadata(c, item, dcv.getSchema(),
                                                     dcv.getElement(),
                                                     dcv.getQualifier(),
@@ -564,7 +580,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     }
                     //Add relations after all metadata has been processed
                     for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                        if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
+                        if (Strings.CS.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
                             addRelationship(c, item, dcv.getElement(), dcv.getValue());
                         }
                     }
@@ -810,7 +826,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 }
             }
 
-            if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+            if (Strings.CS.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
                     .findByLeftwardOrRightwardTypeName(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
@@ -1137,18 +1153,29 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setElement(element);
         dcv.setQualifier(qualifier);
         dcv.setLanguage(language);
-        if (fromAuthority != null) {
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append(schema).append("_").append(element);
+
+        if (StringUtils.isNotEmpty(qualifier)) {
+            builder.append("_").append(qualifier);
+        }
+
+        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(builder.toString(),
+                Constants.ITEM, null);
+
+        if (fromAuthority != null && isAuthorityControlled) {
             if (value.indexOf(':') > 0) {
                 value = value.substring(0, value.indexOf(':'));
             }
 
             // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
+            List<AuthorityValue> byValue = authorityValueService.findByValue(schema, element, qualifier, value);
             AuthorityValue authorityValue = null;
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
                 String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
-                authorityValue = authorityValueService.generate(c, toGenerate, value, field);
+                authorityValue = authorityValueService.generate(toGenerate, value, field);
                 dcv.setAuthority(toGenerate);
             } else {
                 authorityValue = byValue.get(0);
@@ -1560,7 +1587,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 ContentServiceFactory.getInstance().getMetadataFieldService();
             int i = reference.indexOf(":");
             String mfValue = reference.substring(i + 1);
-            String mf[] = reference.substring(0, i).split("\\.");
+            String[] mf = reference.substring(0, i).split("\\.");
             if (mf.length < 2) {
                 throw new MetadataImportException("Error in CSV row " + rowCount + ":\n" +
                                                       "Bad metadata field in reference: '" + reference
@@ -1734,7 +1761,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                                 if (relTypes != null && relTypes.size() > 0) {
                                     String relTypeValue = relTypes.get(0);
-                                    relTypeValue = StringUtils.remove(relTypeValue, "\"").trim();
+                                    relTypeValue = Strings.CS.remove(relTypeValue, "\"").trim();
                                     originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
                                     validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                                 } else {

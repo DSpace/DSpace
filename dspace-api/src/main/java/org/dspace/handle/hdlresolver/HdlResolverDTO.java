@@ -58,8 +58,8 @@ public class HdlResolverDTO {
 
     /**
      * Returns the split String of the resource-path
-     * 
-     * @return
+     *
+     * @return split string array of the resource path
      */
     public final String[] getSplittedString() {
         return this.splittedString;
@@ -67,8 +67,8 @@ public class HdlResolverDTO {
 
     /**
      * Returns the handle identifier
-     * 
-     * @return
+     *
+     * @return handle identifier string
      */
     public final String getHandle() {
         return this.handle;
@@ -76,8 +76,8 @@ public class HdlResolverDTO {
 
     /**
      * Checks if the handle identifier is valid.
-     * 
-     * @return
+     *
+     * @return true if handle identifier is valid, false otherwise
      */
     public boolean isValid() {
         return Objects.nonNull(this.handle) &&

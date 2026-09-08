@@ -8,7 +8,6 @@
 package org.dspace.google.client;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.apache.commons.lang.StringUtils.startsWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.google.GoogleAnalyticsEvent;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
     @Override
     public String getEndpointUrl(String analyticsKey) {
 
-        if (!startsWith(analyticsKey, "G-")) {
+        if (!Strings.CS.startsWith(analyticsKey, "G-")) {
             throw new IllegalArgumentException("Only keys with G- prefix are supported");
         }
 

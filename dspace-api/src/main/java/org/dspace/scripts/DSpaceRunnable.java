@@ -117,7 +117,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * @param args              The primitive array of Strings representing the parameters
      * @throws ParseException   If something goes wrong
      */
-    private StepResult parse(String[] args) throws ParseException {
+    protected StepResult parse(String[] args) throws ParseException {
         commandLine = new DefaultParser().parse(getScriptConfiguration().getOptions(), args);
         setup();
         return StepResult.Continue;

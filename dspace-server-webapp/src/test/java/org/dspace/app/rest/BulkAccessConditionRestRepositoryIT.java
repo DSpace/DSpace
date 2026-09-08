@@ -15,6 +15,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
+import org.dspace.app.bulkaccesscontrol.model.BulkAccessConditionConfiguration;
+import org.dspace.app.bulkaccesscontrol.service.BulkAccessConditionConfigurationService;
 import org.dspace.app.rest.matcher.AccessConditionOptionMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -22,8 +26,10 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.submit.model.AccessConditionOption;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration test class for the bulkaccessconditionoptions endpoint.
@@ -32,9 +38,15 @@ import org.junit.Test;
  */
 public class BulkAccessConditionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private BulkAccessConditionConfigurationService bulkAccessConditionConfigurationService;
+
     @Test
     public void findAllByAdminUserTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
+        String embargoLimit = getLimitForOption("embargo", "startDate");
+        String leaseLimit = getLimitForOption("lease", "endDate");
+
         getClient(authToken)
             .perform(get("/api/config/bulkaccessconditionoptions"))
             .andExpect(status().isOk())
@@ -42,16 +54,24 @@ public class BulkAccessConditionRestRepositoryIT extends AbstractControllerInteg
             .andExpect(jsonPath("$._embedded.bulkaccessconditionoptions", containsInAnyOrder(allOf(
                 hasJsonPath("$.id", is("default")),
                 hasJsonPath("$.itemAccessConditionOptions", Matchers.containsInAnyOrder(
-                    AccessConditionOptionMatcher.matchAccessConditionOption("openaccess", false , false, null, null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption("embargo", true , false, "+36MONTHS", null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption("administrator", false , false, null, null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption("lease", false , true, null, "+6MONTHS"))
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "openaccess", false , false, null, null),
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "embargo", true , false, embargoLimit, null),
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "administrator", false , false, null, null),
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "lease", false , true, null, leaseLimit))
                 ),
                 hasJsonPath("$.bitstreamAccessConditionOptions", Matchers.containsInAnyOrder(
-                    AccessConditionOptionMatcher.matchAccessConditionOption("openaccess", false , false, null, null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption("embargo", true , false, "+36MONTHS", null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption("administrator", false , false, null, null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption("lease", false , true, null, "+6MONTHS"))
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "openaccess", false , false, null, null),
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "embargo", true , false, embargoLimit, null),
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "administrator", false , false, null, null),
+                    AccessConditionOptionMatcher.matchAccessConditionOption(
+                        "lease", false , true, null, leaseLimit))
                 )))));
     }
 
@@ -140,21 +160,24 @@ public class BulkAccessConditionRestRepositoryIT extends AbstractControllerInteg
     @Test
     public void findOneByAdminTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String embargoLimit = getLimitForOption("embargo", "startDate");
+        String leaseLimit = getLimitForOption("lease", "endDate");
+
         getClient(tokenAdmin)
             .perform(get("/api/config/bulkaccessconditionoptions/default"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id", is("default")))
             .andExpect(jsonPath("$.itemAccessConditionOptions", Matchers.containsInAnyOrder(
                 AccessConditionOptionMatcher.matchAccessConditionOption("openaccess", false , false, null, null),
-                AccessConditionOptionMatcher.matchAccessConditionOption("embargo", true , false, "+36MONTHS", null),
+                AccessConditionOptionMatcher.matchAccessConditionOption("embargo", true , false, embargoLimit, null),
                 AccessConditionOptionMatcher.matchAccessConditionOption("administrator", false , false, null, null),
-                AccessConditionOptionMatcher.matchAccessConditionOption("lease", false , true, null, "+6MONTHS"))
+                AccessConditionOptionMatcher.matchAccessConditionOption("lease", false , true, null, leaseLimit))
             ))
             .andExpect(jsonPath("$.bitstreamAccessConditionOptions", Matchers.containsInAnyOrder(
                 AccessConditionOptionMatcher.matchAccessConditionOption("openaccess", false , false, null, null),
-                AccessConditionOptionMatcher.matchAccessConditionOption("embargo", true , false, "+36MONTHS", null),
+                AccessConditionOptionMatcher.matchAccessConditionOption("embargo", true , false, embargoLimit, null),
                 AccessConditionOptionMatcher.matchAccessConditionOption("administrator", false , false, null, null),
-                AccessConditionOptionMatcher.matchAccessConditionOption("lease", false , true, null, "+6MONTHS"))
+                AccessConditionOptionMatcher.matchAccessConditionOption("lease", false , true, null, leaseLimit))
             ))
             .andExpect(jsonPath("$.type", is("bulkaccessconditionoption")));
     }
@@ -251,6 +274,28 @@ public class BulkAccessConditionRestRepositoryIT extends AbstractControllerInteg
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/config/bulkaccessconditionoptions/wrong"))
                             .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Helper method to extract limits from the current configuration dynamically.
+     */
+    private String getLimitForOption(String optionName, String limitType) {
+        BulkAccessConditionConfiguration config = bulkAccessConditionConfigurationService.
+            getBulkAccessConditionConfiguration("default");
+
+        if (config != null) {
+            List<AccessConditionOption> options = config.getItemAccessConditionOptions();
+            for (AccessConditionOption option : options) {
+                if (option.getName().equals(optionName)) {
+                    if ("startDate".equals(limitType)) {
+                        return option.getStartDateLimit();
+                    } else if ("endDate".equals(limitType)) {
+                        return option.getEndDateLimit();
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -31,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminationCrosswalk {
 
-    private List<String> metadata = new ArrayList<>();
+    private List<ImmutablePair<String, String>> metadata = new ArrayList<>();
 
     @Autowired
     private ItemService itemService;
@@ -46,7 +47,7 @@ public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminati
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
             PrintStream printStream = new PrintStream(out);
-            for (String actualMetadata : metadata) {
+            for (String actualMetadata : metadata.stream().map(ImmutablePair::getLeft).toList()) {
                 String[] split = actualMetadata.split("\\.");
                 String qualifier = null;
                 if (split.length == 3) {
@@ -69,11 +70,11 @@ public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminati
         return "text/plain";
     }
 
-    public List<String> getMetadata() {
+    public List<ImmutablePair<String, String>> getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(List<String> metadata) {
+    public void setMetadata(List<ImmutablePair<String, String>> metadata) {
         this.metadata = metadata;
     }
 

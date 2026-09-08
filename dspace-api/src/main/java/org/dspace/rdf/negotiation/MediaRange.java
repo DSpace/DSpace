@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -180,11 +181,11 @@ public class MediaRange {
     }
 
     public boolean typeIsWildcard() {
-        return (StringUtils.equals(type, "*"));
+        return (Strings.CS.equals(type, "*"));
     }
 
     public boolean subtypeIsWildcard() {
-        return (StringUtils.equals(subtype, "*"));
+        return (Strings.CS.equals(subtype, "*"));
     }
 
 }

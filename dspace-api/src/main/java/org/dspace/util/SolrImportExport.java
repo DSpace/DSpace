@@ -556,7 +556,7 @@ public class SolrImportExport {
             YearMonth monthStartDate;
             String monthStart = monthFacet.getValue();
             try {
-                monthStartDate = YearMonth.parse(monthStart);
+                monthStartDate = YearMonth.parse(monthStart, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
             } catch (DateTimeParseException e) {
                 throw new SolrImportExportException("Could not read start of month batch as date: " + monthStart, e);
             }

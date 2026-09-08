@@ -92,61 +92,16 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
     /**
      * Queries the bitstream table for bitstream IDs that are not yet in the
      * most_recent_checksum table, and inserts them into the
-     * most_recent_checksum and checksum_history tables.
-     *
+     * most_recent_checksum table.
      * @param context Context
      * @throws SQLException if database error
      */
     @Override
     public void updateMissingBitstreams(Context context) throws SQLException {
-//                "insert into most_recent_checksum ( "
-//                + "bitstream_id, to_be_processed, expected_checksum, current_checksum, "
-//                + "last_process_start_date, last_process_end_date, "
-//                + "checksum_algorithm, matched_prev_checksum, result ) "
-//                + "select bitstream.bitstream_id, "
-//                + "CASE WHEN bitstream.deleted = false THEN true ELSE false END, "
-//                + "CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, "
-//                + "CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, "
-//                + "?, ?, CASE WHEN bitstream.checksum_algorithm IS NULL "
-//                + "THEN 'MD5' ELSE bitstream.checksum_algorithm END, true, "
-//                + "CASE WHEN bitstream.deleted = true THEN 'BITSTREAM_MARKED_DELETED' else 'CHECKSUM_MATCH' END "
-//                + "from bitstream where not exists( "
-//                + "select 'x' from most_recent_checksum "
-//                + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )";
-
-        List<Bitstream> unknownBitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context);
-        for (Bitstream bitstream : unknownBitstreams) {
-            log.info(bitstream + " " + bitstream.getID().toString() + " " + bitstream.getName());
-
-            MostRecentChecksum mostRecentChecksum = new MostRecentChecksum();
-            mostRecentChecksum.setBitstream(bitstream);
-            //Only process if our bitstream isn't deleted
-            mostRecentChecksum.setToBeProcessed(!bitstream.isDeleted());
-            if (bitstream.getChecksum() == null) {
-                mostRecentChecksum.setCurrentChecksum("");
-                mostRecentChecksum.setExpectedChecksum("");
-            } else {
-                mostRecentChecksum.setCurrentChecksum(bitstream.getChecksum());
-                mostRecentChecksum.setExpectedChecksum(bitstream.getChecksum());
-            }
-            mostRecentChecksum.setProcessStartDate(Instant.now());
-            mostRecentChecksum.setProcessEndDate(Instant.now());
-            if (bitstream.getChecksumAlgorithm() == null) {
-                mostRecentChecksum.setChecksumAlgorithm("MD5");
-            } else {
-                mostRecentChecksum.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
-            }
-            mostRecentChecksum.setMatchedPrevChecksum(true);
-            ChecksumResult checksumResult;
-            if (bitstream.isDeleted()) {
-                checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.BITSTREAM_MARKED_DELETED);
-            } else {
-                checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
-            }
-            mostRecentChecksum.setChecksumResult(checksumResult);
-            mostRecentChecksumDAO.create(context, mostRecentChecksum);
-            mostRecentChecksumDAO.save(context, mostRecentChecksum);
-        }
+        log.info("Retrieving missing bitsreams (bitstream IDs that are not yet in most_recent_checksum table)...");
+        int updated = mostRecentChecksumDAO.updateMissingBitstreams(context);
+        log.info("Updated most_recent_checksum for " + updated + " bitstreams.");
+        log.info("Missing bitsreams processing done.");
     }
 
     @Override
