@@ -64,7 +64,35 @@ public class DynamicLayoutSectionServiceImpl implements DynamicLayoutSectionServ
     public List<DynamicLayoutSection> findAllVisibleSectionsInTopBar() {
         return components.stream()
             .filter(DynamicLayoutSection::isVisible)
+            .map(this::filterVisibleNestedSections)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a representation of the given section that only exposes its
+     * visible nested sections (applied recursively). Sections that hold
+     * components rather than nested sections are returned unchanged, since a
+     * {@link DynamicLayoutSection} can only hold either components or nested
+     * sections.
+     *
+     * @param section the (visible) section to process
+     * @return the section itself when it has no nested sections, otherwise a
+     *         copy retaining only its visible nested sections
+     */
+    private DynamicLayoutSection filterVisibleNestedSections(DynamicLayoutSection section) {
+        List<DynamicLayoutSection> nestedSections = section.getNestedSections();
+        if (nestedSections.isEmpty()) {
+            return section;
+        }
+
+        List<DynamicLayoutSection> visibleNestedSections = nestedSections.stream()
+            .filter(DynamicLayoutSection::isVisible)
+            .map(this::filterVisibleNestedSections)
+            .collect(Collectors.toList());
+
+        DynamicLayoutSection filteredSection = new DynamicLayoutSection(section.getId(), section.isVisible());
+        filteredSection.setNestedSections(visibleNestedSections);
+        return filteredSection;
     }
 
 }
