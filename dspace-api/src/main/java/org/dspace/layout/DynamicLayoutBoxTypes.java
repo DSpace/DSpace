@@ -11,6 +11,7 @@ public enum DynamicLayoutBoxTypes {
     IIIFVIEWER,
     METADATA,
     RELATION,
+    // TODO will be implemented by https://github.com/DSpace/DSpace/issues/11782
     METRICS,
     COLLECTIONS,
     VERSIONING,
