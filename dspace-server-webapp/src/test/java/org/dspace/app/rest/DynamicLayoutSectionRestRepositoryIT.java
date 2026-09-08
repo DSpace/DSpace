@@ -126,8 +126,6 @@ public class DynamicLayoutSectionRestRepositoryIT extends AbstractControllerInte
                 .andExpect(jsonPath("$._embedded.sections[0].id", is("CasualIdForTestingPurposes1")))
                 // The other has id -> CasualIdForTestingPurposes3
                 .andExpect(jsonPath("$._embedded.sections[1].id", is("CasualIdForTestingPurposes3")));
-        } catch (Exception e) {
-            // Test Failed
         } finally {
             // Restoring situation previous to mock
             dynamicLayoutSectionService.getComponents().clear();
@@ -203,8 +201,6 @@ public class DynamicLayoutSectionRestRepositoryIT extends AbstractControllerInte
                                hasJsonPath("$.id", is(sectionOne.getId())),
                                hasJsonPath("$.id", is(sectionTwo.getId()))
                            )));
-        } catch (Exception e) {
-            // Test Failed
         } finally {
             // Restoring situation previous to mock
             dynamicLayoutSectionService.getComponents().clear();
