@@ -191,6 +191,19 @@ public class EmailTemplateServiceImplTest extends AbstractDSpaceTest {
     }
 
     @Test
+    public void testUpdatePreservesLeadingWhitespace() throws Exception {
+        createTemplateFile("register", "#set($subject = \"Old\")\nOld content");
+
+        String contentWithLeadingWhitespace = "\n  #set($subject = \"Indented\")\n  Indented body text here.\n";
+        EmailTemplate result = emailTemplateService.update(context, "register", contentWithLeadingWhitespace);
+        assertNotNull(result);
+
+        File file = new File(emailsDir, "register");
+        String diskContent = Files.readString(file.toPath());
+        assertTrue(diskContent.startsWith("\n  #set($subject = \"Indented\")"));
+    }
+
+    @Test
     public void testUpdateTemplateNotFound() {
         assertThrows(IllegalArgumentException.class, () ->
             emailTemplateService.update(context, "non_existent", "Some valid content for template.")

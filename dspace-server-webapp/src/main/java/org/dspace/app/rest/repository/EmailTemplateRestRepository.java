@@ -76,11 +76,8 @@ public class EmailTemplateRestRepository extends DSpaceRestRepository<EmailTempl
                 response.setHeader(HttpHeaders.ETAG, "\"" + etag + "\"");
 
                 String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
-                if (ifNoneMatch != null) {
-                    String cleanIfNoneMatch = unquote(ifNoneMatch);
-                    if (cleanIfNoneMatch.equals(etag) || "*".equals(ifNoneMatch)) {
-                        throw new NotModifiedException();
-                    }
+                if (ifNoneMatch != null && etagMatches(ifNoneMatch, etag)) {
+                    throw new NotModifiedException();
                 }
             }
 
@@ -138,8 +135,7 @@ public class EmailTemplateRestRepository extends DSpaceRestRepository<EmailTempl
             throw new ResourceNotFoundException("Email template not found: " + id);
         }
 
-        String cleanIfMatch = unquote(ifMatch);
-        if (!"*".equals(cleanIfMatch) && !cleanIfMatch.equals(existing.getEtag())) {
+        if (!etagMatches(ifMatch, existing.getEtag())) {
             throw new PreconditionFailedException(
                 "If-Match ETag mismatch. Template has been modified by another process.");
         }
@@ -160,6 +156,23 @@ public class EmailTemplateRestRepository extends DSpaceRestRepository<EmailTempl
     @Override
     public Class<EmailTemplateRest> getDomainClass() {
         return EmailTemplateRest.class;
+    }
+
+    private boolean etagMatches(String headerValue, String etag) {
+        if (StringUtils.isBlank(headerValue) || etag == null) {
+            return false;
+        }
+        for (String value : headerValue.split("\\s*,\\s*")) {
+            String candidate = value.trim();
+            if (candidate.startsWith("W/")) {
+                candidate = candidate.substring(2).trim();
+            }
+            candidate = unquote(candidate);
+            if ("*".equals(candidate) || etag.equals(candidate)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String unquote(String headerValue) {

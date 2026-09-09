@@ -197,6 +197,60 @@ public class EmailTemplateRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void getWithMultipleIfNoneMatchOneMatchesReturns304() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<String> etagRef = new AtomicReference<>();
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template"))
+                .andExpect(status().isOk())
+                .andDo(result -> etagRef.set(result.getResponse().getHeader(HttpHeaders.ETAG)));
+
+        assertNotNull(etagRef.get());
+
+        // Comma-separated list containing a stale ETag and the current ETag
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template")
+                .header(HttpHeaders.IF_NONE_MATCH, "\"stale-etag-1\", " + etagRef.get() + ", \"stale-etag-2\""))
+                .andExpect(status().isNotModified());
+    }
+
+    @Test
+    public void getWithWeakIfNoneMatchReturns304() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<String> etagRef = new AtomicReference<>();
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template"))
+                .andExpect(status().isOk())
+                .andDo(result -> etagRef.set(result.getResponse().getHeader(HttpHeaders.ETAG)));
+
+        assertNotNull(etagRef.get());
+
+        // Weak ETag with W/ prefix should be accepted for If-None-Match
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template")
+                .header(HttpHeaders.IF_NONE_MATCH, "W/" + etagRef.get()))
+                .andExpect(status().isNotModified());
+    }
+
+    @Test
+    public void getWithWildcardIfNoneMatchReturns304() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template")
+                .header(HttpHeaders.IF_NONE_MATCH, "*"))
+                .andExpect(status().isNotModified());
+    }
+
+    @Test
+    public void getWithMultipleIfNoneMatchNoneMatchReturns200() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Neither candidate matches -> returns 200 OK with content
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template")
+                .header(HttpHeaders.IF_NONE_MATCH, "\"stale-etag-1\", \"stale-etag-2\""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("it_test_template")));
+    }
+
+    @Test
     public void putAsAdminSuccess() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -260,6 +314,60 @@ public class EmailTemplateRestRepositoryIT extends AbstractControllerIntegration
                 .content(mapper.writeValueAsBytes(rest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subject", is("Wildcard Test")));
+    }
+
+    @Test
+    public void putWithMultipleIfMatchOneMatchesSuccess() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<String> etagRef = new AtomicReference<>();
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template"))
+                .andExpect(status().isOk())
+                .andDo(result -> etagRef.set(result.getResponse().getHeader(HttpHeaders.ETAG)));
+
+        EmailTemplateRest rest = new EmailTemplateRest();
+        rest.setContent("## Parameters: {0} user\n#set($subject = 'Multi-Match Test')\nMulti match body.");
+
+        getClient(token).perform(put("/api/system/emailtemplates/it_test_template")
+                .header(HttpHeaders.IF_MATCH, "\"stale-1\", " + etagRef.get() + ", \"stale-2\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsBytes(rest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.subject", is("Multi-Match Test")));
+    }
+
+    @Test
+    public void putWithMultipleIfMatchNoneMatchesReturns412() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        EmailTemplateRest rest = new EmailTemplateRest();
+        rest.setContent("## Parameters: {0} user\n#set($subject = 'Test')\nValid body text here.");
+
+        getClient(token).perform(put("/api/system/emailtemplates/it_test_template")
+                .header(HttpHeaders.IF_MATCH, "\"stale-etag-1\", \"stale-etag-2\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsBytes(rest)))
+                .andExpect(status().isPreconditionFailed());
+    }
+
+    @Test
+    public void putWithWeakIfMatchSuccess() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<String> etagRef = new AtomicReference<>();
+        getClient(token).perform(get("/api/system/emailtemplates/it_test_template"))
+                .andExpect(status().isOk())
+                .andDo(result -> etagRef.set(result.getResponse().getHeader(HttpHeaders.ETAG)));
+
+        EmailTemplateRest rest = new EmailTemplateRest();
+        rest.setContent("## Parameters: {0} user\n#set($subject = 'Weak ETag Test')\nWeak tag body.");
+
+        getClient(token).perform(put("/api/system/emailtemplates/it_test_template")
+                .header(HttpHeaders.IF_MATCH, "W/" + etagRef.get())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsBytes(rest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.subject", is("Weak ETag Test")));
     }
 
     @Test
