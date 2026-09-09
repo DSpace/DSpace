@@ -196,8 +196,11 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
         validateContent(name, content);
 
-        String trimmedContent = content.strip() + "\n";
-        Files.writeString(file.toPath(), trimmedContent, StandardCharsets.UTF_8);
+        String normalizedContent = content;
+        if (!normalizedContent.endsWith("\n")) {
+            normalizedContent += "\n";
+        }
+        Files.writeString(file.toPath(), normalizedContent, StandardCharsets.UTF_8);
 
         log.info(LogHelper.getHeader(context, "email_template_update",
                 "Email template has been updated: " + name));
