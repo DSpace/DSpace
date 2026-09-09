@@ -8,19 +8,28 @@
 package org.dspace.core;
 
 import java.lang.ref.Cleaner;
+import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import com.google.common.collect.AbstractIterator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Session;
@@ -125,6 +134,50 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) createQuery(context, query).getResultList();
         return result;
+    }
+
+    public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+        fields.addAll(Arrays.asList(type.getDeclaredFields()));
+
+        if (type.getSuperclass() != null) {
+            getAllFields(fields, type.getSuperclass());
+        }
+
+        return fields;
+    }
+
+    @Override
+    public boolean exists(Context context, Class<T> clazz, UUID id) throws SQLException {
+        if (id == null) {
+            return false;
+        }
+        Optional<Field> optionalField =
+            getAllFields(new LinkedList<>(), clazz)
+                .stream()
+                .filter(field -> field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class))
+                .findFirst();
+        if (optionalField.isEmpty()) {
+            return false;
+        }
+
+        Field idField = optionalField.get();
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
+
+        Root<T> root = criteriaQuery.from(clazz);
+        Path<?> idPath = root.get(idField.getName());
+        criteriaQuery.multiselect(idPath);
+        criteriaQuery.where(
+            criteriaBuilder.equal(
+                idPath,
+                id
+            )
+        );
+
+        TypedQuery<Tuple> query =
+            getHibernateSession(context).createQuery(criteriaQuery);
+        query.setMaxResults(1);
+        return !query.getResultList().isEmpty();
     }
 
     /**

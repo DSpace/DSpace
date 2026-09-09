@@ -205,6 +205,28 @@ public interface SolrLoggerService {
                                                 int facetMinCount)
         throws SolrServerException, IOException;
 
+    /**
+     * This method generates a faceting solr query that uses ranges between date
+     *
+     * @param context           dspace Context
+     * @param fieldList         list of field (fl param)
+     * @param facetField        facet field (facet.field param)
+     * @param query             query of solr (q param)
+     * @param filterQuery       filter query used in solr (fq param)
+     * @param dateType          formatted string date type (YEAR, MONTH, DATE) used as range
+     * @param dateStart         formatted string date
+     * @param dateEnd           formatted string date
+     * @param showTotal         boolean to use total
+     * @param facetMinCount     min count of the results
+     * @param increment         the gap increment
+     * @return
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    ObjectCount[] queryFacetDateField(Context context, String fieldList, String facetField, String query,
+            String filterQuery, String dateType, String dateStart, String dateEnd, boolean showTotal, int facetMinCount,
+            int increment) throws SolrServerException, IOException;
+
     public ObjectCount queryTotal(String query, String filterQuery, int facetMinCount)
         throws SolrServerException, IOException;
 
@@ -261,6 +283,37 @@ public interface SolrLoggerService {
                                String dateEnd, List<String> facetQueries, String sort, boolean ascending,
                                int facetMinCount, boolean defaultFilterQueries)
             throws SolrServerException, IOException;
+
+    /**
+     * Perform a solr query.
+     *
+     * @param  query                the query to be used
+     * @param  filterQuery          filter query
+     * @param  facetField           field to facet the results by
+     * @param  rows                 the max number of results to return
+     * @param  max                  the max number of facets to return
+     * @param  dateType             the type to be used (example: DAY, MONTH, YEAR)
+     * @param  increment            the gap increment
+     * @param  dateStart            the start date Format:(-3, -2, ..) the date is
+     *                              calculated relatively on today
+     * @param  dateEnd              the end date stop Format (-2, +1, ..) the date
+     *                              is calculated relatively on today
+     * @param  facetQueries         list of facet queries
+     * @param  sort                 the sort field
+     * @param  ascending            the sort direction (true: ascending)
+     * @param  facetMinCount        Minimum count of results facet must have to
+     *                              return a result
+     * @param  defaultFilterQueries use the default filter queries
+     * @param  pivotField           the pivot field to apply
+     * @param  fieldList            the field list to use (fl)
+     * @throws SolrServerException  Exception from the Solr server to the solrj Java
+     *                              client.
+     * @throws                      java.io.IOException passed through.
+     */
+    public QueryResponse query(String query, String filterQuery, String facetField, int rows,
+        int max, String dateType, String dateStart, String dateEnd, int increment, List<String> facetQueries,
+        String sort, boolean ascending, int facetMinCount, boolean defaultFilterQueries,
+        String pivotField, String fieldList) throws SolrServerException, IOException;
 
     public void shardSolrIndex() throws IOException, SolrServerException;
 

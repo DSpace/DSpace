@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
     @LinkRest(name = ItemRest.VERSION, method = "getItemVersion"),
     @LinkRest(name = ItemRest.TEMPLATE_ITEM_OF, method = "getTemplateItemOf"),
     @LinkRest(name = ItemRest.THUMBNAIL, method = "getThumbnail"),
+    @LinkRest(name = ItemRest.METRICS, method = "getMetrics"),
     @LinkRest(name = ItemRest.SUBMITTER, method = "getItemSubmitter")
 })
 public class ItemRest extends DSpaceObjectRest {
@@ -41,6 +42,7 @@ public class ItemRest extends DSpaceObjectRest {
     public static final String RELATIONSHIPS = "relationships";
     public static final String VERSION = "version";
     public static final String TEMPLATE_ITEM_OF = "templateItemOf";
+    public static final String METRICS = "metrics";
     public static final String THUMBNAIL = "thumbnail";
 
     public static final String SUBMITTER = "submitter";

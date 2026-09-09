@@ -50,8 +50,10 @@ import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.CrisMetricsBuilder;
 import org.dspace.builder.DynamicLayoutBoxBuilder;
 import org.dspace.builder.DynamicLayoutFieldBuilder;
+import org.dspace.builder.DynamicLayoutMetric2BoxBuilder;
 import org.dspace.builder.DynamicLayoutTabBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -197,6 +199,14 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
                 .withType(DynamicLayoutBoxTypes.RELATION.name())
                 .build();
 
+        DynamicLayoutBox boxFour = DynamicLayoutBoxBuilder.createBuilder(context, eType, false, false)
+                                                          .withHeader("Fourth New Box Header - priority 1")
+                                                          .withSecurity(LayoutSecurity.PUBLIC)
+                                                          .withShortname("Shortname 4")
+                                                          .withStyle("STYLE")
+                                                          .withType(DynamicLayoutBoxTypes.METRICS.name())
+                                                          .withMaxColumns(2)
+                                                          .build();
 
         DynamicLayoutBox boxFive = DynamicLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Fifth New Box Header - priority 2")
@@ -223,6 +233,7 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
                                                 .addBoxIntoNewRow(boxOne)
                                                 .addBoxIntoNewRow(boxTwo, "rowTwoStyle", "cellOfRowTwoStyle")
                                                 .addBoxIntoLastRow(boxThree, "style")
+                                                .addBoxIntoLastCell(boxFour)
                                                 .addBoxIntoNewRow(boxFive)
                                                 .addBoxIntoLastCell(boxSix)
                                                 .build();
@@ -247,7 +258,7 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.rows[1].cells[0].style", is("cellOfRowTwoStyle")))
             .andExpect(jsonPath("$.rows[1].cells[0].boxes", contains(matchBox(boxTwo))))
             .andExpect(jsonPath("$.rows[1].cells[1].style", is("style")))
-            .andExpect(jsonPath("$.rows[1].cells[1].boxes", contains(matchBox(boxThree))))
+            .andExpect(jsonPath("$.rows[1].cells[1].boxes", contains(matchBox(boxThree), matchBox(boxFour))))
             .andExpect(jsonPath("$.rows[2].style").doesNotExist())
             .andExpect(jsonPath("$.rows[2].cells", hasSize(1)))
             .andExpect(jsonPath("$.rows[2].cells[0].style").doesNotExist())
@@ -955,6 +966,433 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
                    );
     }
 
+    /**
+     * Test for the altering which happens at endpoint /api/layout/tabs/search/findByItem?uuid=<ITEM-UUID>
+     * The configuration of DynamicLayoutBoxRest: boxType=METRICS, is altered by inner joining the DynamicLayoutBoxRest
+     * metrics with the item's metric.
+     *
+     * No altering is done here since box and item share the same metrics.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByItemWithMetricBox() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Test Community")
+                .withTitle("Title test community")
+                .build();
+
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withName("Test Collection")
+                .build();
+
+        // Create entity type Publication
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+                .build();
+
+        // Create entity Type
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+                .build();
+
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withPersonIdentifierFirstName("Danilo")
+                               .withPersonIdentifierLastName("Di Nuzzo")
+                               .withEntityType(eTypePer.getLabel())
+                               .build();
+
+        // Create box
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer,
+                        DynamicLayoutBoxTypes.METRICS.name(), true, true)
+                .withShortname("box-shortname-two")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .build();
+
+        // Add metrics to box
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-view", 0).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-download", 1).build();
+
+        // Add metrics to item
+        CrisMetricsBuilder.createCrisMetrics(context, item)
+                          .withMetricType("embedded-view").build();
+        CrisMetricsBuilder.createCrisMetrics(context, item)
+                                                .withMetricType("embedded-download").build();
+
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, eTypePer, 0)
+                .withShortName("TabOne For Person - priority 0")
+                .withHeader("New Tab header")
+                .addBoxIntoNewRow(box)
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // Test
+        getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
+                .andExpect(jsonPath("$._embedded.tabs", contains(matchTab(tab))))
+                .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(box))))
+                .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics", hasSize(2)))
+                .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[0]",
+                                                        Matchers.is("embedded-view")))
+                .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[1]",
+                                                        Matchers.is("embedded-download")));
+    }
+
+    /**
+     * Test for the altering which happens at endpoint /api/layout/tabs/search/findByItem?uuid=<ITEM-UUID>
+     * The configuration of DynamicLayoutBoxRest: boxType=METRICS, is altered by inner joining the DynamicLayoutBoxRest
+     * metrics with the item's metric.
+     *
+     * Box is altered by removing non-matching metrics between box and item.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByItemWithMetricBoxAltered() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Test Community")
+                                              .withTitle("Title test community")
+                                              .build();
+
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Test Collection")
+                                                 .build();
+
+        // Create entity type Publication
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+                         .build();
+
+        // Create entity Type
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+                                               .build();
+
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withPersonIdentifierFirstName("Danilo")
+                               .withPersonIdentifierLastName("Di Nuzzo")
+                               .withEntityType(eTypePer.getLabel())
+                               .build();
+
+        // Create box
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer,
+                                                               DynamicLayoutBoxTypes.METRICS.name(), true, true)
+                                                .withShortname("box-shortname-two")
+                                                .withSecurity(LayoutSecurity.PUBLIC)
+                                                .build();
+
+        // Add metrics to box
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "altmetric", 0).build(); // will be filtered
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-view", 1).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-download", 2).build();
+
+        // Add metrics to item
+        CrisMetricsBuilder.createCrisMetrics(context, item)
+                                               .withMetricType("embedded-view").build();
+        CrisMetricsBuilder.createCrisMetrics(context, item)
+                                               .withMetricType("embedded-download").build();
+
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, eTypePer,0)
+                                                .withShortName("TabOne For Person - priority 0")
+                                                .withHeader("New Tab header")
+                                                .addBoxIntoNewRow(box)
+                                                .withSecurity(LayoutSecurity.PUBLIC)
+                                                .build();
+
+        context.restoreAuthSystemState();
+
+        // Test
+        getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
+            .andExpect(jsonPath("$._embedded.tabs", contains(matchTab(tab))))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(box))))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics", hasSize(2)))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[0]",
+                                Matchers.is("embedded-view")))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[1]",
+                                Matchers.is("embedded-download")));
+    }
+
+    /**
+     * Test for the altering which happens at endpoint /api/layout/tabs/search/findByItem?uuid=<ITEM-UUID>
+     * The configuration of DynamicLayoutBoxRest: boxType=METRICS, is altered by inner joining the DynamicLayoutBoxRest
+     * metrics with the item's metric.
+     *
+     * Box is removed because there are no matching metrics between box and item.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByItemWithNoMetricsForItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Test Community")
+                                              .withTitle("Title test community")
+                                              .build();
+
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Test Collection")
+                                                 .build();
+
+        // Create entity type Publication
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+                         .build();
+
+        // Create entity Type
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+                                               .build();
+
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField lastName = mfss.findByElement(context, schema, "familyName", null);
+
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withPersonIdentifierFirstName("Danilo")
+                               .withPersonIdentifierLastName("Di Nuzzo")
+                               .withEntityType(eTypePer.getLabel())
+                               .build();
+
+        // Create box
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer,
+                                                               DynamicLayoutBoxTypes.METRICS.name(), true, true)
+                                                .withShortname("box-shortname-two")
+                                                .withSecurity(LayoutSecurity.PUBLIC)
+                                                .build();
+
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+                                                 .withHeader("Second New Box Header")
+                                                 .withSecurity(LayoutSecurity.PUBLIC)
+                                                 .withShortname("Shortname for new second box")
+                                                 .withStyle("STYLE")
+                                                 .withType(DynamicLayoutBoxTypes.METADATA.name())
+                                                 .build();
+
+        // Add field for METADATA
+        DynamicLayoutFieldBuilder.createMetadataField(context, lastName, 0, 1)
+                              .withLabel("LAST NAME")
+                              .withRendering("TEXT")
+                              .withBox(box1)
+                              .build();
+
+        // Add metrics to box
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "altmetric", 0).build();
+
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, eTypePer,0)
+                                                .withShortName("TabOne For Person - priority 0")
+                                                .withHeader("New Tab header")
+                                                .addBoxIntoNewRow(box)
+                                                .addBoxIntoNewRow(box1)
+                                                .withSecurity(LayoutSecurity.PUBLIC)
+                                                .build();
+
+        context.restoreAuthSystemState();
+
+        // Test
+        getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
+                                 .andExpect(jsonPath("$._embedded.tabs", contains(matchTab(tab))))
+                                 .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", hasSize(1)))
+                                 .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes",
+                                                     contains(matchBox(box1))));
+    }
+
+    /**
+     * Test for the altering which happens at endpoint /api/layout/tabs/search/findByItem?uuid=<ITEM-UUID>
+     * The configuration of DynamicLayoutBoxRest: boxType=METRICS, is altered by inner joining the DynamicLayoutBoxRest
+     * metrics with the item's metric.
+     *
+     * Only the box with boxType=METRICS is altered.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByItemWithDifferentBoxTypes() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Test Community")
+                                              .withTitle("Title test community")
+                                              .build();
+
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Test Collection")
+                                                 .build();
+
+        // Create entity Type
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+                                               .build();
+
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField lastName = mfss.findByElement(context, schema, "familyName", null);
+
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withPersonIdentifierFirstName("Danilo")
+                               .withPersonIdentifierLastName("Di Nuzzo")
+                               .withEntityType(eTypePer.getLabel())
+                               .build();
+
+        // Create box
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer,
+                                                               DynamicLayoutBoxTypes.METRICS.name(), true, true)
+                                                .withShortname("box-shortname-one")
+                                                .withSecurity(LayoutSecurity.PUBLIC)
+                                                .build();
+        DynamicLayoutBox box1 = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
+                                                   .withHeader("Second New Box Header")
+                                                   .withSecurity(LayoutSecurity.PUBLIC)
+                                                   .withShortname("Shortname for new second box")
+                                                   .withStyle("STYLE")
+                                                   .withType(DynamicLayoutBoxTypes.METADATA.name())
+                                                   .build();
+
+        // Add field for METADATA
+        DynamicLayoutFieldBuilder.createMetadataField(context, lastName, 0, 1)
+                              .withLabel("LAST NAME")
+                              .withRendering("TEXT")
+                              .withBox(box1)
+                              .build();
+
+        // Add metrics to boxes
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "altmetric", 0).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-download", 1).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-view", 2).build();
+
+        DynamicLayoutMetric2BoxBuilder.create(context, box1, "altmetric", 0).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box1, "embedded-download", 1).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box1, "embedded-view", 2).build();
+
+        // Add metrics to item
+        CrisMetricsBuilder.createCrisMetrics(context, item).withMetricType("embedded-download").build();
+        CrisMetricsBuilder.createCrisMetrics(context, item).withMetricType("embedded-view").build();
+
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, eTypePer,0)
+                                                .withShortName("TabOne For Person - priority 0")
+                                                .withHeader("New Tab header")
+                                                .addBoxIntoNewRow(box)
+                                                .addBoxIntoNewRow(box1)
+                                                .withSecurity(LayoutSecurity.PUBLIC)
+                                                .build();
+
+        context.restoreAuthSystemState();
+
+        // Test
+        getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
+                   .andExpect(jsonPath("$._embedded.tabs", contains(matchTab(tab))))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(box))))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[1].cells[0].boxes", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[1].cells[0].boxes", contains(matchBox(box1))))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics",
+                                       hasSize(2)))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[0]",
+                                       Matchers.is("embedded-download")))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[1]",
+                                       Matchers.is("embedded-view")));
+    }
+
+    /**
+     * Test for the altering which happens at endpoint /api/layout/tabs/search/findByItem?uuid=<ITEM-UUID>
+     * The configuration of DynamicLayoutBoxRest: boxType=METRICS, is altered by inner joining the DynamicLayoutBoxRest
+     * metrics with the item's metric.
+     *
+     * Test the removal of duplicate metrics.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByItemWithDistinctMetrics() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Test Community")
+            .withTitle("Title test community")
+            .build();
+
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withName("Test Collection")
+            .build();
+
+        // Create entity Type
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+            .build();
+
+        MetadataSchema schema = mdss.find(context, "person");
+        mfss.findByElement(context, schema, "familyName", null);
+
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+            .withPersonIdentifierFirstName("Danilo")
+            .withPersonIdentifierLastName("Di Nuzzo")
+            .withEntityType(eTypePer.getLabel())
+            .build();
+
+        // Create box
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, eTypePer,
+                                                               DynamicLayoutBoxTypes.METRICS.name(), true, true)
+            .withShortname("box-shortname-one")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .build();
+
+        // Add metrics to boxes
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "altmetric", 0).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-download", 1).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-view", 2).build();
+        // Add duplicate metric to test the distinct function
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "embedded-view", 3).build();
+
+        // Add metrics to item
+        CrisMetricsBuilder.createCrisMetrics(context, item).withMetricType("embedded-download").build();
+        CrisMetricsBuilder.createCrisMetrics(context, item).withMetricType("embedded-view").build();
+
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, eTypePer,0)
+            .withShortName("TabOne For Person - priority 0")
+            .withHeader("New Tab header")
+            .addBoxIntoNewRow(box)
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // Test
+        getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
+            .andExpect(jsonPath("$._embedded.tabs", contains(matchTab(tab))))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", hasSize(1)))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(box))))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics",
+                                hasSize(2))) // Only shared and distinct metrics are returned
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[0]",
+                                Matchers.is("embedded-download")))
+            .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes[0].configuration.metrics[1]",
+                                Matchers.is("embedded-view")));
+    }
 
     /**
      * Test for endpoint /api/layout/tabs/search/findByEntityType?type=<:string>. It returns all the tabs
@@ -1131,10 +1569,11 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
             assertThat(thirdBox.isContainer(), is(true));
             assertThat(thirdBox.getStyle(), nullValue());
             assertThat(thirdBox.getSecurity(), is(0));
-            assertThat(thirdBox.getType(), is("METADATA"));
+            assertThat(thirdBox.getType(), is("METRICS"));
             assertThat(thirdBox.getMetadataSecurityFields(), empty());
-            assertThat(thirdBox.getLayoutFields(), hasSize(1));
+            assertThat(thirdBox.getLayoutFields(), empty());
             assertThat(thirdBox.getMaxColumns(), is(2));
+            assertThat(thirdBox.getMetric2box(), hasSize(2));
 
         } finally {
             if (idRef.get() != null) {
@@ -1425,6 +1864,53 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
             .andExpect(jsonPath(firstConfigurationCell + ".fields[2].metadataGroup.elements", hasSize(2)))
             .andExpect(jsonPath(firstConfigurationCell + ".fields[2].metadataGroup.elements[1].metadata",
                 is("oairecerif.author.affiliation")));
+    }
+
+    @Test
+    public void testGetTabWithMetricsBox() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        // Create boxes
+        DynamicLayoutBoxBuilder.createBuilder(context, eType, DynamicLayoutBoxTypes.METRICS.name(), true, true)
+            .withShortname("box-shortname-one")
+            .build();
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, eType,
+            DynamicLayoutBoxTypes.METRICS.name(), true, true)
+            .withShortname("box-shortname-two")
+            .withMaxColumns(2)
+            .build();
+        // Add metrics
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "metric1", 0).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "metric2", 1).build();
+
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, eType, 0)
+            .withShortName("TabOne For Person - priority 0")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .addBoxIntoNewRow(box)
+            .build();
+
+        DynamicLayoutBoxBuilder.createBuilder(context, eType, DynamicLayoutBoxTypes.METRICS.name(), true, true)
+            .withShortname("box-shortname-three")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/layout/tabs/" + tab.getID()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.id", is(tab.getID())))
+            .andExpect(jsonPath("$.rows", hasSize(1)))
+            .andExpect(jsonPath("$.rows[0].style").doesNotExist())
+            .andExpect(jsonPath("$.rows[0].cells", hasSize(1)))
+            .andExpect(jsonPath("$.rows[0].cells[0].style").doesNotExist())
+            .andExpect(jsonPath("$.rows[0].cells[0].boxes", hasSize(1)))
+            .andExpect(jsonPath("$.rows[0].cells[0].boxes[0].configuration.maxColumns", Matchers.is(2)))
+            .andExpect(jsonPath("$.rows[0].cells[0].boxes[0].configuration.metrics", hasSize(2)))
+            .andExpect(jsonPath("$.rows[0].cells[0].boxes[0].configuration.metrics[0]", Matchers.is("metric1")))
+            .andExpect(jsonPath("$.rows[0].cells[0].boxes[0].configuration.metrics[1]", Matchers.is("metric2")));
     }
 
     @Test
@@ -1931,8 +2417,16 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
                        .param("uuid", item.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.page.totalElements", is(0)))
-                   .andExpect(jsonPath("$._embedded.tabs").doesNotExist());
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._embedded.tabs[0].id", is(tabOne.getID())))
+                   .andExpect(jsonPath("$._embedded.tabs[0].shortname", is("TabOne For Person - priority 0")))
+                   .andExpect(jsonPath("$._embedded.tabs[0].header", is("New Tab header")))
+                   .andExpect(jsonPath("$._embedded.tabs[0].security", is(LayoutSecurity.ADMINISTRATOR.getValue())))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].style", is("rowTwoStyle")))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].style", is("cellOfRowTwoStyle")))
+                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(boxOne))));
     }
 
     @Test

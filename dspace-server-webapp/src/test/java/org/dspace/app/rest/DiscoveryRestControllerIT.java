@@ -18,6 +18,7 @@ import static org.dspace.app.rest.matcher.FacetEntryMatcher.workflowFacetMatcher
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.workspaceFacetMatchers;
 import static org.dspace.app.rest.matcher.FacetValueMatcher.entrySupervisedBy;
 import static org.dspace.app.rest.matcher.SearchFilterMatcher.searchFilterMatchers;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -36,12 +37,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.rest.matcher.AppliedFilterMatcher;
@@ -75,12 +81,18 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.core.CrisConstants;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet;
+import org.dspace.discovery.indexobject.ItemIndexFactoryImpl;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.supervision.SupervisionOrder;
+import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
@@ -99,6 +111,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     ChoiceAuthorityService choiceAuthorityService;
 
+    @Autowired
+    private DiscoveryConfigurationService discoveryConfigurationService;
     @Autowired
     private ObjectMapper mapper;
 
@@ -5500,6 +5514,275 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         )
                 ))
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+    }
+
+    @Test
+    public void graphDiscoverSearchFilterFacetByDateTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Boychuk, Michele")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Boychuk, Michele")
+                                      .withAuthor("Bollini, Andrea")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Boychuk, Michele")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem4 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 4")
+                                      .withIssueDate("2020-02-13")
+                                      .withAuthor("Trus, Volodymyr")
+                                      .withSubject("AnotherTest")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem5 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 5")
+                                      .withIssueDate("2019-06-17")
+                                      .withAuthor("Bruschetti, Luca")
+                                      .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/graphpubldate")
+                                .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$.name", is("graphpubldate")))
+                   .andExpect(jsonPath("$.facetType", is("chart.bar")))
+                   .andExpect(jsonPath("$._links.self.href", containsString(
+                       "api/discover/facets/graphpubldate")))
+                   .andExpect(jsonPath("$.missing", is("0")))
+                   .andExpect(jsonPath("$.more", is("3")))
+                   .andExpect(jsonPath("$.totalElements", is("4")))
+                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 3))))
+                   .andExpect(jsonPath("$._embedded.values", contains(
+                       FacetValueMatcher.entryDateIssuedWithLabelAndCount("2020", 1),
+                       FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1),
+                       FacetValueMatcher.entryDateIssuedWithLabelAndCount("2018", 0))));
+
+        GraphDiscoverSearchFilterFacet graphpubldateFacet =
+            (GraphDiscoverSearchFilterFacet) discoveryConfigurationService.getDiscoveryConfiguration(null)
+                                                                          .getSidebarFacet("graphpubldate");
+
+        try {
+            // change the default configuration to disable the reverse direction
+            graphpubldateFacet.setInverseDirection(false);
+            graphpubldateFacet.setGraphType("bar.left-to-right");
+            getClient().perform(get("/api/discover/facets/graphpubldate")
+                                    .param("size", "4"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.type", is("discover")))
+                       .andExpect(jsonPath("$.name", is("graphpubldate")))
+                       .andExpect(jsonPath("$.facetType", is("chart.bar.left-to-right")))
+                       .andExpect(jsonPath("$._links.self.href", containsString(
+                           "api/discover/facets/graphpubldate")))
+                       .andExpect(jsonPath("$.missing", is("0")))
+                       .andExpect(jsonPath("$.more", is("1")))
+                       .andExpect(jsonPath("$.totalElements", is("4")))
+                       .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
+                       .andExpect(jsonPath("$._embedded.values", contains(
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2016", 1),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2017", 2),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2018", 0),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1))));
+
+            // also disable the fillDateGap flag
+            graphpubldateFacet.setFillDateGaps(false);
+            graphpubldateFacet.setGraphType("bar.right-to-left");
+            getClient().perform(get("/api/discover/facets/graphpubldate")
+                                    .param("size", "4"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.type", is("discover")))
+                       .andExpect(jsonPath("$.name", is("graphpubldate")))
+                       .andExpect(jsonPath("$.facetType", is("chart.bar.right-to-left")))
+                       .andExpect(jsonPath("$._links.self.href", containsString(
+                           "api/discover/facets/graphpubldate")))
+                       .andExpect(jsonPath("$.missing", is("0")))
+                       .andExpect(jsonPath("$.more", is("0")))
+                       .andExpect(jsonPath("$.totalElements", is("4")))
+                       .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 4))))
+                       .andExpect(jsonPath("$._embedded.values", contains(
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2016", 1),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2017", 2),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2019", 1),
+                           FacetValueMatcher.entryDateIssuedWithLabelAndCount("2020", 1))));
+        } finally {
+            // restore default configuration
+            graphpubldateFacet.setInverseDirection(true);
+            graphpubldateFacet.setFillDateGaps(true);
+            graphpubldateFacet.setGraphType("bar");
+        }
+    }
+
+    @Test
+    public void graphDiscoverSearchFilterFacetByType() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Boychuk, Michele")
+                                      .withType("book").build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Bollini, Andrea")
+                                      .withType("manuscript").build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Boychuk, Michele")
+                                      .withSubject("AnotherTest")
+                                      .withType("manuscript").build();
+
+        Item publicItem4 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 4")
+                                      .withIssueDate("2020-02-13")
+                                      .withAuthor("Trus, Volodymyr")
+                                      .withSubject("AnotherTest")
+                                      .withType("Journal Article")
+                                      .withSubject("ExtraEntry").build();
+
+        Item publicItem5 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 5 without type")
+                                      .withIssueDate("2021-01-07")
+                                      .withAuthor("Volodymyr, Trus")
+                                      .withSubject("AnotherTest")
+                                      .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/graphitemtype")
+                                .param("size", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$.name", is("graphitemtype")))
+                   .andExpect(jsonPath("$.facetType", is("chart.pie")))
+                   .andExpect(jsonPath("$.missing", is("1")))
+                   .andExpect(jsonPath("$._links.missing.href",
+                                       containsString("f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
+                   .andExpect(jsonPath("$.more", is("2")))
+                   .andExpect(jsonPath("$._links.more.href", Matchers.allOf(
+                       containsString("f.graphitemtype=manuscript,notequals"),
+                       containsString("f.graphitemtype=book,notequals")
+                   )))
+                   .andExpect(jsonPath("$.totalElements", is("3")))
+                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 2))))
+                   .andExpect(jsonPath("$._embedded.values", contains(
+                       FacetValueMatcher.entryDateIssuedWithLabelAndCount("manuscript", 2),
+                       FacetValueMatcher.entryDateIssuedWithLabelAndCount("book", 1)
+                   )));
+    }
+
+    @Test
+    public void nestedPlaceholderFacetTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        final DSpace dSpace = new DSpace();
+        SearchService searchService = dSpace.getSingletonService(SearchService.class);
+        ConfigurationService configurationService = dSpace.getConfigurationService();
+        configurationService.setProperty("discovery.index.projection", "oairecerif.author.affiliation");
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withEntityType("Publication")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Boychuk, Michele")
+                                      .withAuthorAffiliation("4Science")
+                                      .withAuthor("Another, Author")
+                                      .withAuthorAffiliationPlaceholder()
+                                      .withAuthor("Bollini, Andrea")
+                                      .withAuthorAffiliation("4Science")
+                                      .withType("book").build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Dohonue, Tim")
+                                      .withAuthorAffiliation("Lyrasis")
+                                      .withType("manuscript").build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2018-08-13")
+                                      .withAuthor("Dohonue, Tim")
+                                      .withAuthorAffiliationPlaceholder()
+                                      .withType("manuscript").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/organization")
+                                .param("configuration", "researchoutputs")
+                                .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$.name", is("organization")))
+                   .andExpect(jsonPath("$.missing", is("1")))
+                   .andExpect(jsonPath("$._links.missing.href",
+                                       containsString("f.organization=%5B*%20TO%20*%5D,notequals")))
+                   .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 3))))
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entryText("organization", "4Science", 1),
+                       FacetValueMatcher.entryText("organization", "Lyrasis", 1))));
+
+        QueryResponse qResp = searchService.getSolrSearchCore().getSolr()
+                                           .query(new SolrQuery("search.resourceid:" + publicItem1.getID().toString()));
+        final SolrDocument solrDocument = qResp.getResults().get(0);
+        assertThat((ArrayList<String>) solrDocument.getFieldValue("oairecerif.author.affiliation_stored"),
+                   Matchers.contains(
+                       StringUtils.join(new String[] {"4Science", "null", "null", "null", "null"},
+                                        ItemIndexFactoryImpl.STORE_SEPARATOR),
+                       StringUtils.join(new String[] {
+                                            CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE, "null", "null", "null",
+                                            "null"},
+                                        ItemIndexFactoryImpl.STORE_SEPARATOR),
+                       StringUtils.join(new String[] {"4Science", "null", "null", "null", "null"},
+                                        ItemIndexFactoryImpl.STORE_SEPARATOR)));
     }
 
     @Test

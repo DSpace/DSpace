@@ -31,6 +31,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.profile.OrcidEntitySyncPreference;
@@ -112,6 +113,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
     }
 
+    public ItemBuilder withAuthorAffiliation(String affiliation) {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation", affiliation);
+    }
+
+    public ItemBuilder withAuthorAffiliationPlaceholder() {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation",
+                                CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    //adds an affiliattion to the author
     public ItemBuilder withAffiliation(String affiliation, String authority) {
         return addMetadataValue(item, "person", "affiliation", "name", null, affiliation, authority, 600);
     }
@@ -287,6 +298,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withProjectInvestigator(String investigator, String authority) {
         return addMetadataValue(item, "crispj", "investigator", null, null, investigator, authority, 600);
+    }
+
+    public ItemBuilder withProjectCoinvestigators(String coinvestigators, String authority) {
+        return addMetadataValue(item, "crispj", "coinvestigators", null, null, coinvestigators, authority, 600);
     }
 
     public ItemBuilder withType(String type) {

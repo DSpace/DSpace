@@ -31,6 +31,9 @@ public class DiscoverResult {
     private int start;
     private List<IndexableObject> indexableObjects;
     private Map<String, List<FacetResult>> facetResults;
+    private Map<String, Long> facetResultsMissing;
+    private Map<String, Long> facetResultMore;
+    private Map<String, Long> facetResultTotalElements;
 
     // Total count of facet entries calculated for a metadata browsing query
     private long totalEntries;
@@ -108,6 +111,30 @@ public class DiscoverResult {
         this.facetResults.put(facetField, facetValues);
     }
 
+    public void setFacetResultMissing(String facetField, long missingCount) {
+        facetResultsMissing.put(facetField, missingCount);
+    }
+
+    public Long getFacetResultMissing(String facetField) {
+        return facetResultsMissing.get(facetField);
+    }
+
+    public void setFacetResultMore(String field, long l) {
+        facetResultMore.put(field, l);
+    }
+
+    public Long getFacetResultMore(String facetField) {
+        return facetResultMore.get(facetField);
+    }
+
+    public void setFacetResultTotalElements(String field, Long countDistinct) {
+        facetResultTotalElements.put(field, countDistinct);
+    }
+
+    public Long getFacetResultTotalElements(String facetField) {
+        return facetResultTotalElements.get(facetField);
+    }
+
     public Map<String, List<FacetResult>> getFacetResults() {
         return facetResults;
     }
@@ -143,6 +170,9 @@ public class DiscoverResult {
         private String sortValue;
         private long count;
         private String fieldType;
+        private int missing;
+        private int more;
+        private int totalElements;
 
         public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue,
                 long count, String fieldType) {
@@ -152,6 +182,22 @@ public class DiscoverResult {
             this.sortValue = sortValue;
             this.count = count;
             this.fieldType = fieldType;
+            this.missing = -1;
+            this.more = -1;
+            this.totalElements = -1;
+        }
+
+        public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue,
+                long count, String fieldType, int missing, int more, int totalElements) {
+            this.asFilterQuery = asFilterQuery;
+            this.displayedValue = displayedValue;
+            this.authorityKey = authorityKey;
+            this.sortValue = sortValue;
+            this.count = count;
+            this.fieldType = fieldType;
+            this.missing = missing;
+            this.more = more;
+            this.totalElements = totalElements;
         }
 
         public String getAsFilterQuery() {
@@ -184,6 +230,18 @@ public class DiscoverResult {
 
         public String getFieldType() {
             return fieldType;
+        }
+
+        public int getMissing() {
+            return missing;
+        }
+
+        public int getMore() {
+            return more;
+        }
+
+        public int getTotalElements() {
+            return totalElements;
         }
     }
 

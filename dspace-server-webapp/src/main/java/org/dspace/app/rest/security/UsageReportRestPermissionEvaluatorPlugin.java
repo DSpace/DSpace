@@ -9,7 +9,6 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,41 +62,46 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
      */
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
-                                       DSpaceRestPermission restPermission) {
-        if (Strings.CI.equals(UsageReportRest.NAME, targetType)
-                || Strings.CI.equals(UsageReportRest.NAME + "search", targetType)) {
+        DSpaceRestPermission restPermission) {
+        if (Strings.CI.equals(UsageReportRest.NAME, targetType)) {
             Request request = requestService.getCurrentRequest();
             Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
             UUID uuidObject = null;
             try {
-                if (Objects.isNull(targetId)) {
-                    return true;
-                }
-                if (configurationService.getBooleanProperty("usage-statistics.authorization.admin.usage", false)) {
-                    return authorizeService.isAdmin(context);
-                } else  if (Strings.CI.equals(UsageReportRest.NAME, targetType)) {
-                    if (StringUtils.countMatches(targetId.toString(), "_") != 1) {
-                        throw new IllegalArgumentException("Must end in objectUUID_reportId, example: "
-                                + "1911e8a4-6939-490c-b58b-a5d70f8d91fb_TopCountries");
+                if (targetId != null) {
+                    if (configurationService.getBooleanProperty("usage-statistics.authorization.admin.usage", false)) {
+                        return authorizeService.isAdmin(context);
                     }
-                    // Get uuid from uuidDSO_reportId pathParam
-                    uuidObject = UUID.fromString(StringUtils.substringBefore(targetId.toString(), "_"));
+                    if (Strings.CI.equals(UsageReportRest.NAME, targetType)) {
+                        if (StringUtils.countMatches(targetId.toString(), "_") != 1) {
+                            throw new IllegalArgumentException("Must end in objectUUID_reportId, example: " +
+                                "1911e8a4-6939-490c-b58b-a5d70f8d91fb_TopCountries");
+                        }
+                        // Get uuid from uuidDSO_reportId pathParam
+                        uuidObject = UUID.fromString(StringUtils.substringBefore(targetId.toString(), "_"));
+                    } else if (Strings.CI.equals(UsageReportRest.NAME + "search", targetType)
+                        || Strings.CI.equals(UsageReportRest.NAME + "categorysearch", targetType)) {
+                        // Get uuid from url (selfLink of dso) queryParam
+                        uuidObject = UUID.fromString(StringUtils.substringAfterLast(targetId.toString(), "/"));
+                    } else {
+                        return false;
+                    }
                 } else if (Strings.CI.equals(UsageReportRest.NAME + "search", targetType)) {
                     // Get uuid from url (selfLink of dso) queryParam
                     uuidObject = UUID.fromString(StringUtils.substringAfterLast(targetId.toString(), "/"));
                 } else {
                     return false;
                 }
-
                 DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
-                // If the dso is null then we give permission so we can throw another status code instead
-                if (Objects.isNull(dso)) {
+                if (dso == null) {
+                    // allow to return a proper response code
                     return true;
                 }
                 return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
             } catch (SQLException e) {
                 log.error(e::getMessage, e);
             }
+            return true;
         }
         return false;
     }

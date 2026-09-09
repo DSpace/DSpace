@@ -13,6 +13,7 @@ import org.dspace.layout.script.service.DynamicLayoutToolValidator;
 import org.dspace.layout.service.DynamicLayoutBoxService;
 import org.dspace.layout.service.DynamicLayoutFieldService;
 import org.dspace.layout.service.DynamicLayoutMetadataGroupService;
+import org.dspace.layout.service.DynamicLayoutMetric2BoxService;
 import org.dspace.layout.service.DynamicLayoutSectionService;
 import org.dspace.layout.service.DynamicLayoutTabService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -47,6 +48,11 @@ public abstract class DynamicLayoutServiceFactory {
      * Returns the field service.
      */
     public abstract DynamicLayoutFieldService getFieldService();
+
+    /**
+     * Returns the metric2Box service.
+     */
+    public abstract DynamicLayoutMetric2BoxService getMetric2BoxService();
 
     /**
      * Returns the section service.

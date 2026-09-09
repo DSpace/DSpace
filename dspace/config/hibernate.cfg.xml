@@ -104,6 +104,7 @@
         <mapping class="org.dspace.layout.DynamicLayoutFieldBitstream" />
         <mapping class="org.dspace.layout.DynamicLayoutRow" />
         <mapping class="org.dspace.layout.DynamicLayoutCell" />
+        <mapping class="org.dspace.layout.DynamicLayoutMetric2Box" />
         <mapping class="org.dspace.layout.DynamicMetadataGroup" />
         <mapping class="org.dspace.layout.DynamicLayoutBox2SecurityGroup" />
         <mapping class="org.dspace.layout.DynamicLayoutTab2SecurityGroup" />
@@ -114,6 +115,7 @@
         <mapping class="org.dspace.orcid.OrcidHistory" />
         <mapping class="org.dspace.orcid.OrcidToken"/>
 
+        <mapping class="org.dspace.app.metrics.CrisMetrics"/>
         <mapping class="org.dspace.supervision.SupervisionOrder"/>
 
         <mapping class="org.dspace.app.ldn.NotifyServiceEntity"/>

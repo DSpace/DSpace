@@ -11,15 +11,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.dspace.app.metrics.CrisMetrics;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -28,12 +34,16 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryConfigurationUtilsService;
 import org.dspace.layout.DynamicLayoutBox;
 import org.dspace.layout.DynamicLayoutBoxTypes;
 import org.dspace.layout.DynamicLayoutField;
 import org.dspace.layout.DynamicLayoutFieldBitstream;
+import org.dspace.layout.DynamicLayoutMetric2Box;
+import org.dspace.metrics.CrisItemMetricsService;
+import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -54,6 +64,12 @@ public class DynamicLayoutBoxServiceImplTest {
 
     @Mock
     private Context context;
+
+    @Mock
+    private AuthorizeService authorizeService;
+
+    @Mock
+    private CrisItemMetricsService crisItemMetricsService;
 
     @Mock
     private DiscoveryConfigurationUtilsService searchConfigurationUtilsService;
@@ -219,6 +235,50 @@ public class DynamicLayoutBoxServiceImplTest {
     }
 
     @Test
+    public void testHasMetricsBoxContent() throws SQLException {
+
+        when(authorizeService.authorizeActionBoolean(eq(context), any(), eq(Constants.READ))).thenReturn(true);
+
+        // should return false when the box has no metrics associated
+        DynamicLayoutBox boxWithoutMetrics = dynamicLayoutMetricBox();
+        assertFalse(dynamicLayoutBoxService.hasContent(context, boxWithoutMetrics, item()));
+
+        // should return true when the box has at least one embeddable associated (stored mocked to empty)
+        DynamicLayoutBox boxMetric1 = dynamicLayoutMetricBox("metric1");
+        storedCrisMetrics();
+        embeddableCrisMetrics("metric1");
+        assertTrue(dynamicLayoutBoxService.hasContent(context, boxMetric1, item()));
+
+        // should return true when the box has at least one stored associated (embeded mocked to empty)
+        storedCrisMetrics("metric1");
+        embeddableCrisMetrics();
+        assertTrue(dynamicLayoutBoxService.hasContent(context, boxMetric1, item()));
+
+        // shuld return false when the box has embedded but not associated (stored mocked to empty)
+        storedCrisMetrics();
+        embeddableCrisMetrics("metric2");
+        assertFalse(dynamicLayoutBoxService.hasContent(context, boxMetric1, item()));
+
+        // shuld return false when the box has stored but not associated (embedded mocked to empty)
+        storedCrisMetrics("metric2");
+        embeddableCrisMetrics();
+        assertFalse(dynamicLayoutBoxService.hasContent(context, boxMetric1, item()));
+
+    }
+
+    @Test
+    public void testHasMetricsBoxContentNotAuthorized() throws SQLException {
+
+        // should return false if there is content but context has not an authenticated user
+        when(authorizeService.authorizeActionBoolean(eq(context), any(), eq(Constants.READ))).thenReturn(false);
+        DynamicLayoutBox boxMetric1 = dynamicLayoutMetricBox("metric1");
+        storedCrisMetrics();
+        embeddableCrisMetrics("metric1");
+
+        assertFalse(dynamicLayoutBoxService.hasContent(context, boxMetric1, item()));
+    }
+
+    @Test
     public void testIiifBoxHasContentWithMetadataTrue() {
         Item item = item();
 
@@ -330,6 +390,49 @@ public class DynamicLayoutBoxServiceImplTest {
         DynamicLayoutField dynamicLayoutField = new DynamicLayoutField();
         dynamicLayoutField.setMetadataField(metadataField);
         return dynamicLayoutField;
+    }
+
+    private DynamicLayoutBox dynamicLayoutMetricBox(String ...metricTypes) {
+        DynamicLayoutBox dynamicLayoutMetricBox = new DynamicLayoutBox();
+        dynamicLayoutMetricBox.setType(DynamicLayoutBoxTypes.METRICS.name());
+        int position = 0;
+        for (String metricType : metricTypes) {
+            DynamicLayoutMetric2Box metric2Box = new DynamicLayoutMetric2Box();
+            metric2Box.setBox(dynamicLayoutMetricBox);
+            metric2Box.setPosition(position++);
+            metric2Box.setType(metricType);
+            dynamicLayoutMetricBox.getMetric2box().add(metric2Box);
+        }
+        return dynamicLayoutMetricBox;
+    }
+
+    private List<EmbeddableCrisMetrics> embeddableCrisMetrics(String ...metricTypes) {
+        List<EmbeddableCrisMetrics> metrics = Arrays.stream(metricTypes)
+                                                    .map(this::buildEmbeddableCrisMetrics)
+                                                    .collect(Collectors.toList());
+        when(crisItemMetricsService.getEmbeddableMetrics(any(), any(), any())).thenReturn(metrics);
+        return metrics;
+    }
+
+    private List<CrisMetrics> storedCrisMetrics(String ...metricTypes) {
+        List<CrisMetrics> metrics = Arrays.stream(metricTypes)
+            .map(this::buildCrisMetrics)
+            .collect(Collectors.toList());
+        when(crisItemMetricsService.getStoredMetrics(any(), any())).thenReturn(metrics);
+        return metrics;
+
+    }
+
+    private CrisMetrics buildCrisMetrics(String metricType) {
+        CrisMetrics crisMetrics = new CrisMetrics();
+        crisMetrics.setMetricType(metricType);
+        return crisMetrics;
+    }
+
+    private EmbeddableCrisMetrics buildEmbeddableCrisMetrics(String metricType) {
+        EmbeddableCrisMetrics crisMetrics = new EmbeddableCrisMetrics();
+        crisMetrics.setMetricType(metricType);
+        return crisMetrics;
     }
 
 }

@@ -88,6 +88,9 @@ public class DynamicLayoutBox implements ReloadableEntity<Integer> {
     @OrderBy(value = "row, cell, priority")
     private List<DynamicLayoutField> layoutFields = new ArrayList<>();
 
+    @OneToMany(mappedBy = "box", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DynamicLayoutMetric2Box> metric2box = new ArrayList<>();
+
     @Column(name = "max_columns")
     private Integer maxColumns = null;
 
@@ -326,6 +329,16 @@ public class DynamicLayoutBox implements ReloadableEntity<Integer> {
      */
     public void setMaxColumns(Integer maxColumns) {
         this.maxColumns = maxColumns;
+    }
+
+
+    public List<DynamicLayoutMetric2Box> getMetric2box() {
+        return metric2box;
+    }
+
+    public void addMetric2box(DynamicLayoutMetric2Box box2metric) {
+        box2metric.setBox(this);
+        this.metric2box.add(box2metric);
     }
 
     /**

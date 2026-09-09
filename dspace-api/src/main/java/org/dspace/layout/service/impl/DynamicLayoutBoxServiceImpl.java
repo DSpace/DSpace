@@ -10,9 +10,11 @@ package org.dspace.layout.service.impl;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -37,6 +39,7 @@ import org.dspace.layout.DynamicLayoutFieldBitstream;
 import org.dspace.layout.dao.DynamicLayoutBoxDAO;
 import org.dspace.layout.service.DynamicLayoutBoxAccessService;
 import org.dspace.layout.service.DynamicLayoutBoxService;
+import org.dspace.metrics.CrisItemMetricsService;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,6 +61,9 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
 
     @Autowired
     private DiscoveryConfigurationUtilsService searchConfigurationUtilsService;
+
+    @Autowired
+    private CrisItemMetricsService crisMetricService;
 
     @Autowired
     private ItemService itemService;
@@ -157,6 +163,8 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
         switch (boxType.toUpperCase()) {
             case "RELATION":
                 return hasRelationBoxContent(context, box, item);
+            case "METRICS":
+                return hasMetricsBoxContent(context, box, item);
             case "COLLECTIONS":
                 return isOwningCollectionPresent(item);
             case "IIIFVIEWER":
@@ -228,6 +236,39 @@ public class DynamicLayoutBoxServiceImpl implements DynamicLayoutBoxService {
 
     private boolean hasRelationBoxContent(Context context, DynamicLayoutBox box, Item item) {
         return searchConfigurationUtilsService.countByRelation(context, item, box.getShortname()) > 0;
+    }
+
+    /**
+     * Checks whether a metrics box has content to display, i.e. the box has at least one associated
+     * metric type and the current user is allowed to read the given item, and the item exposes at
+     * least one embeddable or stored metric matching the box's metric types (including embeddable
+     * fallbacks).
+     *
+     * @param context the DSpace context
+     * @param box the metrics layout box
+     * @param item the item
+     * @return {@code true} if the metrics box has content to display, {@code false} otherwise
+     */
+    protected boolean hasMetricsBoxContent(Context context, DynamicLayoutBox box, Item item) {
+
+        if (box.getMetric2box().isEmpty() || currentUserIsNotAllowedToReadItem(context, item)) {
+            return false;
+        }
+
+        final Set<String> boxTypes = new HashSet<>();
+        box.getMetric2box().forEach(b -> {
+            boxTypes.add(b.getType());
+            crisMetricService.embeddableFallback(b.getType()).ifPresent(boxTypes::add);
+        });
+        if (this.crisMetricService.getEmbeddableMetrics(context, item.getID(), null).stream()
+            .filter(m -> boxTypes.contains(m.getMetricType())).count() > 0) {
+            return true;
+        }
+        if (this.crisMetricService.getStoredMetrics(context, item.getID()).stream()
+            .filter(m -> boxTypes.contains(m.getMetricType())).count() > 0) {
+            return true;
+        }
+        return false;
     }
 
     private boolean isIiifEnabled(Item item) {

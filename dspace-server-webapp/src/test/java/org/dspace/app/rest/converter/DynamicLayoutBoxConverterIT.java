@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -25,10 +26,12 @@ import org.dspace.app.rest.model.DynamicLayoutMetadataConfigurationRest;
 import org.dspace.app.rest.model.DynamicLayoutMetadataConfigurationRest.Cell;
 import org.dspace.app.rest.model.DynamicLayoutMetadataConfigurationRest.Field;
 import org.dspace.app.rest.model.DynamicLayoutMetadataConfigurationRest.Row;
+import org.dspace.app.rest.model.DynamicLayoutMetricsConfigurationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.DynamicLayoutBoxBuilder;
 import org.dspace.builder.DynamicLayoutFieldBuilder;
+import org.dspace.builder.DynamicLayoutMetric2BoxBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.content.EntityType;
 import org.dspace.content.MetadataField;
@@ -270,6 +273,50 @@ public class DynamicLayoutBoxConverterIT extends AbstractControllerIntegrationTe
 
         assertThat(config.getDiscoveryConfiguration(), is("RELATION.Publication.box"));
 
+    }
+
+    @Test
+    public void testMetricsBoxConversion() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EntityType entityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, entityType, true, true)
+            .withContainer(true)
+            .withHeader("Box Header")
+            .withShortname("box")
+            .withType("METRICS")
+            .withSecurity(LayoutSecurity.OWNER_ONLY)
+            .withMaxColumns(1)
+            .build();
+
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "metric1", 0).build();
+        DynamicLayoutMetric2BoxBuilder.create(context, box, "metric2", 1).build();
+
+        context.commit();
+
+        context.restoreAuthSystemState();
+
+        DynamicLayoutBoxRest rest = converter.convert(box, Projection.DEFAULT);
+        assertThat(rest, notNullValue());
+        assertThat(rest.getBoxType(), is("METRICS"));
+        assertThat(rest.isContainer(), is(true));
+        assertThat(rest.getCollapsed(), is(true));
+        assertThat(rest.getEntityType(), is("Publication"));
+        assertThat(rest.getHeader(), is("Box Header"));
+        assertThat(rest.getShortname(), is("box"));
+        assertThat(rest.getMaxColumns(), is(1));
+        assertThat(rest.getMinor(), is(true));
+        assertThat(rest.getSecurity(), is(2));
+        assertThat(rest.getStyle(), nullValue());
+        assertThat(rest.getMetadataSecurityFields(), empty());
+        assertThat(rest.getConfiguration(), instanceOf(DynamicLayoutMetricsConfigurationRest.class));
+
+        DynamicLayoutMetricsConfigurationRest config =
+            (DynamicLayoutMetricsConfigurationRest) rest.getConfiguration();
+        assertThat(config.getMaxColumns(), is(1));
+        assertThat(config.getMetrics(), contains("metric1", "metric2"));
     }
 
     @Test

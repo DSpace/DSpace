@@ -137,6 +137,7 @@
     <bean class="org.dspace.util.FrontendUrlService"/>
 
     <bean class="org.dspace.content.security.MetadataSecurityServiceImpl"/>
+    <bean class="org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService"/>
 
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
@@ -164,11 +165,13 @@
     <bean class="org.dspace.layout.service.impl.DynamicLayoutBoxServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.DynamicLayoutFieldServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.DynamicLayoutMetadataGroupServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutMetric2BoxServiceImpl"/>
 
     <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.DynamicLayoutBoxAccessServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.DynamicLayoutTabAccessServiceImpl"/>
     <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
+    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl"/>
 
     <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolValidatorImpl"/>
     <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolParserImpl"/>

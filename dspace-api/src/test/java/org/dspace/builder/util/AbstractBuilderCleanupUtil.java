@@ -21,7 +21,9 @@ import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.CrisMetricsBuilder;
 import org.dspace.builder.DynamicLayoutBoxBuilder;
+import org.dspace.builder.DynamicLayoutMetric2BoxBuilder;
 import org.dspace.builder.DynamicLayoutTabBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -68,6 +70,8 @@ public class AbstractBuilderCleanupUtil {
         map.put(OrcidQueueBuilder.class.getName(), new ArrayList<>());
         map.put(OrcidHistoryBuilder.class.getName(), new ArrayList<>());
         map.put(OrcidTokenBuilder.class.getName(), new ArrayList<>());
+        map.put(CrisMetricsBuilder.class.getName(), new ArrayList<>());
+        map.put(DynamicLayoutMetric2BoxBuilder.class.getName(), new ArrayList<>());
         map.put(DynamicLayoutBoxBuilder.class.getName(), new ArrayList<>());
         map.put(DynamicLayoutTabBuilder.class.getName(), new ArrayList<>());
         map.put(ResourcePolicyBuilder.class.getName(), new ArrayList<>());

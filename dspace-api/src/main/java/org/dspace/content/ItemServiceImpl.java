@@ -36,6 +36,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
@@ -198,6 +199,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     protected SubscribeService subscribeService;
+
+    @Autowired
+    protected CrisMetricsService crisMetricsService;
 
     @Autowired
     private QAEventsDAO qaEventsDao;
@@ -979,6 +983,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID()));
         //remove subscription related with it
         subscribeService.deleteByDspaceObject(context, item);
+        // Remove any cris metrics related with the item
+        crisMetricsService.deleteByResourceID(context, item);
         // Remove relationships
         for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
@@ -2322,6 +2328,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         return item.equals(latestVersion.getItem());
 
+    }
+
+    @Override
+    public boolean exists(Context context, UUID id) throws SQLException {
+        return this.itemDAO.exists(context, Item.class, id);
     }
 
 }

@@ -821,4 +821,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             .flatMap(bundle -> bundle.getItems().stream())
             .findFirst();
     }
+
+    @Override
+    public boolean exists(Context context, UUID id) throws SQLException {
+        return this.bitstreamDAO.exists(context, Bitstream.class, id);
+    }
 }

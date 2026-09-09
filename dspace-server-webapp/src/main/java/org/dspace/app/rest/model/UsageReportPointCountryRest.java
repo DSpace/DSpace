@@ -33,6 +33,11 @@ public class UsageReportPointCountryRest extends UsageReportPointRest {
         super.label = LocationUtils.getCountryName(id, Locale.getDefault());
     }
 
+    public void setIdAndLabel(String id, String label) {
+        this.id = id;
+        this.label = label;
+    }
+
     @Override
     public String getType() {
         return NAME;

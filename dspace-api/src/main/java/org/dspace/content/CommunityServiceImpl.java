@@ -734,4 +734,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     public int countArchivedItems(Context context, Community community) {
         return itemCounter.getCount(context, community);
     }
+
+    @Override
+    public boolean exists(Context context, UUID id) throws SQLException {
+        return this.communityDAO.exists(context, Community.class, id);
+    }
 }

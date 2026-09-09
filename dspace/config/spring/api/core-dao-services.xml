@@ -70,6 +70,10 @@
     <bean class="org.dspace.layout.dao.impl.DynamicLayoutBoxDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.DynamicLayoutFieldDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.DynamicLayoutMetadataGroupDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.DynamicLayoutMetric2BoxDAOImpl" />
+
+    <bean class="org.dspace.app.metrics.dao.CrisMetricsDAOImpl" />
+
     <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
 
