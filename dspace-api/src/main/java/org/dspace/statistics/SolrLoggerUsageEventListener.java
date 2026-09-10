@@ -67,6 +67,8 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
                     UsageWorkflowEvent usageWorkflowEvent = (UsageWorkflowEvent) ue;
 
                     solrLoggerService.postWorkflow(usageWorkflowEvent);
+                } else if (UsageEvent.Action.LOGIN == ue.getAction()) {
+                    solrLoggerService.postLogin(ue.getObject(), ue.getRequest(), currentUser);
                 }
 
             } catch (Exception e) {

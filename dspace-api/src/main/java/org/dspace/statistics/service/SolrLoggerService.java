@@ -76,6 +76,15 @@ public interface SolrLoggerService {
     public void postSearch(DSpaceObject resultObject, HttpServletRequest request, EPerson currentUser,
                            List<String> queries, int rpp, String sortBy, String order, int page, DSpaceObject scope);
 
+    /**
+     * Store a login usage event into Solr.
+     *
+     * @param dspaceObject the object used.
+     * @param request      the current request context.
+     * @param currentUser  the current session's user.
+     */
+    public void postLogin(DSpaceObject dspaceObject, HttpServletRequest request, EPerson currentUser);
+
     public void postWorkflow(UsageWorkflowEvent usageWorkflowEvent) throws SQLException;
 
     /**
