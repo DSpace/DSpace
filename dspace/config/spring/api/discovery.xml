@@ -410,6 +410,12 @@
         </property>
         <!-- When true a "did you mean" example will be displayed, value can be true or false -->
         <property name="spellCheckEnabled" value="true"/>
+        <!-- Maximum number of "did you mean" suggestions requested from Solr for each term of the query.
+             Optional, defaults to 2. Only values between 1 and 20 are accepted: values outside that range are
+             adjusted to the closest bound, since Solr rejects a count lower than 1 and can run out of memory
+             when asked for a very large amount of suggestions.
+        <property name="spellCheckCount" value="2"/>
+        -->
     </bean>
 
     <bean id="communityConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration"

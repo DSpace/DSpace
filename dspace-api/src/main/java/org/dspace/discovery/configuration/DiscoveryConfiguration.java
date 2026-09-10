@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +22,37 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoveryConfiguration implements InitializingBean {
+
+    private static final Logger log = LogManager.getLogger(DiscoveryConfiguration.class);
+
+    /**
+     * Minimum accepted value for {@link #spellCheckCount}: Solr rejects a non-positive
+     * {@code spellcheck.count} with an {@code IllegalArgumentException}.
+     */
+    public static final int MIN_SPELL_CHECK_COUNT = 1;
+
+    /**
+     * Maximum accepted value for {@link #spellCheckCount}. The value of {@code spellcheck.count} is passed straight
+     * to Solr, which allocates and ranks that many alternatives <em>per query term</em>: an excessively large value
+     * (in the order of hundreds of millions) is enough to bring the Solr instance down with an OutOfMemoryError.
+     * Since the alternatives returned by Solr are already deduplicated and sorted by frequency, the suggestions
+     * beyond the first handful carry little value ("noe" starts suggesting "hope" or "love" well before the 50th
+     * alternative), so capping the configurable value costs nothing in terms of usefulness.
+     */
+    public static final int MAX_SPELL_CHECK_COUNT = 20;
+
+    /**
+     * Default value for {@link #spellCheckCount}.
+     * <p>
+     * Solr defaults {@code spellcheck.count} to 1 when the parameter is omitted (and to 5 when the parameter is
+     * present but holds no number), see the
+     * <a href="https://solr.apache.org/guide/solr/9_0/query-guide/spell-checking.html">Solr spell checking
+     * documentation</a>. We deliberately keep a small explicit default of 2 rather than adopting either of those:
+     * the "did you mean" feature only needs the best correction plus one fallback for the frequent case where the
+     * top alternative is not the one the user meant, and every extra alternative is additional work for Solr and
+     * additional noise in the response. Increase it per configuration if a use case needs richer suggestions.
+     */
+    public static final int DEFAULT_SPELL_CHECK_COUNT = 2;
 
     /**
      * The configuration for the sidebar facets
@@ -51,6 +84,13 @@ public class DiscoveryConfiguration implements InitializingBean {
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
     private boolean spellCheckEnabled;
+
+    /**
+     * Maximum number of spellcheck alternatives requested from Solr for each term of the query.
+     * Always kept within [{@link #MIN_SPELL_CHECK_COUNT}, {@link #MAX_SPELL_CHECK_COUNT}] by
+     * {@link #setSpellCheckCount(int)}.
+     */
+    private int spellCheckCount = DEFAULT_SPELL_CHECK_COUNT;
     private boolean indexAlways = false;
 
     /**
@@ -221,5 +261,35 @@ public class DiscoveryConfiguration implements InitializingBean {
             }
         }
         return null;
+    }
+
+    /**
+     * @return the maximum number of spellcheck alternatives to request from Solr for each query term, guaranteed to
+     *         be within [{@link #MIN_SPELL_CHECK_COUNT}, {@link #MAX_SPELL_CHECK_COUNT}].
+     */
+    public int getSpellCheckCount() {
+        return spellCheckCount;
+    }
+
+    /**
+     * Sets the maximum number of spellcheck alternatives to request from Solr for each query term.
+     * <p>
+     * The value is clamped to [{@link #MIN_SPELL_CHECK_COUNT}, {@link #MAX_SPELL_CHECK_COUNT}] instead of being
+     * rejected, so that a misconfiguration cannot make Solr fail (a non-positive count makes Solr throw an
+     * {@code IllegalArgumentException}, a huge one can exhaust its heap) nor prevent DSpace from starting up.
+     * A warning is logged whenever the configured value is out of range.
+     *
+     * @param spellCheckCount the configured amount of alternatives
+     */
+    public void setSpellCheckCount(int spellCheckCount) {
+        if (spellCheckCount < MIN_SPELL_CHECK_COUNT || spellCheckCount > MAX_SPELL_CHECK_COUNT) {
+            int clamped = Math.min(Math.max(spellCheckCount, MIN_SPELL_CHECK_COUNT), MAX_SPELL_CHECK_COUNT);
+            log.warn("The configured spellCheckCount {} for the discovery configuration {} is outside the allowed "
+                         + "range [{}, {}] and has been adjusted to {}", spellCheckCount, id,
+                     MIN_SPELL_CHECK_COUNT, MAX_SPELL_CHECK_COUNT, clamped);
+            this.spellCheckCount = clamped;
+        } else {
+            this.spellCheckCount = spellCheckCount;
+        }
     }
 }
