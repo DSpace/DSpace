@@ -26,18 +26,22 @@
         </constructor-arg>
         <constructor-arg name="subscriptionType2generators">
             <!-- The keys of the map used by the script "subscription-send"
-             org.dspace.subscriptions.SubscriptionEmailNotification
-             currently we support only 'content' type.
+             org.dspace.subscriptions.SubscriptionEmailNotification.
+             The 'statistics' type is handled by a dedicated dispatch branch using
+             the statisticsGenerator bean below, so it is not part of this map.
               -->
             <map>
                 <entry key="content" value-ref="contentNotifyGenerator"/>
             </map>
         </constructor-arg>
+        <constructor-arg name="statisticsGenerator" ref="statisticsNotifyGenerator"/>
     </bean>
 
     <bean id="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator" >
          <property name="entityType2Disseminator" ref ="entityDissemination"/>
     </bean>
+
+    <bean id="statisticsNotifyGenerator" class="org.dspace.subscriptions.StatisticsGenerator"/>
 
     <!-- This map allows configuring custom generators for e-mail body by EntityType.
     currently, we support only 'subscriptionDsoMetadataForEmailCompose' for all EntityType  -->

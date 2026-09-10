@@ -31,6 +31,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.CrisMetricsBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -39,6 +41,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.MockSolrSearchCore;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.services.ConfigurationService;
@@ -530,6 +533,81 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
         assertEquals(0, receivedMessages.length);
     }
 
+    @Test
+    public void testStatisticsSubscriptionWithMetricsSendsSpreadsheet() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Metrics Item")
+                               .build();
+        CrisMetricsBuilder.createCrisMetrics(context, item)
+                          .withMetricType("ScopusCitation")
+                          .withMetricCount(12)
+                          .withDeltaPeriod1(2.0)
+                          .withDeltaPeriod2(5.0)
+                          .isLast(true)
+                          .build();
+        statisticsSubscribeTo(item);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "statistics", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+
+        MimeMessage message = receivedMessages[0];
+        assertEquals(eperson.getEmail(), message.getRecipients(Message.RecipientType.TO)[0].toString());
+        assertTrue(GreenMailUtil.getBody(message).contains("subscriptions.xlsx"));
+    }
+
+    @Test
+    public void testStatisticsSubscriptionWithoutMetricsSendsNoEmail() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("No Metrics Item")
+                               .build();
+        statisticsSubscribeTo(item);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "statistics", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(0, receivedMessages.length);
+    }
+
+    @Test
+    public void testStatisticsSubscriptionSendsOneEmailPerSubscriber() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson otherEperson = EPersonBuilder.createEPerson(context)
+                                             .withEmail("other-subscriber@example.com")
+                                             .withNameInMetadata("Other", "Subscriber")
+                                             .build();
+
+        Item itemWithMetrics = ItemBuilder.createItem(context, col)
+                                          .withTitle("Metrics Item")
+                                          .build();
+        CrisMetricsBuilder.createCrisMetrics(context, itemWithMetrics)
+                          .withMetricType("ScopusCitation")
+                          .withMetricCount(7)
+                          .isLast(true)
+                          .build();
+        Item itemWithoutMetrics = ItemBuilder.createItem(context, col)
+                                             .withTitle("No Metrics Item")
+                                             .build();
+
+        // eperson subscribes to an item that has metrics -> should receive an email
+        statisticsSubscribeTo(eperson, itemWithMetrics);
+        // otherEperson subscribes to an item with no metrics -> should receive nothing
+        statisticsSubscribeTo(otherEperson, itemWithoutMetrics);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "statistics", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+        assertEquals(eperson.getEmail(),
+                     receivedMessages[0].getRecipients(Message.RecipientType.TO)[0].toString());
+    }
+
     private void subscribeTo(Collection collection) throws Exception {
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
@@ -546,6 +624,19 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
         subscriptionParameter.setValue("D");
         subscriptionParameterList.add(subscriptionParameter);
         subscribeService.subscribe(context, eperson, community, subscriptionParameterList, "content");
+    }
+
+    private void statisticsSubscribeTo(Item item) throws Exception {
+        statisticsSubscribeTo(eperson, item);
+    }
+
+    private void statisticsSubscribeTo(EPerson subscriber, Item item) throws Exception {
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        subscribeService.subscribe(context, subscriber, item, subscriptionParameterList, "statistics");
     }
 
     private void setFakeLastModifiedOnItemSolrDocument(Context c, UUID itemId, ZonedDateTime lastModified)
