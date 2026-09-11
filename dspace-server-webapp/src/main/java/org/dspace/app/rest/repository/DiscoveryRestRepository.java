@@ -94,7 +94,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
                                               final String configuration,
                                               final List<SearchFilter> searchFilters, final Pageable page,
                                               final Projection projection) {
-        Context context = obtainContext();
+        Context context = obtainReadOnlyContext();
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
@@ -141,7 +141,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             String dsoScope, final String configuration, List<SearchFilter> searchFilters, Pageable page)
                     throws SearchServiceException {
 
-        Context context = obtainContext();
+        Context context = obtainReadOnlyContext();
 
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
@@ -173,7 +173,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     public SearchResultsRest getAllFacets(String query, List<String> dsoTypes, String dsoScope, String configuration,
                                           List<SearchFilter> searchFilters) {
 
-        Context context = obtainContext();
+        Context context = obtainReadOnlyContext();
         Pageable page = PageRequest.of(1, 1);
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService

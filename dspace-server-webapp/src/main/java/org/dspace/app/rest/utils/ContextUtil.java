@@ -106,6 +106,30 @@ public class ContextUtil {
         return context;
     }
 
+    /**
+     * Similar to {@link #obtainCurrentRequestContext()} but returns a READ_ONLY context if the current
+     * request is a GET
+     *
+     * @return the DSpace Context associated with the current thread-bound request in READ_ONLY mode
+     * if the request is a GET
+     */
+    public static Context obtainCurrentRequestContextAsReadOnly() {
+        Context context = null;
+        RequestService requestService = new DSpace().getRequestService();
+        Request currentRequest = requestService.getCurrentRequest();
+        if (currentRequest != null) {
+            context = ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
+            // Only set the context to READ_ONLY if this is a GET request
+            if (currentRequest.getHttpServletRequest().getMethod().equals("GET")) {
+                if (context != null && !context.isReadOnly()) {
+                    context.setMode(Context.Mode.READ_ONLY);
+                }
+            }
+        }
+
+        return context;
+    }
+
     private static Locale getLocale(Context context, HttpServletRequest request) {
         Locale userLocale = null;
         Locale supportedLocale = null;

@@ -48,7 +48,7 @@ public class CollectionMappedItemLinkRepository extends AbstractDSpaceRestReposi
                                          @Nullable Pageable optionalPageable,
                                          Projection projection) {
         try {
-            Context context = obtainContext();
+            Context context = obtainReadOnlyContext();
             Collection collection = collectionService.find(context, collectionId);
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
