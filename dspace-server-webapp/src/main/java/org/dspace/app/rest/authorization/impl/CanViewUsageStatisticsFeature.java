@@ -49,6 +49,11 @@ public class CanViewUsageStatisticsFeature implements AuthorizationFeature {
     @Override
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
+
+        if (!configurationService.getBooleanProperty("usage-statistics.enabled", true)) {
+            return false;
+        }
+
         if (object instanceof SiteRest
             || object instanceof CommunityRest
             || object instanceof CollectionRest

@@ -9,7 +9,10 @@ package org.dspace.statistics;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -21,6 +24,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -41,6 +45,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.statistics.service.SolrLoggerService;
+import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -361,5 +367,105 @@ public class SolrLoggerServiceImplIT
         SolrQuery originalQuery = new SolrQuery("id:" + originalBitstream.getID().toString());
         QueryResponse originalResponse = solrStatisticsCore.getSolr().query(originalQuery);
         assertEquals("ORIGINAL bundle SHOULD be logged", 1, originalResponse.getResults().getNumFound());
+    }
+
+    @Test
+    public void testStatisticsLoggingDisabledManuallyCreatedListener() throws Exception {
+        cfg.setProperty("usage-statistics.enabled", false);
+
+        SolrStatisticsCore solrStatisticsCore = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServiceByName(SolrStatisticsCore.class.getName(), MockSolrStatisticsCore.class);
+        solrStatisticsCore.getSolr().deleteByQuery("*:*");
+        solrStatisticsCore.getSolr().commit();
+
+        SolrLoggerUsageEventListener listener = new SolrLoggerUsageEventListener();
+        listener.setConfigurationService(cfg);
+        SolrLoggerService solrLoggerService = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServiceByName("solrLoggerService", SolrLoggerService.class);
+        assertNotNull("SolrLoggerService bean not found", solrLoggerService);
+        listener.setSolrLoggerService(solrLoggerService);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        Bitstream bitstream = BitstreamBuilder
+                .createBitstream(context, item, new ByteArrayInputStream("Conteúdo".getBytes()))
+                .withName("TestBitstream.txt")
+                .build();
+        context.restoreAuthSystemState();
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("User-Agent")).thenReturn(NOT_BOT_AGENT);
+        when(request.getRemoteAddr()).thenReturn(NOT_BOT_IP);
+        when(request.getHeader("X-Forwarded-For")).thenReturn(null);
+
+        UsageEvent usageEvent = new UsageEvent(
+                UsageEvent.Action.VIEW,
+                request,
+                context,
+                bitstream);
+
+        listener.receiveEvent(usageEvent);
+
+        solrStatisticsCore.getSolr().commit();
+
+        SolrQuery query = new SolrQuery("id:" + bitstream.getID().toString());
+        QueryResponse response = solrStatisticsCore.getSolr().query(query);
+
+        assertEquals("Statistics should NOT be logged when 'usage-statistics.enabled=false' (manual listener)",
+                     0, response.getResults().getNumFound());
+
+        cfg.setProperty("usage-statistics.enabled", true);
+    }
+
+    @Test
+    public void testStatisticsLoggingEnabledManuallyCreatedListener() throws Exception {
+        cfg.setProperty("usage-statistics.enabled", true);
+
+        SolrStatisticsCore solrStatisticsCore = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServiceByName(SolrStatisticsCore.class.getName(), MockSolrStatisticsCore.class);
+        solrStatisticsCore.getSolr().deleteByQuery("*:*");
+        solrStatisticsCore.getSolr().commit();
+
+        SolrLoggerUsageEventListener listener = new SolrLoggerUsageEventListener();
+        listener.setConfigurationService(cfg);
+        SolrLoggerService solrLoggerService = DSpaceServicesFactory.getInstance().getServiceManager()
+                 .getServiceByName("solrLoggerService", SolrLoggerService.class);
+        assertNotNull("SolrLoggerService bean not found", solrLoggerService);
+        listener.setSolrLoggerService(solrLoggerService);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        Bitstream bitstream = BitstreamBuilder
+                .createBitstream(context, item, new ByteArrayInputStream("Conteúdo".getBytes()))
+                .withName("TestBitstream.txt")
+                .build();
+        context.restoreAuthSystemState();
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("User-Agent")).thenReturn(NOT_BOT_AGENT);
+        when(request.getRemoteAddr()).thenReturn(NOT_BOT_IP);
+        when(request.getHeader("X-Forwarded-For")).thenReturn(null);
+
+        UsageEvent usageEvent = new UsageEvent(
+                UsageEvent.Action.VIEW,
+                request,
+                context,
+                bitstream);
+
+        listener.receiveEvent(usageEvent);
+
+        solrStatisticsCore.getSolr().commit();
+
+        SolrQuery query = new SolrQuery("id:" + bitstream.getID().toString());
+        QueryResponse response = solrStatisticsCore.getSolr().query(query);
+
+        assertEquals("Statistics SHOULD be logged when 'usage-statistics.enabled=true' (manual listener)",
+                     1, response.getResults().getNumFound());
+
+        cfg.setProperty("usage-statistics.enabled", true);
     }
 }
