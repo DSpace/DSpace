@@ -21,6 +21,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -32,6 +33,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -147,7 +149,10 @@ public class SolrUpgradePre6xStatistics {
         String serverPath = configurationService.getProperty("solr-statistics.server");
         serverPath = serverPath.replaceAll("statistics$", indexName);
         System.out.println("Connecting to " + serverPath);
+        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
         server = new HttpSolrClient.Builder(serverPath)
+                .withHttpClient(httpClient)
                 .build();
         this.numRec = numRec;
         this.batchSize = batchSize;

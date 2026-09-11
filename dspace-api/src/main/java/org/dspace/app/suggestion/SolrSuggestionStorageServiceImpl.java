@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -40,12 +41,15 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.FacetParams;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.exception.SQLRuntimeException;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.SolrAuthUtils;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -73,9 +77,16 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
      */
     public SolrClient getSolr() {
         if (solrSuggestionClient == null) {
-            String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+                    .getConfigurationService();
+            String solrService = configurationService
                     .getProperty("suggestion.solr.server", "http://localhost:8983/solr/suggestion");
-            solrSuggestionClient = new HttpSolrClient.Builder(solrService).build();
+            CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                    SolrAuthUtils.addAuthenticationIfConfigured(builder, "suggestion.solr", "solr",
+                            configurationService));
+            solrSuggestionClient = new HttpSolrClient.Builder(solrService)
+                    .withHttpClient(httpClient)
+                    .build();
         }
         return solrSuggestionClient;
     }

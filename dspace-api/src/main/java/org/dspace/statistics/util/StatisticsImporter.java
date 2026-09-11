@@ -35,11 +35,13 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -58,6 +60,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
+import org.dspace.util.SolrAuthUtils;
 
 /**
  * Class to load intermediate statistics files (produced from log files by {@link ClassicDSpaceLogConverter}) into Solr.
@@ -463,7 +466,11 @@ public class StatisticsImporter {
         if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
-        solr = new HttpSolrClient.Builder(sserver).build();
+        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+        solr = new HttpSolrClient.Builder(sserver)
+                .withHttpClient(httpClient)
+                .build();
 
         String dbPath = configurationService.getProperty("usage-statistics.dbfile");
         try {
