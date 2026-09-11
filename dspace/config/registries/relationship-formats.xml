@@ -261,6 +261,30 @@
         <scope_note>Contains all uuids of PUBLICATIONS which link to the current ISSUE via a "latest" relationship. In other words, this stores all relationships pointing to the current ISSUE from any PUBLICATION, implying that the ISSUE is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>relation</schema>
+        <element>isAdvisorOfPublication</element>
+        <scope_note>Contains all uuids of the "latest" ADVISORS that the current PUBLICATION links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any ADVISOR where the ADVISOR is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isAdvisorOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of ADVISORS which link to the current PUBLICATION via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from an ADVISOR, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfAdvisor</element>
+        <scope_note>Contains all uuids of the "latest" PUBLICATIONS that the current ADVISOR links to via a relationship. In other words, this stores all relationships pointing from the current ADVISOR to any PUBLICATION where the PUBLICATION is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfAdvisor</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PUBLICATIONS which link to the current ADVISOR via a "latest" relationship. In other words, this stores all relationships pointing to the current ADVISOR from any PUBLICATION, implying that the ADVISOR is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
     <!-- Openaire4 Guidelines - required relationships -->
 
     <dc-type>
