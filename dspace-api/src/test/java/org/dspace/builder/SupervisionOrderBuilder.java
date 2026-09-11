@@ -60,7 +60,6 @@ public class SupervisionOrderBuilder
         try {
             getService().update(context, supervisionOrder);
             context.dispatchEvents();
-            indexingService.commit();
         } catch (Exception e) {
             log.error("Error in SupervisionOrderBuilder.build(), error: ", e);
         }
@@ -88,7 +87,6 @@ public class SupervisionOrderBuilder
                 getService().delete(context, attached);
             }
             context.complete();
-            indexingService.commit();
         }
     }
 }
