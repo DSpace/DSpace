@@ -114,7 +114,7 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
         try {
             bitstreamStorageService.migrate(
                 context, SOURCE_STORE, DEST_STORE, deleteOld,
-                batchCommitSize
+                batchCommitSize, false, false
             );
             fail("IOException should have been thrown");
         } catch (IOException ioe) {
@@ -166,7 +166,7 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
         try {
             bitstreamStorageService.migrate(
                 context, SOURCE_STORE, DEST_STORE, deleteOld,
-                batchCommitSize
+                batchCommitSize, false, false
             );
             fail("IOException should have been thrown");
         } catch (IOException ioe) {
