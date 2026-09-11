@@ -30,10 +30,21 @@ public class DoiCheck {
             "dx.doi.org/",
             "doi:");
 
+    /**
+     * Recognises the DOI forms published by CrossRef.
+     * <p>
+     * Two constructs in the third alternative were rewritten because they let a crafted query
+     * drive matching into cubic time (CodeQL <code>java/polynomial-redos</code>).
+     * <code>\d+X?(\d+)\d+</code> became the equivalent but unambiguous
+     * <code>(?:\d{3,}|\d+X\d{2,})</code>: with the optional <code>X</code> absent it is three
+     * adjacent unbounded digit runs, and with it present two. The unescaped dots in
+     * <code>\d+.\d+.\w+</code> became literal dots, which is what the version segment of a
+     * legacy SICI DOI (for example <code>3.0.CO;2</code>) always meant.
+     */
     private static final Pattern PATTERN = Pattern.compile("10.\\d{4,9}/[-._;()/:A-Z0-9]+" +
                                                                "|10.1002/[^\\s]+" +
-                                                               "|10.\\d{4}/\\d+-\\d+X?(\\d+)" +
-                                                               "\\d+<[\\d\\w]+:[\\d\\w]*>\\d+.\\d+.\\w+;\\d" +
+                                                               "|10.\\d{4}/\\d+-(?:\\d{3,}|\\d+X\\d{2,})" +
+                                                               "<[\\d\\w]+:[\\d\\w]*>\\d+\\.\\d+\\.\\w+;\\d" +
                                                                "|10.1021/\\w\\w\\d++" +
                                                                "|10.1207/[\\w\\d]+\\&\\d+_\\d+",
                                                            Pattern.CASE_INSENSITIVE);
