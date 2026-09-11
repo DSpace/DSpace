@@ -680,7 +680,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     public void removeIndex(String query) throws IOException,
         SolrServerException {
         solr.deleteByQuery(query);
-        solr.commit();
+        solr.commit(true, true, true);
     }
 
     @Override
@@ -751,7 +751,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         public void commit() throws IOException, SolrServerException {
-            solr.commit();
+            solr.commit(true, true, true);
         }
 
         /**
@@ -802,7 +802,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         try {
             processor.execute("-isBot:true");
-            solr.commit();
+            solr.commit(true, true, true);
         } catch (SolrServerException | IOException ex) {
             log.error("Failed while marking robot accesses.", ex);
         }
@@ -1250,12 +1250,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 statisticsYearServer.request(contentStreamUpdateRequest);
             }
 
-            statisticsYearServer.commit(true, true);
+            statisticsYearServer.commit(true, true, true);
 
 
             //Delete contents of this year from our year query !
             solr.deleteByQuery(filterQuery.toString());
-            solr.commit(true, true);
+            solr.commit(true, true, true);
 
             log.info("Moved {} records into core: {}", totalRecords, coreName);
         }
@@ -1440,7 +1440,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             //Now that all our new bitstream stats are in place, delete all the old ones !
             solr.deleteByQuery("-bundleName:[* TO *] AND type:" + Constants.BITSTREAM);
             //Commit everything to wrap up
-            solr.commit(true, true);
+            solr.commit(true, true, true);
             //Clean up our directory !
             FileUtils.deleteDirectory(tempDirectory);
         } catch (Exception e) {
@@ -1497,7 +1497,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void commit() throws IOException, SolrServerException {
-        solr.commit();
+        solr.commit(true, true, true);
     }
 
     protected void addDocumentsToFile(Context context, SolrDocumentList docs, File exportOutput)
