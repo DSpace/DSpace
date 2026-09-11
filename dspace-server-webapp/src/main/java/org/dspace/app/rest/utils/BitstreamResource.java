@@ -7,14 +7,12 @@
  */
 package org.dspace.app.rest.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -86,15 +84,13 @@ public class BitstreamResource extends AbstractResource {
      * @param bitstream the pdf for which we want to generate a coverpage
      * @return a byte array containing the cover page
      */
-    byte[] getCoverpageByteArray(Context context, Bitstream bitstream)
+    CitationDocumentService.CitedDocument getCoverPageDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException {
         try {
-            var citedDocument = citationDocumentService.makeCitedDocument(context, bitstream);
-            return citedDocument.getLeft();
+            return citationDocumentService.makeCitedDocumentStream(context, bitstream);
         } catch (Exception e) {
             LOG.warn("Could not generate cover page. Will fallback to original document", e);
-            // Return the original bitstream without the cover page
-            return IOUtils.toByteArray(bitstreamService.retrieve(context, bitstream));
+            return null;
         }
     }
 
@@ -136,11 +132,14 @@ public class BitstreamResource extends AbstractResource {
         try (Context context = initializeContext()) {
             Bitstream bitstream = bitstreamService.find(context, uuid);
             if (shouldGenerateCoverPage) {
-                var coverPage = getCoverpageByteArray(context, bitstream);
-
-                this.document = new BitstreamDocumentCoverPage(etag(bitstream),
-                        coverPage.length,
-                        new ByteArrayInputStream(coverPage));
+                var citedDocument = getCoverPageDocument(context, bitstream);
+                if (citedDocument != null) {
+                    this.document = new BitstreamDocumentCoverPage(etag(bitstream), citedDocument);
+                } else {
+                    this.document = new BitstreamDocumentInputstream(bitstream.getChecksum(),
+                            bitstream.getSizeBytes(),
+                            bitstream.getID());
+                }
             } else {
                 this.document = new BitstreamDocumentInputstream(bitstream.getChecksum(),
                         bitstream.getSizeBytes(),
@@ -241,16 +240,16 @@ public class BitstreamResource extends AbstractResource {
     }
 
     protected class BitstreamDocumentCoverPage extends BitstreamDocument {
-        private final ByteArrayInputStream coverpage;
+        private final CitationDocumentService.CitedDocument coverPageDocument;
 
-        public BitstreamDocumentCoverPage(String etag, long length, ByteArrayInputStream byteArrayInputStream) {
-            super(etag, length);
-            this.coverpage = byteArrayInputStream;
+        public BitstreamDocumentCoverPage(String etag, CitationDocumentService.CitedDocument coverPageDocument) {
+            super(etag, coverPageDocument.length());
+            this.coverPageDocument = coverPageDocument;
         }
 
         @Override
-        public InputStream getInputStream() {
-            return coverpage;
+        public InputStream getInputStream() throws IOException {
+            return coverPageDocument.getInputStream();
         }
     }
 
