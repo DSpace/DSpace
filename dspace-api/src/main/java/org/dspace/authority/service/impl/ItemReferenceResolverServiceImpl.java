@@ -13,7 +13,6 @@ import org.dspace.authority.service.ItemReferenceResolver;
 import org.dspace.authority.service.ItemReferenceResolverService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link ItemReferenceResolverService} that delegate the
@@ -25,10 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public record ItemReferenceResolverServiceImpl(List<ItemReferenceResolver> resolvers)
     implements ItemReferenceResolverService {
-
-    @Autowired
-    public ItemReferenceResolverServiceImpl {
-    }
 
     @Override
     public void resolveReferences(Context context, Item item) {
