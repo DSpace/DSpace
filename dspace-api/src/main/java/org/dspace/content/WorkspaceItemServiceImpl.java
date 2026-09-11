@@ -295,20 +295,61 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException {
-        source.setCollection(toCollection);
+        // First, check if there's anything to do at all
+        if (fromCollection.equals(toCollection)) {
+            return; // Nothing to do here.
+        } else {
+            // Set WorkspaceItem's Collection to destination Collection
+            source.setCollection(toCollection);
 
-        List<MetadataValue> remove = new ArrayList<>();
-        List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
-        for (String toRemove : diff) {
-            for (MetadataValue value : source.getItem().getMetadata()) {
-                if (value.getMetadataField().toString('.').equals(toRemove)) {
-                    remove.add(value);
+            // Do entity types of Item and Collection differ now?
+            // (Trying to handle null values returned for untyped Items while doing so...)
+            String currentEntityTypeOfItem =
+                    this.itemService.getEntityType(source.getItem()) == null ?
+                            "none" : this.itemService.getEntityType(source.getItem());
+            String entityTypeOfCurrentCollection =
+                    this.collectionService.getEntityType(source.getCollection()) == null ?
+                            "none" : this.collectionService.getEntityType(source.getCollection());
+
+            // Check for entity type mismatch
+            if (!currentEntityTypeOfItem.equals(entityTypeOfCurrentCollection)) {
+                // If Collection has no entity type, we delete dspace.entity.type from the Item
+                // There *could* be several values present for dspace.entity.type; this deletes all of them.
+                if (entityTypeOfCurrentCollection.equals("none")) {
+                    List<MetadataValue> toRemove = this.itemService.getMetadataByMetadataString(
+                            source.getItem(),
+                            "dspace.entity.type"
+                    );
+                    source.getItem().removeMetadata(toRemove);
+                } else {
+                    // Otherwise, set entity type according to *current* Collection's type
+                    this.itemService.setEntityType(
+                            context,
+                            source.getItem(),
+                            entityTypeOfCurrentCollection
+                    );
                 }
             }
+
+            // Check for differences between Collections' submission forms involved
+            List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
+            // If there are differences,
+            // remove metadata fields that do not occur in destination Collection's submission form:
+            if (!diff.isEmpty()) {
+                List<MetadataValue> remove = new ArrayList<>();
+                // Of differences found, keep only those that are actually present on the item
+                for (String toRemove : diff) {
+                    for (MetadataValue value : source.getItem().getMetadata()) {
+                        if (value.getMetadataField().toString('.').equals(toRemove)) {
+                            remove.add(value);
+                        }
+                    }
+                }
+                // Remove the metadata
+                source.getItem().removeMetadata(remove);
+            }
+
         }
-
-        source.getItem().removeMetadata(remove);
-
     }
 
     private void addPoliciesToSubmitterGroup(Context context, Item item, Collection collection, int[] actionIds)
