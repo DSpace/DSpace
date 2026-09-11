@@ -13,11 +13,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.converter.JsonPatchConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -35,6 +38,7 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,6 +75,9 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     public BundleRestRepository(BundleService dsoService) {
         super(dsoService);
@@ -228,5 +235,26 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         } catch (IOException | SQLException e) {
             throw new RuntimeException("Something went wrong trying to delete bundle with id: " + id, e);
         }
+    }
+
+    /**
+     * Method that will transform the provided PATCH json body into a list of operations.
+     * The operations will be handled by a supporting class resolved by the
+     * {@link org.dspace.app.rest.repository.patch.ResourcePatch#patch} method.
+     *
+     * @param context The context
+     * @param jsonNode the json body provided from the request body
+     */
+    public void patchBundlesInBulk(Context context, JsonNode jsonNode) throws SQLException {
+        int operationsLimit = configurationService.getIntProperty("rest.patch.operations.limit", 1000);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
+        Patch patch = patchConverter.convert(jsonNode);
+        if (patch.getOperations().size() > operationsLimit) {
+            throw new DSpaceBadRequestException("The number of operations in the patch is over the limit of " +
+                                                operationsLimit);
+        }
+        resourcePatch.patch(obtainContext(), null, patch.getOperations());
+        context.commit();
     }
 }
