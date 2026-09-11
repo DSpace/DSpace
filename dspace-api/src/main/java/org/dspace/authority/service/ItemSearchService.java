@@ -50,11 +50,11 @@ public interface ItemSearchService {
      *
      * @param context     the DSpace context
      * @param searchParam the identifier to search for
-     * @param entityType  the required dspace.entity.type (e.g., "Person", "OrgUnit")
+     * @param entityTypes  the required dspace.entity.type (e.g., "Person", "OrgUnit")
      * @param source      the item that triggered the search
      * @return the found item that matches both the identifier and the entity type,
      * or null if no match is found or if the type does not align
      */
-    Item search(Context context, String searchParam, String entityType, Item source);
+    Item search(Context context, String searchParam, String[] entityTypes, Item source);
 
 }
