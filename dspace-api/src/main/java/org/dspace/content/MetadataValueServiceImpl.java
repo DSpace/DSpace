@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -129,5 +130,27 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public int countTotal(Context context) throws SQLException {
         return metadataValueDAO.countRows(context);
+    }
+
+    @Override
+    public long countByField(Context context, MetadataField metadataField) throws SQLException {
+        return metadataValueDAO.countByField(context, metadataField);
+    }
+
+    @Override
+    public List<UUID> findObjectIdsByField(Context context, MetadataField metadataField, UUID afterUuid, int limit)
+        throws SQLException {
+        return metadataValueDAO.findObjectIdsByField(context, metadataField, afterUuid, limit);
+    }
+
+    @Override
+    public List<MetadataValue> findByFieldAndObjects(Context context, MetadataField metadataField,
+                                                     List<UUID> objectIds) throws SQLException {
+        return metadataValueDAO.findByFieldAndObjects(context, metadataField, objectIds);
+    }
+
+    @Override
+    public int deleteByIds(Context context, List<Integer> ids) throws SQLException {
+        return metadataValueDAO.deleteByIds(context, ids);
     }
 }
