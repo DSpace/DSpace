@@ -250,7 +250,7 @@ public class RoleDisseminator implements PackageDisseminator {
      */
     @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,
-                                     PackageParameters params, File pkgFile)
+                                     PackageParameters params, File pkgFile, List<DSpaceObject> alreadyDisseminated)
         throws PackageException, CrosswalkException,
         AuthorizeException, SQLException, IOException {
         throw new PackageException(
