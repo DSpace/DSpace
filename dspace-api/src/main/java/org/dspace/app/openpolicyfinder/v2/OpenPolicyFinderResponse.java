@@ -378,6 +378,12 @@ public class OpenPolicyFinderResponse implements Serializable {
                             publishedOption++;
                             currentOption = publishedOption;
                         }
+
+                        permittedVersion.setAdditionalOpenAccessFee(
+                            permitted.has("additional_oa_fee")
+                            && "yes".equals(permitted.getString("additional_oa_fee"))
+                        );
+
                         permittedVersion.setOption(currentOption);
                         permittedVersions.add(permittedVersion);
                     }
