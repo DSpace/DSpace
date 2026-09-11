@@ -19,7 +19,16 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
  * Utility class that represents the year range for a date facet
  */
 public class FacetYearRange {
-    private static final Pattern PATTERN = Pattern.compile("\\[(.*? TO .*?)\\]");
+    /**
+     * Matches a Solr year range such as <code>[2000 TO 2010]</code>.
+     * <p>
+     * The bounds are restricted to (optionally negative) integers instead of the <code>.*?</code>
+     * wildcards this pattern used previously. Both bounds are parsed with
+     * {@link Integer#parseInt} immediately below, so no other bound was ever usable, and the
+     * wildcard form allowed a crafted filter query to drive matching into quadratic time
+     * (CodeQL <code>java/polynomial-redos</code>).
+     */
+    private static final Pattern PATTERN = Pattern.compile("\\[( *-?\\d+ +TO +-?\\d+ *)\\]");
 
     private final DiscoverySearchFilterFacet facet;
     private String dateFacet;
