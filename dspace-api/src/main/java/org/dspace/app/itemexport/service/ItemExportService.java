@@ -8,11 +8,13 @@
 package org.dspace.app.itemexport.service;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 
 import jakarta.mail.MessagingException;
+import org.dspace.app.itemexport.ItemExportException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -267,6 +269,47 @@ public interface ItemExportService {
      * @throws Exception if error
      */
     public void zip(String strSource, String target) throws Exception;
+
+    /**
+     * Estimate the total size of an export by summing bitstream sizes for the given items.
+     *
+     * @param context   DSpace context
+     * @param dsObjects List of DSpaceObjects (Items, Collections, or Communities) to estimate
+     * @return estimated total size in bytes
+     * @throws SQLException if a database error occurs
+     */
+    public long estimateExportSize(Context context, List<DSpaceObject> dsObjects) throws SQLException;
+
+    /**
+     * Validate that the estimated export size does not exceed the configured maximum
+     * and that sufficient disk space is available in the export work directory.
+     *
+     * @param estimatedSize estimated export size in bytes
+     * @throws ItemExportException if the export exceeds configured limits or available disk space
+     * @throws Exception           if the export work directory cannot be determined
+     */
+    public void validateExportSize(long estimatedSize) throws ItemExportException, Exception;
+
+    /**
+     * Count the total number of items that would be included in an export
+     * of the given DSpaceObjects. Uses efficient COUNT queries rather than
+     * loading Item entities.
+     *
+     * @param context   DSpace context
+     * @param dsObjects List of DSpaceObjects (Items, Collections, or Communities) to count
+     * @return total item count
+     * @throws SQLException if a database error occurs
+     */
+    public int countExportItems(Context context, List<DSpaceObject> dsObjects) throws SQLException;
+
+    /**
+     * Validate that the item count does not exceed the configured maximum
+     * ({@code org.dspace.app.itemexport.max.items}). A configured value of 0 disables the check.
+     *
+     * @param itemCount the number of items in the export
+     * @throws ItemExportException if the item count exceeds the configured limit
+     */
+    public void validateExportItemCount(int itemCount) throws ItemExportException;
 
     /**
      * Set the DSpace Runnable Handler

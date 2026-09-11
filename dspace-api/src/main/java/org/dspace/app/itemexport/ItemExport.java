@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import org.apache.commons.io.file.PathUtils;
 import org.dspace.app.itemexport.factory.ItemExportServiceFactory;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -203,6 +205,18 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
         setEPerson(context);
         setDestDirName(context, itemExportService);
         setZip(context);
+
+        // Phase 1: lightweight item count check
+        DSpaceObject exportObject = item != null ? item : collection;
+        List<DSpaceObject> dsoList = Collections.<DSpaceObject>singletonList(exportObject);
+        int itemCount = itemExportService.countExportItems(context, dsoList);
+        itemExportService.validateExportItemCount(itemCount);
+
+        // Phase 2: size + disk space check (only when bitstreams included)
+        if (!excludeBitstreams) {
+            long estimatedSize = itemExportService.estimateExportSize(context, dsoList);
+            itemExportService.validateExportSize(estimatedSize);
+        }
 
         Iterator<Item> items;
         if (item != null) {
