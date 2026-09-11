@@ -52,6 +52,17 @@ public class DoiCheckTest {
         );
     }
 
+    /**
+     * A value that starts like a DOI but cannot be one has to be rejected promptly. Three
+     * adjacent unbounded digit runs in the pattern needed time cubic in the length of the value,
+     * where rejecting it is now linear. The bound is therefore a very wide margin and is not
+     * sensitive to a slow CI machine.
+     */
+    @Test(timeout = 5000)
+    public void rejectsLongDigitRunWithoutBacktracking() {
+        assertFalse(DoiCheck.isDoi("10.1234/1-" + "00".repeat(2000) + "!"));
+    }
+
     private List<String> wrongDOIsToTest() {
         return Arrays.asList(
             StringUtils.EMPTY,
