@@ -659,6 +659,11 @@
             <artifactId>guava</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+            <artifactId>owasp-java-html-sanitizer</artifactId>
+        </dependency>
+
         <!-- Gson is needed by JENA, borker-client, OAuth, Handle and JClouds -->
         <dependency>
             <groupId>com.google.code.gson</groupId>

@@ -65,6 +65,8 @@
     <bean class="org.dspace.scripts.ScriptServiceImpl"/>
 
     <bean class="org.dspace.alerts.SystemWideAlertServiceImpl"/>
+    <bean class="org.dspace.core.EmailTemplateServiceImpl"/>
+    <bean class="org.dspace.core.SystemConfigVariableServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.AuthorityServiceUtils"/>

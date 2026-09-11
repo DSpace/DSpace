@@ -1248,7 +1248,8 @@ public class RestResourceController implements InitializingBean {
      * @param jsonNode    the part of the request body representing the updated rest object
      * @return the relevant REST resource
      */
-    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32,
+    @RequestMapping(method = RequestMethod.PUT,
+        value = {REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32, REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG},
         consumes = {"application/json", "application/hal+json"})
     public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
                                                     @PathVariable String apiCategory, @PathVariable String model,
