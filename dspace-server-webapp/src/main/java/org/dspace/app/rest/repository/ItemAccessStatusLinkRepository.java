@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
-import org.dspace.access.status.DefaultAccessStatusHelper;
+import org.dspace.access.status.AccessStatusHelper;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.app.rest.model.AccessStatusRest;
 import org.dspace.app.rest.model.ItemRest;
@@ -56,7 +56,7 @@ public class ItemAccessStatusLinkRepository extends AbstractDSpaceRestRepository
             AccessStatusRest accessStatusRest = new AccessStatusRest();
             AccessStatus accessStatus = accessStatusService.getAccessStatus(context, item);
             String status = accessStatus.getStatus();
-            if (status == DefaultAccessStatusHelper.EMBARGO) {
+            if (status == AccessStatusHelper.EMBARGO) {
                 LocalDate availabilityDate = accessStatus.getAvailabilityDate();
                 String embargoDate = availabilityDate.toString();
                 accessStatusRest.setEmbargoDate(embargoDate);
