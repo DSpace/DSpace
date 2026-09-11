@@ -60,7 +60,10 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.core.Constants;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
@@ -89,6 +92,12 @@ public class StatisticsRestSearchByCategoryRepositoryIT extends AbstractControll
     ConfigurationService configurationService;
     @Autowired
     protected AuthorizeService authorizeService;
+    @Autowired
+    private PluginService pluginService;
+    @Autowired
+    private ChoiceAuthorityService choiceAuthorityService;
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     private Site site;
     private Community communityCRIS;
@@ -136,6 +145,19 @@ public class StatisticsRestSearchByCategoryRepositoryIT extends AbstractControll
         super.setUp();
         // Explicitly use solr commit in SolrLoggerServiceImpl#postView
         configurationService.setProperty("solr-statistics.autoCommit", false);
+
+        // Enable authority control on the metadata used to link the CRIS entities together, so that the
+        // relations between publications, projects and persons are properly resolved by the usage reports.
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("authority.controlled.dc.relation.project", "true");
+        configurationService.setProperty("authority.controlled.crispj.investigator", "true");
+        configurationService.setProperty("authority.controlled.crispj.coinvestigators", "true");
+        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
+        // the properties that we're altering above and this is only used within the tests
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
         context.turnOffAuthorisationSystem();
         site = SiteBuilder.createSite(context).build();
         communityCRIS = CommunityBuilder.createCommunity(context).build();

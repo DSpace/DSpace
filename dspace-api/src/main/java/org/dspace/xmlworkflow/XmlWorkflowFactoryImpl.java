@@ -111,6 +111,10 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                 try {
                     Collection collection = (Collection) handleService.resolveToObject(context, handle);
                     if (collection != null) {
+                        // Initialize the lazy metadata while the Hibernate session is still active,
+                        // so callers can safely read the collection name after the surrounding
+                        // transaction is committed/closed (scoped to this path only).
+                        collection.getName();
                         collectionsMapped.add(collection);
                     }
                 } catch (SQLException e) {
@@ -128,6 +132,10 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
         try {
             for (Collection collection : this.collectionService.findAll(context)) {
                 if (workflowMapping.get(collection.getHandle()) == null) {
+                    // Initialize the lazy metadata while the Hibernate session is still active,
+                    // so callers can safely read the collection name after the surrounding
+                    // transaction is committed/closed (scoped to this path only).
+                    collection.getName();
                     nonMappedCollections.add(collection);
                 }
             }

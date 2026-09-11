@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet;
 
 /**
  * This class represents the result that the discovery search impl returns
@@ -54,6 +56,9 @@ public class DiscoverResult {
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
         facetPivotResults = new LinkedHashMap<String, List<FacetPivotResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
+        facetResultsMissing = new LinkedHashMap<String, Long>();
+        facetResultMore = new LinkedHashMap<String, Long>();
+        facetResultTotalElements = new LinkedHashMap<String, Long>();
         highlightedResults = new HashMap<String, IndexableObjectHighlightResult>();
     }
 
@@ -114,6 +119,15 @@ public class DiscoverResult {
         this.facetResults.put(facetField, facetValues);
     }
 
+    public void addFacetPivotResult(String facetPivot, FacetPivotResult... pivotResults) {
+        List<FacetPivotResult> facetValues = this.facetPivotResults.get(facetPivot);
+        if (facetValues == null) {
+            facetValues = new ArrayList<FacetPivotResult>();
+        }
+        facetValues.addAll(Arrays.asList(pivotResults));
+        this.facetPivotResults.put(facetPivot, facetValues);
+    }
+
     public void setFacetResultMissing(String facetField, long missingCount) {
         facetResultsMissing.put(facetField, missingCount);
     }
@@ -146,15 +160,6 @@ public class DiscoverResult {
         return ListUtils.emptyIfNull(facetResults.get(facet));
     }
 
-    public void addFacetPivotResult(String facetPivot, FacetPivotResult... pivotResults) {
-        List<FacetPivotResult> facetValues = this.facetPivotResults.get(facetPivot);
-        if (facetValues == null) {
-            facetValues = new ArrayList<FacetPivotResult>();
-        }
-        facetValues.addAll(Arrays.asList(pivotResults));
-        this.facetPivotResults.put(facetPivot, facetValues);
-    }
-
     public Map<String, List<FacetPivotResult>> getFacetPivotResults() {
         return facetPivotResults;
     }
@@ -164,7 +169,11 @@ public class DiscoverResult {
     }
 
     public List<FacetResult> getFacetResult(DiscoverySearchFilterFacet field) {
-        List<DiscoverResult.FacetResult> facetValues = getFacetResult(field.getIndexFieldName());
+        String facetName = field.getIndexFieldName();
+        if (Strings.CS.startsWith(field.getIndexFieldName(), GraphDiscoverSearchFilterFacet.TYPE_PREFIX)) {
+            facetName = facetName.split("\\.", 3)[2];
+        }
+        List<DiscoverResult.FacetResult> facetValues = getFacetResult(facetName);
         // Check if we are dealing with a date, sometimes the facet values arrive as dates !
         if (facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             facetValues = getFacetResult(field.getIndexFieldName() + ".year");
@@ -263,6 +272,59 @@ public class DiscoverResult {
         public int getTotalElements() {
             return totalElements;
         }
+    }
+
+    public static class FacetPivotResult {
+
+        private long count;
+
+        private String value;
+
+        private FacetPivotResult[] pivot;
+
+        public FacetPivotResult(long count, String value, FacetPivotResult[] pivot) {
+            this.count = count;
+            this.value = value;
+            this.pivot = pivot;
+        }
+
+        public static FacetPivotResult[] fromPivotFields(List<PivotField> pivotFields) {
+            return ListUtils.emptyIfNull(pivotFields).stream()
+                .map(FacetPivotResult::fromPivotField)
+                .toArray(FacetPivotResult[]::new);
+        }
+
+        public static FacetPivotResult fromPivotField(PivotField pivotField) {
+            int count = pivotField.getCount();
+            String value = String.valueOf(pivotField.getValue());
+            FacetPivotResult[] pivot = fromPivotFields(pivotField.getPivot());
+            return new FacetPivotResult(count, value, pivot);
+        }
+
+        public long getCount() {
+            return count;
+        }
+
+        public void setCount(long count) {
+            this.count = count;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public FacetPivotResult[] getPivot() {
+            return pivot;
+        }
+
+        public void setPivot(FacetPivotResult[] pivot) {
+            this.pivot = pivot;
+        }
+
     }
 
     public String getSpellCheckQuery() {
@@ -379,60 +441,4 @@ public class DiscoverResult {
         }
     }
 
-    /**
-     * This class models the result of a Solr facet pivot query, storing the pivot
-     * value, its count and the nested pivot results.
-     */
-    public static class FacetPivotResult {
-
-        private long count;
-
-        private String value;
-
-        private FacetPivotResult[] pivot;
-
-        public FacetPivotResult(long count, String value, FacetPivotResult[] pivot) {
-            this.count = count;
-            this.value = value;
-            this.pivot = pivot;
-        }
-
-        public static FacetPivotResult[] fromPivotFields(List<PivotField> pivotFields) {
-            return ListUtils.emptyIfNull(pivotFields).stream()
-                .map(FacetPivotResult::fromPivotField)
-                .toArray(FacetPivotResult[]::new);
-        }
-
-        public static FacetPivotResult fromPivotField(PivotField pivotField) {
-            int count = pivotField.getCount();
-            String value = String.valueOf(pivotField.getValue());
-            FacetPivotResult[] pivot = fromPivotFields(pivotField.getPivot());
-            return new FacetPivotResult(count, value, pivot);
-        }
-
-        public long getCount() {
-            return count;
-        }
-
-        public void setCount(long count) {
-            this.count = count;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public FacetPivotResult[] getPivot() {
-            return pivot;
-        }
-
-        public void setPivot(FacetPivotResult[] pivot) {
-            this.pivot = pivot;
-        }
-
-    }
 }
