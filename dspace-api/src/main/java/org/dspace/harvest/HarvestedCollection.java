@@ -92,6 +92,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
     protected HarvestedCollection() {
     }
 
+    @Override
     public Integer getID() {
         return id;
     }

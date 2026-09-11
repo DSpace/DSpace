@@ -24,6 +24,7 @@ import org.dspace.core.Context;
  */
 public class SystemWideAlertDAOImpl extends AbstractHibernateDAO<SystemWideAlert> implements SystemWideAlertDAO {
 
+    @Override
     public List<SystemWideAlert> findAll(final Context context, final int limit, final int offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, SystemWideAlert.class);
@@ -33,6 +34,7 @@ public class SystemWideAlertDAOImpl extends AbstractHibernateDAO<SystemWideAlert
         return list(context, criteriaQuery, false, SystemWideAlert.class, limit, offset);
     }
 
+    @Override
     public List<SystemWideAlert> findAllActive(final Context context, final int limit, final int offset)
             throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

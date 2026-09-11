@@ -44,6 +44,7 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
         return getType();
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }

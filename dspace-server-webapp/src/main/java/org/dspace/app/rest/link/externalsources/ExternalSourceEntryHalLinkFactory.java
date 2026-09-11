@@ -48,6 +48,7 @@ public class ExternalSourceEntryHalLinkFactory
         return ExternalSourcesRestController.class;
     }
 
+    @Override
     protected Class<ExternalSourceEntryResource> getResourceClass() {
         return ExternalSourceEntryResource.class;
     }

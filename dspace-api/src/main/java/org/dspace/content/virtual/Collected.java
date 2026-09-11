@@ -94,6 +94,7 @@ public class Collected implements VirtualMetadataConfiguration {
      * @param item      The item that will be used to either retrieve metadata values from
      * @return The String values for all of the retrieved metadatavalues
      */
+    @Override
     public List<String> getValues(Context context, Item item) {
         List<String> resultValues = new LinkedList<>();
         List<String> value = this.getFields();

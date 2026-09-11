@@ -79,6 +79,7 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream> {
      * @param b2 second bitstream
      * @return
      */
+    @Override
     public int compare(Bitstream b1, Bitstream b2) {
         int priority1 = getPriorityFromBitstream(b1);
         int priority2 = getPriorityFromBitstream(b2);

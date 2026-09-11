@@ -115,6 +115,7 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
      * The findOne method is not supported in this repository
      */
     @PreAuthorize("permitAll()")
+    @Override
     public SubmissionCCLicenseUrlRest findOne(final Context context, final String s) {
         throw new RepositoryMethodNotImplementedException(SubmissionCCLicenseUrlRest.NAME, "findOne");
     }
@@ -122,10 +123,12 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
     /**
      * The findAll method is not supported in this repository
      */
+    @Override
     public Page<SubmissionCCLicenseUrlRest> findAll(final Context context, final Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(SubmissionCCLicenseUrlRest.NAME, "findAll");
     }
 
+    @Override
     public Class<SubmissionCCLicenseUrlRest> getDomainClass() {
         return SubmissionCCLicenseUrlRest.class;
     }

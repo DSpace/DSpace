@@ -31,15 +31,18 @@ public class SearchEventRest extends BaseObjectRest<UUID> {
     private SearchResultsRest.Sorting sort;
     private PageRest page;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Override
     public String getType() {
         return NAME;
     }

@@ -50,10 +50,12 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
         return PLURAL_NAME;
     }
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }

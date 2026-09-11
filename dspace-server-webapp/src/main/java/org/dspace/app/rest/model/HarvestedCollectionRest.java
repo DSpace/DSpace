@@ -58,15 +58,18 @@ public class HarvestedCollectionRest extends BaseObjectRest<Integer> {
         return id;
     }
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return HarvestedCollectionRest.class;
     }
 
     @JsonIgnore
+    @Override
     public String getType() {
         return NAME;
     }

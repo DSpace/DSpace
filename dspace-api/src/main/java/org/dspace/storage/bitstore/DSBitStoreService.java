@@ -51,6 +51,7 @@ public class DSBitStoreService extends BaseBitStoreService {
     /**
      * Initialize the asset store
      */
+    @Override
     public void init() {
         // the config string contains just the asset store directory path
         //set baseDir?
@@ -62,6 +63,7 @@ public class DSBitStoreService extends BaseBitStoreService {
      *
      * @return a unique ID
      */
+    @Override
     public String generateId() {
         return Utils.generateKey();
     }
@@ -74,6 +76,7 @@ public class DSBitStoreService extends BaseBitStoreService {
      * @return The stream of bits, or null
      * @throws java.io.IOException If a problem occurs while retrieving the bits
      */
+    @Override
     public InputStream get(Bitstream bitstream) throws IOException {
         try {
             return new FileInputStream(getFile(bitstream));
@@ -94,6 +97,7 @@ public class DSBitStoreService extends BaseBitStoreService {
      * @param in The stream of bits to store
      * @throws java.io.IOException If a problem occurs while storing the bits
      */
+    @Override
     public void put(Bitstream bitstream, InputStream in) throws IOException {
         try {
             File file = getFile(bitstream);
@@ -136,6 +140,7 @@ public class DSBitStoreService extends BaseBitStoreService {
      * @throws           java.io.IOException If a problem occurs while obtaining
      *                   metadata
      */
+    @Override
     public Map<String, Object> about(Bitstream bitstream, List<String> attrs) throws IOException {
         try {
             // potentially expensive, since it may calculate the checksum
@@ -156,6 +161,7 @@ public class DSBitStoreService extends BaseBitStoreService {
      * @param bitstream The asset to delete
      * @throws java.io.IOException If a problem occurs while removing the asset
      */
+    @Override
     public void remove(Bitstream bitstream) throws IOException {
         try {
             File file = getFile(bitstream);

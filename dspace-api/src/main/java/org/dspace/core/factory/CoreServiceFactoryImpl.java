@@ -48,6 +48,7 @@ public class CoreServiceFactoryImpl extends CoreServiceFactory {
         return pluginService;
     }
 
+    @Override
     public ClientInfoService getClientInfoService() {
         return clientInfoService;
     }

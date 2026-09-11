@@ -31,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSectionResource, RestResourceController> {
 
+    @Override
     protected void addLinks(final SubmissionSectionResource halResource, final Pageable pageable,
                             final LinkedList<Link> list) throws Exception {
         SubmissionSectionRest sd = halResource.getContent();
@@ -57,10 +58,12 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
         list.add(buildLink(NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
     }
 
+    @Override
     protected Class<RestResourceController> getControllerClass() {
         return RestResourceController.class;
     }
 
+    @Override
     protected Class<SubmissionSectionResource> getResourceClass() {
         return SubmissionSectionResource.class;
     }
