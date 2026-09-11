@@ -28,6 +28,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
@@ -50,11 +51,14 @@ public class PREMISCrosswalk
     private static final Logger log = LogManager.getLogger(PREMISCrosswalk.class);
 
     private static final Namespace PREMIS_NS =
-        Namespace.getNamespace("premis", "http://www.loc.gov/standards/premis");
+        Namespace.getNamespace("premis", "http://www.loc.gov/premis/v3");
+
+    private static final Namespace XSI_NS =
+            Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
     // XML schemaLocation fragment for this crosswalk, from config.
     private final String schemaLocation =
-        PREMIS_NS.getURI() + " http://www.loc.gov/standards/premis/PREMIS-v1-0.xsd";
+        PREMIS_NS.getURI() + " https://www.loc.gov/standards/premis/premis.xsd";
 
     private static final Namespace[] namespaces = {PREMIS_NS};
 
@@ -206,7 +210,10 @@ public class PREMISCrosswalk
         Bitstream bitstream = (Bitstream) dso;
 
         Element premis = new Element("premis", PREMIS_NS);
+        premis.addNamespaceDeclaration(XSI_NS);
+        premis.setAttribute(new Attribute("version", "3.0"));
         Element object = new Element("object", PREMIS_NS);
+        object.setAttribute(new Attribute("type", "premis:file", XSI_NS));
         premis.addContent(object);
 
         // objectIdentifier is required
@@ -239,11 +246,6 @@ public class PREMISCrosswalk
 
         oid.addContent(oiv);
         object.addContent(oid);
-
-        // objectCategory is fixed value, "File".
-        Element oc = new Element("objectCategory", PREMIS_NS);
-        oc.setText("File");
-        object.addContent(oc);
 
         Element ochar = new Element("objectCharacteristics", PREMIS_NS);
         object.addContent(ochar);
