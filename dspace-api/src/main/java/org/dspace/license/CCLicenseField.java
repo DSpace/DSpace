@@ -29,12 +29,15 @@ public class CCLicenseField {
      *
      * @param id    The unique identifier for this field; this value will be used in constructing the answers XML.
      * @param label The label to use when generating the user interface.
+     * @param fieldEnum A list of yes/no answers to questions with labels
+     * @param type  The type of input if not a yes/no question
      */
-    public CCLicenseField(String id, String label, String description, List<CCLicenseFieldEnum> fieldEnum) {
+    public CCLicenseField(String id, String label, String description, List<CCLicenseFieldEnum> fieldEnum, String type) {
         this.id = id;
         this.label = label;
         this.description = description;
         this.fieldEnum = fieldEnum;
+        this.type = type;
     }
 
     /**

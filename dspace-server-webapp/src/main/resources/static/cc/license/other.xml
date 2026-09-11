@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<licenseclass id="other">
+  <label xml:lang="en">Other</label>
+  <field id="dc.rights">
+    <label xml:lang="en">Rights</label>
+    <description xml:lang="en">Provide a copyright statement and/or reuse rights.</description>
+    <type>textarea</type>
+  </field>
+  <field id="dc.rights.uri">
+    <label xml:lang="en">Rights URI</label>
+    <description xml:lang="en">Enter the link or URL for a rights or license statement.</description>
+    <type>input</type>
+  </field>
+</licenseclass>
