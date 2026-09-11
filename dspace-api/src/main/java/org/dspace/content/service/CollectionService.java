@@ -501,6 +501,7 @@ public interface CollectionService
      */
     public Collection findByItem(Context context, Item item) throws SQLException;
 
+
     /**
      * Counts the number of Collection for which the current user has 'submit' privileges.
      *

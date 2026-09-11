@@ -138,6 +138,13 @@
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
                 <entry key="person-relationships" value-ref="personRelationships"/>
 
+                <!-- Discovery configurations backing the dynamic explore sections (dynamic-sections.xml) -->
+                <entry key="researchoutputs" value-ref="researchoutputs"/>
+                <entry key="project_funding" value-ref="project_funding"/>
+                <entry key="homePageTopItems" value-ref="homePageTopItemsConfiguration"/>
+                <!-- The 'site' explore section reuses the default site-scoped configuration -->
+                <entry key="site" value-ref="defaultConfiguration"/>
+
                 <entry key="orgunit" value-ref="orgUnit"/>
                 <!-- Same as the "orgunit" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
@@ -4182,6 +4189,170 @@
         <property name="metadataField" value="dc.date.issued"/>
         <property name="type" value="date"/>
         <property name="defaultSortOrder" value="desc"/>
+    </bean>
+
+    <!-- ===================================================================== -->
+    <!-- Discovery configurations and supporting beans ported from main-cris   -->
+    <!-- to back the dynamic explore sections defined in dynamic-sections.xml.  -->
+    <!-- ===================================================================== -->
+
+    <!-- Sort fields required by the ported configurations -->
+    <bean id="sortDateAccessionedDesc" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="dc.date.accessioned"/>
+        <property name="type" value="date"/>
+        <property name="defaultSortOrder" value="desc"/>
+    </bean>
+
+    <!-- Facet required by the project_funding configuration -->
+    <bean id="searchFilterProjectOrgUnits" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">
+        <property name="indexFieldName" value="projectOrgUnits"/>
+        <property name="metadataFields">
+            <list>
+                <value>crispj.coordinator</value>
+                <value>crispj.partnerou</value>
+                <value>crispj.organization</value>
+                <value>oairecerif.funder</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="splitter" value="::"/>
+    </bean>
+
+    <!-- researchoutputs: explore section for Publication/Patent/Product entities -->
+    <bean id="researchoutputs" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="researchoutputs"/>
+        <property name="indexAlways" value="true"/>
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterEditor" />
+                <ref bean="searchFilterOrgUnit" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterFunding" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterEntityType"/>
+            </list>
+        </property>
+        <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/>
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterEditor" />
+                <ref bean="searchFilterOrgUnit" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterFunding" />
+                <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterFileNameInOriginalBundle" />
+                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
+                <ref bean="searchFilterEntityType"/>
+            </list>
+        </property>
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="defaultFilterQueries">
+            <list>
+                <value>search.resourcetype:Item AND (entityType_keyword:Publication OR entityType_keyword:Patent OR entityType_keyword:Product)</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned" />
+                <property name="type" value="date"/>
+                <property name="max" value="20"/>
+                <property name="useAsHomePage" value="false"/>
+            </bean>
+        </property>
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+    <!-- project_funding: explore section for Project/Funding entities -->
+    <bean id="project_funding" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="project_funding"/>
+        <property name="indexAlways" value="true"/>
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterSubject"/>
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterProjectInvestigator"/>
+                <ref bean="searchFilterProjectOrgUnits" />
+            </list>
+        </property>
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterSubject"/>
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterProjectInvestigator"/>
+                <ref bean="searchFilterProjectOrgUnits"/>
+                <ref bean="searchFilterIdentifier"/>
+            </list>
+        </property>
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitleAsc"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="defaultFilterQueries">
+            <list>
+                <value>search.resourcetype:Item AND (entityType_keyword:Project OR entityType_keyword:Funding)</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned"/>
+                <property name="type" value="date"/>
+                <property name="max" value="5"/>
+                <property name="useAsHomePage" value="false"/>
+            </bean>
+        </property>
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+    <!-- homePageTopItems: used by the 'site' section top-items components -->
+    <bean id="homePageTopItemsConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration">
+        <property name="indexAlways" value="true"/>
+        <property name="sidebarFacets">
+            <list>
+            </list>
+        </property>
+        <property name="searchFilters">
+            <list>
+            </list>
+        </property>
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortDateAccessionedDesc" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="defaultFilterQueries">
+            <list>
+                <value>search.resourcetype:Item</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
     </bean>
 
 </beans>
