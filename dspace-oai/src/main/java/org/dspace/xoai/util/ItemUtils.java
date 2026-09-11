@@ -10,6 +10,7 @@ package org.dspace.xoai.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -237,7 +238,9 @@ public class ItemUtils {
                     in = bitstreamService.retrieve(context, licBit);
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     Utils.bufferedCopy(in, out);
-                    license.getField().add(createValue("bin", Base64Utils.encode(out.toString())));
+                    license.getField().add(createValue("bin",
+                        Base64Utils.encode(out.toString(StandardCharsets.UTF_8)))
+                    );
                 } else {
                     log.info("Missing READ rights for license bitstream. Did not include license bitstream for item: "
                             + item.getID() + ".");

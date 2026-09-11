@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -1533,7 +1532,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
     }
 
-    protected String generateURL(String baseURL, Map<String, String> parameters) throws UnsupportedEncodingException {
+    protected String generateURL(String baseURL, Map<String, String> parameters) {
         boolean first = true;
         StringBuilder result = new StringBuilder(baseURL);
         for (String key : parameters.keySet()) {
@@ -1544,7 +1543,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 result.append("&");
             }
 
-            result.append(key).append("=").append(URLEncoder.encode(parameters.get(key), "UTF-8"));
+            result.append(key).append("=").append(URLEncoder.encode(parameters.get(key), StandardCharsets.UTF_8));
         }
 
         return result.toString();

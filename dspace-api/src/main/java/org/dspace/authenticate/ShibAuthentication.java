@@ -7,8 +7,8 @@
  */
 package org.dspace.authenticate;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -503,11 +503,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/shibboleth"
                     + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
 
-            try {
-                shibURL += "?target=" + URLEncoder.encode(returnURL, "UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                log.error("Unable to generate lazysession authentication",uee);
-            }
+            shibURL += "?target=" + URLEncoder.encode(returnURL, StandardCharsets.UTF_8);
 
             log.debug("Redirecting user to Shibboleth initiator: " + shibURL);
 
@@ -1131,12 +1127,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                 false);
 
         if (!StringUtils.isEmpty(value) && reconvertAttributes) {
-            try {
-                value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                log.warn("Failed to reconvert shibboleth attribute ("
-                             + name + ").", ex);
-            }
+            value = new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
         }
 
         return value;

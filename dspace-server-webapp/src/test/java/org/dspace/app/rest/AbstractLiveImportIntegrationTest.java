@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,11 +67,10 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
         return metadatumDTO;
     }
 
-    protected CloseableHttpResponse mockResponse(String xmlExample, int statusCode, String reason)
-            throws UnsupportedEncodingException {
+    protected CloseableHttpResponse mockResponse(String xmlExample, int statusCode, String reason) {
         BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
         basicHttpEntity.setChunked(true);
-        basicHttpEntity.setContent(IOUtils.toInputStream(xmlExample));
+        basicHttpEntity.setContent(IOUtils.toInputStream(xmlExample, StandardCharsets.UTF_8));
 
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
         when(response.getStatusLine()).thenReturn(statusLine(statusCode, reason));

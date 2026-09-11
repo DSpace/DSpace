@@ -8,7 +8,6 @@
 package org.dspace.statistics.export.processor;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 
@@ -92,10 +91,8 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
      * @param string    to which the additional data needs to be added
      * @param bitstream
      * @return the string with additional data
-     * @throws UnsupportedEncodingException
      */
-    protected String addObjectSpecificData(final String string, Bitstream bitstream)
-            throws UnsupportedEncodingException {
+    protected String addObjectSpecificData(final String string, Bitstream bitstream) {
         StringBuilder data = new StringBuilder(string);
 
         String bitstreamInfo = getBitstreamInfo(bitstream);

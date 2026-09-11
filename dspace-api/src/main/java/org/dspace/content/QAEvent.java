@@ -7,7 +7,7 @@
  */
 package org.dspace.content;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -80,11 +80,7 @@ public class QAEvent {
         this.trust = trust;
         this.message = message;
         this.lastUpdate = lastUpdate;
-        try {
-            computedEventId();
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
+        computedEventId();
     }
 
     public String getOriginalId() {
@@ -129,11 +125,7 @@ public class QAEvent {
 
     public String getEventId() {
         if (eventId == null) {
-            try {
-                computedEventId();
-            } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
+            computedEventId();
         }
         return eventId;
     }
@@ -187,11 +179,17 @@ public class QAEvent {
      * must be compute on the get method. This method create a signature based on
      * the event fields and store it in the eventid attribute.
      */
-    private void computedEventId() throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest digester = MessageDigest.getInstance("MD5");
+    private void computedEventId() {
+        MessageDigest digester;
+        try {
+            digester = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            // This should never happen, and if it does, check your JVM security policy
+            throw new IllegalStateException("MD5 not supported by this JVM", e);
+        }
         String dataToString = "source=" + source + ",originalId=" + originalId + ", title=" + title + ", topic="
             + topic + ", trust=" + trust + ", message=" + message;
-        digester.update(dataToString.getBytes("UTF-8"));
+        digester.update(dataToString.getBytes(StandardCharsets.UTF_8));
         byte[] signature = digester.digest();
         char[] arr = new char[signature.length << 1];
         for (int i = 0; i < signature.length; i++) {

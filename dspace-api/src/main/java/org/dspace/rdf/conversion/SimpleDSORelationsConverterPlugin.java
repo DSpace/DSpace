@@ -9,7 +9,6 @@ package org.dspace.rdf.conversion;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -473,16 +472,10 @@ public class SimpleDSORelationsConverterPlugin
             return null;
         }
         String dspaceURL = configurationService.getProperty("dspace.ui.url");
-        String link = "";
-        try {
-            // the link to the bitstream in the UI
-            link = dspaceURL + "/bitstream/" + parent.getHandle() + "/"
-                + bitstream.getSequenceID() + "/"
-                + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException("DSpace's default encoding is not supported.", ex);
-        }
-        return link;
+        // the link to the bitstream in the UI
+        return dspaceURL + "/bitstream/" + parent.getHandle() + "/"
+            + bitstream.getSequenceID() + "/"
+            + Util.encodeBitstreamName(bitstream.getName());
     }
 
     @Override

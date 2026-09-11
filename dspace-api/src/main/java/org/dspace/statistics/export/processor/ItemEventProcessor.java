@@ -8,7 +8,6 @@
 package org.dspace.statistics.export.processor;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 
@@ -63,9 +62,8 @@ public class ItemEventProcessor extends ExportEventProcessor {
      * @param string to which the additional data needs to be added
      * @param item
      * @return the string with additional data
-     * @throws UnsupportedEncodingException
      */
-    protected String addObjectSpecificData(final String string, Item item) throws UnsupportedEncodingException {
+    protected String addObjectSpecificData(final String string, Item item) {
         StringBuilder data = new StringBuilder(string);
         String itemInfo = getItemInfo(item);
         data.append("&").append(URLEncoder.encode("svc_dat", UTF_8)).append("=")
