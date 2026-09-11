@@ -260,6 +260,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         return null;
     }
 
+    @Deprecated
     @Override
     public String fetchLicenseRDF(Document license) {
         StringWriter result = new StringWriter();
@@ -655,17 +656,13 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     public boolean updateLicense(final Context context, final String licenseUri, final Item item)
             throws AuthorizeException, SQLException {
         try {
-            Document doc = ccLicenseConnectorService.retrieveLicenseRDFDoc(licenseUri);
-            if (doc == null) {
-                return false;
-            }
-            String licenseName = ccLicenseConnectorService.retrieveLicenseName(doc);
+            String licenseName = ccLicenseConnectorService.retrieveLicenseName(licenseUri);
             if (StringUtils.isBlank(licenseName)) {
                 return false;
             }
 
             removeLicense(context, item);
-            addLicense(context, item, licenseUri, licenseName, doc);
+            addLicense(context, item, licenseUri, licenseName, null);
 
             return true;
 
