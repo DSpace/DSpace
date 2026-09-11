@@ -1208,6 +1208,111 @@ public class EPersonTest extends AbstractUnitTest {
     }
 
     /**
+     * Tests the {@code searchMembersCount} method to verify that it correctly counts
+     * an EPerson as a member of a given group when searched by email.
+     *
+     * This test ensures that:
+     * - An EPerson is created and added to a test group.
+     * - When searching with the EPerson's email, the method returns 1, confirming membership.
+     * - Cleanup is performed after execution to maintain test integrity.
+     *
+     * @throws SQLException If a database access error occurs.
+     * @throws AuthorizeException If authorization fails.
+     * @throws IOException If an I/O error occurs.
+     */
+    @Test
+    public void testSearchMembersCount() throws SQLException, AuthorizeException, IOException {
+
+        Group testGroup = createGroup("TestingGroup");
+        String testEPersonMail = "test-eperson@mail.com";
+        String testFirstname = "testFirstname";
+        String testLastname = "testLastname";
+        EPerson testEPerson = createEPersonAndAddToGroup(testEPersonMail, testFirstname, testLastname, testGroup);
+
+        try {
+            // test by email
+            String query1 = testEPersonMail;
+            int result1 = ePersonService.searchMembersCount(context, query1, testGroup);
+            assertEquals(1, result1);
+
+            // test by first name
+            String query2 = testFirstname;
+            int result2 = ePersonService.searchMembersCount(context, query2, testGroup);
+            assertEquals(1, result2);
+
+            // test by last name
+            String query3 = testLastname;
+            int result3 = ePersonService.searchMembersCount(context, query3, testGroup);
+            assertEquals(1, result3);
+
+        } finally {
+            // delete test group
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, testGroup);
+            ePersonService.delete(context, testEPerson);
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
+     * Tests the {@code searchMembers} method to verify that it correctly retrieves
+     * a list of EPersons matching the given query and belonging to the specified group.
+     *
+     * This test ensures that:
+     * - An existing EPerson is added to a test group.
+     * - When searching with the EPerson's email, the method returns the correct EPerson.
+     * - Cleanup is performed after execution.
+     *
+     * @throws SQLException If a database access error occurs.
+     * @throws AuthorizeException If authorization fails.
+     * @throws IOException If an I/O error occurs.
+     */
+    @Test
+    public void testSearchMembers() throws SQLException, AuthorizeException, IOException {
+        Group testGroup = createGroup("TestingGroup");
+        String testEPersonMail = "test-eperson@mail.com";
+        String testFirstname = "testFirstname";
+        String testLastname = "testLastname";
+        EPerson testEPerson = createEPersonAndAddToGroup(testEPersonMail, testFirstname, testLastname, testGroup);
+
+        try {
+            int offset = 0;
+            int limit = 10;
+
+            // test by email
+            String query1 = testEPersonMail;
+            List<EPerson> result1 = ePersonService.searchMembers(context, query1, testGroup, offset, limit);
+
+            assertNotNull(result1);
+            assertEquals(1, result1.size());
+            assertEquals(testEPerson, result1.get(0));
+
+            // test by first name
+            String query2 = testFirstname;
+            List<EPerson> result2 = ePersonService.searchMembers(context, query2, testGroup, offset, limit);
+
+            assertNotNull(result2);
+            assertEquals(1, result2.size());
+            assertEquals(testEPerson, result2.get(0));
+
+            // test by last name
+            String query3 = testLastname;
+            List<EPerson> result3 = ePersonService.searchMembers(context, query3, testGroup, offset, limit);
+
+            assertNotNull(result3);
+            assertEquals(1, result3.size());
+            assertEquals(testEPerson, result3.get(0));
+
+        } finally {
+            // Cleanup: delete test group
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, testGroup);
+            ePersonService.delete(context, testEPerson);
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
      * Creates an item, sets the specified submitter.
      *
      * This method is just an shortcut, so we must not use all the code again
