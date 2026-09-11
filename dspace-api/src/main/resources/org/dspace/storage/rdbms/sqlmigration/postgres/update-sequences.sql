@@ -37,7 +37,6 @@ SELECT setval('harvested_item_seq', max(id)) FROM harvested_item;
 SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
 SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
-SELECT setval('openurltracker_seq', max(tracker_id)) FROM openurltracker;
 SELECT setval('orcid_history_id_seq', max(id)) FROM orcid_history;
 SELECT setval('orcid_queue_id_seq', max(id)) FROM orcid_queue;
 SELECT setval('orcid_token_id_seq', max(id)) FROM orcid_token;
