@@ -7,6 +7,109 @@
             <!-- Restrict access to hidden items by default -->
             <Filter ref="defaultFilter"/>
 
+            <!-- Sets -->
+            <Set ref="ddc_000"/>
+            <Set ref="ddc_010"/>
+            <Set ref="ddc_020"/>
+            <Set ref="ddc_030"/>
+            <Set ref="ddc_040"/>
+            <Set ref="ddc_050"/>
+            <Set ref="ddc_060"/>
+            <Set ref="ddc_070"/>
+            <Set ref="ddc_080"/>
+            <Set ref="ddc_090"/>
+            <Set ref="ddc_100"/>
+            <Set ref="ddc_110"/>
+            <Set ref="ddc_120"/>
+            <Set ref="ddc_130"/>
+            <Set ref="ddc_140"/>
+            <Set ref="ddc_150"/>
+            <Set ref="ddc_160"/>
+            <Set ref="ddc_170"/>
+            <Set ref="ddc_180"/>
+            <Set ref="ddc_190"/>
+            <Set ref="ddc_200"/>
+            <Set ref="ddc_210"/>
+            <Set ref="ddc_220"/>
+            <Set ref="ddc_230"/>
+            <Set ref="ddc_240"/>
+            <Set ref="ddc_250"/>
+            <Set ref="ddc_260"/>
+            <Set ref="ddc_270"/>
+            <Set ref="ddc_280"/>
+            <Set ref="ddc_290"/>
+            <Set ref="ddc_300"/>
+            <Set ref="ddc_310"/>
+            <Set ref="ddc_320"/>
+            <Set ref="ddc_330"/>
+            <Set ref="ddc_340"/>
+            <Set ref="ddc_350"/>
+            <Set ref="ddc_360"/>
+            <Set ref="ddc_370"/>
+            <Set ref="ddc_380"/>
+            <Set ref="ddc_390"/>
+            <Set ref="ddc_400"/>
+            <Set ref="ddc_410"/>
+            <Set ref="ddc_420"/>
+            <Set ref="ddc_430"/>
+            <Set ref="ddc_440"/>
+            <Set ref="ddc_450"/>
+            <Set ref="ddc_460"/>
+            <Set ref="ddc_470"/>
+            <Set ref="ddc_480"/>
+            <Set ref="ddc_490"/>
+            <Set ref="ddc_500"/>
+            <Set ref="ddc_510"/>
+            <Set ref="ddc_520"/>
+            <Set ref="ddc_530"/>
+            <Set ref="ddc_540"/>
+            <Set ref="ddc_550"/>
+            <Set ref="ddc_560"/>
+            <Set ref="ddc_570"/>
+            <Set ref="ddc_580"/>
+            <Set ref="ddc_590"/>
+            <Set ref="ddc_600"/>
+            <Set ref="ddc_610"/>
+            <Set ref="ddc_620"/>
+            <Set ref="ddc_630"/>
+            <Set ref="ddc_640"/>
+            <Set ref="ddc_650"/>
+            <Set ref="ddc_660"/>
+            <Set ref="ddc_670"/>
+            <Set ref="ddc_680"/>
+            <Set ref="ddc_690"/>
+            <Set ref="ddc_700"/>
+            <Set ref="ddc_710"/>
+            <Set ref="ddc_720"/>
+            <Set ref="ddc_730"/>
+            <Set ref="ddc_740"/>
+            <Set ref="ddc_750"/>
+            <Set ref="ddc_760"/>
+            <Set ref="ddc_770"/>
+            <Set ref="ddc_780"/>
+            <Set ref="ddc_790"/>
+            <Set ref="ddc_800"/>
+            <Set ref="ddc_810"/>
+            <Set ref="ddc_820"/>
+            <Set ref="ddc_830"/>
+            <Set ref="ddc_840"/>
+            <Set ref="ddc_850"/>
+            <Set ref="ddc_860"/>
+            <Set ref="ddc_870"/>
+            <Set ref="ddc_880"/>
+            <Set ref="ddc_890"/>
+            <Set ref="ddc_900"/>
+            <Set ref="ddc_910"/>
+            <Set ref="ddc_920"/>
+            <Set ref="ddc_930"/>
+            <Set ref="ddc_940"/>
+            <Set ref="ddc_950"/>
+            <Set ref="ddc_960"/>
+            <Set ref="ddc_970"/>
+            <Set ref="ddc_980"/>
+            <Set ref="ddc_990"/>
+
+            <!-- Formats -->
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Format ref="xoai"/>
@@ -502,6 +605,508 @@
             </Definition>
         </Filter>
 
+        <!-- DDC filters -->
+        <Filter id="ddc_000_filter">
+            <Definition>
+                <Custom ref="ddc_000_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_010_filter">
+            <Definition>
+                <Custom ref="ddc_010_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_020_filter">
+            <Definition>
+                <Custom ref="ddc_020_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_030_filter">
+            <Definition>
+                <Custom ref="ddc_030_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_040_filter">
+            <Definition>
+                <Custom ref="ddc_040_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_050_filter">
+            <Definition>
+                <Custom ref="ddc_050_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_060_filter">
+            <Definition>
+                <Custom ref="ddc_060_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_070_filter">
+            <Definition>
+                <Custom ref="ddc_070_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_080_filter">
+            <Definition>
+                <Custom ref="ddc_080_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_090_filter">
+            <Definition>
+                <Custom ref="ddc_090_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_100_filter">
+            <Definition>
+                <Custom ref="ddc_100_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_110_filter">
+            <Definition>
+                <Custom ref="ddc_110_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_120_filter">
+            <Definition>
+                <Custom ref="ddc_120_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_130_filter">
+            <Definition>
+                <Custom ref="ddc_130_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_140_filter">
+            <Definition>
+                <Custom ref="ddc_140_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_150_filter">
+            <Definition>
+                <Custom ref="ddc_150_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_160_filter">
+            <Definition>
+                <Custom ref="ddc_160_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_170_filter">
+            <Definition>
+                <Custom ref="ddc_170_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_180_filter">
+            <Definition>
+                <Custom ref="ddc_180_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_190_filter">
+            <Definition>
+                <Custom ref="ddc_190_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_200_filter">
+            <Definition>
+                <Custom ref="ddc_200_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_210_filter">
+            <Definition>
+                <Custom ref="ddc_210_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_220_filter">
+            <Definition>
+                <Custom ref="ddc_220_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_230_filter">
+            <Definition>
+                <Custom ref="ddc_230_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_240_filter">
+            <Definition>
+                <Custom ref="ddc_240_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_250_filter">
+            <Definition>
+                <Custom ref="ddc_250_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_260_filter">
+            <Definition>
+                <Custom ref="ddc_260_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_270_filter">
+            <Definition>
+                <Custom ref="ddc_270_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_280_filter">
+            <Definition>
+                <Custom ref="ddc_280_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_290_filter">
+            <Definition>
+                <Custom ref="ddc_290_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_300_filter">
+            <Definition>
+                <Custom ref="ddc_300_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_310_filter">
+            <Definition>
+                <Custom ref="ddc_310_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_320_filter">
+            <Definition>
+                <Custom ref="ddc_320_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_330_filter">
+            <Definition>
+                <Custom ref="ddc_330_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_340_filter">
+            <Definition>
+                <Custom ref="ddc_340_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_350_filter">
+            <Definition>
+                <Custom ref="ddc_350_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_360_filter">
+            <Definition>
+                <Custom ref="ddc_360_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_370_filter">
+            <Definition>
+                <Custom ref="ddc_370_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_380_filter">
+            <Definition>
+                <Custom ref="ddc_380_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_390_filter">
+            <Definition>
+                <Custom ref="ddc_390_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_400_filter">
+            <Definition>
+                <Custom ref="ddc_400_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_410_filter">
+            <Definition>
+                <Custom ref="ddc_410_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_420_filter">
+            <Definition>
+                <Custom ref="ddc_420_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_430_filter">
+            <Definition>
+                <Custom ref="ddc_430_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_440_filter">
+            <Definition>
+                <Custom ref="ddc_440_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_450_filter">
+            <Definition>
+                <Custom ref="ddc_450_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_460_filter">
+            <Definition>
+                <Custom ref="ddc_460_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_470_filter">
+            <Definition>
+                <Custom ref="ddc_470_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_480_filter">
+            <Definition>
+                <Custom ref="ddc_480_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_490_filter">
+            <Definition>
+                <Custom ref="ddc_490_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_500_filter">
+            <Definition>
+                <Custom ref="ddc_500_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_510_filter">
+            <Definition>
+                <Custom ref="ddc_510_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_520_filter">
+            <Definition>
+                <Custom ref="ddc_520_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_530_filter">
+            <Definition>
+                <Custom ref="ddc_530_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_540_filter">
+            <Definition>
+                <Custom ref="ddc_540_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_550_filter">
+            <Definition>
+                <Custom ref="ddc_550_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_560_filter">
+            <Definition>
+                <Custom ref="ddc_560_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_570_filter">
+            <Definition>
+                <Custom ref="ddc_570_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_580_filter">
+            <Definition>
+                <Custom ref="ddc_580_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_590_filter">
+            <Definition>
+                <Custom ref="ddc_590_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_600_filter">
+            <Definition>
+                <Custom ref="ddc_600_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_610_filter">
+            <Definition>
+                <Custom ref="ddc_610_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_620_filter">
+            <Definition>
+                <Custom ref="ddc_620_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_630_filter">
+            <Definition>
+                <Custom ref="ddc_630_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_640_filter">
+            <Definition>
+                <Custom ref="ddc_640_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_650_filter">
+            <Definition>
+                <Custom ref="ddc_650_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_660_filter">
+            <Definition>
+                <Custom ref="ddc_660_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_670_filter">
+            <Definition>
+                <Custom ref="ddc_670_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_680_filter">
+            <Definition>
+                <Custom ref="ddc_680_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_690_filter">
+            <Definition>
+                <Custom ref="ddc_690_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_700_filter">
+            <Definition>
+                <Custom ref="ddc_700_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_710_filter">
+            <Definition>
+                <Custom ref="ddc_710_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_720_filter">
+            <Definition>
+                <Custom ref="ddc_720_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_730_filter">
+            <Definition>
+                <Custom ref="ddc_730_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_740_filter">
+            <Definition>
+                <Custom ref="ddc_740_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_750_filter">
+            <Definition>
+                <Custom ref="ddc_750_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_760_filter">
+            <Definition>
+                <Custom ref="ddc_760_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_770_filter">
+            <Definition>
+                <Custom ref="ddc_770_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_780_filter">
+            <Definition>
+                <Custom ref="ddc_780_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_790_filter">
+            <Definition>
+                <Custom ref="ddc_790_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_800_filter">
+            <Definition>
+                <Custom ref="ddc_800_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_810_filter">
+            <Definition>
+                <Custom ref="ddc_810_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_820_filter">
+            <Definition>
+                <Custom ref="ddc_820_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_830_filter">
+            <Definition>
+                <Custom ref="ddc_830_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_840_filter">
+            <Definition>
+                <Custom ref="ddc_840_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_850_filter">
+            <Definition>
+                <Custom ref="ddc_850_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_860_filter">
+            <Definition>
+                <Custom ref="ddc_860_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_870_filter">
+            <Definition>
+                <Custom ref="ddc_870_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_880_filter">
+            <Definition>
+                <Custom ref="ddc_880_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_890_filter">
+            <Definition>
+                <Custom ref="ddc_890_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_900_filter">
+            <Definition>
+                <Custom ref="ddc_900_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_910_filter">
+            <Definition>
+                <Custom ref="ddc_910_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_920_filter">
+            <Definition>
+                <Custom ref="ddc_920_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_930_filter">
+            <Definition>
+                <Custom ref="ddc_930_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_940_filter">
+            <Definition>
+                <Custom ref="ddc_940_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_950_filter">
+            <Definition>
+                <Custom ref="ddc_950_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_960_filter">
+            <Definition>
+                <Custom ref="ddc_960_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_970_filter">
+            <Definition>
+                <Custom ref="ddc_970_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_980_filter">
+            <Definition>
+                <Custom ref="ddc_980_condition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ddc_990_filter">
+            <Definition>
+                <Custom ref="ddc_990_condition"/>
+            </Definition>
+        </Filter>
+
         <!-- This condition determines if an Item has a "dc.type" field
              which contains "Thesis". -->
         <CustomCondition id="thesisDocumentTypeCondition">
@@ -643,9 +1248,1412 @@
             </Configuration>
         </CustomCondition>
 
+        <!-- DDC custom conditions -->
+        <CustomCondition id="ddc_000_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">000</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_010_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">010</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_020_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">020</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_030_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">030</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_040_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">040</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_050_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">050</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_060_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">060</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_070_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">070</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_080_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">080</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_090_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">090</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_100_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">100</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_110_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">110</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_120_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">120</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_130_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">130</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_140_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">140</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_150_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">150</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_160_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">160</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_170_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">170</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_180_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">180</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_190_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">190</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_200_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">200</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_210_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">210</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_220_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">220</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_230_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">230</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_240_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">240</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_250_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">250</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_260_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">260</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_270_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">270</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_280_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">280</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_290_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">290</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_300_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">300</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_310_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">310</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_320_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">320</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_330_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">330</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_340_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">340</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_350_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">350</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_360_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">360</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_370_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">370</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_380_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">380</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_390_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">390</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_400_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">400</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_410_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">410</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_420_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">420</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_430_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">430</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_440_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">440</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_450_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">450</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_460_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">460</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_470_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">470</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_480_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">480</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_490_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">490</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_500_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">500</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_510_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">510</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_520_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">520</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_530_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">530</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_540_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">540</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_550_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">550</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_560_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">560</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_570_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">570</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_580_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">580</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_590_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">590</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_600_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">600</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_610_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">610</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_620_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">620</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_630_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">630</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_640_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">640</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_650_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">650</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_660_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">660</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_670_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">670</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_680_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">680</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_690_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">690</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_700_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">700</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_710_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">710</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_720_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">720</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_730_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">730</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_740_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">740</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_750_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">750</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_760_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">760</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_770_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">770</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_780_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">780</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_790_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">790</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_800_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">800</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_810_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">810</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_820_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">820</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_830_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">830</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_840_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">840</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_850_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">850</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_860_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">860</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_870_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">870</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_880_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">880</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_890_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">890</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_900_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">900</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_910_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">910</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_920_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">920</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_930_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">930</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_940_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">940</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_950_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">950</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_960_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">960</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_970_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">970</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_980_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">980</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="ddc_990_condition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.subject.ddc</string>
+                <string name="operator">contains</string>
+                <string name="value">990</string>
+            </Configuration>
+        </CustomCondition>
+
     </Filters>
 
     <Sets>
+        <!-- DDC Sets -->
+        <Set id="ddc_000">
+            <Spec>ddc:000</Spec>
+            <Name>DDC 000</Name>
+            <Filter ref="ddc_000_filter"/>
+        </Set>
+        <Set id="ddc_010">
+            <Spec>ddc:010</Spec>
+            <Name>DDC 010</Name>
+            <Filter ref="ddc_010_filter"/>
+        </Set>
+        <Set id="ddc_020">
+            <Spec>ddc:020</Spec>
+            <Name>DDC 020</Name>
+            <Filter ref="ddc_020_filter"/>
+        </Set>
+        <Set id="ddc_030">
+            <Spec>ddc:030</Spec>
+            <Name>DDC 030</Name>
+            <Filter ref="ddc_030_filter"/>
+        </Set>
+        <Set id="ddc_040">
+            <Spec>ddc:040</Spec>
+            <Name>DDC 040</Name>
+            <Filter ref="ddc_040_filter"/>
+        </Set>
+        <Set id="ddc_050">
+            <Spec>ddc:050</Spec>
+            <Name>DDC 050</Name>
+            <Filter ref="ddc_050_filter"/>
+        </Set>
+        <Set id="ddc_060">
+            <Spec>ddc:060</Spec>
+            <Name>DDC 060</Name>
+            <Filter ref="ddc_060_filter"/>
+        </Set>
+        <Set id="ddc_070">
+            <Spec>ddc:070</Spec>
+            <Name>DDC 070</Name>
+            <Filter ref="ddc_070_filter"/>
+        </Set>
+        <Set id="ddc_080">
+            <Spec>ddc:080</Spec>
+            <Name>DDC 080</Name>
+            <Filter ref="ddc_080_filter"/>
+        </Set>
+        <Set id="ddc_090">
+            <Spec>ddc:090</Spec>
+            <Name>DDC 090</Name>
+            <Filter ref="ddc_090_filter"/>
+        </Set>
+        <Set id="ddc_100">
+            <Spec>ddc:100</Spec>
+            <Name>DDC 100</Name>
+            <Filter ref="ddc_100_filter"/>
+        </Set>
+        <Set id="ddc_110">
+            <Spec>ddc:110</Spec>
+            <Name>DDC 110</Name>
+            <Filter ref="ddc_110_filter"/>
+        </Set>
+        <Set id="ddc_120">
+            <Spec>ddc:120</Spec>
+            <Name>DDC 120</Name>
+            <Filter ref="ddc_120_filter"/>
+        </Set>
+        <Set id="ddc_130">
+            <Spec>ddc:130</Spec>
+            <Name>DDC 130</Name>
+            <Filter ref="ddc_130_filter"/>
+        </Set>
+        <Set id="ddc_140">
+            <Spec>ddc:140</Spec>
+            <Name>DDC 140</Name>
+            <Filter ref="ddc_140_filter"/>
+        </Set>
+        <Set id="ddc_150">
+            <Spec>ddc:150</Spec>
+            <Name>DDC 150</Name>
+            <Filter ref="ddc_150_filter"/>
+        </Set>
+        <Set id="ddc_160">
+            <Spec>ddc:160</Spec>
+            <Name>DDC 160</Name>
+            <Filter ref="ddc_160_filter"/>
+        </Set>
+        <Set id="ddc_170">
+            <Spec>ddc:170</Spec>
+            <Name>DDC 170</Name>
+            <Filter ref="ddc_170_filter"/>
+        </Set>
+        <Set id="ddc_180">
+            <Spec>ddc:180</Spec>
+            <Name>DDC 180</Name>
+            <Filter ref="ddc_180_filter"/>
+        </Set>
+        <Set id="ddc_190">
+            <Spec>ddc:190</Spec>
+            <Name>DDC 190</Name>
+            <Filter ref="ddc_190_filter"/>
+        </Set>
+        <Set id="ddc_200">
+            <Spec>ddc:200</Spec>
+            <Name>DDC 200</Name>
+            <Filter ref="ddc_200_filter"/>
+        </Set>
+        <Set id="ddc_210">
+            <Spec>ddc:210</Spec>
+            <Name>DDC 210</Name>
+            <Filter ref="ddc_210_filter"/>
+        </Set>
+        <Set id="ddc_220">
+            <Spec>ddc:220</Spec>
+            <Name>DDC 220</Name>
+            <Filter ref="ddc_220_filter"/>
+        </Set>
+        <Set id="ddc_230">
+            <Spec>ddc:230</Spec>
+            <Name>DDC 230</Name>
+            <Filter ref="ddc_230_filter"/>
+        </Set>
+        <Set id="ddc_240">
+            <Spec>ddc:240</Spec>
+            <Name>DDC 240</Name>
+            <Filter ref="ddc_240_filter"/>
+        </Set>
+        <Set id="ddc_250">
+            <Spec>ddc:250</Spec>
+            <Name>DDC 250</Name>
+            <Filter ref="ddc_250_filter"/>
+        </Set>
+        <Set id="ddc_260">
+            <Spec>ddc:260</Spec>
+            <Name>DDC 260</Name>
+            <Filter ref="ddc_260_filter"/>
+        </Set>
+        <Set id="ddc_270">
+            <Spec>ddc:270</Spec>
+            <Name>DDC 270</Name>
+            <Filter ref="ddc_270_filter"/>
+        </Set>
+        <Set id="ddc_280">
+            <Spec>ddc:280</Spec>
+            <Name>DDC 280</Name>
+            <Filter ref="ddc_280_filter"/>
+        </Set>
+        <Set id="ddc_290">
+            <Spec>ddc:290</Spec>
+            <Name>DDC 290</Name>
+            <Filter ref="ddc_290_filter"/>
+        </Set>
+        <Set id="ddc_300">
+            <Spec>ddc:300</Spec>
+            <Name>DDC 300</Name>
+            <Filter ref="ddc_300_filter"/>
+        </Set>
+        <Set id="ddc_310">
+            <Spec>ddc:310</Spec>
+            <Name>DDC 310</Name>
+            <Filter ref="ddc_310_filter"/>
+        </Set>
+        <Set id="ddc_320">
+            <Spec>ddc:320</Spec>
+            <Name>DDC 320</Name>
+            <Filter ref="ddc_320_filter"/>
+        </Set>
+        <Set id="ddc_330">
+            <Spec>ddc:330</Spec>
+            <Name>DDC 330</Name>
+            <Filter ref="ddc_330_filter"/>
+        </Set>
+        <Set id="ddc_340">
+            <Spec>ddc:340</Spec>
+            <Name>DDC 340</Name>
+            <Filter ref="ddc_340_filter"/>
+        </Set>
+        <Set id="ddc_350">
+            <Spec>ddc:350</Spec>
+            <Name>DDC 350</Name>
+            <Filter ref="ddc_350_filter"/>
+        </Set>
+        <Set id="ddc_360">
+            <Spec>ddc:360</Spec>
+            <Name>DDC 360</Name>
+            <Filter ref="ddc_360_filter"/>
+        </Set>
+        <Set id="ddc_370">
+            <Spec>ddc:370</Spec>
+            <Name>DDC 370</Name>
+            <Filter ref="ddc_370_filter"/>
+        </Set>
+        <Set id="ddc_380">
+            <Spec>ddc:380</Spec>
+            <Name>DDC 380</Name>
+            <Filter ref="ddc_380_filter"/>
+        </Set>
+        <Set id="ddc_390">
+            <Spec>ddc:390</Spec>
+            <Name>DDC 390</Name>
+            <Filter ref="ddc_390_filter"/>
+        </Set>
+        <Set id="ddc_400">
+            <Spec>ddc:400</Spec>
+            <Name>DDC 400</Name>
+            <Filter ref="ddc_400_filter"/>
+        </Set>
+        <Set id="ddc_410">
+            <Spec>ddc:410</Spec>
+            <Name>DDC 410</Name>
+            <Filter ref="ddc_410_filter"/>
+        </Set>
+        <Set id="ddc_420">
+            <Spec>ddc:420</Spec>
+            <Name>DDC 420</Name>
+            <Filter ref="ddc_420_filter"/>
+        </Set>
+        <Set id="ddc_430">
+            <Spec>ddc:430</Spec>
+            <Name>DDC 430</Name>
+            <Filter ref="ddc_430_filter"/>
+        </Set>
+        <Set id="ddc_440">
+            <Spec>ddc:440</Spec>
+            <Name>DDC 440</Name>
+            <Filter ref="ddc_440_filter"/>
+        </Set>
+        <Set id="ddc_450">
+            <Spec>ddc:450</Spec>
+            <Name>DDC 450</Name>
+            <Filter ref="ddc_450_filter"/>
+        </Set>
+        <Set id="ddc_460">
+            <Spec>ddc:460</Spec>
+            <Name>DDC 460</Name>
+            <Filter ref="ddc_460_filter"/>
+        </Set>
+        <Set id="ddc_470">
+            <Spec>ddc:470</Spec>
+            <Name>DDC 470</Name>
+            <Filter ref="ddc_470_filter"/>
+        </Set>
+        <Set id="ddc_480">
+            <Spec>ddc:480</Spec>
+            <Name>DDC 480</Name>
+            <Filter ref="ddc_480_filter"/>
+        </Set>
+        <Set id="ddc_490">
+            <Spec>ddc:490</Spec>
+            <Name>DDC 490</Name>
+            <Filter ref="ddc_490_filter"/>
+        </Set>
+        <Set id="ddc_500">
+            <Spec>ddc:500</Spec>
+            <Name>DDC 500</Name>
+            <Filter ref="ddc_500_filter"/>
+        </Set>
+        <Set id="ddc_510">
+            <Spec>ddc:510</Spec>
+            <Name>DDC 510</Name>
+            <Filter ref="ddc_510_filter"/>
+        </Set>
+        <Set id="ddc_520">
+            <Spec>ddc:520</Spec>
+            <Name>DDC 520</Name>
+            <Filter ref="ddc_520_filter"/>
+        </Set>
+        <Set id="ddc_530">
+            <Spec>ddc:530</Spec>
+            <Name>DDC 530</Name>
+            <Filter ref="ddc_530_filter"/>
+        </Set>
+        <Set id="ddc_540">
+            <Spec>ddc:540</Spec>
+            <Name>DDC 540</Name>
+            <Filter ref="ddc_540_filter"/>
+        </Set>
+        <Set id="ddc_550">
+            <Spec>ddc:550</Spec>
+            <Name>DDC 550</Name>
+            <Filter ref="ddc_550_filter"/>
+        </Set>
+        <Set id="ddc_560">
+            <Spec>ddc:560</Spec>
+            <Name>DDC 560</Name>
+            <Filter ref="ddc_560_filter"/>
+        </Set>
+        <Set id="ddc_570">
+            <Spec>ddc:570</Spec>
+            <Name>DDC 570</Name>
+            <Filter ref="ddc_570_filter"/>
+        </Set>
+        <Set id="ddc_580">
+            <Spec>ddc:580</Spec>
+            <Name>DDC 580</Name>
+            <Filter ref="ddc_580_filter"/>
+        </Set>
+        <Set id="ddc_590">
+            <Spec>ddc:590</Spec>
+            <Name>DDC 590</Name>
+            <Filter ref="ddc_590_filter"/>
+        </Set>
+        <Set id="ddc_600">
+            <Spec>ddc:600</Spec>
+            <Name>DDC 600</Name>
+            <Filter ref="ddc_600_filter"/>
+        </Set>
+        <Set id="ddc_610">
+            <Spec>ddc:610</Spec>
+            <Name>DDC 610</Name>
+            <Filter ref="ddc_610_filter"/>
+        </Set>
+        <Set id="ddc_620">
+            <Spec>ddc:620</Spec>
+            <Name>DDC 620</Name>
+            <Filter ref="ddc_620_filter"/>
+        </Set>
+        <Set id="ddc_630">
+            <Spec>ddc:630</Spec>
+            <Name>DDC 630</Name>
+            <Filter ref="ddc_630_filter"/>
+        </Set>
+        <Set id="ddc_640">
+            <Spec>ddc:640</Spec>
+            <Name>DDC 640</Name>
+            <Filter ref="ddc_640_filter"/>
+        </Set>
+        <Set id="ddc_650">
+            <Spec>ddc:650</Spec>
+            <Name>DDC 650</Name>
+            <Filter ref="ddc_650_filter"/>
+        </Set>
+        <Set id="ddc_660">
+            <Spec>ddc:660</Spec>
+            <Name>DDC 660</Name>
+            <Filter ref="ddc_660_filter"/>
+        </Set>
+        <Set id="ddc_670">
+            <Spec>ddc:670</Spec>
+            <Name>DDC 670</Name>
+            <Filter ref="ddc_670_filter"/>
+        </Set>
+        <Set id="ddc_680">
+            <Spec>ddc:680</Spec>
+            <Name>DDC 680</Name>
+            <Filter ref="ddc_680_filter"/>
+        </Set>
+        <Set id="ddc_690">
+            <Spec>ddc:690</Spec>
+            <Name>DDC 690</Name>
+            <Filter ref="ddc_690_filter"/>
+        </Set>
+        <Set id="ddc_700">
+            <Spec>ddc:700</Spec>
+            <Name>DDC 700</Name>
+            <Filter ref="ddc_700_filter"/>
+        </Set>
+        <Set id="ddc_710">
+            <Spec>ddc:710</Spec>
+            <Name>DDC 710</Name>
+            <Filter ref="ddc_710_filter"/>
+        </Set>
+        <Set id="ddc_720">
+            <Spec>ddc:720</Spec>
+            <Name>DDC 720</Name>
+            <Filter ref="ddc_720_filter"/>
+        </Set>
+        <Set id="ddc_730">
+            <Spec>ddc:730</Spec>
+            <Name>DDC 730</Name>
+            <Filter ref="ddc_730_filter"/>
+        </Set>
+        <Set id="ddc_740">
+            <Spec>ddc:740</Spec>
+            <Name>DDC 740</Name>
+            <Filter ref="ddc_740_filter"/>
+        </Set>
+        <Set id="ddc_750">
+            <Spec>ddc:750</Spec>
+            <Name>DDC 750</Name>
+            <Filter ref="ddc_750_filter"/>
+        </Set>
+        <Set id="ddc_760">
+            <Spec>ddc:760</Spec>
+            <Name>DDC 760</Name>
+            <Filter ref="ddc_760_filter"/>
+        </Set>
+        <Set id="ddc_770">
+            <Spec>ddc:770</Spec>
+            <Name>DDC 770</Name>
+            <Filter ref="ddc_770_filter"/>
+        </Set>
+        <Set id="ddc_780">
+            <Spec>ddc:780</Spec>
+            <Name>DDC 780</Name>
+            <Filter ref="ddc_780_filter"/>
+        </Set>
+        <Set id="ddc_790">
+            <Spec>ddc:790</Spec>
+            <Name>DDC 790</Name>
+            <Filter ref="ddc_790_filter"/>
+        </Set>
+        <Set id="ddc_800">
+            <Spec>ddc:800</Spec>
+            <Name>DDC 800</Name>
+            <Filter ref="ddc_800_filter"/>
+        </Set>
+        <Set id="ddc_810">
+            <Spec>ddc:810</Spec>
+            <Name>DDC 810</Name>
+            <Filter ref="ddc_810_filter"/>
+        </Set>
+        <Set id="ddc_820">
+            <Spec>ddc:820</Spec>
+            <Name>DDC 820</Name>
+            <Filter ref="ddc_820_filter"/>
+        </Set>
+        <Set id="ddc_830">
+            <Spec>ddc:830</Spec>
+            <Name>DDC 830</Name>
+            <Filter ref="ddc_830_filter"/>
+        </Set>
+        <Set id="ddc_840">
+            <Spec>ddc:840</Spec>
+            <Name>DDC 840</Name>
+            <Filter ref="ddc_840_filter"/>
+        </Set>
+        <Set id="ddc_850">
+            <Spec>ddc:850</Spec>
+            <Name>DDC 850</Name>
+            <Filter ref="ddc_850_filter"/>
+        </Set>
+        <Set id="ddc_860">
+            <Spec>ddc:860</Spec>
+            <Name>DDC 860</Name>
+            <Filter ref="ddc_860_filter"/>
+        </Set>
+        <Set id="ddc_870">
+            <Spec>ddc:870</Spec>
+            <Name>DDC 870</Name>
+            <Filter ref="ddc_870_filter"/>
+        </Set>
+        <Set id="ddc_880">
+            <Spec>ddc:880</Spec>
+            <Name>DDC 880</Name>
+            <Filter ref="ddc_880_filter"/>
+        </Set>
+        <Set id="ddc_890">
+            <Spec>ddc:890</Spec>
+            <Name>DDC 890</Name>
+            <Filter ref="ddc_890_filter"/>
+        </Set>
+        <Set id="ddc_900">
+            <Spec>ddc:900</Spec>
+            <Name>DDC 900</Name>
+            <Filter ref="ddc_900_filter"/>
+        </Set>
+        <Set id="ddc_910">
+            <Spec>ddc:910</Spec>
+            <Name>DDC 910</Name>
+            <Filter ref="ddc_910_filter"/>
+        </Set>
+        <Set id="ddc_920">
+            <Spec>ddc:920</Spec>
+            <Name>DDC 920</Name>
+            <Filter ref="ddc_920_filter"/>
+        </Set>
+        <Set id="ddc_930">
+            <Spec>ddc:930</Spec>
+            <Name>DDC 930</Name>
+            <Filter ref="ddc_930_filter"/>
+        </Set>
+        <Set id="ddc_940">
+            <Spec>ddc:940</Spec>
+            <Name>DDC 940</Name>
+            <Filter ref="ddc_940_filter"/>
+        </Set>
+        <Set id="ddc_950">
+            <Spec>ddc:950</Spec>
+            <Name>DDC 950</Name>
+            <Filter ref="ddc_950_filter"/>
+        </Set>
+        <Set id="ddc_960">
+            <Spec>ddc:960</Spec>
+            <Name>DDC 960</Name>
+            <Filter ref="ddc_960_filter"/>
+        </Set>
+        <Set id="ddc_970">
+            <Spec>ddc:970</Spec>
+            <Name>DDC 970</Name>
+            <Filter ref="ddc_970_filter"/>
+        </Set>
+        <Set id="ddc_980">
+            <Spec>ddc:980</Spec>
+            <Name>DDC 980</Name>
+            <Filter ref="ddc_980_filter"/>
+        </Set>
+        <Set id="ddc_990">
+            <Spec>ddc:990</Spec>
+            <Name>DDC 990</Name>
+            <Filter ref="ddc_990_filter"/>
+        </Set>
+
         <Set id="driverSet">
             <Spec>driver</Spec>
             <Name>Open Access DRIVERset</Name>
