@@ -266,6 +266,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         List<ImportRecord> records = new ArrayList<>();
         try {
             for (MultipartFile mpFile : uploadfiles) {
+                // Only files whose name matches a supported import format (BibTeX, RIS, CSV, ...) can
+                // yield metadata. Check that before writing a temp copy, so unsupported uploads (large
+                // binaries especially) are not copied to disk just to be probed and immediately deleted.
+                if (!importService.isValidSourceForFile(mpFile.getOriginalFilename())) {
+                    continue;
+                }
                 File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
                 try {
                     ImportRecord record = importService.getRecord(file, mpFile.getOriginalFilename());
