@@ -9,10 +9,13 @@ package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
 
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
@@ -36,6 +39,9 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
 
     @Autowired
     DSpaceObjectMetadataPatchUtils metadataPatchUtils;
+
+    @Autowired
+    private ItemConverter itemConverter;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -61,6 +67,12 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     private void add(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
                      MetadataValueRest metadataValue, String index) {
         metadataPatchUtils.checkMetadataFieldNotNull(metadataField);
+        if (dso instanceof Item) {
+            if (!itemConverter.checkMetadataFieldVisibility(context, (Item) dso, metadataField)) {
+                throw new UnprocessableEntityException(
+                    "Current user has not permission to execute patch operation on " + metadataField);
+            }
+        }
         int indexInt = 0;
         if (index != null && index.equals("-")) {
             indexInt = -1;

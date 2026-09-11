@@ -51,10 +51,10 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>type</dc-element>
                     <repeatable>false</repeatable>
-                    <label>Audio or Video media type</label>
-                    <input-type value-pairs-name="audio_video_media_type">dropdown</input-type>
-                    <hint>Select Audio or Video media type</hint>
-                    <required></required>
+                    <label>File type</label>
+                    <input-type value-pairs-name="bitstream_types">dropdown</input-type>
+                    <hint>Personal picture, logo, main article, etc.</hint>
+                    <required/>
                 </field>
             </row>
             <row>
@@ -301,6 +301,17 @@
                          However, this is disabled by default to support organizations as authors, etc. -->
                     <!--<regex>\w+(,)+\w+</regex>-->
                 </relation-field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>journalissue</dc-qualifier>
+                    <label>Journal Issue</label>
+                    <hint>Select the journal issue related to this volume.</hint>
+                    <input-type>onebox</input-type>
+                </field>
             </row>
             <!--
                 Uncomment the following definition to enable entry of
@@ -787,15 +798,14 @@
         <!-- Form which defines the metadata page/section for depositing JournalVolume Entities -->
         <form name="journalVolumeStep">
             <row>
-                <relation-field>
-                    <relationship-type>isJournalOfVolume</relationship-type>
-                    <search-configuration>journal</search-configuration>
-                    <!-- example of filtering Discovery search for Journal by a specific publisher -->
-                    <!--<filter>creativework.publisher:somepublishername</filter>-->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>journal</dc-qualifier>
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
-                    <externalsources>opfJournal</externalsources>
-                </relation-field>
+                    <input-type>onebox</input-type>
+                </field>
             </row>
             <row>
                 <field>
@@ -838,12 +848,14 @@
         <!-- Form which defines the metadata page/section for depositing JournalIssue Entities -->
         <form name="journalIssueStep">
             <row>
-                <relation-field>
-                    <relationship-type>isJournalVolumeOfIssue</relationship-type>
-                    <search-configuration>journalvolume</search-configuration>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>journalvolume</dc-qualifier>
                     <label>Journal Volume</label>
                     <hint>Select the journal volume related to this issue.</hint>
-                </relation-field>
+                    <input-type>onebox</input-type>
+                </field>
             </row>
             <row>
                 <field>
@@ -2162,7 +2174,23 @@
             </pair>
         </value-pairs>
 
-        <value-pairs value-pairs-name="audio_video_media_type" dc-term="type">
+        <value-pairs value-pairs-name="bitstream_types" dc-term="type">
+            <pair>
+                <displayed-value>Unspecified</displayed-value>
+                <stored-value />
+            </pair>
+            <pair>
+                <displayed-value>Logo</displayed-value>
+                <stored-value>logo</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Main Article</displayed-value>
+                <stored-value>main article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Personal Picture</displayed-value>
+                <stored-value>personal picture</stored-value>
+            </pair>
             <pair>
                 <displayed-value>Audio</displayed-value>
                 <stored-value>audio</stored-value>
@@ -2175,12 +2203,22 @@
                 <displayed-value>Audio and Video</displayed-value>
                 <stored-value>audio+video</stored-value>
             </pair>
-            <pair>
-                <displayed-value>Neither</displayed-value>
-                <stored-value>neither</stored-value>
-            </pair>
         </value-pairs>
 
+        <value-pairs value-pairs-name="event_types" dc-term="event_types">
+            <pair>
+                <displayed-value>Unspecified</displayed-value>
+                <stored-value />
+            </pair>
+            <pair>
+                <displayed-value>Conference</displayed-value>
+                <stored-value>Conference</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Workshop</displayed-value>
+                <stored-value>Workshop</stored-value>
+            </pair>
+        </value-pairs>
     </form-value-pairs>
 
 </input-forms>
