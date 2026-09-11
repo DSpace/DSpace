@@ -4046,6 +4046,8 @@
     <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dc.title"/>
         <property name="defaultSortOrder" value="asc"/>
+        <property name="ignoreLeadingNonAlphaNum" value="true"/>
+        <property name="ignoreLeadingDigits" value="true"/>
     </bean>
 
     <bean id="sortDateIssued" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
