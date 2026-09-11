@@ -87,7 +87,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
                                 "from c.metadata internal " +
                                 "where internal.metadataField = :sortField and" +
                                 " internal.dSpaceObject = c)" +
-                                " ORDER BY LOWER(CAST(title.value as string))");
+                                " ORDER BY LOWER(CAST(title.value as string)), c.id");
         Query hibernateQuery = createQuery(context, query.toString());
         if (offset != null) {
             hibernateQuery.setFirstResult(offset);
