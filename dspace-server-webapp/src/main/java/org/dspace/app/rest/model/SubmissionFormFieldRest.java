@@ -66,6 +66,11 @@ public class SubmissionFormFieldRest {
     private boolean repeatable;
 
     /**
+     * The maximum number of occurrences allowed for this field, null means unlimited
+     */
+    private Integer maxOccurrences;
+
+    /**
      * The message to return if the information is missing
      */
     private String mandatoryMessage;
@@ -160,10 +165,27 @@ public class SubmissionFormFieldRest {
 
     /**
      * Setter for {@link #repeatable}
-     * 
+     *
      */
     public void setRepeatable(boolean repeatable) {
         this.repeatable = repeatable;
+    }
+
+    /**
+     * Getter for {@link #maxOccurrences}
+     *
+     * @return {@link #maxOccurrences}
+     */
+    public Integer getMaxOccurrences() {
+        return maxOccurrences;
+    }
+
+    /**
+     * Setter for {@link #maxOccurrences}
+     *
+     */
+    public void setMaxOccurrences(Integer maxOccurrences) {
+        this.maxOccurrences = maxOccurrences;
     }
 
     /**

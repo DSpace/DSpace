@@ -56,6 +56,8 @@ public class MetadataValidator implements SubmissionStepValidator {
 
     private static final String ERROR_VALIDATION_NOT_REPEATABLE = "error.validation.notRepeatable";
 
+    private static final String ERROR_VALIDATION_MAX_OCCURRENCES = "error.validation.maxOccurrences";
+
     private static final Logger log = LogManager.getLogger(MetadataValidator.class);
 
     private DCInputsReader inputReader;
@@ -225,6 +227,13 @@ public class MetadataValidator implements SubmissionStepValidator {
         if (!input.isRepeatable() && metadataValues.size() > 1) {
             for (int i = 0; i < metadataValues.size(); i++) {
                 addError(errors, ERROR_VALIDATION_NOT_REPEATABLE,
+                         "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" + input.getFieldName() + "/" + i);
+            }
+        }
+
+        if (input.getMaxOccurrences() > 0 && metadataValues.size() > input.getMaxOccurrences()) {
+            for (int i = input.getMaxOccurrences(); i < metadataValues.size(); i++) {
+                addError(errors, ERROR_VALIDATION_MAX_OCCURRENCES,
                          "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" + input.getFieldName() + "/" + i);
             }
         }

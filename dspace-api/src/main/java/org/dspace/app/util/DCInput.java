@@ -132,6 +132,11 @@ public class DCInput {
     private boolean closedVocabulary = false;
 
     /**
+     * the maximum number of occurrences allowed for this field, -1 means unlimited
+     */
+    private int maxOccurrences = -1;
+
+    /**
      * the regex in ECMAScript standard format, usable also by rests.
      */
     private String regex = null;
@@ -196,6 +201,15 @@ public class DCInput {
         String repStr = fieldMap.get("repeatable");
         repeatable = "true".equalsIgnoreCase(repStr)
             || "yes".equalsIgnoreCase(repStr);
+        String maxOccStr = fieldMap.get("max-occurrences");
+        if (StringUtils.isNotBlank(maxOccStr)) {
+            try {
+                maxOccurrences = Integer.parseInt(maxOccStr.trim());
+            } catch (NumberFormatException e) {
+                log.warn("Invalid max-occurrences value '{}' for field {}.{}, ignoring",
+                         maxOccStr, dcSchema, dcElement);
+            }
+        }
         String nameVariantsString = fieldMap.get("name-variants");
         nameVariants = StringUtils.isNotBlank(nameVariantsString) ?
                 nameVariantsString.equalsIgnoreCase("true") : false;
@@ -308,6 +322,15 @@ public class DCInput {
      */
     public boolean getRepeatable() {
         return isRepeatable();
+    }
+
+    /**
+     * Get the maximum number of occurrences allowed for this field.
+     *
+     * @return the max occurrences, or -1 if unlimited
+     */
+    public int getMaxOccurrences() {
+        return maxOccurrences;
     }
 
     /**
