@@ -14,7 +14,9 @@
  <!ELEMENT dc-qualifier (#PCDATA) >
  <!ELEMENT language (#PCDATA)>
  <!ELEMENT type-bind (#PCDATA) >
-
+ <!ATTLIST type-bind
+         separator CDATA #IMPLIED
+         to-field CDATA #IMPLIED>
  <!ELEMENT repeatable (#PCDATA) >
  <!ELEMENT label (#PCDATA) >
  <!ELEMENT style (#PCDATA) >
