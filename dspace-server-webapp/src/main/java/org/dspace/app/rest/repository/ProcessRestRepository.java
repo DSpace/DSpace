@@ -37,6 +37,7 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.Process_;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.util.ClusteringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -72,9 +73,11 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
      * Marks any processes left running before the previous shutdown as failed after the application is ready.
      */
     @EventListener(ApplicationReadyEvent.class)
-    public void init() throws SQLException, AuthorizeException, IOException {
+    public void failRunningProcesses() throws SQLException, AuthorizeException, IOException {
         Context context = new Context();
-        processService.failRunningProcesses(context);
+        context.turnOffAuthorisationSystem();
+        UUID uuid = ClusteringUtil.createOrGetClusteringUuid();
+        processService.failProcessesOfInstance(context, uuid);
         context.complete();
     }
 

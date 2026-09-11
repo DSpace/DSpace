@@ -10,6 +10,7 @@ package org.dspace.content.dao;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
@@ -120,4 +121,16 @@ public interface ProcessDAO extends GenericDAO<Process> {
      */
     int countByUser(Context context, EPerson user) throws SQLException;
 
+
+    /**
+     * Returns a list of all Process objects in the database by the given instance.
+     *
+     * @param context The relevant DSpace context
+     * @param instance    The instance to search for
+     * @param limit   The limit for the amount of Processes returned
+     * @param offset  The offset for the Processes to be returned
+     * @return The list of all Process objects in the Database
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findByInstance(Context context, UUID instance, int limit, int offset) throws SQLException;
 }

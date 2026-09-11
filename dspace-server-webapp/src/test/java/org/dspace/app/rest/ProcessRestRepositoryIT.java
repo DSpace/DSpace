@@ -12,10 +12,12 @@ import static org.dspace.content.ProcessStatus.SCHEDULED;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ import java.util.UUID;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessFileTypesMatcher;
@@ -952,5 +955,27 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
                                             is("script_output")));
 
+    }
+
+    @Test
+    public void createNewClusteringConfigTest() {
+        assertTrue(new File(getDspaceDir() + "/config/clustering-identifier.txt").exists());
+    }
+
+    @Test
+    public void getProcessWithClusteringUuidTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        FileUtils.copyInputStreamToFile(
+            getClass().getResourceAsStream("clustering-identifier-test.txt"),
+            new File(getDspaceDir() + "/config/clustering-identifier.txt"));
+
+        Process process = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
+
+        getClient(token).perform(get("/api/system/processes/" + process.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.is(
+                ProcessMatcher.matchProcess(process.getName(), String.valueOf(process.getEPerson().getID()),
+                    process.getID(), new LinkedList<>(), ProcessStatus.SCHEDULED))))
+            .andExpect(jsonPath("$.instance", is("04e7918f-ec0a-4d22-a765-0e28df041a7e")));
     }
 }

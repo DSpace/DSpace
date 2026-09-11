@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ProcessStatus;
@@ -77,6 +78,11 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
                                                                  .atZone(ZoneId.systemDefault()).toInstant());
         process.setFinishedTime(endTime == null ? null : LocalDate.parse(endTime).atStartOfDay()
                                                                   .atZone(ZoneId.systemDefault()).toInstant());
+        return this;
+    }
+
+    public ProcessBuilder withInstance(UUID instance) {
+        process.setInstance(instance);
         return this;
     }
 
