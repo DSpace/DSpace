@@ -134,6 +134,8 @@
 
     <bean class="org.dspace.statistics.LoginStatisticsServiceImpl"/>
 
+    <bean class="org.dspace.statistics.WorkflowStatisticsServiceImpl"/>
+
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <bean class="org.dspace.util.FrontendUrlService"/>

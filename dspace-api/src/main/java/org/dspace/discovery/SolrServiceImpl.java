@@ -43,6 +43,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
+import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
 import org.apache.solr.client.solrj.response.json.BucketJsonFacet;
@@ -977,6 +978,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.setFacetMinCount(discoveryQuery.getFacetMinCount());
         }
 
+        if (CollectionUtils.isNotEmpty(discoveryQuery.getFacetPivots())) {
+            solrQuery.addFacetPivotField(discoveryQuery.getFacetPivots().toArray(String[]::new));
+        }
+
         if (CollectionUtils.isNotEmpty(facetFields) || CollectionUtils.isNotEmpty(facetQueries)) {
             solrQuery.setParam(FacetParams.FACET_OFFSET, String.valueOf(discoveryQuery.getFacetOffset()));
         }
@@ -1097,6 +1102,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 resolveFacetFields(context, query, result, skipLoadingResponse, solrQueryResponse);
                 //Resolve our json facet field values used for metadata browsing
                 resolveJsonFacetFields(context, result, solrQueryResponse);
+
+                if (solrQueryResponse.getFacetPivot() != null && !skipLoadingResponse) {
+                    NamedList<List<PivotField>> facetPivotList = solrQueryResponse.getFacetPivot();
+                    for (String facetPivot : query.getFacetPivots()) {
+                        result.addFacetPivotResult(facetPivot,
+                            DiscoverResult.FacetPivotResult.fromPivotFields(facetPivotList.get(facetPivot)));
+                    }
+                }
             }
             // If any stale entries are found in the current page of results,
             // we remove those stale entries and rerun the same query again.

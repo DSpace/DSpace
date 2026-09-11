@@ -93,6 +93,7 @@ public class DiscoverQuery {
      * The READ authorization (Constants.READ) is always required and does not need to be added here.
      */
     private List<Integer> requiredAuthorization;
+    private List<String> facetPivots;
 
     private boolean inheritAuthorizations = true;
 
@@ -111,6 +112,7 @@ public class DiscoverQuery {
         //Use a linked hashmap since sometimes insertion order might matter
         this.properties = new LinkedHashMap<>();
         this.requiredAuthorization = new ArrayList<>();
+        this.facetPivots = new ArrayList<>();
     }
 
 
@@ -283,6 +285,24 @@ public class DiscoverQuery {
      */
     public List<DiscoverFacetField> getFacetFields() {
         return facetFields;
+    }
+
+    /**
+     * Adds a new facet pivot
+     *
+     * @param pivot the new facet pivot to be added
+     */
+    public void addFacetPivot(String pivot) {
+        facetPivots.add(pivot);
+    }
+
+    /**
+     * Gets the facet pivots configured
+     *
+     * @return the facet pivots for this query
+     */
+    public List<String> getFacetPivots() {
+        return facetPivots;
     }
 
     /**

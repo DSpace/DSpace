@@ -25,6 +25,9 @@ public class UsageWorkflowEvent extends UsageEvent {
 
     private String workflowStep;
     private String oldState;
+    private String currentWorkflowAction;
+    private String previousWorkflowAction;
+    private boolean previousActionRequiresUI;
     private EPerson[] epersonOwners;
     private Group[] groupOwners;
     private Collection scope;
@@ -48,6 +51,30 @@ public class UsageWorkflowEvent extends UsageEvent {
 
     public String getOldState() {
         return oldState;
+    }
+
+    public String getCurrentWorkflowAction() {
+        return currentWorkflowAction;
+    }
+
+    public void setCurrentWorkflowAction(String currentWorkflowAction) {
+        this.currentWorkflowAction = currentWorkflowAction;
+    }
+
+    public String getPreviousWorkflowAction() {
+        return previousWorkflowAction;
+    }
+
+    public void setPreviousWorkflowAction(String previousWorkflowAction) {
+        this.previousWorkflowAction = previousWorkflowAction;
+    }
+
+    public boolean isPreviousActionRequiresUI() {
+        return previousActionRequiresUI;
+    }
+
+    public void setPreviousActionRequiresUI(boolean previousActionRequiresUI) {
+        this.previousActionRequiresUI = previousActionRequiresUI;
     }
 
     public Collection getScope() {

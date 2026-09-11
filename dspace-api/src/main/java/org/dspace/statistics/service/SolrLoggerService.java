@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverResult.FacetPivotResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.ObjectCount;
 import org.dspace.usage.UsageWorkflowEvent;
@@ -183,6 +184,28 @@ public interface SolrLoggerService {
     public ObjectCount[] queryFacetField(String query,
                                          String filterQuery, String facetField, int max, boolean showTotal,
                                          List<String> facetQueries, int facetMinCount)
+        throws SolrServerException, IOException;
+
+    /**
+     * Query used to get the values grouped by the given facet pivot field.
+     *
+     * @param  query               the query to be used
+     * @param  filterQuery         filter query
+     * @param  pivotField          the facet pivot field (comma separated list of fields)
+     * @param  max                 the max number of values given back (in case of 10 the
+     *                             top 10 will be given)
+     * @param  showTotal           a boolean determining whether the total amount should be
+     *                             given back as the last element of the array
+     * @param  facetQueries        list of facet queries
+     * @param  facetMinCount       Minimum count of results facet must have to
+     *                             return a result
+     * @return                     an array containing our results
+     * @throws SolrServerException Exception from the Solr server to the solrj Java
+     *                             client.
+     * @throws                     java.io.IOException passed through.
+     */
+    public FacetPivotResult[] queryFacetPivotField(String query, String filterQuery, String pivotField,
+        int max, boolean showTotal, List<String> facetQueries, int facetMinCount)
         throws SolrServerException, IOException;
 
     /**

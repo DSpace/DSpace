@@ -42,6 +42,36 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
 
     /**
+     * The name used to identify the initial submission step in workflow statistics.
+     */
+    public static final String SUBMIT_STEP = "submit";
+
+    /**
+     * The name used to identify the initial submission action in workflow statistics.
+     */
+    public static final String SUBMIT_ACTION = "submit";
+
+    /**
+     * The name used to identify the archived item step in workflow statistics.
+     */
+    public static final String ITEM_STEP = "item";
+
+    /**
+     * The name used to identify the workspace step in workflow statistics (item sent back).
+     */
+    public static final String WORKSPACE_STEP = "workspace";
+
+    /**
+     * The name used to identify the approve action in workflow statistics.
+     */
+    public static final String APPROVE_ACTION = "approve";
+
+    /**
+     * The name used to identify the reject action in workflow statistics.
+     */
+    public static final String REJECT_ACTION = "reject";
+
+    /**
      * Send an email to some addresses, concerning a WorkflowItem, using a given
      * template.
      *

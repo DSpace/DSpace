@@ -179,6 +179,13 @@
 
     <dc-type>
         <schema>dspace</schema>
+        <element>workflow</element>
+        <qualifier>startDateTime</qualifier>
+        <scope_note>The date and time when the item entered the submission workflow</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
         <element>harvesting</element>
         <qualifier>email</qualifier>
         <scope_note>Email address for receiving OAI harvester notifications and status reports</scope_note>

@@ -101,6 +101,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverResult.FacetPivotResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.service.ClientInfoService;
@@ -642,6 +643,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if (usageWorkflowEvent.getOldState() != null) {
                 solrDoc.addField("previousWorkflowStep", usageWorkflowEvent.getOldState());
             }
+            if (usageWorkflowEvent.getCurrentWorkflowAction() != null) {
+                solrDoc.addField("workflowAction", usageWorkflowEvent.getCurrentWorkflowAction());
+            }
+            if (usageWorkflowEvent.getPreviousWorkflowAction() != null) {
+                solrDoc.addField("previousWorkflowAction", usageWorkflowEvent.getPreviousWorkflowAction());
+            }
+            solrDoc.addField("previousActionRequiresUI", usageWorkflowEvent.isPreviousActionRequiresUI());
             if (usageWorkflowEvent.getGroupOwners() != null) {
                 for (int i = 0; i < usageWorkflowEvent.getGroupOwners().length; i++) {
                     Group group = usageWorkflowEvent.getGroupOwners()[i];
@@ -667,6 +675,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
 
             solr.add(solrDoc);
+            // commits are executed automatically using the solr autocommit
+            boolean useAutoCommit = configurationService.getBooleanProperty("solr-statistics.autoCommit", true);
+            if (!useAutoCommit) {
+                solr.commit(false, false);
+            }
         } catch (Exception e) {
             //Log the exception, no need to send it through, the workflow shouldn't crash because of this !
             log.error("Error saving WORKFLOW event to Solr", e);
@@ -973,6 +986,21 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             // Return an empty array cause we got no data
             return new ObjectCount[0];
         }
+    }
+
+    @Override
+    public FacetPivotResult[] queryFacetPivotField(String query, String filterQuery, String pivotField, int max,
+        boolean showTotal, List<String> facetQueries, int facetMinCount) throws SolrServerException, IOException {
+
+        QueryResponse queryResponse = query(query, filterQuery, null,
+            0, max, null, null, null, 1, facetQueries, null, false, facetMinCount, true, pivotField, null);
+
+        if (queryResponse == null) {
+            return new FacetPivotResult[0];
+        }
+
+        return FacetPivotResult.fromPivotFields(queryResponse.getFacetPivot().get(pivotField));
+
     }
 
     @Override
