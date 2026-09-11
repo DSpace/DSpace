@@ -370,6 +370,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
             context.commit();
             context.uncacheEntity(item);
+            handler.registerHeartbeat();
             counter++;
 
             if (counter == limit) {
