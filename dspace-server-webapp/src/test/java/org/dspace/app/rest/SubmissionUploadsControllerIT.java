@@ -16,14 +16,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 
 /**
  * Integration test to test the /api/config/submissionforms endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
  */
 public class SubmissionUploadsControllerIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private MultipartProperties multipartProperties;
 
     @Test
     public void findAll() throws Exception {
@@ -68,5 +77,32 @@ public class SubmissionUploadsControllerIT extends AbstractControllerIntegration
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.startsWith(REST_SERVER_URL + "config/submissionuploads")))
                    .andExpect(jsonPath("$._embedded.submissionuploads", hasSize(greaterThanOrEqualTo(1))));
+    }
+
+    @Test
+    public void maxSizeIsTheConfiguredLimitCappedByTheMultipartLimit() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        int multipartLimit = (int) multipartProperties.getMaxFileSize().toBytes();
+        try {
+            // Without upload.max the servlet container's multipart limit is the effective limit
+            configurationService.setProperty("upload.max", null);
+            getClient(token).perform(get("/api/config/submissionuploads/upload"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.maxSize", is(multipartLimit)));
+
+            // A smaller upload.max applies as is
+            configurationService.setProperty("upload.max", 1024);
+            getClient(token).perform(get("/api/config/submissionuploads/upload"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.maxSize", is(1024)));
+
+            // A larger upload.max can never exceed what the container accepts
+            configurationService.setProperty("upload.max", 2L * multipartLimit);
+            getClient(token).perform(get("/api/config/submissionuploads/upload"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.maxSize", is(multipartLimit)));
+        } finally {
+            configurationService.setProperty("upload.max", null);
+        }
     }
 }
