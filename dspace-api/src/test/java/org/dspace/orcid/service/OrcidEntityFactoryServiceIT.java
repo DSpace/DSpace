@@ -250,6 +250,24 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
     }
 
     @Test
+    public void testConferencePresentationWorkTypeCreation() {
+        context.turnOffAuthorisationSystem();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withTitle("Test conference presentation")
+            .withType("conference presentation")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+        assertThat(work.getWorkType(), is(WorkType.CONFERENCE_PRESENTATION));
+    }
+
+    @Test
     public void testEmptyWorkWithUnknownTypeCreation() {
 
         context.turnOffAuthorisationSystem();
