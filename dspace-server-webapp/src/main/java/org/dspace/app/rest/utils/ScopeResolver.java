@@ -62,6 +62,10 @@ public class ScopeResolver {
                                               .filter(StringUtils::isNotBlank)
                                               .map(this::asUUID);
 
+        if (uuidOptional.isEmpty()) {
+            return null;
+        }
+
         // First try to resolve as a Community
         return uuidOptional
             .flatMap(uuid -> resolveWithIndexedObject(context, uuid, communityService))
