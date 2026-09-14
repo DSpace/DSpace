@@ -8,6 +8,7 @@
 
 package org.dspace.app.bulkedit;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +26,6 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentReportServiceFactory;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.contentreport.Filter;
-import org.dspace.contentreport.FilteredItems;
 import org.dspace.contentreport.FilteredItemsQuery;
 import org.dspace.contentreport.QueryOperator;
 import org.dspace.contentreport.QueryPredicate;
@@ -140,12 +140,19 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
                 collUuids, predicates, 0, Integer.MAX_VALUE, filters, List.of());
         handler.logDebug("creating iterator");
 
-        FilteredItems items = contentReportService.findFilteredItems(context, query);
-        handler.logDebug("creating dspacecsv");
-        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, items.getItems().iterator(),
-                true, handler);
+        handler.logDebug("creating streaming csv export");
+        InputStream csvStream = metadataDSpaceCsvExportService.exportStreaming(
+            context,
+            () -> {
+                try {
+                    return contentReportService.findFilteredItems(context, query).getItems().iterator();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            },
+            true);
         handler.logDebug("writing to file " + getFileNameOrExportFile());
-        handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
+        handler.writeFilestream(context, getFileNameOrExportFile(), csvStream, EXPORT_CSV);
         context.restoreAuthSystemState();
         context.complete();
     }

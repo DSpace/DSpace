@@ -8,16 +8,15 @@
 
 package org.dspace.app.bulkedit;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.DefaultParser.Builder;
 import org.apache.commons.cli.ParseException;
-import org.dspace.content.Item;
 import org.dspace.content.MetadataDSpaceCsvExportServiceImpl;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -143,11 +142,21 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             "Item", 10, Long.getLong("0"), null, SortOption.DESCENDING);
         handler.logDebug("creating iterator");
 
-        Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
-        handler.logDebug("creating dspacecsv");
-        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true, handler);
+        DiscoverQuery searchQuery = discoverQuery;
+        IndexableObject scope = dso;
+        handler.logDebug("creating streaming csv export");
+        InputStream csvStream = metadataDSpaceCsvExportService.exportStreaming(
+            context,
+            () -> {
+                try {
+                    return searchService.iteratorSearch(context, scope, searchQuery);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            },
+            true);
         handler.logDebug("writing to file " + getFileNameOrExportFile());
-        handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
+        handler.writeFilestream(context, getFileNameOrExportFile(), csvStream, EXPORT_CSV);
         context.restoreAuthSystemState();
         context.complete();
 

@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,8 +15,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.dspace.app.bulkedit.DSpaceCSV;
+import org.dspace.app.bulkedit.StreamingDSpaceCsvExporter;
 import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
@@ -39,6 +42,9 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private StreamingDSpaceCsvExporter streamingExporter;
 
     private int csxExportLimit = -1;
 
@@ -144,6 +150,79 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         }
 
         return result.iterator();
+    }
+
+    @Override
+    public InputStream handleExportStreaming(Context context, boolean exportAllItems, boolean exportAllMetadata,
+                                            String identifier,
+                                            DSpaceRunnableHandler handler) throws Exception {
+        Supplier<Iterator<Item>> supplier;
+
+        if (exportAllItems) {
+            handler.logInfo("Exporting whole repository WARNING: May take some time!");
+            supplier = () -> {
+                try {
+                    return itemService.findAll(context, getCsvExportLimit(), 0);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+        } else {
+            DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
+                .resolveToObject(context, identifier);
+            if (dso == null) {
+                dso = dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(identifier));
+            }
+            if (dso == null) {
+                throw new IllegalArgumentException(
+                    "DSO '" + identifier + "' does not resolve to a DSpace Object in your repository!");
+            }
+
+            if (dso.getType() == Constants.ITEM) {
+                handler.logInfo("Exporting item '" + dso.getName() + "' (" + identifier + ")");
+                List<Item> items = new ArrayList<>();
+                items.add((Item) dso);
+                supplier = items::iterator;
+            } else if (dso.getType() == Constants.COLLECTION) {
+                handler.logInfo("Exporting collection '" + dso.getName() + "' (" + identifier + ")");
+                Collection collection = (Collection) dso;
+                supplier = () -> {
+                    try {
+                        return itemService.findByCollection(context, collection, getCsvExportLimit(), 0);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+            } else if (dso.getType() == Constants.COMMUNITY) {
+                handler.logInfo("Exporting community '" + dso.getName() + "' (" + identifier + ")");
+                Community community = (Community) dso;
+                supplier = () -> {
+                    try {
+                        return buildFromCommunity(context, community);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+            } else {
+                throw new IllegalArgumentException(
+                    String.format("DSO with id '%s' (type: %s) can't be exported. Supported types: %s", identifier,
+                        Constants.typeText[dso.getType()], "Item | Collection | Community"));
+            }
+        }
+
+        return exportStreaming(context, supplier, exportAllMetadata);
+    }
+
+    @Override
+    public InputStream exportStreaming(Context context, Supplier<Iterator<Item>> itemIteratorSupplier,
+                                       boolean exportAll) throws Exception {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+        try {
+            return streamingExporter.export(context, itemIteratorSupplier, exportAll, getCsvExportLimit());
+        } finally {
+            context.setMode(originalMode);
+        }
     }
 
     @Override
