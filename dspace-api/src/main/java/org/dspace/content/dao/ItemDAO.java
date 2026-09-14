@@ -132,6 +132,9 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
 
     Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
+    Iterator<Item> findAllByCollectionLastModifiedSince(Context context, Collection collection, Date last)
+        throws SQLException;
+
     Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException;
 
