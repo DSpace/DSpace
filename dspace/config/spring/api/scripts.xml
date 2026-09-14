@@ -133,4 +133,92 @@
         <property name="dspaceRunnableClass" value="org.dspace.content.enhancer.script.ItemEnhancerScript"/>
     </bean>
 
+    <bean id="relationship-to-authority-migrate"
+          class="org.dspace.content.migration.RelationshipToAuthorityMigrationCliScriptConfiguration">
+        <property name="description"
+                  value="Migrate relationships to CRIS authority model (config-driven, one type at a time)"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.content.migration.RelationshipToAuthorityMigrationScript"/>
+    </bean>
+
+    <bean id="metadata-field-move"
+          class="org.dspace.content.migration.MetadataFieldMoveCliScriptConfiguration">
+        <property name="description"
+                  value="Move metadata values from a source field (regex) to a target field (template), DB-level"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.content.migration.MetadataFieldMoveScript"/>
+    </bean>
+
+    <!-- ============================================================ -->
+    <!-- Directional migration definitions                             -->
+    <!-- Shareable: one definition can be reused across type configs   -->
+    <!-- ============================================================ -->
+
+    <bean id="authorLeftwardDef" class="org.dspace.content.migration.DirectionalMigrationDefinition">
+        <property name="ownerSide" value="LEFT"/>
+        <property name="schema" value="dc"/>
+        <property name="element" value="contributor"/>
+        <property name="qualifier" value="author"/>
+    </bean>
+
+    <bean id="projectLeftwardDef" class="org.dspace.content.migration.DirectionalMigrationDefinition">
+        <property name="ownerSide" value="LEFT"/>
+        <property name="schema" value="dc"/>
+        <property name="element" value="relation"/>
+        <property name="qualifier" value="project"/>
+    </bean>
+
+    <bean id="publicationOfProjectRightwardDef"
+          class="org.dspace.content.migration.DirectionalMigrationDefinition">
+        <property name="ownerSide" value="RIGHT"/>
+        <property name="schema" value="dc"/>
+        <property name="element" value="relation"/>
+        <property name="qualifier" value="publication"/>
+    </bean>
+
+    <bean id="journalIssueOfPublicationRightwardDef"
+          class="org.dspace.content.migration.DirectionalMigrationDefinition">
+        <property name="ownerSide" value="RIGHT"/>
+        <property name="schema" value="dc"/>
+        <property name="element" value="relation"/>
+        <property name="qualifier" value="ispartof"/>
+    </bean>
+
+    <!-- ============================================================ -->
+    <!-- Relationship type migration definitions                       -->
+    <!-- Matched to a relationship type by its leftward/rightward      -->
+    <!-- type labels; compose with leftward and/or rightward directions -->
+    <!-- ============================================================ -->
+
+    <bean class="org.dspace.content.migration.RelationshipTypeMigrationDefinition">
+        <property name="leftwardType" value="isAuthorOfPublication"/>
+        <property name="rightwardType" value="isPublicationOfAuthor"/>
+        <property name="description"
+                  value="isAuthorOfPublication -> dc.contributor.author (Person isAuthorOf Publication)"/>
+        <property name="leftwardMigration" ref="authorLeftwardDef"/>
+    </bean>
+
+    <bean class="org.dspace.content.migration.RelationshipTypeMigrationDefinition">
+        <property name="leftwardType" value="isProjectOfPublication"/>
+        <property name="rightwardType" value="isPublicationOfProject"/>
+        <property name="description"
+                  value="isProjectOfPublication/isPublicationOfProject -> dc.relation.project (LEFT) + dc.relation.publication (RIGHT)"/>
+        <property name="leftwardMigration" ref="projectLeftwardDef"/>
+        <property name="rightwardMigration" ref="publicationOfProjectRightwardDef"/>
+    </bean>
+
+    <bean class="org.dspace.content.migration.RelationshipTypeMigrationDefinition">
+        <property name="leftwardType" value="isPublicationOfJournalIssue"/>
+        <property name="rightwardType" value="isJournalIssueOfPublication"/>
+        <property name="description"
+                  value="isJournalIssueOfPublication -> dc.relation.ispartof (RIGHT, on JournalIssue)"/>
+        <property name="rightwardMigration" ref="journalIssueOfPublicationRightwardDef"/>
+    </bean>
+
+    <!-- ============================================================ -->
+    <!-- Shared helper bean for upsert logic                           -->
+    <!-- ============================================================ -->
+
+    <bean id="directionalMetadataMigrator"
+          class="org.dspace.content.migration.DirectionalMetadataMigrator"/>
 </beans>
