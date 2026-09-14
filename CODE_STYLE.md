@@ -124,6 +124,21 @@ the [`checkstyle-suppressions.xml`](checkstyle-suppressions.xml) configuration f
     * http://www.dspace.org/license/
     */
    ```
+13. Prefer named constants, enum constants, or standard library utility methods over magic numbers.
+  * For HTTP status codes, use enums (e.g., `HttpStatus.NO_CONTENT` instead of `204`).
+  * For DSpace entities, use defined constants, such as `Constants.ITEM` instead of `2`.
+  * For time-based calculations, use `java.util.concurrent.TimeUnit` instead of manual multiplication, e.g.
+   ```java
+   // This is INCORRECT. These values lack context, and manual arithmetic is prone to errors.
+   if (status == 204) { ... }
+   if (type == 3) { ... }
+   long waitWindow = waitHours * 60 * 60 * 1000;
+
+   // This is CORRECT. The code is self-documenting.
+   if (status == HttpStatus.NO_CONTENT) { ... }
+   if (type == Constants.ITEM) { ...}
+   long waitWindow = TimeUnit.HOURS.toMillis(waitHours);
+   ```
 
 ## IDE Support
 
