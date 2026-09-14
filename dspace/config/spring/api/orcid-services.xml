@@ -109,6 +109,8 @@
     	<property name="organizationCityField" value="${orcid.mapping.organization.city}" />
     	<property name="organizationCountryField" value="${orcid.mapping.organization.country}" />
     	<property name="disambiguatedOrganizationIdentifierFields" value="${orcid.mapping.organization.identifiers}" />
+		<property name="maxDescriptionValueLength" value="${orcid.mapping.description.maxvaluelength}" />
+		<property name="maxContributorValueLength" value="${orcid.mapping.contributor.maxvaluelength}" />
     </bean>
     
     <!-- Configuration of ORCID profile sections factory. 
