@@ -18,8 +18,9 @@ public class CCLicenseFieldEnum {
     private String id = "";
     private String label = "";
     private String description = "";
+    private Boolean isdefault = false;
 
-    public CCLicenseFieldEnum(String id, String label, String description) {
+    public CCLicenseFieldEnum(String id, String label, String description, Boolean isdefault) {
         if (StringUtils.isNotBlank(id)) {
             this.id = id;
         }
@@ -29,6 +30,7 @@ public class CCLicenseFieldEnum {
         if (StringUtils.isNotBlank(description)) {
             this.description = description;
         }
+        this.isdefault = isdefault;
 
     }
 
@@ -78,5 +80,22 @@ public class CCLicenseFieldEnum {
      */
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    /**
+     * Get the default answer of this enum
+     *
+     * @return the default answer of this enum
+     */
+    public Boolean getDefault() {
+        return isdefault;
+    }
+
+    /**
+     * Set the default answer of this enum
+     * @param isdefault
+     */
+    public void setDefault(final Boolean isdefault) {
+        this.isdefault = isdefault;
     }
 }

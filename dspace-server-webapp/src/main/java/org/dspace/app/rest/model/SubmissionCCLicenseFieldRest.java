@@ -24,6 +24,7 @@ public class SubmissionCCLicenseFieldRest {
 
     private List<SubmissionCCLicenseFieldEnumRest> enums;
 
+    private String type;
 
     public String getId() {
         return id;
@@ -56,4 +57,13 @@ public class SubmissionCCLicenseFieldRest {
     public void setEnums(final List<SubmissionCCLicenseFieldEnumRest> enums) {
         this.enums = enums;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
 }
