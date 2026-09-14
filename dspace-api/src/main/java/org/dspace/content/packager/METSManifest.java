@@ -16,8 +16,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
@@ -927,13 +929,17 @@ public class METSManifest {
     public Element[] getItemDmds()
         throws MetadataValidationException {
         // div@DMDID is actually IDREFS, a space-separated list of IDs:
-        Element objDiv = getObjStructDiv();
-        String dmds = objDiv.getAttributeValue("DMDID");
-        if (dmds == null) {
-            throw new MetadataValidationException(
-                "Invalid METS: Missing reference to Item descriptive metadata, first div on first structmap must have" +
-                    " a DMDID attribute.");
-        }
+        String dmds = mets.getChildren("structMap", metsNS)
+                .stream()
+                .map(e -> e.getChild("div", metsNS))
+                .filter(Objects::nonNull)
+                .map(div -> div.getAttributeValue("DMDID"))
+                .filter(StringUtils::isNotBlank)
+                .findFirst()
+                .orElseThrow(() -> new MetadataValidationException(
+                        "Invalid METS document: Missing reference to Item descriptive metadata. At least one of" +
+                                " the structmap must have a first div with a DMDID attribute."
+                ));
 
         return getDmdElements(dmds);
     }
