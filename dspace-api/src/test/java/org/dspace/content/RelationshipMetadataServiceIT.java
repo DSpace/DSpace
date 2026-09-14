@@ -15,7 +15,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -775,5 +777,99 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
             }
         }
         assertTrue(foundCreativeWorksISSNInSpecificQuery);
+    }
+
+    /**
+     * This test verifies that the transitive metadata retrieved via the Related bean contains the correct
+     * place information when multiple related entities of the same relation type exist, each
+     * holding metadata that should be retrieved.
+     * This is important because the REST converter uses the place data to compare set entries — if the place
+     * information is incorrect, the metadata will not be properly transferred to the caller.
+     */
+    @Test
+    public void testGetTransitiveVirtualMetadata() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection journalCollection = CollectionBuilder.createCollection(context, community)
+            .withEntityType("Journal")
+            .build();
+        Collection volumeCollection = CollectionBuilder.createCollection(context, community)
+            .withEntityType("JournalVolume")
+            .build();
+        Collection issueCollection = CollectionBuilder.createCollection(context, community)
+            .withEntityType("JournalIssue")
+            .build();
+
+        EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        EntityType journalVolumeEntityType =
+            EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
+        EntityType journalEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+
+        RelationshipType isJournalOfVolume =
+            RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalVolumeEntityType, journalEntityType,
+                "isJournalOfVolume", "isVolumeOfJournal",
+                null, null, null, null).build();
+
+        RelationshipType isJournalVolumeOfIssue =
+            RelationshipTypeBuilder
+                .createRelationshipTypeBuilder(context, journalIssueEntityType, journalVolumeEntityType,
+                "isJournalVolumeOfIssue", "isIssueOfJournalVolume",
+                null, null, null, null).build();
+
+        // The journal entities are the ones holding metadata that we want to pass to the current item in scope
+        Item journal1 = ItemBuilder.createItem(context, journalCollection)
+            .withMetadata("creativeworkseries", "issn", null, "issn journal 1").build();
+        Item journal2 = ItemBuilder.createItem(context, journalCollection)
+            .withMetadata("creativeworkseries", "issn", null, "issn journal 2").build();
+
+        // The volume entity holds two relations of same type to the journal entities
+        Item volume = ItemBuilder.createItem(context, volumeCollection).build();
+
+        // This is the item in scope, having a relation to volume
+        Item issue = ItemBuilder.createItem(context, issueCollection).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, volume, journal1,
+            isJournalOfVolume).build();
+        RelationshipBuilder.createRelationshipBuilder(context, volume, journal2,
+            isJournalOfVolume).build();
+        RelationshipBuilder.createRelationshipBuilder(context, issue, volume,
+            isJournalVolumeOfIssue).build();
+        context.restoreAuthSystemState();
+
+        Set<Integer> placesVirtual = new HashSet<>();
+        Set<Integer> placesVirtualTransitive = new HashSet<>();
+
+        //Fetching metadata for the volume entity and store the relevant place information in a set
+        List<MetadataValue> mdVolume =
+            itemService.getMetadata(volume, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        for (MetadataValue metadataValue : mdVolume) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("creativeworkseries") && element.equals("issn") && qualifier == null) {
+                placesVirtual.add(metadataValue.getPlace());
+            }
+        }
+
+        //Fetching metadata for the issue entity and store the relevant place information in a set
+        List<MetadataValue> mdIssue =
+            itemService.getMetadata(issue, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        for (MetadataValue metadataValue : mdIssue) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("creativeworkseries") && element.equals("issn") && qualifier == null) {
+                placesVirtualTransitive.add(metadataValue.getPlace());
+            }
+        }
+
+        /*
+         The sets must be equal, meaning both contain the same place information.
+         As a result of that, the metadata can be sent correctly to a caller using Rest API, where the place
+         information is used as a set comparator.
+        */
+        assertEquals("Place values are identical", placesVirtual, placesVirtualTransitive);
     }
 }
