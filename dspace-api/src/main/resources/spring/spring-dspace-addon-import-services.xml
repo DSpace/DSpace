@@ -11,10 +11,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context.xsd"
+           http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
        default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
@@ -31,6 +32,7 @@
                 <ref bean="tsvImportService" />
                 <ref bean="endnoteImportService" />
                 <ref bean="DoiImportService" />
+                <ref bean="grobidImportMetadataSourceService" />
             </list>
          </property>
     </bean>
@@ -320,6 +322,34 @@
 
     <bean class="java.lang.Integer" id="maxRetry">
         <constructor-arg value="3"/>
+    </bean>
+
+    <bean class='org.dspace.service.impl.HttpConnectionPoolService'
+          id='grobidHttpConnectionPoolService'
+          scope='singleton'
+          autowire-candidate='true'>
+        <constructor-arg name='configPrefix' value='grobid'/>
+    </bean>
+
+    <bean id="grobidImportMetadataSourceService" class="org.dspace.submit.extraction.grobid.GrobidImportMetadataSourceServiceImpl">
+        <property name="grobidClient">
+            <bean class="org.dspace.submit.extraction.grobid.client.GrobidClientImpl"/>
+        </property>
+        <property name="supportedExtensions">
+            <list>
+                <value>pdf</value>
+            </list>
+        </property>
+        <property name="metadataFieldMapping">
+            <bean class="org.dspace.importer.external.tei.TEIFieldMapping">
+                <property name="metadataFieldMap" ref="grobidMetadataFieldMap"/>
+            </bean>
+        </property>
+        <property name="consolidateHeader">
+            <!-- See ConsolidateHeaderEnum and https://grobid.readthedocs.io/en/latest/Grobid-service/#apiprocessheaderdocument
+                 for more information on GROBID API header consolidation -->
+            <util:constant static-field="org.dspace.submit.extraction.grobid.client.ConsolidateHeaderEnum.CONSOLIDATE_AND_INJECT_METADATA"/>
+        </property>
     </bean>
 
 </beans>

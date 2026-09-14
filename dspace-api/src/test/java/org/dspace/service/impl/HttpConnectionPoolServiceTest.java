@@ -16,11 +16,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.http.client.ServiceUnavailableRetryStrategy;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -76,6 +78,55 @@ public class HttpConnectionPoolServiceTest
         );
 
         try (CloseableHttpClient httpClient = instance.getClient()) {
+            assertNotNull("getClient should always return a client", httpClient);
+
+            URI uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost("localhost")
+                    .setPort(mockServerClient.getPort())
+                    .setPath(testPath)
+                    .build();
+            System.out.println(uri.toString());
+            HttpUriRequest request = RequestBuilder.get(uri)
+                    .build();
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                assertEquals("Response status should be OK", HttpStatus.OK_200,
+                        response.getStatusLine().getStatusCode());
+            }
+        }
+    }
+
+    /**
+     * Test of getClient method, of class HttpConnectionPoolService, with a DefaultServiceUnavailableRetryStrategy
+     * @throws java.io.IOException if a connection cannot be closed.
+     * @throws java.net.URISyntaxException when an invalid URI is constructed.
+     */
+    @Test
+    public void testGetClientWithDefaultServiceUnavailableRetryStrategy()
+            throws IOException, URISyntaxException {
+        ServiceUnavailableRetryStrategy retryStrategy = new DefaultServiceUnavailableRetryStrategy(3, 2000);
+        configurationService.setProperty("grobid.client.maxRetries", 3);
+        configurationService.setProperty("grobid.client.retryInterval", 2000);
+        configurationService.setProperty("grobid.service.url", "http://localhost:8070");
+        HttpConnectionPoolService instance = new HttpConnectionPoolService("grobid");
+        instance.configurationService = configurationService;
+        instance.init();
+
+        final String testPath = "/retry-test";
+        mockServerClient.when(
+                request()
+                .withPath(testPath),
+                // First 2 requests will return 503
+                org.mockserver.matchers.Times.exactly(2)
+        ).respond(response().withStatusCode(HttpStatus.SERVICE_UNAVAILABLE_503));
+        mockServerClient.when(
+                request()
+                .withPath(testPath),
+                // Final request will return 200
+                org.mockserver.matchers.Times.exactly(1)
+        ).respond(response().withStatusCode(HttpStatus.OK_200));
+
+        try (CloseableHttpClient httpClient = instance.getClient(retryStrategy)) {
             assertNotNull("getClient should always return a client", httpClient);
 
             URI uri = new URIBuilder()

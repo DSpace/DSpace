@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">This is a simple test file</title>
+			</titleStmt>
+            <publicationStmt>
+				<publisher/>
+                <availability status="unknown"><licence/></availability>
+                <date when="2018" type="published">2018</date>
+			</publicationStmt>
+            <sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Andrea</forename>
+                                <surname>Bollini</surname></persName>
+                            <affiliation key="aff0">
+								<address>
+									<postCode>4Science</postCode>
+                                    <settlement>Srl</settlement>
+                                    <country key="IT">Italy</country>
+								</address>
+							</affiliation>
+						</author>
+                        <title level="a" type="main">This is a simple test file</title>
+					</analytic>
+                    <monogr>
+						<title level="j" type="main">GROBID-JOURNAL</title>
+                        <imprint>
+							<date/>
+						</imprint>
+					</monogr>
+                    <idno type="MD5">00C26635E07C341B9B30BCC2C4E941C2</idno>
+                    <idno type="DOI">10.1234/example.2026.0123</idno>
+                    <idno type="ISSN">1234-5678</idno>
+                    <idno type="ISBN">978-3-16-148410-0</idno>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+        <encodingDesc>
+			<appInfo>
+				<application version="0.8.2-SNAPSHOT" ident="GROBID" when="2026-02-12T14:28+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+                    <ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+        <profileDesc>
+			<abstract>
+				<p>This is the abstract of our PDF file</p>
+			</abstract>
+            <textClass>
+				<keywords>
+					<term>PDF</term>
+                    <term>GROBID</term>
+                    <term>Metadata Extraction</term>
+				</keywords>
+			</textClass>
+		</profileDesc>
+	</teiHeader>
+    <text xml:lang="en">
+	</text>
+</TEI>
