@@ -100,7 +100,9 @@ public class WebSecurityConfiguration {
 
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
-        http.securityMatcher("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
+        // Also include Swagger/OpenAPI endpoints to ensure they are publicly accessible when springdoc is enabled.
+        http.securityMatcher("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**",
+                             "/v3/api-docs/**", "/swagger-ui/**")
             .authorizeHttpRequests((requests) -> requests
                 // Ensure /actuator/info endpoint is restricted to admins
                 .requestMatchers(HttpMethod.GET, actuatorBasePath + "/info")
