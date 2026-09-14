@@ -32,14 +32,17 @@ public class EPersonClaimProvider implements JWTClaimProvider {
     @Autowired
     private EPersonService ePersonService;
 
+    @Override
     public String getKey() {
         return EPERSON_ID;
     }
 
+    @Override
     public Object getValue(Context context, HttpServletRequest request) {
         return context.getCurrentUser().getID().toString();
     }
 
+    @Override
     public void parseClaim(Context context, HttpServletRequest request, JWTClaimsSet jwtClaimsSet) throws SQLException {
         EPerson ePerson = getEPerson(context, jwtClaimsSet);
 

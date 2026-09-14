@@ -81,6 +81,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param language - the language to retrieve the licenses for
      * @return a map of licenses with the id and the license for the provided language
      */
+    @Override
     public Map<String, CCLicense> retrieveLicenses(String language) {
         String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
 
@@ -245,6 +246,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param answerMap - the answers to the different field questions
      * @return the CC License URI
      */
+    @Override
     public String retrieveRightsByQuestion(String licenseId,
                                            String language,
                                            Map<String, String> answerMap) {
@@ -345,6 +347,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param doc - The license document from which to retrieve the license name
      * @return the license name
      */
+    @Override
     public String retrieveLicenseName(final Document doc) {
         return getSingleNodeValue(doc, "//result/license-name");
     }

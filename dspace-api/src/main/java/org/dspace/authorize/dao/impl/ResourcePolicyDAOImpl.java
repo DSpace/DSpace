@@ -171,6 +171,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 
+    @Override
     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
                                                                int action, int type_id) throws SQLException {
         // If groups and eperson are empty, return immediately

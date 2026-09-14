@@ -71,30 +71,37 @@ public class DSpaceAuthentication implements Authentication {
         this(null, (String) null);
     }
 
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
+    @Override
     public Object getCredentials() {
         return password;
     }
 
+    @Override
     public Object getDetails() {
         return null;
     }
 
+    @Override
     public Object getPrincipal() {
         return username;
     }
 
+    @Override
     public boolean isAuthenticated() {
         return authenticated;
     }
 
+    @Override
     public void setAuthenticated(boolean authenticated) throws IllegalArgumentException {
         this.authenticated = authenticated;
     }
 
+    @Override
     public String getName() {
         return username;
     }

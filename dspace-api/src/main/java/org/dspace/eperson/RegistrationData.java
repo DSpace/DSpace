@@ -103,6 +103,7 @@ public class RegistrationData implements ReloadableEntity<Integer> {
         this.netId = netId;
     }
 
+    @Override
     public Integer getID() {
         return id;
     }

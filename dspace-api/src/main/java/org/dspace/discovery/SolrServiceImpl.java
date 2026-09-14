@@ -376,6 +376,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Removes all documents from the Lucene index
      */
+    @Override
     public void deleteIndex() {
         try {
             final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
@@ -588,8 +589,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             Object value = doc.getFieldValue(SearchUtils.LAST_INDEXED_FIELD);
 
             // If it's a java.util.Date, convert to an Instant
-            if (value instanceof java.util.Date) {
-                value = ((java.util.Date) value).toInstant();
+            if (value instanceof java.util.Date) { // NOPMD - required by third-party API
+                value = ((java.util.Date) value).toInstant(); // NOPMD - required by third-party API
             }
 
             if (value instanceof Instant lastIndexed) {

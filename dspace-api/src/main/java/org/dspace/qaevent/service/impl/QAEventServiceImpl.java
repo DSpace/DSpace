@@ -635,7 +635,7 @@ public class QAEventServiceImpl implements QAEventService {
         QAEvent item = new QAEvent();
         item.setSource((String) doc.get(SOURCE));
         item.setEventId((String) doc.get(EVENT_ID));
-        item.setLastUpdate(((java.util.Date) doc.get(LAST_UPDATE)).toInstant());
+        item.setLastUpdate(((java.util.Date) doc.get(LAST_UPDATE)).toInstant()); // NOPMD - required by third-party API
         item.setMessage((String) doc.get(MESSAGE));
         item.setOriginalId((String) doc.get(ORIGINAL_ID));
         item.setTarget((String) doc.get(RESOURCE_UUID));

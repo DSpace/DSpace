@@ -524,6 +524,7 @@ public class JCloudBitStoreService extends BaseBitStoreService {
      * @throws IOException if an error occurs during retrieval
      */
     @SuppressWarnings("unchecked")
+    @Override
     public Map<String, Object> about(Bitstream bitstream, List<String> attrs) throws IOException {
         File file = getFile(bitstream);
         BlobStore blobStore = blobStoreContext.getBlobStore();

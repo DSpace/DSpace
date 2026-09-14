@@ -56,15 +56,18 @@ public class ViewEventRest extends BaseObjectRest<UUID> {
         this.referrer = referrer;
     }
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Override
     public String getType() {
         return NAME;
     }

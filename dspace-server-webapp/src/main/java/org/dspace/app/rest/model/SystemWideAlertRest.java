@@ -22,15 +22,18 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
     public static final String PLURAL_NAME = "systemwidealerts";
     public static final String CATEGORY = RestAddressableModel.SYSTEM;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Override
     public String getType() {
         return NAME;
     }

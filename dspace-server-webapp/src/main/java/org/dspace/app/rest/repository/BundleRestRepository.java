@@ -78,6 +78,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     }
 
     @PreAuthorize("hasPermission(#id, 'BUNDLE', 'READ')")
+    @Override
     public BundleRest findOne(Context context, UUID id) {
         Bundle bundle = null;
         try {
@@ -91,6 +92,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         return converter.toRest(bundle, utils.obtainProjection());
     }
 
+    @Override
     public Page<BundleRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(BundleRest.NAME, "findAll");
     }
@@ -200,6 +202,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         return bitstream;
     }
 
+    @Override
     public Class<BundleRest> getDomainClass() {
         return BundleRest.class;
     }

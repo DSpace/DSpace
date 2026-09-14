@@ -39,7 +39,8 @@ public class DateUntilFilter extends DSpaceFilter {
     @Override
     public SolrFilterResult buildSolrQuery() {
         // Tweak to set the milliseconds
-        String format = dateProvider.format(java.util.Date.from(date)).replace("Z", ".999Z");
+        String format = dateProvider.format(java.util.Date.from(date)) // NOPMD - required by third-party API
+                .replace("Z", ".999Z");
         // if date has timestamp of 00:00:00, switch it to refer to end of day
         if (format.substring(11, 19).equals("00:00:00")) {
             format = format.substring(0, 11) + "23:59:59" + format.substring(19);

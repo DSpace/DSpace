@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FacetConfigurationResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetConfigurationResource> {
 
+    @Override
     protected void addLinks(FacetConfigurationResource halResource, Pageable page, LinkedList<Link> list)
         throws Exception {
         FacetConfigurationRest data = halResource.getContent();
@@ -37,6 +38,7 @@ public class FacetConfigurationResourceHalLinkFactory extends DiscoveryRestHalLi
         }
     }
 
+    @Override
     protected Class<FacetConfigurationResource> getResourceClass() {
         return FacetConfigurationResource.class;
     }

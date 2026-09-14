@@ -31,6 +31,7 @@ public class ItemFilterRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }

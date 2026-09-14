@@ -38,6 +38,7 @@ public class QueryBuilderSearchFilter {
         return value;
     }
 
+    @Override
     public String toString() {
         return "QueryBuilderSearchFilter{" +
                 "name='" + name + '\'' +
@@ -46,6 +47,7 @@ public class QueryBuilderSearchFilter {
                 '}';
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object instanceof QueryBuilderSearchFilter) {
             QueryBuilderSearchFilter obj = (QueryBuilderSearchFilter) object;
@@ -64,6 +66,7 @@ public class QueryBuilderSearchFilter {
         return false;
     }
 
+    @Override
     public int hashCode() {
         return Objects.hash(name, operator, value);
     }

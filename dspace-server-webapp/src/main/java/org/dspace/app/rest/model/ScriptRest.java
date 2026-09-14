@@ -27,14 +27,17 @@ public class ScriptRest extends BaseObjectRest<String> {
     @JsonProperty(value = "parameters")
     private List<ParameterRest> parameterRestList = new LinkedList<>();
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }

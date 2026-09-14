@@ -97,6 +97,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         return list(hibernateQuery);
     }
 
+    @Override
     public int searchNotMemberCount(Context context, String query, List<MetadataField> queryFields,
                                          Group excludeGroup) throws SQLException {
         String queryString = "SELECT count(*) FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();

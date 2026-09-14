@@ -142,7 +142,8 @@ public class LoadLastLogin {
                     System.err.println("Skipping log record:  " + ex.getMessage());
                     continue;
                 }
-                Instant previous = ((java.util.Date) stampDb.find(user)).toInstant();
+                Instant previous = ((java.util.Date) // NOPMD - required by third-party API
+                        stampDb.find(user)).toInstant();
                 if (null == previous || stamp.isAfter(previous)) {
                     stampDb.insert(user, stamp, true); // Record this user's newest login so far
                 }
@@ -161,7 +162,7 @@ public class LoadLastLogin {
         while (walker.getNext(stamp)) {
             // Update an EPerson's last login
             String name = (String) stamp.getKey();
-            Instant date = ((java.util.Date) stamp.getValue()).toInstant();
+            Instant date = ((java.util.Date) stamp.getValue()).toInstant(); // NOPMD - required by third-party API
             EPerson ePerson;
             ePerson = ePersonService.findByEmail(ctx, name);
             if (null == ePerson) {

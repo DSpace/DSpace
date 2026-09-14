@@ -32,10 +32,12 @@ public class BulkAccessConditionRest extends BaseObjectRest<String> {
 
     private List<AccessConditionOptionRest> bitstreamAccessConditionOptions;
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
