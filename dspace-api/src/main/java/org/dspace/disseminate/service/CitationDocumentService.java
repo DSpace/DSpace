@@ -8,9 +8,9 @@
 package org.dspace.disseminate.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
@@ -23,6 +23,15 @@ import org.dspace.core.Context;
  * @author Peter Dietz (peter@longsight.com)
  */
 public interface CitationDocumentService {
+
+    interface CitedDocument extends AutoCloseable {
+        long length();
+
+        InputStream getInputStream() throws IOException;
+
+        @Override
+        void close() throws IOException;
+    }
 
     /**
      * Repository policy can specify to have a custom citation cover/tail page to the document, which embeds metadata.
@@ -59,27 +68,18 @@ public interface CitationDocumentService {
     boolean canGenerateCitationVersion(Context context, Bitstream bitstream) throws SQLException;
 
     /**
-     * Creates a
-     * cited document from the given bitstream of the given item. This
-     * requires that bitstream is contained in item.
-     * <p>
-     * The Process for adding a cover page is as follows:
-     * <ol>
-     * <li> Load source file into PdfReader and create a
-     * Document to put our cover page into.</li>
-     * <li> Create cover page and add content to it.</li>
-     * <li> Concatenate the coverpage and the source
-     * document.</li>
-     * </ol>
+     * Creates a cited document from the given bitstream of the given item.
+     * The result is exposed as a temporary stream-backed artifact to avoid loading
+     * the entire output PDF into memory.
      *
      * @param context   DSpace context
      * @param bitstream The source bitstream being cited. This must be a PDF.
-     * @return The temporary File that is the finished, cited document.
+     * @return stream-backed temporary cited document
      * @throws IOException        if IO error
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
+    CitedDocument makeCitedDocumentStream(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException;
 
 }

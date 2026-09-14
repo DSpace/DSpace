@@ -7,9 +7,10 @@
  */
 package org.dspace.disseminate;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,11 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.io.RandomAccessReadBuffer;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.io.ScratchFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.dspace.authorize.AuthorizeException;
@@ -246,8 +247,9 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         return VALID_TYPES.contains(bitstream.getFormat(context).getMIMEType());
     }
 
+
     @Override
-    public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
+    public CitedDocument makeCitedDocumentStream(Context context, Bitstream bitstream)
             throws IOException, SQLException {
 
         try (
@@ -258,33 +260,73 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
             try (var cover = coverPageService.renderCoverDocument(item)) {
                 addCoverPageToDocument(result, source, cover);
-
-                return documentAsBytes(result);
+                return documentAsTempFile(result);
             }
         }
     }
 
     private PDDocument loadDocumentFromDB(Context context, Bitstream bitstream) {
         try (var inputStream = bitstreamService.retrieve(context, bitstream)) {
-            return Loader.loadPDF(new RandomAccessReadBuffer(inputStream));
+            File tempFile = File.createTempFile("citation-source-", ".pdf", tempDir);
+            tempFile.deleteOnExit();
+            Files.copy(inputStream, tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            var randomAccess = new DeleteOnCloseRandomAccessRead(tempFile.toPath());
+            try {
+                return Loader.loadPDF(randomAccess,
+                        () -> new ScratchFile(MemoryUsageSetting.setupTempFileOnly()));
+            } catch (Exception e) {
+                try {
+                    randomAccess.close();
+                } catch (IOException closeException) {
+                    e.addSuppressed(closeException);
+                }
+                throw e;
+            }
         } catch (IOException | SQLException | AuthorizeException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Pair<byte[], Long> documentAsBytes(PDDocument document) throws IOException {
-
+    private CitedDocument documentAsTempFile(PDDocument document) throws IOException {
         document.setAllSecurityToBeRemoved(true);
+        return TempFileCitedDocument.create(tempDir, document);
+    }
 
-        //We already have the full PDF in memory, so keep it there
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            document.save(out);
-            byte[] data = out.toByteArray();
-            return Pair.of(data, (long) data.length);
+    private static final class TempFileCitedDocument implements CitedDocument {
+        private final File file;
+        private final long length;
+
+        private TempFileCitedDocument(File file) {
+            this.file = file;
+            this.length = file.length();
+        }
+
+        private static TempFileCitedDocument create(File tempDir, PDDocument document) throws IOException {
+            File tempFile = File.createTempFile("citation-document-", ".pdf", tempDir);
+            tempFile.deleteOnExit();
+            document.save(tempFile);
+            return new TempFileCitedDocument(tempFile);
+        }
+
+        @Override
+        public long length() {
+            return length;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return Files.newInputStream(file.toPath());
+        }
+
+        @Override
+        public void close() throws IOException {
+            Files.deleteIfExists(file.toPath());
         }
     }
 
-    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDDocument coverPage) {
+    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument,
+                                        PDDocument coverPage) throws IOException {
         var sourcePages = sourceDocument.getDocumentCatalog().getPages();
         var coverPages = coverPage.getDocumentCatalog().getPages();
 
@@ -292,20 +334,20 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             //citation as cover page
 
             for (var page: coverPages) {
-                document.addPage(page);
+                document.importPage(page);
             }
 
             for (PDPage sourcePage : sourcePages) {
-                document.addPage(sourcePage);
+                document.importPage(sourcePage);
             }
         } else {
             //citation as tail page
             for (PDPage sourcePage : sourcePages) {
-                document.addPage(sourcePage);
+                document.importPage(sourcePage);
             }
 
             for (var page: coverPages) {
-                document.addPage(page);
+                document.importPage(page);
             }
         }
     }
