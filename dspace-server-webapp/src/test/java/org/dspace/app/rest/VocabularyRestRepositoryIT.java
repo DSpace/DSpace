@@ -170,11 +170,15 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                      VocabularyMatcher.matchProperties("SRJournalTitle", "SRJournalTitle", false , false),
                      VocabularyMatcher.matchProperties("funding_types", "funding_types", true, false),
                      VocabularyMatcher.matchProperties("currency", "currency", true, false),
+                     VocabularyMatcher.matchProperties("event_types", "event_types", true, false),
+                     VocabularyMatcher.matchProperties("patent-coar-types", "patent-coar-types", false, true),
+                     VocabularyMatcher.matchProperties("publication-coar-types", "publication-coar-types", false, true),
+                     VocabularyMatcher.matchProperties("product-coar-types", "product-coar-types", false, true),
                      VocabularyMatcher.matchProperties("gender", "gender", true, false)
                  )))
         .andExpect(jsonPath("$._links.self.href",
             Matchers.containsString("api/submission/vocabularies")))
-        .andExpect(jsonPath("$.page.totalElements", is(9)));
+        .andExpect(jsonPath("$.page.totalElements", is(13)));
     }
 
     @Test
