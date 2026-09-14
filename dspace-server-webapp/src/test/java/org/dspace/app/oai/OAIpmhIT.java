@@ -192,16 +192,16 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(xpath("OAI-PMH/responseDate").exists())
                    .andExpect(xpath("OAI-PMH/request/@verb").string("ListSets"))
-                   // Expect two Sets to be returned
-                   .andExpect(xpath("//set").nodeCount(2))
+                   // Expect three Sets to be returned, because open access set should also be present
+                   .andExpect(xpath("//set").nodeCount(3))
                    // First setSpec should start with "com_" (Community)
-                   .andExpect(xpath("(//set/setSpec)[1]").string(startsWith("com_")))
+                   .andExpect(xpath("(//set/setSpec)[2]").string(startsWith("com_")))
                    // First set name should be Community name
-                   .andExpect(xpath("(//set/setName)[1]").string("Parent Community"))
+                   .andExpect(xpath("(//set/setName)[2]").string("Parent Community"))
                    // Second setSpec should start with "col_" (Collection)
-                   .andExpect(xpath("(//set/setSpec)[2]").string(startsWith("col_")))
+                   .andExpect(xpath("(//set/setSpec)[3]").string(startsWith("col_")))
                    // Second set name should be Collection name
-                   .andExpect(xpath("(//set/setName)[2]").string("Child Collection"))
+                   .andExpect(xpath("(//set/setName)[3]").string("Child Collection"))
                    // No resumption token should be returned
                    .andExpect(xpath("//resumptionToken").doesNotExist())
         ;

@@ -213,7 +213,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 null, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithNullItem 0", status, equalTo(DefaultAccessStatusHelper.UNKNOWN));
+        assertThat("testWithNullItem 0", status, equalTo(AccessStatusHelper.UNKNOWN));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNull("testWithNullItem 1", availabilityDate);
     }
@@ -228,7 +228,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutBundle, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithoutBundle 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
+        assertThat("testWithoutBundle 0", status, equalTo(AccessStatusHelper.METADATA_ONLY));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNull("testWithoutBundle 1", availabilityDate);
     }
@@ -246,14 +246,14 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithoutBitstream 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
+        assertThat("testWithoutBitstream 0", status, equalTo(AccessStatusHelper.METADATA_ONLY));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNull("testWithoutBitstream 1", availabilityDate);
         // getAccessStatusFromBitstream
         AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 null, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
-        assertThat("testWithoutBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.UNKNOWN));
+        assertThat("testWithoutBitstream 3", bitstreamStatus, equalTo(AccessStatusHelper.UNKNOWN));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertNull("testWithoutBitstream 4", bitstreamAvailabilityDate);
     }
@@ -275,14 +275,14 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        assertThat("testWithBitstream 0", status, equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNull("testWithBitstream 1", availabilityDate);
         // getAccessStatusFromBitstream
         AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
-        assertThat("testWithBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        assertThat("testWithBitstream 3", bitstreamStatus, equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertNull("testWithBitstream 4", bitstreamAvailabilityDate);
     }
@@ -314,14 +314,14 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        assertThat("testWithEmbargo 0", status, equalTo(AccessStatusHelper.EMBARGO));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithEmbargo 1", availabilityDate, equalTo(startDate));
         // getAccessStatusFromBitstream
         AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
-        assertThat("testWithEmbargo 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        assertThat("testWithEmbargo 3", bitstreamStatus, equalTo(AccessStatusHelper.EMBARGO));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithEmbargo 4", bitstreamAvailabilityDate, equalTo(startDate));
     }
@@ -353,14 +353,14 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithDateRestriction, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithDateRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        assertThat("testWithDateRestriction 0", status, equalTo(AccessStatusHelper.RESTRICTED));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithDateRestriction 1", availabilityDate, equalTo(startDate));
         // getAccessStatusFromBitstream
         AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
-        assertThat("testWithDateRestriction 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        assertThat("testWithDateRestriction 3", bitstreamStatus, equalTo(AccessStatusHelper.RESTRICTED));
         LocalDate bistreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithDateRestriction 4", bistreamAvailabilityDate, equalTo(startDate));
     }
@@ -390,14 +390,14 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithGroupRestriction, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithGroupRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        assertThat("testWithGroupRestriction 0", status, equalTo(AccessStatusHelper.RESTRICTED));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithGroupRestriction 1", availabilityDate, equalTo(threshold));
         // getAccessStatusFromBitstream
         AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
-        assertThat("testWithGroupRestriction 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        assertThat("testWithGroupRestriction 3", bitstreamStatus, equalTo(AccessStatusHelper.RESTRICTED));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithGroupRestriction 4", bitstreamAvailabilityDate, equalTo(threshold));
     }
@@ -420,14 +420,14 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutPolicy, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithoutPolicy 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        assertThat("testWithoutPolicy 0", status, equalTo(AccessStatusHelper.RESTRICTED));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithoutPolicy 1", availabilityDate, equalTo(threshold));
         // getAccessStatusFromBitstream
         AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
-        assertThat("testWithoutPolicy 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        assertThat("testWithoutPolicy 3", bitstreamStatus, equalTo(AccessStatusHelper.RESTRICTED));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithoutPolicy 4", bitstreamAvailabilityDate, equalTo(threshold));
     }
@@ -448,14 +448,14 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutPrimaryBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithoutPrimaryBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        assertThat("testWithoutPrimaryBitstream 0", status, equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNull("testWithoutPrimaryBitstream 1", availabilityDate);
         // getAccessStatusFromBitstream
         AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
-        assertThat("testWithoutPrimaryBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        assertThat("testWithoutPrimaryBitstream 3", bitstreamStatus, equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertNull("testWithoutPrimaryBitstream 4", bitstreamAvailabilityDate);
     }
@@ -490,7 +490,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithPrimaryAndMultipleBitstreams, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
-        assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(AccessStatusHelper.EMBARGO));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithPrimaryAndMultipleBitstreams 1", availabilityDate, equalTo(startDate));
         // getAccessStatusFromBitstream -> primary
@@ -498,7 +498,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 primaryBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String primaryBitstreamStatus = accessStatusPrimaryBitstream.getStatus();
         assertThat("testWithPrimaryAndMultipleBitstreams 3", primaryBitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         LocalDate primaryAvailabilityDate = accessStatusPrimaryBitstream.getAvailabilityDate();
         assertThat("testWithPrimaryAndMultipleBitstreams 4", primaryAvailabilityDate, equalTo(startDate));
         // getAccessStatusFromBitstream -> other
@@ -506,7 +506,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 otherBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String otherBitstreamStatus = accessStatusOtherBitstream.getStatus();
         assertThat("testWithPrimaryAndMultipleBitstreams 5", otherBitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+                equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate otherAvailabilityDate = accessStatusOtherBitstream.getAvailabilityDate();
         assertNull("testWithPrimaryAndMultipleBitstreams 6", otherAvailabilityDate);
     }
@@ -541,7 +541,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 itemWithoutPrimaryAndMultipleBitstreams, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
         assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status,
-                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+                equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNull("testWithNoPrimaryAndMultipleBitstreams 1", availabilityDate);
         // getAccessStatusFromBitstream -> first
@@ -549,7 +549,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 firstBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String firstBitstreamStatus = accessStatusFirstBitstream.getStatus();
         assertThat("testWithNoPrimaryAndMultipleBitstreams 3", firstBitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+                equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate firstAvailabilityDate = accessStatusFirstBitstream.getAvailabilityDate();
         assertNull("testWithNoPrimaryAndMultipleBitstreams 4", firstAvailabilityDate);
         // getAccessStatusFromBitstream -> other
@@ -557,7 +557,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 anotherBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String otherBitstreamStatus = accessStatusOtherBitstream.getStatus();
         assertThat("testWithNoPrimaryAndMultipleBitstreams 5", otherBitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         LocalDate otherAvailabilityDate = accessStatusOtherBitstream.getAvailabilityDate();
         assertThat("testWithNoPrimaryAndMultipleBitstreams 6", otherAvailabilityDate, equalTo(startDate));
     }
@@ -597,7 +597,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 1", status,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 2", availabilityDate, equalTo(startDate));
         // getAccessStatusFromBitstream
@@ -605,7 +605,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 3", bitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         LocalDate bistreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 4", bistreamAvailabilityDate, equalTo(startDate));
         // Configuration: anonymous
@@ -614,7 +614,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
         status = accessStatus.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 5", status,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 6", availabilityDate, equalTo(startDate));
         // getAccessStatusFromBitstream
@@ -622,7 +622,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
         bitstreamStatus = accessStatusBitstream.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 7", bitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         bistreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 8", bistreamAvailabilityDate, equalTo(startDate));
     }
@@ -664,7 +664,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 1", status,
-                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+                equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate availabilityDate = accessStatus.getAvailabilityDate();
         assertNull("testWithEmbargoForCurrentOrAnonymousAsAdmin 2", availabilityDate);
         // getAccessStatusFromBitstream
@@ -672,7 +672,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 3", bitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+                equalTo(AccessStatusHelper.OPEN_ACCESS));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertNull("testWithEmbargoForCurrentOrAnonymousAsAdmin 4", bitstreamAvailabilityDate);
         // Configuration: anonymous
@@ -680,7 +680,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
         status = accessStatus.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 5", status,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         availabilityDate = accessStatus.getAvailabilityDate();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 6", availabilityDate, equalTo(startDate));
         // getAccessStatusFromBitstream
@@ -688,7 +688,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
         bitstreamStatus = accessStatusBitstream.getStatus();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 7", bitstreamStatus,
-                equalTo(DefaultAccessStatusHelper.EMBARGO));
+                equalTo(AccessStatusHelper.EMBARGO));
         bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 8", bitstreamAvailabilityDate, equalTo(startDate));
         context.setCurrentUser(currentUser);
