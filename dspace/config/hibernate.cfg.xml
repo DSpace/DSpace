@@ -109,6 +109,8 @@
 
         <mapping class="org.dspace.app.ldn.LDNMessageEntity"/>
         <mapping class="org.dspace.app.ldn.NotifyPatternToTrigger"/>
+        <mapping class="org.dspace.mfa.Mfa"/>
+        <mapping class="org.dspace.mfa.MfaRecoveryCode"/>
 
     </session-factory>
 </hibernate-configuration>

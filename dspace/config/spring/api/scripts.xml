@@ -133,4 +133,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.content.enhancer.script.ItemEnhancerScript"/>
     </bean>
 
+    <bean id="mfa" class="org.dspace.mfa.MfaScriptConfiguration">
+        <property name="description" value="Manage Multi-Factor Authentication for users (disable, status, generate recovery codes)"/>
+        <property name="dspaceRunnableClass" value="org.dspace.mfa.MfaScript"/>
+    </bean>
+
 </beans>
