@@ -1027,7 +1027,17 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
      */
     protected void moveSingleMetadataValue(Context context, T dso, int place, MetadataValue rr) {
         //just move the metadata
+        boolean placeChanged = rr.getPlace() != place;
+        if (placeChanged) {
+            dso.addMetadataEventDetails(new MetadataEvent(rr, MetadataEvent.REMOVE));
+        }
+
         rr.setPlace(place);
+
+        if (placeChanged) {
+            dso.addMetadataEventDetails(new MetadataEvent(rr, MetadataEvent.ADD));
+            dso.setMetadataModified();
+        }
     }
 
     @Override
