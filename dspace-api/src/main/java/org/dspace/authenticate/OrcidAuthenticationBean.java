@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.content.Item.ANY;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -119,13 +119,8 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             return "";
         }
 
-        try {
-            return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e.getMessage(), e);
-            return "";
-        }
-
+        return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes,
+            encode(redirectUri, StandardCharsets.UTF_8));
     }
 
     @Override

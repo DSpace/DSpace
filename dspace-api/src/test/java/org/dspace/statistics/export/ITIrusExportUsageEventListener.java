@@ -15,8 +15,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,7 +189,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
      * Test whether the usage event of an item meeting all conditions is processed and succeeds
      */
     @Test
-    public void testReceiveEventOnItemThatShouldBeProcessed() throws UnsupportedEncodingException, SQLException {
+    public void testReceiveEventOnItemThatShouldBeProcessed() throws SQLException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getRemoteAddr()).thenReturn("client-ip");
         when(request.getHeader(anyString())).thenReturn(null);
@@ -206,10 +206,11 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
 
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
-                URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
-                ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
+                URLEncoder.encode(request.getRemoteAddr(), StandardCharsets.UTF_8) + "&req_dat=&rft" +
+                ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), StandardCharsets.UTF_8) +
+                "&rfr_dat=&rfr_id" +
                 "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUIUrl + "%2Fhandle%2F" + URLEncoder
-                .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
+                .encode(item.getHandle(), StandardCharsets.UTF_8) + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
 
@@ -224,7 +225,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
      * Test whether the usage event of an item meeting all conditions is processed but fails
      */
     @Test
-    public void testReceiveEventOnItemThatShouldBeProcessedFailed() throws SQLException, UnsupportedEncodingException {
+    public void testReceiveEventOnItemThatShouldBeProcessedFailed() throws SQLException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getRemoteAddr()).thenReturn("client-ip-fail");
         when(request.getHeader(anyString())).thenReturn(null);
@@ -240,10 +241,11 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
-                URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
-                ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
+                URLEncoder.encode(request.getRemoteAddr(), StandardCharsets.UTF_8) + "&req_dat=&rft" +
+                ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), StandardCharsets.UTF_8) +
+                "&rfr_dat=&rfr_id" +
                 "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUIUrl + "%2Fhandle%2F" + URLEncoder
-                .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
+                .encode(item.getHandle(), StandardCharsets.UTF_8) + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
 
@@ -287,7 +289,7 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
      * Test whether the usage event of a bitstream meeting all conditions is processed and succeeds
      */
     @Test
-    public void testReceiveEventOnBitstreamThatShouldBeProcessed() throws SQLException, UnsupportedEncodingException {
+    public void testReceiveEventOnBitstreamThatShouldBeProcessed() throws SQLException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getRemoteAddr()).thenReturn("client-ip");
         when(request.getHeader(anyString())).thenReturn(null);
@@ -300,8 +302,9 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         exportUsageEventListener.receiveEvent(usageEvent);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
-                URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
-                ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
+                URLEncoder.encode(request.getRemoteAddr(), StandardCharsets.UTF_8) + "&req_dat=&rft" +
+                ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), StandardCharsets.UTF_8) +
+                "&rfr_dat=&rfr_id" +
                 "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams" +
                 "%2F" + bitstream.getID() + "%2Fcontent" + "&rft_dat=Request";
 
@@ -318,8 +321,8 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
      * Test whether the usage event of a bitstream meeting all conditions is processed but fails
      */
     @Test
-    public void testReceiveEventOnBitstreamThatShouldBeProcessedFail() throws UnsupportedEncodingException,
-            SQLException {
+    public void testReceiveEventOnBitstreamThatShouldBeProcessedFail() throws
+        SQLException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getRemoteAddr()).thenReturn("client-ip-fail");
         when(request.getHeader(anyString())).thenReturn(null);
@@ -334,10 +337,11 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
-                URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
-                ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams" +
-                "%2F" + bitstream.getID() + "%2Fcontent" + "&rft_dat=Request";
+            URLEncoder.encode(request.getRemoteAddr(), StandardCharsets.UTF_8) + "&req_dat=&rft" +
+            ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), StandardCharsets.UTF_8) +
+            "&rfr_dat=&rfr_id" +
+            "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams" +
+            "%2F" + bitstream.getID() + "%2Fcontent" + "&rft_dat=Request";
 
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
