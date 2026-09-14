@@ -221,7 +221,7 @@ public class QAEventServiceImpl implements QAEventService {
     public void deleteEventByEventId(String id) {
         try {
             getSolr().deleteById(id);
-            getSolr().commit();
+            getSolr().commit(true, true, true);
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -231,7 +231,7 @@ public class QAEventServiceImpl implements QAEventService {
     public void deleteEventsByTargetId(UUID targetId) {
         try {
             getSolr().deleteByQuery(RESOURCE_UUID + ":" + targetId.toString());
-            getSolr().commit();
+            getSolr().commit(true, true, true);
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -347,7 +347,7 @@ public class QAEventServiceImpl implements QAEventService {
                 updateRequest.add(doc);
                 updateRequest.process(getSolr());
 
-                getSolr().commit();
+                getSolr().commit(true, true, true);
 
                 performAutomaticProcessingIfNeeded(context, dto);
             }

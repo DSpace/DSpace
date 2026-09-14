@@ -142,7 +142,7 @@ public class AnonymizeStatisticsIT
                 Pair.of("time", getTimeNDaysAgo(500))
         ));
 
-        solrStatisticsCore.getSolr().commit();
+        solrStatisticsCore.getSolr().commit(true, true, true);
 
         runDSpaceScript("anonymize-statistics");
 
