@@ -14,7 +14,10 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableClaimedTask;
+import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.IndexablePoolTask;
 
 /**
  * This plugin adds three fields to the solr index to make a facet with/without
@@ -31,8 +34,8 @@ public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServi
 
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
-        if (indexableObject instanceof IndexableItem) {
-            Item item = ((IndexableItem) indexableObject).getIndexedObject();
+        Item item = this.getIndexedItemDerivedObject(indexableObject);
+        if (item != null) {
             boolean hasOriginalBundleWithContent = hasOriginalBundleWithContent(item);
 
             // _keyword and _filter because
@@ -48,6 +51,25 @@ public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServi
                 document.addField("has_content_in_original_bundle_filter", true);
             }
         }
+    }
+
+    /**
+     * Retrieve the item object from a given IndexableObject if it is an item, workspace item or workflow item
+     * @param indexableObject The IndexableObject to get the indexed object from
+     * @return The indexed item object or null
+     */
+    private Item getIndexedItemDerivedObject(IndexableObject indexableObject) {
+        Item item = null;
+        if (indexableObject instanceof IndexableItem) {
+            item = ((IndexableItem) indexableObject).getIndexedObject();
+        } else if (indexableObject instanceof IndexableInProgressSubmission) {
+            item = ((IndexableInProgressSubmission<?>) indexableObject).getIndexedObject().getItem();
+        } else if (indexableObject instanceof IndexablePoolTask) {
+            item = ((IndexablePoolTask) indexableObject).getIndexedObject().getWorkflowItem().getItem();
+        } else if (indexableObject instanceof IndexableClaimedTask) {
+            item = ((IndexableClaimedTask) indexableObject).getIndexedObject().getWorkflowItem().getItem();
+        }
+        return item;
     }
 
     /**
