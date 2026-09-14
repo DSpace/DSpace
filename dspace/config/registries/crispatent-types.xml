@@ -1,0 +1,46 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris Patent Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>crispatent</name>
+        <namespace>http://dspace.org/crispatent</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>crispatent</schema>
+        <element>kind</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispatent</schema>
+        <element>document</element>
+        <qualifier>kind</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispatent</schema>
+        <element>document</element>
+        <qualifier>issueDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>crispatent</schema>
+        <element>document</element>
+        <qualifier>title</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>crispatent</schema>
+        <element>document</element>
+        <qualifier>description</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

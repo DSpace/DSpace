@@ -10,11 +10,14 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.repository.patch.operation.BitstreamRemoveOperation.OPERATION_PATH_BITSTREAM_REMOVE;
 import static org.dspace.core.Constants.WRITE;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -45,7 +48,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
@@ -145,7 +147,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -156,7 +158,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //Add a bitstream to an item
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream1")
@@ -200,7 +202,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "This is an archived bitstream";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -211,7 +213,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         //Add a bitstream to an item
         bitstreamContent = "This is a deleted bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream1")
@@ -261,7 +263,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -272,7 +274,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //Add a bitstream to an item
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream1")
@@ -318,7 +320,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -371,7 +373,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -425,7 +427,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -484,7 +486,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -525,7 +527,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -585,7 +587,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -646,7 +648,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -709,7 +711,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -776,7 +778,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -834,7 +836,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Item publicItem1;
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
 
             publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
@@ -904,7 +906,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -915,7 +917,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //Add a bitstream to an item
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream1")
@@ -1040,7 +1042,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1089,7 +1091,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1138,7 +1140,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1224,7 +1226,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1288,7 +1290,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "ThisIsSomeDummyText";
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1311,7 +1313,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.metadata",
-                    Matchers.allOf(
+                    allOf(
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(0), 0),
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(1), 1),
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(2), 2)
@@ -1332,7 +1334,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.metadata",
-                    Matchers.allOf(
+                    allOf(
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(2), 0),
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(0), 1),
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(1), 2)
@@ -1344,7 +1346,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.metadata",
-                    Matchers.allOf(
+                    allOf(
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(2), 0),
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(0), 1),
                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(1), 2)
@@ -1382,7 +1384,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1435,7 +1437,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1491,7 +1493,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1551,7 +1553,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1608,7 +1610,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream")
@@ -1692,7 +1694,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withName("THUMBNAIL")
             .build();
 
-        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+        InputStream is = toInputStream("dummy", "utf-8");
 
         // With an ORIGINAL Bitstream & matching THUMBNAIL Bitstream
         Bitstream bitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
@@ -1739,7 +1741,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withName("THUMBNAIL")
             .build();
 
-        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+        InputStream is = toInputStream("dummy", "utf-8");
 
         // With an ORIGINAL Bitstream & matching THUMBNAIL Bitstream containing special characters in filenames
         Bitstream bitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
@@ -1786,7 +1788,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withName("THUMBNAIL")
             .build();
 
-        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+        InputStream is = toInputStream("dummy", "utf-8");
 
         // With multiple ORIGINAL Bitstreams & matching THUMBNAIL Bitstreams
         Bitstream bitstream1 = BitstreamBuilder.createBitstream(context, originalBundle, is)
@@ -1863,7 +1865,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withName("THUMBNAIL")
             .build();
 
-        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+        InputStream is = toInputStream("dummy", "utf-8");
 
         Bitstream bitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
             .withName("test.pdf")
@@ -1909,7 +1911,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream1")
@@ -1919,7 +1921,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream2 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("Bitstream2")
@@ -1970,7 +1972,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, embargoItem1, is)
                 .withName("Bitstream1")
@@ -1982,7 +1984,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream2 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.
                 createBitstream(context, embargoItem1, is)
                 .withName("Bitstream2")
@@ -2049,7 +2051,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, privateItem1, is)
                 .withName("Bitstream1")
@@ -2059,7 +2061,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream2 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.
                 createBitstream(context, privateItem1, is)
                 .withName("Bitstream2")
@@ -2109,7 +2111,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("BitstreamName")
@@ -2119,7 +2121,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream2 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is)
                 .withName("BitstreamName")
@@ -2183,7 +2185,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, license, is)
                 .withName("BitstreamName")
@@ -2251,7 +2253,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, license, is)
                 .withName("BitstreamName")
@@ -2307,7 +2309,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, license, is)
                 .withName("BitstreamName")
@@ -2372,7 +2374,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, license, is)
                 .withName("BitstreamName")
@@ -2412,7 +2414,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.
                 createBitstream(context, license, is)
                 .withName("BitstreamName")
@@ -2455,7 +2457,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "Embargoed bitstream";
         Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Test Embargoed Bitstream")
@@ -2479,6 +2481,281 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findByItemIdWithoutRequiredParameters() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString()))
+                   .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void findByItemIdWithMetadataFieldsAndValuesWithDifferentCardinality() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", "bundle name")
+                       .param("filterMetadata", "dc.title"))
+                   .andExpect(status().isBadRequest());
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", "bundle name")
+                       .param("filterMetadata", "dc.title")
+                       .param("filterMetadataValue", "Test", "Test 2"))
+                   .andExpect(status().isBadRequest());
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", "bundle name")
+                       .param("filterMetadata", "dc.title", "dc.date.issued", "dc.description")
+                       .param("filterMetadataValue", "Test", "Test 2"))
+                   .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void findByFakeItemId() throws Exception {
+
+        String fakeId = "9cc8104e-5337-4305-b4ce-b578eb1b24ba";
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", fakeId)
+                       .param("name", "bundle name")
+                       .param("filterMetadata", "dc.title")
+                       .param("filterMetadataValue", "test"))
+                   .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void findByItemIdWithNoMatchedBitstreams() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle license = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("LICENSE")
+                                      .build();
+
+        String bitstreamContent1 = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, license, is)
+                .withName("license bitstream name")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", license.getName())
+                       .param("filterMetadata", "dc.title")
+                       .param("filterMetadataValue", "wrong value"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+    }
+
+    @Test
+    public void findByItemIdAndBundleNameAndMetadataValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle bundle = BundleBuilder.createBundle(context, publicItem1).withName("ORIGINAL").build();
+
+        String bitstreamContent1 = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, bundle, is)
+                .withName("this is a test")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "This is an original bitstream";
+        Bitstream bitstream2 = null;
+        try (InputStream is = toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, bundle, is)
+                .withName("this is a test 2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", bundle.getName())
+                       .param("filterMetadata", "dc.title")
+                       .param("filterMetadataValue", "this is a test")
+                       .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", contains(
+                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
+                   )));
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", bundle.getName())
+                       .param("filterMetadata", "dc.title")
+                       .param("filterMetadataValue", "([a-z]+ [a-z]+ [a-z]+ [a-z]+)")
+                       .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", contains(
+                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
+                   )));
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", bundle.getName())
+                       .param("filterMetadata", "dc.title")
+                       .param("filterMetadataValue", "(this is a test.*)")
+                       .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", hasSize(2)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", containsInAnyOrder(
+                       BitstreamMatcher.matchBitstreamEntry(bitstream1),
+                       BitstreamMatcher.matchBitstreamEntry(bitstream2)
+                   )));
+
+    }
+
+    @Test
+    public void findByItemIdAndBundleName() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle license = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("LICENSE")
+                                      .build();
+
+        Bundle original = BundleBuilder.createBundle(context, publicItem1)
+                                       .withName("ORIGINAL")
+                                       .build();
+
+        String bitstreamContent1 = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, license, is)
+                .withName("this is a test")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "This is an original bitstream";
+        Bitstream bitstream2 = null;
+        try (InputStream is = toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, original, is)
+                .withName("original bitstream name")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        // Query the non-restricted ORIGINAL bundle: an anonymous client can read its bitstream, so it
+        // appears in the response content. Querying the restricted LICENSE bundle would report a count
+        // but omit the bitstream from _embedded (anonymous users cannot read LICENSE bitstreams). The
+        // LICENSE bundle above remains as the bundle the name filter must exclude.
+        getClient().perform(get("/api/core/bitstreams/search/byItemId")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", original.getName())
+                       .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", contains(
+                       BitstreamMatcher.matchBitstreamEntry(bitstream2)
+                   )));
+
+    }
+
+    @Test
     public void deleteBitstreamsInBulk() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -2499,7 +2776,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream2 = null;
         Bitstream bitstream3 = null;
         Bitstream bitstream4 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
                 .withName("Bitstream 1")
                 .withMimeType("text/plain")
@@ -2563,7 +2840,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream2 = null;
         Bitstream bitstream3 = null;
         Bitstream bitstream4 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
                 .withName("Bitstream 1")
                 .withMimeType("text/plain")
@@ -2633,7 +2910,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream2 = null;
         Bitstream bitstream3 = null;
         Bitstream bitstream4 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
                 .withName("Bitstream 1")
                 .withMimeType("text/plain")
@@ -2698,7 +2975,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream2 = null;
         Bitstream bitstream3 = null;
         Bitstream bitstream4 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
                 .withName("Bitstream 1")
                 .withMimeType("text/plain")
@@ -2757,7 +3034,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream1 = null;
         Bitstream bitstream2 = null;
         Bitstream bitstream3 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
                 .withName("Bitstream 1")
                 .withMimeType("text/plain")
@@ -2828,7 +3105,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream2 = null;
         Bitstream bitstream3 = null;
         Bitstream bitstream4 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
                 .withName("Bitstream 1")
                 .withMimeType("text/plain")
@@ -2931,7 +3208,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Bitstream bitstream2 = null;
         Bitstream bitstream3 = null;
         Bitstream bitstream4 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
                 .withName("Bitstream 1")
                 .withMimeType("text/plain")
@@ -2997,7 +3274,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         String bitstreamContent = "ThisIsSomeDummyText";
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.createBitstream(context, publicItem1, is)
                                         .withName("Bitstream")
                                         .withDescription("Description")
@@ -3028,7 +3305,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         String bitstreamContent = "ThisIsSomeDummyText";
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.createBitstream(context, publicItem1, is)
                                         .withName("Bitstream")
                                         .withDescription("Description")
@@ -3075,7 +3352,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent3 = "ThisIsSomeDummyText3";
         // Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is1 = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+        try (InputStream is1 = toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, publicItem1, is1)
                 .withName("Bitstream1")
@@ -3086,7 +3363,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Add another bitstream to an item
         Bitstream bitstream2;
-        try (InputStream is2 = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+        try (InputStream is2 = toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is2)
                 .withName("Bitstream2")
@@ -3105,7 +3382,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Add another bitstream to an item
         Bitstream bitstream3 = null;
-        try (InputStream is3 = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+        try (InputStream is3 = toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
             bitstream3 = BitstreamBuilder.
                 createBitstream(context, publicItem1, is3)
                 .withName("Bitstream3")
@@ -3200,7 +3477,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withTitle("TestItem")
             .build();
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream("TestContent", CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, item, is)
                 .withName("TestBitstream")
@@ -3234,7 +3511,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withTitle("TestItem")
             .build();
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream("TestContent", CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, item, is)
                 .withName("TestBitstream")
@@ -3266,7 +3543,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withTitle("TestItem")
             .build();
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream("TestContent", CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, item, is)
                 .withName("TestBitstream")
@@ -3299,7 +3576,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .withTitle("TestItem")
             .build();
         Bitstream bitstream;
-        try (InputStream is = IOUtils.toInputStream("TestContent", CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream("TestContent", CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, item, is)
                 .withName("TestBitstream")
@@ -3335,12 +3612,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             .build();
         Bitstream bitstream1;
         Bitstream bitstream2;
-        try (InputStream is = IOUtils.toInputStream("TestContent1", CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream("TestContent1", CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
                 .withName("OldBitstream1.txt")
                 .build();
         }
-        try (InputStream is = IOUtils.toInputStream("TestContent2", CharEncoding.UTF_8)) {
+        try (InputStream is = toInputStream("TestContent2", CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
                 .withName("OldBitstream2.txt")
                 .build();
@@ -3420,7 +3697,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String bitstreamContent1 = "ThisIsSomeDummyText1";
         // Add a bitstream to an item
         Bitstream bitstream = null;
-        try (InputStream is1 = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+        try (InputStream is1 = toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is1)
                     .withName("Bitstream1")
