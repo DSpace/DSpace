@@ -2216,4 +2216,65 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Overridden so that removing an authority-backed metadata value also removes exactly the
+     * relationship that value owns (see the {@code relationship_id} link on {@link MetadataValue}).
+     * The relationship is deleted <em>before</em> {@code super} removes the metadata row, because
+     * the owning foreign key lives on that row: once {@code super} has deleted it the relationship
+     * can no longer be located from the value. Because this runs per matching value, clearing a
+     * whole field tears down every owned relationship for that field.</p>
+     */
+    @Override
+    public void clearMetadata(Context context, Item dso, String schema, String element, String qualifier,
+                              String lang) throws SQLException {
+        for (MetadataValue metadataValue : getMetadata(dso, schema, element, qualifier, lang)) {
+            deleteOwnedRelationship(context, metadataValue);
+        }
+        super.clearMetadata(context, dso, schema, element, qualifier, lang);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Overridden so that removing an authority-backed metadata value also removes exactly the
+     * relationship that value owns. As with {@link #clearMetadata}, the relationship is deleted
+     * <em>before</em> {@code super} removes the metadata row carrying the owning foreign key. The
+     * indexed single-value remove therefore tears down exactly one relationship.</p>
+     */
+    @Override
+    public void removeMetadataValues(Context context, Item dso, List<MetadataValue> values) throws SQLException {
+        for (MetadataValue metadataValue : values) {
+            deleteOwnedRelationship(context, metadataValue);
+        }
+        super.removeMetadataValues(context, dso, values);
+    }
+
+    /**
+     * Delete the relationship owned by the given metadata value, if any. Must be called while the
+     * metadata row still exists so the owning {@code relationship_id} foreign key is readable.
+     *
+     * @param context          the DSpace context
+     * @param metadataValue    the metadata value whose owned relationship should be removed
+     * @throws SQLException if a database error occurs
+     */
+    private void deleteOwnedRelationship(Context context, MetadataValue metadataValue) throws SQLException {
+        Integer relationshipId = metadataValue.getOwnedRelationshipId();
+        if (relationshipId == null) {
+            return;
+        }
+        Relationship relationship = relationshipService.find(context, relationshipId);
+        if (relationship == null) {
+            return;
+        }
+        try {
+            relationshipService.delete(context, relationship);
+        } catch (AuthorizeException e) {
+            throw new IllegalStateException(
+                "Not authorized to delete relationship " + relationshipId + " owned by metadata value "
+                    + metadataValue.getID(), e);
+        }
+    }
+
 }

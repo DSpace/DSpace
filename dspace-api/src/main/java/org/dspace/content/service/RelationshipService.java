@@ -360,6 +360,28 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
         throws AuthorizeException, SQLException;
 
     /**
+     * Mint a type-less (authority-backed) relationship between an owner item and a target item.
+     *
+     * <p>Unlike the typed {@code create(...)} methods, this path does not dereference a
+     * {@link RelationshipType}: it performs no entity-type verification, no cardinality checks and no
+     * virtual-metadata place shifting (all of which are type-driven). The persisted row has both
+     * {@code left_id} and {@code right_id} populated and {@code type_id} NULL.</p>
+     *
+     * <p>Side convention: the owner is stored as the left item and the target as the right item. The
+     * owner is always recoverable later from the owning metadata value, so this convention is safe and
+     * reversible when a future stage attaches real types.</p>
+     *
+     * @param context   The relevant DSpace context
+     * @param ownerItem The owning item; stored as the left item of the relationship
+     * @param targetItem The target item; stored as the right item of the relationship
+     * @return          The created type-less Relationship
+     * @throws AuthorizeException   If the user is not authorized to write to either item
+     * @throws SQLException         If something goes wrong
+     */
+    Relationship createTypeLessRelationship(Context context, Item ownerItem, Item targetItem)
+        throws AuthorizeException, SQLException;
+
+    /**
      * This method returns a list of Relationship objects for the given typeName
      * @param context           The relevant DSpace context
      * @param typeName          The leftward or rightward typeName of the relationship type
