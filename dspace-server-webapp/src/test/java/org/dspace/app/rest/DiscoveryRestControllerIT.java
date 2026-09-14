@@ -6914,4 +6914,61 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 "$._embedded.searchResult._embedded.objects[0].hitHighlights['dc.title']",
                 contains("This is a <a>test</a> <em>title</em>")));
     }
+
+    /**
+     * Regression test for DSpace/DSpace#12245: ISO 639-1 language codes that are also English stopwords
+     * ("it", "no", ...) must stay findable through fielded queries on dc.language.iso and dcterms.language,
+     * which the search schema routes past the stopword-filtered "text" chain. Unfielded search keeps its
+     * stopword filtering.
+     */
+    @Test
+    public void discoverSearchObjectsDontUseStopWordsForCertainFields() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+        ItemBuilder.createItem(context, col1)
+                .withTitle("Public item is it ?")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .withLanguage("it")
+                .build();
+        ItemBuilder.createItem(context, col1)
+                .withTitle("Public item with a dcterms language")
+                .withIssueDate("2017-10-18")
+                .withMetadata("dcterms", "language", null, "no")
+                .build();
+        context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // A normal / full-text search will not find the item if you just give a stop-word query value
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects").param("query", "it"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
+                )));
+
+        // dc.language.iso and dcterms.language are configured differently to other dynamic fields, to not
+        // use stop words as they themselves contain abbreviations or identifiers and not large searchable text entries
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects").param("query", "dc.language.iso:it"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                )));
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects").param("query", "dcterms.language:no"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                )));
+    }
 }
