@@ -48,6 +48,8 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     private String url;
 
+    private int timeout = 5000;
+
     @Autowired
     private LiveImportClient liveImportClient;
 
@@ -157,7 +159,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
                 uriBuilder.addParameter("offset", start.toString());
             }
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String response = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(response);
             Iterator<JsonNode> nodes = jsonNode.at("/message/items").iterator();
             while (nodes.hasNext()) {
@@ -196,7 +198,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             String ID = URLDecoder.decode(query.getParameterAsClass("id", String.class), "UTF-8");
             uriBuilder.setPath(uriBuilder.getPath() + "/" + ID);
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String responseString = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
             JsonNode messageNode = jsonNode.at("/message");
             if (!messageNode.isMissingNode()) {
@@ -250,7 +252,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
                 uriBuilder.addParameter("query.bibliographic", bibliographics);
             }
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            String resp = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(resp);
             Iterator<JsonNode> nodes = jsonNode.at("/message/items").iterator();
             while (nodes.hasNext()) {
@@ -290,7 +292,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             URIBuilder uriBuilder = new URIBuilder(url);
             uriBuilder.addParameter("query", query.getParameterAsClass("query", String.class));
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String responseString = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
             return jsonNode.at("/message/total-results").asInt();
         }
@@ -322,7 +324,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             URIBuilder uriBuilder = new URIBuilder(url);
             uriBuilder.setPath(uriBuilder.getPath() + "/" + query.getParameterAsClass("id", String.class));
-            String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String responseString = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
             return Strings.CS.equals(jsonNode.at("/status").toString(), "ok") ? 1 : 0;
         }
@@ -341,4 +343,11 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         this.url = url;
     }
 
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 }
