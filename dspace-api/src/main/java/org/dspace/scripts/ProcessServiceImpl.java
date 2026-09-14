@@ -353,8 +353,11 @@ public class ProcessServiceImpl implements ProcessService {
                 return false;
             }
             // Only the process owner or an administrator may perform any action
-            if ((null != context.getCurrentUser() && context.getCurrentUser().equals(process.getEPerson()) )
-                    || authorizeService.isAdmin(context)) {
+            EPerson currentUser = context.getCurrentUser();
+            EPerson processOwner = process.getEPerson();
+            boolean isOwner = currentUser != null && processOwner != null
+                    && currentUser.getID().equals(processOwner.getID());
+            if (isOwner || authorizeService.isAdmin(context)) {
                 return true;
             }
         } catch (SQLException e) {
@@ -368,15 +371,20 @@ public class ProcessServiceImpl implements ProcessService {
         List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
                 context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), Instant.now());
         for (Process process : processesToBeFailed) {
-            context.setCurrentUser(process.getEPerson());
-            // Fail the process.
-            log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
-            fail(context, process);
-            // But still attach its log to the process.
-            appendLog(process.getID(), process.getName(),
-                      "Process did not complete before tomcat shutdown.",
-                      ProcessLogLevel.ERROR);
-            createLogBitstream(context, process);
+            context.turnOffAuthorisationSystem();
+            try {
+                // Fail the process.
+                log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.",
+                        process.getID());
+                fail(context, process);
+                // But still attach its log to the process.
+                appendLog(process.getID(), process.getName(),
+                        "Process did not complete before tomcat shutdown.",
+                        ProcessLogLevel.ERROR);
+                createLogBitstream(context, process);
+            } finally {
+                context.restoreAuthSystemState();
+            }
         }
     }
 
