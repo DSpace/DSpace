@@ -732,7 +732,7 @@ public class OAIHarvester {
      */
     private String processDate(Instant date, int secondsPad) {
         date = date.minus(secondsPad, ChronoUnit.SECONDS);
-        return DateTimeFormatter.ISO_INSTANT.format(date);
+        return DateTimeFormatter.ISO_INSTANT.format(date.truncatedTo(ChronoUnit.SECONDS));
     }
 
 
