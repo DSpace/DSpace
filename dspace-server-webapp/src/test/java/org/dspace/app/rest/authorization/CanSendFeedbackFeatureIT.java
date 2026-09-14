@@ -76,10 +76,9 @@ public class CanSendFeedbackFeatureIT extends AbstractControllerIntegrationTest 
                                .andExpect(jsonPath("$", Matchers.is(
                                           AuthorizationMatcher.matchAuthorization(authEPersonSite))));
 
+        // anonymous users cannot send feedback by default (feedback.allow-anonymous defaults to false)
         getClient().perform(get("/api/authz/authorizations/" + authAnonymousSite.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", Matchers.is(
-                              AuthorizationMatcher.matchAuthorization(authAnonymousSite))));
+                   .andExpect(status().isNotFound());
     }
 
     @Test
@@ -105,6 +104,26 @@ public class CanSendFeedbackFeatureIT extends AbstractControllerIntegrationTest 
 
         getClient().perform(get("/api/authz/authorizations/" + authAnonymousSite.getID()))
                    .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void canSendFeedbackFeatureAnonymousAllowedTest() throws Exception {
+        configurationService.setProperty("feedback.recipient", "myemail@test.com");
+        configurationService.setProperty("feedback.allow-anonymous", true);
+        try {
+            Site site = siteService.findSite(context);
+            SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
+
+            // when anonymous submission is enabled, anonymous users are allowed to send feedback
+            Authorization authAnonymousSite = new Authorization(null, canSendFeedbackFeature, siteRest);
+
+            getClient().perform(get("/api/authz/authorizations/" + authAnonymousSite.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$", Matchers.is(
+                                  AuthorizationMatcher.matchAuthorization(authAnonymousSite))));
+        } finally {
+            configurationService.setProperty("feedback.allow-anonymous", false);
+        }
     }
 
 }
