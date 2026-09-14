@@ -26,24 +26,24 @@ import org.springframework.stereotype.Component;
  * to the convert method.
  */
 @Component
-public class DiscoverConfigurationConverter
-        implements DSpaceConverter<DiscoveryConfiguration, SearchConfigurationRest> {
+public class DiscoverConfigurationConverter {
 
-    @Override
-    public SearchConfigurationRest convert(DiscoveryConfiguration configuration, Projection projection) {
+    /**
+     * The requested configuration name and scope are kept on the REST object so that the self link can be built
+     * from them, the same way {@link DiscoverFacetConfigurationConverter} does it.
+     */
+    public SearchConfigurationRest convert(final String configurationName, final String scope,
+                                           DiscoveryConfiguration configuration, Projection projection) {
         SearchConfigurationRest searchConfigurationRest = new SearchConfigurationRest();
         searchConfigurationRest.setProjection(projection);
+        searchConfigurationRest.setConfiguration(configurationName);
+        searchConfigurationRest.setScope(scope);
         if (configuration != null) {
             addSearchFilters(searchConfigurationRest,
                              configuration.getSearchFilters(), configuration.getSidebarFacets());
             addSortOptions(searchConfigurationRest, configuration.getSearchSortConfiguration());
         }
         return searchConfigurationRest;
-    }
-
-    @Override
-    public Class<DiscoveryConfiguration> getModelClass() {
-        return DiscoveryConfiguration.class;
     }
 
     public void addSearchFilters(SearchConfigurationRest searchConfigurationRest,
