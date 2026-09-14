@@ -50,7 +50,8 @@
     <bean class="org.dspace.qaevent.MockQAEventService"
           id="org.dspace.qaevent.service.QAEventService" />
           
-    <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
+    <bean class="org.dspace.statistics.MockGeoIpService"
+          name="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
           
     <!-- suggestion service for solr providers -->
     <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.MockSolrSuggestionStorageService" />
