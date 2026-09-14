@@ -4322,6 +4322,46 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void uploadFileLargerThanTheConfiguredLimitTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2017-10-17")
+                .build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                "application/pdf", pdf);
+        try {
+            // The upload configuration falls back to upload.max, which is now smaller than the file
+            configurationService.setProperty("upload.max", 1024);
+
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
+                    .file(pdfFile))
+                    .andExpect(status().isCreated())
+                    // the mandatory-upload validation error is reported too, so match by message
+                    .andExpect(jsonPath("$.errors[*].message", hasItem("error.validation.filesize")))
+                    .andExpect(jsonPath("$.errors[?(@.message=='error.validation.filesize')].paths[0]",
+                            contains("/sections/upload")))
+                    .andExpect(jsonPath("$.sections.upload.files[0]").doesNotExist());
+
+            // nothing was stored
+            getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.upload.files[0]").doesNotExist());
+        } finally {
+            configurationService.setProperty("upload.max", null);
+        }
+    }
+
+    @Test
     public void uploadUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
