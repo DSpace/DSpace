@@ -401,6 +401,7 @@ public class Email {
         // template lookup
         vctx.put("config", Utils.getAllowedTemplateConfig());
         vctx.put("params", Collections.unmodifiableList(arguments));
+        vctx.put("global", vctx);
 
         StringWriter writer = new StringWriter();
         try {
