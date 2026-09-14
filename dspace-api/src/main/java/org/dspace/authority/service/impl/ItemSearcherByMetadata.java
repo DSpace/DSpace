@@ -30,6 +30,7 @@ import org.dspace.authority.service.ItemSearcher;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -69,6 +70,9 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
 
     @Autowired
     private ChoiceAuthorityService choiceAuthorityService;
+
+    @Autowired
+    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
 
     private static final Logger log = LogManager.getLogger(ItemSearcherByMetadata.class);
     private final String metadata;
@@ -191,10 +195,18 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
     private void updateReferences(Context context, Item itemWithReference, Item item, List<String> authorities)
         throws SQLException, AuthorizeException {
 
-        itemWithReference.getMetadata().stream()
+        List<MetadataValue> resolvedValues = itemWithReference.getMetadata().stream()
                          .filter(metadataValue -> authorities.contains(metadataValue.getAuthority()))
-                         .forEach(
-                             metadataValue -> choiceAuthorityService.setReferenceWithAuthority(metadataValue, item));
+                         .collect(Collectors.toList());
+
+        for (MetadataValue metadataValue : resolvedValues) {
+            // system / reference path: stamp the authority first, then mint the relationship
+            choiceAuthorityService.setReferenceWithAuthority(metadataValue, item);
+            if (item.isArchived()) {
+                authorityBackedRelationshipService
+                    .createRelationshipForResolvedAuthority(context, itemWithReference, metadataValue, item);
+            }
+        }
 
         itemService.update(context, itemWithReference);
     }

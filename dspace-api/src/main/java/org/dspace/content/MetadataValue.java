@@ -92,6 +92,15 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     @Column(name = "security_level")
     private Integer securityLevel;
 
+    /**
+     * The id of the single {@link Relationship} row this metadata value owns, if any.
+     * Mapped as a scalar id (not a {@code @ManyToOne} association) to keep the
+     * relationship object graph out of hot metadata reads. May be {@code null}.
+     */
+    @Nullable
+    @Column(name = "relationship_id")
+    private Integer ownedRelationshipId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dspace_object_id")
     protected DSpaceObject dSpaceObject;
@@ -303,5 +312,24 @@ public class MetadataValue implements ReloadableEntity<Integer> {
 
     public void setSecurityLevel(Integer securityLevel) {
         this.securityLevel = securityLevel;
+    }
+
+    /**
+     * Get the id of the {@link Relationship} row this metadata value owns.
+     *
+     * @return the owned relationship id, or {@code null} if this value owns no relationship
+     */
+    @Nullable
+    public Integer getOwnedRelationshipId() {
+        return ownedRelationshipId;
+    }
+
+    /**
+     * Set the id of the {@link Relationship} row this metadata value owns.
+     *
+     * @param ownedRelationshipId the owned relationship id, or {@code null} to clear the link
+     */
+    public void setOwnedRelationshipId(@Nullable Integer ownedRelationshipId) {
+        this.ownedRelationshipId = ownedRelationshipId;
     }
 }

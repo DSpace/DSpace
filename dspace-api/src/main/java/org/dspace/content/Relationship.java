@@ -55,7 +55,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * This is stored as an ID in the database
      */
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "type_id", nullable = false)
+    @JoinColumn(name = "type_id", nullable = true)
     private RelationshipType relationshipType;
 
     /**
@@ -131,7 +131,8 @@ public class Relationship implements ReloadableEntity<Integer> {
 
     /**
      * Standard getter for the relationshipType field
-     * @return  The relationshipType RelationshipType object in this relationship
+     * @return  The relationshipType RelationshipType object in this relationship,
+     *          or {@code null} for a type-less (authority-backed) relationship
      */
     public RelationshipType getRelationshipType() {
         return relationshipType;

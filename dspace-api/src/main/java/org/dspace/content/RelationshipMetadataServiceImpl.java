@@ -181,6 +181,11 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
+        // Type-less (authority-backed) relationships have no RelationshipType to drive virtual metadata.
+        // Skip them: they contribute no virtual metadata and dereferencing the null type would NPE.
+        if (relationshipType == null) {
+            return resultingMetadataValueList;
+        }
         HashMap<String, VirtualMetadataConfiguration> hashMaps;
         String relationName;
         Item otherItem;
