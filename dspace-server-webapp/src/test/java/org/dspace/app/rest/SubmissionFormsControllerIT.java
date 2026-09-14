@@ -763,4 +763,19 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
             .andExpect(jsonPath("$.rows[1].fields[0].rows").exists())
             .andExpect(jsonPath("$.rows[1].fields[0].rows").isArray());
     }
+
+    @Test
+    public void findTraditionalPageTwoMaxOccurrences() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissionforms/traditionalpagetwo"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.id", is("traditionalpagetwo")))
+                   // the dc.subject field (first row) should have maxOccurrences = 10
+                   .andExpect(jsonPath("$.rows[0].fields[0].repeatable", is(true)))
+                   .andExpect(jsonPath("$.rows[0].fields[0].maxOccurrences", is(10)))
+                   // the dc.description.abstract field (second row) should NOT have maxOccurrences
+                   .andExpect(jsonPath("$.rows[1].fields[0].maxOccurrences").doesNotExist());
+    }
 }
