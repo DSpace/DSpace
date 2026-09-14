@@ -15,6 +15,8 @@ import static org.mockserver.model.HttpResponse.response;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -90,6 +92,57 @@ public class HttpConnectionPoolServiceTest
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 assertEquals("Response status should be OK", HttpStatus.OK_200,
                         response.getStatusLine().getStatusCode());
+            }
+        }
+    }
+
+    @org.junit.After
+    public void tearDown() {
+        configurationService.setProperty("solr.authentication.type", null);
+        configurationService.setProperty("solr.authentication.user", null);
+        configurationService.setProperty("solr.authentication.password", null);
+    }
+
+    /**
+     * Test that getClient() attaches a preemptive HTTP Basic Authorization
+     * header when solr.authentication.* is configured.
+     */
+    @Test
+    public void testGetClientWithBasicAuthConfigured()
+            throws IOException, URISyntaxException {
+        configurationService.setProperty("solr.authentication.type", "basic");
+        configurationService.setProperty("solr.authentication.user", "solr");
+        configurationService.setProperty("solr.authentication.password", "SolrRocks");
+
+        HttpConnectionPoolService instance = new HttpConnectionPoolService("solr");
+        instance.configurationService = configurationService;
+        instance.init();
+
+        String expectedAuthHeader = "Basic " + Base64.getEncoder()
+                .encodeToString("solr:SolrRocks".getBytes(StandardCharsets.UTF_8));
+
+        final String testPath = "/test-auth";
+        mockServerClient.when(
+                request()
+                        .withPath(testPath)
+                        .withHeader("Authorization", expectedAuthHeader)
+        ).respond(
+                response()
+                        .withStatusCode(HttpStatus.OK_200)
+        );
+
+        try (CloseableHttpClient httpClient = instance.getClient()) {
+            URI uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost("localhost")
+                    .setPort(mockServerClient.getPort())
+                    .setPath(testPath)
+                    .build();
+            HttpUriRequest request = RequestBuilder.get(uri)
+                    .build();
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                assertEquals("Response status should be OK when the expected Authorization header is sent",
+                        HttpStatus.OK_200, response.getStatusLine().getStatusCode());
             }
         }
     }
