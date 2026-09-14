@@ -16,7 +16,6 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, MetadataSchemaService> {
 
@@ -45,7 +44,6 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
                 delete(c, metadataSchema);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -63,8 +61,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
             metadataSchemaService.update(context, metadataSchema);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException | AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error(e);
         } catch (NonUniqueMetadataException e) {
             log.error("Failed to complete MetadataSchema", e);
@@ -82,7 +79,6 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     /**

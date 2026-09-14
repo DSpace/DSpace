@@ -91,7 +91,6 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
                 delete(c, process);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -100,7 +99,6 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         try {
             processService.update(context, process);
             context.dispatchEvents();
-            indexingService.commit();
         } catch (Exception e) {
             return null;
         }

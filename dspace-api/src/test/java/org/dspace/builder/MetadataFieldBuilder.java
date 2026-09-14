@@ -17,7 +17,6 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, MetadataFieldService> {
 
@@ -46,7 +45,6 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
                 delete(c, metadataField);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -64,8 +62,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
             metadataFieldService.update(context, metadataField);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException | AuthorizeException
+        } catch (SQLException | AuthorizeException
                 | NonUniqueMetadataException | IOException e) {
             log.error("Failed to complete MetadataField", e);
         }
@@ -82,7 +79,6 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     /**

@@ -255,7 +255,6 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
             context.dispatchEvents();
 
-            indexingService.commit();
 
         } catch (Exception e) {
             return null;

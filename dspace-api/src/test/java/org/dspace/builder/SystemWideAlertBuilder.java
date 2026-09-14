@@ -64,7 +64,6 @@ public class SystemWideAlertBuilder extends AbstractBuilder<SystemWideAlert, Sys
                 delete(c, systemWideAlert);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -73,7 +72,6 @@ public class SystemWideAlertBuilder extends AbstractBuilder<SystemWideAlert, Sys
         try {
             systemWideAlertService.update(context, systemWideAlert);
             context.dispatchEvents();
-            indexingService.commit();
         } catch (Exception e) {
             return null;
         }
