@@ -45,23 +45,41 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 
     @Override
     public Item search(Context context, String searchParam, Item source) {
-        return search(context, searchParam, null, source);
+        return search(context, searchParam, new String[] {}, source);
     }
 
     @Override
-    public Item search(Context context, String searchParam, String entityType, Item source) {
+    public Item search(Context context, String searchParam, String[] entityTypes, Item source) {
         try {
-            return performSearch(context, searchParam, entityType, source);
+            return performSearchWithEntityTypes(context, searchParam, entityTypes, source);
         } catch (SQLException | AuthorizeException ex) {
-            String msg = "An error occurs searching an item by " + searchParam;
-            msg = StringUtils.isBlank(entityType) ? msg : " and relationship type " + entityType;
+            String msg = "An error occurs searching an item by " + searchParam
+                + (entityTypes == null || entityTypes.length == 0 ? ""
+                : " and relationship type " + StringUtils.join(entityTypes, ','));
             throw new RuntimeException(msg, ex);
         }
     }
 
-    private Item performSearch(Context context, String searchParam, String entityType, Item source)
+    private Item performSearchWithEntityTypes(
+                Context context, String searchParam, String[] entityTypes, Item source)
         throws SQLException, AuthorizeException {
 
+        if (entityTypes == null || entityTypes.length == 0) {
+            return performSearchWithSingleEntityType(context, searchParam, source, null);
+        } else {
+            for (String entityType : entityTypes) {
+                Item item = performSearchWithSingleEntityType(context, searchParam, source, entityType);
+                if (item != null) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Item performSearchWithSingleEntityType(
+                Context context, String searchParam, Item source, String entityType)
+        throws SQLException {
         return findByUuid(context, searchParam, entityType)
             .or(() -> findByCrisSourceIdAndEntityType(context, searchParam, entityType))
             .or(() -> findByItemSearcher(context, searchParam, entityType, source))

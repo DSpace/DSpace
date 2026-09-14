@@ -2067,6 +2067,29 @@ it, please enter the types and the actual numbers or codes.</hint>
      </pair>
    </value-pairs>
 
+   <value-pairs value-pairs-name="common_iso_countries" dc-term="common_iso_countries">
+     <pair>
+       <displayed-value>Italia</displayed-value>
+       <stored-value>IT</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Albania</displayed-value>
+       <stored-value>AL</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Algeria</displayed-value>
+       <stored-value>DZ</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Australia</displayed-value>
+       <stored-value>AU</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Botswana</displayed-value>
+       <stored-value>BW</stored-value>
+     </pair>
+   </value-pairs>
+
    <value-pairs value-pairs-name="funding_types" dc-term="funding_types">
        <pair>
            <displayed-value>Unspecified</displayed-value>

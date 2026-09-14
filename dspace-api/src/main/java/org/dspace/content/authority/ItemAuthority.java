@@ -10,6 +10,7 @@ package org.dspace.content.authority;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -143,7 +144,7 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             return new Choices(Choices.CF_UNSET);
         }
 
-        String entityType = getLinkedEntityType();
+        String[] entityTypes = getLinkedEntityTypes();
         ItemAuthorityService itemAuthorityService = itemAuthorityServiceFactory.getInstance(authorityName);
 
         String query = "";
@@ -162,8 +163,11 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
         solrQuery.addFilterQuery("withdrawn:false");
         solrQuery.addFilterQuery("NOT(discoverable:false)");
 
-        if (StringUtils.isNotBlank(entityType)) {
-            solrQuery.addFilterQuery("dspace.entity.type:" + entityType);
+        if (entityTypes != null && entityTypes.length > 0) {
+            String filter = Arrays.stream(entityTypes)
+                .map(entityType -> "dspace.entity.type:" + entityType)
+                .collect(Collectors.joining(" OR "));
+            solrQuery.addFilterQuery(filter);
         }
 
         customAuthorityFilters.stream()
@@ -287,8 +291,25 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     }
 
     @Override
-    public String getLinkedEntityType() {
-        return configurationService.getProperty("cris.ItemAuthority." + authorityName + ".entityType");
+    public String[] getLinkedEntityTypes() {
+        return configurationService.getArrayProperty("cris.ItemAuthority." + authorityName + ".entityType");
+    }
+
+    @Override
+    public String getPrimaryLinkedEntityType() {
+        String entityType = configurationService.getProperty(
+            "cris.ItemAuthority." + authorityName + ".primaryEntityType");
+        if (StringUtils.isNotBlank(entityType)) {
+            return entityType;
+        }
+
+        // fallback strategy
+        String[] entityTypes = getLinkedEntityTypes();
+        if (entityTypes != null && entityTypes.length == 1) {
+            return entityTypes[0];
+        }
+
+        return null;
     }
 
     public void setPluginInstanceName(String name) {
