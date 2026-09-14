@@ -9,6 +9,7 @@ package org.dspace.checker.dao.impl;
 
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.List;
 
 import jakarta.persistence.Query;
 import org.dspace.checker.ChecksumHistory;
@@ -57,4 +58,60 @@ public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory
         query.executeUpdate();
     }
 
+    @Override
+    public List<ChecksumHistory> findByBitstream(Context context, Bitstream bitstream, int pageSize, int offset)
+            throws SQLException {
+        var hql = "SELECT c FROM ChecksumHistory c WHERE c.bitstream = :bitstream ORDER BY c.processStartDate DESC";
+        Query query = createQuery(context, hql);
+        query.setParameter("bitstream", bitstream);
+        query.setMaxResults(pageSize);
+        query.setFirstResult(offset);
+        return list(query);
+    }
+
+    @Override
+    public int countByBitstream(Context context, Bitstream bitstream) throws SQLException {
+        var hql = "SELECT count(c) FROM ChecksumHistory c WHERE c.bitstream = :bitstream";
+        Query query = createQuery(context, hql);
+        query.setParameter("bitstream", bitstream);
+        return count(query);
+    }
+
+    @Override
+    public List<ChecksumHistory> findByResultCode(Context context, ChecksumResultCode checksumResultCode,
+                                                  int pageSize, int offset) throws SQLException {
+        var hql = """
+            SELECT c FROM ChecksumHistory c
+            WHERE c.checksumResult.resultCode = :resultCode
+            ORDER BY c.processStartDate DESC
+            """;
+        Query query = createQuery(context, hql);
+        query.setParameter("resultCode", checksumResultCode);
+        query.setMaxResults(pageSize);
+        query.setFirstResult(offset);
+        return list(query);
+    }
+
+    @Override
+    public int countByResultCode(Context context, ChecksumResultCode checksumResultCode) throws SQLException {
+        var hql = "SELECT count(c) FROM ChecksumHistory c WHERE c.checksumResult.resultCode = :resultCode";
+        Query query = createQuery(context, hql);
+        query.setParameter("resultCode", checksumResultCode);
+        return count(query);
+    }
+
+    @Override
+    public ChecksumHistory findByID(Context context, Long id) throws SQLException {
+        var hql = "SELECT c FROM ChecksumHistory c WHERE c.id = :id";
+        Query query = createQuery(context, hql);
+        query.setParameter("id", id);
+        return singleResult(query);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        var hql = "SELECT count(c) FROM ChecksumHistory c";
+        Query query = createQuery(context, hql);
+        return count(query);
+    }
 }
