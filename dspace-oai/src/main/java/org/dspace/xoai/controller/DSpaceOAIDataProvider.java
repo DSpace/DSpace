@@ -42,6 +42,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.xoai.data.ResumptionCursor;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.config.XOAIManagerResolverException;
@@ -91,7 +92,6 @@ public class DSpaceOAIDataProvider {
     @Autowired
     ConfigurationService configurationService;
 
-    private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
 
     @PostConstruct
     public void setUpHTMLTransformerFactory() {
@@ -143,11 +143,12 @@ public class DSpaceOAIDataProvider {
 
             XOAIManager manager = xoaiManagerResolver.getManager();
 
+            ResumptionCursor cursor = new ResumptionCursor();
             OAIDataProvider dataProvider = new OAIDataProvider(manager, xoaiContext,
                                                                identifyResolver.getIdentify(),
                                                                setRepositoryResolver.getSetRepository(),
-                                                               itemRepositoryResolver.getItemRepository(),
-                                                               resumptionTokenFormat);
+                                                               itemRepositoryResolver.getItemRepository(cursor),
+                                                               new DSpaceResumptionTokenFormatter(cursor));
 
             OutputStream out = response.getOutputStream();
             OAIRequestParameters parameters = new OAIRequestParameters(buildParametersMap(request));
@@ -204,7 +205,7 @@ public class DSpaceOAIDataProvider {
         } catch (InvalidContextException e) {
             log.debug(e.getMessage(), e);
             return indexAction(response, model);
-        } catch (ContextServiceException e) {
+        } catch (ContextServiceException | WritingXmlException | XMLStreamException e) {
             log.error(e.getMessage(), e);
             closeContext(context);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -217,16 +218,6 @@ public class DSpaceOAIDataProvider {
             closeContext(context);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                "Unexpected error. For more information visit the log files.");
-        } catch (WritingXmlException e) {
-            log.error(e.getMessage(), e);
-            closeContext(context);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               "Unexpected error while writing the output. For more information visit the log files.");
-        } catch (XMLStreamException e) {
-            log.error(e.getMessage(), e);
-            closeContext(context);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               "Unexpected error while writing the output. For more information visit the log files.");
         } finally {
             closeContext(context);
         }
