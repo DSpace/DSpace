@@ -22,7 +22,6 @@ import org.dspace.core.Utils;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.util.IPTable;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link ClientInfoService} that can provide information on DSpace client requests
@@ -44,7 +43,6 @@ public class ClientInfoServiceImpl implements ClientInfoService {
      */
     private final IPTable trustedProxies;
 
-    @Autowired(required = true)
     public ClientInfoServiceImpl(ConfigurationService configurationService) {
         this.configurationService = configurationService;
         this.trustedProxies = parseTrustedProxyRanges();

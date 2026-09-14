@@ -50,7 +50,6 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @Autowired
     private ObjectMapper mapper;
 
-    @Autowired
     GroupRestRepository(GroupService dsoService) {
         super(dsoService);
         this.gs = dsoService;
