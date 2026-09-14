@@ -19,6 +19,7 @@ import org.dspace.content.dao.BitstreamFormatDAO;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,11 +36,31 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      */
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormat.class);
 
+    /**
+     * Configuration property that enables the upload format whitelist. When {@code true},
+     * bitstreams whose identified format has a support level below
+     * {@link #CFG_WHITELIST_MIN_SUPPORT_LEVEL} are rejected on upload. Defaults to
+     * {@code false} (no restriction).
+     */
+    protected static final String CFG_WHITELIST_ENABLED = "bitstream.format.upload.whitelist.enabled";
+
+    /**
+     * Configuration property holding the minimum support level a format must have to be
+     * accepted on upload when the whitelist is enabled. Values match the
+     * {@link BitstreamFormat} support-level constants (0 = UNKNOWN, 1 = KNOWN,
+     * 2 = SUPPORTED). Defaults to {@link BitstreamFormat#KNOWN}.
+     */
+    protected static final String CFG_WHITELIST_MIN_SUPPORT_LEVEL =
+        "bitstream.format.upload.whitelist.min-support-level";
+
     @Autowired(required = true)
     protected BitstreamFormatDAO bitstreamFormatDAO;
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected BitstreamFormatServiceImpl() {
 
@@ -232,6 +253,21 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         }
 
         return -1;
+    }
+
+    @Override
+    public boolean isUploadAllowed(BitstreamFormat bitstreamFormat) {
+        // When the whitelist is disabled (the default), every format is accepted.
+        if (!configurationService.getBooleanProperty(CFG_WHITELIST_ENABLED, false)) {
+            return true;
+        }
+        // An unidentified format (null) is treated as "Unknown" and therefore not allowed.
+        if (bitstreamFormat == null) {
+            return false;
+        }
+        int minSupportLevel = configurationService.getIntProperty(CFG_WHITELIST_MIN_SUPPORT_LEVEL,
+                                                                  BitstreamFormat.KNOWN);
+        return bitstreamFormat.getSupportLevel() >= minSupportLevel;
     }
 
     @Override
