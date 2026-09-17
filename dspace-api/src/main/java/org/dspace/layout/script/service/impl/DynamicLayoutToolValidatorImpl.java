@@ -352,7 +352,67 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
             validateMetadataFields(allMetadataFields, metadataGroupsSheet, parentColumn, fieldTypeColumn, result);
         }
 
+        int entityTypeColumn = getCellIndexFromHeaderName(metadataGroupsSheet, ENTITY_COLUMN);
+        if (entityTypeColumn != -1 && parentColumn != -1) {
+            validateMetadataGroupParents(metadataGroupsSheet, result, entityTypeColumn, parentColumn);
+        }
+
         validateRenderingColumn(metadataGroupsSheet, fieldTypeColumn, result);
+
+    }
+
+    /**
+     * Validates that every {@link #PARENT_COLUMN} value in the metadatagroups sheet is anchored by a
+     * matching row in the box2metadata sheet. A metadata group is only imported when the box2metadata
+     * sheet declares a {@link #METADATAGROUP_TYPE} field with the same ENTITY whose METADATA equals the
+     * group's PARENT value; otherwise the group would be silently dropped on import. When no such anchor
+     * exists, an error naming the offending ENTITY and PARENT is added to the result.
+     *
+     * @param metadataGroupsSheet the metadatagroups sheet to validate
+     * @param result              the validation result to populate with errors
+     * @param entityTypeColumn    the index of the ENTITY column
+     * @param parentColumn        the index of the PARENT column
+     */
+    private void validateMetadataGroupParents(Sheet metadataGroupsSheet, DynamicLayoutToolValidationResult result,
+        int entityTypeColumn, int parentColumn) {
+
+        for (Row row : getNotEmptyRowsSkippingHeader(metadataGroupsSheet)) {
+            String entityType = getEntityTypeCellValue(row, entityTypeColumn);
+            String parent = getCellValue(row, parentColumn);
+
+            if (StringUtils.isBlank(entityType) || StringUtils.isBlank(parent)) {
+                continue;
+            }
+
+            if (isNotAnchoredInBox2Metadata(metadataGroupsSheet.getWorkbook(), entityType, parent)) {
+                result.addError("The metadata group with parent " + parent + " and entity type " + entityType
+                    + " has no matching " + METADATAGROUP_TYPE + " field in the " + BOX2METADATA_SHEET
+                    + " sheet and would be silently dropped on import");
+            }
+        }
+
+    }
+
+    private boolean isNotAnchoredInBox2Metadata(Workbook workbook, String entityType, String parent) {
+
+        Sheet box2metadataSheet = workbook.getSheet(BOX2METADATA_SHEET);
+        if (box2metadataSheet == null) {
+            // Return false to avoid many validation errors when the sheet is missing
+            return false;
+        }
+
+        int entityTypeColumn = getCellIndexFromHeaderName(box2metadataSheet, ENTITY_COLUMN);
+        int metadataColumn = getCellIndexFromHeaderName(box2metadataSheet, METADATA_COLUMN);
+        int fieldTypeColumn = getCellIndexFromHeaderName(box2metadataSheet, FIELD_TYPE_COLUMN);
+        if (entityTypeColumn == -1 || metadataColumn == -1 || fieldTypeColumn == -1) {
+            // Return false to avoid many validation errors when a required column is missing
+            return false;
+        }
+
+        return getNotEmptyRowsSkippingHeader(box2metadataSheet).stream()
+            .noneMatch(row -> METADATAGROUP_TYPE.equals(getCellValue(row, fieldTypeColumn))
+                && entityType.equals(getEntityTypeCellValue(row, entityTypeColumn))
+                && parent.equals(getCellValue(row, metadataColumn)));
 
     }
 

@@ -802,6 +802,28 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             "The tabpolicy contains an unknown group field: 'Researchers' at row 0"));
     }
 
+    @Test
+    public void testWithOrphanMetadataGroup() throws InstantiationException, IllegalAccessException {
+        context.turnOffAuthorisationSystem();
+        createEntityType("Publication");
+        createEntityType("Person");
+        GroupBuilder.createGroup(context)
+            .withName("Researchers")
+            .build();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFilePath("invalid-orphan-metadata-group.xls");
+        String[] args = new String[] { "dynamic-layout-tool", "-f", fileLocation };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat(errorMessages, containsInAnyOrder(
+            "The metadata group with parent dc.title and entity type Person has no matching METADATAGROUP field in "
+                + "the box2metadata sheet and would be silently dropped on import"));
+    }
+
     private void assertThatBitstreamFieldHas(DynamicLayoutField field, String label, String rowStyle, String cellStyle,
         int row, int cell, int priority, String rendering, int metadataGroupSize, String metadataField,
         String labelStyle, String valueStyle, boolean labelAsHeading, boolean valuesInline, String bundle,
