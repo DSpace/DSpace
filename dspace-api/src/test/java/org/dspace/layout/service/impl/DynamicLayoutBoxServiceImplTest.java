@@ -179,7 +179,7 @@ public class DynamicLayoutBoxServiceImplTest {
         box.setShortname("Main Box");
         box.setType("METADATA");
 
-        when(bitstreamService.findShowableByItem(context, item.getID(), "ORIGINAL", Map.of("dc.type", "thumbnal")))
+        when(bitstreamService.findShowableByItem(context, item.getID(), "ORIGINAL", Map.of("dc.type", "thumbnail")))
             .thenReturn(List.of());
 
         assertThat(dynamicLayoutBoxService.hasContent(context, box, item), is(false));
