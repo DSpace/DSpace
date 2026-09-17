@@ -23,9 +23,9 @@
                     <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">
                         <property name="browseNames">
                             <list>
-                                <value>rodept</value>
+<!--                                <value>rodept</value>-->
                                 <value>author</value>
-                                <value>rsoTitle</value>
+<!--                                <value>rsoTitle</value>-->
                                 <value>type</value>
                                 <value>dateissued</value>
                                 <value>subject</value>
@@ -62,17 +62,17 @@
         <constructor-arg name="sectionComponents">
             <list>
                 <list>
-                    <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">
-                        <property name="browseNames">
-                            <list>
-                                <value>pjtitle</value>
-                            </list>
-                        </property>
-                        <property name="style" value="col-md-4"/>
-                    </bean>
+<!--                    <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">-->
+<!--                        <property name="browseNames">-->
+<!--                            <list>-->
+<!--                                <value>pjtitle</value>-->
+<!--                            </list>-->
+<!--                        </property>-->
+<!--                        <property name="style" value="col-md-4"/>-->
+<!--                    </bean>-->
                     <bean class="org.dspace.layout.DynamicLayoutSearchComponent">
                         <property name="discoveryConfigurationName" value="project_funding" />
-                        <property name="style" value="col-md-8"/>
+                        <property name="style" value="col-md-12"/>
                     </bean>
                 </list>
                 <list>
@@ -90,18 +90,18 @@
         <constructor-arg name="sectionComponents">
             <list>
                 <list>
-                    <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">
-                        <property name="browseNames">
-                            <list>
-                                <value>rpname</value>
-                                <value>rpdept</value>
-                            </list>
-                        </property>
-                        <property name="style" value="col-md-4"/>
-                    </bean>
+<!--                    <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">-->
+<!--                        <property name="browseNames">-->
+<!--                            <list>-->
+<!--                                <value>rpname</value>-->
+<!--                                <value>rpdept</value>-->
+<!--                            </list>-->
+<!--                        </property>-->
+<!--                        <property name="style" value="col-md-4"/>-->
+<!--                    </bean>-->
                     <bean class="org.dspace.layout.DynamicLayoutSearchComponent">
                         <property name="discoveryConfigurationName" value="person" />
-                        <property name="style" value="col-md-8"/>
+                        <property name="style" value="col-md-12"/>
                     </bean>
                 </list>
                 <list>
