@@ -65,7 +65,7 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="$lc_value = 'en_US'">
+            <xsl:when test="$lc_value = 'en_us'">
                 <xsl:text>eng</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_value = 'en'">
