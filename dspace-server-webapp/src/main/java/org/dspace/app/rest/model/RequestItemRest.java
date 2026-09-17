@@ -10,6 +10,9 @@ package org.dspace.app.rest.model;
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -28,6 +31,7 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$$")
     protected String bitstream_id;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -35,12 +39,17 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
 
     protected Instant expires;
 
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$$")
     protected String item_id;
 
+    @Email
+    @Size(max = 64)
     protected String reqEmail;
 
+    @Size(max = 1000)
     protected String reqMessage;
 
+    @Size(max = 64)
     protected String reqName;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
