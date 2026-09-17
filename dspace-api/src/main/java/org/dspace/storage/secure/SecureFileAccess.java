@@ -15,7 +15,12 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -29,9 +34,13 @@ public final class SecureFileAccess {
     private SecureFileAccess() {}
 
     /**
-     * Validate a given path against an allowed base path. Does not attempt to calculate "real path"
-     * before validation, as this breaks for new files which don't yet exist. This can make the resulting
-     * validation still vulnerable to symlink traversal in some cases
+     * Validate a given path against allowed base paths.
+     *
+     * Calculates the "real path" for as much of the given path as exists,
+     * (traversing existing symlinks) with non-existent folders/files being
+     * appended to the existing path, and then validating against the
+     * allowed base paths.
+     *
      * @param file the unvalidated file, usually derived from user input or configuration
      *             This MUST be an absolute path, and the caller is expected to calculate it based on best
      *             context (e.g. configured base path, CWD, dspace.dir, and so on)
@@ -45,14 +54,18 @@ public final class SecureFileAccess {
         if (!filePath.isAbsolute()) {
             throw new IOException("Absolute path required for I/O (%s): %s".formatted(purpose, file));
         }
+
+        Path resolvedPath = resolvePathForWrite(filePath);
+
         for (String allowedBasePath : allowedBasePaths) {
+            if (allowedBasePath == null) {
+                throw new IOException("Null base path can not be provided for validation");
+            }
+
             Path basePath = Path.of(allowedBasePath)
                                 .toRealPath()
                                 .normalize();
-            if (basePath == null) {
-                throw new IOException("Null base path can not be provided for validation");
-            }
-            Path resolvedPath = basePath.resolve(file).normalize();
+
             if (resolvedPath.startsWith(basePath)) {
                 return resolvedPath;
             }
@@ -61,6 +74,63 @@ public final class SecureFileAccess {
         // If no valid path was resolved and returned by now
         // we raise an exception and treat this as illegal access
         throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
+    }
+
+    /**
+     * Resolves a Path intended for writing without requiring the complete path
+     * to exist.
+     *
+     * Before validation, existing segments of the path are converted to the
+     * "real path" (traversing symlinks), with non-existent segments of the path
+     * are then appended to the real path in their original order.
+     *
+     * Note: The validated path reflects the state of the filesystem when this
+     * method executes. It does not prevent another process from replacing a
+     * validated path component before the caller opens the file.
+     *
+     * @param path the absolute path intended for writing
+     * @return the normalized path formed from the real path of the nearest
+     *         existing ancestor and any trailing nonexistent path elements
+     * @throws IOException if no existing ancestor can be resolved, if an
+     *         existing symbolic link is dangling, if filesystem access is
+     *         denied, or if another I/O error occurs
+     */
+    private static Path resolvePathForWrite(Path path) throws IOException {
+        Path normalizedPath = path.normalize();
+        Path existingAncestor = normalizedPath;
+        Deque<Path> nonexistentElements = new ArrayDeque<>();
+
+        // Determine the existing and non-existing path segments
+        while (true) {
+            try {
+                Files.readAttributes(
+                    existingAncestor,
+                    BasicFileAttributes.class,
+                    LinkOption.NOFOLLOW_LINKS
+                );
+                break;
+            } catch (NoSuchFileException e) {
+                Path fileName = existingAncestor.getFileName();
+                Path parent = existingAncestor.getParent();
+
+                if (fileName == null || parent == null) {
+                    throw e;
+                }
+
+                nonexistentElements.addFirst(fileName);
+                existingAncestor = parent;
+            }
+        }
+
+        // Determine "real path" for existing segments
+        Path resolvedPath = existingAncestor.toRealPath();
+
+        // Append non-existing segments to real path
+        for (Path element : nonexistentElements) {
+            resolvedPath = resolvedPath.resolve(element);
+        }
+
+        return resolvedPath.normalize();
     }
 
     /**
