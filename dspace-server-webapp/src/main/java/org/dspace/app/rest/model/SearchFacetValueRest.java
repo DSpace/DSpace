@@ -29,10 +29,12 @@ public class SearchFacetValueRest extends RestAddressableModel {
     @JsonIgnore
     private String filterType;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -45,6 +47,7 @@ public class SearchFacetValueRest extends RestAddressableModel {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return DiscoveryRestController.class;
     }

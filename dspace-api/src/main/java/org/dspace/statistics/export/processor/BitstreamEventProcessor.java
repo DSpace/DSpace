@@ -78,6 +78,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void processEvent() throws SQLException, IOException {
         if (shouldProcessItem(item)) {
             String baseParam = getBaseParameters(item);

@@ -268,6 +268,7 @@ public class ProcessServiceImpl implements ProcessService {
         return process.getBitstreams();
     }
 
+    @Override
     public int countTotal(Context context) throws SQLException {
         return processDAO.countRows(context);
     }

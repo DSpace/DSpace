@@ -26,6 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class BrowseEntryHalLinkFactory extends HalLinkFactory<BrowseEntryResource, RestResourceController> {
 
+    @Override
     protected void addLinks(final BrowseEntryResource halResource, final Pageable pageable, final LinkedList<Link> list)
         throws Exception {
         BrowseEntryRest data = halResource.getContent();
@@ -45,10 +46,12 @@ public class BrowseEntryHalLinkFactory extends HalLinkFactory<BrowseEntryResourc
         }
     }
 
+    @Override
     protected Class<RestResourceController> getControllerClass() {
         return RestResourceController.class;
     }
 
+    @Override
     protected Class<BrowseEntryResource> getResourceClass() {
         return BrowseEntryResource.class;
     }

@@ -79,6 +79,7 @@ public abstract class UsageReportPointRest extends BaseObjectRest<String> {
      *
      * @return The id of this {@link UsageReportPointRest} object, of the form: type of UsageReport_dso uuid
      */
+    @Override
     public String getId() {
         return id;
     }
@@ -88,6 +89,7 @@ public abstract class UsageReportPointRest extends BaseObjectRest<String> {
      *
      * @param id The id of this {@link UsageReportPointRest} object, of the form: type of UsageReport_dso uuid
      */
+    @Override
     public void setId(String id) {
         this.id = id;
     }

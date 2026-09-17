@@ -29,6 +29,7 @@ public final class OrderedServiceComparator implements Comparator<Object>, Seria
      * (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    @Override
     public int compare(Object arg0, Object arg1) {
         /* a negative integer, zero, or a positive integer as the first argument
          * is less than, equal to, or greater than the second.

@@ -216,7 +216,7 @@ public class SyndicationFeed {
 
         feed.setDescription(defaultDescriptionField);
         feed.setLink(objectURL);
-        feed.setPublishedDate(java.util.Date.from(Instant.now()));
+        feed.setPublishedDate(java.util.Date.from(Instant.now())); // NOPMD - required by third-party API
         feed.setUri(objectURL);
 
         // add logo if we found one:
@@ -259,7 +259,9 @@ public class SyndicationFeed {
                     ZonedDateTime pubDate = new DCDate(pubDateString).toDate();
                     // If date string could not be parsed as a date, then pubDate will be null
                     if (pubDate != null) {
-                        entry.setPublishedDate(java.util.Date.from(pubDate.toInstant()));
+                        entry.setPublishedDate(
+                                java.util.Date.from(pubDate.toInstant()) // NOPMD - required by third-party API
+                        );
                         hasDate = true;
                     } else {
                         log.warn("Date field {} for item {} could not be parsed: {}", dateField, item.getID(),
@@ -267,7 +269,9 @@ public class SyndicationFeed {
                     }
                 }
                 // date of last change to Item
-                entry.setUpdatedDate(java.util.Date.from(item.getLastModified()));
+                entry.setUpdatedDate(
+                        java.util.Date.from(item.getLastModified()) // NOPMD - required by third-party API
+                );
 
                 StringBuilder db = new StringBuilder();
                 for (String df : descriptionFields) {
@@ -333,7 +337,9 @@ public class SyndicationFeed {
                         List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDateField);
                         if (v.size() > 0) {
                             ZonedDateTime dateTime = (new DCDate(v.get(0).getValue())).toDate();
-                            dc.setDate(java.util.Date.from(dateTime.toInstant()));
+                            dc.setDate(
+                                    java.util.Date.from(dateTime.toInstant()) // NOPMD - required by third-party API
+                            );
                         }
                     }
                     if (dcDescriptionField != null) {

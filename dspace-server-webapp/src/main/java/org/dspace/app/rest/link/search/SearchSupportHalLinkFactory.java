@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SearchSupportHalLinkFactory extends HalLinkFactory<SearchSupportResource, DiscoveryRestController> {
 
+    @Override
     protected void addLinks(SearchSupportResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
         list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn()
@@ -33,10 +34,12 @@ public class SearchSupportHalLinkFactory extends HalLinkFactory<SearchSupportRes
         list.add(buildLink("facets", getMethodOn().getFacetsConfiguration(null, null, pageable)));
     }
 
+    @Override
     protected Class<SearchSupportResource> getResourceClass() {
         return SearchSupportResource.class;
     }
 
+    @Override
     protected Class<DiscoveryRestController> getControllerClass() {
         return DiscoveryRestController.class;
     }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExternalSourceRestConverter implements DSpaceConverter<ExternalDataProvider, ExternalSourceRest> {
 
+    @Override
     public ExternalSourceRest convert(ExternalDataProvider modelObject, Projection projection) {
         ExternalSourceRest externalSourceRest = new ExternalSourceRest();
         externalSourceRest.setId(modelObject.getSourceIdentifier());
@@ -26,6 +27,7 @@ public class ExternalSourceRestConverter implements DSpaceConverter<ExternalData
         return externalSourceRest;
     }
 
+    @Override
     public Class<ExternalDataProvider> getModelClass() {
         return ExternalDataProvider.class;
     }

@@ -41,6 +41,7 @@ public class DefaultFilter implements Filter {
      * @return boolean
      * @throws LogicalStatementException
      */
+    @Override
     public boolean getResult(Context context, Item item) throws LogicalStatementException {
         return this.statement.getResult(context, item);
     }

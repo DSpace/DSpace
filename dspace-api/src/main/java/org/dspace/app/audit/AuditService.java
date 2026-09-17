@@ -8,7 +8,7 @@
 package org.dspace.app.audit;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,7 +73,7 @@ public interface AuditService {
      * @param asc if true sort the result in ascending order (by timeStamp)
      * @return the list of events in the specified time window for the requested object
      */
-    List<AuditEvent> findEvents(UUID objectUuid, Date from, Date to, int limit, int offset, boolean asc);
+    List<AuditEvent> findEvents(UUID objectUuid, Instant from, Instant to, int limit, int offset, boolean asc);
 
     /**
      * Find a specific audit event by its UUID
@@ -91,7 +91,7 @@ public interface AuditService {
      * @param from the start date (inclusive)
      * @param to the end date (inclusive)
      */
-    void deleteEvents(Context context, Date from, Date to);
+    void deleteEvents(Context context, Instant from, Instant to);
 
     /**
      * Commit pending changes
@@ -116,5 +116,5 @@ public interface AuditService {
      * @param to the end date (inclusive) can be null
      * @return the number of events matching the criteria
      */
-    long countEvents(Context context, UUID objectUuid, Date from, Date to);
+    long countEvents(Context context, UUID objectUuid, Instant from, Instant to);
 }

@@ -25,6 +25,7 @@ public interface InProgressSubmission<ID extends Serializable> extends Reloadabl
      *
      * @return the internal identifier
      */
+    @Override
     ID getID();
 
     /**

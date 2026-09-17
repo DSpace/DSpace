@@ -132,6 +132,10 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+            </plugin>
             <!-- This plugin allows us to run a Groovy script in our Maven POM
                  (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
                  We are generating a OS-agnostic version (agnostic.build.dir) of

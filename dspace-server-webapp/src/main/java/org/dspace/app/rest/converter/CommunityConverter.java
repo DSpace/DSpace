@@ -30,6 +30,7 @@ public class CommunityConverter
     @Autowired
     CommunityService communityService;
 
+    @Override
     public CommunityRest convert(Community community, Projection projection) {
         CommunityRest resource = super.convert(community, projection);
 

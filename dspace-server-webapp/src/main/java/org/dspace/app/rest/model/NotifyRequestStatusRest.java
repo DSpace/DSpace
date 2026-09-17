@@ -63,6 +63,7 @@ public class NotifyRequestStatusRest extends RestAddressableModel {
         return NAME;
     }
 
+    @Override
     public Class getController() {
         return NotifyRequestStatusRestController.class;
     }

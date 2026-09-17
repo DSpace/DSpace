@@ -35,11 +35,13 @@ public class BundleRest extends DSpaceObjectRest {
         return super.getId();
     }
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Override
     public String getType() {
         return NAME;
     }

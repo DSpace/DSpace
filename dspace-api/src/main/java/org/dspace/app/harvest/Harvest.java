@@ -58,11 +58,13 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
     protected Context context;
 
 
+    @Override
     public HarvestScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
                            .getServiceByName("harvest", HarvestScriptConfiguration.class);
     }
 
+    @Override
     public void setup() throws ParseException {
         harvestedCollectionService =
                 HarvestServiceFactory.getInstance().getHarvestedCollectionService();
@@ -140,6 +142,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         }
     }
 
+    @Override
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
