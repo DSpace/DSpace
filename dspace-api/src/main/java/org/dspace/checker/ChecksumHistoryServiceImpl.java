@@ -119,4 +119,40 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
 
     }
 
+    @Override
+    public ChecksumHistory find(Context context, Long id) throws SQLException {
+        return checksumHistoryDAO.findByID(context, id);
+    }
+
+    @Override
+    public List<ChecksumHistory> findAll(Context context, int pageSize, int offset) throws SQLException {
+        return checksumHistoryDAO.findAll(context, ChecksumHistory.class, pageSize, offset);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return checksumHistoryDAO.countTotal(context);
+    }
+
+    @Override
+    public List<ChecksumHistory> findByBitstream(Context context, Bitstream bitstream, int pageSize, int offset)
+            throws SQLException {
+        return checksumHistoryDAO.findByBitstream(context, bitstream, pageSize, offset);
+    }
+
+    @Override
+    public int countByBitstream(Context context, Bitstream bitstream) throws SQLException {
+        return checksumHistoryDAO.countByBitstream(context, bitstream);
+    }
+
+    @Override
+    public List<ChecksumHistory> findByResultCode(Context context, ChecksumResultCode checksumResultCode,
+                                                  int pageSize, int offset) throws SQLException {
+        return checksumHistoryDAO.findByResultCode(context, checksumResultCode, pageSize, offset);
+    }
+
+    @Override
+    public int countByResultCode(Context context, ChecksumResultCode checksumResultCode) throws SQLException {
+        return checksumHistoryDAO.countByResultCode(context, checksumResultCode);
+    }
 }
