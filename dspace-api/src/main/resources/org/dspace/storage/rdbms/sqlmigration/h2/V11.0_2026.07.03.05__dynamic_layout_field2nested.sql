@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------
--- CRIS Layout Field 2 Nested - squashed idempotent migration
+-- Dynamic Layout Field 2 Nested - squashed idempotent migration
 -- Consolidates: V7.0_2021.03.25, V7.0_2021.11.05 (nested),
 --   V7.0_2021.11.26 (nested)
 -------------------------------------------------------

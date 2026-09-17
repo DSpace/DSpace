@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------
--- CRIS Layout Tab - squashed idempotent migration
+-- Dynamic Layout Tab - squashed idempotent migration
 -- Consolidates: V7.0_2020.05.06 (tab), V7.0_2020.08.03 (tab),
 --   V7.0_2021.11.05 (tab), V7.6_2023.10.23, V7.6_2023.10.28
 -------------------------------------------------------

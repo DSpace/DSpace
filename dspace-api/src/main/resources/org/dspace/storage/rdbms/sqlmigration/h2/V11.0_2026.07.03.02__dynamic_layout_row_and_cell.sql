@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------
--- CRIS Layout Row and Cell - squashed idempotent migration
+-- Dynamic Layout Row and Cell - squashed idempotent migration
 -- Consolidates: V7.0_2021.11.05 (row + cell)
 -------------------------------------------------------
 

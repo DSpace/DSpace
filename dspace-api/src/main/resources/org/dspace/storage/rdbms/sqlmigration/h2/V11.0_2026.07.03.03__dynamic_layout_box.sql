@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------
--- CRIS Layout Box - squashed idempotent migration
+-- Dynamic Layout Box - squashed idempotent migration
 -- Consolidates: V7.0_2020.05.06 (box), V7.0_2020.08.03 (box),
 --   V7.0_2020.12.08 (box), V7.0_2021.11.05 (box), V7.0_2021.11.17
 -------------------------------------------------------

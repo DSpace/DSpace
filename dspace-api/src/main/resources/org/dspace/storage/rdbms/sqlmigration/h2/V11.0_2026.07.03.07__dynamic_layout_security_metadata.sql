@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------
--- CRIS Layout Security Metadata - squashed idempotent migration
+-- Dynamic Layout Security Metadata - squashed idempotent migration
 -- Consolidates: V7.0_2020.05.06 (securityfield),
 --   V7.0_2020.08.03 (securitymetadata)
 -------------------------------------------------------
@@ -34,5 +34,5 @@ CREATE TABLE IF NOT EXISTS dynamic_layout_tab2securitymetadata
         FOREIGN KEY (metadata_field_id) REFERENCES metadatafieldregistry (metadata_field_id)
 );
 
-DROP TABLE IF EXISTS dynamic_layout_box2securityfield;
-DROP TABLE IF EXISTS dynamic_layout_tab2securityfield;
+DROP TABLE IF EXISTS cris_layout_box2securityfield;
+DROP TABLE IF EXISTS cris_layout_tab2securityfield;

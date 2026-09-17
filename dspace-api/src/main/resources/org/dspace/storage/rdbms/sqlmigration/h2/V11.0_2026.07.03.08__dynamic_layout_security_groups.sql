@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------
--- CRIS Layout Security Groups - squashed idempotent migration
+-- Dynamic Layout Security Groups - squashed idempotent migration
 -- Consolidates: V7.2_2022.05.06, V7.2_2022.05.08,
 --   V7.6_2023.12.12, V7.6_2023.12.13
 -------------------------------------------------------

@@ -7,7 +7,7 @@
 --
 
 -------------------------------------------------------
--- CRIS Layout Field - squashed idempotent migration
+-- Dynamic Layout Field - squashed idempotent migration
 -- Consolidates: V7.0_2020.05.06 (field), V7.0_2020.08.03 (field),
 --   V7.0_2020.08.27, V7.0_2021.05.24, V7.0_2021.11.05 (field),
 --   V7.0_2021.11.26
