@@ -170,6 +170,38 @@ public class MetadataValueTest extends AbstractUnitTest {
     }
 
     /**
+     * Test of setLanguage method, of class MetadataValue.
+     */
+    @Test
+    public void testSetLanguageNormalizesBlankLanguageToNull() {
+        mv.setLanguage(null);
+        assertThat("testSetLanguageNormalizesBlankLanguageToNull null", mv.getLanguage(), nullValue());
+
+        mv.setLanguage(Item.ANY);
+        assertThat("testSetLanguageNormalizesBlankLanguageToNull any", mv.getLanguage(), nullValue());
+
+        mv.setLanguage("");
+        assertThat("testSetLanguageNormalizesBlankLanguageToNull empty", mv.getLanguage(), nullValue());
+
+        mv.setLanguage(" \t\r\n ");
+        assertThat("testSetLanguageNormalizesBlankLanguageToNull whitespace", mv.getLanguage(), nullValue());
+    }
+
+    /**
+     * Test of setLanguage method, of class MetadataValue.
+     */
+    @Test
+    public void testSetLanguagePreservesNonBlankLanguage() {
+        String language = " eng ";
+        mv.setLanguage(language);
+        assertThat("testSetLanguagePreservesNonBlankLanguage spaced", mv.getLanguage(), equalTo(language));
+
+        language = "not-a-language-tag";
+        mv.setLanguage(language);
+        assertThat("testSetLanguagePreservesNonBlankLanguage invalid", mv.getLanguage(), equalTo(language));
+    }
+
+    /**
      * Test of getPlace method, of class MetadataValue.
      */
     @Test
