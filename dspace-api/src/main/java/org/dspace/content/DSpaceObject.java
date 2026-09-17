@@ -75,7 +75,8 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     @OrderBy("id ASC")
     private List<Handle> handles = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject",
+              cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH})
     private final List<ResourcePolicy> resourcePolicies = new ArrayList<>();
 
     /**
