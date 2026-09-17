@@ -229,7 +229,7 @@ public final class Utils {
      */
     public static void copy(final InputStream input, final OutputStream output)
         throws IOException {
-        final int BUFFER_SIZE = 1024 * 4;
+        final int BUFFER_SIZE = 1024 * 256;
         final byte[] buffer = new byte[BUFFER_SIZE];
 
         while (true) {
