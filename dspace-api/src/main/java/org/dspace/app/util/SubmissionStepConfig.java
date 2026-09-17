@@ -201,7 +201,7 @@ public class SubmissionStepConfig implements Serializable {
 
     }
 
-    private String getScope(InProgressSubmission obj) {
+    public String getScope(InProgressSubmission obj) {
         if (HibernateProxyHelper.getClassWithoutInitializingProxy(obj).equals(WorkspaceItem.class)) {
             return "submission";
         }
