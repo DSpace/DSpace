@@ -54,6 +54,7 @@ public class SubmissionCCLicenseFieldConverter
             }
         }
         submissionCCLicenseFieldRest.setEnums(submissionCCLicenseFieldEnumRests);
+        submissionCCLicenseFieldRest.setType(modelObject.getType());
         return submissionCCLicenseFieldRest;
     }
 
