@@ -101,7 +101,7 @@ public class ConcatenateTest {
     public void testGetValues() {
         // Setup objects utilized in unit test
         List<String> list = new ArrayList<>();
-        List<String> valueList = new ArrayList<>();
+        List<VirtualMetadataConfiguration.ValueResult> valueList = new ArrayList<>();
         List<MetadataValue> metadataValueList = new ArrayList<>();
         MetadataValue metadataValue = mock(MetadataValue.class);
         Item item = mock(Item.class);
@@ -110,7 +110,7 @@ public class ConcatenateTest {
         list.add(s);
         List<String> splittedString = Splitter.on(".").splitToList(s);
         concatenate.setFields(list);
-        valueList.add("TestValue");
+        valueList.add(new VirtualMetadataConfiguration.ValueResult("TestValue"));
 
         // Mock the state of objects utilized in getValues() to meet the success criteria of an invocation
         when(itemService.getMetadata(item, splittedString.size() > 0 ? splittedString.get(0) : null,
