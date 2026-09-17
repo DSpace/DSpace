@@ -8,7 +8,6 @@
 package org.dspace.external.provider.impl;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -278,11 +277,7 @@ public class OpenaireFundingDataProvider extends AbstractExternalDataProvider {
     }
 
     private static String encodeValue(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            return value;
-        }
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     public Map<String, MetadataFieldConfig> getMetadataFields() {

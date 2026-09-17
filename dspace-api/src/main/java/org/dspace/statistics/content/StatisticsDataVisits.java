@@ -8,7 +8,6 @@
 package org.dspace.statistics.content;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -656,15 +655,8 @@ public class StatisticsDataVisits extends StatisticsData {
                     String url = configurationService.getProperty("dspace.ui.url") + "/bitstream/" + identifier + "/";
 
                     // If we can put the pretty name of the bitstream on the end of the URL
-                    try {
-                        if (bit.getName() != null) {
-                            url += Util.encodeBitstreamName(bit.getName(), "UTF-8");
-                        }
-                    } catch (UnsupportedEncodingException uee) {
-                        // Just ignore it:  we don't have to have a pretty
-                        // name on the end of the URL because the sequence id will
-                        // locate it. However it means that links in this file might
-                        // not work....
+                    if (StringUtils.isNotBlank(bit.getName())) {
+                        url += Util.encodeBitstreamName(bit.getName());
                     }
 
                     url += "?sequence=" + bit.getSequenceID();

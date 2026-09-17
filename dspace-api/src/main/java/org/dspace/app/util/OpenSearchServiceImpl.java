@@ -8,8 +8,8 @@
 package org.dspace.app.util;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -181,12 +181,8 @@ public class OpenSearchServiceImpl implements OpenSearchService {
         osMod.setItemsPerPage(pageSize);
         OSQuery osq = new OSQuery();
         osq.setRole("request");
-        try {
-            if (StringUtils.isNotBlank(query)) {
-                osq.setSearchTerms(URLEncoder.encode(query, "UTF-8"));
-            }
-        } catch (UnsupportedEncodingException e) {
-            log.error(e);
+        if (StringUtils.isNotBlank(query)) {
+            osq.setSearchTerms(URLEncoder.encode(query, StandardCharsets.UTF_8));
         }
         osq.setStartPage(1 + (start / pageSize));
         osMod.addQuery(osq);
