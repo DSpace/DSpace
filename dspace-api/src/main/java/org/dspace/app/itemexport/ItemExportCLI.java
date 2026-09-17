@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.app.itemexport.service.ItemExportService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -44,6 +45,18 @@ public class ItemExportCLI extends ItemExport {
     @Override
     protected void process(Context context, ItemExportService itemExportService) throws Exception {
         setZip(context);
+
+        // Phase 1: lightweight item count check
+        DSpaceObject exportObject = item != null ? item : collection;
+        List<DSpaceObject> dsoList = Collections.<DSpaceObject>singletonList(exportObject);
+        int itemCount = itemExportService.countExportItems(context, dsoList);
+        itemExportService.validateExportItemCount(itemCount);
+
+        // Phase 2: size + disk space check (only when bitstreams included)
+        if (!excludeBitstreams) {
+            long estimatedSize = itemExportService.estimateExportSize(context, dsoList);
+            itemExportService.validateExportSize(estimatedSize);
+        }
 
         if (zip) {
             Iterator<Item> items;
