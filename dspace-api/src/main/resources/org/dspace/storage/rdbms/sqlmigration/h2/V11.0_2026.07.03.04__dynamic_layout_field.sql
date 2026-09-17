@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS dynamic_layout_field
     cell_style       VARCHAR(255),
     cell             INTEGER NOT NULL,
     CONSTRAINT dynamic_layout_field_pkey PRIMARY KEY (field_id),
-    CONSTRAINT dynamic_layout_box2metadata_metadata_field_id_fkey
+    CONSTRAINT dynamic_layout_field_metadata_field_id_fkey
         FOREIGN KEY (metadata_field_id) REFERENCES metadatafieldregistry (metadata_field_id),
     CONSTRAINT dynamic_layout_field_box_fkey FOREIGN KEY (box_id)
         REFERENCES dynamic_layout_box (id)
