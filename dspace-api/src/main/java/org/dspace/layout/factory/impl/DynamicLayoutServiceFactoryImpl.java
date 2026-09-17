@@ -14,7 +14,6 @@ import org.dspace.layout.script.service.DynamicLayoutToolValidator;
 import org.dspace.layout.service.DynamicLayoutBoxService;
 import org.dspace.layout.service.DynamicLayoutFieldService;
 import org.dspace.layout.service.DynamicLayoutMetadataGroupService;
-import org.dspace.layout.service.DynamicLayoutSectionService;
 import org.dspace.layout.service.DynamicLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,9 +36,6 @@ public class DynamicLayoutServiceFactoryImpl extends DynamicLayoutServiceFactory
 
     @Autowired(required = true)
     private DynamicLayoutMetadataGroupService metadataGroupService;
-
-    @Autowired(required = true)
-    private DynamicLayoutSectionService sectionService;
 
     @Autowired(required = true)
     private DynamicLayoutToolValidator validator;
@@ -68,11 +64,6 @@ public class DynamicLayoutServiceFactoryImpl extends DynamicLayoutServiceFactory
     @Override
     public DynamicLayoutMetadataGroupService getMetadataGroupService() {
         return this.metadataGroupService;
-    }
-
-    @Override
-    public DynamicLayoutSectionService getSectionService() {
-        return sectionService;
     }
 
     @Override
