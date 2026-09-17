@@ -162,7 +162,6 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * Jakarta Dependency Injection (jakarta.inject:jakarta.inject-api:2.0.1 - https://github.com/eclipse-ee4j/injection-api)
         * Jakarta Bean Validation API (jakarta.validation:jakarta.validation-api:3.0.2 - https://beanvalidation.org)
         * JSR107 API and SPI (javax.cache:cache-api:1.1.1 - https://github.com/jsr107/jsr107spec)
-        * jdbm (jdbm:jdbm:1.0 - no url defined)
         * Joda-Time (joda-time:joda-time:2.10.5 - https://www.joda.org/joda-time/)
         * Byte Buddy (without dependencies) (net.bytebuddy:byte-buddy:1.14.11 - https://bytebuddy.net/byte-buddy)
         * Byte Buddy (without dependencies) (net.bytebuddy:byte-buddy:1.17.7 - https://bytebuddy.net/byte-buddy)
