@@ -198,11 +198,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // Read in the file so we don't have to do it all the time
         //spiderIps = SpiderDetector.getSpiderIpAddresses();
 
+        // getDatabaseReader() only throws here if geo is explicitly disabled
+        // (usage-statistics.geo.enabled = false), since otherwise GeoIpService
+        // already validated the database at startup.
         DatabaseReader service = null;
         try {
             service = geoIpService.getDatabaseReader();
         } catch (IllegalStateException ex) {
-            log.error(ex);
+            log.warn(ex.getMessage());
         }
         locationService = service;
     }
