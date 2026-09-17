@@ -130,7 +130,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
 
     @Override
     public List<AuthorityValue> findByValue(String field, String value) {
-        String queryString = "value:" + value + " AND field:" + field;
+        String queryString = "value:(" + value + ") AND field:" + field;
         return find(queryString);
     }
 
@@ -158,7 +158,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     public List<AuthorityValue> findByName(String schema, String element, String qualifier,
                                            String name) {
         String field = fieldParameter(schema, element, qualifier);
-        String queryString = "first_name:" + name + " OR last_name:" + name + " OR name_variant:" + name + " AND " +
+        String queryString = "(first_name:" + name + " OR last_name:" + name + " OR name_variant:" + name + ") AND " +
             "field:" + field;
         return find(queryString);
     }
@@ -167,7 +167,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     public List<AuthorityValue> findByAuthorityMetadata(String schema, String element,
                                                         String qualifier, String value) {
         String field = fieldParameter(schema, element, qualifier);
-        String queryString = "all_Labels:" + value + " AND field:" + field;
+        String queryString = "all_labels:(" + value + ") AND field:" + field;
         return find(queryString);
     }
 
@@ -206,7 +206,8 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
         List<AuthorityValue> findings = new ArrayList<AuthorityValue>();
         try {
             SolrQuery solrQuery = new SolrQuery();
-            solrQuery.setQuery(filtered(queryString));
+            solrQuery.setQuery(queryString);
+            solrQuery.addFilterQuery("-deleted:true");
             log.debug("AuthorityValueFinder makes the query: " + queryString);
             QueryResponse queryResponse = SolrAuthority.getSearchService().search(solrQuery);
             if (queryResponse != null && queryResponse.getResults() != null && 0 < queryResponse.getResults()
@@ -222,14 +223,6 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
         }
 
         return findings;
-    }
-
-    protected String filtered(String queryString) throws InstantiationException, IllegalAccessException {
-        String instanceFilter = "-deleted:true";
-        if (StringUtils.isNotBlank(instanceFilter)) {
-            queryString += " AND " + instanceFilter;
-        }
-        return queryString;
     }
 
     protected String fieldParameter(String schema, String element, String qualifier) {
