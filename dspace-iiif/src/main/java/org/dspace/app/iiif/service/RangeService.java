@@ -7,6 +7,7 @@
  */
 package org.dspace.app.iiif.service;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,8 @@ public class RangeService extends AbstractResourceService {
     private Map<String, RangeGenerator> tocRanges = new LinkedHashMap<String, RangeGenerator>();
     private RangeGenerator currentRange;
     private RangeGenerator root;
+    private List<String> currentLabels = new ArrayList<>();
+    private List<RangeGenerator> currentRanges = new ArrayList<>();
 
 
     public RangeService(ConfigurationService configurationService) {
@@ -103,36 +106,46 @@ public class RangeService extends AbstractResourceService {
     private void addTocRange(List<String> tocs , CanvasGenerator canvasGenerator) {
 
         for (String toc : tocs) {
-            // Make tempRange a reference to root.
             RangeGenerator tempRange = root;
             String[] parts = toc.split(IIIFUtils.TOC_SEPARATOR_REGEX);
+            List<String> newLabels = new ArrayList<>();
+            List<RangeGenerator> newRanges = new ArrayList<>();
             String key = "";
-            // Process sub-ranges.
+            boolean onCurrentPath = true;
             for (int pIdx = 0; pIdx < parts.length; pIdx++) {
                 if (pIdx > 0) {
                     key += IIIFUtils.TOC_SEPARATOR;
                 }
                 key += parts[pIdx];
-                if (tocRanges.get(key) != null) {
-                    // Handles the case of a bitstream that crosses two ranges.
-                    tempRange = tocRanges.get(key);
+                // Reuse an existing range only while this segment still lies on the path
+                // from the root to the most recently updated range. This preserves the
+                // "bitstream that crosses two ranges" case and shared parent segments,
+                // while a repeated label that was interrupted by another section becomes
+                // a distinct logical section.
+                if (onCurrentPath && pIdx < currentLabels.size()
+                        && currentLabels.get(pIdx).equals(parts[pIdx])) {
+                    tempRange = currentRanges.get(pIdx);
                 } else {
+                    onCurrentPath = false;
                     RangeGenerator range = new RangeGenerator(this);
                     range.setLabel(parts[pIdx]);
-                    // Add sub-range to the root Range
                     tempRange.addSubRange(range);
-                    // Add new sub-range to the map.
-                    tocRanges.put(key, range);
-                    // Make tempRange a reference to the new sub-range.
+                    String uniqueKey = key;
+                    int suffix = 2;
+                    while (tocRanges.containsKey(uniqueKey)) {
+                        uniqueKey = key + " #" + suffix++;
+                    }
+                    tocRanges.put(uniqueKey, range);
                     tempRange = range;
                 }
+                newLabels.add(parts[pIdx]);
+                newRanges.add(tempRange);
             }
-            // Add a simple canvas reference to the Range.
             tempRange
                 .addCanvas(canvasService.getRangeCanvasReference(canvasGenerator.getIdentifier()));
-
-            // Update the current Range.
             currentRange = tempRange;
+            currentLabels = newLabels;
+            currentRanges = newRanges;
         }
     }
 
