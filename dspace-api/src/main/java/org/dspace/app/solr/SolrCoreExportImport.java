@@ -430,9 +430,33 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         log.debug("Thread '{}' writing to file: {}", currentThread.getName(), filename);
         long writeStart = System.currentTimeMillis();
 
-        try (InputStream inputStream = response.body();
-             FileOutputStream outputStream = new FileOutputStream(filePath.toFile())) {
-            inputStream.transferTo(outputStream);
+        if (format.equals("json")) {
+            try (InputStream inputStream = response.body()) {
+                JsonNode root = jsonMapper.readTree(inputStream);
+                JsonNode docs = root.path("response").path("docs");
+                if (docs.isArray()) {
+                    for (JsonNode doc : docs) {
+                        if (doc.isObject()) {
+                            com.fasterxml.jackson.databind.node.ObjectNode objectNode =
+                                    (com.fasterxml.jackson.databind.node.ObjectNode) doc;
+                            objectNode.remove("_version_");
+                            objectNode.remove("_root_");
+                        }
+                    }
+                    try (FileOutputStream outputStream = new FileOutputStream(filePath.toFile())) {
+                        jsonMapper.writeValue(outputStream, docs);
+                    }
+                } else {
+                    try (FileOutputStream outputStream = new FileOutputStream(filePath.toFile())) {
+                        jsonMapper.writeValue(outputStream, root);
+                    }
+                }
+            }
+        } else {
+            try (InputStream inputStream = response.body();
+                 FileOutputStream outputStream = new FileOutputStream(filePath.toFile())) {
+                inputStream.transferTo(outputStream);
+            }
         }
 
         long writeTime = System.currentTimeMillis() - writeStart;
@@ -537,25 +561,67 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         String url = baseUrl + "/update";
         String contentType = format.equals("csv") ? "application/csv" : "application/json";
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofMinutes(10))
-                .header("Content-Type", contentType)
-                .POST(HttpRequest.BodyPublishers.ofFile(file.toPath()))
-                .build();
+        Path pathToSend = file.toPath();
+        boolean isTempFile = false;
 
-        long uploadStart = System.currentTimeMillis();
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        long uploadTime = System.currentTimeMillis() - uploadStart;
-
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("SOLR import failed for file " + file.getName() +
-                    " with status: " + response.statusCode() + " - " + response.body());
+        if (format.equals("json")) {
+            try {
+                JsonNode root = jsonMapper.readTree(file);
+                JsonNode docs = root;
+                if (root.isObject() && root.has("response") && root.get("response").has("docs")) {
+                    docs = root.get("response").get("docs");
+                }
+                if (docs.isArray()) {
+                    for (JsonNode doc : docs) {
+                        if (doc.isObject()) {
+                            com.fasterxml.jackson.databind.node.ObjectNode objectNode =
+                                    (com.fasterxml.jackson.databind.node.ObjectNode) doc;
+                            objectNode.remove("_version_");
+                            objectNode.remove("_root_");
+                        }
+                    }
+                    Path tempFile = Files.createTempFile("solr_import_", ".json");
+                    try (FileOutputStream outputStream = new FileOutputStream(tempFile.toFile())) {
+                        jsonMapper.writeValue(outputStream, docs);
+                    }
+                    pathToSend = tempFile;
+                    isTempFile = true;
+                }
+            } catch (Exception e) {
+                log.warn("Failed to preprocess JSON file {}, posting raw file instead: {}",
+                        file.getName(), e.getMessage());
+            }
         }
 
-        long totalTime = System.currentTimeMillis() - fileStart;
-        handler.logInfo("Thread '" + currentThread.getName() + "' completed import of '" + file.getName() +
-                        "' in " + totalTime + " ms (upload: " + uploadTime + "ms)");
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofMinutes(10))
+                    .header("Content-Type", contentType)
+                    .POST(HttpRequest.BodyPublishers.ofFile(pathToSend))
+                    .build();
+
+            long uploadStart = System.currentTimeMillis();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            long uploadTime = System.currentTimeMillis() - uploadStart;
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("SOLR import failed for file " + file.getName() +
+                        " with status: " + response.statusCode() + " - " + response.body());
+            }
+
+            long totalTime = System.currentTimeMillis() - fileStart;
+            handler.logInfo("Thread '" + currentThread.getName() + "' completed import of '" + file.getName() +
+                            "' in " + totalTime + " ms (upload: " + uploadTime + "ms)");
+        } finally {
+            if (isTempFile) {
+                try {
+                    Files.deleteIfExists(pathToSend);
+                } catch (Exception e) {
+                    log.warn("Failed to delete temp file: {}", pathToSend, e);
+                }
+            }
+        }
     }
 
     /**
