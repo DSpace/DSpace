@@ -15,6 +15,21 @@ List of changes in this PR:
 
 **Include guidance for how to test or review your PR.** This may include: steps to reproduce a bug, screenshots or description of a new feature, or reasons behind specific changes. 
 
+## AI Disclosure (REQUIRED)
+
+Per our AI Contribution Policy **_(ADD LINK)_**, all contributors to DSpace MUST disclose AI/LLM usage.
+This information helps reviewers assess provenance, licensing, security, and the level of verification needed.
+
+If AI/LLM tools were ONLY used for incidental assistance (such as spelling/grammar correction, IDE/code autocomplete, minor tooling suggestions, or translation), then select 'No'.
+
+**Were AI/LLM tools used in the creation of this PR?**
+   - [ ] No (This PR does NOT include AI-generated or AI-assisted content that requires disclosure.)
+   - [ ] Yes (This PR includes AI-generated or AI-assisted content that requires disclosure.)
+
+**If "Yes", briefly describe what portion of this PR was generated or assisted by AI. Additionally, tell us how you've verified the AI output is accurate.**
+
+(Example: "AI assisted me in investigating the bug and generated a suggested patch. I reviewed, modified and tested the code. No AI was used for the PR description.")
+
 ## Checklist
 _This checklist provides a reminder of what we are going to look for when reviewing your PR. You need not complete this checklist prior to creating your PR (draft PRs are always welcome).
 However, reviewers may request that you complete any actions in this list if you have not done so. If you are unsure about an item in the checklist, don't hesitate to ask. We're here to help!_
