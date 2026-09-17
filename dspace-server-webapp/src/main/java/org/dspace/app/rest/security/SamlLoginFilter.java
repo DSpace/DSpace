@@ -8,13 +8,14 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.ArrayList;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.SamlAuthentication;
@@ -88,32 +89,39 @@ public class SamlLoginFilter extends StatelessLoginFilter {
     }
 
     /**
-     * After successful login, redirect to the configured UI URL. If that URL is not allowed for
-     * this DSpace site, return a 400 error.
+     * After successful login, redirect to the DSpace URL specified by this SAML
+     * request (in the "redirectUrl" request parameter). If that 'redirectUrl' is
+     * not valid or trusted for this DSpace site, then return a 400 error.
      *
      * @param request
      * @param response
      * @throws IOException
      */
     private void redirectAfterSuccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String redirectUrl = configurationService.getProperty("dspace.ui.url");
+        // Get redirect URL from request parameter
+        String redirectUrl = request.getParameter("redirectUrl");
+
+        // If redirectUrl unspecified, default to the configured UI
+        if (StringUtils.isEmpty(redirectUrl)) {
+            redirectUrl = configurationService.getProperty("dspace.ui.url");
+        }
+
+        // Validate that the redirectURL matches either the server or UI hostname. It *cannot* be an arbitrary URL.
         String redirectHostName = Utils.getHostName(redirectUrl);
-        String serverUrl = configurationService.getProperty("dspace.server.url");
+        String serverHostName = Utils.getHostName(configurationService.getProperty("dspace.server.url"));
+        ArrayList<String> allowedHostNames = new ArrayList<>();
+        allowedHostNames.add(serverHostName);
+        String[] allowedUrls = configurationService.getArrayProperty("rest.cors.allowed-origins");
+        for (String url : allowedUrls) {
+            allowedHostNames.add(Utils.getHostName(url));
+        }
 
-        boolean isRedirectAllowed = Stream.concat(
-                Stream.of(serverUrl),
-                Arrays.stream(configurationService.getArrayProperty("rest.cors.allowed-origins")))
-            .map(url -> Utils.getHostName(url))
-            .anyMatch(hostName -> hostName.equalsIgnoreCase(redirectHostName));
-
-        if (isRedirectAllowed) {
+        if (Strings.CI.equalsAny(redirectHostName, allowedHostNames.toArray(new String[0]))) {
             logger.debug("SAML redirecting to " + redirectUrl);
-
             response.sendRedirect(redirectUrl);
         } else {
             logger.error("SAML redirect URL {} is not allowed" + redirectUrl);
-
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,"SAML redirect URL not allowed");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "SAML redirect URL not allowed");
         }
     }
 }
