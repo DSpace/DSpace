@@ -106,14 +106,14 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             document.addField(EVIDENCES, jsonMapper.writeValueAsString(suggestion.getEvidences()));
             getSolr().add(document);
             if (commit) {
-                getSolr().commit();
+                getSolr().commit(true, true, true);
             }
         }
     }
 
     @Override
     public void commit() throws SolrServerException, IOException {
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     private List<String> getAllValues(Suggestion suggestion, String schema, String element, String qualifier) {
@@ -143,7 +143,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     @Override
     public void deleteSuggestion(Suggestion suggestion) throws SolrServerException, IOException {
         getSolr().deleteById(suggestion.getID());
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         fieldModifier.put("set", true);
         sdoc.addField(PROCESSED, fieldModifier); // add the map as the field value
         getSolr().add(sdoc);
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
@@ -173,14 +173,14 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
                 getSolr().add(sdoc);
             }
         }
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
     public void deleteTarget(SuggestionTarget target) throws SolrServerException, IOException {
         getSolr().deleteByQuery(
                 SOURCE + ":" + target.getSource() + " AND " + TARGET_ID + ":" + target.getTarget().getID().toString());
-        getSolr().commit();
+        getSolr().commit(true, true, true);
     }
 
     @Override
