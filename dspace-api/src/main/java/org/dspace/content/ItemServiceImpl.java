@@ -872,10 +872,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID()));
         //remove subscription related with it
         subscribeService.deleteByDspaceObject(context, item);
-        // Remove relationships
-        for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
-            relationshipService.forceDelete(context, relationship, false, false);
-        }
 
         // Remove bundles
         removeAllBundles(context, item);
@@ -925,6 +921,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // remove authority references
         if (configurationService.getBooleanProperty("item-deletion.authority-cleanup.enabled", false)) {
             removeAuthorityReferences(context, item);
+        }
+
+        // Remove relationships
+        for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
+            relationshipService.forceDelete(context, relationship, false, false);
         }
 
         // Finally remove item row

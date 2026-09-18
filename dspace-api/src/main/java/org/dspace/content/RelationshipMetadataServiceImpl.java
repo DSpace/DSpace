@@ -181,6 +181,11 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
+        // Config-backed relationships expose stored metadata projections, not legacy
+        // virtual metadata. This also prevents duplicates during legacy migration.
+        if (relationship.isConfigurationBacked() || relationshipType == null) {
+            return resultingMetadataValueList;
+        }
         HashMap<String, VirtualMetadataConfiguration> hashMaps;
         String relationName;
         Item otherItem;

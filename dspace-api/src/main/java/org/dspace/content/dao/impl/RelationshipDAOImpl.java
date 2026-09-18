@@ -17,6 +17,8 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.dspace.content.Item;
@@ -82,15 +84,17 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         );
 
         if (excludeTilted) {
+            Join<Relationship, RelationshipType> type = relationshipRoot.join(Relationship_.relationshipType,
+                                                                              JoinType.LEFT);
             // if this item is the left item,
             // return relationships for types which are NOT tilted right (tilted is either left nor null)
             predicates.add(
                 criteriaBuilder.or(
                     criteriaBuilder.isNull(
-                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted)
+                        type.get(RelationshipType_.tilted)
                     ),
                     criteriaBuilder.notEqual(
-                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted),
+                        type.get(RelationshipType_.tilted),
                         RelationshipType.Tilted.RIGHT
                     )
                 )
@@ -133,15 +137,17 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         );
 
         if (excludeTilted) {
+            Join<Relationship, RelationshipType> type = relationshipRoot.join(Relationship_.relationshipType,
+                                                                              JoinType.LEFT);
             // if this item is the right item,
             // return relationships for types which are NOT tilted left (tilted is either right nor null)
             predicates.add(
                 criteriaBuilder.or(
                     criteriaBuilder.isNull(
-                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted)
+                        type.get(RelationshipType_.tilted)
                     ),
                     criteriaBuilder.notEqual(
-                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted),
+                        type.get(RelationshipType_.tilted),
                         RelationshipType.Tilted.LEFT
                     )
                 )

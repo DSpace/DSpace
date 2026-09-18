@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -81,6 +82,14 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 
     @Override
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
+        Relationship relationship = metadataValue.getRelationship();
+        if (relationship != null) {
+            UUID owner = metadataValue.getDSpaceObject().getID();
+            if (!owner.equals(relationship.getLeftItem().getID())
+                && !owner.equals(relationship.getRightItem().getID())) {
+                throw new IllegalArgumentException("Metadata owner must be an endpoint of its relationship");
+            }
+        }
         metadataValueDAO.save(context, metadataValue);
         log.info(LogHelper.getHeader(context, "update_metadatavalue",
                                       "metadata_value_id=" + metadataValue.getID()));
@@ -129,5 +138,15 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public int countTotal(Context context) throws SQLException {
         return metadataValueDAO.countRows(context);
+    }
+
+    @Override
+    public List<MetadataValue> findByRelationship(Context context, Relationship relationship) throws SQLException {
+        return metadataValueDAO.findByRelationship(context, relationship);
+    }
+
+    @Override
+    public int countByRelationship(Context context, Relationship relationship) throws SQLException {
+        return metadataValueDAO.countByRelationship(context, relationship);
     }
 }

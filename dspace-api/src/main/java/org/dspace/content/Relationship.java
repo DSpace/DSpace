@@ -55,8 +55,28 @@ public class Relationship implements ReloadableEntity<Integer> {
      * This is stored as an ID in the database
      */
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "type_id", nullable = false)
+    @JoinColumn(name = "type_id", nullable = true)
     private RelationshipType relationshipType;
+
+    /**
+     * Stable identifier of the configured relationship semantics. This is independent
+     * of the metadata projections. Legacy rows may continue to use relationshipType
+     * until explicitly migrated; no metadata collection is eagerly mapped here.
+     */
+    @Column(name = "relationship_config_key", length = 255)
+    private String relationshipConfigKey;
+
+    public String getRelationshipConfigKey() {
+        return relationshipConfigKey;
+    }
+
+    public void setRelationshipConfigKey(String relationshipConfigKey) {
+        this.relationshipConfigKey = relationshipConfigKey;
+    }
+
+    public boolean isConfigurationBacked() {
+        return relationshipConfigKey != null;
+    }
 
     /**
      * The rightItem property for the Relationship object.
@@ -131,7 +151,8 @@ public class Relationship implements ReloadableEntity<Integer> {
 
     /**
      * Standard getter for the relationshipType field
-     * @return  The relationshipType RelationshipType object in this relationship
+     * @return  The relationshipType RelationshipType object in this relationship,
+     *          or {@code null} when semantics are supplied by relationshipConfigKey
      */
     public RelationshipType getRelationshipType() {
         return relationshipType;

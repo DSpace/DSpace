@@ -27,13 +27,16 @@ import org.dspace.authority.filler.AuthorityImportFiller;
 import org.dspace.authority.filler.AuthorityImportFillerService;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authority.service.ItemSearchService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.AuthorityBackedRelationshipServiceImpl;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -82,7 +85,9 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * does not exist, and link the article to that person via a CRIS authority key.
  * </p>
  *
- * * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  */
 public class CrisConsumer implements Consumer {
 
@@ -121,6 +126,8 @@ public class CrisConsumer implements Consumer {
 
     private ItemSearchService itemSearchService;
 
+    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
+
     /**
      * Initializes the CrisConsumer by retrieving service instances from their
      * respective factories. This method sets up all dependencies required for
@@ -146,6 +153,9 @@ public class CrisConsumer implements Consumer {
         workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         authorityImportFillerService = AuthorityServiceFactory.getInstance().getAuthorityImportFillerService();
         itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
+        authorityBackedRelationshipService = new DSpace().getServiceManager().getServiceByName(
+            AuthorityBackedRelationshipServiceImpl.class.getCanonicalName(),
+            AuthorityBackedRelationshipService.class);
     }
 
     /**
@@ -209,11 +219,16 @@ public class CrisConsumer implements Consumer {
         addEntityTypeIfNotExist(context, item);
 
         for (MetadataValue metadata : item.getMetadata()) {
+            if (metadata.getConfidence() == Choices.CF_REJECTED) {
+                continue;
+            }
 
             String fieldKey = getFieldKey(metadata);
             String authority = metadata.getAuthority();
 
             if (isMetadataSkippable(metadata)) {
+                //TODO: needs to be replaced by a Service
+                mintRelationshipForUserSelectedAuthority(context, item, metadata, fieldKey);
                 continue;
             }
 
@@ -250,8 +265,81 @@ public class CrisConsumer implements Consumer {
             fillRelatedItem(context, metadata, relatedItem, relatedItemAlreadyPresent);
 
             choiceAuthorityService.setReferenceWithAuthority(metadata, relatedItem);
+
+            //TODO: needs to be replaced by a Service
+            mintRelationshipIfTargetArchived(context, item, metadata, relatedItem);
         }
 
+    }
+
+    /**
+     * Mint an authority-backed relationship for a metadata value on the system
+     * (reference) path, provided the resolved target item is archived. The
+     * authority stamp has already been applied by the caller via
+     * {@code setReferenceWithAuthority}; this only creates the durable
+     * relationship. Minting is idempotent (guarded by the owning metadata
+     * value's {@code relationship_id}) and never touches the value text.
+     *
+     * @param context     the DSpace context
+     * @param item        the owning item
+     * @param metadata    the owning metadata value
+     * @param relatedItem the resolved target item (may be freshly built and not
+     *                    yet archived, in which case nothing is minted)
+     * @throws SQLException       if a database error occurs
+     * @throws AuthorizeException if the current user cannot create the relationship
+     */
+    private void mintRelationshipIfTargetArchived(Context context, Item item, MetadataValue metadata,
+        Item relatedItem) throws SQLException, AuthorizeException {
+        if (relatedItem != null && relatedItem.isArchived()) {
+            authorityBackedRelationshipService.promoteResolvedAuthority(context, item, metadata,
+                relatedItem);
+        }
+    }
+
+    /**
+     * Mint an authority-backed relationship for a metadata value carrying a
+     * user-selected plain UUID authority (confidence {@code CF_ACCEPTED}), which
+     * the main resolution loop skips because the authority is already set. The
+     * target item is resolved <b>directly</b> from the authority UUID via
+     * {@code itemService.find} (not through {@code generateCrisSourceId}, which
+     * would md5-hash and discard the UUID). No authority stamp is applied here,
+     * so the user's typed display text is preserved. A relationship is minted
+     * only when the field is a mapped entity field and the target is archived;
+     * minting is idempotent via the owning value's {@code relationship_id}.
+     *
+     * @param context  the DSpace context
+     * @param item     the owning item
+     * @param metadata the owning metadata value
+     * @param fieldKey the underscore-joined metadata field key
+     * @throws SQLException       if a database error occurs
+     * @throws AuthorizeException if the current user cannot create the relationship
+     */
+    private void mintRelationshipForUserSelectedAuthority(Context context, Item item, MetadataValue metadata,
+        String fieldKey) throws SQLException, AuthorizeException {
+
+        String authority = metadata.getAuthority();
+        if (metadata.getConfidence() < Choices.CF_ACCEPTED
+            || isBlank(authority) || isGenerateAuthority(authority) || isReferenceAuthority(authority)) {
+            return;
+        }
+
+        if (!choiceAuthorityService.isChoicesConfigured(fieldKey, Constants.ITEM, (Collection) null)) {
+            return;
+        }
+        String entityType = choiceAuthorityService.getLinkedEntityType(fieldKey);
+        if (entityType == null) {
+            return;
+        }
+
+        UUID targetUuid;
+        try {
+            targetUuid = UUID.fromString(authority);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+
+        Item relatedItem = itemService.find(context, targetUuid);
+        mintRelationshipIfTargetArchived(context, item, metadata, relatedItem);
     }
 
     private void addEntityTypeIfNotExist(Context context, Item item) throws SQLException {
