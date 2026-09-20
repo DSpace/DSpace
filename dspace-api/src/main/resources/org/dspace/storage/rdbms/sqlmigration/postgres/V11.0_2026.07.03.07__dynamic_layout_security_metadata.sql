@@ -12,14 +12,11 @@
 --   V7.0_2020.08.03 (securitymetadata)
 --
 -- Handles three states idempotently (legacy cris_* present / dynamic_* already
--- present / fresh install). Two legacy names may exist depending on how far the
--- original 7.x migrations progressed:
---   * cris_layout_box2securitymetadata / cris_layout_tab2securitymetadata
---     (post 7.0_2020.08.03, column metadata_field_id)
---   * cris_layout_box2securityfield / cris_layout_tab2securityfield
---     (pre 7.0_2020.08.03, column authorized_field_id)
--- Whichever exists is copied into the new tables, mapping authorized_field_id to
--- metadata_field_id, then all legacy variants are dropped.
+-- present / fresh install). The upgrade source is assumed to be a current-schema
+-- DSpace-CRIS 7.x (post 7.0_2020.08.03), so the only legacy tables considered are
+-- cris_layout_box2securitymetadata / cris_layout_tab2securitymetadata (column
+-- metadata_field_id). Whichever exists is copied into the new tables, then the
+-- legacy tables are dropped.
 -------------------------------------------------------
 
 -- Step 1: create the new tables (safe on any database state)
@@ -52,26 +49,15 @@ BEGIN
                WHERE schemaname = 'public' AND tablename = 'cris_layout_box2securitymetadata') THEN
         INSERT INTO dynamic_layout_box2securitymetadata (box_id, metadata_field_id)
         SELECT box_id, metadata_field_id FROM cris_layout_box2securitymetadata;
-    ELSIF EXISTS (SELECT FROM pg_catalog.pg_tables
-                  WHERE schemaname = 'public' AND tablename = 'cris_layout_box2securityfield') THEN
-        INSERT INTO dynamic_layout_box2securitymetadata (box_id, metadata_field_id)
-        SELECT box_id, authorized_field_id FROM cris_layout_box2securityfield;
     END IF;
 
     IF EXISTS (SELECT FROM pg_catalog.pg_tables
                WHERE schemaname = 'public' AND tablename = 'cris_layout_tab2securitymetadata') THEN
         INSERT INTO dynamic_layout_tab2securitymetadata (tab_id, metadata_field_id)
         SELECT tab_id, metadata_field_id FROM cris_layout_tab2securitymetadata;
-    ELSIF EXISTS (SELECT FROM pg_catalog.pg_tables
-                  WHERE schemaname = 'public' AND tablename = 'cris_layout_tab2securityfield') THEN
-        INSERT INTO dynamic_layout_tab2securitymetadata (tab_id, metadata_field_id)
-        SELECT tab_id, authorized_field_id FROM cris_layout_tab2securityfield;
     END IF;
 END $$;
 
--- Step 3: drop every legacy variant (also corrects a previous erroneous
--- dynamic_ prefix on the *securityfield drops). Safe no-op when absent.
-DROP TABLE IF EXISTS cris_layout_box2securityfield;
+-- Step 3: drop the legacy tables. Safe no-op when absent.
 DROP TABLE IF EXISTS cris_layout_box2securitymetadata;
-DROP TABLE IF EXISTS cris_layout_tab2securityfield;
 DROP TABLE IF EXISTS cris_layout_tab2securitymetadata;
