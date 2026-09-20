@@ -33,6 +33,3 @@ CREATE TABLE IF NOT EXISTS dynamic_layout_tab2securitymetadata
     CONSTRAINT dynamic_layout_tab2securitymetadata_field_id_fkey
         FOREIGN KEY (metadata_field_id) REFERENCES metadatafieldregistry (metadata_field_id)
 );
-
-DROP TABLE IF EXISTS cris_layout_box2securityfield;
-DROP TABLE IF EXISTS cris_layout_tab2securityfield;
