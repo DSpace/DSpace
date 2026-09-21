@@ -29,6 +29,7 @@ import org.dspace.core.Context;
 import org.dspace.layout.DynamicLayoutTab;
 import org.dspace.layout.DynamicLayoutTab_;
 import org.dspace.layout.dao.DynamicLayoutTabDAO;
+import org.hibernate.jpa.SpecHints;
 
 /**
  * Database Access Object implementation class for the DynamicLayoutTab object
@@ -49,7 +50,7 @@ public class DynamicLayoutTabDAOImpl extends AbstractHibernateDAO<DynamicLayoutT
 
         TypedQuery<DynamicLayoutTab> typedQuery = getHibernateSession(context).createQuery(query);
         EntityGraph<?> graph = getHibernateSession(context).createEntityGraph(ROWS_AND_CONTENT_GRAPH);
-        typedQuery.setHint("javax.persistence.loadgraph", graph);
+        typedQuery.setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, graph);
 
         return singleResult(typedQuery);
     }
@@ -109,7 +110,7 @@ public class DynamicLayoutTabDAOImpl extends AbstractHibernateDAO<DynamicLayoutT
         }
 
         EntityGraph<?> graph = getHibernateSession(context).createEntityGraph(ROWS_AND_CONTENT_GRAPH);
-        typedQuery.setHint("javax.persistence.loadgraph", graph);
+        typedQuery.setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, graph);
 
         return typedQuery.getResultList();
     }
