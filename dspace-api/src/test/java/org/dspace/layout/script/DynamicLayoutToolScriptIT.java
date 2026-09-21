@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -45,12 +46,15 @@ import org.dspace.builder.DynamicLayoutTabBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.content.EntityType;
+import org.dspace.eperson.Group;
 import org.dspace.layout.DynamicLayoutBox;
+import org.dspace.layout.DynamicLayoutBox2SecurityGroup;
 import org.dspace.layout.DynamicLayoutCell;
 import org.dspace.layout.DynamicLayoutField;
 import org.dspace.layout.DynamicLayoutFieldBitstream;
 import org.dspace.layout.DynamicLayoutRow;
 import org.dspace.layout.DynamicLayoutTab;
+import org.dspace.layout.DynamicLayoutTab2SecurityGroup;
 import org.dspace.layout.DynamicMetadataGroup;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.factory.DynamicLayoutServiceFactory;
@@ -83,6 +87,197 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             tabService.delete(context, tab);
         }
         context.restoreAuthSystemState();
+    }
+
+    /**
+     * Verifies that importing a workbook whose {@code tabpolicy}/{@code boxpolicy}
+     * {@code ALTERNATIVE_TO} column is populated persists the correct alternative tab/box
+     * associations. {@code tabTwo}'s group policy points at {@code tabOne} and {@code boxTwo}'s at
+     * {@code boxOne}.
+     */
+    @Test
+    public void testImportWithAlternativeTabsAndBoxes() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createEntityType("Person");
+        GroupBuilder.createGroup(context)
+            .withName("Researchers")
+            .build();
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), empty());
+
+        String fileLocation = getXlsFilePath("valid-layout-with-alternative.xls");
+        String[] args = new String[] { "dynamic-layout-tool", "-f", fileLocation };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+
+        List<DynamicLayoutTab> personTabs = tabService.findByEntityType(context, "Person", null);
+        DynamicLayoutTab tabTwo = findTab(personTabs, "tabTwo");
+
+        assertThat(tabTwo.getTab2SecurityGroups(), hasSize(1));
+        DynamicLayoutTab2SecurityGroup tab2SecurityGroup = tabTwo.getTab2SecurityGroups().iterator().next();
+        assertThat(tab2SecurityGroup.getGroup().getName(), is("Researchers"));
+        assertThat(tab2SecurityGroup.getAlternativeTab(), notNullValue());
+        assertThat(tab2SecurityGroup.getAlternativeTab().getShortName(), is("tabOne"));
+
+        List<DynamicLayoutBox> personBoxes = boxService.findByEntityType(context, "Person", null, null);
+        DynamicLayoutBox boxTwo = findBox(personBoxes, "boxTwo");
+
+        assertThat(boxTwo.getBox2SecurityGroups(), hasSize(1));
+        DynamicLayoutBox2SecurityGroup box2SecurityGroup = boxTwo.getBox2SecurityGroups().iterator().next();
+        assertThat(box2SecurityGroup.getGroup().getName(), is("Researchers"));
+        assertThat(box2SecurityGroup.getAlternativeBox(), notNullValue());
+        assertThat(box2SecurityGroup.getAlternativeBox().getShortname(), is("boxOne"));
+    }
+
+    /**
+     * Verifies that importing a workbook whose {@code ALTERNATIVE_TO} column references a shortname
+     * that does not exist fails with the parser's "Alternative ... not found" error and persists no
+     * layout. The parser throws a {@link RuntimeException} during parse (before the previous-layout
+     * cleanup), which the import script routes to {@link TestDSpaceRunnableHandler#getException()}.
+     */
+    @Test
+    public void testImportWithUnknownAlternativeFails() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createEntityType("Person");
+        GroupBuilder.createGroup(context)
+            .withName("Researchers")
+            .build();
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), empty());
+
+        String fileLocation = getXlsFilePath("invalid-alternative-not-found.xls");
+        String[] args = new String[] { "dynamic-layout-tool", "-f", fileLocation };
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        Exception exception = handler.getException();
+        assertThat(exception, notNullValue());
+        assertThat(exception.getMessage(),
+            containsString("Alternative tab not found for shortname: no-such-tab, entityType: Person"));
+
+        // The parse failed before any layout was imported, so nothing is persisted.
+        assertThat(tabService.findByEntityType(context, "Person", null), empty());
+    }
+
+    /**
+     * Verifies that exporting a layout containing alternative tab/box associations writes the
+     * alternative shortnames into the {@code tabpolicy}/{@code boxpolicy} {@code ALTERNATIVE_TO}
+     * column, and that a full export/import round-trip preserves those associations.
+     */
+    @Test
+    public void testExportImportAlternativeRoundTrip() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+        Group researchers = GroupBuilder.createGroup(context)
+            .withName("Researchers")
+            .build();
+
+        DynamicLayoutBox boxOne = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Box One")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("boxOne")
+            .build();
+
+        DynamicLayoutBox boxTwo = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Box Two")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .withShortname("boxTwo")
+            .addBox2SecurityGroups(researchers, boxOne)
+            .build();
+
+        DynamicLayoutTab tabOne = DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("tabOne")
+            .withSecurity(LayoutSecurity.ADMINISTRATOR)
+            .withHeader("Tab One")
+            .withLeading(true)
+            .addBoxIntoNewRow(boxOne)
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, personType, 1)
+            .withShortName("tabTwo")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .withHeader("Tab Two")
+            .withLeading(false)
+            .addBoxIntoNewRow(boxTwo)
+            .addTab2SecurityGroups(researchers, tabOne)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), hasSize(2));
+
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
+                Sheet tabPolicy = workbook.getSheet(DynamicLayoutToolValidator.TAB_POLICY_SHEET);
+                assertThat(getAlternativeTo(tabPolicy, "tabTwo"), is("tabOne"));
+
+                Sheet boxPolicy = workbook.getSheet(DynamicLayoutToolValidator.BOX_POLICY_SHEET);
+                assertThat(getAlternativeTo(boxPolicy, "boxTwo"), is("boxOne"));
+            }
+
+            // Re-import the exported workbook and confirm the alternatives survive the round-trip.
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            List<DynamicLayoutTab> personTabs = tabService.findByEntityType(context, "Person", null);
+            DynamicLayoutTab reimportedTabTwo = findTab(personTabs, "tabTwo");
+            DynamicLayoutTab2SecurityGroup tab2SecurityGroup =
+                reimportedTabTwo.getTab2SecurityGroups().iterator().next();
+            assertThat(tab2SecurityGroup.getAlternativeTab(), notNullValue());
+            assertThat(tab2SecurityGroup.getAlternativeTab().getShortName(), is("tabOne"));
+
+            List<DynamicLayoutBox> personBoxes = boxService.findByEntityType(context, "Person", null, null);
+            DynamicLayoutBox reimportedBoxTwo = findBox(personBoxes, "boxTwo");
+            DynamicLayoutBox2SecurityGroup box2SecurityGroup =
+                reimportedBoxTwo.getBox2SecurityGroups().iterator().next();
+            assertThat(box2SecurityGroup.getAlternativeBox(), notNullValue());
+            assertThat(box2SecurityGroup.getAlternativeBox().getShortname(), is("boxOne"));
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
+    private DynamicLayoutTab findTab(List<DynamicLayoutTab> tabs, String shortName) {
+        return tabs.stream()
+            .filter(tab -> shortName.equals(tab.getShortName()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Expected a tab with shortname " + shortName));
+    }
+
+    private DynamicLayoutBox findBox(List<DynamicLayoutBox> boxes, String shortname) {
+        return boxes.stream()
+            .filter(box -> shortname.equals(box.getShortname()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Expected a box with shortname " + shortname));
+    }
+
+    private String getAlternativeTo(Sheet sheet, String shortname) {
+        return WorkbookUtils.getNotEmptyRowsSkippingHeader(sheet).stream()
+            .filter(row -> shortname.equals(
+                    WorkbookUtils.getCellValue(row, DynamicLayoutToolValidator.SHORTNAME_COLUMN))
+                && StringUtils.isNotBlank(WorkbookUtils.getCellValue(row, DynamicLayoutToolValidator.GROUP_COLUMN)))
+            .map(row -> WorkbookUtils.getCellValue(row, DynamicLayoutToolValidator.ALTERNATIVE_TO_COLUMN))
+            .findFirst()
+            .orElse(null);
     }
 
     @Test
