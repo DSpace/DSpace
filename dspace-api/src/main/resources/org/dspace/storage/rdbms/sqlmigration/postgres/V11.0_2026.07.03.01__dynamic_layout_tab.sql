@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS dynamic_layout_tab
     CONSTRAINT dynamic_layout_tab_entity_id_fkey FOREIGN KEY (entity_id)
         REFERENCES entity_type (id),
     CONSTRAINT dynamic_layout_tab_entity_shortname_custom_filter_unique
-        UNIQUE (entity_id, shortname, custom_filter)
+        UNIQUE NULLS NOT DISTINCT (entity_id, shortname, custom_filter)
 );
 
 -- Step 2: migrate data from the legacy cris_layout_tab table when it exists.
