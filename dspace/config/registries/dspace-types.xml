@@ -123,6 +123,9 @@
 
     <dc-type>
         <schema>dspace</schema>
+        <element>thumbnail</element>
+        <qualifier>description</qualifier>
+        <scope_note>Stores the thumbnail description of collections or communities. Valid values; text</scope_note>
         <element>customurl</element>
         <qualifier/>
         <scope_note>Custom URL for DSpace entities (e.g. Person, Publication, etc).</scope_note>
