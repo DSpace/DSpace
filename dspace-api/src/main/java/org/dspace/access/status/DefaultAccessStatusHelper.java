@@ -46,6 +46,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     public static final String STATUS_FOR_ANONYMOUS  = "anonymous";
 
     public static final String EMBARGO = "embargo";
+    public static final String LEASE = "lease";
     public static final String METADATA_ONLY = "metadata.only";
     public static final String OPEN_ACCESS = "open.access";
     public static final String RESTRICTED = "restricted";
@@ -104,13 +105,22 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     @Override
     public AccessStatus getAccessStatusFromBitstream(Context context,
         Bitstream bitstream, LocalDate threshold, String type) throws SQLException {
-        if (bitstream == null) {
+        
+            if (bitstream == null) {
             return new AccessStatus(UNKNOWN, null);
         }
+
         List<ResourcePolicy> policies = getReadPolicies(context, bitstream, type);
-        LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
-        // Get the access status based on the availability date
+        LocalDate[] dates = findAvailabilityDate(policies, threshold);
+        LocalDate availabilityDate = dates[0];
+        LocalDate leaseEndDate = dates[1];
+        
+        if (leaseEndDate != null && availabilityDate == null) {
+            return new AccessStatus(LEASE, null, leaseEndDate);
+        }
+        
         String accessStatus = getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        
         return new AccessStatus(accessStatus, availabilityDate);
     }
 
@@ -233,45 +243,49 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     }
 
     /**
-     * Look at the read policies to retrieve the access status availability date.
+     * Look at the read policies to retrieve the access status availability date
+     * and the earliest lease expiration date.
+     *
+     * A lease policy is a valid anonymous read policy with an endDate but no startDate.
+     * When such a policy is found, the earliest endDate is tracked as the lease date.
      *
      * @param readPolicies  the read policies
      * @param threshold     the embargo threshold date
-     * @return an availability date
+     * @return a two-element array: [availabilityDate, leaseEndDate]
      */
-    private LocalDate findAvailabilityDate(List<ResourcePolicy> readPolicies, LocalDate threshold) {
-        // If the list is null, the object is readable
+    private LocalDate[] findAvailabilityDate(List<ResourcePolicy> readPolicies, LocalDate threshold) {
         if (readPolicies == null) {
-            return null;
+            return new LocalDate[] { null, null };
         }
-        // If there's no policies, return the threshold date (restriction)
         if (readPolicies.size() == 0) {
-            return threshold;
+            return new LocalDate[] { threshold, null };
         }
         LocalDate availabilityDate = null;
+        LocalDate leaseEndDate = null;
         LocalDate currentDate = LocalDate.now();
         boolean takeMostRecentDate = true;
-        // Looks at all read policies
+        boolean hasOpenAccess = false;
         for (ResourcePolicy policy : readPolicies) {
             boolean isValid = resourcePolicyService.isDateValid(policy);
-            // If any policy is valid, the object is accessible
             if (isValid) {
-                return null;
+                LocalDate endDate = policy.getEndDate();
+                if (endDate != null) {
+                    // Valid policy with endDate = active lease
+                    leaseEndDate = (leaseEndDate == null || endDate.isBefore(leaseEndDate))
+                        ? endDate : leaseEndDate;
+                    continue;
+                }
+                // Valid policy without endDate = truly open access
+                hasOpenAccess = true;
+                continue;
             }
-            // There may be an active embargo
             LocalDate startDate = policy.getStartDate();
-            // Ignore policy with no start date or which is expired
             if (startDate == null || startDate.isBefore(currentDate)) {
                 continue;
             }
-            // Policy with a start date over the threshold (restriction)
-            // overrides the embargos
             if (!startDate.isBefore(threshold)) {
                 takeMostRecentDate = false;
             }
-            // Take the most recent embargo date if there is no restriction, otherwise
-            // take the highest date (account for rare cases where more than one resource
-            // policy exists)
             if (availabilityDate == null) {
                 availabilityDate = startDate;
             } else if (takeMostRecentDate) {
@@ -280,7 +294,14 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
                 availabilityDate = startDate.isAfter(availabilityDate) ? startDate : availabilityDate;
             }
         }
-        return availabilityDate;
+        if (hasOpenAccess) {
+            return new LocalDate[] { null, null };
+        }
+        // No valid policies and no future start date: treat as restriction
+        if (availabilityDate == null && leaseEndDate == null) {
+            return new LocalDate[] { threshold, null };
+        }
+        return new LocalDate[] { availabilityDate, leaseEndDate };
     }
 
     /**

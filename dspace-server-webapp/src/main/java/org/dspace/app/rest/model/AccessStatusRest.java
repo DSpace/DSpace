@@ -9,6 +9,7 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import jakarta.validation.constraints.Size;
 
 /**
  * The Access Status REST Resource.
@@ -19,6 +20,7 @@ public class AccessStatusRest implements RestModel {
 
     String status;
     String embargoDate;
+    String leaseDate;
 
     @Override
     @JsonProperty(access = Access.READ_ONLY)
@@ -58,5 +60,19 @@ public class AccessStatusRest implements RestModel {
 
     public void setEmbargoDate(String embargoDate) {
         this.embargoDate = embargoDate;
+    }
+
+    /**
+     * @return the lease expiration date
+     */
+    public String getLeaseDate() {
+        return leaseDate;
+    }
+
+    /**
+     * @param leaseDate the lease expiration date
+     */
+    public void setLeaseDate(String leaseDate) {
+        this.leaseDate = leaseDate;
     }
 }
