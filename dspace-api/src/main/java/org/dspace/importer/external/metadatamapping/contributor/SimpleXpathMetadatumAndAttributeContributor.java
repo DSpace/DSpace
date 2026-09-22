@@ -47,7 +47,22 @@ public class SimpleXpathMetadatumAndAttributeContributor extends SimpleXpathMeta
         for (Object el : nodes) {
             if (el instanceof Element) {
                 Element element = (Element) el;
-                String attributeValue = element.getAttributeValue(this.attribute);
+                String attributeValue = null;
+                // Look for a prefix if it exists and resolve to a namespace if in configured scope
+                // or NO_NAMESPACE if prefix can't be resolved, and extract the local attr name
+                if (this.attribute.contains(":")) {
+                    String prefix = this.attribute.substring(0, this.attribute.indexOf(':'));
+                    String localName = this.attribute.substring(this.attribute.indexOf(':') + 1);
+                    Namespace attributeNamespaces = namespaces.stream()
+                        .filter(ns -> ns.getPrefix().equals(prefix))
+                        .findFirst()
+                        .orElse(Namespace.NO_NAMESPACE);
+                    attributeValue = element.getAttributeValue(localName, attributeNamespaces);
+                }
+                // Fall back to finding without an explicit namespace then map it if we got a good value
+                if (null == attributeValue) {
+                    attributeValue = element.getAttributeValue(this.attribute);
+                }
                 if (StringUtils.isNotBlank(attributeValue)) {
                     values.add(metadataFieldMapping.toDCValue(this.field, attributeValue));
                 }

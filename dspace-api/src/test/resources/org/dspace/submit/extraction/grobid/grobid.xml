@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">Evaluation of Header Metadata Extraction Approaches and Tools for Scientific PDF Documents</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability status="unknown"><licence/></availability>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Mario</forename><surname>Lipinski</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="institution">University of California</orgName>
+								<address>
+									<settlement>Berkeley</settlement>
+									<region>CA</region>
+									<country key="US">USA</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Kevin</forename><surname>Yao</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="institution">University of California</orgName>
+								<address>
+									<settlement>Berkeley</settlement>
+									<region>CA</region>
+									<country key="US">USA</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Corinna</forename><surname>Breitinger</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="institution">University of California</orgName>
+								<address>
+									<settlement>Berkeley</settlement>
+									<region>CA</region>
+									<country key="US">USA</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Joeran</forename><surname>Beel</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="institution">University of California</orgName>
+								<address>
+									<settlement>Berkeley</settlement>
+									<region>CA</region>
+									<country key="US">USA</country>
+								</address>
+							</affiliation>
+						</author>
+						<author role="corresp">
+							<persName><forename type="first">Bela</forename><surname>Gipp</surname></persName>
+							<email>gipp@berkeley.edu</email>
+							<affiliation key="aff0">
+								<orgName type="institution">University of California</orgName>
+								<address>
+									<settlement>Berkeley</settlement>
+									<region>CA</region>
+									<country key="US">USA</country>
+								</address>
+							</affiliation>
+						</author>
+						<title level="a" type="main">Evaluation of Header Metadata Extraction Approaches and Tools for Scientific PDF Documents</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date/>
+						</imprint>
+					</monogr>
+					<idno type="MD5">B68B8878022F3BA590EE9D16EC971332</idno>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.8.2" ident="GROBID" when="2026-01-31T18:24+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<label type="revision">a91ee48</label>
+					<label type="parameters">startPage=0, endPage=2, consolidateCitations=0, consolidateHeader=1, consolidateFunders=0, includeRawAffiliations=false, includeRawCitations=false, includeRawCopyrights=false, generateTeiIds=false, generateTeiCoordinates=null, sentenceSegmentation=false, flavor=null</label>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<textClass>
+				<keywords>
+					<term>H.3.4 [Information Storage and Retrieval]: Systems and Software performance evaluation (efficiency and effectiveness) Algorithms, Measurement, Performance, Experimentation Information Retrieval</term>
+					<term>Metadata Extraction</term>
+					<term>Evaluation</term>
+					<term>PDF</term>
+				</keywords>
+			</textClass>
+			<abstract>
+				<p>This paper evaluates the performance of tools for the extraction of metadata from scientific articles. Accurate metadata extraction is an important task for automating the management of digital libraries. This comparative study is a guide for developers looking to integrate the most suitable and effective metadata extraction tool into their software. We shed light on the strengths and weaknesses of seven tools in common use. In our evaluation using papers from the arXiv collection, GROBID delivered the best results, followed by Mendeley Desktop. SciPlore Xtract, PDFMeat, and SVMHeaderParse also delivered good results depending on the metadata type to be extracted.</p>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+	</text>
+</TEI>
