@@ -9,7 +9,6 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import jakarta.validation.constraints.Size;
 
 /**
  * The Access Status REST Resource.

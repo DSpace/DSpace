@@ -105,8 +105,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     @Override
     public AccessStatus getAccessStatusFromBitstream(Context context,
         Bitstream bitstream, LocalDate threshold, String type) throws SQLException {
-        
-            if (bitstream == null) {
+        if (bitstream == null) {
             return new AccessStatus(UNKNOWN, null);
         }
 
@@ -114,13 +113,13 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         LocalDate[] dates = findAvailabilityDate(policies, threshold);
         LocalDate availabilityDate = dates[0];
         LocalDate leaseEndDate = dates[1];
-        
+
         if (leaseEndDate != null && availabilityDate == null) {
             return new AccessStatus(LEASE, null, leaseEndDate);
         }
-        
+
         String accessStatus = getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
-        
+
         return new AccessStatus(accessStatus, availabilityDate);
     }
 
