@@ -33,6 +33,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.eperson.EPerson;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 
 /**
@@ -76,6 +78,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     private Collection owningCollection;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "template")
+    @LazyToOne(LazyToOneOption.NO_PROXY)
     private Collection templateItemOf;
 
     /**
