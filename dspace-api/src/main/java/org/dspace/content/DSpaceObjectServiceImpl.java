@@ -37,6 +37,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataRelationshipService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
@@ -46,6 +47,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Service implementation class for the DSpaceObject.
@@ -57,6 +59,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author kevinvandevelde at atmire.com
  */
 public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements DSpaceObjectService<T> {
+
+    @Autowired
+    @Lazy
+    private MetadataRelationshipService metadataRelationshipService;
 
     /**
      * log4j category
@@ -518,14 +524,30 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang)
         throws SQLException {
-        Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
-        while (metadata.hasNext()) {
-            MetadataValue metadataValue = metadata.next();
+        // Iterate over a snapshot so relationship removal can safely modify the managed metadata collection.
+        List<MetadataValue> values = new ArrayList<>(dso.getMetadata());
+
+        for (MetadataValue metadataValue : values) {
+            if (!dso.getMetadata().contains(metadataValue)) {
+                // Previous removeMetadataValue() call may remove the entire logical relationship, including other
+                // projections. If this snapshot value is no longer present in the owner's managed collection, SKIP.
+                continue;
+            }
             // If this value matches, delete it
             if (match(schema, element, qualifier, lang, metadataValue)) {
-                dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
-                metadata.remove();
-                metadataValueService.delete(context, metadataValue);
+                if (metadataValue.isRelationshipBacked()) {
+                    // Delegate relationship-backed metadata lifecycle and cleanup to MetadataRelationshipService.
+                    try {
+                        metadataRelationshipService.removeMetadataValue(context, metadataValue);
+                    } catch (AuthorizeException e) {
+                        throw new SQLException("Not authorized to remove relationship-bound metadata", e);
+                    }
+                } else {
+                    // Ordinary metadata removal
+                    dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
+                    dso.getMetadata().remove(metadataValue); // Keep in-memory metadata in sync.
+                    metadataValueService.delete(context, metadataValue);
+                }
             }
         }
         dso.setMetadataModified();
@@ -533,13 +555,30 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void removeMetadataValues(Context context, T dso, List<MetadataValue> values) throws SQLException {
-        Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
-        while (metadata.hasNext()) {
-            MetadataValue metadataValue = metadata.next();
+        // Iterate over a snapshot so relationship removal can safely modify the managed metadata collection.
+        List<MetadataValue> metadataValues = new ArrayList<>(dso.getMetadata());
+
+        for (MetadataValue metadataValue : metadataValues) {
+            if (!dso.getMetadata().contains(metadataValue)) {
+                // Previous removeMetadataValue() call may remove the entire logical relationship, including other
+                // projections. If this snapshot value is no longer present in the owner's managed collection, SKIP.
+                continue;
+            }
+            // If this managed value was requested for removal, delete it
             if (values.contains(metadataValue)) {
-                dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
-                metadata.remove();
-                metadataValueService.delete(context, metadataValue);
+                if (metadataValue.isRelationshipBacked()) {
+                    // Delegate relationship-backed metadata lifecycle and cleanup to MetadataRelationshipService.
+                    try {
+                        metadataRelationshipService.removeMetadataValue(context, metadataValue);
+                    } catch (AuthorizeException e) {
+                        throw new SQLException("Not authorized to remove relationship-bound metadata", e);
+                    }
+                } else {
+                    // Ordinary metadata removal
+                    dso.addMetadataEventDetails(new MetadataEvent(metadataValue, MetadataEvent.REMOVE));
+                    dso.getMetadata().remove(metadataValue);  // Keep in-memory metadata in sync.
+                    metadataValueService.delete(context, metadataValue);
+                }
             }
         }
         dso.setMetadataModified();

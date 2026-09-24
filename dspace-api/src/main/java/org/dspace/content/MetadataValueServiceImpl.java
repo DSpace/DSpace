@@ -130,4 +130,14 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     public int countTotal(Context context) throws SQLException {
         return metadataValueDAO.countRows(context);
     }
+
+    @Override
+    public List<MetadataValue> findByRelationship(Context context, Relationship relationship) throws SQLException {
+        return metadataValueDAO.findByRelationship(context, relationship);
+    }
+
+    @Override
+    public int countByRelationship(Context context, Relationship relationship) throws SQLException {
+        return metadataValueDAO.countByRelationship(context, relationship);
+    }
 }

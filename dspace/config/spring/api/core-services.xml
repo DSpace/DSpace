@@ -67,8 +67,12 @@
     <bean class="org.dspace.alerts.SystemWideAlertServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
+    <bean class="org.dspace.content.authority.AuthorityBackedRelationshipServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipConfigurationServiceImpl"/>
     <bean class="org.dspace.content.authority.AuthorityServiceUtils"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
+
+    <bean class="org.dspace.content.MetadataRelationshipServiceImpl"/>
 
     <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
 
