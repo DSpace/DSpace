@@ -186,6 +186,27 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
         checkItemHasBeenProcessed(item1_2_2_b);
     }
 
+    @Test
+    public void mediaFilterScriptBundleOptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item thumbnailItem = ItemBuilder.createItem(context, col1_1)
+                .withTitle("Item thumbnail").withIssueDate("2017-10-17").build();
+        BitstreamBuilder.createBitstream(context, thumbnailItem,
+                getClass().getResourceAsStream("test.txt"), "THUMBNAIL")
+                .withName("test.txt").guessFormat().build();
+        context.restoreAuthSystemState();
+
+        runDSpaceScript("filter-media", "--bundle", "THUMBNAIL");
+        thumbnailItem = context.reloadEntity(thumbnailItem);
+        item1_1_a = context.reloadEntity(item1_1_a);
+
+        // bitstream in THUMBNAIL was processed
+        List<Bundle> textBundles = thumbnailItem.getBundles("TEXT");
+        assertTrue("Item with THUMBNAIL bitstream should have TEXT bundle", textBundles.size() == 1);
+        // bitstreams in ORIGINAL were not processed
+        checkItemHasBeenNotProcessed(item1_1_a);
+    }
+
     private void checkItemHasBeenNotProcessed(Item item) throws IOException, SQLException, AuthorizeException {
         List<Bundle> textBundles = item.getBundles("TEXT");
         assertTrue("The item " + item.getName() + " should NOT have the TEXT bundle", textBundles.size() == 0);

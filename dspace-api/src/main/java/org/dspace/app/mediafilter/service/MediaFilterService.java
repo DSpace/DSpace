@@ -152,4 +152,6 @@ public interface MediaFilterService {
     public void setLogHandler(DSpaceRunnableHandler handler);
 
     public void setFromDate(LocalDate fromDate);
+
+    public void setSourceBundles(List<String> sourceBundles);
 }
