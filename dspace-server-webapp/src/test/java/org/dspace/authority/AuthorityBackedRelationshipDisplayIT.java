@@ -144,6 +144,9 @@ public class AuthorityBackedRelationshipDisplayIT extends AbstractControllerInte
         List<MetadataValue> authors = itemService.getMetadataByMetadataString(publication, "dc.contributor.author");
         assertThat(authors, hasSize(1));
         assertThat(authors.get(0).getValue(), equalTo("Smith, John"));
+        // the raw authority column is elided after minting, but the public getter reconstitutes
+        // the UUID from the backing relationship's right_id
+        assertThat(authors.get(0).getRawAuthority(), nullValue());
         assertThat(authors.get(0).getAuthority(), equalTo(person.getID().toString()));
     }
 

@@ -23,7 +23,9 @@ import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
@@ -262,26 +264,82 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Get the metadata authority
+     * Get the metadata authority.
+     * <p>
+     * For a resolved internal reference the {@code authority} column is elided (nulled) after
+     * the backing {@code relationship} row is minted — the target UUID is then stored only once,
+     * in {@code right_id}. This getter reconstitutes it transparently: it returns the raw column
+     * when present, otherwise the {@code right_id} UUID when the relationship endpoints are set,
+     * otherwise {@code null}.
+     * </p>
      *
      * @return metadata authority
      */
     public String getAuthority() {
+        if (authority != null) {
+            return authority;
+        }
+        return rightItem != null ? rightItem.toString() : null;
+    }
+
+    /**
+     * Return the literal {@code authority} column value, without deriving from {@code right_id}.
+     * <p>
+     * <strong>Internal use only</strong>: only the reconcile/mint machinery
+     * ({@code AuthorityBackedRelationshipService}) may read the raw column, so it can tell an
+     * already-elided value (raw {@code null}, endpoints set) apart from one whose authority
+     * genuinely names nothing. All other readers must use {@link #getAuthority()}.
+     * </p>
+     *
+     * @return the raw {@code authority} column, possibly {@code null}
+     */
+    public String getRawAuthority() {
         return authority;
     }
 
     /**
-     * Set the metadata authority
+     * Set the metadata authority.
+     * <p>
+     * Blanking the authority on a value that currently backs an internal relationship is a
+     * librarian "clear": both relationship endpoints are nulled (so Hibernate deletes the
+     * secondary {@code relationship} row) and the confidence is reset to unset, while the human
+     * readable display value is kept. Retarget (a non-blank new value) and external authority
+     * keys (which have no {@code right_id}) are unaffected.
+     * </p>
      *
      * @param value new metadata authority
      */
     public void setAuthority(String value) {
-        this.authority = value;
+        boolean clearing = StringUtils.isBlank(value);
+        if (clearing && rightItem != null) {
+            // Librarian clear: unlink the relationship (both endpoints null -> row deleted) but
+            // keep the display text. Confidence must not stay accepted for a now-detached value.
+            this.leftItem = null;
+            this.rightItem = null;
+            this.confidence = Choices.CF_UNSET;
+        }
+        this.authority = clearing ? null : value;
         if (dSpaceObject != null) {
             // An authority change can change whether this value is backed by a
             // relationship, so make sure the owning object is reconciled on update.
             dSpaceObject.setMetadataModified();
         }
+    }
+
+    /**
+     * Elide (null out) only the {@code authority} column, leaving the relationship endpoints
+     * intact so {@link #getAuthority()} can reconstitute the UUID from {@code right_id}.
+     * <p>
+     * <strong>Internal use only</strong> and deliberately does <strong>not</strong> mark the
+     * owning object modified: it is a field-level operation invoked by the mint machinery
+     * ({@code AuthorityBackedRelationshipService}) once a relationship row has been stamped, and
+     * must not re-open the dirty window (which would trigger a redundant reconcile pass). The
+     * endpoints must already be set before this is called. It is public only because that service
+     * lives in a sibling package; treat it as package-private in intent.
+     * </p>
+     */
+    public void elideAuthorityColumn() {
+        this.authority = null;
     }
 
     /**

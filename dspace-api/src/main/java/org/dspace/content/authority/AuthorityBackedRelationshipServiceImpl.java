@@ -61,11 +61,28 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         UUID ownerItem = owner.getID();
         UUID currentLeft = metadataValue.getLeftItem();
         UUID currentRight = metadataValue.getRightItem();
-        String authority = metadataValue.getAuthority();
+        // Read the RAW authority column, not the derived getter: for an already-elided internal
+        // reference the column is null while the getter would reconstitute the UUID from right_id.
+        // Reconcile must see the physical null so it can recognise "already in sync" below.
+        String authority = metadataValue.getRawAuthority();
 
-        // Fast path: the value already points at the item named by its (trimmed) authority.
-        // The side foreign key guarantees that a stamped right side still exists, so this
-        // common case needs no database access at all.
+        // Already-in-sync shortcut for a resolved internal reference whose authority column
+        // was elided. When this value was stamped, left_id/right_id were set to
+        // (owner -> target) and elideAuthorityColumn() nulled the authority column, so the
+        // UUID now lives only in right_id. That combination — authority column null, left_id
+        // pointing at this owner, right_id set — is a fully reconciled value, so return early.
+        // This check MUST run before the resolve/clear logic below: with a null authority,
+        // resolveTargetItem() returns null and the clear branch would then null left_id/right_id,
+        // destroying a still-valid relationship row on every reconcile.
+        if (authority == null && currentRight != null && ownerItem.equals(currentLeft)) {
+            return false;
+        }
+
+        // Fast path: the authority column is still present and already equals right_id, with
+        // left_id pointing at this owner — the value names the right item, so nothing to do.
+        // The metadata_value_id foreign key guarantees a stamped right_id still exists, so this
+        // common case needs no database access. This runs only while the raw authority is non-null;
+        // a null authority is handled by the already-in-sync shortcut above or the clear branch below.
         if (currentRight != null && ownerItem.equals(currentLeft)
             && currentRight.toString().equals(authority == null ? null : authority.trim())) {
             return false;
@@ -97,6 +114,10 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
 
         metadataValue.setLeftItem(ownerItem);
         metadataValue.setRightItem(targetItem);
+        // Single-store invariant: once the row is stamped the target UUID lives in right_id, so
+        // elide the redundant copy from the authority column. Endpoints are set first (above), so
+        // getAuthority() can always reconstitute the UUID from right_id afterwards.
+        metadataValue.elideAuthorityColumn();
 
         log.debug("Stamped metadata value {} (item {}) as authority-backed towards item {}",
             metadataValue.getID(), ownerItem, targetItem);
@@ -133,6 +154,10 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
 
         ownerMetadataValue.setLeftItem(ownerItemId);
         ownerMetadataValue.setRightItem(relatedItemId);
+        // Single-store invariant: the target UUID now lives in right_id, so elide the redundant
+        // copy from the authority column. Endpoints are set first, so getAuthority() can always
+        // reconstitute the UUID from right_id afterwards.
+        ownerMetadataValue.elideAuthorityColumn();
 
         log.debug("Stamped metadata value {} (item {}) as authority-backed towards item {}",
             ownerMetadataValue.getID(), ownerItemId, relatedItemId);

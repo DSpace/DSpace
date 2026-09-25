@@ -587,7 +587,10 @@ public class CleanUpAuthorityRelationMetadataIT extends AbstractControllerIntegr
             .andExpect(jsonPath("$", Matchers.allOf(
              // check Boychuk, Mykhaylo
              hasJsonPath("$.metadata['dc.contributor.author'][0].value", is(personItem.getName())),
-             hasJsonPath("$.metadata['dc.contributor.author'][0].authority", is(personItem.getID().toString())),
+             // the internal-reference UUID lives only in the relationship row.
+             // With cleanup disabled, deleting the person removes that row, so the derived
+             // authority is gone; the display value and confidence are untouched.
+             hasJsonPath("$.metadata['dc.contributor.author'][0].authority", nullValue()),
              hasJsonPath("$.metadata['dc.contributor.author'][0].confidence", is(600)),
              // check Giamminonni, Luca
              hasJsonPath("$.metadata['dc.contributor.author'][1].value", is(personItem2.getName())),

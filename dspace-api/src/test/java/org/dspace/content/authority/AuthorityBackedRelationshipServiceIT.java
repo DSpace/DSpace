@@ -90,7 +90,6 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         MetadataValue authorValue = getFirstAuthorValue(owner);
         assertThat(authorValue.isRelationshipBacked(), equalTo(false));
         String originalValue = authorValue.getValue();
-        String originalAuthority = authorValue.getAuthority();
 
         boolean stamped = authorityBackedRelationshipService
             .markRelationshipForResolvedAuthority(context, owner, authorValue, target);
@@ -102,9 +101,13 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         assertThat(authorValue.isRelationshipBacked(), equalTo(true));
         assertThat(authorValue.getLeftItem(), equalTo(owner.getID()));
         assertThat(authorValue.getRightItem(), equalTo(target.getID()));
-        // The helper never touches value or authority
+        // The helper never touches the display value
         assertThat(authorValue.getValue(), equalTo(originalValue));
-        assertThat(authorValue.getAuthority(), equalTo(originalAuthority));
+        // After a successful mint the authority column is elided (single-store),
+        // so the RAW column is null while the derived getter reconstitutes the
+        // target UUID from right_id.
+        assertThat(authorValue.getRawAuthority(), equalTo(null));
+        assertThat(authorValue.getAuthority(), equalTo(target.getID().toString()));
     }
 
     @Test
@@ -201,6 +204,10 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         assertThat(authorValue.getLeftItem(), equalTo(owner.getID()));
         assertThat(authorValue.getRightItem(), equalTo(target.getID()));
         assertThat(relationshipService.findByItem(context, owner), hasSize(1));
+        // the row is minted and the authority column elided, so the raw column is
+        // null while the derived getter still returns the target UUID from right_id.
+        assertThat(authorValue.getRawAuthority(), equalTo(null));
+        assertThat(authorValue.getAuthority(), equalTo(target.getID().toString()));
     }
 
     @Test
@@ -227,6 +234,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         assertThat(authorValue.getLeftItem(), equalTo(owner.getID()));
         assertThat(authorValue.getRightItem(), equalTo(otherTarget.getID()));
         assertThat(relationshipService.findByItem(context, owner), hasSize(1));
+        assertThat(authorValue.getRawAuthority(), equalTo(null));
+        assertThat(authorValue.getAuthority(), equalTo(otherTarget.getID().toString()));
     }
 
     @Test
@@ -237,7 +246,12 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         authorValue.setAuthority(target.getID().toString());
         authorValue.setConfidence(Choices.CF_ACCEPTED);
         itemService.update(context, owner);
+        // After the first update the row is minted and the column elided (raw null, right_id set).
+        assertThat(authorValue.getRawAuthority(), equalTo(null));
+        assertThat(authorValue.getRightItem(), equalTo(target.getID()));
 
+        // reconciling an already-elided, in-sync value is a no-op —
+        // the raw-null column must not be misread as "authority names nothing".
         boolean reconciled = authorityBackedRelationshipService
             .reconcileRelationshipForAuthority(context, owner, authorValue);
         context.commit();
@@ -246,6 +260,7 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
 
         assertThat(reconciled, equalTo(false));
         assertThat(authorValue.getRightItem(), equalTo(target.getID()));
+        assertThat(authorValue.getAuthority(), equalTo(target.getID().toString()));
         assertThat(relationshipService.findByItem(context, owner), hasSize(1));
     }
 

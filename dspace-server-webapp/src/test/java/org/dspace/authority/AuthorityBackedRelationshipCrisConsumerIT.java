@@ -130,7 +130,9 @@ public class AuthorityBackedRelationshipCrisConsumerIT extends AbstractControlle
         person = context.reloadEntity(person);
 
         // the authority stamp still happened (system path keeps setReferenceWithAuthority)
+        // fter minting, the raw column is elided; the getter reconstitutes from right_id
         MetadataValue author = getSingleMetadata(publication, "dc.contributor.author");
+        assertThat(author.getRawAuthority(), nullValue());
         assertThat(author.getAuthority(), equalTo(person.getID().toString()));
         assertThat(author.getConfidence(), equalTo(CF_ACCEPTED));
 
@@ -166,8 +168,10 @@ public class AuthorityBackedRelationshipCrisConsumerIT extends AbstractControlle
         person = context.reloadEntity(person);
 
         // display text is preserved (user path does NOT call setReferenceWithAuthority)
+        // after minting, the raw column is elided; the getter reconstitutes from right_id
         MetadataValue author = getSingleMetadata(publication, "dc.contributor.author");
         assertThat(author.getValue(), equalTo("J. Smith"));
+        assertThat(author.getRawAuthority(), nullValue());
         assertThat(author.getAuthority(), equalTo(person.getID().toString()));
 
         // relationship minted, type-less, owner=left, target=right

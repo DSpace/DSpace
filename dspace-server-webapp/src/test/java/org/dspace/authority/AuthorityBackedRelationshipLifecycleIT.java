@@ -230,7 +230,10 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(relationship.getRightItem(), equalTo(person));
         Integer relationshipId = relationship.getID();
 
+        // reverse-resolution mints the row and elides the raw column;
+        // the getter reconstitutes the UUID from the backing right_id
         MetadataValue author = getSingleAuthor(publication);
+        assertThat(author.getRawAuthority(), nullValue());
         assertThat(author.getAuthority(), equalTo(person.getID().toString()));
 
         // the item reads cleanly

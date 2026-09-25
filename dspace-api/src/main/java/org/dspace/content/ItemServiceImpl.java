@@ -872,6 +872,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID()));
         //remove subscription related with it
         subscribeService.deleteByDspaceObject(context, item);
+
+        // Clean up other items' authority references to THIS item BEFORE the force-delete loop below.
+        // removeAuthorityReferences() finds items whose authority-controlled fields name this item's
+        // UUID and matches them via MetadataValue.getAuthority(). For an authority-backed (elided)
+        // internal reference the authority column is null and getAuthority() reconstitutes the UUID
+        // from the value's right_id (its relationship endpoint). The loop below runs
+        // relationshipService.findByItem(this item), which returns rows where this item is EITHER
+        // side — including the referencing items' rows that point at this item via right_id. So if it
+        // ran first it would null those right_id values, getAuthority() would then return null, and
+        // the cleanup would silently fail to match, leaving dangling references.
+        if (configurationService.getBooleanProperty("item-deletion.authority-cleanup.enabled", false)) {
+            removeAuthorityReferences(context, item);
+        }
+
         // Remove relationships
         for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
@@ -921,11 +935,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         //Only clear collections after we have removed everything else from the item
         item.clearCollections();
         item.setOwningCollection(null);
-
-        // remove authority references
-        if (configurationService.getBooleanProperty("item-deletion.authority-cleanup.enabled", false)) {
-            removeAuthorityReferences(context, item);
-        }
 
         // Finally remove item row
         itemDAO.delete(context, item);
@@ -988,6 +997,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         while (itemsToFixAuthority.hasNext()) {
             Item itemToProcess = itemsToFixAuthority.next();
+
+            // The item being deleted can never be a *referencing* item, but it may still surface in
+            // the discovery results (e.g. it carries the authority field itself). Skip it: processing
+            // it would uncache the entity that rawDelete still needs to delete afterwards.
+            if (itemToProcess != null && itemToProcess.getID().equals(deletedItem.getID())) {
+                continue;
+            }
 
             for (String controlledField : controlledFields) {
                 List<MetadataValue> metadataValuesWithAuthorityToUpdate = getMetadataWithAuthority(itemToProcess,
