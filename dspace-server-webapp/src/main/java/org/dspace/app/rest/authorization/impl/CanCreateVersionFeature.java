@@ -70,6 +70,11 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
     }
 
     @Override
+    public boolean requiresAuthentication() {
+        return true;
+    }
+
+    @Override
     public String[] getSupportedTypes() {
         return new String[]{
             ItemRest.CATEGORY + "." + ItemRest.NAME

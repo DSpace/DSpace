@@ -66,6 +66,11 @@ public class CanReplaceBitstreamFeature implements AuthorizationFeature {
     }
 
     @Override
+    public boolean requiresAuthentication() {
+        return true;
+    }
+
+    @Override
     public String[] getSupportedTypes() {
         return new String[]{
             BitstreamRest.CATEGORY + "." + BitstreamRest.NAME
