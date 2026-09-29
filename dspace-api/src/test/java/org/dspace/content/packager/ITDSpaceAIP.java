@@ -15,12 +15,16 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.google.common.base.Splitter;
 import org.apache.logging.log4j.Logger;
@@ -108,6 +112,14 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
     private static String testItemHandle = null;
     private static String testMappedItemHandle = null;
     private static String submitterEmail = "aip-test@dspace.org";
+
+    /**
+     * METS manifest test resources (see src/test/resources/org/dspace/content/packager)
+     **/
+    private static final String COLLECTION_METS = "collection-with-entity-type-mets.xml";
+    private static final String COLLECTION_METS_TITLE = "Testcollection: allow_dspace_metadata_for_collection_mets";
+    private static final String COMMUNITY_METS = "community-with-entity-type-mets.xml";
+    private static final String COMMUNITY_METS_TITLE = "Testcommunity: allow_dspace_metadata_for_collection_mets";
 
     /**
      * Create a global temporary upload folder which will be cleaned up automatically by JUnit.
@@ -997,6 +1009,103 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         assertEquals("testRestoreMappedItem() collection count", 2, restoredMappings.size());
 
         log.info("testRestoreMappedItem() - END");
+    }
+
+    /**
+     * Test restoration of a Collection from a METS manifest containing
+     * "dspace" schema metadata (dspace.entity.type).
+     */
+    @Test
+    public void testRestoreCollectionWithDspaceMetadataFromMets() throws Exception {
+        Community topCommunity = (Community) handleService.resolveToObject(context, topCommunityHandle);
+        File aipFile = createAIPFromMetsResource(COLLECTION_METS);
+
+        restoreFromAIP(topCommunity, aipFile, ignoreHandleParams(), false);
+
+        Collection restored = findCollectionByName(topCommunity, COLLECTION_METS_TITLE);
+        assertThat("testRestoreCollectionWithDspaceMetadataFromMets() collection exists", restored,
+                   notNullValue());
+        assertEquals("testRestoreCollectionWithDspaceMetadataFromMets() entity type", "Publication",
+                     collectionService.getMetadataFirstValue(restored, "dspace", "entity", "type", Item.ANY));
+    }
+
+    /**
+     * Test replacement of an existing Collection from a METS manifest containing
+     * "dspace" schema metadata (dspace.entity.type).
+     */
+    @Test
+    public void testReplaceCollectionWithDspaceMetadataFromMets() throws Exception {
+        Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
+        assertThat("testReplaceCollectionWithDspaceMetadataFromMets() no entity type before replace",
+                   collectionService.getMetadataFirstValue(testCollection, "dspace", "entity", "type", Item.ANY),
+                   nullValue());
+        File aipFile = createAIPFromMetsResource(COLLECTION_METS);
+
+        replaceFromAIP(testCollection, aipFile, ignoreHandleParams(), false);
+
+        assertEquals("testReplaceCollectionWithDspaceMetadataFromMets() title", COLLECTION_METS_TITLE,
+                     testCollection.getName());
+        assertEquals("testReplaceCollectionWithDspaceMetadataFromMets() entity type", "Publication",
+                     collectionService.getMetadataFirstValue(testCollection, "dspace", "entity", "type",
+                                                             Item.ANY));
+    }
+
+    /**
+     * Test restoration of a Community from a METS manifest containing "dspace"
+     * schema metadata. Only "dc" metadata is ingested for Communities, so
+     * dspace.entity.type must be ignored.
+     */
+    @Test
+    public void testRestoreCommunityIgnoresDspaceMetadataFromMets() throws Exception {
+        Community topCommunity = (Community) handleService.resolveToObject(context, topCommunityHandle);
+        File aipFile = createAIPFromMetsResource(COMMUNITY_METS);
+
+        restoreFromAIP(topCommunity, aipFile, ignoreHandleParams(), false);
+
+        Community restored = null;
+        for (Community sub : topCommunity.getSubcommunities()) {
+            if (COMMUNITY_METS_TITLE.equals(sub.getName())) {
+                restored = sub;
+            }
+        }
+        assertThat("testRestoreCommunityIgnoresDspaceMetadataFromMets() community exists", restored,
+                   notNullValue());
+        assertThat("testRestoreCommunityIgnoresDspaceMetadataFromMets() entity type ignored",
+                   communityService.getMetadataFirstValue(restored, "dspace", "entity", "type", Item.ANY),
+                   nullValue());
+    }
+
+    /**
+     * Build an AIP zip file from a METS manifest test resource.
+     *
+     * @param resourceName name of the METS resource (relative to this class)
+     * @return AIP zip file containing the resource as mets.xml
+     */
+    private File createAIPFromMetsResource(String resourceName) throws IOException {
+        File aipFile = new File(aipTempFolder.getRoot(), resourceName.replace(".xml", ".zip"));
+        try (InputStream mets = getClass().getResourceAsStream(resourceName);
+             ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(aipFile))) {
+            assertThat("METS resource " + resourceName + " exists", mets, notNullValue());
+            zip.putNextEntry(new ZipEntry(METSManifest.MANIFEST_FILE));
+            mets.transferTo(zip);
+            zip.closeEntry();
+        }
+        return aipFile;
+    }
+
+    private PackageParameters ignoreHandleParams() {
+        PackageParameters pkgParams = new PackageParameters();
+        pkgParams.addProperty("ignoreHandle", "true");
+        return pkgParams;
+    }
+
+    private Collection findCollectionByName(Community parent, String name) {
+        for (Collection collection : parent.getCollections()) {
+            if (name.equals(collection.getName())) {
+                return collection;
+            }
+        }
+        return null;
     }
 
     /**

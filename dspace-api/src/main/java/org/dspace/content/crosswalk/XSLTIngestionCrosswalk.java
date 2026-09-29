@@ -27,7 +27,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -189,11 +188,11 @@ public class XSLTIngestionCrosswalk
     }
 
     // return coll/comm "metadata" label corresponding to a DIM field.
-    private static MetadataFieldName getMetadataForDIM(Element field) {
+    private static MetadataFieldName getMetadataForDIM(String schema, Element field) {
         // make up fieldname, then look for it in xwalk
         String element = field.getAttributeValue("element");
         String qualifier = field.getAttributeValue("qualifier");
-        return new MetadataFieldName(MetadataSchemaEnum.DC.getName(), element, qualifier);
+        return new MetadataFieldName(schema, element, qualifier);
     }
 
     /**
@@ -203,7 +202,8 @@ public class XSLTIngestionCrosswalk
      * a DIM document.
      * <p>
      * Note that this is ONLY implemented for Item, Collection, and
-     * Community objects.  Also only works for the "dc" metadata schema.
+     * Community objects.  For Communities only the "dc" metadata schema is
+     * ingested, for Collections the "dc" and "dspace" metadata schemas.
      * <p>
      *
      * @param context                     the context
@@ -238,20 +238,14 @@ public class XSLTIngestionCrosswalk
                     ingestDIM(context, dso, field.getChildren(), createMissingMetadataFields);
                 } else if ("field".equals(field.getName()) &&
                     DIM_NS.equals(field.getNamespace()) &&
-                    schema != null && "dc".equals(schema)) {
-                    MetadataFieldName md = getMetadataForDIM(field);
-                    if (md == null) {
-                        log.warn("Cannot map to Coll/Comm metadata field, DIM element=" +
-                                     field.getAttributeValue("element") + ", qualifier=" + field
-                            .getAttributeValue("qualifier"));
+                    ("dc".equals(schema) || ("dspace".equals(schema) && type == Constants.COLLECTION))) {
+                    MetadataFieldName md = getMetadataForDIM(schema, field);
+                    if (type == Constants.COLLECTION) {
+                        collectionService.setMetadataSingleValue(context,
+                            (Collection) dso, md, null, field.getText());
                     } else {
-                        if (type == Constants.COLLECTION) {
-                            collectionService.setMetadataSingleValue(context,
-                                    (Collection) dso, md, null, field.getText());
-                        } else {
-                            communityService.setMetadataSingleValue(context,
-                                    (Community) dso, md, null, field.getText());
-                        }
+                        communityService.setMetadataSingleValue(context,
+                            (Community) dso, md, null, field.getText());
                     }
                 } else {
                     log.warn("ignoring unrecognized DIM element: " + field.toString());
