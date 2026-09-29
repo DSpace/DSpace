@@ -7,11 +7,14 @@
  */
 package org.dspace.app.rest.health;
 
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -22,9 +25,19 @@ import org.springframework.web.client.RestTemplate;
  */
 public class SEOHealthIndicator extends AbstractHealthIndicator {
 
-    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private static final Pattern CSR_PATTERN = Pattern.compile("<ds-app[^>]*>\\s*</ds-app>");
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    ConfigurationService configurationService;
+
+    RestTemplate restTemplate;
+
+    public SEOHealthIndicator() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000);
+        factory.setReadTimeout(10000);
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     @Override
     protected void doHealthCheck(Health.Builder builder) {
@@ -32,9 +45,9 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
 
         boolean sitemapOk = checkUrl(baseUrl + "/sitemap_index.xml") || checkUrl(baseUrl + "/sitemap_index.html");
         RobotsTxtStatus robotsTxtStatus = checkRobotsTxt(baseUrl + "/robots.txt");
-        boolean ssrOk = checkSSR(baseUrl);
+        SsrStatus ssrStatus = checkSSR(baseUrl);
 
-        if (sitemapOk && robotsTxtStatus == RobotsTxtStatus.VALID && ssrOk) {
+        if (sitemapOk && robotsTxtStatus == RobotsTxtStatus.VALID && ssrStatus == SsrStatus.ENABLED) {
             builder.up()
                    .withDetail("sitemap", "OK")
                    .withDetail("robots.txt", "OK")
@@ -44,9 +57,9 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
             builder.withDetail("sitemap", sitemapOk ? "OK" : "Sitemaps are missing or inaccessible. Please see the " +
                     "DSpace Documentation on Search Engine Optimization for how to enable Sitemaps.");
 
-            if (robotsTxtStatus == RobotsTxtStatus.MISSING) {
-                builder.withDetail("robots.txt", "Missing or inaccessible. Please see the DSpace Documentation on " +
-                        "Search Engine Optimization for how to create a robots.txt.");
+            if (robotsTxtStatus == RobotsTxtStatus.UNKNOWN) {
+                builder.withDetail("robots.txt", "Could not be fetched or evaluated. Please check that " +
+                        "the DSpace UI is reachable from the backend server.");
             } else if (robotsTxtStatus == RobotsTxtStatus.INVALID) {
                 builder.withDetail("robots.txt", "Invalid because it contains localhost URLs. This is often a sign " +
                         "that a proxy is failing to pass X-Forwarded headers to DSpace. Please see the DSpace " +
@@ -54,9 +67,17 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
             } else {
                 builder.withDetail("robots.txt", "OK");
             }
-            builder.withDetail("ssr", ssrOk ? "OK" : "Server-side rendering (SSR) appears to be disabled.  Most " +
-                    "search engines require enabling SSR for proper indexing. Please see the DSpace Documentation on" +
-                    " Search Engine Optimization for more details.");
+
+            if (ssrStatus == SsrStatus.DISABLED) {
+                builder.withDetail("ssr", "Server-side rendering (SSR) appears to be disabled.  Most " +
+                        "search engines require enabling SSR for proper indexing. Please see the DSpace Documentation" +
+                        " on Search Engine Optimization for more details.");
+            } else if (ssrStatus == SsrStatus.UNKNOWN) {
+                builder.withDetail("ssr", "Could not be fetched or evaluated. Please check that " +
+                        "the DSpace UI is reachable from the backend server.");
+            } else {
+                builder.withDetail("ssr", "OK");
+            }
         }
     }
 
@@ -73,28 +94,34 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
         try {
             String content = restTemplate.getForObject(url, String.class);
             if (StringUtils.isBlank(content)) {
-                return RobotsTxtStatus.MISSING;
+                return RobotsTxtStatus.UNKNOWN;
             }
             if (content.contains("localhost")) {
                 return RobotsTxtStatus.INVALID;
             }
             return RobotsTxtStatus.VALID;
         } catch (Exception e) {
-            return RobotsTxtStatus.MISSING;
+            return RobotsTxtStatus.UNKNOWN;
         }
     }
 
-    private boolean checkSSR(String url) {
+    private SsrStatus checkSSR(String url) {
         try {
             String content = restTemplate.getForObject(url, String.class);
-            return content != null && !content.contains("<ds-app></ds-app>");
+            if (StringUtils.isBlank(content)) {
+                return SsrStatus.UNKNOWN;
+            }
+            return CSR_PATTERN.matcher(content).find() ? SsrStatus.DISABLED : SsrStatus.ENABLED;
         } catch (Exception e) {
-            return false;
+            return SsrStatus.UNKNOWN;
         }
     }
 
     private enum RobotsTxtStatus {
-        VALID, MISSING, INVALID
+        VALID, INVALID, UNKNOWN
+    }
+
+    private enum SsrStatus {
+        ENABLED, DISABLED, UNKNOWN
     }
 }
-
