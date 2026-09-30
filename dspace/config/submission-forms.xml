@@ -1531,31 +1531,31 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Name</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required>You must enter the funding name.</required>
                     <hint />
+                    <required>You must enter the funding name.</required>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>acronym</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Acronym</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>internalid</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Internal Funding code</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
@@ -1563,31 +1563,31 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>relation</dc-element>
                     <dc-qualifier>project</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>Funded project</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>funder</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Funder</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>fundingParent</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Program</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint>Link this funding with its upper level if applicable</hint>
+                    <required />
                 </field>
             </row>
             <row>
@@ -1595,11 +1595,11 @@
                     <dc-schema>crisfund</dc-schema>
                     <dc-element>award</dc-element>
                     <dc-qualifier>url</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>Award Url</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required>The url preferably on the funder website of the award notice</required>
-                    <hint />
+                    <hint>The url preferably on the funder website of the award notice</hint>
+                    <required>The Award URL is a required field</required>
                 </field>
             </row>
             <row>
@@ -1607,53 +1607,53 @@
                     <dc-schema>crisfund</dc-schema>
                     <dc-element>award</dc-element>
                     <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>Award URI</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required>The Award URI</required>
-                    <hint />
+                    <hint>The URI of the award notice</hint>
+                    <required>The Award URI is a required field</required>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>oamandate</dc-element>
+                    <repeatable>false</repeatable>
                     <label>OA Mandate</label>
                     <input-type value-pairs-name="truefalse">dropdown</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>oamandate</dc-element>
                     <dc-qualifier>url</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>OA Policy URL</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>amount</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Amount</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>amount</dc-element>
                     <dc-qualifier>currency</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>Currency</label>
                     <input-type value-pairs-name="currency">dropdown</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
@@ -1661,97 +1661,97 @@
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>funding</dc-element>
                     <dc-qualifier>identifier</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>Grant number</label>
                     <input-type>onebox</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>funding</dc-element>
                     <dc-qualifier>startDate</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>Start date</label>
                     <input-type>date</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
                 <field>
                     <dc-schema>oairecerif</dc-schema>
                     <dc-element>funding</dc-element>
                     <dc-qualifier>endDate</dc-qualifier>
+                    <repeatable>false</repeatable>
                     <label>End date</label>
                     <input-type>date</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>type</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Type</label>
                     <input-type value-pairs-name="funding_types">dropdown</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
+                    <repeatable>false</repeatable>
                     <label>Funding Description</label>
                     <input-type>textarea</input-type>
-                    <repeatable>false</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>crisfund</dc-schema>
                     <dc-element>investigators</dc-element>
+                    <repeatable>true</repeatable>
                     <label>Investigator(s)</label>
                     <input-type>onebox</input-type>
-                    <repeatable>true</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>crisfund</dc-schema>
                     <dc-element>coinvestigators</dc-element>
+                    <repeatable>true</repeatable>
                     <label>Co-Investigator(s)</label>
                     <input-type>onebox</input-type>
-                    <repeatable>true</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>crisfund</dc-schema>
                     <dc-element>leadorganizations</dc-element>
+                    <repeatable>true</repeatable>
                     <label>Lead Organization(s)</label>
                     <input-type>onebox</input-type>
-                    <repeatable>true</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>crisfund</dc-schema>
                     <dc-element>leadcoorganizations</dc-element>
+                    <repeatable>true</repeatable>
                     <label>Lead Co-Organization(s)</label>
                     <input-type>onebox</input-type>
-                    <repeatable>true</repeatable>
-                    <required />
                     <hint />
+                    <required />
                 </field>
             </row>
         </form>
