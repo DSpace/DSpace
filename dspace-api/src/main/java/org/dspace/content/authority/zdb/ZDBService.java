@@ -51,6 +51,14 @@ public class ZDBService {
 
     private static final Pattern SAFE_ID_PATTERN = Pattern.compile("^\\d{1,7}-[0-9Xx]$");
 
+    /**
+     * SRU query prefix appended to the configured base search URL. The request contract (SRU version,
+     * operation, record schema and the title index) is owned by the code rather than by configuration,
+     * so that the {@code cris.zdb.search.url} property holds only the base URL.
+     */
+    private static final String SRU_SEARCH_QUERY_PREFIX =
+        "?version=1.1&operation=searchRetrieve&recordSchema=RDFxml&query=tit=";
+
     @Autowired
     private ConfigurationService configurationService;
 
@@ -257,7 +265,7 @@ public class ZDBService {
         }
 
         StringBuilder queryURL = new StringBuilder(baseUrl)
-            .append("&query=tit=")
+            .append(SRU_SEARCH_QUERY_PREFIX)
             .append(URLEncoder.encode(query, Charset.defaultCharset()));
 
         // SRU uses a 1-based startRecord position; DSpace supplies a 0-based offset

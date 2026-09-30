@@ -53,7 +53,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 public class ZDBServiceTest {
 
-    private static final String SEARCH_URL = "https://example.org/sru?operation=searchRetrieve";
+    private static final String SEARCH_URL = "https://example.org/sru";
     private static final String DETAIL_URL_TEMPLATE = "https://example.org/detail?id={0}";
 
     /**
