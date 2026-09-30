@@ -2572,6 +2572,86 @@
                 <displayed-value>Pound sterling</displayed-value>
                 <stored-value>Pound sterling</stored-value>
             </pair>
+            <pair>
+                <displayed-value>US dollar</displayed-value>
+                <stored-value>US dollar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Japanese yen</displayed-value>
+                <stored-value>Japanese yen</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Renminbi</displayed-value>
+                <stored-value>Renminbi</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Australian dollar</displayed-value>
+                <stored-value>Australian dollar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Canadian dollar</displayed-value>
+                <stored-value>Canadian dollar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hong Kong dollar</displayed-value>
+                <stored-value>Hong Kong dollar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Singapore dollar</displayed-value>
+                <stored-value>Singapore dollar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Indian rupee</displayed-value>
+                <stored-value>Indian rupee</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>South Korean won</displayed-value>
+                <stored-value>South Korean won</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Mexican peso</displayed-value>
+                <stored-value>Mexican peso</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>New Zealand dollar</displayed-value>
+                <stored-value>New Zealand dollar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>New Taiwan dollar</displayed-value>
+                <stored-value>New Taiwan dollar</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Brazilian real</displayed-value>
+                <stored-value>Brazilian real</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>South African rand</displayed-value>
+                <stored-value>South African rand</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Indonesian rupiah</displayed-value>
+                <stored-value>Indonesian rupiah</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Thai baht</displayed-value>
+                <stored-value>Thai baht</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Israeli new shekel</displayed-value>
+                <stored-value>Israeli new shekel</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Chilean peso</displayed-value>
+                <stored-value>Chilean peso</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Philippine peso</displayed-value>
+                <stored-value>Philippine peso</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Colombian peso</displayed-value>
+                <stored-value>Colombian peso</stored-value>
+            </pair>
         </value-pairs>
 
     </form-value-pairs>
