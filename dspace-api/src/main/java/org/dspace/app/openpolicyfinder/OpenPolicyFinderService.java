@@ -405,6 +405,7 @@ public class OpenPolicyFinderService {
         predicate = OpenPolicyFinderUtils.sanitiseQuery(predicate);
         value = OpenPolicyFinderUtils.sanitiseQuery(value);
         type = OpenPolicyFinderUtils.sanitiseQuery(type);
+        searchAfter = OpenPolicyFinderUtils.sanitiseQuery(searchAfter);
 
         // Build URL based on search query
         URIBuilder uriBuilder = new URIBuilder(endpoint);
