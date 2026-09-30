@@ -265,10 +265,10 @@ public class GenerateSitemaps {
                     c.uncacheEntity(doc.getIndexedObject());
 
                     if (makeHTMLMap) {
-                        html.addURL(url, null);
+                        html.addURL(url, lastMod);
                     }
                     if (makeSitemapOrg) {
-                        sitemapsOrg.addURL(url, null);
+                        sitemapsOrg.addURL(url, lastMod);
                     }
                 }
                 offset += PAGE_SIZE;
