@@ -271,9 +271,18 @@ public interface ChoiceAuthorityService {
     String[] getLinkedEntityTypes(String fieldKey);
 
     /**
-     * Get the primary entity type starting from the metadata field.
+     * Get the primary linked entity type for the authority bound to the given metadata field.
      *
-     * @return       the primary entity type as a String
+     * <p>The primary entity type is read from the {@code cris.ItemAuthority.<authorityName>.primaryEntityType}
+     * configuration property. When that property is blank it falls back to the single configured
+     * {@code entityType} (the sole value returned by the authority's linked entity types); when multiple
+     * entity types are configured and no explicit primary is set, {@code null} is returned.</p>
+     *
+     * <p>It is used when an empty-authority value must create a new item, to decide which entity type
+     * to generate.</p>
+     *
+     * @param fieldKey the metadata field key (e.g. {@code dc_relation_project}) bound to the authority
+     * @return         the primary entity type as a String, or {@code null} when it cannot be resolved
      */
     String getPrimaryLinkedEntityType(String fieldKey);
 

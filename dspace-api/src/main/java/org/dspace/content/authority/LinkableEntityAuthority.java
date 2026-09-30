@@ -25,9 +25,18 @@ public interface LinkableEntityAuthority extends ChoiceAuthority {
     public String[] getLinkedEntityTypes();
 
     /**
-     * Get the primary linked entity type managed by the authority
+     * Get the primary linked entity type managed by the authority.
      *
-     * @return the primary linked entity types as a String
+     * <p>The primary linked entity type is read from the
+     * {@code cris.ItemAuthority.<authorityName>.primaryEntityType} configuration property. When that
+     * property is blank it falls back to the single configured {@code entityType} (from
+     * {@link #getLinkedEntityTypes()}); when multiple entity types are configured and no explicit
+     * primary is set, {@code null} is returned.</p>
+     *
+     * <p>It is used when an empty-authority value must create a new item, to decide which entity type
+     * to generate.</p>
+     *
+     * @return the primary linked entity type as a String, or {@code null} when it cannot be resolved
      */
     public String getPrimaryLinkedEntityType();
 
