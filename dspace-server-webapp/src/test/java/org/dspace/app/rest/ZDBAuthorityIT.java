@@ -11,13 +11,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.matcher.ItemAuthorityMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.ItemAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -72,7 +70,9 @@ public class ZDBAuthorityIT extends AbstractControllerIntegrationTest {
     }
 
     @Before
-    public void setup() throws IOException, SubmissionConfigReaderException {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         choiceAuthorityService.getChoiceAuthoritiesNames();
         zdbService = Mockito.mock(ZDBService.class);
 

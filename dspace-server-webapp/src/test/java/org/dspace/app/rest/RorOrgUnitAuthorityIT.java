@@ -77,7 +77,9 @@ public class RorOrgUnitAuthorityIT extends AbstractControllerIntegrationTest {
     }
 
     @Before
-    public void setup() throws Exception {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
 
         RorServicesFactoryImpl rorServiceFactory =
             new RorServicesFactoryImpl(this.metadataSourceService);

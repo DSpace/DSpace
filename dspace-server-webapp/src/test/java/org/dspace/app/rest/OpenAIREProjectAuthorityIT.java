@@ -67,7 +67,9 @@ public class OpenAIREProjectAuthorityIT extends AbstractControllerIntegrationTes
     }
 
     @Before
-    public void setup() throws Exception {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         DSpaceHttpClientFactory mockFactory = Mockito.mock(DSpaceHttpClientFactory.class);
         CloseableHttpClient mockClient = Mockito.mock(CloseableHttpClient.class);
         StatusLine mockStatusLine = Mockito.mock(StatusLine.class);

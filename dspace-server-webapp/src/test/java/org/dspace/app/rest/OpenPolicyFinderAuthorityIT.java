@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Map;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -60,7 +59,9 @@ public class OpenPolicyFinderAuthorityIT extends AbstractControllerIntegrationTe
     private Collection collection;
 
     @Before
-    public void setup() throws SubmissionConfigReaderException {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).build();
 
