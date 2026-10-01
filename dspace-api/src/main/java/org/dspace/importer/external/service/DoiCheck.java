@@ -91,10 +91,12 @@ public class DoiCheck {
     }
 
     private static String urlDecode(String value) {
-        if (!value.contains("%")) {
-            return value;
+        // decode repeatedly so double-encoding is handled, e.g. %252F → %2F → /
+        String decoded = value;
+        while (decoded.contains("%")) {
+            decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
         }
-        return URLDecoder.decode(value, StandardCharsets.UTF_8);
+        return decoded;
     }
 
 }
