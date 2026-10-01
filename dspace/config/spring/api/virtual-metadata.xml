@@ -26,6 +26,10 @@
                 <entry key="isOrgUnitOfDataset" value-ref="isOrgUnitOfPublicationMap"/>
                 <entry key="isDatasetOfPublication" value-ref="isDatasetOfPublicationMap"/>
                 <entry key="isPublicationOfDataset" value-ref="isPublicationOfDatasetMap"/>
+                <entry key="isOrgUnitOfFunding" value-ref="isOrgUnitOfPublicationMap"/>
+                <entry key="isInvestigatorOfFunding" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isFundingOfPublication" value-ref="isFundingOfPublicationMap"/>
+                <entry key="isPublicationOfFunding" value-ref="isPublicationOfFundingMap"/>
             </map>
         </property>
     </bean>
@@ -37,6 +41,7 @@
                 <entry key="Person" value="f.entityType=Person,equals"/>
                 <entry key="Journal" value="f.entityType=Journal,equals"/>
                 <entry key="Dataset" value="f.entityType=Dataset,equals"/>
+                <entry key="Funding" value="f.entityType=Funding,equals"/>
             </map>
         </property>
     </bean>
@@ -304,6 +309,17 @@
         <entry key="dc.relation.isbasedon" value-ref="relatedEntityIdentifier_uri"/>
     </util:map>
     <util:map id="isPublicationOfDatasetMap">
+        <entry key="dc.relation.isreferencedby" value-ref="relatedEntityIdentifier_uri"/>
+    </util:map>
+
+    <!-- Publication<->Funding projection, following the Dataset<->Publication Collected-bean pattern.
+         isFundingOfPublication is the virtual metadata rendered on a PUBLICATION for each related FUNDING;
+         isPublicationOfFunding is the virtual metadata rendered on a FUNDING for each related PUBLICATION.
+         Both project the related item's dc.identifier.uri (via the shared relatedEntityIdentifier_uri bean). -->
+    <util:map id="isFundingOfPublicationMap">
+        <entry key="dc.relation.funding" value-ref="relatedEntityIdentifier_uri"/>
+    </util:map>
+    <util:map id="isPublicationOfFundingMap">
         <entry key="dc.relation.isreferencedby" value-ref="relatedEntityIdentifier_uri"/>
     </util:map>
     <!-- This Collected bean will create a list of dc.identifier.uri virtual metadata fields that hold the value of

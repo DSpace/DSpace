@@ -16,6 +16,7 @@
                 </entry>
                 <entry key="ORCID" value-ref="orcidImportFiller" />
                 <entry key="ISSN" value-ref="opfImportFiller" />
+                <entry key="ROR-ID" value-ref="rorImportFiller" />
             </map>
         </property>
     </bean>
@@ -110,6 +111,11 @@
     <bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="opfImportFiller" >
        <constructor-arg name="externalDataProvider" ref="org.dspace.external.provider.impl.OpenPolicyFinderJournalISSNDataProvider"/>
        <constructor-arg name="authorityIdentifier" value="ISSN"/>
+    </bean>
+
+    <bean class="org.dspace.authority.filler.ExternalDataProviderImportFiller" id="rorImportFiller" >
+       <constructor-arg name="externalDataProvider" ref="rorDataProvider"/>
+       <constructor-arg name="authorityIdentifier" value="ROR-ID"/>
     </bean>
 
     <bean class="org.dspace.authority.service.ItemSearcherMapper" name="org.dspace.authority.service.ItemSearcherMapper">
