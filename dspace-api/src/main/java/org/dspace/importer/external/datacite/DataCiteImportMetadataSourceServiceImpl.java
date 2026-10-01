@@ -207,16 +207,7 @@ public class DataCiteImportMetadataSourceServiceImpl
     }
 
     public String getID(String query) {
-        if (DoiCheck.isDoi(query)) {
-            return query;
-        }
-        // Workaround for encoded slashes.
-        if (query.contains("%252F")) {
-            query = query.replace("%252F", "/");
-        }
-        if (DoiCheck.isDoi(query)) {
-            return query;
-        }
-        return StringUtils.EMPTY;
+        String normalized = DoiCheck.purgeDoiValue(query);
+        return DoiCheck.isDoi(normalized) ? normalized : StringUtils.EMPTY;
     }
 }
