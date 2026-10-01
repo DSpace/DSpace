@@ -233,12 +233,54 @@
         <rightCardinality>
             <min>0</min>
         </rightCardinality>
+        <copyToLeft>true</copyToLeft>
+        <copyToRight>true</copyToRight>
     </type>
     <type>
         <leftType>Funding</leftType>
         <rightType>OrgUnit</rightType>
         <leftwardType>isOrgUnitOfFunding</leftwardType>
         <rightwardType>isFundingOfOrgUnit</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+        <copyToLeft>true</copyToLeft>
+        <copyToRight>true</copyToRight>
+    </type>
+    <type>
+        <leftType>Funding</leftType>
+        <rightType>Publication</rightType>
+        <leftwardType>isPublicationOfFunding</leftwardType>
+        <rightwardType>isFundingOfPublication</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+        <copyToLeft>true</copyToLeft>
+        <copyToRight>true</copyToRight>
+    </type>
+    <type>
+        <leftType>Funding</leftType>
+        <rightType>Person</rightType>
+        <leftwardType>isInvestigatorOfFunding</leftwardType>
+        <rightwardType>isFundingOfInvestigator</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+    </type>
+    <type>
+        <leftType>Funding</leftType>
+        <rightType>Funding</rightType>
+        <leftwardType>isFundingOfFunding</leftwardType>
+        <rightwardType>isFundingProgrammeOf</rightwardType>
         <leftCardinality>
             <min>0</min>
         </leftCardinality>

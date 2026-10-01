@@ -166,6 +166,10 @@
                 <entry key="project-relationships" value-ref="projectRelationships"/>
 
                 <entry key="funding" value-ref="funding"/>
+                <!-- Same as the "funding" configuration, but does NOT filter out older versions of items -->
+                <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
+                <entry key="funding-relationships" value-ref="fundingRelationships"/>
+
                 <!-- search for an entity that can be a Person or an OrgUnit -->
                 <entry key="personOrOrgunit" value-ref="personOrOrgunit"/>
                 <!-- Openaire4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
@@ -1566,6 +1570,7 @@
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
                 <ref bean="searchFilterIsDatasetOfPublicationRelation"/>
+                <ref bean="searchFilterIsFundingOfPublicationRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1637,6 +1642,7 @@
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
                 <ref bean="searchFilterIsDatasetOfPublicationRelation"/>
+                <ref bean="searchFilterIsFundingOfPublicationRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1839,6 +1845,7 @@
                 <ref bean="searchFilterIsProjectOfPersonRelation"/>
                 <ref bean="searchFilterIsPublicationOfAuthorRelation"/>
                 <ref bean="searchFilterIsDatasetOfAuthorRelation"/>
+                <ref bean="searchFilterIsFundingOfInvestigatorRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1902,6 +1909,7 @@
                 <ref bean="searchFilterIsProjectOfPersonRelation"/>
                 <ref bean="searchFilterIsPublicationOfAuthorRelation"/>
                 <ref bean="searchFilterIsDatasetOfAuthorRelation"/>
+                <ref bean="searchFilterIsFundingOfInvestigatorRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1961,6 +1969,7 @@
                 <ref bean="searchFilterIsPersonOfProjectRelation"/>
                 <ref bean="searchFilterIsPublicationOfProjectRelation"/>
                 <ref bean="searchFilterIsDatasetOfProjectRelation"/>
+                <ref bean="searchFilterIsFundingOfProjectRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2016,6 +2025,7 @@
                 <ref bean="searchFilterIsPersonOfProjectRelation"/>
                 <ref bean="searchFilterIsPublicationOfProjectRelation"/>
                 <ref bean="searchFilterIsDatasetOfProjectRelation"/>
+                <ref bean="searchFilterIsFundingOfProjectRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2068,6 +2078,12 @@
             <list>
                 <ref bean="searchFilterTitle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterIsProjectOfFundingRelation"/>
+                <ref bean="searchFilterIsOrgUnitOfFundingRelation"/>
+                <ref bean="searchFilterIsPublicationOfFundingRelation"/>
+                <ref bean="searchFilterIsInvestigatorOfFundingRelation"/>
+                <ref bean="searchFilterIsFundingOfFundingRelation"/>
+                <ref bean="searchFilterIsFundingProgrammeOfRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2118,6 +2134,12 @@
             <list>
                 <ref bean="searchFilterTitle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterIsProjectOfFundingRelation"/>
+                <ref bean="searchFilterIsOrgUnitOfFundingRelation"/>
+                <ref bean="searchFilterIsPublicationOfFundingRelation"/>
+                <ref bean="searchFilterIsInvestigatorOfFundingRelation"/>
+                <ref bean="searchFilterIsFundingOfFundingRelation"/>
+                <ref bean="searchFilterIsFundingProgrammeOfRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2178,6 +2200,7 @@
                 <ref bean="searchFilterIsProjectOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsPublicationOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsDatasetOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsFundingOfOrgUnitRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2243,6 +2266,7 @@
                 <ref bean="searchFilterIsProjectOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsPublicationOfOrgUnitRelation"/>
                 <ref bean="searchFilterIsDatasetOfOrgUnitRelation"/>
+                <ref bean="searchFilterIsFundingOfOrgUnitRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -3951,6 +3975,118 @@
         <property name="metadataFields">
             <list>
                 <value>relation.isPublicationOfDataset.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <!-- Funding relationship search filters (DURACOM-481). One DiscoverySearchFilter per Funding
+         relationship label; indexFieldName matches the bean's own label (no copy-paste from Dataset). -->
+    <bean id="searchFilterIsProjectOfFundingRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isProjectOfFunding"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isProjectOfFunding.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingOfProjectRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingOfProject"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingOfProject.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsOrgUnitOfFundingRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isOrgUnitOfFunding"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isOrgUnitOfFunding.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingOfOrgUnitRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingOfOrgUnit"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingOfOrgUnit.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfFundingRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfFunding"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfFunding.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingOfPublication"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingOfPublication.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsInvestigatorOfFundingRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isInvestigatorOfFunding"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isInvestigatorOfFunding.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingOfInvestigatorRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingOfInvestigator"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingOfInvestigator.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingOfFundingRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingOfFunding"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingOfFunding.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsFundingProgrammeOfRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isFundingProgrammeOf"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isFundingProgrammeOf.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
