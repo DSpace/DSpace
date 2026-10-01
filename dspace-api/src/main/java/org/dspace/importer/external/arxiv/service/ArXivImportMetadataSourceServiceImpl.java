@@ -12,8 +12,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -21,6 +23,7 @@ import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -28,6 +31,7 @@ import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
+import org.dspace.services.ConfigurationService;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -36,6 +40,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements a data source for querying ArXiv
@@ -46,8 +51,14 @@ import org.jdom2.xpath.XPathFactory;
 public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
     implements QuerySource {
 
+    private static final Pattern ARXIV_ID_PATTERN =
+            Pattern.compile("^(?i:arxiv:)?\\d{4}\\.\\d{4,5}(?:v\\d+)?$");
+
     private WebTarget webTarget;
     private String baseAddress;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     /**
      * Find the number of records matching the query string in ArXiv. Supports pagination.
@@ -60,7 +71,18 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
-        return retry(new SearchByQueryCallable(query, count, start));
+        String arxivId = getArxivId(query);
+        if (StringUtils.isNotBlank(arxivId)) {
+            List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
+            if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
+                return records;
+            }
+            return emptyIfNull(retry(new SearchByQueryCallable(query, count, start)));
+        }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
+        }
+        return emptyIfNull(retry(new SearchByQueryCallable(query, count, start)));
     }
 
     /**
@@ -75,7 +97,19 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
-        return retry(new SearchByQueryCallable(query));
+        String queryString = query.getParameterAsClass("query", String.class);
+        String arxivId = getArxivId(queryString);
+        if (StringUtils.isNotBlank(arxivId)) {
+            List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
+            if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
+                return records;
+            }
+            return emptyIfNull(retry(new SearchByQueryCallable(query)));
+        }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
+        }
+        return emptyIfNull(retry(new SearchByQueryCallable(query)));
     }
 
     /**
@@ -87,7 +121,21 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        return retry(new CountByQueryCallable(query));
+        String arxivId = getArxivId(query);
+        if (StringUtils.isNotBlank(arxivId)) {
+            List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
+            int count = records.size();
+            if (count > 0 || isExactIdOnly()) {
+                return count;
+            }
+            Integer fallback = retry(new CountByQueryCallable(query));
+            return fallback == null ? 0 : fallback;
+        }
+        if (isExactIdOnly()) {
+            return 0;
+        }
+        Integer count = retry(new CountByQueryCallable(query));
+        return count == null ? 0 : count;
     }
 
 
@@ -102,7 +150,22 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
-        return retry(new CountByQueryCallable(query));
+        String queryString = query.getParameterAsClass("query", String.class);
+        String arxivId = getArxivId(queryString);
+        if (StringUtils.isNotBlank(arxivId)) {
+            List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
+            int count = records.size();
+            if (count > 0 || isExactIdOnly()) {
+                return count;
+            }
+            Integer fallback = retry(new CountByQueryCallable(query));
+            return fallback == null ? 0 : fallback;
+        }
+        if (isExactIdOnly()) {
+            return 0;
+        }
+        Integer count = retry(new CountByQueryCallable(query));
+        return count == null ? 0 : count;
     }
 
     /**
@@ -431,5 +494,28 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     public void setBaseAddress(String baseAddress) {
         this.baseAddress = baseAddress;
+    }
+
+    /**
+     * Returns the normalized arXiv id when the value matches an arXiv identifier, otherwise empty.
+     * Strips an optional {@code arXiv:} prefix so {@link SearchByIdCallable} can use {@code id_list}.
+     */
+    public String getArxivId(String value) {
+        if (StringUtils.isBlank(value)) {
+            return StringUtils.EMPTY;
+        }
+        String trimmed = value.trim();
+        if (!ARXIV_ID_PATTERN.matcher(trimmed).matches()) {
+            return StringUtils.EMPTY;
+        }
+        return trimmed.replaceFirst("(?i)^arxiv:", "");
+    }
+
+    private boolean isExactIdOnly() {
+        return configurationService.getBooleanProperty("arxiv.exact-id-only", false);
+    }
+
+    private List<ImportRecord> emptyIfNull(List<ImportRecord> records) {
+        return records == null ? Collections.emptyList() : records;
     }
 }
