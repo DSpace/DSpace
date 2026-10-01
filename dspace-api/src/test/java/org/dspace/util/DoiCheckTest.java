@@ -7,6 +7,7 @@
  */
 package org.dspace.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -39,6 +40,18 @@ public class DoiCheckTest {
         }
     }
 
+    @Test
+    public void purgeDoiValueNormalizesTicketExamples() {
+        for (String[] example : ticketDoiExamples()) {
+            String input = example[0];
+            String expected = example[1];
+            String normalized = DoiCheck.purgeDoiValue(input);
+            assertEquals("Failed for input: " + input, expected, normalized);
+            assertTrue("Normalized value should be recognized as a DOI: " + normalized,
+                       DoiCheck.isDoi(normalized));
+        }
+    }
+
     private List<String> DOIsToTest() {
         return Arrays.asList(
             "10.1430/8105",
@@ -59,6 +72,25 @@ public class DoiCheckTest {
             "nphys1170/10.1038",
             "10.", "10",
             "10.1038/"
+        );
+    }
+
+    /**
+     * DOI forms agreed in the ticket: input → normalized DOI.
+     */
+    private List<String[]> ticketDoiExamples() {
+        return Arrays.asList(
+            new String[] { "10.1038/s41561-018-0221-6", "10.1038/s41561-018-0221-6" },
+            new String[] { "https://doi.org/10.1038/s41561-018-0221-6", "10.1038/s41561-018-0221-6" },
+            new String[] { "https://dx.doi.org/10.1038/s41561-018-0221-6", "10.1038/s41561-018-0221-6" },
+            new String[] { "HTTPS://DOI.ORG/10.5281/zenodo.5511912", "10.5281/zenodo.5511912" },
+            new String[] { "10.1038/s41561-018-0221-6?download=true", "10.1038/s41561-018-0221-6" },
+            new String[] { "https://doi.org/10.1038/s41561-018-0221-6?pdf=1", "10.1038/s41561-018-0221-6" },
+            new String[] { "10.1038/s41561-018-0221-6.", "10.1038/s41561-018-0221-6" },
+            new String[] { "https://link.springer.com/article/10.1016%2Fj.comnet.2021.108245",
+                "10.1016/j.comnet.2021.108245" },
+            new String[] { "https://api.elsevier.com/content/abstract/doi/10.1016/j.comnet.2021.108245",
+                "10.1016/j.comnet.2021.108245" }
         );
     }
 
