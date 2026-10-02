@@ -10,6 +10,7 @@ package org.dspace.importer.external.crossref;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -73,6 +74,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             records = retry(new SearchByQueryCallable(recordId, 1, 0));
             return CollectionUtils.isEmpty(records) ? null : records.get(0);
         }
+        if (isExactIdOnly()) {
+            return null;
+        }
         List<ImportRecord> records = retry(new SearchByIdCallable(recordId));
         return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
@@ -87,6 +91,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             }
             return retry(new CountByQueryCallable(query));
         }
+        if (isExactIdOnly()) {
+            return 0;
+        }
         return retry(new CountByQueryCallable(query));
     }
 
@@ -99,6 +106,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
                 return count;
             }
             return retry(new CountByQueryCallable(query));
+        }
+        if (isExactIdOnly()) {
+            return 0;
         }
         return retry(new CountByQueryCallable(query));
     }
@@ -113,6 +123,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             }
             return retry(new SearchByQueryCallable(query, count, start));
         }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
+        }
         return retry(new SearchByQueryCallable(query, count, start));
     }
 
@@ -124,6 +137,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
                 return records;
             }
+        }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
         }
         return retry(new SearchByQueryCallable(query));
     }
@@ -139,6 +155,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             records = retry(new SearchByQueryCallable(query));
             return CollectionUtils.isEmpty(records) ? null : records.get(0);
         }
+        if (isExactIdOnly()) {
+            return null;
+        }
         List<ImportRecord> records = retry(new SearchByIdCallable(query));
         return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
@@ -152,6 +171,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
                 return records;
             }
             return retry(new SearchByQueryCallable(query));
+        }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
         }
         return retry(new FindMatchingRecordCallable(query));
     }
