@@ -54,14 +54,17 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
     }
 
     /**
-     * Adds metadata to the dso (appending if index is 0 or left out, prepending if -)
+     * Adds metadata to the dso. Without an index in the path, all existing values of the field are replaced by
+     * the given list of values (RFC 6902 section 4.1). With an index, a single value is inserted at that position
+     * ("0" is first, "-" is last, "n" inserts before the current value at position n); a list with more than one
+     * value is rejected in that case.
      *
      * @param context           context patch is being performed in
      * @param dso               dso being patched
      * @param dsoService        service doing the patch in db
      * @param metadataField     md field being patched
      * @param metadataValueList list of md element values
-     * @param index             determines whether we're prepending (-) or appending (0) md value (if one value in list)
+     * @param index             position from the path: null (replace all values), "-" (append) or a number
      */
     private void add(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
                      List<MetadataValueRest> metadataValueList, String index) {

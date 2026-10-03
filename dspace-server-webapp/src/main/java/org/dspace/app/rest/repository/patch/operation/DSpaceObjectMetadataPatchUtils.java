@@ -49,8 +49,9 @@ public final class DSpaceObjectMetadataPatchUtils {
     }
 
     /**
-     * Extract metadataValue from Operation by parsing the json and mapping it to a MetadataValueRest
-     * @param operation     Operation whose value is begin parsed
+     * Extract metadataValue from Operation by parsing the json and mapping it to a MetadataValueRest.
+     * If the operation value is an array, only its first element is returned.
+     * @param operation     Operation whose value is being parsed
      * @return MetadataValueRest extracted from json in operation value
      */
     protected MetadataValueRest extractMetadataValueFromOperation(Operation operation) {
@@ -58,9 +59,11 @@ public final class DSpaceObjectMetadataPatchUtils {
     }
 
     /**
-     * Extract metadataValue from Operation by parsing the json and mapping it to a MetadataValueRest
-     * @param operation     Operation whose value is begin parsed
-     * @return MetadataValueRest extracted from json in operation value
+     * Extract all metadata values from Operation by parsing the json and mapping each to a MetadataValueRest.
+     * Accepts a single json object, an array of json objects, or a plain string value.
+     * @param operation     Operation whose value is being parsed
+     * @return list of MetadataValueRest extracted from json in operation value (never empty)
+     * @throws DSpaceBadRequestException if no value could be extracted, e.g. for an empty array
      */
     protected List<MetadataValueRest> extractMetadataValueListFromOperation(Operation operation) {
         List<MetadataValueRest> metadataValueList = new ArrayList<>();
