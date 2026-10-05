@@ -156,7 +156,7 @@ public interface AuthorityBackedRelationshipService {
      * @throws AuthorizeException if the current user is not authorized to modify the metadata owner
      * @throws IllegalArgumentException if the value is the final configured anchor or its relationship cannot be edited
      */
-    void removeRelationshipMetadata(Context context, MetadataValue value)
+    void removeAdditionalRelationshipMetadata(Context context, MetadataValue value)
         throws SQLException, AuthorizeException;
 
     /**

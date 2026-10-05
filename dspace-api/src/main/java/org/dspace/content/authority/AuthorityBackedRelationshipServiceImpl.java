@@ -203,13 +203,13 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
     }
 
     @Override
-    public void removeRelationshipMetadata(Context context, MetadataValue value)
+    public void removeAdditionalRelationshipMetadata(Context context, MetadataValue value)
         throws SQLException, AuthorizeException {
-        removeRelationshipMetadata(context, value, null);
+        removeAdditionalRelationshipMetadata(context, value, null);
     }
 
-    private void removeRelationshipMetadata(Context context, MetadataValue value,
-                                          DSpaceObject metadataOwnerWithActiveIterator)
+    private void removeAdditionalRelationshipMetadata(Context context, MetadataValue value,
+                                                      DSpaceObject metadataOwnerWithActiveIterator)
         throws SQLException, AuthorizeException {
         authorizeService.authorizeAction(context, value.getDSpaceObject(), Constants.WRITE);
         if (value.isRelationshipBacked() && isFinalAnchor(context, value)) {
@@ -231,7 +231,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         if (value.isRelationshipBacked() && isFinalAnchor(context, value)) {
             removeRelationshipAndMetadata(context, value.getRelationship(), metadataOwnerWithActiveIterator);
         } else {
-            removeRelationshipMetadata(context, value, metadataOwnerWithActiveIterator);
+            removeAdditionalRelationshipMetadata(context, value, metadataOwnerWithActiveIterator);
         }
     }
 

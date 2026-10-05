@@ -155,7 +155,7 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
         MetadataValue orcid = addOrcid();
         service.attachMetadataToRelationship(context, orcid, relationship);
-        service.removeRelationshipMetadata(context, orcid);
+        service.removeAdditionalRelationshipMetadata(context, orcid);
         context.commit();
         assertThat(relationshipService.find(context, relationship.getID()), notNullValue());
         assertThat(metadataValueService.findByRelationship(context, relationship), hasSize(1));
