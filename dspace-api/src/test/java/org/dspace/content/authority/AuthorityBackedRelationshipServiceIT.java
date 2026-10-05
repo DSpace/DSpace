@@ -137,7 +137,7 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     }
 
     @Test
-    public void testMultipleProjectionsShareOneRelationship() throws Exception {
+    public void testMultipleMetadataValuesShareOneRelationship() throws Exception {
         context.turnOffAuthorisationSystem();
         Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
         MetadataValue orcid = addOrcid();
@@ -150,19 +150,19 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     }
 
     @Test
-    public void testRemoveDependentProjectionRetainsRelationshipAndAuthor() throws Exception {
+    public void testRemoveDependentRelationshipMetadataRetainsRelationshipAndAuthor() throws Exception {
         context.turnOffAuthorisationSystem();
         Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
         MetadataValue orcid = addOrcid();
         service.attachMetadataToRelationship(context, orcid, relationship);
-        service.removeMetadataProjection(context, orcid);
+        service.removeRelationshipMetadata(context, orcid);
         context.commit();
         assertThat(relationshipService.find(context, relationship.getID()), notNullValue());
         assertThat(metadataValueService.findByRelationship(context, relationship), hasSize(1));
     }
 
     @Test
-    public void testRemovingFinalAnchorRemovesAllProjections() throws Exception {
+    public void testRemovingFinalPrimaryRelationshipMetadataRemovesAllRelationshipMetadata() throws Exception {
         context.turnOffAuthorisationSystem();
         Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
         service.attachMetadataToRelationship(context, addOrcid(), relationship);

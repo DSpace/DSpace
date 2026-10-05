@@ -65,9 +65,9 @@ public interface AuthorityBackedRelationshipService {
      * particular, when the metadata authority is an internal Item UUID, it must identify the Item at the opposite
      * endpoint of the relationship. The metadata value must also be owned by one of the relationship endpoints.
      *
-     * Attaching a metadata value adds another stored metadata projection of the same logical relationship; it does not
-     * create another relationship occurrence. A value which is already linked to a different relationship cannot be
-     * reassigned implicitly through this method.
+     * Attaching a metadata value associates another stored metadata value with the same logical relationship; it
+     * does not create another relationship occurrence. A value which is already linked to a different relationship
+     * cannot be reassigned implicitly through this method.
      *
      * @param context current DSpace context
      * @param value stored metadata value to associate with the relationship
@@ -85,8 +85,9 @@ public interface AuthorityBackedRelationshipService {
      * Replace the Item opposite {@code owner} while preserving the identity of an existing relationship.
      *
      * The supplied {@code owner} identifies the endpoint which remains unchanged. The opposite endpoint is replaced by
-     * {@code newTarget}. Relationship configuration and existing metadata projections are validated before the
-     * relationship is changed so unsupported two-sided or dependent projection cases are not left inconsistent.
+     * {@code newTarget}. Relationship configuration and existing relationship metadata values are validated before the
+     * relationship is changed so unsupported two-sided or dependent relationship metadata cases are not left
+     * inconsistent.
      *
      * Metadata display text is preserved. Where authority metadata contains an internal Item UUID used as a cache of
      * the relationship target, that UUID is updated to the new target as part of the authority-aware operation.
@@ -97,9 +98,9 @@ public interface AuthorityBackedRelationshipService {
      * @param newTarget new Item which should replace the endpoint opposite {@code owner}
      * @throws SQLException if a database error occurs while validating or updating the relationship or metadata
      * @throws AuthorizeException if the current user is not authorized to modify the retained endpoint, read the new
-     *         target, or modify affected metadata projections
+     *         target, or modify affected relationship metadata values
      * @throws IllegalArgumentException if {@code owner} is not a relationship endpoint, the new endpoint is invalid for
-     *         the configured relationship, or existing projections cannot be safely retained
+     *         the configured relationship, or existing relationship metadata values cannot be safely retained
      */
     void replaceRelatedObject(Context context, Item owner, Relationship relationship, Item newTarget)
         throws SQLException, AuthorizeException;
@@ -115,23 +116,24 @@ public interface AuthorityBackedRelationshipService {
      * should no longer exist.
      *
      * @param context current DSpace context
-     * @param relationship relationship to detach from its metadata projections and remove
+     * @param relationship relationship to detach from its relationship metadata values and remove
      * @throws SQLException if a database error occurs while updating metadata or deleting the relationship
-     * @throws AuthorizeException if the current user is not authorized to modify the affected metadata projections
+     * @throws AuthorizeException if the current user is not authorized to modify the affected relationship metadata
+     * values
      * @throws IllegalArgumentException if the relationship is not a supported configuration-backed relationship
      */
     void detachRelationshipKeepMetadata(Context context, Relationship relationship)
         throws SQLException, AuthorizeException;
 
     /**
-     * Remove a complete logical relationship together with all stored metadata projections which refer to it.
+     * Remove a complete logical relationship together with all stored relationship metadata values which refer to it.
      *
      * This operation is intended for deleting the logical association itself. All relationship-backed metadata values
      * belonging to the relationship are removed, followed by the durable relationship. This differs from
      * {@link #detachRelationshipKeepMetadata(Context, Relationship)}, which keeps the descriptive metadata.
      *
      * @param context current DSpace context
-     * @param relationship relationship to remove together with its stored metadata projections
+     * @param relationship relationship to remove together with its stored relationship metadata values
      * @throws SQLException if a database error occurs while deleting metadata or the relationship
      * @throws AuthorizeException if the current user is not authorized to modify the affected metadata owners or
      *         relationship endpoints
@@ -141,28 +143,29 @@ public interface AuthorityBackedRelationshipService {
         throws SQLException, AuthorizeException;
 
     /**
-     * Remove a single non-anchor metadata projection without removing the durable relationship.
+     * Remove a single non-primary relationship metadata value without removing the durable relationship.
      *
      * A relationship may be represented by more than one stored metadata value. This method removes only the supplied
-     * projection when the remaining metadata still contains the configured anchor required to represent the logical
-     * relationship. It must not be used to remove the final anchor of a relationship; use
-     * {@link #removeMetadataValue(Context, MetadataValue)} for normal metadata-editing semantics.
+     * additional value while the primary relationship metadata value remains. It must not be used to remove the final
+     * primary relationship metadata value; use {@link #removeMetadataValue(Context, MetadataValue)} for normal
+     * metadata-editing semantics.
      *
      * @param context current DSpace context
-     * @param value relationship-backed metadata projection to remove
+     * @param value relationship-backed metadata value to remove
      * @throws SQLException if a database error occurs while inspecting or deleting the metadata value
      * @throws AuthorizeException if the current user is not authorized to modify the metadata owner
      * @throws IllegalArgumentException if the value is the final configured anchor or its relationship cannot be edited
      */
-    void removeMetadataProjection(Context context, MetadataValue value)
+    void removeRelationshipMetadata(Context context, MetadataValue value)
         throws SQLException, AuthorizeException;
 
     /**
      * Remove a relationship-backed metadata value using normal metadata-editing lifecycle semantics.
      *
-     * If the supplied value is a dependent projection, or if another value still provides the configured anchor on the
-     * same relationship side, only that metadata value is removed. If it is the final configured anchor, the complete
-     * logical relationship and its stored projections are removed.
+     * If the supplied value is an additional linked metadata value, or if another value still provides the
+     * primary relationship metadata value on the same relationship side, only that metadata value is removed.
+     * If it is the final primary relationship metadata value, the complete logical relationship and its stored
+     * relationship metadata values are removed.
      *
      * This is the preferred removal entry point for callers editing metadata when they should not need to determine
      * whether deleting a value also requires deleting the relationship.

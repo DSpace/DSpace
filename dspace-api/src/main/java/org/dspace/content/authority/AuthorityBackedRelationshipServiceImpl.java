@@ -127,7 +127,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         List<MetadataValue> values = metadataValueService.findByRelationship(context, relationship);
         authorizeService.authorizeAction(context, owner, Constants.WRITE);
         authorizeService.authorizeAction(context, newTarget, Constants.READ);
-        authorizeProjections(context, values);
+        authorizeRelationshipMetadataValues(context, values);
         boolean ownerOnLeft = owner.getID().equals(relationship.getLeftItem().getID());
         RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(
             relationship.getRelationshipConfigKey());
@@ -138,11 +138,12 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         for (MetadataValue value : values) {
             if (!value.getDSpaceObject().getID().equals(owner.getID())) {
                 throw new IllegalArgumentException(
-                        "Relinking a two-sided projection requires an explicit transfer policy");
+                        "Relinking a two-sided relationship metadata requires an explicit transfer policy");
             }
             String anchor = ownerOnLeft ? configuration.getLeftMetadataField() : configuration.getRightMetadataField();
             if (!RelationshipConfigurationServiceImpl.fieldName(value).equals(anchor)) {
-                throw new IllegalArgumentException("Relinking dependent projections requires a refresh policy");
+                throw new IllegalArgumentException(
+                    "Relinking dependent relationship metadata requires a refresh policy");
             }
         }
         if (ownerOnLeft) {
@@ -168,7 +169,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         throws SQLException, AuthorizeException {
         requireConfiguredRelationship(relationship);
         List<MetadataValue> values = metadataValueService.findByRelationship(context, relationship);
-        authorizeProjections(context, values);
+        authorizeRelationshipMetadataValues(context, values);
         for (MetadataValue value : values) {
             value.setRelationship(null);
             if (isUuid(value.getAuthority())) {
@@ -193,29 +194,29 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         throws SQLException, AuthorizeException {
         requireConfiguredRelationship(relationship);
         List<MetadataValue> values = metadataValueService.findByRelationship(context, relationship);
-        authorizeProjections(context, values);
-        // Relationship deletion checks write access even if there are no projections.
+        authorizeRelationshipMetadataValues(context, values);
+        // Relationship deletion checks write access even if there are no associated metadata values.
         assertWriteOnRelationship(context, relationship);
         for (MetadataValue value : values) {
-            deleteProjection(context, value, metadataOwnerWithActiveIterator);
+            deleteRelationshipMetadata(context, value, metadataOwnerWithActiveIterator);
         }
         relationshipService.delete(context, relationship);
     }
 
     @Override
-    public void removeMetadataProjection(Context context, MetadataValue value)
+    public void removeRelationshipMetadata(Context context, MetadataValue value)
         throws SQLException, AuthorizeException {
-        removeMetadataProjection(context, value, null);
+        removeRelationshipMetadata(context, value, null);
     }
 
-    private void removeMetadataProjection(Context context, MetadataValue value,
+    private void removeRelationshipMetadata(Context context, MetadataValue value,
                                           DSpaceObject metadataOwnerWithActiveIterator)
         throws SQLException, AuthorizeException {
         authorizeService.authorizeAction(context, value.getDSpaceObject(), Constants.WRITE);
         if (value.isRelationshipBacked() && isFinalAnchor(context, value)) {
             throw new IllegalArgumentException("Use removeMetadataValue or detach for the final relationship anchor");
         }
-        deleteProjection(context, value, metadataOwnerWithActiveIterator);
+        deleteRelationshipMetadata(context, value, metadataOwnerWithActiveIterator);
     }
 
     @Override
@@ -231,16 +232,16 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         if (value.isRelationshipBacked() && isFinalAnchor(context, value)) {
             removeRelationshipAndMetadata(context, value.getRelationship(), metadataOwnerWithActiveIterator);
         } else {
-            removeMetadataProjection(context, value, metadataOwnerWithActiveIterator);
+            removeRelationshipMetadata(context, value, metadataOwnerWithActiveIterator);
         }
     }
 
     private boolean isFinalAnchor(Context context, MetadataValue value) throws SQLException {
         Relationship relationship = value.getRelationship();
         if (!relationship.isConfigurationBacked()) {
-            // Legacy typed projections require explicit migration/policy first.
+            // Legacy typed relationship metadata require explicit migration/policy first.
             throw new IllegalArgumentException(
-                    "Migrate this legacy relationship before editing its stored projections");
+                    "Migrate this legacy relationship before editing its stored relationship metadata values");
         }
         RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(
             relationship.getRelationshipConfigKey());
@@ -258,7 +259,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
                 && RelationshipConfigurationServiceImpl.fieldName(other).equals(field));
     }
 
-    private void deleteProjection(Context context, MetadataValue value,
+    private void deleteRelationshipMetadata(Context context, MetadataValue value,
                                   DSpaceObject metadataOwnerWithActiveIterator)
         throws SQLException, AuthorizeException {
         DSpaceObject owner = value.getDSpaceObject();
@@ -271,7 +272,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         }
     }
 
-    private void authorizeProjections(Context context, List<MetadataValue> values)
+    private void authorizeRelationshipMetadataValues(Context context, List<MetadataValue> values)
         throws SQLException, AuthorizeException {
         // Validate all permissions before the first mutation, including the other side.
         for (MetadataValue value : values) {
