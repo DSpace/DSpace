@@ -46,7 +46,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * The leftItem property for the Relationship object.
      * This leftItem is a DSpaceObject and is stored as an ID
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "left_id", nullable = false)
     private Item leftItem;
 
@@ -82,7 +82,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * The rightItem property for the Relationship object.
      * This rightItem is a DSpaceObject and is stored as an ID
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "right_id", nullable = false)
     private Item rightItem;
 
