@@ -708,8 +708,9 @@ public class RelationshipServiceImpl implements RelationshipService {
             relationshipDAO.findByItem(context, item, limit, offset, excludeTilted, excludeNonLatest);
 
         list.sort((o1, o2) -> {
-            // Configured rows sort by stable semantics and ID. Legacy rows keep
-            // their directional type/place ordering until explicitly migrated.
+            // Sort by relationship configuration key if defined, otherwise by leftward type.
+            // Configuration-backed relationships with the same key are then sorted by ID;
+            // legacy relationships retain their place ordering.
             String leftwardType1 = o1.isConfigurationBacked() ? o1.getRelationshipConfigKey()
                 : o1.getRelationshipType() != null ? o1.getRelationshipType().getLeftwardType() : null;
             String leftwardType2 = o2.isConfigurationBacked() ? o2.getRelationshipConfigKey()
@@ -776,7 +777,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
             // Configured relationships retain stored text; no legacy virtual copy is needed.
-            deleteTypeLessRelationship(context, relationship);
+            deleteConfigBackedOrTypeLessRelationship(context, relationship);
             return;
         }
         delete(context, relationship, relationship.getRelationshipType().isCopyToLeft(),
@@ -788,9 +789,9 @@ public class RelationshipServiceImpl implements RelationshipService {
      * only a database safeguard; clearing the managed objects avoids stale session
      * state and clearing internal authorities prevents automatic re-creation.
      */
-    private void deleteTypeLessRelationship(Context context, Relationship relationship)
+    private void deleteConfigBackedOrTypeLessRelationship(Context context, Relationship relationship)
         throws SQLException, AuthorizeException {
-        deleteTypeLessRelationship(context, relationship, true);
+        deleteConfigBackedOrTypeLessRelationship(context, relationship, true);
     }
 
     /**
@@ -798,7 +799,8 @@ public class RelationshipServiceImpl implements RelationshipService {
      *
      * @param clearInternalAuthority whether UUID authority references to either endpoint should be cleared
      */
-    private void deleteTypeLessRelationship(Context context, Relationship relationship, boolean clearInternalAuthority)
+    private void deleteConfigBackedOrTypeLessRelationship(Context context, Relationship relationship,
+                                                          boolean clearInternalAuthority)
         throws SQLException, AuthorizeException {
         assertWriteOnEitherItem(context, relationship.getLeftItem(), relationship.getRightItem());
         for (MetadataValue value : metadataValueDAO.findByRelationship(context, relationship)) {
@@ -824,7 +826,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
             // The POC defaults to retaining bibliographic text on endpoint/link deletion.
             // Full projection deletion is an explicit compound-service operation.
-            deleteTypeLessRelationship(context, relationship);
+            deleteConfigBackedOrTypeLessRelationship(context, relationship);
             return;
         }
         log.info(org.dspace.core.LogHelper.getHeader(context, "delete_relationship",
@@ -852,7 +854,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             // Item deletion already applies the configured authority-cleanup policy before relationships are removed.
             // Preserve authority/confidence here so force deletion cannot override that policy
             //      (including disabled mode).
-            deleteTypeLessRelationship(context, relationship, false);
+            deleteConfigBackedOrTypeLessRelationship(context, relationship, false);
             return;
         }
         if (copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
@@ -1295,6 +1297,9 @@ public class RelationshipServiceImpl implements RelationshipService {
             //           of the item's relationships and copy their data depending on the
             //           configuration.
             for (Relationship relationship : findByItem(context, item)) {
+                // Configuration-backed relationship metadata is already stored as MetadataValues,
+                // and relationships without a RelationshipType have no legacy virtual metadata,
+                // so no virtual metadata needs to be copied before deleting the relationship.
                 if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
                     forceDelete(context, relationship, false, false);
                     continue;

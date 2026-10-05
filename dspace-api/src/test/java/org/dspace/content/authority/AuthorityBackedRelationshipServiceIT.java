@@ -187,7 +187,7 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         assertThat(value.getRelationship(), nullValue());
         assertThat(value.getAuthority(), nullValue());
         assertThat(value.getValue(), equalTo("Smith, John"));
-        assertThat(value.getConfidence(), equalTo(Choices.CF_REJECTED));
+        assertThat(value.getConfidence(), equalTo(Choices.CF_RELATIONSHIP_REJECTED));
         assertThat(relationshipService.find(context, relationship.getID()), nullValue());
     }
 

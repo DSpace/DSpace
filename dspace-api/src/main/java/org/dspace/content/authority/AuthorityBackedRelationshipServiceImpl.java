@@ -61,15 +61,14 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
             return null;
         }
         requireOwner(value, owner);
-        if (!owner.isArchived() || !target.isArchived() || value.getConfidence() == Choices.CF_REJECTED) {
+        if (!owner.isArchived() || !target.isArchived() || value.getConfidence() == Choices.CF_RELATIONSHIP_REJECTED) {
             return null;
         }
-        authorizeService.authorizeAction(context, owner, Constants.WRITE);
-        authorizeService.authorizeAction(context, target, Constants.READ);
+        authorizeRelationshipOperation(context, owner, target);
 
         Relationship existing = value.getRelationship();
         if (existing != null) {
-            // Never silently accept a stale or different authority as idempotency.
+            // Return an existing relationship only if it points to the same target.
             if (!opposite(existing, owner).getID().equals(target.getID())) {
                 throw new IllegalArgumentException(
                         "Use replaceRelatedObject to change an existing relationship target");
@@ -84,7 +83,6 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         boolean ownerOnLeft = configuration.isOwnerOnLeft(RelationshipConfigurationServiceImpl.fieldName(value));
         Item left = ownerOnLeft ? owner : target;
         Item right = ownerOnLeft ? target : owner;
-        relationshipConfigurationService.validate(context, configuration, left, right);
         // Validate before persistence, so invalid input does not leave a half-created link.
         validateAuthorityTarget(value, target);
         Relationship relationship = relationshipService.createConfigBackedRelationship(
@@ -105,8 +103,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
             throw new IllegalArgumentException("A stored metadata value and owner are required");
         }
         Item target = opposite(relationship, value.getDSpaceObject());
-        authorizeService.authorizeAction(context, value.getDSpaceObject(), Constants.WRITE);
-        authorizeService.authorizeAction(context, target, Constants.READ);
+        authorizeRelationshipOperation(context, value.getDSpaceObject(), target);
         if (value.getRelationship() != null && !sameRelationship(value.getRelationship(), relationship)) {
             throw new IllegalArgumentException("Metadata is already associated with another relationship");
         }
@@ -125,16 +122,18 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         }
         Item oldTarget = opposite(relationship, owner);
         List<MetadataValue> values = metadataValueService.findByRelationship(context, relationship);
-        authorizeService.authorizeAction(context, owner, Constants.WRITE);
-        authorizeService.authorizeAction(context, newTarget, Constants.READ);
+        authorizeRelationshipOperation(context, owner, newTarget);
         authorizeRelationshipMetadataValues(context, values);
         boolean ownerOnLeft = owner.getID().equals(relationship.getLeftItem().getID());
         RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(
             relationship.getRelationshipConfigKey());
         relationshipConfigurationService.validate(context, configuration,
             ownerOnLeft ? owner : newTarget, ownerOnLeft ? newTarget : owner);
-        // Moving opposite-side metadata to a different owning item needs a policy of
-        // its own. Reject BEFORE changing anything rather than orphaning those rows.
+
+        // Moving opposite-side metadata to a different owning item needs a policy of its own, as this would require
+        // transferring that metadata to the new target. Additional relationship metadata on the owner may need to be
+        // refreshed for the new target. Reject BEFORE changing anything rather than orphaning or leaving
+        // inconsistent metadata rows.
         for (MetadataValue value : values) {
             if (!value.getDSpaceObject().getID().equals(owner.getID())) {
                 throw new IllegalArgumentException(
@@ -176,7 +175,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
                 value.setAuthority(null);
             }
             // Explicit detachment is not an invitation to resolve again at next update.
-            value.setConfidence(Choices.CF_REJECTED);
+            value.setConfidence(Choices.CF_RELATIONSHIP_REJECTED);
             itemService.update(context, (Item) value.getDSpaceObject());
             metadataValueService.update(context, value);
         }
@@ -345,5 +344,11 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    private void authorizeRelationshipOperation(Context context, DSpaceObject owner, Item target)
+        throws SQLException, AuthorizeException {
+        authorizeService.authorizeAction(context, owner, Constants.WRITE);
+        authorizeService.authorizeAction(context, target, Constants.READ);
     }
 }

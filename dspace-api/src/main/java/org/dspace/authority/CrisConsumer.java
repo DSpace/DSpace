@@ -219,7 +219,9 @@ public class CrisConsumer implements Consumer {
         addEntityTypeIfNotExist(context, item);
 
         for (MetadataValue metadata : item.getMetadata()) {
-            if (metadata.getConfidence() == Choices.CF_REJECTED) {
+            // Check if this metadata value was explicitly detached from its relationship,
+            // if so, skip it to prevent the consumer from recreating that relationship.
+            if (metadata.getConfidence() == Choices.CF_RELATIONSHIP_REJECTED) {
                 continue;
             }
 

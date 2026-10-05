@@ -524,10 +524,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang)
         throws SQLException {
+        // Removing one relationship-backed metadata value may also remove other values from the same relationship.
+        // Track those values so they can be removed safely from the metadata collection while its iterator is active.
         List<MetadataValue> relationshipValuesToRemove = new ArrayList<>();
         Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
         while (metadata.hasNext()) {
             MetadataValue metadataValue = metadata.next();
+            // Remove from the DSO's metadata collection any values already deleted as part of an earlier
+            // relationship removal.
             if (relationshipValuesToRemove.remove(metadataValue)) {
                 metadata.remove();
                 continue;
@@ -540,7 +544,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                             context, metadataValue.getRelationship());
                         authorityBackedRelationshipService.removeMetadataValue(context, metadataValue, dso);
                         metadata.remove();
-                        collectRemovedRelationshipValues(dso, metadataValue, relationshipValues,
+                        collectRelationshipValuesPendingRemoval(dso, metadataValue, relationshipValues,
                                                          relationshipValuesToRemove);
                     } catch (AuthorizeException e) {
                         throw new SQLException("Not authorized to remove relationship-bound metadata", e);
@@ -558,10 +562,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void removeMetadataValues(Context context, T dso, List<MetadataValue> values) throws SQLException {
+        // Removing one relationship-backed metadata value may also remove other values from the same relationship.
+        // Track those values so they can be removed safely from the metadata collection while its iterator is active.
         List<MetadataValue> relationshipValuesToRemove = new ArrayList<>();
         Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
         while (metadata.hasNext()) {
             MetadataValue metadataValue = metadata.next();
+            // Remove from the DSO's metadata collection any values already deleted as part of an earlier
+            // relationship removal.
             if (relationshipValuesToRemove.remove(metadataValue)) {
                 metadata.remove();
                 continue;
@@ -573,7 +581,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                             context, metadataValue.getRelationship());
                         authorityBackedRelationshipService.removeMetadataValue(context, metadataValue, dso);
                         metadata.remove();
-                        collectRemovedRelationshipValues(dso, metadataValue, relationshipValues,
+                        collectRelationshipValuesPendingRemoval(dso, metadataValue, relationshipValues,
                                                          relationshipValuesToRemove);
                     } catch (AuthorizeException e) {
                         throw new SQLException("Not authorized to remove relationship-bound metadata", e);
@@ -589,7 +597,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         dso.setMetadataModified();
     }
 
-    private void collectRemovedRelationshipValues(T dso, MetadataValue removedValue,
+    /**
+     * Collects metadata values that were removed as part of the same relationship removal
+     * and still need to be removed from the DSO's in-memory metadata collection.
+     */
+    private void collectRelationshipValuesPendingRemoval(T dso, MetadataValue removedValue,
                                                    List<MetadataValue> relationshipValues,
                                                    List<MetadataValue> relationshipValuesToRemove) {
         relationshipValues.stream()

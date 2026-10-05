@@ -46,7 +46,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * The leftItem property for the Relationship object.
      * This leftItem is a DSpaceObject and is stored as an ID
      */
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "left_id", nullable = false)
     private Item leftItem;
 
@@ -54,7 +54,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * The relationshipType property for this Relationship object
      * This is stored as an ID in the database
      */
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id", nullable = true)
     private RelationshipType relationshipType;
 
@@ -82,7 +82,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * The rightItem property for the Relationship object.
      * This rightItem is a DSpaceObject and is stored as an ID
      */
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "right_id", nullable = false)
     private Item rightItem;
 

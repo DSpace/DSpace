@@ -48,7 +48,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
                 match = candidate;
             }
         }
-        return match != null ? match : fromAuthority(field);
+        return match != null ? match : fromLinkedEntityAuthority(field);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
             }
         }
         if (match == null && key.startsWith(AUTHORITY_PREFIX)) {
-            match = fromAuthority(key.substring(AUTHORITY_PREFIX.length()));
+            match = fromLinkedEntityAuthority(key.substring(AUTHORITY_PREFIX.length()));
         }
         if (match == null) {
             throw new IllegalArgumentException("Unknown relationship configuration " + key);
@@ -74,7 +74,13 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         return match;
     }
 
-    private RelationshipTypeConfiguration fromAuthority(String field) {
+    /**
+     * Builds a relationship configuration for an authority field linked to an entity type.
+     *
+     * @return the relationship configuration, or {@code null} if the field is not configured
+     *         as a linked entity authority
+     */
+    private RelationshipTypeConfiguration fromLinkedEntityAuthority(String field) {
         String fieldKey = field.replace('.', '_');
         if (!choiceAuthorityService.isChoicesConfigured(fieldKey, Constants.ITEM, (Collection) null)) {
             return null;

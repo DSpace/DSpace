@@ -84,6 +84,8 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         );
 
         if (excludeTilted) {
+            // Use a LEFT JOIN because configuration-backed relationships may have no relationship type.
+            // An inner join would incorrectly exclude those relationships.
             Join<Relationship, RelationshipType> type = relationshipRoot.join(Relationship_.relationshipType,
                                                                               JoinType.LEFT);
             // if this item is the left item,
@@ -137,6 +139,8 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         );
 
         if (excludeTilted) {
+            // Use a LEFT JOIN because configuration-backed relationships may have no relationship type.
+            // An inner join would incorrectly exclude those relationships.
             Join<Relationship, RelationshipType> type = relationshipRoot.join(Relationship_.relationshipType,
                                                                               JoinType.LEFT);
             // if this item is the right item,
