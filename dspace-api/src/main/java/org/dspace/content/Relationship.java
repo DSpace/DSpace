@@ -54,7 +54,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * The relationshipType property for this Relationship object
      * This is stored as an ID in the database
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "type_id", nullable = true)
     private RelationshipType relationshipType;
 
