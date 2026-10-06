@@ -376,7 +376,8 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
-        <!-- Jackson 2 databind - required by Flyway which hasn't migrated to Jackson 3 yet -->
+        <!-- Jackson 2 databind - required at runtime by SolrJ 10, whose published 10.0.0 POM omits the
+             Jackson 2 versions (so Maven drops its transitive dependencies); recheck with Solr 10.1 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -902,21 +903,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>${flyway.version}</version>
-            <exclusions>
-                <!-- Exclude Jackson 2 - we use Jackson 3 -->
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.dataformat</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>

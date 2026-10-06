@@ -27,7 +27,7 @@
         <hibernate-validator.version>9.1.4.Final</hibernate-validator.version>
         <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.13</postgresql.driver.version>
-        <flyway.version>10.22.0</flyway.version>
+        <flyway.version>12.4.0</flyway.version>
         <!-- SolrJ client version: what the DSpace backend uses to talk to a Solr server. -->
         <solr.client.version>10.0.0</solr.client.version>
         <!-- Solr server version used ONLY by the embedded Solr in integration tests (solr-core etc.).
