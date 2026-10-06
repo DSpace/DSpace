@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.service.DoiCheck;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * Test class for the DoiCheck
@@ -58,7 +59,8 @@ public class DoiCheckTest {
      * where rejecting it is now linear. The bound is therefore a very wide margin and is not
      * sensitive to a slow CI machine.
      */
-    @Test(timeout = 5000)
+    @Test
+    @Timeout(5)
     public void rejectsLongDigitRunWithoutBacktracking() {
         assertFalse(DoiCheck.isDoi("10.1234/1-" + "00".repeat(2000) + "!"));
     }

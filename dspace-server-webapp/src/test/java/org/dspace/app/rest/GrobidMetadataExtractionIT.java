@@ -9,7 +9,7 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -34,8 +34,9 @@ import org.dspace.submit.extraction.grobid.client.ConsolidateHeaderEnum;
 import org.dspace.submit.extraction.grobid.client.GrobidClient;
 import org.dspace.submit.extraction.grobid.client.GrobidClientException;
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -87,7 +88,7 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
     private Document loadSimpleTei() throws Exception {
         try (InputStream is = this.getClass().getResourceAsStream(
             "/org/dspace/app/rest/simple-article.pdf.tei.xml")) {
-            assertNotNull("Test TEI XML resource should exist", is);
+            assertNotNull(is, "Test TEI XML resource should exist");
 
             DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
             dbf.setNamespaceAware(true);
@@ -98,13 +99,14 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
     private Document loadFullTei() throws Exception {
         try (InputStream is = this.getClass().getResourceAsStream(
             "/org/dspace/app/rest/full-example.pdf.tei.xml")) {
-            assertNotNull("Test TEI XML resource should exist", is);
+            assertNotNull(is, "Test TEI XML resource should exist");
             DocumentBuilderFactory dbf = XMLUtils.getDocumentBuilderFactory();
             dbf.setNamespaceAware(true);
             return dbf.newDocumentBuilder().parse(is);
         }
     }
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -132,7 +134,7 @@ public class GrobidMetadataExtractionIT extends AbstractControllerIntegrationTes
         grobidImportMetadataSourceService.setGrobidClient(grobidClientMock);
     }
 
-    @After
+    @AfterEach
     public void cleanupGrobidMock() {
         grobidImportMetadataSourceService.setGrobidClient(grobidClient);
     }

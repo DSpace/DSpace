@@ -20,14 +20,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Named;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.util.TimeValue;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.service.impl.HttpConnectionPoolService;
 import org.dspace.services.ConfigurationService;
@@ -124,14 +126,14 @@ public class GrobidClientImpl implements GrobidClient {
             throw new GrobidClientException("Base URL not configured, GROBID client is disabled");
         }
         try  {
-            CloseableHttpClient client = httpConnectionPoolService
-                    .getClient(new DefaultServiceUnavailableRetryStrategy(maxRetries, retryInterval));
+            CloseableHttpClient client = httpConnectionPoolService.getClient(
+                    new DefaultHttpRequestRetryStrategy(maxRetries, TimeValue.ofMilliseconds(retryInterval)));
             HttpPost method = new HttpPost(baseUrl + "/api/processHeaderDocument");
             method.addHeader("Accept", "application/xml");
 
             // add multipart form data with application/xml header
             MultipartEntityBuilder builder = MultipartEntityBuilder.create()
-                .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                .setMode(HttpMultipartMode.LEGACY)
                 .addBinaryBody("input", inputStream);
 
             if (consolidateHeader != null) {
@@ -141,34 +143,35 @@ public class GrobidClientImpl implements GrobidClient {
             HttpEntity entity = builder.build();
             method.setEntity(entity);
 
-            HttpResponse response = client.execute(method);
+            try (CloseableHttpResponse response = client.execute(method)) {
 
-            if (hasNoContent(response)) {
-                LOG.warn("Cannot extract metadata from the document: GROBID returned NO CONTENT");
-                return Optional.empty();
-            }
+                if (hasNoContent(response)) {
+                    LOG.warn("Cannot extract metadata from the document: GROBID returned NO CONTENT");
+                    return Optional.empty();
+                }
 
-            if (isNotSuccessful(response)) {
-                throw new GrobidClientException(formatErrorMessage(response));
-            }
+                if (isNotSuccessful(response)) {
+                    throw new GrobidClientException(formatErrorMessage(response));
+                }
 
-            try (InputStream content = response.getEntity().getContent()) {
-                DocumentBuilder documentBuilder = XMLUtils.getDocumentBuilder();
-                Document document = documentBuilder.parse(content);
-                // Normalize document
-                document.normalizeDocument();
-                return Optional.of(document);
-            } catch (SAXException | ParserConfigurationException e) {
-                throw new GrobidClientException(e);
+                try (InputStream content = response.getEntity().getContent()) {
+                    DocumentBuilder documentBuilder = XMLUtils.getDocumentBuilder();
+                    Document document = documentBuilder.parse(content);
+                    // Normalize document
+                    document.normalizeDocument();
+                    return Optional.of(document);
+                } catch (SAXException | ParserConfigurationException e) {
+                    throw new GrobidClientException(e);
+                }
             }
         } catch (IOException | UnsupportedOperationException e) {
             throw new GrobidClientException(e);
         }
     }
 
-    private String formatErrorMessage(HttpResponse response) {
+    private String formatErrorMessage(ClassicHttpResponse response) {
         try {
-            int statusCode = response.getStatusLine().getStatusCode();
+            int statusCode = response.getCode();
             String message = format("An error occured calling GROBID web services. Response status: %s", statusCode);
             return getEntityContentString(response)
                 .map(content -> message + " - " + content)
@@ -178,15 +181,15 @@ public class GrobidClientImpl implements GrobidClient {
         }
     }
 
-    private boolean isNotSuccessful(HttpResponse response) {
-        return response.getStatusLine().getStatusCode() != HttpStatus.SC_OK;
+    private boolean isNotSuccessful(ClassicHttpResponse response) {
+        return response.getCode() != HttpStatus.SC_OK;
     }
 
-    private boolean hasNoContent(HttpResponse response) {
-        return response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT;
+    private boolean hasNoContent(ClassicHttpResponse response) {
+        return response.getCode() == HttpStatus.SC_NO_CONTENT;
     }
 
-    private Optional<String> getEntityContentString(HttpResponse response) {
+    private Optional<String> getEntityContentString(ClassicHttpResponse response) {
         try {
             HttpEntity entity = response.getEntity();
             if (null == entity) {

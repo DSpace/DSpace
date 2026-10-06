@@ -7,12 +7,13 @@
  */
 package org.dspace.discovery;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * Tests for the year range that {@link FacetYearRange} recovers from previously selected filter
@@ -82,7 +83,8 @@ public class FacetYearRangeTest {
      * recognising it as "not a range" is now linear. The bound is therefore a very wide margin
      * and is not sensitive to a slow CI machine.
      */
-    @Test(timeout = 5000)
+    @Test
+    @Timeout(5)
     public void rejectsUnclosedRangeWithoutBacktracking() throws Exception {
         FacetYearRange range = rangeOf(FACET + ".year:2005 OR [" + " TO ".repeat(60000) + "x");
         assertEquals(2005, range.getOldestYear());
