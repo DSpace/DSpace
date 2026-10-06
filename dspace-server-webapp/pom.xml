@@ -617,11 +617,11 @@
             <version>${ehcache.version}</version>
    <classifier>jakarta</classifier>
         </dependency>
-  <dependency>
-   <groupId>org.jspecify</groupId>
-   <artifactId>jspecify</artifactId>
-   <version>1.0.0</version>
-  </dependency>
+        <!-- Version managed in the parent POM -->
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
 
         <!-- TEST DEPENDENCIES -->
         <dependency>

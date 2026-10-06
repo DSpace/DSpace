@@ -19,12 +19,12 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>21</java.version>
-        <spring.version>7.0.8</spring.version>
-        <spring-ldap.version>4.0.2</spring-ldap.version>
-        <spring-boot.version>4.1.0</spring-boot.version>
-        <spring-security.version>7.1.0</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>7.0.9</spring.version>
+        <spring-ldap.version>4.1.1</spring-ldap.version>
+        <spring-boot.version>4.1.1</spring-boot.version>
+        <spring-security.version>7.1.1</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>7.2.7.Final</hibernate.version>
-        <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.4.Final</hibernate-validator.version>
         <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.13</postgresql.driver.version>
         <flyway.version>10.22.0</flyway.version>
@@ -37,21 +37,21 @@
         <test.solr.server.version>10.0.0</test.solr.server.version>
         <lucene.version>10.3.2</lucene.version>
         <!-- ZooKeeper version matching Solr 10.0.0 -->
-        <zookeeper.version>3.9.5</zookeeper.version>
+        <zookeeper.version>3.9.6</zookeeper.version>
 
         <ehcache.version>3.12.0</ehcache.version>
         <errorprone.version>2.50.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
-        <jackson.version>3.0.3</jackson.version>
+        <jackson.version>3.1.7</jackson.version>
         <!-- Jackson 2 remains required by third-party libraries. -->
-        <jackson2.version>2.22.2</jackson2.version>
+        <jackson2.version>2.22.3</jackson2.version>
         <jackson-annotations.version>2.22</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.5</jaxb-api.version>
         <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>12.1.10</jetty.version>
+        <jetty.version>12.1.14</jetty.version>
         <log4j.version>2.26.1</log4j.version>
         <pdfbox-version>3.0.8</pdfbox-version>
         <rome.version>1.19.0</rome.version>
@@ -1089,17 +1089,24 @@
     <dependencyManagement>
         <dependencies>
             <!-- Pin Micrometer to the higher version to resolve a convergence conflict from the Spring upgrades:
-                 Spring Security 7.1.0 pulls micrometer 1.17.0 while Spring Framework 7.0.8 pulls 1.16.6. Micrometer
-                 is backward-compatible within a minor line, so pin to 1.17.0. -->
+                 Spring Boot 4.1.1 (actuator) pulls micrometer 1.17.1 while Spring Framework 7.0.9 pulls an older
+                 line. Micrometer is backward-compatible within a minor line, so pin to 1.17.1. -->
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-observation</artifactId>
-                <version>1.17.0</version>
+                <version>1.17.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-commons</artifactId>
-                <version>1.17.0</version>
+                <version>1.17.1</version>
+            </dependency>
+            <!-- JSpecify nullness annotations: Micrometer 1.17.1 pulls 1.0.1, Spring Framework 7.0.9 and
+                 Spring HATEOAS pull 1.0.0. Annotation-only, so pin to the higher version for convergence. -->
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>1.0.1</version>
             </dependency>
             <!-- Pin Thymeleaf to the version required by dspace-api (frontpage generation).
                  Spring Boot 4's spring-boot-starter-thymeleaf pulls an older Thymeleaf (via

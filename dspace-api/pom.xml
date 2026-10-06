@@ -1040,11 +1040,11 @@
             <artifactId>json</artifactId>
             <version>20231013</version>
         </dependency>
-  <dependency>
-   <groupId>org.jspecify</groupId>
-   <artifactId>jspecify</artifactId>
-   <version>1.0.0</version>
-  </dependency>
+        <!-- Version managed in the parent POM -->
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
 
         <!-- Useful for testing command-line tools that call System.exit() -->
         <!-- Note: system-lambda replaces system-rules for Java 21 compatibility -->
