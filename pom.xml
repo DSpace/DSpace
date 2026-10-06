@@ -23,7 +23,7 @@
         <spring-ldap.version>4.1.1</spring-ldap.version>
         <spring-boot.version>4.1.1</spring-boot.version>
         <spring-security.version>7.1.1</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>7.2.7.Final</hibernate.version>
+        <hibernate.version>7.4.5.Final</hibernate.version>
         <hibernate-validator.version>9.1.4.Final</hibernate-validator.version>
         <expressly.version>6.0.0</expressly.version>
         <postgresql.driver.version>42.7.13</postgresql.driver.version>

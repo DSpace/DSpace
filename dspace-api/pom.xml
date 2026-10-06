@@ -390,11 +390,6 @@
             <artifactId>hibernate-validator-cdi</artifactId>
             <version>${hibernate-validator.version}</version>
             <exclusions>
-                <!-- Exclude old classmate version - use the one from hibernate-core -->
-                <exclusion>
-                    <groupId>com.fasterxml</groupId>
-                    <artifactId>classmate</artifactId>
-                </exclusion>
                 <!-- Exclude old jakarta.validation-api - use the one from hibernate-processor -->
                 <exclusion>
                     <groupId>jakarta.validation</groupId>
