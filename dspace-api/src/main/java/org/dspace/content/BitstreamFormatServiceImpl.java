@@ -63,6 +63,16 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     protected static final long DEFAULT_MAX_BYTES = 32L * 1024 * 1024;
 
     /**
+     * Configuration property for how many leading bytes of new content are kept in memory while
+     * it is stored, so that the format can be identified without reading the content back from
+     * the bitstore. A value of {@code 0} or less disables the capture.
+     */
+    protected static final String CFG_CAPTURE_BYTES = "bitstream.format.identification.by-content.capture-bytes";
+
+    /** Default number of leading bytes captured while storing new content (1 MiB). */
+    protected static final int DEFAULT_CAPTURE_BYTES = 1024 * 1024;
+
+    /**
      * MIME type Apache Tika returns when it cannot recognise the content. It is
      * also the MIME type of the registry's "Unknown" format, so we treat it as
      * "not identified" and fall back to extension-based identification.
@@ -300,9 +310,11 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     }
 
     /**
-     * Identify a bitstream's format from its actual content, using Apache Tika. The
-     * bitstream's filename (if any) is supplied to Tika only as a hint to disambiguate
-     * content that magic-byte detection alone cannot separate. If the content cannot be
+     * Identify a bitstream's format from its actual content, using Apache Tika. For newly
+     * created bitstreams the leading bytes captured while storing are used; otherwise the
+     * content is read back from the bitstore. The bitstream's filename (if any) is supplied
+     * to Tika only as a hint to disambiguate content that magic-byte detection alone cannot
+     * separate. If the content cannot be
      * read, Tika cannot recognise it, or the detected MIME type is not present in the
      * bitstream format registry, {@code null} is returned so the caller can fall back to
      * extension-based identification.
@@ -315,6 +327,45 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      */
     protected BitstreamFormat guessFormatByContent(Context context, Bitstream bitstream) throws SQLException {
         String mimeType;
+        byte[] contentPrefix = bitstream.getContentPrefix();
+        try {
+            if (contentPrefix != null) {
+                // Captured while the content was stored, so there is no need to read it back
+                // from the bitstore. Signatures sit at the start of a file, and the filename hint
+                // lets Tika refine container formats whose markers lie beyond the prefix.
+                mimeType = detectMimeType(TikaInputStream.get(contentPrefix), bitstream.getName());
+            } else {
+                mimeType = detectMimeTypeFromBitstore(context, bitstream);
+            }
+        } catch (IOException e) {
+            log.warn(LogHelper.getHeader(context, "guess_format_by_content",
+                "Unable to read content of bitstream " + bitstream.getID()
+                    + " for format identification; falling back to filename"), e);
+            return null;
+        }
+
+        // Tika returns application/octet-stream when it cannot recognise the content.
+        if (mimeType == null || mimeType.equalsIgnoreCase(UNKNOWN_MIME_TYPE)) {
+            return null;
+        }
+
+        // Map the detected MIME type onto a (non-internal) registry format. Returns null
+        // when the registry does not list this MIME type, letting the extension fallback try.
+        return findByMIMEType(context, mimeType);
+    }
+
+    /**
+     * Read the bitstream's content from the bitstore and detect its MIME type, for bitstreams
+     * without a captured content prefix (e.g. when re-identifying existing bitstreams).
+     *
+     * @param context   DSpace context object
+     * @param bitstream the bitstream to identify
+     * @return the detected MIME type, or {@code null} if the content is not available
+     * @throws IOException if the content cannot be read
+     * @throws SQLException if a database error occurs
+     */
+    private String detectMimeTypeFromBitstore(Context context, Bitstream bitstream)
+        throws IOException, SQLException {
         long maxBytes = configurationService.getLongProperty(CFG_MAX_BYTES, DEFAULT_MAX_BYTES);
         try (InputStream inputStream = bitstreamStorageService.retrieve(context, bitstream)) {
             if (inputStream == null) {
@@ -332,32 +383,29 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
                                                   .setMaxCount(maxBytes)
                                                   .get();
             }
-            Metadata metadata = new Metadata();
-            String name = bitstream.getName();
-            if (name != null) {
-                // Provide the filename as a detection hint; it does not override the content.
-                metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, name);
-            }
             // Wrap in a TikaInputStream so container-aware detectors (e.g. OLE2/OOXML for
             // legacy and modern Office documents) can inspect the file properly.
-            try (TikaInputStream tikaStream = TikaInputStream.get(boundedStream)) {
-                mimeType = tika.detect(tikaStream, metadata);
-            }
-        } catch (IOException e) {
-            log.warn(LogHelper.getHeader(context, "guess_format_by_content",
-                "Unable to read content of bitstream " + bitstream.getID()
-                    + " for format identification; falling back to filename"), e);
-            return null;
+            return detectMimeType(TikaInputStream.get(boundedStream), bitstream.getName());
         }
+    }
 
-        // Tika returns application/octet-stream when it cannot recognise the content.
-        if (mimeType == null || mimeType.equalsIgnoreCase(UNKNOWN_MIME_TYPE)) {
-            return null;
+    /**
+     * Detect the MIME type of the given content with Apache Tika.
+     *
+     * @param content the content to inspect; closed by this method
+     * @param name    the bitstream's filename, used only as a detection hint (may be {@code null})
+     * @return the detected MIME type
+     * @throws IOException if the content cannot be read
+     */
+    private String detectMimeType(TikaInputStream content, String name) throws IOException {
+        Metadata metadata = new Metadata();
+        if (name != null) {
+            // Provide the filename as a detection hint; it does not override the content.
+            metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, name);
         }
-
-        // Map the detected MIME type onto a (non-internal) registry format. Returns null
-        // when the registry does not list this MIME type, letting the extension fallback try.
-        return findByMIMEType(context, mimeType);
+        try (TikaInputStream tikaStream = content) {
+            return tika.detect(tikaStream, metadata);
+        }
     }
 
     /**

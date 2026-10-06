@@ -14,6 +14,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.util.Arrays;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -61,8 +63,9 @@ public class FormatIdentifierTest extends AbstractUnitTest {
     @After
     @Override
     public void destroy() {
-        // Reset any override of the content-based identification toggle
+        // Reset any override of the content-based identification settings
         configurationService.setProperty("bitstream.format.identification.by-content.enabled", null);
+        configurationService.setProperty("bitstream.format.identification.by-content.capture-bytes", null);
         super.destroy();
     }
 
@@ -125,6 +128,76 @@ public class FormatIdentifierTest extends AbstractUnitTest {
         bs.setName(context, "document.pdf");
         BitstreamFormat result = bitstreamFormatService.guessFormat(context, bs);
         assertThat("extension fallback, .pdf -> PDF", result.getID(), equalTo(pdf.getID()));
+    }
+
+    /**
+     * The leading bytes of new content are captured while it is stored: the whole file when it
+     * is smaller than the limit, otherwise exactly the configured number of bytes.
+     */
+    @Test
+    public void testContentPrefixCapturedOnCreate() throws Exception {
+        File f = new File(testProps.get("test.bitstream").toString());
+        byte[] content = Files.readAllBytes(f.toPath());
+
+        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+        assertThat("small file is captured in full", bs.getContentPrefix(), equalTo(content));
+
+        configurationService.setProperty("bitstream.format.identification.by-content.capture-bytes", 1024);
+        bs = bitstreamService.create(context, new FileInputStream(f));
+        assertThat("capture is bounded by capture-bytes", bs.getContentPrefix(),
+                   equalTo(Arrays.copyOf(content, 1024)));
+        assertThat("stored size is unaffected by the capture", bs.getSizeBytes(), equalTo((long) content.length));
+    }
+
+    /**
+     * A new bitstream is identified from its captured prefix without reading the content back
+     * from the bitstore: identification still succeeds when the stored content cannot be found.
+     */
+    @Test
+    public void testGuessFormatUsesCapturedPrefix() throws Exception {
+        configurationService.setProperty("bitstream.format.identification.by-content.capture-bytes", 1024);
+        File f = new File(testProps.get("test.bitstream").toString());
+        BitstreamFormat pdf = bitstreamFormatService.findByShortDescription(context, "Adobe PDF");
+
+        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+        bs.setName(context, null);
+        bs.setInternalId("not-in-the-bitstore");
+
+        BitstreamFormat result = bitstreamFormatService.guessFormat(context, bs);
+        assertThat("identified from the captured prefix is not null", result, notNullValue());
+        assertThat("identified from the captured prefix -> PDF", result.getID(), equalTo(pdf.getID()));
+    }
+
+    /**
+     * The captured prefix is released once a format is assigned; later identification reads the
+     * content from the bitstore instead.
+     */
+    @Test
+    public void testContentPrefixReleasedWhenFormatAssigned() throws Exception {
+        File f = new File(testProps.get("test.bitstream").toString());
+        BitstreamFormat pdf = bitstreamFormatService.findByShortDescription(context, "Adobe PDF");
+
+        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+        assertThat("prefix captured on create", bs.getContentPrefix(), notNullValue());
+
+        bs.setFormat(context, bitstreamFormatService.guessFormat(context, bs));
+        assertThat("prefix released when a format is assigned", bs.getContentPrefix(), nullValue());
+
+        BitstreamFormat result = bitstreamFormatService.guessFormat(context, bs);
+        assertThat("identified from the bitstore is not null", result, notNullValue());
+        assertThat("identified from the bitstore -> PDF", result.getID(), equalTo(pdf.getID()));
+    }
+
+    /**
+     * Setting capture-bytes to 0 disables the capture.
+     */
+    @Test
+    public void testContentPrefixCaptureDisabled() throws Exception {
+        configurationService.setProperty("bitstream.format.identification.by-content.capture-bytes", 0);
+        File f = new File(testProps.get("test.bitstream").toString());
+
+        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+        assertThat("no prefix captured when disabled", bs.getContentPrefix(), nullValue());
     }
 
 }
