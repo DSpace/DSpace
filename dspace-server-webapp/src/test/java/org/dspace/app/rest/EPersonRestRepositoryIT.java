@@ -145,6 +145,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .param("projection", "full"))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
+                            .andExpect(header().string("Location",
+                                startsWith(REST_SERVER_URL + "eperson/epersons/")))
                             .andExpect(jsonPath("$", EPersonMatcher.matchFullEmbeds()))
                             .andExpect(jsonPath("$", Matchers.allOf(
                                hasJsonPath("$.uuid", not(empty())),
@@ -160,8 +162,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                        matchMetadata("eperson.lastname", "Doe"),
                                        matchMetadataDoesNotExist("dc.identifier.uri")
                                )))))
-                            .andDo(result -> idRef
-                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+                            .andDo(result -> {
+                                String id = read(result.getResponse().getContentAsString(), "$.id");
+                                assertEquals(REST_SERVER_URL + "eperson/epersons/" + id,
+                                    result.getResponse().getHeader("Location"));
+                                idRef.set(UUID.fromString(id));
+                            });
 
         getClient(authToken).perform(post("/api/eperson/epersons")
                 .content(mapper.writeValueAsBytes(dataFull))
