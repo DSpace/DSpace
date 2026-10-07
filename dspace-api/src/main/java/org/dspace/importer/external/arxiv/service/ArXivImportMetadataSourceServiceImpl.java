@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
+import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
@@ -75,7 +76,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         if (StringUtils.isNotBlank(arxivId)) {
             List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
             if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
-                return records;
+                return new ExactImportRecords(records);
             }
             return emptyIfNull(retry(new SearchByQueryCallable(query, count, start)));
         }
@@ -102,7 +103,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         if (StringUtils.isNotBlank(arxivId)) {
             List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
             if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
-                return records;
+                return new ExactImportRecords(records);
             }
             return emptyIfNull(retry(new SearchByQueryCallable(query)));
         }

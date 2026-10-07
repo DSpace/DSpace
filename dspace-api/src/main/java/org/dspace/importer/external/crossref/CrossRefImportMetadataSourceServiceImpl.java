@@ -27,6 +27,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
+import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
@@ -119,7 +120,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         if (StringUtils.isNotBlank(id)) {
             List<ImportRecord> records = retry(new SearchByIdCallable(id));
             if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
-                return records;
+                return new ExactImportRecords(records);
             }
             return retry(new SearchByQueryCallable(query, count, start));
         }
@@ -135,7 +136,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         if (StringUtils.isNotBlank(id)) {
             List<ImportRecord> records = retry(new SearchByIdCallable(id));
             if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
-                return records;
+                return new ExactImportRecords(records);
             }
         }
         if (isExactIdOnly()) {
@@ -168,7 +169,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         if (StringUtils.isNotBlank(id)) {
             List<ImportRecord> records = retry(new SearchByIdCallable(id));
             if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
-                return records;
+                return new ExactImportRecords(records);
             }
             return retry(new SearchByQueryCallable(query));
         }

@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
+import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
@@ -111,7 +112,7 @@ public class DataCiteImportMetadataSourceServiceImpl
         if (StringUtils.isNotBlank(id)) {
             List<ImportRecord> records = fetchById(id);
             if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
-                return records;
+                return new ExactImportRecords(records);
             }
             return searchByQuery(query, start, count);
         }
