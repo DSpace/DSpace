@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.core.Context;
 
 /**
@@ -112,4 +113,15 @@ public interface MetadataValueService {
         throws SQLException;
 
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * Find stored projections in a deterministic owner/field/place/ID order.
+     */
+    List<MetadataValue> findByRelationship(Context context, Relationship relationship) throws SQLException;
+
+    /**
+     * Count stored projections; this does not determine relationship lifetime.
+     */
+    int countByRelationship(Context context, Relationship relationship) throws SQLException;
+
 }

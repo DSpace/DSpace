@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -40,5 +41,15 @@ public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
         throws SQLException;
 
     int countRows(Context context) throws SQLException;
+
+    /**
+     * Find stored projections in a deterministic owner/field/place/ID order.
+     */
+    List<MetadataValue> findByRelationship(Context context, Relationship relationship) throws SQLException;
+
+    /**
+     * Count stored projections; this does not determine relationship lifetime.
+     */
+    int countByRelationship(Context context, Relationship relationship) throws SQLException;
 
 }

@@ -541,4 +541,11 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
             throws SQLException, AuthorizeException, BadVirtualMetadataTypeException;
 
+    /**
+     * Persist a configured internal link without legacy virtual metadata/place handling.
+     * Metadata association is the responsibility of the compound service.
+     */
+    Relationship createConfigBackedRelationship(Context context, Item leftItem, Item rightItem,
+                                               String relationshipConfigKey)
+        throws SQLException, AuthorizeException;
 }

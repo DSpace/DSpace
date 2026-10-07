@@ -120,18 +120,28 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         // Verify that the new Publication is related to both author2 and author1 (in that exact order)
         List<Relationship> relationships = relationshipService.findByItem(context, article2);
         assertEquals(2, relationships.size());
+        Relationship relationship1 = relationships.get(0);
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(0)))
                    .andExpect(jsonPath("$._links.rightItem.href", containsString(author2.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(1)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(
+                       article2.getID(), author2.getID(),
+                       relationship1.getLeftPlace(), relationship1.getRightPlace(),
+                       relationship1.getRelationshipType()
+                   ))));
+        Relationship relationship2 = relationships.get(1);
         getClient().perform(get("/api/core/relationships/" + relationships.get(1).getID()).param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(1)))
                    .andExpect(jsonPath("$._links.rightItem.href", containsString(author1.getID().toString())))
                    .andExpect(jsonPath("$.rightPlace", is(1)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(1)))));
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(
+                       article2.getID(), author1.getID(),
+                       relationship2.getLeftPlace(), relationship2.getRightPlace(),
+                       relationship2.getRelationshipType()
+                   ))));
 
         // Via CSV import add a new Author to the new Publication, as the *third* author.
         // At this point the new Publication has three authors in this order: author2, author1, author3
@@ -230,14 +240,18 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
         List<Relationship> relationships = relationshipService.findByItem(context, item);
         assertEquals(reasonAssertCheck, sizeToCheck, relationships.size());
+        Relationship relationship1 = relationships.getFirst();
         getClient().perform(get("/api/core/items/" + item.getID())).andExpect(status().isOk());
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID())
                         .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(leftPlaceToCheck)))
                    .andExpect(jsonPath("$.rightPlace", is(rightPlaceToCheck)))
-                   .andExpect(jsonPath("$",
-                           Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(
+                       relatedItem.getID(), item.getID(),
+                       relationship1.getLeftPlace(), relationship1.getRightPlace(),
+                       relationship1.getRelationshipType()
+                   ))));
 
         return item;
     }

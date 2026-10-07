@@ -32,7 +32,9 @@ public class RelationshipConverter implements DSpaceConverter<Relationship, Rela
         relationshipRest.setProjection(projection);
         relationshipRest.setId(obj.getID());
         relationshipRest.setLeftId(obj.getLeftItem().getID());
-        relationshipRest.setRelationshipType(converter.toRest(obj.getRelationshipType(), projection));
+        if (!obj.isConfigurationBacked()) {
+            relationshipRest.setRelationshipType(converter.toRest(obj.getRelationshipType(), projection));
+        }
         relationshipRest.setRightId(obj.getRightItem().getID());
         relationshipRest.setLeftPlace(obj.getLeftPlace());
         relationshipRest.setRightPlace(obj.getRightPlace());
