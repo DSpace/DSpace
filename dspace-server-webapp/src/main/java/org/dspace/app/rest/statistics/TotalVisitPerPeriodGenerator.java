@@ -72,9 +72,18 @@ public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
     private Integer dsoType;
 
     /**
-     * Create a stat usage report for the amount of TotalVisitPerMonth on a DSO, containing one point for each month
-     * with the views on that DSO in that month with the range -6 months to now. If there are no views on the DSO
-     * in a month, the point on that month contains views=0.
+     * Create a stat usage report for the amount of visits per period (month by default) on a DSO.
+     * <p>
+     * The reported window is dynamic and depends on whether a start date is provided:
+     * <ul>
+     *   <li>When {@code startDate} is provided, the report contains one point for each period in the
+     *       {@code [startDate, endDate]} range, including periods with zero views.</li>
+     *   <li>When {@code startDate} is blank, it defaults to the date of the earliest recorded view and
+     *       leading periods with no views are trimmed, so the report starts at the first period that
+     *       actually has data (typically collapsing to a single current-period point for a freshly
+     *       visited DSO). When there is no data at all, a single zero-valued point for the end period
+     *       is returned.</li>
+     * </ul>
      *
      * @param context   DSpace context
      * @param dso       DSO we want usage report with TotalVisitsPerMonth to the DSO
