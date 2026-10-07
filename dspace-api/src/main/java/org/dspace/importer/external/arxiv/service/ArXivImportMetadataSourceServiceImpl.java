@@ -29,6 +29,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.datamodel.RecordsCount;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
@@ -122,21 +123,26 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(String query) throws MetadataSourceException {
         String arxivId = getArxivId(query);
         if (StringUtils.isNotBlank(arxivId)) {
             List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
             int count = records.size();
             if (count > 0 || isExactIdOnly()) {
-                return count;
+                return RecordsCount.exact(count);
             }
             Integer fallback = retry(new CountByQueryCallable(query));
-            return fallback == null ? 0 : fallback;
+            return RecordsCount.query(fallback == null ? 0 : fallback);
         }
         if (isExactIdOnly()) {
-            return 0;
+            return RecordsCount.query(0);
         }
         Integer count = retry(new CountByQueryCallable(query));
-        return count == null ? 0 : count;
+        return RecordsCount.query(count == null ? 0 : count);
     }
 
 
@@ -151,22 +157,27 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(Query query) throws MetadataSourceException {
         String queryString = query.getParameterAsClass("query", String.class);
         String arxivId = getArxivId(queryString);
         if (StringUtils.isNotBlank(arxivId)) {
             List<ImportRecord> records = emptyIfNull(retry(new SearchByIdCallable(arxivId)));
             int count = records.size();
             if (count > 0 || isExactIdOnly()) {
-                return count;
+                return RecordsCount.exact(count);
             }
             Integer fallback = retry(new CountByQueryCallable(query));
-            return fallback == null ? 0 : fallback;
+            return RecordsCount.query(fallback == null ? 0 : fallback);
         }
         if (isExactIdOnly()) {
-            return 0;
+            return RecordsCount.query(0);
         }
         Integer count = retry(new CountByQueryCallable(query));
-        return count == null ? 0 : count;
+        return RecordsCount.query(count == null ? 0 : count);
     }
 
     /**

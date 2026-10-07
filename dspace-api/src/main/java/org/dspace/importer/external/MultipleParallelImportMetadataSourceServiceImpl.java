@@ -21,6 +21,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.datamodel.RecordsCount;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.components.QuerySource;
 
@@ -71,38 +72,30 @@ public class MultipleParallelImportMetadataSourceServiceImpl implements QuerySou
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        List<Future<Integer>> futureList = new ArrayList<>();
-        int result = 0;
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(String query) throws MetadataSourceException {
+        List<Future<RecordsCount>> futureList = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
-            futureList.add(executorService.submit(() -> innerProvider.getRecordsCount(query)));
+            futureList.add(executorService.submit(() -> innerProvider.getRecordsCountResult(query)));
         }
-        for (Future<Integer> future: futureList) {
-            try {
-                Integer count = future.get();
-                result += Objects.isNull(count) ? 0 : count;
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return result;
+        return preferExactCount(futureList);
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
-        List<Future<Integer>> futureList = new ArrayList<>();
-        int result = 0;
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(Query query) throws MetadataSourceException {
+        List<Future<RecordsCount>> futureList = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
-            futureList.add(executorService.submit(() -> innerProvider.getRecordsCount(query)));
+            futureList.add(executorService.submit(() -> innerProvider.getRecordsCountResult(query)));
         }
-        for (Future<Integer> future: futureList) {
-            try {
-                Integer count = future.get();
-                result += Objects.isNull(count) ? 0 : count;
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return result;
+        return preferExactCount(futureList);
     }
 
 
@@ -169,5 +162,30 @@ public class MultipleParallelImportMetadataSourceServiceImpl implements QuerySou
             }
         }
         return merged;
+    }
+
+    /**
+     * If any provider returned an exact count, only exact counts are summed.
+     */
+    private RecordsCount preferExactCount(List<Future<RecordsCount>> futureList) {
+        List<RecordsCount> results = new ArrayList<>();
+        for (Future<RecordsCount> future : futureList) {
+            try {
+                RecordsCount count = future.get();
+                if (count != null) {
+                    results.add(count);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        boolean anyExact = results.stream().anyMatch(RecordsCount::isExact);
+        int total = 0;
+        for (RecordsCount count : results) {
+            if (!anyExact || count.isExact()) {
+                total += count.getCount();
+            }
+        }
+        return anyExact ? RecordsCount.exact(total) : RecordsCount.query(total);
     }
 }

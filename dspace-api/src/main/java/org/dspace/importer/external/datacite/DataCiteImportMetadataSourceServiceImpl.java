@@ -26,6 +26,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.datamodel.RecordsCount;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
@@ -85,24 +86,34 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(String query) throws MetadataSourceException {
         String id = getID(query);
         if (StringUtils.isNotBlank(id)) {
             int count = fetchById(id).isEmpty() ? 0 : 1;
             if (count > 0 || isExactIdOnly()) {
-                return count;
+                return RecordsCount.exact(count);
             }
-            return searchByQueryCount(query);
+            return RecordsCount.query(searchByQueryCount(query));
         }
         if (isExactIdOnly()) {
-            return 0;
+            return RecordsCount.query(0);
         }
-        return searchByQueryCount(query);
+        return RecordsCount.query(searchByQueryCount(query));
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        return getRecordsCount(StringUtils.isBlank(id) ? query.toString() : id);
+        return getRecordsCountResult(StringUtils.isBlank(id) ? query.toString() : id);
     }
 
 
