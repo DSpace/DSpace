@@ -16,6 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -337,5 +339,19 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     @Transient
     public boolean isRelationshipBacked() {
         return relationship != null;
+    }
+
+    /**
+     * Ensures relationship-backed metadata is owned by one of the Relationship endpoints.
+     */
+    @PrePersist
+    @PreUpdate
+    private void validateRelationshipOwner() {
+        if (relationship != null
+            && !dSpaceObject.getID().equals(relationship.getLeftItem().getID())
+            && !dSpaceObject.getID().equals(relationship.getRightItem().getID())) {
+            throw new IllegalArgumentException(
+                "Metadata owner must be an endpoint of its relationship");
+        }
     }
 }

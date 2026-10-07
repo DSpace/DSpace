@@ -24,6 +24,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
@@ -230,6 +231,61 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         assertThat(metadataValueService.findByRelationship(context, relationship), hasSize(0));
         // Includes configured rows even in the path which excludes legacy tilted types.
         assertThat(relationshipService.findByItem(context, target, -1, -1, true), hasSize(1));
+    }
+
+    /**
+     * Verify that the MetadataValue/Relationship owner invariant is enforced when a managed MetadataValue
+     * is modified directly and persisted through Hibernate, without calling MetadataValueService.update().
+     *
+     * A MetadataValue linked to a Relationship must belong to one of that Relationship's endpoint Items.
+     */
+    @Test
+    public void testUnrelatedMetadataOwnerIsRejectedOnHibernateFlush() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Create a valid relationship-backed MetadataValue owned by one of the relationship endpoints.
+        MetadataValue value = author();
+        service.promoteResolvedAuthority(context, owner, value, target);
+
+        Item stranger = ItemBuilder.createItem(context, collection).withTitle("stranger").build();
+
+        // Make the managed MetadataValue invalid without going through MetadataValueService.update().
+        value.setDSpaceObject(stranger);
+
+        // Hibernate dirty checking must not allow the invalid owner/relationship combination to be persisted.
+        assertThrows(IllegalArgumentException.class, () -> context.commit());
+
+        // The failed flush marks the transaction for rollback; recover the Context so test cleanup can proceed.
+        context.rollback();
+    }
+
+    /**
+     * Verify that the MetadataValue/Relationship owner invariant is enforced when a new MetadataValue
+     * is persisted with a Relationship whose endpoints do not include the MetadataValue owner.
+     *
+     * This verifies the invariant during initial persistence, before the MetadataValue has been stored.
+     */
+    @Test
+    public void testUnrelatedMetadataOwnerIsRejectedOnPersist() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
+
+        Item stranger = ItemBuilder.createItem(context, collection).withTitle("stranger").build();
+
+        MetadataField field = ContentServiceFactory.getInstance().getMetadataFieldService()
+                                                   .findByElement(context, "dc", "contributor", "author");
+
+        // Create a new MetadataValue owned by an Item which is not an endpoint of the Relationship.
+        MetadataValue value = metadataValueService.create(context, stranger, field);
+        value.setValue("Other");
+        value.setRelationship(relationship);
+
+        // The invalid owner/relationship combination must be rejected when the new entity is persisted.
+        assertThrows(IllegalArgumentException.class, () -> context.commit());
+
+        // The failed persistence marks the transaction for rollback; recover the Context for test cleanup.
+        context.rollback();
     }
 
     private MetadataValue addOrcid() throws Exception {
