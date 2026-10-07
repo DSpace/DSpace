@@ -158,6 +158,10 @@
                 <xsl:text>book part</xsl:text>
             </xsl:when>
             <xsl:when
+                test="$lc_dc_type = 'book chapter' or $lc_dc_type = 'bookchapter'">
+            <xsl:text>book part</xsl:text>
+            </xsl:when>
+            <xsl:when
                 test="$lc_dc_type = 'book review' or $lc_dc_type = 'bookreview' or $dc_type = 'http://purl.org/coar/resource_type/c_ba08'">
                 <xsl:text>book review</xsl:text>
             </xsl:when>
@@ -214,6 +218,10 @@
             </xsl:when>
             <xsl:when
                 test="$lc_dc_type = 'moving image' or $lc_dc_type = 'movingimage' or $dc_type = 'http://purl.org/coar/resource_type/c_8a7e'">
+                <xsl:text>moving image</xsl:text>
+            </xsl:when>
+            <xsl:when
+                test="$lc_dc_type = 'animation'">
                 <xsl:text>moving image</xsl:text>
             </xsl:when>
             <xsl:when
@@ -336,6 +344,14 @@
             <xsl:when
                 test="$lc_dc_type = 'research article' or $lc_dc_type = 'researcharticle' or $dc_type = 'http://purl.org/coar/resource_type/c_2df8fbb1'">
                 <xsl:text>research article</xsl:text>
+            </xsl:when>
+            <xsl:when
+                test="$lc_dc_type = 'presentation' or $dc_type = 'http://purl.org/coar/resource_type/R60J-J5BD'">
+            <xsl:text>conference presentation</xsl:text>
+            </xsl:when>
+            <xsl:when
+                test="$lc_dc_type = 'learning object' or $lc_dc_type = 'learningobject' or $dc_type = 'http://purl.org/coar/resource_type/c_e059'">
+            <xsl:text>learning object</xsl:text>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text>other</xsl:text>

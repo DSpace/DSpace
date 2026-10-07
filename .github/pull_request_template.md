@@ -21,7 +21,8 @@ However, reviewers may request that you complete any actions in this list if you
 
 - [ ] My PR is **created against the `main` branch** of code (unless it is a backport or is fixing an issue specific to an older branch).
 - [ ] My PR is **small in size** (e.g. less than 1,000 lines of code, not including comments & integration tests). Exceptions may be made if previously agreed upon.
-- [ ] My PR **passes Checkstyle** validation based on the [Code Style Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide).
+- [ ] My PR **follows all coding best practices** based on the [Code Conventions Guide](../CODE_CONVENTIONS.md).
+- [ ] My PR **passes Checkstyle** validation based on the [Code Style Guide](../CODE_STYLE.md).
 - [ ] My PR **includes Javadoc** for _all new (or modified) public methods and classes_. It also includes Javadoc for large or complex private methods.
 - [ ] My PR **passes all tests and includes new/updated Unit or Integration Tests** based on the [Code Testing Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Testing+Guide).
 - [ ] My PR **includes details on how to test it**. I've provided clear instructions to reviewers on how to successfully test this fix or feature.

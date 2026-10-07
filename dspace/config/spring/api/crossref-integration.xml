@@ -35,10 +35,16 @@
 
     <bean id="crossrefIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="crossref.id"/>
-        <property name="query" value="/DOI"/>
+        <property name="metadataProcessor" ref="crossrefDoiMetadataProcessor"/>
+    </bean>
+    <bean name="crossrefDoiMetadataProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
+        <property name="path" value="/DOI"/>
+        <property name="regexPattern" value="^"/>
+        <property name="replacement" value="https://doi.org/"/>
     </bean>
     <bean id="crossref.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="crossrefJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">

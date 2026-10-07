@@ -244,6 +244,62 @@ public class CustomUrlStepIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void testNonLatinCharactersRejectedOnWorkspaceItem() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                                          .withTitle("Test WorkspaceItem")
+                                                          .withIssueDate("2020")
+                                                          .build();
+
+        context.restoreAuthSystemState();
+
+        // Test Cyrillic characters
+        Operation replaceOperation = new ReplaceOperation("/sections/custom-url/url", "тестовый-url");
+
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                         .content(getPatchContent(List.of(replaceOperation)))
+                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.custom-url.invalid-characters')]",
+                                contains(hasJsonPath("$.paths",
+                                                     contains(hasJsonPath("$", is("/sections/custom-url/url")))))))
+            .andExpect(jsonPath("$.sections.custom-url.url", is("тестовый-url")))
+            .andExpect(jsonPath("$.sections.custom-url.redirected-urls").doesNotExist());
+
+        // Test Arabic characters
+        replaceOperation = new ReplaceOperation("/sections/custom-url/url", "اختبار-url");
+
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                         .content(getPatchContent(List.of(replaceOperation)))
+                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.custom-url.invalid-characters')]",
+                                contains(hasJsonPath("$.paths",
+                                                     contains(hasJsonPath("$", is("/sections/custom-url/url")))))))
+            .andExpect(jsonPath("$.sections.custom-url.url", is("اختبار-url")))
+            .andExpect(jsonPath("$.sections.custom-url.redirected-urls").doesNotExist());
+
+        // Test Chinese characters
+        replaceOperation = new ReplaceOperation("/sections/custom-url/url", "测试-url");
+
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                         .content(getPatchContent(List.of(replaceOperation)))
+                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.custom-url.invalid-characters')]",
+                                contains(hasJsonPath("$.paths",
+                                                     contains(hasJsonPath("$", is("/sections/custom-url/url")))))))
+            .andExpect(jsonPath("$.sections.custom-url.url", is("测试-url")))
+            .andExpect(jsonPath("$.sections.custom-url.redirected-urls").doesNotExist());
+
+    }
+
+    @Test
     public void testAlreadyExistingCustomUrlReplacementOnWorkspaceItem() throws Exception {
 
         context.turnOffAuthorisationSystem();

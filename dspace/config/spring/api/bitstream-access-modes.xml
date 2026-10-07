@@ -1,0 +1,152 @@
+<!--
+    Bitstream Access Modes Configuration
+    
+    This file configures custom CRIS-based security policies for bitstream downloads
+    that work in ADDITION to the standard DSpace ACL system.
+    
+    USE CASE:
+    Allow specific users (submitters, authors, editors) to download embargoed or
+    restricted bitstreams even when they don't have explicit READ permissions in ACLs.
+    
+    SECURITY NOTE:
+    These policies GRANT additional access. They do NOT restrict access that users
+    already have through standard ACLs. Think of them as "bonus permissions".
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--
+        bitstreamAccessModesMap
+        
+        Maps entity types to lists of access modes that grant download permissions.
+        
+        Structure:
+        - Key: Entity type name (e.g., "Publication", "Dataset", "Person")
+        - Value: List of EditItemMode beans defining who gets access
+        
+        Example: "Publication" items allow downloads by submitters and authors
+    -->
+    <util:map id="bitstreamAccessModesMap" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.util.List"> 
+        <entry key="Publication">
+            <list>
+                <!-- Allow the person who submitted the item to download bitstreams -->
+                <ref bean="submitterEditItemMode" />
+                <!-- Allow authors/editors (from metadata) to download bitstreams -->
+                <ref bean="customEditItemMode" />
+            </list>
+        </entry>
+        
+        <!-- 
+        Example: Add another entity type
+        <entry key="Dataset">
+            <list>
+                <ref bean="datasetOwnerMode" />
+            </list>
+        </entry>
+        -->
+    </util:map>
+    
+    <!--
+        allowedBundlesForBitstreamAccess
+        
+        Optional: Restricts which bundles each access mode applies to.
+        
+        BEHAVIOR:
+        1. If an access mode is NOT in this map → All bundles are allowed
+        2. If an access mode has an EMPTY list → No bundles are allowed (policy disabled)
+        3. If an access mode has a LIST of bundle names → Only those bundles are allowed
+        
+        Common bundle names: ORIGINAL, LICENSE, THUMBNAIL, TEXT
+        
+        Example use case:
+        - Allow submitters to download ORIGINAL files but not LICENSE files
+        - Allow authors to download ORIGINAL and THUMBNAIL but not administrative bundles
+    -->
+    <util:map id="allowedBundlesForBitstreamAccess">
+        <!-- Submitters can only download from ORIGINAL bundle -->
+        <entry key-ref="submitterEditItemMode">
+            <list>
+                <value>ORIGINAL</value>
+            </list>
+        </entry>
+        <!-- Authors/editors can only download from ORIGINAL bundle -->
+        <entry key-ref="customEditItemMode">
+            <list>
+                <value>ORIGINAL</value>
+            </list>
+        </entry>
+        
+        <!--
+        Example: Allow downloads from multiple bundles
+        <entry key-ref="customEditItemMode">
+            <list>
+                <value>ORIGINAL</value>
+                <value>LICENSE</value>
+                <value>THUMBNAIL</value>
+            </list>
+        </entry>
+        -->
+        
+        <!--
+        Example: Block all bundle access (effectively disable the policy)
+        <entry key-ref="submitterEditItemMode">
+            <list>
+                <Empty list = no bundles allowed
+            </list>
+        </entry>
+        -->
+    </util:map>
+    
+    
+    <!--
+        Access Mode Bean Definitions
+        
+        These beans define WHO gets access based on their relationship to the item.
+    -->
+    
+    <!--
+        submitterEditItemMode
+        
+        Grants access to the EPerson who submitted the item to the archive.
+        Uses SUBMITTER security type from CrisSecurityService.
+    -->
+    <bean id="submitterEditItemMode" class="org.dspace.content.edit.EditItemMode">
+        <property name="security">
+            <value type="org.dspace.content.security.CrisSecurity">SUBMITTER</value>
+        </property>
+    </bean>
+    
+    <!--
+        customEditItemMode
+        
+        Grants access to EPersons whose UUID appears in specific metadata fields.
+        Uses CUSTOM security type with metadata field matching.
+        
+        This example grants access to:
+        - Anyone listed in dc.contributor.author (with their EPerson UUID as authority)
+        - Anyone listed in dc.contributor.editor (with their EPerson UUID as authority)
+        
+        HOW IT WORKS:
+        If an item has: dc.contributor.author = "John Doe" with authority="abc-123-def"
+        And EPerson with UUID="abc-123-def" tries to download → Access granted
+    -->
+    <bean id="customEditItemMode" class="org.dspace.content.edit.EditItemMode">
+        <property name="security">
+            <value type="org.dspace.content.security.CrisSecurity">CUSTOM</value>
+        </property>
+        <property name="items">
+            <list>
+                <value>dc.contributor.author</value>
+                <value>dc.contributor.editor</value>
+                <!-- Add more metadata fields as needed, e.g.:
+                <value>dc.contributor.advisor</value>
+                <value>dc.contributor.illustrator</value>
+                -->
+            </list>
+        </property>
+    </bean>
+
+</beans>

@@ -43,6 +43,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityService;
@@ -164,6 +166,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                                    .getAuthorityValueService();
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
+        .getInstance()
+        .getMetadataAuthorityService();
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -360,6 +365,16 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
         // Process each change
         rowCount = 1;
+
+        int maxItems = configurationService.getIntProperty("bulkedit.import.max.items", 1000);
+        int numItems = toImport.size();
+        if (numItems > maxItems && maxItems > 0) {
+            throw new MetadataImportException(
+                "Import contains " + numItems + " items, which exceeds the configured "
+                + "maximum of " + maxItems + ". You can change this limit by setting "
+                + "'bulkedit.import.max.items' in your local configuration.");
+        }
+
         for (DSpaceCSVLine line : toImport) {
             // Resolve target references to other items
             populateRefAndRowMap(line, line.getID());
@@ -1138,7 +1153,18 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setElement(element);
         dcv.setQualifier(qualifier);
         dcv.setLanguage(language);
-        if (fromAuthority != null) {
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append(schema).append("_").append(element);
+
+        if (StringUtils.isNotEmpty(qualifier)) {
+            builder.append("_").append(qualifier);
+        }
+
+        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityAllowed(builder.toString(),
+                Constants.ITEM, null);
+
+        if (fromAuthority != null && isAuthorityControlled) {
             if (value.indexOf(':') > 0) {
                 value = value.substring(0, value.indexOf(':'));
             }

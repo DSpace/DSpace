@@ -23,6 +23,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
 
     @Autowired
     UploadConfigurationService uploadConfigurationService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
@@ -70,6 +74,10 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
                         newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
                     }
 
+                    if (isAppendModeDisabled() && item.isArchived()) {
+                        resourcePolicyService.removePolicies(context, bitstream, ResourcePolicy.TYPE_INHERITED);
+                    }
+
                     if (CollectionUtils.isNotEmpty(newAccessConditions)) {
                         BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfig, bitstream,
                                                                              newAccessConditions);
@@ -78,6 +86,10 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
                 idx++;
             }
         }
+    }
+
+    private boolean isAppendModeDisabled() {
+        return !configurationService.getBooleanProperty("core.authorization.installitem.inheritance-read.append-mode");
     }
 
     @Override

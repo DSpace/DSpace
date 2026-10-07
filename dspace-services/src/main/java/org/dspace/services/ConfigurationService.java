@@ -269,6 +269,8 @@ public interface ConfigurationService {
      * Set a configuration property (setting) in the system.
      * Type is not important here since conversion happens automatically
      * when properties are requested.
+     * <br>
+     * Note: use with care, the value will be reset when the configuration is reloaded!
      *
      * @param name  the property name
      * @param value the property value (set this to null to clear out the property)
@@ -286,4 +288,11 @@ public interface ConfigurationService {
      */
     public void reloadConfig();
 
+
+    /**
+     * Find the configurations that starts with prefix
+     *
+     * @param prefix the prefix string of configurations to be found
+     */
+    public Properties getPropertiesWithPrefix(String prefix);
 }

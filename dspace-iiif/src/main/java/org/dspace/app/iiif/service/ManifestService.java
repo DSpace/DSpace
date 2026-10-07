@@ -21,11 +21,11 @@ import org.dspace.app.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.iiif.model.generator.RangeGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -82,7 +82,7 @@ public class ManifestService extends AbstractResourceService {
     ManifestGenerator manifestGenerator;
 
     @Autowired
-    MetadataExposureService metadataExposureService;
+    protected MetadataSecurityService metadataSecurityService;
 
     protected String[] METADATA_FIELDS;
 
@@ -197,21 +197,13 @@ public class ManifestService extends AbstractResourceService {
             if (eq.length > 2) {
                 qualifier = eq[2];
             }
-            List<MetadataValue> metadata = item.getItemService().getMetadata(item, schema, element, qualifier,
-                    Item.ANY);
-            List<String> values = new ArrayList<String>();
+            List<MetadataValue> metadata =
+                metadataSecurityService.getPermissionFilteredMetadataValues(
+                    context, item, schema, element, qualifier, Item.ANY
+                );
+            List<String> values = new ArrayList<>();
             for (MetadataValue meta : metadata) {
-                // we need to perform the check here as the configuration can include jolly
-                // characters (i.e. dc.description.*) and we need to be sure to hide qualified
-                // metadata (dc.description.provenance)
-                try {
-                    if (metadataExposureService.isHidden(context, meta.getMetadataField().getMetadataSchema().getName(),
-                            meta.getMetadataField().getElement(), meta.getMetadataField().getQualifier())) {
-                        continue;
-                    }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+
                 values.add(meta.getValue());
             }
             if (values.size() > 0) {

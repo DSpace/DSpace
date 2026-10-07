@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -175,7 +176,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
                 Source transformSource
                     = new StreamSource(new FileInputStream(transformFile));
                 TransformerFactory transformerFactory
-                    = TransformerFactory.newInstance();
+                    = XMLUtils.getTransformerFactory();
                 transformer = transformerFactory.newTransformer(transformSource);
                 transformLastModified = transformFile.lastModified();
             } catch (TransformerConfigurationException | FileNotFoundException e) {

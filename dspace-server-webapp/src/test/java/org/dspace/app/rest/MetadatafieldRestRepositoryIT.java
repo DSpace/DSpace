@@ -147,14 +147,14 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema")
             .param("schema", "dc")
-            .param("size", String.valueOf(100)))
+            .param("size", String.valueOf(103)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "title", null),
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "date", "issued"))
                                       ))
-                   .andExpect(jsonPath("$.page.size", is(100)));
+                   .andExpect(jsonPath("$.page.size", is(103)));
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema")
             .param("schema", schema.getName()))

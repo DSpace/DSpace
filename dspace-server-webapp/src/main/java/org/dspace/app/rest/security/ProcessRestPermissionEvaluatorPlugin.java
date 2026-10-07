@@ -54,17 +54,20 @@ public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
+        if (context == null) {
+            return false;
+        }
 
         try {
             int processId = Integer.parseInt(targetId.toString());
             Process process = processService.find(context, processId);
+            // This previously returned true, to allow a 404 to be thrown later. However, this assists enumeration
+            // of sequential process IDs. It is better to simply return 'unauthorized' here.
             if (process == null) {
-                return true;
+                return false;
             }
-            if (!((context.getCurrentUser() == null) || (!context.getCurrentUser().equals(process.getEPerson())
-                && !authorizeService.isAdmin(context)))) {
-                return true;
-            }
+            // Only the process owner or an administrator may perform any action
+            return processService.authorizeActionBoolean(context, process);
         } catch (SQLException e) {
             log.error(e::getMessage, e);
         }

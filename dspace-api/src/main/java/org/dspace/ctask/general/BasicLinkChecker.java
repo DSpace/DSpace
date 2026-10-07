@@ -24,6 +24,7 @@ import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.services.ConfigurationService;
@@ -58,12 +59,13 @@ public class BasicLinkChecker extends AbstractCurationTask {
     /**
      * Perform the link checking.
      *
+     * @param context The DSpace Context
      * @param dso The DSpaaceObject to be checked
      * @return The curation task status of the checking
      * @throws java.io.IOException THrown if something went wrong
      */
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
         // The results that we'll return
         StringBuilder results = new StringBuilder();
 

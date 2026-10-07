@@ -21,11 +21,10 @@ import org.dspace.app.rest.model.FilteredItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,7 @@ public class FilteredItemConverter {
     @Autowired
     AuthorizeService authorizeService;
     @Autowired
-    MetadataExposureService metadataExposureService;
+    MetadataSecurityService metadataSecurityService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredItemConverter.class);
 
@@ -97,25 +96,17 @@ public class FilteredItemConverter {
      * configuration
      */
     private MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
-        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        List<MetadataValue> fullList =
+            metadataSecurityService.getPermissionFilteredMetadataValues(
+                context, obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY
+            );
         List<MetadataValue> returnList = new LinkedList<>();
         try {
             if (obj.isWithdrawn() && (Objects.isNull(context) ||
                                       Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
                 return new MetadataValueList(new ArrayList<>());
             }
-            if (context != null && (authorizeService.isAdmin(context) || itemService.canEdit(context, obj))) {
-                return new MetadataValueList(fullList);
-            }
-            for (MetadataValue mv : fullList) {
-                MetadataField metadataField = mv.getMetadataField();
-                if (!metadataExposureService
-                        .isHidden(context, metadataField.getMetadataSchema().getName(),
-                                  metadataField.getElement(),
-                                  metadataField.getQualifier())) {
-                    returnList.add(mv);
-                }
-            }
+            return new MetadataValueList(fullList);
         } catch (SQLException e) {
             log.error("Error filtering item metadata based on permissions", e);
         }

@@ -13,6 +13,7 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 
@@ -27,7 +28,7 @@ public class WorkflowReportTest
     private static final Logger LOG = LogManager.getLogger();
 
     @Override
-    public int perform(DSpaceObject dso)
+    public int perform(Context context, DSpaceObject dso)
             throws IOException {
         LOG.info("Class {} as task {} received 'perform' for object {}",
                 WorkflowReportTest.class::getSimpleName, () -> taskId, () -> dso);

@@ -12,6 +12,7 @@
                  are to be added to the item that has a relationship with this relationship type-->
             <map>
                 <entry key="isAuthorOfPublication" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isEditorOfPublication" value-ref="isEditorOfPublicationMap"/>
                 <entry key="isOrgUnitOfPublication" value-ref="isOrgUnitOfPublicationMap"/>
                 <entry key="isPersonOfProject" value-ref="isPersonOfProjectMap"/>
                 <entry key="isOrgUnitOfProject" value-ref="isOrgUnitOfProjectMap"/>
@@ -21,6 +22,10 @@
                 <entry key="isVolumeOfJournal" value-ref="isVolumeOfJournalMap"/>
                 <entry key="isIssueOfJournalVolume" value-ref="isIssueOfJournalVolumeMap"/>
                 <entry key="isJournalIssueOfPublication" value-ref="isJournalIssueOfPublicationMap"/>
+                <entry key="isAuthorOfDataset" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isOrgUnitOfDataset" value-ref="isOrgUnitOfPublicationMap"/>
+                <entry key="isDatasetOfPublication" value-ref="isDatasetOfPublicationMap"/>
+                <entry key="isPublicationOfDataset" value-ref="isPublicationOfDatasetMap"/>
             </map>
         </property>
     </bean>
@@ -31,6 +36,7 @@
                 <entry key="Publication" value="f.entityType=Publication,equals"/>
                 <entry key="Person" value="f.entityType=Person,equals"/>
                 <entry key="Journal" value="f.entityType=Journal,equals"/>
+                <entry key="Dataset" value="f.entityType=Dataset,equals"/>
             </map>
         </property>
     </bean>
@@ -41,6 +47,8 @@
     <util:map id="isAuthorOfPublicationMap">
         <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
         <entry key="person.identifier.orcid" value-ref="publicationAuthor_identifierOrcid"/>
+        <entry key="organization.identifier.ror" value-ref="publicationAuthor_identifierRor"/>
+        <entry key="dspace.relatedentity.type" value-ref="publicationAuthor_entityType"/>
     </util:map>
     <!--
          If the related item has:
@@ -69,17 +77,83 @@
             </util:list>
         </property>
     </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierRor">
+        <property name="fields">
+            <util:list>
+                <value>organization.identifier.ror</value>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_entityType">
+        <property name="fields">
+            <util:list>
+                <value>dspace.entity.type</value>
+            </util:list>
+        </property>
+    </bean>
+
+    <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
+         'dc.contributor.editor' on the appropriate item with the values defined in the value-ref.
+          This value-ref should be a bean of type VirtualMetadataConfiguration -->
+    <util:map id="isEditorOfPublicationMap">
+        <entry key="dc.contributor.editor" value-ref="publicationEditor_author"/>
+        <entry key="person.identifier.orcid" value-ref="publicationEditor_identifierOrcid"/>
+        <entry key="organization.identifier.ror" value-ref="publicationEditor_identifierRor"/>
+    </util:map>
+    <!--
+         If the related item has:
+            person.familyName = Smith
+            person.givenName = John
+         Then the original item will have, in this case:
+            dc.contributor.editor = Smith, John -->
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationEditor_author">
+        <property name="fields">
+            <util:list>
+                <value>person.familyName</value>
+                <value>person.givenName</value>
+                <value>organization.legalName</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationEditor_identifierOrcid">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.orcid</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationEditor_identifierRor">
+        <property name="fields">
+            <util:list>
+                <value>organization.identifier.ror</value>
+            </util:list>
+        </property>
+    </bean>
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
      'dc.contributor.other' on the appropriate item with the values defined in the value-ref.
       This value-ref should be a bean of type VirtualMetadataConfiguration -->
     <util:map id="isOrgUnitOfPublicationMap">
         <entry key="dc.contributor.other" value-ref="publicationOrgUnit_name"/>
+        <entry key="organization.identifier.ror" value-ref="publicationOrgUnit_ror"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="publicationOrgUnit_name">
         <property name="fields">
             <util:list>
                 <value>organization.legalName</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationOrgUnit_ror">
+        <property name="fields">
+            <util:list>
+                <value>organization.identifier.ror</value>
             </util:list>
         </property>
     </bean>
@@ -223,6 +297,27 @@
         </property>
         <property name="separator">
             <value>, </value>
+        </property>
+    </bean>
+
+    <util:map id="isDatasetOfPublicationMap">
+        <entry key="dc.relation.isbasedon" value-ref="relatedEntityIdentifier_uri"/>
+    </util:map>
+    <util:map id="isPublicationOfDatasetMap">
+        <entry key="dc.relation.isreferencedby" value-ref="relatedEntityIdentifier_uri"/>
+    </util:map>
+    <!-- This Collected bean will create a list of dc.identifier.uri virtual metadata fields that hold the value of
+    Create new scratch file from selection, each of them in a separate metadata value.
+    If the related item has:
+        dc.relation.isbasedon/isreferencedby = https://demo.dspace.org/handle/123456789/123
+    Then the original item will have, in this case:
+        dc.identifier.uri = https://demo.dspace.org/handle/123456789/123
+    -->
+    <bean class="org.dspace.content.virtual.Collected" id="relatedEntityIdentifier_uri">
+        <property name="fields">
+            <util:list>
+                <value>dc.identifier.uri</value>
+            </util:list>
         </property>
     </bean>
 

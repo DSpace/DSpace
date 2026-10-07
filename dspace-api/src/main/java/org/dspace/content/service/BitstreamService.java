@@ -86,6 +86,20 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
         throws IOException, SQLException, AuthorizeException;
 
     /**
+     * Replaces {@code oldBitstream} with {@code newBitstream}.
+     * Copies all metadata from {@code oldBitstream} to {@code newBitstream}
+     * and sets in the same order in the bundle list.
+     * <br>
+     * The {@code oldBitstream} is deleted, along with any Bitstreams derived from it via {@code filter-media}.
+     *
+     * @param context the current DSpace context
+     * @param oldBitstream the bitstream object we want to replace
+     * @param newBitstream the new bitstream that will replace the old one
+     */
+    public Bitstream replace(Context context, Bitstream oldBitstream, Bitstream newBitstream, boolean replaceName)
+        throws SQLException, AuthorizeException, IOException;
+
+    /**
      * Register a new bitstream, with a new ID.  The checksum and file size
      * are calculated. The newly created bitstream has the "unknown"
      * format.

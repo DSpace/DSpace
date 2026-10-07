@@ -8,7 +8,9 @@
 package org.dspace.app.itemexport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -78,6 +80,9 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
             Files.createDirectory(Path.of(file.getAbsolutePath()));
         }
         workDir = Path.of(file.getAbsolutePath());
+
+        configurationService.setProperty("org.dspace.app.itemexport.allowed.dir",
+                new String[] { tempDir.toString(), workDir.toString() });
     }
 
     @After
@@ -85,7 +90,7 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
     public void destroy() throws Exception {
         PathUtils.deleteOnExit(tempDir);
         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
-            PathUtils.deleteOnExit(path);
+            PathUtils.delete(path);
         }
         super.destroy();
     }
@@ -317,6 +322,92 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
 
         checkDir();
         checkItemMigration(item);
+    }
+
+    @Test
+    public void exportItemWithPathTraversalBitstreamName() throws Exception {
+        Path notAllowed = Files.createTempDirectory("notSafExportDir");
+        String traversalName = "../../../../../../../"
+                + notAllowed.getFileName().toString() + "/test.txt";
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .build();
+        String bitstreamContent = "some arbitrary content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder.createBitstream(context, item, is)
+                    .withName(traversalName)
+                    .withMimeType("text/plain")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+
+        // Exception should be thrown at validation
+        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args));
+        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
+
+        // File should never have been written
+        assertFalse(Files.exists(notAllowed.resolve("test.txt")));
+        PathUtils.deleteOnExit(notAllowed);
+    }
+
+    @Test
+    public void exportRejectedWhenDestDirOutsideAllowedBase() throws Exception {
+        configurationService.setProperty(
+                "org.dspace.app.itemexport.allowed.dir", workDir.toString());
+
+        Path notAllowed = Files.createTempDirectory("notSafExportDir");
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .build();
+        context.restoreAuthSystemState();
+
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", notAllowed.toString(), "-n", "1" };
+
+        // Exception should be thrown at validation
+        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args));
+        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
+
+        // File should never have been written
+        assertFalse(Files.list(notAllowed).findAny().isPresent());
+        PathUtils.deleteOnExit(notAllowed);
+    }
+
+    @Test
+    public void allowedDirDefaultsToExportWorkDir() throws Exception {
+        // default array property is workDir, used on null or empty value set
+        configurationService.setProperty(
+                "org.dspace.app.itemexport.allowed.dir", new String[]{});
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .build();
+        context.restoreAuthSystemState();
+
+        // Work dir should be allowed
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", workDir.toString(), "-n", "1" };
+        perfomExportScript(args);
+        assertTrue(Files.list(workDir).findAny().isPresent());
+
+        String[] args2 = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+        // Exception should be thrown at validation
+        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args2));
+        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
+        // File should never have been written
+        assertFalse(Files.list(tempDir).findAny().isPresent());
     }
 
     /**

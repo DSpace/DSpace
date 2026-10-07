@@ -162,13 +162,14 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     }
 
     @Override
+    @PreAuthorize("hasPermission(@workflowSecurityUtils.parseIdFromUriList(#stringList), 'WORKFLOWITEM', 'WRITE')")
     protected WorkflowItemRest createAndReturn(Context context, List<String> stringList) {
         XmlWorkflowItem source;
-        if (stringList == null || stringList.isEmpty() || stringList.size() > 1) {
+        if (stringList == null || stringList.size() != 1) {
             throw new UnprocessableEntityException("The given URI list could not be properly parsed to one result");
         }
         try {
-            source = submissionService.createWorkflowItem(context, stringList.get(0));
+            source = submissionService.createWorkflowItem(context, stringList.getFirst());
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (WorkflowException e) {
@@ -192,7 +193,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Override
     public WorkflowItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                   MultipartFile file) throws SQLException {
+                                   MultipartFile file) throws SQLException, AuthorizeException, IOException {
 
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
@@ -201,13 +202,13 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         this.checkIfEditMetadataAllowedInCurrentStep(context, source);
         List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
                 file);
+        context.commit();
+        context.reloadEntity(source);
         wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
         }
-
-        context.commit();
         return wsi;
     }
 

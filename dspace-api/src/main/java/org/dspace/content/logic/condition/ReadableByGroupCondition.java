@@ -49,7 +49,7 @@ public class ReadableByGroupCondition extends AbstractCondition {
             List<ResourcePolicy> policies = authorizeService
                 .getPoliciesActionFilter(context, item, Constants.getActionID(action));
             for (ResourcePolicy policy : policies) {
-                if (policy.getGroup().getName().equals(group)) {
+                if (policy.getGroup() != null && policy.getGroup().getName().equals(group)) {
                     return true;
                 }
             }

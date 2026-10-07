@@ -4,11 +4,18 @@
                 xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" version="1.0">
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes"/>
 
-    <!-- An identity transformation to show the internal XOAI generated XML -->
     <xsl:template match="/">
+        <xsl:call-template name="dim-root">
+            <xsl:with-param name="xoai-root" select="." />
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- An identity transformation to show the internal XOAI generated XML -->
+    <xsl:template name="dim-root">
+        <xsl:param name="xoai-root" />
         <dim:dim xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://www.dspace.org/xmlns/dspace/dim http://www.dspace.org/schema/dim.xsd">
-            <xsl:apply-templates select="//doc:field[@name='value']"/>
+            <xsl:apply-templates select="$xoai-root//doc:field[@name='value']"/>
         </dim:dim>
     </xsl:template>
 

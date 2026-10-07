@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/util
+                        http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<bean id="itemAuthorityServiceFactory"
+		  class="org.dspace.content.authority.factory.ItemAuthorityServiceFactory">
+
+		<property name="authorityServiceImplMap">
+			<map>
+			    <!-- Specify here any services to use with the relative authority name -->
+				<entry key="AuthorAuthority" value-ref="personItemAuthorityFilter" />
+				<entry key="EditorAuthority" value-ref="personItemAuthorityFilter" />
+				<entry key="AuthorCoarseMatchAuthority" value-ref="personItemAuthorityCoarseMatchFilter" />
+				<entry key="AuthorStrictMatchAuthority" value-ref="personItemAuthorityStrictMatchFilter" />
+				<entry key="default" value-ref="itemAuthorityFilter" />
+			</map>
+		</property>
+	</bean>
+
+	<bean name="personItemAuthorityFilter" class="org.dspace.content.authority.ItemAuthorityServiceImpl" >
+		<property name="customAuthorityFilter" ref="personAuthoritySolrFilter" />
+	</bean>
+	<bean name="personItemAuthorityCoarseMatchFilter" class="org.dspace.content.authority.ItemAuthorityServiceImpl" >
+		<property name="customAuthorityFilter" ref="personCoarseCustomSolrFilter" />
+	</bean>
+	<bean name="personItemAuthorityStrictMatchFilter" class="org.dspace.content.authority.ItemAuthorityServiceImpl" >
+		<property name="customAuthorityFilter" ref="personStrictCustomSolrFilter" />
+	</bean>
+	<bean name="itemAuthorityFilter" class="org.dspace.content.authority.ItemAuthorityServiceImpl">
+		<property name="customAuthorityFilter" ref="itemAuthorityCustomSolrFilter" />
+	</bean>
+
+	<bean name="itemAuthorityCustomSolrFilter" class="org.dspace.content.authority.ItemAuthorityCustomSolrFilterImpl" />
+	<bean name="personAuthoritySolrFilter" class="org.dspace.content.authority.PersonAuthoritySolrFilterImpl" />
+	<bean name="personStrictCustomSolrFilter" class="org.dspace.content.authority.PersonStrictCustomSolrFilterImpl" />
+	<bean name="personCoarseCustomSolrFilter" class="org.dspace.content.authority.PersonCoarseCustomSolrFilterImpl" />
+
+</beans>

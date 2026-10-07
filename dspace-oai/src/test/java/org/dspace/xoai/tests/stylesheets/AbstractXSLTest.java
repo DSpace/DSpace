@@ -17,12 +17,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
+import org.dspace.app.util.XMLUtils;
 
 public abstract class AbstractXSLTest {
-    // Requires usage of Saxon as OAI-PMH uses some XSLT 2 functions
-    private static final TransformerFactory factory = TransformerFactory
-            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
-
     protected TransformBuilder apply(String xslLocation) throws Exception {
         return new TransformBuilder(xslLocation);
     }
@@ -44,8 +41,16 @@ public abstract class AbstractXSLTest {
         private final Transformer transformer;
 
         public TransformBuilder(String xslLocation) throws Exception {
+            File inputFile = new File("../dspace/config/crosswalks/oai/metadataFormats", xslLocation);
+            String inputFileDir = inputFile.toPath().normalize().getParent().toString();
+
+            // Requires usage of Saxon as OAI-PMH uses some XSLT 2 functions. Only trust stylesheets stored under
+            // the same directory as the given XSL.
+            TransformerFactory factory = XMLUtils.getTrustedTransformerFactory("net.sf.saxon.TransformerFactoryImpl",
+                                                                               new String[] {inputFileDir});
+
             this.transformer = factory.newTransformer(
-                new StreamSource(new File("../dspace/config/crosswalks/oai/metadataFormats", xslLocation)));
+                new StreamSource(inputFile));
         }
 
         public String to(InputStream input) throws Exception {

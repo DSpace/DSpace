@@ -827,6 +827,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                            int limit)
         throws SearchServiceException {
         List<Community> communities = new ArrayList<>();
+        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCommunity.TYPE, action, true,
@@ -864,6 +865,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public long countAuthorizedCommunityByAction(Context context, String query, int action)
         throws SearchServiceException {
+        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCommunity.TYPE, action, true,
@@ -907,6 +909,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return collections;
         }
 
+        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCollection.TYPE, action, true,
@@ -944,6 +947,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public long countAuthorizedCollectionByAction(Context context, String query, int action)
         throws SearchServiceException {
+        query = searchService.formatAutoCompleteQuery(query, "dc.title_sort");
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + RESOURCE_TYPE_FIELD + ":" +
                 IndexableCollection.TYPE, action,

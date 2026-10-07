@@ -337,7 +337,11 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
         String bareDoiRef = doiService.DOIToExternalForm(bareDoi);
 
         List<MetadataValue> identifiers = itemService
-            .getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
+            .getMetadata(item,
+                         doiMetadataFieldName.schema,
+                         doiMetadataFieldName.element,
+                         doiMetadataFieldName.qualifier,
+                         Item.ANY);
         // We have to remove all DOIs referencing previous versions. To do that,
         // we store all identifiers we do not know in an array list, clear
         // dc.identifier.uri and add the safed identifiers.
@@ -355,10 +359,19 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
         // reset the metadata if necessary.
         if (changed) {
             try {
-                itemService.clearMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
+                itemService.clearMetadata(c, item,
+                                          doiMetadataFieldName.schema,
+                                          doiMetadataFieldName.element,
+                                          doiMetadataFieldName.qualifier,
+                                          Item.ANY);
                 // Checks if Array newIdentifiers is empty to avoid adding null values to the metadata field.
                 if (!newIdentifiers.isEmpty()) {
-                    itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                    itemService.addMetadata(c, item,
+                                            doiMetadataFieldName.schema,
+                                            doiMetadataFieldName.element,
+                                            doiMetadataFieldName.qualifier,
+                                            null,
+                                            newIdentifiers);
                 }
                 itemService.update(c, item);
             } catch (SQLException ex) {

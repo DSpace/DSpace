@@ -69,6 +69,13 @@
         </step>
     </command>
     <command>
+        <name>doi-migrate</name>
+        <description>Migrate DOI metadata from legacy fields to new standard fields</description>
+        <step>
+            <class>org.dspace.identifier.doi.DOIMigrator</class>
+        </step>
+    </command>
+    <command>
         <name>dsprop</name>
         <description>View a DSpace property from dspace.cfg</description>
         <step>

@@ -44,6 +44,7 @@ import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
      * 
      * @return solr client
      */
-    protected SolrClient getSolr() {
+    public SolrClient getSolr() {
         if (solrSuggestionClient == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getProperty("suggestion.solr.server", "http://localhost:8983/solr/suggestion");
@@ -315,12 +316,18 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
 
         Suggestion suggestion = new Suggestion(sourceName, target, (String) solrDoc.getFieldValue(SUGGESTION_ID));
         suggestion.setDisplay((String) solrDoc.getFieldValue(DISPLAY));
-        suggestion.getMetadata()
-            .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
-        suggestion.getMetadata()
-            .add(new MetadataValueDTO("dc", "date", "issued", null, (String) solrDoc.getFieldValue(DATE)));
-        suggestion.getMetadata().add(
-            new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
+        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(TITLE))) {
+            suggestion.getMetadata()
+                      .add(new MetadataValueDTO("dc", "title", null, null, (String) solrDoc.getFieldValue(TITLE)));
+        }
+        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(DATE))) {
+            suggestion.getMetadata()
+                      .add(new MetadataValueDTO("dc", "date", "issued", null, (String) solrDoc.getFieldValue(DATE)));
+        }
+        if (StringUtils.isNotBlank((String) solrDoc.getFieldValue(ABSTRACT))) {
+            suggestion.getMetadata().add(
+                new MetadataValueDTO("dc", "description", "abstract", null, (String) solrDoc.getFieldValue(ABSTRACT)));
+        }
 
         suggestion.setExternalSourceUri((String) solrDoc.getFieldValue(EXTERNAL_URI));
         if (solrDoc.containsKey(CATEGORY)) {
@@ -352,7 +359,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         try {
             return itemService.find(context, itemId);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLRuntimeException(e);
         }
     }
 

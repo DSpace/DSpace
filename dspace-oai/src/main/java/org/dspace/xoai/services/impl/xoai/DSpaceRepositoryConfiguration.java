@@ -133,6 +133,7 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
 
     @Override
     public List<String> getDescription() {
+        configurationService.ensureRequiredConfiguration();
         List<String> result = new ArrayList<String>();
         String descriptionFile = configurationService.getProperty("oai.description.file");
         if (descriptionFile == null) {

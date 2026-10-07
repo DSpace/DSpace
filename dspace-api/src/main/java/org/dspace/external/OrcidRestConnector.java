@@ -76,7 +76,7 @@ public class OrcidRestConnector {
 
     private boolean isSuccessful(HttpResponse response) {
         int statusCode = getStatusCode(response);
-        return statusCode >= 200 || statusCode <= 299;
+        return statusCode >= 200 && statusCode <= 299;
     }
 
     private int getStatusCode(HttpResponse response) {

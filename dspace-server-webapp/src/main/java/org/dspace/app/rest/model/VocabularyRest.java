@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.Map;
+
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -31,6 +33,10 @@ public class VocabularyRest extends BaseObjectRest<String> {
     private boolean hierarchical;
 
     private Integer preloadLevel;
+
+    private String entity;
+
+    private Map<String, String> externalSource;
 
     @Override
     public String getId() {
@@ -67,6 +73,22 @@ public class VocabularyRest extends BaseObjectRest<String> {
 
     public void setPreloadLevel(Integer preloadLevel) {
         this.preloadLevel = preloadLevel;
+    }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public void setEntity(String entity) {
+        this.entity = entity;
+    }
+
+    public Map<String, String> getExternalSource() {
+        return externalSource;
+    }
+
+    public void setExternalSource(Map<String, String> externalSource) {
+        this.externalSource = externalSource;
     }
 
     @Override

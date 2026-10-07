@@ -58,7 +58,7 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
      * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the found orcid queue records
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
         throws SQLException;

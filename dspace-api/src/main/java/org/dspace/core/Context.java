@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -35,6 +36,7 @@ import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
+import org.hibernate.Session;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -475,6 +477,36 @@ public class Context implements AutoCloseable {
         }
     }
 
+    /**
+     * Clears the Hibernate session persistence context, causing all managed entities
+     * to become detached, then reloads context-bound entities.
+     *
+     * <p><strong>Key differences from other Context methods:</strong></p>
+     * <ul>
+     *   <li><strong>vs. rollback():</strong> Preserves the transaction; only clears the session cache</li>
+     *   <li><strong>vs. close()/abort():</strong> Keeps the Context and connection open; only clears entities</li>
+     * </ul>
+     *
+     * <p>Useful for memory management during batch processing while maintaining transactional integrity.</p>
+     *
+     * @throws SQLRuntimeException if reloading context-bound entities fails
+     * @see org.hibernate.Session#clear()
+     * @see #uncacheEntities()
+     */
+    public void clear() {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if (!isValid()) {
+            log.info("clear() was called on a closed Context object. No cache to clear.");
+            return;
+        }
+
+        try {
+            ((Session) dbConnection.getSession()).clear();
+            reloadContextBoundEntities();
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
 
     /**
      * Dispatch any events (cached in current Context) to configured EventListeners (consumers)

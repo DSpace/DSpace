@@ -21,8 +21,14 @@ import org.dspace.authority.AuthorityValue;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public interface AuthorityValueService {
-    public static final String SPLIT = "::";
-    public static final String GENERATE = "will be generated" + SPLIT;
+    String SPLIT = "::";
+    String GENERATE = "will be generated" + SPLIT;
+    String REFERENCE = "will be referenced" + SPLIT;
+
+    // Cleanup authority metadata modes
+    String AUTHORITY_CLEANUP_PROPERTY_PREFIX = "item-deletion.authority-cleanup.mode.";
+    String AUTHORITY_CLEANUP_BUSINESS_MODE = "business-identifier";
+    String AUTHORITY_CLEANUP_CLEAN_ALL_MODE = "clean_all";
 
     /**
      * Generates an {@link AuthorityValue} based on the given parameters.
@@ -32,7 +38,7 @@ public interface AuthorityValueService {
      * @param field         the field of the generated authority value
      * @return the generated {@link AuthorityValue}
      */
-    public AuthorityValue generate(String authorityKey, String content, String field);
+    AuthorityValue generate(String authorityKey, String content, String field);
 
     /**
      * Updates an AuthorityValue.
@@ -40,7 +46,7 @@ public interface AuthorityValueService {
      * @param value the AuthorityValue to be updated
      * @return the updated AuthorityValue
      */
-    public AuthorityValue update(AuthorityValue value);
+    AuthorityValue update(AuthorityValue value);
 
     /**
      * Finds an AuthorityValue based on the provided authorityID.
@@ -48,7 +54,7 @@ public interface AuthorityValueService {
      * @param authorityID the authority ID used to search for the AuthorityValue
      * @return the found AuthorityValue, or null if no match is found
      */
-    public AuthorityValue findByUID(String authorityID);
+    AuthorityValue findByUID(String authorityID);
 
     /**
      * Finds AuthorityValues in the given context based on field and value.
@@ -57,7 +63,7 @@ public interface AuthorityValueService {
      * @param value the value to search for AuthorityValues
      * @return a list of found AuthorityValues matching the given field and value, or an empty list if no match is found
      */
-    public List<AuthorityValue> findByValue(String field, String value);
+    List<AuthorityValue> findByValue(String field, String value);
 
     /**
      * Finds an {@link AuthorityValue} based on the provided ORCID ID.
@@ -65,7 +71,7 @@ public interface AuthorityValueService {
      * @param orcid_id the ORCID ID used to search for the AuthorityValue
      * @return the found AuthorityValue, or null if no match is found
      */
-    public AuthorityValue findByOrcidID(String orcid_id);
+    AuthorityValue findByOrcidID(String orcid_id);
 
     /**
      * Finds {@link AuthorityValue}s based on the provided metadata schema, element, qualifier, and name.
@@ -77,8 +83,7 @@ public interface AuthorityValueService {
      * @return a list of found AuthorityValues matching the given schema, element, qualifier, and name,
      *         or an empty list if no match is found
      */
-    public List<AuthorityValue> findByName(String schema, String element, String qualifier,
-                                           String name);
+    List<AuthorityValue> findByName(String schema, String element, String qualifier, String name);
 
     /**
      * Finds {@link AuthorityValue}s based on the provided metadata schema, element, qualifier, and value.
@@ -90,8 +95,7 @@ public interface AuthorityValueService {
      * @return a list of found AuthorityValues matching the given schema, element, qualifier, and value,
      *         or an empty list if no match is found
      */
-    public List<AuthorityValue> findByAuthorityMetadata(String schema, String element,
-                                                        String qualifier, String value);
+    List<AuthorityValue> findByAuthorityMetadata(String schema, String element, String qualifier, String value);
 
     /**
      * Finds {@link AuthorityValue}s in the given context based on the exact field and value.
@@ -101,7 +105,7 @@ public interface AuthorityValueService {
      * @return a list of found AuthorityValues matching the given field and value,
      *         or an empty list if no match is found
      */
-    public List<AuthorityValue> findByExactValue(String field, String value);
+    List<AuthorityValue> findByExactValue(String field, String value);
 
     /**
      * Finds {@link AuthorityValue}s based on the provided metadata schema, element, qualifier, and value.
@@ -113,7 +117,7 @@ public interface AuthorityValueService {
      * @return a list of found AuthorityValues matching the given schema, element, qualifier, and value,
      *         or an empty list if no match is found
      */
-    public List<AuthorityValue> findByValue(String schema, String element, String qualifier,
+    List<AuthorityValue> findByValue(String schema, String element, String qualifier,
                                             String value);
 
     /**
@@ -121,14 +125,14 @@ public interface AuthorityValueService {
      *
      * @return a list of AuthorityValues or an empty list if no matching values are found
      */
-    public List<AuthorityValue> findOrcidHolders();
+    List<AuthorityValue> findOrcidHolders();
 
     /**
      * Retrieves all AuthorityValues from Solr.
      *
      * @return A list of all AuthorityValues.
      */
-    public List<AuthorityValue> findAll();
+    List<AuthorityValue> findAll();
 
     /**
      * Converts a SolrDocument into an AuthorityValue object.
@@ -136,7 +140,7 @@ public interface AuthorityValueService {
      * @param solrDocument the SolrDocument to convert
      * @return the converted AuthorityValue object
      */
-    public AuthorityValue fromSolr(SolrDocument solrDocument);
+    AuthorityValue fromSolr(SolrDocument solrDocument);
 
     /**
      * Retrieves the type of authority value based on the provided metadata string.
@@ -144,5 +148,5 @@ public interface AuthorityValueService {
      * @param metadataString the metadata string used to determine the authority value type
      * @return the {@link AuthorityValue} representing the type of authority value, or null if no match is found
      */
-    public AuthorityValue getAuthorityValueType(String metadataString);
+    AuthorityValue getAuthorityValueType(String metadataString);
 }

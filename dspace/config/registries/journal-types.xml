@@ -1,0 +1,37 @@
+<dspace-dc-types>
+
+    <!-- These metadata schema are currently only used in virtual-metadata.xml
+         to represent a virtual relationship to a Journal / JournalVolume / JournalIssue Entities -->
+    <!-- TODO: We may want to move these to "relation" schema fields as they are only used by relationships -->
+    <dspace-header>
+        <title>DSpace Journal Types</title>
+    </dspace-header>
+
+
+    <!-- "journal" schema -->
+    <dc-schema>
+        <name>journal</name>
+        <namespace>http://dspace.org/journal</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>title</element>
+        <qualifier></qualifier>
+        <scope_note>The title of the Journal related to this object</scope_note>
+    </dc-type>
+
+    <!-- "journalvolume" schema -->
+    <dc-schema>
+        <name>journalvolume</name>
+        <namespace>http://dspace.org/journalvolume</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>journalvolume</schema>
+        <element>identifier</element>
+        <qualifier>name</qualifier>
+        <scope_note>The identifier name for the Journal Volume related to this object</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
