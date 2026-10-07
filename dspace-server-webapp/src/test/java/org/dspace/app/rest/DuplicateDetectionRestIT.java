@@ -111,7 +111,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
 
         col = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Test Collection")
-                .withWorkflowGroup("reviewer", admin)
+                .withWorkflowGroup(1, admin)
                 .build();
         simpleCol = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Test Collection without Workflow")
@@ -312,7 +312,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         // Create a new collection with handle that maps to the test-duplicate-detection submission config
         col = CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-duplicate-detection")
                 .withName("Test Collection with Duplicate Detection")
-                .withWorkflowGroup("reviewer", admin)
+                .withWorkflowGroup(1, admin)
                 .build();
         // Create a new workspace item with a similar title to Item 1 (1 edit distance). Reuse other items
         // metadata for the rest, as it is not relevant.

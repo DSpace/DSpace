@@ -9,7 +9,6 @@ package org.dspace.app.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -17,9 +16,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -104,12 +103,8 @@ public class InitializeEntities {
      */
     private static boolean checkHelpEntered(Options options, CommandLine line) {
         if (line.hasOption("h") || !line.hasOption("f")) {
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "Initialize Entities", null, options, null, false);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("Initialize Entities", options);
             return true;
         }
         return false;

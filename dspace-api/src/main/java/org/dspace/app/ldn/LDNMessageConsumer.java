@@ -7,6 +7,8 @@
  */
 package org.dspace.app.ldn;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -168,7 +170,7 @@ public class LDNMessageConsumer implements Consumer {
         LDN ldn = (resubmissionID != null)
                 ? getLDNMessage(pattern + RESUBMISSION_SUFFIX) : getLDNMessage(pattern);
         LDNMessageEntity ldnMessage =
-                ldnMessageService.create(context, "urn:uuid:%s".formatted(UUID.randomUUID()));
+                ldnMessageService.create(context, format("urn:uuid:%s", UUID.randomUUID()));
 
         ldnMessage.setObject(item);
         ldnMessage.setTarget(service);
@@ -235,7 +237,7 @@ public class LDNMessageConsumer implements Consumer {
         ldn.addArgument(ldnMessage.getID());
         ldn.addArgument(getRelationUri(item));
         ldn.addArgument("http://purl.org/vocab/frbr/core#supplement");
-        ldn.addArgument("urn:uuid:%s".formatted(UUID.randomUUID()));
+        ldn.addArgument(format("urn:uuid:%s", UUID.randomUUID()));
         if (actorID != null) {
             ldn.addArgument("Person");
         } else {
@@ -245,7 +247,7 @@ public class LDNMessageConsumer implements Consumer {
         ldn.addArgument(getUiUrl());
         // Param 15: inReplyTo ID, used in endorsement resubmission notifications
         if (resubmissionId != null) {
-            ldn.addArgument("\"inReplyTo\": \"%s\",".formatted(resubmissionId));
+            ldn.addArgument(String.format("\"inReplyTo\": \"%s\",", resubmissionId));
         }
 
         ldnMessage.setMessage(ldn.generateLDNMessage());

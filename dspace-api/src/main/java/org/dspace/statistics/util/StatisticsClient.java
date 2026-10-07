@@ -8,16 +8,13 @@
 package org.dspace.statistics.util;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URI;
 import java.net.URL;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Get;
@@ -46,12 +43,8 @@ public class StatisticsClient {
      */
     private static void printHelp(Options options, int exitCode) {
         // print the help message
-        HelpFormatter myhelp = HelpFormatter.builder().get();
-        try {
-            myhelp.printHelp("StatisticsClient", null, options, null, false);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        HelpFormatter myhelp = new HelpFormatter();
+        myhelp.printHelp("StatisticsClient\n", options);
         System.exit(exitCode);
     }
 
@@ -135,7 +128,7 @@ public class StatisticsClient {
                 value = value.trim();
                 System.out.println(" Downloading: " + value);
 
-                URL url = URI.create(value).toURL();
+                URL url = new URL(value);
 
                 Get get = new Get();
                 get.setProject(new Project());

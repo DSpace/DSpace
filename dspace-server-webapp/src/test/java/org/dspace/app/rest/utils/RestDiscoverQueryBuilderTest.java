@@ -83,15 +83,15 @@ public class RestDiscoverQueryBuilderTest {
 
 
         DiscoveryHitHighlightingConfiguration discoveryHitHighlightingConfiguration =
-            new DiscoveryHitHighlightingConfiguration();
+                new DiscoveryHitHighlightingConfiguration();
         List<DiscoveryHitHighlightFieldConfiguration> discoveryHitHighlightFieldConfigurations = new LinkedList<>();
 
         DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration =
-            new DiscoveryHitHighlightFieldConfiguration();
+                new DiscoveryHitHighlightFieldConfiguration();
         discoveryHitHighlightFieldConfiguration.setField("dc.title");
 
         DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration1 =
-            new DiscoveryHitHighlightFieldConfiguration();
+                new DiscoveryHitHighlightFieldConfiguration();
         discoveryHitHighlightFieldConfiguration1.setField("fulltext");
 
         discoveryHitHighlightFieldConfigurations.add(discoveryHitHighlightFieldConfiguration1);
@@ -147,12 +147,12 @@ public class RestDiscoverQueryBuilderTest {
     @Test
     public void testBuildQuery() throws Exception {
         restQueryBuilder.buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "item",
-            page);
+                                    page);
 
         verify(discoverQueryBuilder, times(1)).buildQuery(context, scope, discoveryConfiguration, query,
-            Arrays.asList(tranformedFilter), singletonList("item"),
-            page.getPageSize(), page.getOffset(), "dc.title",
-            "ASC");
+                                                          Arrays.asList(tranformedFilter), singletonList("item"),
+                                                          page.getPageSize(), page.getOffset(), "dc.title",
+                                                          "ASC");
     }
 
     @Test
@@ -160,7 +160,7 @@ public class RestDiscoverQueryBuilderTest {
         restQueryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), null);
 
         verify(discoverQueryBuilder, times(1)).buildQuery(context, null, discoveryConfiguration, null,
-            emptyList(), emptyList(), null, null, null, null);
+                                                          emptyList(), emptyList(), null, null, null, null);
     }
 
     @Test
@@ -169,8 +169,8 @@ public class RestDiscoverQueryBuilderTest {
         restQueryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), page);
 
         verify(discoverQueryBuilder, times(1)).buildQuery(context, null, discoveryConfiguration, null,
-            emptyList(), emptyList(), page.getPageSize(),
-            page.getOffset(), "SCORE", "ASC");
+                                                          emptyList(), emptyList(), page.getPageSize(),
+                                                          page.getOffset(), "SCORE", "ASC");
     }
 
     @Test
@@ -179,15 +179,15 @@ public class RestDiscoverQueryBuilderTest {
         restQueryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), page);
 
         verify(discoverQueryBuilder, times(1))
-            .buildQuery(context, null, discoveryConfiguration, null, emptyList(), emptyList(),
-                page.getPageSize(), page.getOffset(), null, null);
+                .buildQuery(context, null, discoveryConfiguration, null, emptyList(), emptyList(),
+                        page.getPageSize(), page.getOffset(), null, null);
     }
 
     @Test
     public void testCatchIllegalArgumentException() throws Exception {
         assertThrows(DSpaceBadRequestException.class, () -> {
             when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
-                any())).thenThrow(IllegalArgumentException.class);
+                                                 any())).thenThrow(IllegalArgumentException.class);
             restQueryBuilder
                 .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "TEST", page);
         });
@@ -197,7 +197,7 @@ public class RestDiscoverQueryBuilderTest {
     public void testCatchSearchServiceException() throws Exception {
         assertThrows(InvalidSearchRequestException.class, () -> {
             when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
-                any())).thenThrow(SearchServiceException.class);
+                                                 any())).thenThrow(SearchServiceException.class);
             restQueryBuilder
                 .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
         });
@@ -206,13 +206,13 @@ public class RestDiscoverQueryBuilderTest {
     @Test
     public void testBuildFacetQuery() throws Exception {
         restQueryBuilder.buildFacetQuery(context, scope, discoveryConfiguration,
-            "prefix", query,
-            singletonList(searchFilter), "item", page,
-            "subject");
+                                         "prefix", query,
+                                         singletonList(searchFilter), "item", page,
+                                         "subject");
 
         verify(discoverQueryBuilder, times(1)).buildFacetQuery(context, scope, discoveryConfiguration, "prefix",
-            query, singletonList(tranformedFilter),
-            singletonList("item"), page.getPageSize(),
-            page.getOffset(), "subject");
+                                                               query, singletonList(tranformedFilter),
+                                                               singletonList("item"), page.getPageSize(),
+                                                               page.getOffset(), "subject");
     }
 }

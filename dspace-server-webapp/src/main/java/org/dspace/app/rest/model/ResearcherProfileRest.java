@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serial;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +25,6 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class ResearcherProfileRest extends BaseObjectRest<UUID> {
 
-    @Serial
     private static final long serialVersionUID = 1L;
     public static final String CATEGORY = RestModel.EPERSON;
     public static final String NAME = "profile";

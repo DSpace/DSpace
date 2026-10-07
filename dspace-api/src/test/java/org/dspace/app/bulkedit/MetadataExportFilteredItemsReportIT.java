@@ -81,7 +81,7 @@ public class MetadataExportFilteredItemsReportIT extends AbstractIntegrationTest
                     for (int k = 0; k < itemCountPerSubjectThenPerAuthor[s][a]; k++) {
                         ItemKey key = new ItemKey(collName, subject, author);
                         Item item = ItemBuilder.createItem(context, collection)
-                            .withTitle("%s item %d".formatted(subject, k))
+                            .withTitle(String.format("%s item %d", subject, k))
                             .withSubject(subject)
                             .withAuthor(author)
                             .withIssueDate(dateFunction.apply(s, a, k))

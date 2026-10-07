@@ -6,8 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.model;
-import java.io.Serial;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
@@ -18,7 +16,6 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class FeedbackRest extends BaseObjectRest<Integer> {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final String NAME = "feedback";

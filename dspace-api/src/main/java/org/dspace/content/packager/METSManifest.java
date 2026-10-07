@@ -267,11 +267,12 @@ public class METSManifest {
         throws IOException,
         MetadataValidationException {
 
-        SAXBuilder builder = XMLUtils.getSAXBuilder(validate);
+        SAXBuilder builder = XMLUtils.getSAXBuilder();
         builder.setIgnoringElementContentWhitespace(true);
 
         // Set validation feature
         if (validate) {
+            builder.setValidation(true);
             builder.setFeature("http://apache.org/xml/features/validation/schema", true);
 
             // Tell the parser where local copies of schemas are, to speed up
@@ -1115,7 +1116,10 @@ public class METSManifest {
             // If we found the IngestionCrosswalk, crosswalk our XML-based content
             if (xwalk != null) {
                 // Check if our Crosswalk actually wraps another Packager Plugin
-                if (xwalk instanceof AbstractPackagerWrappingCrosswalk wrapper) {
+                if (xwalk instanceof AbstractPackagerWrappingCrosswalk) {
+                    // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                    // (which essentially allow us to customize the ingest process of the crosswalk)
+                    AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) xwalk;
                     wrapper.setPackagingParameters(params);
                 }
 
@@ -1127,7 +1131,10 @@ public class METSManifest {
 
                 if (sxwalk != null) {
                     // Check if our Crosswalk actually wraps another Packager Plugin
-                    if (sxwalk instanceof AbstractPackagerWrappingCrosswalk wrapper) {
+                    if (sxwalk instanceof AbstractPackagerWrappingCrosswalk) {
+                        // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                        // (which essentially allow us to customize the ingest process of the crosswalk)
+                        AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) sxwalk;
                         wrapper.setPackagingParameters(params);
                     }
 

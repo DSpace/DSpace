@@ -3113,7 +3113,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-            "%s.isPublicationOfAuthor".formatted(MetadataSchemaEnum.RELATION.getName()),
+                String.format("%s.isPublicationOfAuthor", MetadataSchemaEnum.RELATION.getName()),
                 publication1.getID().toString()
             )));
 
@@ -3124,7 +3124,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-            "%s.isAuthorOfPublication".formatted(MetadataSchemaEnum.RELATION.getName()),
+                String.format("%s.isAuthorOfPublication", MetadataSchemaEnum.RELATION.getName()),
                 author1.getID().toString()
             )));
     }
@@ -3153,7 +3153,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-            "%s.isOrgUnitOfPerson".formatted(MetadataSchemaEnum.RELATION.getName()),
+                String.format("%s.isOrgUnitOfPerson", MetadataSchemaEnum.RELATION.getName()),
                 orgUnit1.getID().toString()
             )));
 
@@ -3164,7 +3164,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-            "%s.isPersonOfOrgUnit".formatted(MetadataSchemaEnum.RELATION.getName()),
+                String.format("%s.isPersonOfOrgUnit", MetadataSchemaEnum.RELATION.getName()),
                 author1.getID().toString()
             )));
     }

@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import org.dspace.utils.DSpace;
@@ -61,7 +61,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
         String extraConfPath = getLocalConfigurationFilePath();
         FileChannel fileOpen;
         try {
-            fileOpen = FileChannel.open(Path.of(extraConfPath), StandardOpenOption.READ);
+            fileOpen = FileChannel.open(Paths.get(extraConfPath), StandardOpenOption.READ);
             initialLocalCfgSize = fileOpen.size();
             fileOpen.close();
         } catch (IOException e) {
@@ -91,7 +91,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
         }
         String extraConfPath = getLocalConfigurationFilePath();
         try {
-            FileChannel.open(Path.of(extraConfPath), StandardOpenOption.WRITE)
+            FileChannel.open(Paths.get(extraConfPath), StandardOpenOption.WRITE)
                 .truncate(initialLocalCfgSize).close();
             localCfgChanged = false;
             // sleep to give the time to the configuration to note the change

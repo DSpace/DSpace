@@ -32,8 +32,8 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
     }
 
     public HttpServletRequest getHttpServletRequest() {
-        if (servletRequest instanceof HttpServletRequest request) {
-            return request;
+        if (servletRequest instanceof HttpServletRequest) {
+            return (HttpServletRequest) servletRequest;
         }
 
         return null;
@@ -44,8 +44,8 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
     }
 
     public HttpServletResponse getHttpServletResponse() {
-        if (servletResponse instanceof HttpServletResponse response) {
-            return response;
+        if (servletResponse instanceof HttpServletResponse) {
+            return (HttpServletResponse) servletResponse;
         }
 
         return null;

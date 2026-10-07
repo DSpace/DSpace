@@ -82,13 +82,13 @@ public class CoverPageServiceTest extends AbstractDSpaceTest {
     public void multipleAuthors() throws Exception {
 
         givenMetadataValues("dc_title",
-            "My title",
-            "dc_contributor_author",
-            "My author 1",
-            "dc_contributor_author",
-            "My author 2",
-            "dc_creator",
-            "My author 3");
+                "My title",
+                "dc_contributor_author",
+                "My author 1",
+                "dc_contributor_author",
+                "My author 2",
+                "dc_creator",
+                "My author 3");
 
         try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));
@@ -103,13 +103,13 @@ public class CoverPageServiceTest extends AbstractDSpaceTest {
     public void multipleEditors() throws Exception {
 
         givenMetadataValues("dc_title",
-            "My title",
-            "dc_contributor_author",
-            "My author 1",
-            "dc_contributor_editor",
-            "My editor 1",
-            "dc_contributor_editor",
-            "My editor 2");
+                "My title",
+                "dc_contributor_author",
+                "My author 1",
+                "dc_contributor_editor",
+                "My editor 1",
+                "dc_contributor_editor",
+                "My editor 2");
 
         try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));

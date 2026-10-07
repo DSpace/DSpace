@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serial;
 import java.time.Instant;
 
 import org.dspace.app.rest.RestResourceController;
@@ -20,7 +19,6 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class QASourceRest extends BaseObjectRest<String> {
 
-    @Serial
     private static final long serialVersionUID = -7455358581579629244L;
 
     public static final String NAME = "qualityassurancesource";

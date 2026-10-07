@@ -37,7 +37,8 @@ public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, Browse
         bir.setProjection(projection);
         List<String> metadataList = new ArrayList<String>();
         String id = obj.getName();
-        if (obj instanceof DSpaceControlledVocabularyIndex vocObj) {
+        if (obj instanceof DSpaceControlledVocabularyIndex) {
+            DSpaceControlledVocabularyIndex vocObj = (DSpaceControlledVocabularyIndex) obj;
             metadataList = new ArrayList<>(vocObj.getMetadataFields());
             id = vocObj.getVocabulary().getPluginInstanceName();
             bir.setFacetType(vocObj.getFacetConfig().getIndexFieldName());

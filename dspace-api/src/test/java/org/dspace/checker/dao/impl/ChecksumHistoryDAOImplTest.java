@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import jakarta.persistence.Query;
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.content.Bitstream;
@@ -65,7 +66,7 @@ public class ChecksumHistoryDAOImplTest
 
         // Create two older rows
         HibernateDBConnection dbc = (HibernateDBConnection) CoreHelpers.getDBConnection(context);
-        var insertQry = dbc.getSession().createNativeMutationQuery(
+        Query qry = dbc.getSession().createNativeQuery(
             "INSERT INTO checksum_history"
                 + "(check_id, process_end_date, result, bitstream_id)"
                 + " VALUES (:id, :date, :result, :bitstream)");
@@ -80,29 +81,29 @@ public class ChecksumHistoryDAOImplTest
         // Add a past date row with matching result code
         Instant matchDate = retentionDate.minus(1, ChronoUnit.DAYS);
         int matchId = 0;
-        insertQry.setParameter("id", matchId);
-        insertQry.setParameter("date", matchDate);
-        insertQry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-        insertQry.setParameter("bitstream", bs.getID());
-        insertQry.executeUpdate();
+        qry.setParameter("id", matchId);
+        qry.setParameter("date", matchDate);
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
+        qry.executeUpdate();
 
         // Add a past date row with a nonmatching result code
         Instant noMatchDate = retentionDate.minus(2, ChronoUnit.DAYS);
         int noMatchId = 1;
-        insertQry.setParameter("id", noMatchId);
-        insertQry.setParameter("date", noMatchDate);
-        insertQry.setParameter("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
-        insertQry.setParameter("bitstream", bs.getID());
-        insertQry.executeUpdate();
+        qry.setParameter("id", noMatchId);
+        qry.setParameter("date", noMatchDate);
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
+        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
+        qry.executeUpdate();
 
         // Add a future date row with a matching result code
         Instant futureDate = retentionDate.plus(3, ChronoUnit.DAYS);
         int futureMatchId = 2;
-        insertQry.setParameter("id", futureMatchId);
-        insertQry.setParameter("date", futureDate);
-        insertQry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-        insertQry.setParameter("bitstream", bs.getID());
-        insertQry.executeUpdate();
+        qry.setParameter("id", futureMatchId);
+        qry.setParameter("date", futureDate);
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
+        qry.executeUpdate();
 
         // Test!
         ChecksumHistoryDAOImpl instance = new ChecksumHistoryDAOImpl();
@@ -112,22 +113,22 @@ public class ChecksumHistoryDAOImplTest
         assertEquals(expResult, result);
 
         // See if matching old row is gone.
-        var selectQry = dbc.getSession().createQuery(
-            "SELECT COUNT(*) FROM ChecksumHistory WHERE id = :id", Long.class);
+        qry = dbc.getSession().createQuery(
+            "SELECT COUNT(*) FROM ChecksumHistory WHERE id = :id");
         long count;
 
-        selectQry.setParameter("id", matchId);
-        count = (Long) selectQry.getSingleResult();
+        qry.setParameter("id", matchId);
+        count = (Long) qry.getSingleResult();
         assertEquals(0, count, "Should find no row at matchDate");
 
         // See if nonmatching old row is still present.
-        selectQry.setParameter("id", noMatchId);
-        count = (Long) selectQry.getSingleResult();
+        qry.setParameter("id", noMatchId);
+        count = (Long) qry.getSingleResult();
         assertEquals(1, count, "Should find one row at noMatchDate");
 
         // See if future date row is still present.
-        selectQry.setParameter("id", futureMatchId);
-        count = (Long) selectQry.getSingleResult();
+        qry.setParameter("id", futureMatchId);
+        count = (Long) qry.getSingleResult();
         assertEquals(1, count, "Should find one row at futureDate");
     }
 

@@ -7,7 +7,6 @@
  */
 package org.dspace.servicemanager.fakeservices;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.annotation.PostConstruct;
@@ -18,7 +17,6 @@ import jakarta.annotation.PostConstruct;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class FakeService2 implements Comparable<FakeService2>, Serializable {
-    @Serial
     private static final long serialVersionUID = 1L;
 
     public String data = "data";

@@ -679,7 +679,8 @@ public class SamlAuthentication implements AuthenticationMethod {
 
         Object value = request.getAttribute(name);
 
-        if (value instanceof List<?> list) {
+        if (value instanceof List) {
+            List<?> list = (List<?>) value;
 
             if (list.size() == 0) {
                 value = null;

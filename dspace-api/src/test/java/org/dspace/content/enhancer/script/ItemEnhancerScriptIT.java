@@ -78,7 +78,7 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
 
     /**
-     * This method will be run before the first test as per @BeforeAll. It will
+     * This method will be run before the first test as per @BeforeClass. It will
      * configure the event.dispatcher.default.consumers property to remove the
      * ItemEnhancerConsumer.
      */

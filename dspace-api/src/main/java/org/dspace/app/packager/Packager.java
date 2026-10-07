@@ -12,15 +12,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
@@ -215,13 +214,9 @@ public class Packager {
         Packager myPackager = new Packager();
 
         if (line.hasOption('h')) {
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "Packager  [options]  package-file|-",
-                    null, options, null, false);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            HelpFormatter myhelp = new HelpFormatter();
+            myhelp.printHelp("Packager  [options]  package-file|-\n",
+                             options);
             //If user specified a type, also print out the SIP and DIP options
             // that are specific to that type of packager
             if (line.hasOption('t')) {
@@ -331,13 +326,8 @@ public class Packager {
         // REQUIRED: sourceFile, ePerson (-e), packageType (-t)
         if (sourceFile == null || eperson == null || myPackager.packageType == null) {
             System.err.println("Error - missing a REQUIRED argument or option.\n");
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "PackageManager  [options]  package-file|-",
-                    null, options, null, false);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            HelpFormatter myhelp = new HelpFormatter();
+            myhelp.printHelp("PackageManager  [options]  package-file|-\n", options);
             return;
         }
 
@@ -377,10 +367,8 @@ public class Packager {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.println("\n\nWARNING -- You are running the packager in REPLACE mode.");
                 System.out.println(
-                    """
-
-                    REPLACE mode may be potentially dangerous as it will automatically remove and replace contents\
-                     within DSpace.""");
+                    "\nREPLACE mode may be potentially dangerous as it will automatically remove and replace contents" +
+                        " within DSpace.");
                 System.out.println(
                     "We highly recommend backing up all your DSpace contents (files & database) before continuing.");
                 System.out.print("\nWould you like to continue? [y/n]: ");

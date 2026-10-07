@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -229,7 +229,7 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
     // We use 'Paths' instead of splitting on slashes because these OSes use different path separators.
     private int countPathElements(String stringPath) {
         List<String> pathElements = new ArrayList<>();
-        Path.of(stringPath).forEach(p -> pathElements.add(p.toString()));
+        Paths.get(stringPath).forEach(p -> pathElements.add(p.toString()));
         return pathElements.size();
     }
 

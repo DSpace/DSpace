@@ -9,6 +9,7 @@ package org.dspace.app.rest.scripts.handler.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,9 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.help.HelpFormatter;
-import org.apache.commons.cli.help.TextHelpAppendable;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -177,8 +177,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
     private String getLogMessage(String message) {
-        return "Process id: %d, script name: %s, message: %s"
-            .formatted(processId, scriptName, message);
+        return String
+            .format("Process id: %d, script name: %s, message: %s", processId, scriptName, message);
     }
 
     @Override
@@ -219,15 +219,12 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public void printHelp(Options options, String name) {
         if (options != null) {
+            HelpFormatter formatter = new HelpFormatter();
             StringWriter out = new StringWriter();
-            HelpFormatter formatter = HelpFormatter.builder()
-                .setHelpAppendable(new TextHelpAppendable(out))
-                .get();
-            try {
-                formatter.printHelp(name, null, options, null, false);
-            } catch (IOException e) {
-                throw new java.io.UncheckedIOException(e);
-            }
+            PrintWriter pw = new PrintWriter(out);
+            formatter.printHelp(pw, 1000, name, null, options, formatter.getLeftPadding(), formatter.getDescPadding(),
+                                null, false);
+            pw.flush();
 
             String helpString = out.toString();
 

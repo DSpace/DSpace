@@ -14,7 +14,6 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -34,8 +33,8 @@ import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -409,12 +408,8 @@ public class StatisticsImporter {
      */
     private static void printHelp(Options options, int exitCode) {
         // print the help message
-        HelpFormatter myhelp = HelpFormatter.builder().get();
-        try {
-            myhelp.printHelp("StatisticsImporter", null, options, null, false);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        HelpFormatter myhelp = new HelpFormatter();
+        myhelp.printHelp("StatisticsImporter\n", options);
         System.exit(exitCode);
     }
 

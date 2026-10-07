@@ -70,8 +70,8 @@ public class LDNInboxController {
         context.commit();
 
         return ResponseEntity.accepted()
-            .body("Successfully stored notification %s %s".formatted(
-            notification.getId(), notification.getType()));
+            .body(String.format("Successfully stored notification %s %s",
+                notification.getId(), notification.getType()));
     }
 
     /**

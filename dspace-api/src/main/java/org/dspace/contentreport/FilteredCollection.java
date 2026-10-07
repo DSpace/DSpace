@@ -7,7 +7,6 @@
  */
 package org.dspace.contentreport;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
@@ -20,7 +19,6 @@ import java.util.Optional;
  */
 public class FilteredCollection implements Cloneable, Serializable {
 
-    @Serial
     private static final long serialVersionUID = -231735620268582719L;
 
     /** Name of the collection */

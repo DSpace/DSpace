@@ -366,9 +366,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             EntityType dsoEntityType = itemService.getEntityType(context, item);
 
             if (dsoEntityType == null) {
-                throw new UnprocessableEntityException(
-                    "The request DSO with id: %s doesn't have an entity type"
-                        .formatted(dsoId));
+                throw new UnprocessableEntityException(String.format(
+                    "The request DSO with id: %s doesn't have an entity type", dsoId));
             }
 
             for (RelationshipType relationshipType : relationshipTypeList) {

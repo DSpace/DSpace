@@ -393,7 +393,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         super.update(context, bitstream);
         if (bitstream.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null,
-                                       DetailType.INFO, getIdentifiers(context, bitstream)));
+                                       getIdentifiers(context, bitstream)));
             bitstream.setModified();
         }
         if (bitstream.isMetadataModified()) {
@@ -506,8 +506,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public void updateLastModified(Context context, Bitstream bitstream) {
         //Also fire a modified event since the bitstream HAS been modified
         context.addEvent(
-            new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null,
-                      DetailType.INFO, getIdentifiers(context, bitstream)));
+            new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
     }
 
     @Override

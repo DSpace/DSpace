@@ -412,9 +412,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             //We expect the content disposition to have the encoded bitstream name
             .andExpect(header().string(
                 "Content-Disposition",
-            "attachment; filename=\"%s\"; filename*=UTF-8''%s".formatted(
-                expectedAscii,
-                expectedUtf8Encoded)
+                String.format("attachment; filename=\"%s\"; filename*=UTF-8''%s",
+                              expectedAscii,
+                              expectedUtf8Encoded)
             ));
     }
 

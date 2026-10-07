@@ -20,7 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UncheckedIOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +36,10 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -173,19 +173,19 @@ public class StructBuilder {
 
         options.addOption(Option.builder("e").longOpt("eperson")
                 .desc("User who is manipulating the repository's structure.")
-                .hasArg().argName("eperson").required().get());
+                .hasArg().argName("eperson").required().build());
 
         options.addOption(Option.builder("f").longOpt("file")
                 .desc("File of new structure information.")
-                .hasArg().argName("input").get());
+                .hasArg().argName("input").build());
 
         options.addOption(Option.builder("o").longOpt("output")
                 .desc("File to receive the structure map ('-' for standard out).")
-                .hasArg().argName("output").required().get());
+                .hasArg().argName("output").required().build());
 
         options.addOption(Option.builder("p").longOpt("parent")
                 .desc("Parent community or handle (optional)")
-                .hasArg().argName("parent").required(false).get());
+                .hasArg().argName("parent").required(false).build());
 
         // Parse the command line.
         CommandLineParser parser = new DefaultParser();
@@ -510,11 +510,10 @@ public class StructBuilder {
      * Output the usage information.
      */
     private static void usage(Options options) {
-        try {
-            HelpFormatter.builder().get().printHelp(
-                "structure-builder", null, options, null, true);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        HelpFormatter helper = new HelpFormatter();
+        try (PrintWriter writer = new PrintWriter(System.out);) {
+            helper.printUsage(writer, 80/* FIXME Magic */,
+                    "structure-builder", options);
         }
     }
 
@@ -522,8 +521,8 @@ public class StructBuilder {
      * Help the user more.
      */
     private static void giveHelp(Options options) {
-        try {
-            HelpFormatter.builder().get().printHelp("struct-builder",
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("struct-builder",
                 "Import or export Community/Collection structure.",
                 options,
                 "When importing (-f), communities will be created from the "
@@ -531,9 +530,6 @@ public class StructBuilder {
                     + "be returned in the output file.  When exporting (-x),"
                     + "the current structure will be written to the map file.",
                 true);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 
     /**

@@ -8,7 +8,6 @@
 package org.dspace.util;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,9 +18,9 @@ import java.util.UUID;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -235,7 +234,7 @@ public class SolrUpgradePre6xStatistics {
         long hh = sec / 3600;
         long mm = (sec % 3600) / 60;
         long ss = (sec % 60);
-        return "%d:%02d:%02d".formatted(hh, mm, ss);
+        return String.format("%d:%02d:%02d", hh, mm, ss);
     }
 
     /**
@@ -257,11 +256,11 @@ public class SolrUpgradePre6xStatistics {
             log.error("Cannot get cache size", e);
         }
         String label = fromStart ? "TOTAL" : "Processed";
-        System.out.println("%s (%s; %s; %s)".formatted(
-            "\t%,12d %10s...".formatted(numProcessed, label),
-            "%,6d sec; %s".formatted(dur / 1000, stotalDur),
-            "DB cache: %,6d/%,8d".formatted(cacheSize, getCacheCounts(fromStart)),
-            "Docs: %,6d".formatted(docs.size())));
+        System.out.println(String.format("%s (%s; %s; %s)",
+            String.format("\t%,12d %10s...", numProcessed, label),
+            String.format("%,6d sec; %s", dur / 1000, stotalDur),
+            String.format("DB cache: %,6d/%,8d", cacheSize, getCacheCounts(fromStart)),
+            String.format("Docs: %,6d", docs.size())));
     }
 
     /*
@@ -289,13 +288,8 @@ public class SolrUpgradePre6xStatistics {
      *            the given code.
      */
     private static void printHelpAndExit(Options options, int exitCode) {
-        HelpFormatter myhelp = HelpFormatter.builder().get();
-        try {
-            myhelp.printHelp(SolrUpgradePre6xStatistics.class.getSimpleName(),
-                             null, options, null, false);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        HelpFormatter myhelp = new HelpFormatter();
+        myhelp.printHelp(SolrUpgradePre6xStatistics.class.getSimpleName() + "\n", options);
         System.out.println("\n\nCommand Defaults");
         System.out.println(
                 "\tsolr-upgrade-statistics-6x [-i statistics] [-n num_recs_to_process] [-b num_rec_to_update_at_once]");
@@ -384,7 +378,7 @@ public class SolrUpgradePre6xStatistics {
         System.out.println("\t*** Statistics Records with Legacy Id ***\n");
         long total = runReportQuery();
         System.out.println("\t--------------------------------------");
-        System.out.println("\t%,12d\t%s".formatted(total, "TOTAL"));
+        System.out.println(String.format("\t%,12d\t%s", total, "TOTAL"));
         System.out.println("=================================================================");
         System.out.println();
     }
@@ -424,17 +418,17 @@ public class SolrUpgradePre6xStatistics {
                     unexpected += count.getCount();
                     continue;
                 }
-                System.out.println("\t%,12d\t%s".formatted(count.getCount(), name));
+                System.out.println(String.format("\t%,12d\t%s", count.getCount(), name));
                 total += count.getCount();
             }
         }
         if (unexpected > 0) {
-            System.out.println("\t%,12d\t%s".formatted(unexpected, "Unexpected Type & Full Site"));
+            System.out.println(String.format("\t%,12d\t%s", unexpected, "Unexpected Type & Full Site"));
             total += unexpected;
         }
         long rem = sr.getResults().getNumFound() - total;
         if (rem > 0) {
-            System.out.println("\t%,12d\t%s".formatted(rem, "Other Records"));
+            System.out.println(String.format("\t%,12d\t%s", rem, "Other Records"));
             total += rem;
         }
         return total;

@@ -22,7 +22,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.event.EventDetail;
 
 /**
  * Consumer that takes care of the indexing of authority controlled metadata fields for installed/updated items
@@ -65,16 +64,15 @@ public class AuthorityConsumer implements Consumer {
         }
 
         DSpaceObject dso = event.getSubject(ctx);
-        if (dso instanceof Item item) {
+        if (dso instanceof Item) {
+            Item item = (Item) dso;
             if (item.isArchived()) {
                 if (!itemsToReindex.contains(item.getID())) {
                     itemsToReindex.add(item.getID());
                 }
             }
 
-            EventDetail detail = event.getDetailList().isEmpty()
-                ? null : event.getDetailList().get(0);
-            if (("ARCHIVED: " + true).equals(detail)) {
+            if (("ARCHIVED: " + true).equals(event.getDetail())) {
                 itemsToUpdateAuthority.add(item.getID());
             }
 

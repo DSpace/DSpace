@@ -140,9 +140,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -213,9 +213,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -282,9 +282,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -354,9 +354,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -433,13 +433,13 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collectionA = CollectionBuilder.createCollection(context, parent)
-                                                  .withWorkflowGroup("reviewer", workflowUserB)
-                                                  .withWorkflowGroup("editor", workflowUserC)
-                                                  .withWorkflowGroup("finaleditor", workflowUserB)
+                                                  .withWorkflowGroup(1, workflowUserB)
+                                                  .withWorkflowGroup(2, workflowUserC)
+                                                  .withWorkflowGroup(3, workflowUserB)
                                                   .build();
 
         Collection collectionB = CollectionBuilder.createCollection(context, parent)
-                                                  .withWorkflowGroup("reviewer", workflowUserB)
+                                                  .withWorkflowGroup(1, workflowUserB)
                                                   .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collectionA)
@@ -503,9 +503,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -575,9 +575,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -647,9 +647,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -723,9 +723,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -796,9 +796,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -873,9 +873,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -951,9 +951,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -1027,9 +1027,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB)
-                                                 .withWorkflowGroup("editor", workflowUserC)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB)
+                                                 .withWorkflowGroup(1, workflowUserB)
+                                                 .withWorkflowGroup(2, workflowUserC)
+                                                 .withWorkflowGroup(3, workflowUserB)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -1094,9 +1094,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB, workflowUserD)
-                                                 .withWorkflowGroup("editor", workflowUserC, workflowUserD)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -1159,9 +1159,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB, workflowUserD)
-                                                 .withWorkflowGroup("editor", workflowUserC, workflowUserD)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -1224,9 +1224,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB, workflowUserD)
-                                                 .withWorkflowGroup("editor", workflowUserC, workflowUserD)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -1292,9 +1292,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB, workflowUserD)
-                                                 .withWorkflowGroup("editor", workflowUserC, workflowUserD)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -1362,9 +1362,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB, workflowUserD)
-                                                 .withWorkflowGroup("editor", workflowUserC, workflowUserD)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
@@ -1431,9 +1431,9 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUserB, workflowUserD)
-                                                 .withWorkflowGroup("editor", workflowUserC, workflowUserD)
-                                                 .withWorkflowGroup("finaleditor", workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(1, workflowUserB, workflowUserD)
+                                                 .withWorkflowGroup(2, workflowUserC, workflowUserD)
+                                                 .withWorkflowGroup(3, workflowUserB, workflowUserD)
                                                  .build();
 
         WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)

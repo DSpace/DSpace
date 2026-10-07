@@ -31,7 +31,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -354,6 +353,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             super.setMetadataSingleValue(context, collection, field, null, value);
         }
 
+        collection.addDetails(field.toString());
     }
 
     @Override
@@ -554,7 +554,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // register this as the admin group
         collection.setAdmins(admins);
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
-                                   null, DetailType.INFO, getIdentifiers(context, collection)));
+                                              null, getIdentifiers(context, collection)));
         return admins;
     }
 
@@ -572,7 +572,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Remove the link to the collection table.
         collection.setAdmins(null);
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
-                                   null, DetailType.INFO, getIdentifiers(context, collection)));
+                                              null, getIdentifiers(context, collection)));
     }
 
     @Override
@@ -688,8 +688,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (collection.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION,
-                                       collection.getID(), null, DetailType.INFO,
-                                       getIdentifiers(context, collection)));
+                                       collection.getID(), null, getIdentifiers(context, collection)));
             collection.clearModified();
         }
         if (collection.isMetadataModified()) {
@@ -783,6 +782,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 removeItem(context, collection, item);
             }
         }
+
 
         // Delete bitstream logo
         setLogo(context, collection, null);
@@ -1003,8 +1003,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public void updateLastModified(Context context, Collection collection) throws SQLException, AuthorizeException {
         //Also fire a modified event since the collection HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION,
-                                   collection.getID(), null, DetailType.INFO,
-                                   getIdentifiers(context, collection)));
+                                   collection.getID(), null, getIdentifiers(context, collection)));
     }
 
     @Override
@@ -1124,11 +1123,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             discoverQuery.addFilterQueries("search.entitytype:" + entityType);
         }
         if (StringUtils.isNotBlank(q)) {
-            StringBuilder buildQuery = new StringBuilder();
-            String escapedQuery = ClientUtils.escapeQueryChars(q);
-            buildQuery.append("(").append(escapedQuery).append(" OR dc.title_sort:*")
-                .append(escapedQuery).append("*").append(")");
-            discoverQuery.setQuery(buildQuery.toString());
+            q = searchService.formatAutoCompleteQuery(q, "dc.title_sort");
+            discoverQuery.setQuery(q);
         }
         discoverQuery.addRequiredAuthorization(Constants.ADD);
         DiscoverResult resp = searchService.search(context, discoverQuery);

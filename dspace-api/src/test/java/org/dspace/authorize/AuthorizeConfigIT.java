@@ -32,10 +32,8 @@ public class AuthorizeConfigIT extends AbstractIntegrationTest {
 
         // in our extra configuration file for test, disable some feature
         appendToLocalConfiguration(
-            """
-            core.authorization.community-admin.group = false
-            core.authorization.community-admin.delete-subelement = false
-            """);
+            "core.authorization.community-admin.group = false\n" +
+            "core.authorization.community-admin.delete-subelement = false\n");
         // verify that the two changed one are reflected in the AuthorizationConfiguration
         assertFalse(AuthorizeConfiguration.canCommunityAdminPerformGroupCreation());
         assertFalse(AuthorizeConfiguration.canCommunityAdminPerformSubelementDeletion());

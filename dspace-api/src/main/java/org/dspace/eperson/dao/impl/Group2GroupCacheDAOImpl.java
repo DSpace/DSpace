@@ -157,21 +157,21 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
 
     @Override
     public void deleteFromCache(Context context, UUID parent, UUID child) throws SQLException {
-        getHibernateSession(context).createNativeMutationQuery(
+        Query query = getHibernateSession(context).createNativeQuery(
             "delete from group2groupcache g WHERE g.parent_id = :parent AND g.child_id = :child"
-        )
-        .setParameter("parent", parent)
-        .setParameter("child", child)
-        .executeUpdate();
+        );
+        query.setParameter("parent", parent);
+        query.setParameter("child", child);
+        query.executeUpdate();
     }
 
     @Override
     public void addToCache(Context context, UUID parent, UUID child) throws SQLException {
-        getHibernateSession(context).createNativeMutationQuery(
+        Query query = getHibernateSession(context).createNativeQuery(
             "insert into group2groupcache (parent_id, child_id) VALUES (:parent, :child)"
-        )
-        .setParameter("parent", parent)
-        .setParameter("child", child)
-        .executeUpdate();
+        );
+        query.setParameter("parent", parent);
+        query.setParameter("child", child);
+        query.executeUpdate();
     }
 }

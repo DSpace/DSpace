@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -2107,7 +2107,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @return the filename
      */
     protected String generateRandomFilename(boolean hidden) {
-        String filename = "%s".formatted(RandomStringUtils.secure().nextAlphanumeric(8));
+        String filename = String.format("%s", RandomStringUtils.randomAlphanumeric(8));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
         String datePart = formatter.format(LocalDateTime.now(ZoneOffset.UTC));
         filename = datePart + "_" + filename;
@@ -2217,7 +2217,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         byte[] b = new byte[2048];
                         int length;
 
-                        InputStream is = URI.create(theFilePath).toURL().openStream();
+                        InputStream is = new URL(theFilePath).openStream();
                         while ((length = is.read(b)) != -1) {
                             os.write(b, 0, length);
                         }

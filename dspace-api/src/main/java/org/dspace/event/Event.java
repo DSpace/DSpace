@@ -7,7 +7,6 @@
  */
 package org.dspace.event;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -53,7 +52,6 @@ import org.dspace.event.factory.EventServiceFactory;
  * </ul>
  */
 public class Event implements Serializable {
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /** ---------- Constants ------------- * */
@@ -421,7 +419,8 @@ public class Event implements Serializable {
      */
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Event otherEvent) {
+        if (other instanceof Event) {
+            Event otherEvent = (Event) other;
             return (Objects.equals(this.detailList, otherEvent.detailList))
                 && this.eventType == otherEvent.eventType
                 && this.subjectType == otherEvent.subjectType

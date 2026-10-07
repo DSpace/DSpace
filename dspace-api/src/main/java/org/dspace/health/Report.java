@@ -8,7 +8,6 @@
 package org.dspace.health;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,9 +18,9 @@ import java.util.StringTokenizer;
 import jakarta.mail.MessagingException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,8 +59,8 @@ public class Report {
             String check_name = check_entry.getKey();
             Check check = check_entry.getValue();
 
-            log.info("#%d. Processing [%s] at [%s]".formatted(
-                pos, check_name, Instant.now().toString()));
+            log.info(String.format("#%d. Processing [%s] at [%s]",
+                                   pos, check_name, Instant.now().toString()));
 
             try {
                 // do the stuff
@@ -90,7 +89,8 @@ public class Report {
             if (null != check) {
                 checks.put(check_name, check);
             } else {
-                log.warn("Could not find implementation for [%s]".formatted(check_name));
+                log.warn(String.format(
+                    "Could not find implementation for [%s]", check_name));
             }
         }
         return checks;
@@ -103,12 +103,13 @@ public class Report {
 
     //
     private void store(String name, long took, String report) {
-        name += " [took: %ds] [# lines: %d]".formatted(
-            took / 1000,
-            new StringTokenizer(report, "\r\n").countTokens()
+        name += String.format(" [took: %ds] [# lines: %d]",
+                              took / 1000,
+                              new StringTokenizer(report, "\r\n").countTokens()
         );
 
-        String one_summary = "\n#### %s\n%s\n\n###############################\n".formatted(
+        String one_summary = String.format(
+            "\n#### %s\n%s\n\n###############################\n",
             name,
             report.replaceAll("\\s+$", "")
         );
@@ -156,14 +157,10 @@ public class Report {
             String checks_summary = "";
             int pos = 0;
             for (String check_name : checks().keySet()) {
-                checks_summary += "%d. %s\n".formatted(pos++, check_name);
+                checks_summary += String.format("%d. %s\n", pos++, check_name);
             }
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "dspace healthcheck", null, options, null, false);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("dspace healthcheck", options);
             System.out.println("\nAvailable checks:\n" + checks_summary);
             return;
         }
@@ -208,7 +205,8 @@ public class Report {
                     String email_path = dspace_dir.endsWith("/") ? dspace_dir
                         : dspace_dir + "/";
                     email_path += Report.EMAIL_PATH;
-                    log.info("Looking for email template at [%s]".formatted(email_path));
+                    log.info(String.format(
+                        "Looking for email template at [%s]", email_path));
                     Email email = Email.getEmail(email_path);
                     email.addRecipient(to);
                     email.addArgument(r.toString());

@@ -104,7 +104,8 @@ public class DSpaceHttpClientFactoryTest {
         assertThat(mockServer.getRequestCount(), is(0));
         RecordedRequest request = mockProxy.takeRequest(100, TimeUnit.MILLISECONDS);
         assertThat(request, notNullValue());
-        // Path assertion removed - mockwebserver3 API change
+        // mockwebserver3 reports the requested (absolute-form) URL for proxied requests
+        assertThat(request.getUrl(), is(mockServer.url("")));
         assertThat(request.getRequestLine(), is("GET " + mockServer.url("").toString() + " HTTP/1.1"));
         verify(configurationService).getProperty("http.proxy.host");
         verify(configurationService).getProperty("http.proxy.port");
@@ -133,7 +134,7 @@ public class DSpaceHttpClientFactoryTest {
         InetAddress address = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
         String hostname = address.getHostName();
         // Take first 4 characters hostname as the prefix (e.g. "loca" in "localhost")
-        String hostnamePrefix = hostname.substring(0, 4);
+        String hostnamePrefix =  hostname.substring(0, 4);
         // Save hostname prefix to our list of hosts to ignore, followed by an asterisk.
         // (This should result in our Proxy ignoring our localhost)
         setHttpProxyOnConfigurationService(hostnamePrefix + "*", "www.test.com");
@@ -155,7 +156,7 @@ public class DSpaceHttpClientFactoryTest {
         InetAddress address = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
         String hostname = address.getHostName();
         // Take last 4 characters hostname as the suffix (e.g. "host" in "localhost")
-        String hostnameSuffix = hostname.substring(hostname.length() - 4);
+        String hostnameSuffix =  hostname.substring(hostname.length() - 4);
         // Save hostname suffix to our list of hosts to ignore, preceded by an asterisk.
         // (This should result in our Proxy ignoring our localhost)
         setHttpProxyOnConfigurationService("www.test.com", "*" + hostnameSuffix);
@@ -183,7 +184,7 @@ public class DSpaceHttpClientFactoryTest {
         assertThat(mockServer.getRequestCount(), is(1));
         RecordedRequest request = mockServer.takeRequest(100, TimeUnit.MILLISECONDS);
         assertThat(request, notNullValue());
-        // Path assertion removed - mockwebserver3 API change
+        assertThat(request.getUrl(), is(mockServer.url("")));
         assertThat(request.getRequestLine(), is("GET / HTTP/1.1"));
         verify(configurationService).getProperty("http.proxy.host");
         verify(configurationService).getProperty("http.proxy.port");
@@ -201,7 +202,7 @@ public class DSpaceHttpClientFactoryTest {
         assertThat(mockProxy.getRequestCount(), is(0));
         RecordedRequest request = mockServer.takeRequest(100, TimeUnit.MILLISECONDS);
         assertThat(request, notNullValue());
-        // Path assertion removed - mockwebserver3 API change
+        assertThat(request.getUrl(), is(mockServer.url("")));
         assertThat(request.getRequestLine(), is("GET / HTTP/1.1"));
         verifyNoInteractions(configurationService);
     }
@@ -215,7 +216,8 @@ public class DSpaceHttpClientFactoryTest {
         assertThat(mockServer.getRequestCount(), is(0));
         RecordedRequest request = mockProxy.takeRequest(100, TimeUnit.MILLISECONDS);
         assertThat(request, notNullValue());
-        // Path assertion removed - mockwebserver3 API change
+        // mockwebserver3 reports the requested (absolute-form) URL for proxied requests
+        assertThat(request.getUrl(), is(mockServer.url("")));
         assertThat(request.getRequestLine(), is("GET " + mockServer.url("").toString() + " HTTP/1.1"));
         verify(configurationService).getProperty("http.proxy.host");
         verify(configurationService).getProperty("http.proxy.port");
@@ -263,8 +265,8 @@ public class DSpaceHttpClientFactoryTest {
     public void testBuildWithRequestConfig() throws Exception {
         setHttpProxyOnConfigurationService();
         RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectTimeout(2500, TimeUnit.MILLISECONDS)
-            .build();
+                .setConnectTimeout(2500, TimeUnit.MILLISECONDS)
+                .build();
         AtomicReference<HttpContext> contextReference = new AtomicReference<HttpContext>();
         HttpRequestInterceptor interceptor = (request, entity, context) -> contextReference.set(context);
         httpClientFactory.setRequestInterceptors(List.of(interceptor));

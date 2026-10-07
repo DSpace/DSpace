@@ -7,8 +7,6 @@
  */
 package org.dspace.authenticate.oidc;
 
-import java.io.Serial;
-
 /**
  * Exception throwable from class that implements {@link OidcClient} in case of
  * error response from the OIDC provider.
@@ -17,7 +15,6 @@ import java.io.Serial;
  */
 public class OidcClientException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = -7618061110212398216L;
 
     private int status = 0;

@@ -47,7 +47,8 @@ public class QueryBuilderSearchFilter {
     }
 
     public boolean equals(Object object) {
-        if (object instanceof QueryBuilderSearchFilter obj) {
+        if (object instanceof QueryBuilderSearchFilter) {
+            QueryBuilderSearchFilter obj = (QueryBuilderSearchFilter) object;
 
             if (!Strings.CS.equals(obj.getName(), getName())) {
                 return false;

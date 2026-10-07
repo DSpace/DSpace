@@ -7,7 +7,6 @@
  */
 package org.dspace.services.model;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import java.util.Map;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class Event implements Serializable {
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

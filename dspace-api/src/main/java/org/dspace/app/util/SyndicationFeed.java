@@ -179,8 +179,8 @@ public class SyndicationFeed {
             objectURL = resolveURL(request, null);
         } else {
             Bitstream logo = null;
-            if (dso instanceof IndexableCollection collection) {
-                Collection col = collection.getIndexedObject();
+            if (dso instanceof IndexableCollection) {
+                Collection col = ((IndexableCollection) dso).getIndexedObject();
                 defaultTitle = col.getName();
                 defaultDescriptionField = collectionService.getMetadataFirstValue(col,
                         CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
@@ -190,8 +190,8 @@ public class SyndicationFeed {
                     podcastFeed = true;
                 }
                 objectURL = resolveURL(request, col);
-            } else if (dso instanceof IndexableCommunity community) {
-                Community comm = community.getIndexedObject();
+            } else if (dso instanceof IndexableCommunity) {
+                Community comm = ((IndexableCommunity) dso).getIndexedObject();
                 defaultTitle = comm.getName();
                 defaultDescriptionField = communityService.getMetadataFirstValue(comm,
                         CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);

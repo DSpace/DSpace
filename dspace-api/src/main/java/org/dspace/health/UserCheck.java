@@ -78,12 +78,14 @@ public class UserCheck extends Check {
             error(e);
         }
 
-        ret += "%-20s: %d\n".formatted("Users", info.get("Count"));
-        ret += "%-20s: %d\n".formatted("Have email", info.get("Have email"));
+        ret += String.format(
+            "%-20s: %d\n", "Users", info.get("Count"));
+        ret += String.format(
+            "%-20s: %d\n", "Have email", info.get("Have email"));
         for (Map.Entry<String, Integer> e : info.entrySet()) {
             if (!e.getKey().equals("Count") && !e.getKey().equals("Have email")) {
-                ret += "%-21s: %s\n".formatted(e.getKey(),
-                    String.valueOf(e.getValue()));
+                ret += String.format("%-21s: %s\n", e.getKey(),
+                                     String.valueOf(e.getValue()));
             }
         }
 
@@ -92,19 +94,21 @@ public class UserCheck extends Check {
         try {
             // empty group
             List<Group> emptyGroups = groupService.getEmptyGroups(context);
-            ret += "Empty groups: #%d\n    ".formatted(emptyGroups.size());
+            ret += String.format("Empty groups: #%d\n    ", emptyGroups.size());
             for (Group group : emptyGroups) {
-                ret += "id=%s;name=%s,\n    ".formatted(group.getID(), group.getName());
+                ret += String.format("id=%s;name=%s,\n    ", group.getID(), group.getName());
             }
 
             //subscribers
             List<EPerson> subscribers = ePersonService.findEPeopleWithSubscription(context);
-            ret += "Subscribers: #%d [%s]\n".formatted(
+            ret += String.format(
+                "Subscribers: #%d [%s]\n",
                 subscribers.size(), formatIds(subscribers));
 
             //subscribed collections
             List<Collection> subscribedCols = collectionService.findCollectionsWithSubscribers(context);
-            ret += "Subscribed cols.: #%d [%s]\n".formatted(
+            ret += String.format(
+                "Subscribed cols.: #%d [%s]\n",
                 subscribedCols.size(), formatIds(subscribedCols));
 
             context.complete();

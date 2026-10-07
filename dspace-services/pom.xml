@@ -115,12 +115,11 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-  <dependency>
-   <groupId>org.junit.jupiter</groupId>
-   <artifactId>junit-jupiter</artifactId>
-   <version>5.14.1</version>
-   <scope>test</scope>
-  </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-configuration2</artifactId>
@@ -138,7 +137,7 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-   <scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

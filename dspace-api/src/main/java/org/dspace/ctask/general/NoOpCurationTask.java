@@ -23,7 +23,8 @@ public class NoOpCurationTask extends AbstractCurationTask {
     @Override
     public int perform(Context context, DSpaceObject dso) throws IOException {
 
-        if (dso instanceof Item item) {
+        if (dso instanceof Item) {
+            Item item = (Item) dso;
             status = Curator.CURATE_SUCCESS;
             result = "No operation performed on " + item.getHandle();
 

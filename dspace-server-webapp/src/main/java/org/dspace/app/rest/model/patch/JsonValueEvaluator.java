@@ -39,7 +39,7 @@ public class JsonValueEvaluator implements LateObjectEvaluator {
         try {
             return mapper.treeToValue(valueNode, type);
         } catch (Exception e) {
-            throw new PatchException("Could not read %s into %s!".formatted(valueNode, type), e);
+            throw new PatchException(String.format("Could not read %s into %s!", valueNode, type), e);
         }
     }
 

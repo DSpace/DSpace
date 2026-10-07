@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.exception;
 
-import java.io.Serial;
-
 import org.dspace.core.I18nUtil;
 
 /**
@@ -20,7 +18,6 @@ import org.dspace.core.I18nUtil;
  */
 public class PasswordNotValidException extends UnprocessableEntityException implements TranslatableException {
 
-    @Serial
     private static final long serialVersionUID = -4294543847989250566L;
 
     public static final String MESSAGE_KEY = "org.dspace.app.rest.exception.PasswordNotValidException.message";

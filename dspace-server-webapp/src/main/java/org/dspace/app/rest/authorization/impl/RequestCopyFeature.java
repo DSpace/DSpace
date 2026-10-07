@@ -85,7 +85,8 @@ public class RequestCopyFeature implements AuthorizationFeature {
             log.warn("The configuration parameter \"request.item.type\" contains an invalid value.");
             return false;
         }
-        if (object instanceof ItemRest itemRest) {
+        if (object instanceof ItemRest) {
+            ItemRest itemRest = (ItemRest) object;
             String id = itemRest.getId();
             Item item = itemService.find(context, UUID.fromString(id));
             if (!item.isArchived()) {
@@ -102,12 +103,13 @@ public class RequestCopyFeature implements AuthorizationFeature {
                     }
                 }
             }
-        } else if (object instanceof BitstreamRest bitstreamRest) {
+        } else if (object instanceof BitstreamRest) {
+            BitstreamRest bitstreamRest = (BitstreamRest) object;
             Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamRest.getId()));
 
             DSpaceObject parentObject = bitstreamService.getParentObject(context, bitstream);
-            if (parentObject instanceof Item item) {
-                if (item.isArchived()) {
+            if (parentObject instanceof Item) {
+                if (((Item) parentObject).isArchived()) {
                     return !authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ);
                 }
             }

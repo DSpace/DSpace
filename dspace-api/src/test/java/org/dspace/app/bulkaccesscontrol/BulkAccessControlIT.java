@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -132,16 +133,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -176,16 +175,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -219,16 +216,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -263,16 +258,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -303,16 +296,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -342,16 +333,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -388,16 +377,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -434,16 +421,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -484,16 +469,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -580,16 +563,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "wrong",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"wrong\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -623,15 +604,13 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -665,16 +644,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "bitstream": {
-                  "mode": "wrong",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"bitstream\": {\n" +
+            "      \"mode\": \"wrong\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -708,15 +685,13 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "bitstream": {
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"bitstream\": {\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -749,16 +724,14 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "wrongAccess"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"wrongAccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -792,17 +765,15 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "embargo",
-                        "endDate": "2024-06-24T00:00:00Z"
-                      }
-                  ]
-               }}
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"embargo\",\n" +
+            "            \"endDate\": \"2024-06-24T00:00:00Z\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(jsonOne);
 
@@ -836,17 +807,15 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String json = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "lease",
-                        "startDate": "2024-06-24T00:00:00Z"
-                      }
-                  ]
-               }}
-            """;
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"lease\",\n" +
+            "            \"startDate\": \"2024-06-24T00:00:00Z\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(json);
 
@@ -1048,12 +1017,10 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "add"
-               }
-            }
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"add\"\n" +
+            "   }\n" +
+            "}\n";
 
         buildJsonFile(jsonOne);
 
@@ -1113,17 +1080,15 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "replace",
-                  "accessConditions": [
-                      {
-                        "name": "embargo",
-                        "startDate": "2024-06-24"
-                      }
-                  ]
-               }}
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"replace\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"embargo\",\n" +
+            "            \"startDate\": \"2024-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(jsonOne);
 
@@ -1231,15 +1196,13 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "replace"
-               },
-             "bitstream": {
-                  "mode": "replace"
-               }
-            }
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"replace\"\n" +
+            "   },\n" +
+            " \"bitstream\": {\n" +
+            "      \"mode\": \"replace\"\n" +
+            "   }\n" +
+            "}\n";
 
         buildJsonFile(jsonOne);
 
@@ -1345,33 +1308,31 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      },
-                      {
-                        "name": "embargo",
-                        "startDate": "2024-06-24"
-                      }
-                  ]
-               },
-             "bitstream": {
-                  "mode": "add",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      },
-                      {
-                        "name": "lease",
-                        "endDate": "2023-06-24"
-                      }
-                  ]
-               }
-            }
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          },\n" +
+            "          {\n" +
+            "            \"name\": \"embargo\",\n" +
+            "            \"startDate\": \"2024-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   },\n" +
+            " \"bitstream\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          },\n" +
+            "          {\n" +
+            "            \"name\": \"lease\",\n" +
+            "            \"endDate\": \"2023-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }\n" +
+            "}\n";
 
         buildJsonFile(jsonOne);
 
@@ -1457,33 +1418,31 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "replace",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      },
-                      {
-                        "name": "embargo",
-                        "startDate": "2024-06-24"
-                      }
-                  ]
-               },
-             "bitstream": {
-                  "mode": "replace",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      },
-                      {
-                        "name": "lease",
-                        "endDate": "2023-06-24"
-                      }
-                  ]
-               }
-            }
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"replace\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          },\n" +
+            "          {\n" +
+            "            \"name\": \"embargo\",\n" +
+            "            \"startDate\": \"2024-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   },\n" +
+            " \"bitstream\": {\n" +
+            "      \"mode\": \"replace\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          },\n" +
+            "          {\n" +
+            "            \"name\": \"lease\",\n" +
+            "            \"endDate\": \"2023-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }\n" +
+            "}\n";
 
         buildJsonFile(jsonOne);
 
@@ -1625,33 +1584,31 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "replace",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      },
-                      {
-                        "name": "embargo",
-                        "startDate": "2024-06-24"
-                      }
-                  ]
-               },
-             "bitstream": {
-                  "mode": "replace",
-                  "accessConditions": [
-                      {
-                        "name": "openaccess"
-                      },
-                      {
-                        "name": "lease",
-                        "endDate": "2023-06-24"
-                      }
-                  ]
-               }
-            }
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"replace\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          },\n" +
+            "          {\n" +
+            "            \"name\": \"embargo\",\n" +
+            "            \"startDate\": \"2024-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   },\n" +
+            " \"bitstream\": {\n" +
+            "      \"mode\": \"replace\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          },\n" +
+            "          {\n" +
+            "            \"name\": \"lease\",\n" +
+            "            \"endDate\": \"2023-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }\n" +
+            "}\n";
 
         buildJsonFile(jsonOne);
 
@@ -1710,17 +1667,15 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            { "item": {
-                  "mode": "replace",
-                  "accessConditions": [
-                      {
-                        "name": "embargo",
-                        "startDate": "2024-06-24"
-                      }
-                  ]
-               }}
-            """;
+        String jsonOne = "{ \"item\": {\n" +
+            "      \"mode\": \"replace\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"embargo\",\n" +
+            "            \"startDate\": \"2024-06-24\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
 
         buildJsonFile(jsonOne);
 
@@ -1819,23 +1774,21 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
         context.restoreAuthSystemState();
 
-        String jsonOne = """
-            {
-              "bitstream": {
-                "constraints": {
-                  "uuid": []
-                },
-                "mode": "replace",
-                "accessConditions": [
-                  {
-                    "name": "administrator",
-                    "startDate": null,
-                    "endDate": null
-                  }
-                ]
-              }
-            }\
-            """;
+        String jsonOne = "{\n" +
+            "  \"bitstream\": {\n" +
+            "    \"constraints\": {\n" +
+            "      \"uuid\": []\n" +
+            "    },\n" +
+            "    \"mode\": \"replace\",\n" +
+            "    \"accessConditions\": [\n" +
+            "      {\n" +
+            "        \"name\": \"administrator\",\n" +
+            "        \"startDate\": null,\n" +
+            "        \"endDate\": null\n" +
+            "      }\n" +
+            "    ]\n" +
+            "  }\n" +
+            "}";
 
         buildJsonFile(jsonOne);
 
@@ -1999,7 +1952,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
     private void buildJsonFile(String json) throws IOException {
         File file = new File(tempDir + "/bulk-access.json");
-        Path path = Path.of(file.getAbsolutePath());
+        Path path = Paths.get(file.getAbsolutePath());
         Files.writeString(path, json, StandardCharsets.UTF_8);
     }
 }

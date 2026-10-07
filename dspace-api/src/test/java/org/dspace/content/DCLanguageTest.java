@@ -152,10 +152,10 @@ public class DCLanguageTest {
 
         dc = new DCLanguage("en");
         assertThat("testGetDisplayName 3", dc.getDisplayName(),
-                   equalTo(Locale.of("en", "").getDisplayName()));
+                   equalTo(new Locale("en", "").getDisplayName()));
 
         dc = new DCLanguage("en_GB");
         assertThat("testGetDisplayName 4", dc.getDisplayName(),
-                   equalTo(Locale.of("en", "GB").getDisplayName()));
+                   equalTo(new Locale("en", "GB").getDisplayName()));
     }
 }

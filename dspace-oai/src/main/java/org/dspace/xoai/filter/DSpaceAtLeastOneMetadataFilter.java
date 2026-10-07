@@ -50,9 +50,9 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
                 parameterValue = getConfiguration().get("values");
             }
 
-            if (parameterValue instanceof SimpleType type) {
+            if (parameterValue instanceof SimpleType) {
                 values = new ArrayList<>();
-                values.add(type.asString());
+                values.add(((SimpleType) parameterValue).asString());
             } else if (parameterValue instanceof ParameterList) {
                 // transform list of ParameterValues into list of Strings
                 values = newArrayList(transform(parameterValue.asParameterList().getValues(),

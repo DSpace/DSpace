@@ -144,7 +144,8 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             List wfis = workflowItemService.findBySubmitter(sc.getContext(),
                                                             person);
             for (Object found : wfis) {
-                if (found instanceof WorkflowItem wfi) {
+                if (found instanceof WorkflowItem) {
+                    WorkflowItem wfi = (WorkflowItem) found;
                     Item item = wfi.getItem();
 
                     // check for the wfi collection

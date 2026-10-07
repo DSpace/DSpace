@@ -154,7 +154,7 @@ public class AltchaCaptchaRestController implements InitializingBean {
     public static String bytesToHex(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
         for (byte b : bytes) {
-            stringBuilder.append("%02x".formatted(b));
+            stringBuilder.append(String.format("%02x", b));
         }
         return stringBuilder.toString();
     }

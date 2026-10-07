@@ -41,8 +41,8 @@ public class PredefinedUUIDGenerator implements BeforeExecutionGenerator {
         SharedSessionContractImplementor session, Object owner,
         Object currentValue, EventType eventType
     ) {
-        if (owner instanceof DSpaceObject spaceObject) {
-            UUID uuid = spaceObject.getPredefinedUUID();
+        if (owner instanceof DSpaceObject) {
+            UUID uuid = ((DSpaceObject) owner).getPredefinedUUID();
             if (uuid != null) {
                 return uuid;
             }

@@ -132,7 +132,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         String hqlQuery = "select s from Subscription s join %s dso " +
                 "ON dso = s.dSpaceObject ORDER BY s.id";
         if (resourceType != null) {
-            hqlQuery = hqlQuery.formatted(resourceType);
+            hqlQuery = String.format(hqlQuery, resourceType);
         }
         Query query = createQuery(context, hqlQuery);
         if (limit != -1) {

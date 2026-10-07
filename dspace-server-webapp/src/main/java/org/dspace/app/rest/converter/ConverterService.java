@@ -110,7 +110,8 @@ public class ConverterService {
         M transformedModel = projection.transformModel(modelObject);
         DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
         R restObject = converter.convert(transformedModel, projection);
-        if (restObject instanceof BaseObjectRest baseObjectRest) {
+        if (restObject instanceof BaseObjectRest) {
+            BaseObjectRest baseObjectRest = (BaseObjectRest) restObject;
             // This section will verify whether the current user has permissions to retrieve the
             // rest object. It'll only return the REST object if the permission is granted.
             // If permission isn't granted, it'll return null
@@ -120,12 +121,12 @@ public class ConverterService {
                           requestService.getCurrentRequest().getHttpServletResponse(),
                           String.valueOf(baseObjectRest.getId()))) {
                 log.debug("Access denied on " + restObject.getClass() + " with id: " +
-                              baseObjectRest.getId());
+                              ((BaseObjectRest) restObject).getId());
                 return null;
             }
         }
-        if (restObject instanceof RestModel model) {
-            return (R) projection.transformRest(model);
+        if (restObject instanceof RestModel) {
+            return (R) projection.transformRest((RestModel) restObject);
         }
         return restObject;
     }
@@ -300,10 +301,10 @@ public class ConverterService {
             return null;
         }
         T halResource = getResource(restObject);
-        if (restObject instanceof RestAddressableModel model) {
+        if (restObject instanceof RestAddressableModel) {
             utils.embedOrLinkClassLevelRels(halResource, oldLinks);
             halLinkService.addLinks(halResource);
-            Projection projection = model.getProjection();
+            Projection projection = ((RestAddressableModel) restObject).getProjection();
             return projection.transformResource(halResource);
         } else {
             halLinkService.addLinks(halResource);

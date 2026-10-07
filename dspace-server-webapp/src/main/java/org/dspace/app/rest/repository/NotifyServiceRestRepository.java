@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -98,13 +100,13 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         if (notifyServiceRest.getScore() != null) {
             if (notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ZERO) == -1 ||
                 notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ONE) == 1) {
-                throw new UnprocessableEntityException("Score out of range [0, 1] %s".formatted(
+                throw new UnprocessableEntityException(format("Score out of range [0, 1] %s",
                     notifyServiceRest.getScore().setScale(4).toPlainString()));
             }
         }
 
         if (notifyService.findByLdnUrl(context,notifyServiceRest.getLdnUrl()) != null) {
-            throw new UnprocessableEntityException("LDN url already in use %s".formatted(
+            throw new UnprocessableEntityException(format("LDN url already in use %s",
                 notifyServiceRest.getLdnUrl()));
         }
 

@@ -138,7 +138,7 @@ public class I18nUtilTest extends AbstractDSpaceTest {
         configService.setProperty("default.locale", "en_US.UTF-8");
 
         // Assert our overridden default.locale is set in I18nUtil
-        assertEquals(Locale.of("en", "US", "UTF-8"), I18nUtil.getDefaultLocale(), "Default locale");
+        assertEquals(new Locale("en", "US", "UTF-8"), I18nUtil.getDefaultLocale(), "Default locale");
 
         // Test for a stock key (in Messages.properties)
         String key = "metadata.dc.title";

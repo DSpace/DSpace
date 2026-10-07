@@ -7,7 +7,6 @@
  */
 package org.dspace.orcid.exception;
 
-import java.io.Serial;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,6 @@ import org.dspace.orcid.model.validator.OrcidValidationError;
  */
 public class OrcidValidationException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = 3377335341871311369L;
 
     private final List<OrcidValidationError> errors;

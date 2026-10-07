@@ -7,8 +7,6 @@
  */
 package org.dspace.orcid.exception;
 
-import java.io.Serial;
-
 /**
  * Exception throwable from class that implements {@link OrcidClient} in case of
  * error response from the ORCID registry.
@@ -20,7 +18,6 @@ public class OrcidClientException extends RuntimeException {
 
     public static final String INVALID_GRANT_MESSAGE = "invalid_grant";
 
-    @Serial
     private static final long serialVersionUID = -7618061110212398216L;
 
     private int status = 0;

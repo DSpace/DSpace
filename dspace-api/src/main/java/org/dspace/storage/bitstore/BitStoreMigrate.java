@@ -7,15 +7,12 @@
  */
 package org.dspace.storage.bitstore;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
@@ -124,11 +121,7 @@ public class BitStoreMigrate {
     }
 
     private static void printHelp(Options options) {
-        HelpFormatter myhelp = HelpFormatter.builder().get();
-        try {
-            myhelp.printHelp("BitstoreMigrate", null, options, null, false);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        HelpFormatter myhelp = new HelpFormatter();
+        myhelp.printHelp("BitstoreMigrate\n", options);
     }
 }

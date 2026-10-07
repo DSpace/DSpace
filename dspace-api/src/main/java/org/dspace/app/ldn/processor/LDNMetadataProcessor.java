@@ -7,6 +7,8 @@
  */
 package org.dspace.app.ldn.processor;
 
+import static java.lang.String.format;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -217,7 +219,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
             if (Objects.isNull(item)) {
                 throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                    "Item with uuid %s not found".formatted(uuid));
+                    format("Item with uuid %s not found", uuid));
             }
             return item;
         }
@@ -225,21 +227,21 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
         if (Objects.isNull(handle)) {
             throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                "Handle not found for %s".formatted(url));
+                format("Handle not found for %s", url));
         }
 
         DSpaceObject object = handleService.resolveToObject(context, handle);
 
         if (Objects.isNull(object)) {
             throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                "Item with handle %s not found".formatted(handle));
+                format("Item with handle %s not found", handle));
         }
 
         if (object.getType() == Constants.ITEM) {
             item = (Item) object;
         } else {
-            throw new HttpResponseException(HttpStatus.SC_UNPROCESSABLE_CONTENT,
-                "Handle %s does not resolve to an item".formatted(handle));
+            throw new HttpResponseException(HttpStatus.SC_UNPROCESSABLE_ENTITY,
+                format("Handle %s does not resolve to an item", handle));
         }
         return item;
     }

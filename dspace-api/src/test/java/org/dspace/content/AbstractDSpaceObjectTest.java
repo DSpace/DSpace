@@ -9,19 +9,16 @@ package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.dspace.AbstractUnitTest;
-import org.dspace.app.audit.MetadataEvent;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -87,88 +84,49 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
     }
 
     /**
-     * Test of clearMetadataEventDetails method, of class DSpaceObject.
+     * Test of clearDetails method, of class DSpaceObject.
      */
     @Test
-    public void testClearMetadataEventDetails() {
-        // Clear any events accumulated during test object creation
-        dspaceObject.clearMetadataEventDetails();
+    public void testClearDetails() {
+        String[] testData = new String[] {"details 1", "details 2", "details 3"};
+        for (String s : testData) {
+            dspaceObject.addDetails(s);
+        }
 
-        MetadataEvent event1 = new MetadataEvent();
-        event1.setMetadataField("dc_title");
-        event1.setValue("Test Title");
-        event1.setAction(MetadataEvent.ADD);
+        String details = dspaceObject.getDetails();
+        dspaceObject.clearDetails();
 
-        MetadataEvent event2 = new MetadataEvent();
-        event2.setMetadataField("dc_description");
-        event2.setValue("Test Description");
-        event2.setAction(MetadataEvent.MODIFY);
-
-        dspaceObject.addMetadataEventDetails(event1);
-        dspaceObject.addMetadataEventDetails(event2);
-
-        List<MetadataEvent> details = dspaceObject.getMetadataEventDetails();
-        assertThat("testClearMetadataEventDetails 0", details, hasSize(2));
-
-        dspaceObject.clearMetadataEventDetails();
-        assertThat("testClearMetadataEventDetails 1",
-            dspaceObject.getMetadataEventDetails(), is(empty()));
+        assertThat("testClearDetails 0", dspaceObject.getDetails(), nullValue());
+        assertThat("testClearDetails 1", dspaceObject.getDetails(), not(equalTo(details)));
     }
 
     /**
-     * Test of addMetadataEventDetails method, of class DSpaceObject.
+     * Test of addDetails method, of class DSpaceObject.
      */
     @Test
-    public void testAddMetadataEventDetails() {
-        dspaceObject.clearMetadataEventDetails();
-
-        MetadataEvent event1 = new MetadataEvent();
-        event1.setMetadataField("dc_title");
-        event1.setValue("Test Title");
-        event1.setAction(MetadataEvent.ADD);
-
-        MetadataEvent event2 = new MetadataEvent();
-        event2.setMetadataField("dc_description");
-        event2.setValue("Test Description");
-        event2.setAction(MetadataEvent.MODIFY);
-
-        MetadataEvent event3 = new MetadataEvent();
-        event3.setMetadataField("dc_subject");
-        event3.setValue("Test Subject");
-        event3.setAction(MetadataEvent.REMOVE);
-
-        dspaceObject.addMetadataEventDetails(event1);
-        dspaceObject.addMetadataEventDetails(event2);
-        dspaceObject.addMetadataEventDetails(event3);
-
-        List<MetadataEvent> details = dspaceObject.getMetadataEventDetails();
-        assertThat("testAddMetadataEventDetails 0", details, hasSize(3));
+    public void testAddDetails() {
+        dspaceObject.clearDetails();
+        String[] testData = new String[] {"details 1", "details 2", "details 3"};
+        for (String s : testData) {
+            dspaceObject.addDetails(s);
+        }
+        assertThat("testAddDetails 0", dspaceObject.getDetails(), is(equalTo("details 1, details 2, details 3")));
+        assertThat("testAddDetails 1", dspaceObject.getDetails(), is(not(equalTo(null))));
     }
 
     /**
-     * Test of getMetadataEventDetails method, of class DSpaceObject.
+     * Test of getDetails method, of class DSpaceObject.
      */
     @Test
-    public void testGetMetadataEventDetails() {
-        dspaceObject.clearMetadataEventDetails();
-        assertThat("testGetMetadataEventDetails 0",
-            dspaceObject.getMetadataEventDetails(), is(empty()));
+    public void testGetDetails() {
+        dspaceObject.clearDetails();
+        assertThat("testGetDetails 0", dspaceObject.getDetails(), nullValue());
 
-        MetadataEvent event1 = new MetadataEvent();
-        event1.setMetadataField("dc_title");
-        event1.setValue("Test Title");
-        event1.setAction(MetadataEvent.ADD);
-
-        MetadataEvent event2 = new MetadataEvent();
-        event2.setMetadataField("dc_description");
-        event2.setValue("Test Description");
-        event2.setAction(MetadataEvent.MODIFY);
-
-        dspaceObject.addMetadataEventDetails(event1);
-        dspaceObject.addMetadataEventDetails(event2);
-
-        List<MetadataEvent> details = dspaceObject.getMetadataEventDetails();
-        assertThat("testGetMetadataEventDetails 1", details, hasSize(2));
+        String[] testData = new String[] {"details 1", "details 2", "details 3"};
+        for (String s : testData) {
+            dspaceObject.addDetails(s);
+        }
+        assertThat("testGetDetails 1", dspaceObject.getDetails(), is(equalTo("details 1, details 2, details 3")));
     }
 
     /**

@@ -54,7 +54,7 @@ public class RightTiltedRelationshipRestRepositoryIT extends RelationshipRestRep
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath(
-                    "$.metadata['%s.isOrgUnitOfPerson']".formatted(MetadataSchemaEnum.RELATION.getName())
+                    String.format("$.metadata['%s.isOrgUnitOfPerson']", MetadataSchemaEnum.RELATION.getName())
                 ).doesNotExist()
             );
 
@@ -65,7 +65,7 @@ public class RightTiltedRelationshipRestRepositoryIT extends RelationshipRestRep
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata", matchMetadata(
-            "%s.isPersonOfOrgUnit".formatted(MetadataSchemaEnum.RELATION.getName()),
+                String.format("%s.isPersonOfOrgUnit", MetadataSchemaEnum.RELATION.getName()),
                 author1.getID().toString()
             )));
     }

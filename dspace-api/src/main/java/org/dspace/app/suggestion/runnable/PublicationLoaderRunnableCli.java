@@ -7,11 +7,8 @@
  */
 package org.dspace.app.suggestion.runnable;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.utils.DSpace;
 
@@ -51,13 +48,9 @@ public class PublicationLoaderRunnableCli extends PublicationLoaderRunnable {
 
         // in case of CLI we show the help prompt
         if (commandLine.hasOption('h')) {
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "Imports suggestions from external providers for publication claim",
-                    null, getScriptConfiguration().getOptions(), null, false);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("Imports suggestions from external providers for publication claim",
+                                getScriptConfiguration().getOptions());
             System.exit(0);
         }
     }

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -165,7 +164,7 @@ public class OpenaireRestConnector {
         file = trimSlashes(file);
 
         try {
-            URL fullPath = URI.create(url + '/' + file).toURL();
+            URL fullPath = new URL(url + '/' + file);
 
             log.debug("Requesting: " + fullPath.toString());
 

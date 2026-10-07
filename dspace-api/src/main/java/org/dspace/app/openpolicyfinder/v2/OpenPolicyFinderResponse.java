@@ -10,7 +10,6 @@ package org.dspace.app.openpolicyfinder.v2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -39,7 +38,6 @@ import org.json.JSONTokener;
  */
 public class OpenPolicyFinderResponse implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 2732963970169240597L;
 
     // Is this response to be treated as an error?

@@ -8,7 +8,7 @@
 package org.dspace.statistics;
 
 import java.net.MalformedURLException;
-import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,7 +47,7 @@ public class EmbeddedSolrClientFactory
     @Override
     public SolrClient getClient(String coreUrl) {
         try {
-            coreName = Path.of(URI.create(coreUrl).toURL().getPath())
+            coreName = Path.of(new URL(coreUrl).getPath())
                     .getFileName()
                     .toString();
         } catch (MalformedURLException ex) {

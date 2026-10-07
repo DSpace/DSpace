@@ -285,11 +285,9 @@ public class MetadataImporter {
      * Print the usage message to stdout
      */
     public static void usage() {
-        String usage = """
-            Use this class with the following option:
-             -f <xml source file> : specify which xml source file \
-            contains the DC fields to import.
-            """;
+        String usage = "Use this class with the following option:\n" +
+            " -f <xml source file> : specify which xml source file " +
+            "contains the DC fields to import.\n";
         System.out.println(usage);
     }
 }

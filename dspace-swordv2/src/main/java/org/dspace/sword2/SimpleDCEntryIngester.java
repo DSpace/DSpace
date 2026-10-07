@@ -62,11 +62,11 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
                                 DepositResult result, boolean replace)
         throws DSpaceSwordException, SwordError, SwordAuthException,
         SwordServerException {
-        if (dso instanceof Collection collection) {
-            return this.ingestToCollection(context, deposit, collection,
+        if (dso instanceof Collection) {
+            return this.ingestToCollection(context, deposit, (Collection) dso,
                                            verboseDescription, result);
-        } else if (dso instanceof Item item) {
-            return this.ingestToItem(context, deposit, item,
+        } else if (dso instanceof Item) {
+            return this.ingestToItem(context, deposit, (Item) dso,
                                      verboseDescription, result, replace);
         }
         return null;

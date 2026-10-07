@@ -43,8 +43,8 @@ public abstract class RestObjectPermissionEvaluatorPlugin  implements RestPermis
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                           Object permission) {
 
-        if (permission instanceof Patch patch) {
-            return hasPatchPermission(authentication, targetId, targetType, patch);
+        if (permission instanceof Patch) {
+            return hasPatchPermission(authentication, targetId, targetType, (Patch) permission);
         } else {
             DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
             return hasDSpacePermission(authentication, targetId, targetType, restPermission);

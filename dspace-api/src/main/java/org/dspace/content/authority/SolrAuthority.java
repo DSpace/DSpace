@@ -48,6 +48,7 @@ public class SolrAuthority implements ChoiceAuthority {
      * in the form schema_element_qualifier
      */
     protected String field;
+
     protected SolrAuthorityInterface source =
         DSpaceServicesFactory.getInstance().getServiceManager()
                              .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);

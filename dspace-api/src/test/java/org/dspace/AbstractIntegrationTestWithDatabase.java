@@ -247,13 +247,17 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             .getServiceByName(QAEventService.class.getName(), MockQAEventService.class);
         qaEventService.reset();
 
-        // Reload our ConfigurationService (to reset configs to defaults again)
-        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+        try {
+            // Reload our ConfigurationService (to reset configs to defaults again)
+            DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
-        AbstractBuilder.cleanupBuilderCache();
+            AbstractBuilder.cleanupBuilderCache();
 
-        // NOTE: we explicitly do NOT destroy our default eperson & admin as they
-        // are cached and reused for all tests. This speeds up all tests.
+            // NOTE: we explicitly do NOT destroy our default eperson & admin as they
+            // are cached and reused for all tests. This speeds up all tests.
+        } catch (Exception e) {
+            throw new RuntimeException("Error reloading configuration & resetting builders", e);
+        }
     }
 
     /**

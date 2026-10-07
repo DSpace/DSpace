@@ -50,7 +50,6 @@ import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-
 /**
  * This is the repository responsible to manage MetadataField Rest object
  *
@@ -151,8 +150,8 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             try {
                 DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
                 for (IndexableObject object : searchResult.getIndexableObjects()) {
-                    if (object instanceof IndexableMetadataField field) {
-                        matchingMetadataFields.add(field.getIndexedObject());
+                    if (object instanceof IndexableMetadataField) {
+                        matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
                     }
                 }
                 totalElements = searchResult.getTotalSearchResults();
@@ -292,7 +291,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                 + " already exists"
             );
         } catch (IOException e) {
-            throw new RuntimeException("error while creating metadata field", e);
+            throw new RuntimeException(e);
         }
 
         // return
@@ -358,7 +357,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                 "." + metadataFieldRest.getQualifier() : "")
                                                    + " already exists");
         } catch (IOException e) {
-            throw new RuntimeException("error while updating metadata field", e);
+            throw new RuntimeException(e);
         }
 
         return converter.toRest(metadataField, utils.obtainProjection());

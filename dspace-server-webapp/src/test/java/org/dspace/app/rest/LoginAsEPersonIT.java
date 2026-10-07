@@ -237,7 +237,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
-                                           .withWorkflowGroup("reviewer", reviewer).build();
+                                           .withWorkflowGroup(1, reviewer).build();
 
         //3. create a normal user to use as submitter
         EPerson submitter = EPersonBuilder.createEPerson(context)

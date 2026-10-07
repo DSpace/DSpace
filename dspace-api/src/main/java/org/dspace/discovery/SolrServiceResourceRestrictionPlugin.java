@@ -66,17 +66,17 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
         DSpaceObject dso = null;
-        if (idxObj instanceof IndexableDSpaceObject object) {
-            dso = object.getIndexedObject();
-        } else if (idxObj instanceof IndexableInProgressSubmission submission) {
+        if (idxObj instanceof IndexableDSpaceObject) {
+            dso = ((IndexableDSpaceObject) idxObj).getIndexedObject();
+        } else if (idxObj instanceof IndexableInProgressSubmission) {
             final InProgressSubmission inProgressSubmission
-                    = submission.getIndexedObject();
+                    = ((IndexableInProgressSubmission) idxObj).getIndexedObject();
             dso = inProgressSubmission.getItem();
-        } else if (idxObj instanceof IndexablePoolTask task1) {
-            final PoolTask poolTask = task1.getIndexedObject();
+        } else if (idxObj instanceof IndexablePoolTask) {
+            final PoolTask poolTask = ((IndexablePoolTask) idxObj).getIndexedObject();
             dso = poolTask.getWorkflowItem().getItem();
-        } else if (idxObj instanceof IndexableClaimedTask task) {
-            final ClaimedTask claimedTask = task.getIndexedObject();
+        } else if (idxObj instanceof IndexableClaimedTask) {
+            final ClaimedTask claimedTask = ((IndexableClaimedTask) idxObj).getIndexedObject();
             dso = claimedTask.getWorkflowItem().getItem();
         }
         if (dso != null) {

@@ -420,9 +420,9 @@ public class SWORDConfiguration {
             return true;
         }
 
-        if (dso instanceof Collection collection) {
+        if (dso instanceof Collection) {
             Map<String, Float> accepts = this
-                .getAcceptPackaging(collection);
+                .getAcceptPackaging((Collection) dso);
             for (String accept : accepts.keySet()) {
                 if (accept.equals(mediaType)) {
                     return true;

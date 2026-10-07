@@ -7,9 +7,7 @@
  */
 package org.dspace.authority;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,9 +17,9 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -92,14 +90,9 @@ public class UpdateAuthorities {
 
         // help
 
+        HelpFormatter helpFormatter = new HelpFormatter();
         if (line.hasOption("h")) {
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "dsrun " + UpdateAuthorities.class.getCanonicalName(),
-                    null, options, null, false);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            helpFormatter.printHelp("dsrun " + UpdateAuthorities.class.getCanonicalName(), options);
             return 0;
         }
 

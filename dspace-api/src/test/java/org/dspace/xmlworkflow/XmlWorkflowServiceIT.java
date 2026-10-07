@@ -89,7 +89,7 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
                                               .build();
         Collection colWithWorkflow = CollectionBuilder.createCollection(context, community)
                                                       .withName("Collection WITH workflow")
-                                                      .withWorkflowGroup("reviewer", submitter)
+                                                      .withWorkflowGroup(1, submitter)
                                                       .build();
         Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(colWithWorkflow);
         ClaimedTask taskToReject = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, submitter)

@@ -56,10 +56,10 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
     Bitstream secondCopy;
 
     /**
-     * This method will be run before every test as per @BeforeEach. It will
+     * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
-     * Other methods can be annotated with @BeforeEach here or in subclasses
+     * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed.
      *
      * @throws Exception passed through.

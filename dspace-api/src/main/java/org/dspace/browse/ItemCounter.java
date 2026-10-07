@@ -74,18 +74,18 @@ public class ItemCounter {
         }
 
         // if we make it this far, we need to manually count
-        if (dso instanceof Collection collection) {
+        if (dso instanceof Collection) {
             try {
-                return itemService.countItems(context, collection);
+                return itemService.countItems(context, (Collection) dso);
             } catch (SQLException e) {
                 log.error("Error counting number of Items in Collection {} :", dso.getID(), e);
                 return -1;
             }
         }
 
-        if (dso instanceof Community community) {
+        if (dso instanceof Community) {
             try {
-                return itemService.countItems(context, community);
+                return itemService.countItems(context, ((Community) dso));
             } catch (SQLException e) {
                 log.error("Error counting number of Items in Community {} :", dso.getID(), e);
                 return -1;

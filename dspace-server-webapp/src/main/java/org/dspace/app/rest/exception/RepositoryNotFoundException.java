@@ -27,6 +27,6 @@ public class RepositoryNotFoundException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return "The repository type %s.%s was not found".formatted(apiCategory, model);
+        return String.format("The repository type %s.%s was not found", apiCategory, model);
     }
 }

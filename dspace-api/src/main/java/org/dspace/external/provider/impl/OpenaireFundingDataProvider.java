@@ -250,7 +250,7 @@ public class OpenaireFundingDataProvider extends AbstractExternalDataProvider {
         String jurisdiction = "+";
 
         Optional<FundingTreeType> fundingTree = projectHelper.getFundingTreeTypes().stream().findFirst();
-        if (fundingTree.isPresent()) {
+        if (!fundingTree.isEmpty()) {
             if (fundingTree.get().getFunder() != null) {
                 if (fundingTree.get().getFunder().getShortname() != null) {
                     funderShortName = encodeValue(fundingTree.get().getFunder().getShortname());
@@ -263,18 +263,18 @@ public class OpenaireFundingDataProvider extends AbstractExternalDataProvider {
                     fundingTree.get().getFundingLevel2OrFundingLevel1OrFundingLevel0());
             Optional<FundingType> funding = fundingHelper.getFirstAvailableFunding().stream().findFirst();
 
-            if (funding.isPresent()) {
+            if (!funding.isEmpty()) {
                 fundingName = encodeValue(funding.get().getName());
             }
 
         }
 
         Optional<String> optCode = projectHelper.getCodes().stream().findFirst();
-        if (optCode.isPresent()) {
+        if (!optCode.isEmpty()) {
             code = encodeValue(optCode.get());
         }
 
-        return "%s/%s/%s/%s/%s".formatted(prefix, funderShortName, fundingName, code, jurisdiction);
+        return String.format("%s/%s/%s/%s/%s", prefix, funderShortName, fundingName, code, jurisdiction);
     }
 
     private static String encodeValue(String value) {

@@ -297,7 +297,8 @@ public class RDFUtil {
             return;
         }
         authorizeService.authorizeAction(context, dso, Constants.READ);
-        if (dso instanceof Item item) {
+        if (dso instanceof Item) {
+            Item item = (Item) dso;
             if (!item.isArchived()) {
                 throw new ItemNotArchivedException();
             }

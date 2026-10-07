@@ -48,7 +48,10 @@ import org.springframework.context.ApplicationContext;
 public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    ConfigurationService configurationService;
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     @Autowired
     private SubmissionFormRestRepository submissionFormRestRepository;
@@ -58,9 +61,6 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Autowired
     private ChoiceAuthorityService cas;
-
-    @Autowired
-    private MetadataAuthorityService metadataAuthorityService;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -552,6 +552,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("entryID", "VR131402"))
                         .andExpect(status().isBadRequest());
     }
+
     @Test
     public void shouldReturnPrefixedAuthorityForHierarchicalSuggestions() throws Exception {
 

@@ -234,7 +234,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
         if (session.contains(entity)) {
             return entity;
         } else {
-            return (E) session.find(HibernateProxyHelper.getClassWithoutInitializingProxy(entity), entity.getID());
+            return (E) session.get(HibernateProxyHelper.getClassWithoutInitializingProxy(entity), entity.getID());
         }
     }
 
@@ -278,7 +278,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Override
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
         if (entity != null) {
-            if (entity instanceof DSpaceObject dso) {
+            if (entity instanceof DSpaceObject) {
+                DSpaceObject dso = (DSpaceObject) entity;
 
                 // The metadatavalue relation has CascadeType.ALL, so they are evicted automatically
                 // and we don' need to uncache the values explicitly.
@@ -291,7 +292,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
             }
 
             // ITEM
-            if (entity instanceof Item item) {
+            if (entity instanceof Item) {
+                Item item = (Item) entity;
 
                 //DO NOT uncache the submitter. This could be the current eperson. Uncaching could lead to
                 //LazyInitializationExceptions (see DS-3648)
@@ -302,7 +304,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
                     }
                 }
                 // BUNDLE
-            } else if (entity instanceof Bundle bundle) {
+            } else if (entity instanceof Bundle) {
+                Bundle bundle = (Bundle) entity;
 
                 if (Hibernate.isInitialized(bundle.getBitstreams())) {
                     for (Bitstream bitstream : Utils.emptyIfNull(bundle.getBitstreams())) {
@@ -313,7 +316,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 // No specific child entities to decache
 
                 // COMMUNITY
-            } else if (entity instanceof Community community) {
+            } else if (entity instanceof Community) {
+                Community community = (Community) entity;
 
                 // We don't uncache groups as they might still be referenced from the Context object
 
@@ -322,7 +326,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 }
 
                 // COLLECTION
-            } else if (entity instanceof Collection collection) {
+            } else if (entity instanceof Collection) {
+                Collection collection = (Collection) entity;
 
                 //We don't uncache groups as they might still be referenced from the Context object
 

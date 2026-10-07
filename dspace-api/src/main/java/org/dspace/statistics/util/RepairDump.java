@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
@@ -23,9 +22,9 @@ import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -125,11 +124,6 @@ public class RepairDump {
 
     private static void giveHelp(Options options) {
         String className = MethodHandles.lookup().lookupClass().getCanonicalName();
-        try {
-            HelpFormatter.builder().get().printHelp(
-                className + " [options]", null, options, null, false);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        new HelpFormatter().printHelp(className + " [options]", options);
     }
 }

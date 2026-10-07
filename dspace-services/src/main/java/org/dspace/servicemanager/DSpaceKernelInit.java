@@ -42,8 +42,8 @@ public class DSpaceKernelInit {
             try {
                 DSpaceKernel kernel = new DSpaceKernelManager().getKernel(name);
                 if (kernel != null) {
-                    if (kernel instanceof DSpaceKernelImpl impl) {
-                        return impl;
+                    if (kernel instanceof DSpaceKernelImpl) {
+                        return (DSpaceKernelImpl) kernel;
                     }
 
                     throw new IllegalStateException("Wrong DSpaceKernel implementation");

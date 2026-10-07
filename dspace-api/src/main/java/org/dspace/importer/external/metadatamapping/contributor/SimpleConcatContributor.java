@@ -47,7 +47,8 @@ public class SimpleConcatContributor extends SimpleXpathMetadatumContributor {
         XPathExpression<Object> xpath = XPathFactory.instance().compile(query, Filters.fpassthrough(), null,namespaces);
         List<Object> nodes = xpath.evaluate(t);
         for (Object el : nodes) {
-            if (el instanceof Element element) {
+            if (el instanceof Element) {
+                Element element = (Element) el;
                 if (StringUtils.isNotBlank(element.getText())) {
                     text.append(element.getText());
                 }

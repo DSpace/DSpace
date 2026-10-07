@@ -217,12 +217,12 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
 
     private String getNodeValue(final Object el) {
-        if (el instanceof Element element) {
-            return element.getValue();
-        } else if (el instanceof Attribute attribute) {
-            return attribute.getValue();
-        } else if (el instanceof String string) {
-            return string;
+        if (el instanceof Element) {
+            return ((Element) el).getValue();
+        } else if (el instanceof Attribute) {
+            return ((Attribute) el).getValue();
+        } else if (el instanceof String) {
+            return (String) el;
         } else {
             return null;
         }

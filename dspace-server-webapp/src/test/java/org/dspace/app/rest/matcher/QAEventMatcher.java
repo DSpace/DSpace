@@ -95,7 +95,8 @@ public class QAEventMatcher {
         }
     }
     private static Matcher<? super Object> matchMessage(String topic, QAMessageDTO message) {
-        if (message instanceof OpenaireMessageDTO oadto) {
+        if (message instanceof OpenaireMessageDTO) {
+            OpenaireMessageDTO oadto = (OpenaireMessageDTO) message;
             if (Strings.CS.endsWith(topic, "/ABSTRACT")) {
                 return allOf(hasJsonPath("$.abstract", is(oadto.getAbstracts())));
             } else if (Strings.CS.endsWith(topic, "/PID")) {
@@ -113,7 +114,8 @@ public class QAEventMatcher {
                         hasJsonPath("$.jurisdiction", is(oadto.getJurisdiction())),
                         hasJsonPath("$.title", is(oadto.getTitle())));
             }
-        } else if (message instanceof NotifyMessageDTO notifyDTO) {
+        } else if (message instanceof NotifyMessageDTO) {
+            NotifyMessageDTO notifyDTO = (NotifyMessageDTO) message;
             if (Strings.CS.endsWith(topic, "/REVIEW")) {
                 return allOf(
                             hasJsonPath("$.serviceName", is(notifyDTO.getServiceName())),

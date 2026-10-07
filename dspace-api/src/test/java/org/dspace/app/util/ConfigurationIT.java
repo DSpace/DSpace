@@ -10,9 +10,9 @@ package org.dspace.app.util;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.collection.ArrayMatching.arrayContainingInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.dspace.AbstractDSpaceTest;

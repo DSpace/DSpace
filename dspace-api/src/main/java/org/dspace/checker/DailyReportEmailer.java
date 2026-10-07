@@ -10,7 +10,6 @@ package org.dspace.checker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -19,9 +18,9 @@ import jakarta.mail.MessagingException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
@@ -70,8 +69,9 @@ public class DailyReportEmailer {
                     = DSpaceServicesFactory.getInstance().getConfigurationService();
             String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
             Email email = new Email();
-            email.setSubject("Checksum checker Report - %d Bitstreams found with POSSIBLE issues on %s".formatted(
-                numberOfBitstreams, hostname));
+            email.setSubject(String.format(
+                "Checksum checker Report - %d Bitstreams found with POSSIBLE issues on %s",
+                    numberOfBitstreams, hostname));
             email.setContent("Checker Report", "report is attached ...");
             email.addAttachment(attachment, "checksum_checker_report.txt");
             email.addRecipient(configurationService.getProperty("mail.admin"));
@@ -133,12 +133,9 @@ public class DailyReportEmailer {
 
         // user asks for help
         if (line.hasOption('h')) {
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "checker-emailer", null, options, null, false);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            HelpFormatter myhelp = new HelpFormatter();
+
+            myhelp.printHelp("checker-emailer\n", options);
             System.out.println("\nChecksum Checker Reporter usage examples:\n");
             System.out.println(" - Send all email reports: checker-emailer -a");
             System.out.println(" - Send deleted bitstream email report: checker-emailer -d");

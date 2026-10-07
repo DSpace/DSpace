@@ -443,7 +443,7 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
                                                  .withName("Test SWORDv2 Workflow Collection")
                                                  .withSubmitterGroup(eperson)
-                                                 .withWorkflowGroup("reviewer", admin)
+                                                 .withWorkflowGroup(1, admin)
                                                  .build();
 
         String titleOfItem = "This is a test SWORD workflow item";

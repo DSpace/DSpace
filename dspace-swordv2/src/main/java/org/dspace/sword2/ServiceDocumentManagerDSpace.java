@@ -159,7 +159,8 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
                 throw new SwordError(404);
             }
 
-            if (dso instanceof Community community) {
+            if (dso instanceof Community) {
+                Community community = (Community) dso;
                 SwordWorkspace workspace = new SwordWorkspace();
                 workspace.setTitle(communityService.getName(community));
 

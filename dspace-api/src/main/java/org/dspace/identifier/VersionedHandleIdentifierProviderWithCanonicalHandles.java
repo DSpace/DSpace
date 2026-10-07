@@ -93,7 +93,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         String id = mint(context, dso);
 
         // move canonical to point the latest version
-        if (dso.getType() == Constants.ITEM && dso instanceof Item item) {
+        if (dso.getType() == Constants.ITEM && dso instanceof Item) {
+            Item item = (Item) dso;
             VersionHistory history;
             try {
                 history = versionHistoryService.findByItem(context, item);
@@ -187,7 +188,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     @Override
     public void register(Context context, DSpaceObject dso, String identifier) {
         try {
-            if (dso instanceof Item item) {
+            if (dso instanceof Item) {
+                Item item = (Item) dso;
                 // if this identifier is already present in the Handle table and the corresponding item
                 // has a history, then someone is trying to restore the latest version for the item. When
                 // trying to restore the latest version, the identifier in input doesn't have the
@@ -306,8 +308,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         try {
             String handleId = null;
             VersionHistory history = null;
-            if (dso instanceof Item item) {
-                history = versionHistoryService.findByItem(context, item);
+            if (dso instanceof Item) {
+                history = versionHistoryService.findByItem(context, (Item) dso);
             }
 
             if (history != null) {
@@ -357,7 +359,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     public void delete(Context context, DSpaceObject dso) throws IdentifierException {
 
         try {
-            if (dso instanceof Item item) {
+            if (dso instanceof Item) {
+                Item item = (Item) dso;
 
                 // If it is the most current version occurs to move the canonical to the previous version
                 VersionHistory history = versionHistoryService.findByItem(context, item);

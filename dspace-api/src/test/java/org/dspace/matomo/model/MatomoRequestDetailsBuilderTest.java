@@ -123,9 +123,9 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
             mock.when(() -> ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
             DSpaceObjectService<Bitstream> bitstreamService = Mockito.mock(BitstreamService.class);
             Mockito.when(serviceFactory.getDSpaceObjectService(bitstream))
-                .thenReturn(bitstreamService);
+                   .thenReturn(bitstreamService);
             Mockito.when(bitstreamService.getParentObject(context, bitstream))
-                .thenReturn(item);
+                   .thenReturn(item);
             requestDetails = builder.build(usageEvent);
             assertThat(
                 requestDetails.parameters,
@@ -345,7 +345,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         Mockito.when(cookie.getName()).thenReturn("_pk_id.1.1fff");
         Mockito.when(cookie.getValue()).thenReturn("3225aebdb98b13f9.1740076196.");
 
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cookie });
         Mockito.when(usageEvent.getRequest()).thenReturn(request);
 
         MatomoRequestDetails requestDetails = builder.build(usageEvent);
@@ -369,7 +369,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
             )
         );
 
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[]{});
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { });
         requestDetails = builder.build(usageEvent);
         assertThat(
             requestDetails.parameters,
@@ -383,7 +383,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
 
         Mockito.when(cookie.getName()).thenReturn("_pk_id.1.1fff");
         Mockito.when(cookie.getValue()).thenReturn("wrongvalue.1.2");
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cookie });
         requestDetails = builder.build(usageEvent);
         assertThat(
             requestDetails.parameters,
@@ -397,7 +397,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
 
         Mockito.when(cookie.getName()).thenReturn("_pk_id.1.1fff");
         Mockito.when(cookie.getValue()).thenReturn("");
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cookie });
         requestDetails = builder.build(usageEvent);
         assertThat(
             requestDetails.parameters,
@@ -431,7 +431,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         Cookie noCustom = Mockito.mock(Cookie.class);
         Mockito.when(noCustom.getName()).thenReturn("_pk_custom.1.1fff");
 
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[]{pkRefCookie, pkHsr, pkSes, noCustom});
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { pkRefCookie, pkHsr, pkSes, noCustom });
         Mockito.when(usageEvent.getRequest()).thenReturn(request);
 
         MatomoRequestDetails requestDetails = builder.build(usageEvent);
@@ -473,7 +473,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         Mockito.when(sessionCookie.getName()).thenReturn("MATOMO_SESSID");
         Mockito.when(sessionCookie.getValue()).thenReturn("44d4405e1652daa7a7e451c019cf01db");
 
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[]{sessionCookie});
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { sessionCookie });
         Mockito.when(usageEvent.getRequest()).thenReturn(request);
 
         MatomoRequestDetails requestDetails = builder.build(usageEvent);
@@ -495,7 +495,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         Mockito.when(cvar.getName()).thenReturn("_pk_cvar.1.1fff");
         Mockito.when(cvar.getValue()).thenReturn("{\"1\":[\"key1\",\"value1\"],\"2\":[\"key2\",\"value2\"]}");
 
-        Mockito.when(request.getCookies()).thenReturn(new Cookie[]{cvar});
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cvar });
         Mockito.when(usageEvent.getRequest()).thenReturn(request);
 
         MatomoRequestDetails requestDetails = builder.build(usageEvent);
@@ -538,7 +538,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         when(usageEvent.getRequest()).thenReturn(mock(HttpServletRequest.class));
 
         Map<String, String[]> parameterMap = new HashMap<>();
-        parameterMap.put("trackerId", new String[]{"invalidTrackerID"});
+        parameterMap.put("trackerId", new String[] {"invalidTrackerID"});
         when(usageEvent.getRequest().getParameterMap()).thenReturn(parameterMap);
 
         MatomoRequestDetails result = enricher.enrich(usageEvent, matomoRequestDetails);
@@ -605,7 +605,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
 
         Map<String, String[]> parameterMap = new HashMap<>();
-        parameterMap.put("trackerId", new String[]{"invalidValue"});
+        parameterMap.put("trackerId", new String[] {"invalidValue"});
 
         when(usageEvent.getRequest()).thenReturn(request);
         when(request.getParameterMap()).thenReturn(parameterMap);
@@ -631,7 +631,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
         MatomoRequestDetails matomoRequestDetails = new MatomoRequestDetails();
 
         Map<String, String[]> parameterMap = new HashMap<>();
-        parameterMap.put("trackerId", new String[]{"1234567890abcdef"});
+        parameterMap.put("trackerId", new String[] {"1234567890abcdef"});
 
         when(usageEvent.getRequest()).thenReturn(request);
         when(request.getParameterMap()).thenReturn(parameterMap);

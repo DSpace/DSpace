@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -182,7 +183,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         String statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
 
         if (null != statisticsCoreURL) {
-            Path statisticsPath = Path.of(new URI(statisticsCoreURL).getPath());
+            Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
             statisticsCoreBase = statisticsPath
                 .getName(statisticsPath.getNameCount() - 1)
                 .toString();
@@ -231,7 +232,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             throw new RuntimeException(e);
         }
 
-        if (dspaceObject instanceof Bitstream bitstream && !isBitstreamLoggable(bitstream)) {
+        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
             return;
         }
 
@@ -246,7 +247,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if (doc1 == null) {
                 return;
             }
-            if (dspaceObject instanceof Bitstream bit) {
+            if (dspaceObject instanceof Bitstream) {
+                Bitstream bit = (Bitstream) dspaceObject;
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
                     doc1.addField("bundleName", bundle.getName());
@@ -281,7 +283,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser, String referrer) {
-        if (dspaceObject instanceof Bitstream bitstream && !isBitstreamLoggable(bitstream)) {
+        if (dspaceObject instanceof Bitstream && !isBitstreamLoggable((Bitstream) dspaceObject)) {
             return;
         }
 
@@ -296,7 +298,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if (doc1 == null) {
                 return;
             }
-            if (dspaceObject instanceof Bitstream bit) {
+            if (dspaceObject instanceof Bitstream) {
+                Bitstream bit = (Bitstream) dspaceObject;
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
                     doc1.addField("bundleName", bundle.getName());
@@ -634,25 +637,29 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void storeParents(SolrInputDocument doc1, DSpaceObject dso)
         throws SQLException {
-        if (dso instanceof Community comm) {
+        if (dso instanceof Community) {
+            Community comm = (Community) dso;
             List<Community> parentCommunities = comm.getParentCommunities();
             for (Community parent : parentCommunities) {
                 doc1.addField("owningComm", parent.getID().toString());
                 storeParents(doc1, parent);
             }
-        } else if (dso instanceof Collection coll) {
+        } else if (dso instanceof Collection) {
+            Collection coll = (Collection) dso;
             List<Community> communities = coll.getCommunities();
             for (Community community : communities) {
                 doc1.addField("owningComm", community.getID().toString());
                 storeParents(doc1, community);
             }
-        } else if (dso instanceof Item item) {
+        } else if (dso instanceof Item) {
+            Item item = (Item) dso;
             List<Collection> collections = item.getCollections();
             for (Collection collection : collections) {
                 doc1.addField("owningColl", collection.getID().toString());
                 storeParents(doc1, collection);
             }
-        } else if (dso instanceof Bitstream bitstream) {
+        } else if (dso instanceof Bitstream) {
+            Bitstream bitstream = (Bitstream) dso;
             List<Bundle> bundles = bitstream.getBundles();
             for (Bundle bundle : bundles) {
                 List<Item> items = bundle.getItems();

@@ -122,8 +122,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         log.info(LogHelper.getHeader(context, "create_group", "group_id="
             + g.getID()));
 
-        context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null, DetailType.INFO,
-                                   getIdentifiers(context, g)));
+        context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null, getIdentifiers(context, g)));
         update(context, g);
 
         return g;

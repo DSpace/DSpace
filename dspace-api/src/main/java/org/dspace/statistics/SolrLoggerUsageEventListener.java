@@ -41,9 +41,10 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
     @Override
     public void receiveEvent(Event event) {
 
-        if (event instanceof UsageEvent ue) {
+        if (event instanceof UsageEvent) {
             log.debug("Usage event received " + event.getName());
             try {
+                UsageEvent ue = (UsageEvent) event;
 
                 EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 

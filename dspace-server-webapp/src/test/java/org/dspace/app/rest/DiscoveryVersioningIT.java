@@ -223,7 +223,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     protected DiscoverResult getItemSearchResult(Item item) throws Exception {
         DiscoverQuery query = new DiscoverQuery();
-        query.setQuery("search.resourcetype:\"Item\" AND search.resourceid:\"%s\"".formatted(item.getID()
+        query.setQuery(String.format(
+            "search.resourcetype:\"Item\" AND search.resourceid:\"%s\"", item.getID()
         ));
         return searchService.search(context, query);
     }
@@ -239,9 +240,9 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     protected void verifySolrField(Item item, String fieldName, List<Object> expectedValues) throws Exception {
-        String solrQuery = "search.resourcetype:\"Item\" AND search.resourceid:\"%s\""
-            .formatted(item.getID());
-        QueryResponse result = solrSearchCore.getSolr().query(new SolrQuery(solrQuery));
+        QueryResponse result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
+            "search.resourcetype:\"Item\" AND search.resourceid:\"%s\"", item.getID()
+        )));
 
         SolrDocumentList docs = result.getResults();
         Assertions.assertEquals(1, docs.size());

@@ -7,8 +7,6 @@
  */
 package org.dspace.app.exception;
 
-import java.io.Serial;
-
 /**
  * This class provides an exception to be used when trying to save a resource
  * that already exists.
@@ -18,7 +16,6 @@ import java.io.Serial;
  */
 public class ResourceAlreadyExistsException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

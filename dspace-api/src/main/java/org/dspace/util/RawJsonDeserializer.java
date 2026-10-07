@@ -7,7 +7,6 @@
  */
 package org.dspace.util;
 
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;

@@ -45,7 +45,8 @@ public class SubmissionVisibilityRest {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SubmissionVisibilityRest vis2) {
+        if (obj instanceof SubmissionVisibilityRest) {
+            SubmissionVisibilityRest vis2 = (SubmissionVisibilityRest) obj;
             return Objects.equals(main, vis2.getMain()) && Objects.equals(other, vis2.getOther());
         }
         return super.equals(obj);

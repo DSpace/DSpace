@@ -118,9 +118,9 @@ public class LocaleOrderingFilter implements TextFilter {
             String[] localeArr = locale.split("_");
 
             if (localeArr.length > 1) {
-                theLocale = Locale.of(localeArr[0], localeArr[1]);
+                theLocale = new Locale(localeArr[0], localeArr[1]);
             } else {
-                theLocale = Locale.of(locale);
+                theLocale = new Locale(locale);
             }
 
             // Return the configured locale, or English default

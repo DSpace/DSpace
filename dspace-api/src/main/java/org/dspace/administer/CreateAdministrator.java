@@ -8,16 +8,14 @@
 package org.dspace.administer;
 
 import java.io.Console;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -96,22 +94,14 @@ public final class CreateAdministrator {
                     line.getOptionValue("f"), line.getOptionValue("l"),
                     line.getOptionValue("c"), line.getOptionValue("p"));
         } else if (line.hasOption("h")) {
-            String header = """
-
-                    A command-line tool for creating an initial administrator for setting up a\
-                     DSpace site. Unless all the required parameters are passed it will\
-                     prompt for an e-mail address, last name, first name and password from\
-                     standard input.. An administrator group is then created and the data passed\
-                      in used to create an e-person in that group.
-
-                    """;
+            String header = "\nA command-line tool for creating an initial administrator for setting up a" +
+                    " DSpace site. Unless all the required parameters are passed it will" +
+                    " prompt for an e-mail address, last name, first name and password from" +
+                    " standard input.. An administrator group is then created and the data passed" +
+                    "  in used to create an e-person in that group.\n\n";
             String footer = "\n";
-            try {
-                HelpFormatter.builder().get().printHelp(
-                    "dspace create-administrator", header, options, footer, true);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("dspace create-administrator", header, options, footer, true);
             return;
         } else {
             ca.negotiateAdministratorDetails(line);

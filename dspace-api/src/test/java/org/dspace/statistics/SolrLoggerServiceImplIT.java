@@ -17,6 +17,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 
@@ -87,7 +88,7 @@ public class SolrLoggerServiceImplIT
     @BeforeAll
     public static void setUpClass()
             throws IOException {
-        Path spidersPath = Path.of(cfg.getProperty("dspace.dir"), "config", "spiders");
+        Path spidersPath = Paths.get(cfg.getProperty("dspace.dir"), "config", "spiders");
         Writer writer;
 
         // Ensure the presence of a known "bot" address.
@@ -207,10 +208,10 @@ public class SolrLoggerServiceImplIT
 
             if (NOT_BOT_IP.equals(ip) && NOT_BOT_AGENT.equals(agent)) {
                 assertFalse(isBot,
-                    "IP %s plus Agent %s is marked as bot --".formatted(ip, agent));
+                        String.format("IP %s plus Agent %s is marked as bot --", ip, agent));
             } else {
                 assertTrue(isBot,
-                    "IP %s or Agent %s is not marked as bot --".formatted(ip, agent));
+                        String.format("IP %s or Agent %s is not marked as bot --", ip, agent));
             }
 
             nDocs++;

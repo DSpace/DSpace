@@ -234,7 +234,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Community com = CommunityBuilder.createCommunity(context).withName("A community").build();
         Collection col = CollectionBuilder.createCollection(context, com).withName("A collection")
-                .withWorkflowGroup("reviewer", eperson).build();
+                .withWorkflowGroup(1, eperson).build();
 
         Item archivedItem = ItemBuilder.createItem(context, col).withTitle("Item already in archive").build();
         WorkspaceItem wsItem = WorkspaceItemBuilder.createWorkspaceItem(context, col).withTitle("A workspace item")

@@ -335,7 +335,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 + e.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(),
-                null, DetailType.INFO, getIdentifiers(context, e)));
+                null, getIdentifiers(context, e)));
 
         return e;
     }
@@ -616,7 +616,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         if (ePerson.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.EPERSON,
-                    ePerson.getID(), null, DetailType.INFO, getIdentifiers(context, ePerson)));
+                    ePerson.getID(), null, getIdentifiers(context, ePerson)));
             ePerson.clearModified();
         }
         if (ePerson.isMetadataModified()) {

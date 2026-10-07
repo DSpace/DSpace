@@ -234,7 +234,7 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Community com = CommunityBuilder.createCommunity(context).withName("A community").build();
         Collection col = CollectionBuilder.createCollection(context, com).withName("A collection")
-                .withWorkflowGroup("reviewer", eperson).build();
+                .withWorkflowGroup(1, eperson).build();
 
         Item withdrawnItem = ItemBuilder.createItem(context, col).withTitle("Item already withdrawn").withdrawn()
                 .build();

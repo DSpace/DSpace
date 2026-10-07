@@ -10,8 +10,8 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -203,8 +203,8 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getID()))
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)))
                    .andExpect(jsonPath("$.rightMinCardinality", is(0)))
-                   .andExpect(jsonPath("$.leftMaxCardinality", emptyOrNullString()))
-                   .andExpect(jsonPath("$.rightMaxCardinality", emptyOrNullString()));
+                   .andExpect(jsonPath("$.leftMaxCardinality", isEmptyOrNullString()))
+                   .andExpect(jsonPath("$.rightMaxCardinality", isEmptyOrNullString()));
 
     }
 
@@ -249,7 +249,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getID()))
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)))
                    .andExpect(jsonPath("$.rightMinCardinality", is(1)))
-                   .andExpect(jsonPath("$.leftMaxCardinality", emptyOrNullString()))
+                   .andExpect(jsonPath("$.leftMaxCardinality", isEmptyOrNullString()))
                    .andExpect(jsonPath("$.rightMaxCardinality", is(1)));
 
     }

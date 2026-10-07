@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serial;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -22,7 +21,6 @@ import org.dspace.app.rest.RestResourceController;
 @LinkRest
 public class OrcidHistoryRest extends BaseObjectRest<Integer> {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final String CATEGORY = RestModel.EPERSON;

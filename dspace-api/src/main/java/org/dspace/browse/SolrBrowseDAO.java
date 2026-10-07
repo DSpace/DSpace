@@ -57,11 +57,13 @@ public class SolrBrowseDAO implements BrowseDAO {
         public int compare(Object o1, Object o2) {
             String s1 = "";
             String s2 = "";
-            if (o1 instanceof FacetResult c && o2 instanceof String string1) {
+            if (o1 instanceof FacetResult && o2 instanceof String) {
+                FacetResult c = (FacetResult) o1;
                 s1 = c.getSortValue();
-                s2 = string1;
-            } else if (o2 instanceof FacetResult c && o1 instanceof String string) {
-                s1 = string;
+                s2 = (String) o2;
+            } else if (o2 instanceof FacetResult && o1 instanceof String) {
+                FacetResult c = (FacetResult) o2;
+                s1 = (String) o1;
                 s2 = c.getSortValue();
             }
             // both object are FacetResult so they are already sorted

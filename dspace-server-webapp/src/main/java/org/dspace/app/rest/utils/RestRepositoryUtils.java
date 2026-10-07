@@ -148,8 +148,8 @@ public class RestRepositoryUtils {
             if (value == null) {
                 if (parameterAnnotation != null && parameterAnnotation.required()) {
                     throw new MissingParameterException(
-                        "Required Parameter[%s] Missing".formatted(
-                            parameter.getParameterName()));
+                            String.format("Required Parameter[%s] Missing",
+                                    parameter.getParameterName()));
                 }
                 continue;
             }
@@ -210,7 +210,7 @@ public class RestRepositoryUtils {
 
                 if (StringUtils.isBlank(parameterName)) {
                     throw new IllegalArgumentException(
-                        NAME_NOT_FOUND.formatted(ClassUtils.getQualifiedMethodName(method)));
+                        String.format(NAME_NOT_FOUND, ClassUtils.getQualifiedMethodName(method)));
                 }
 
                 Object value = unwrapSingleElement(rawParameters.get(parameterName));

@@ -74,7 +74,7 @@ public class SystemWideAlertServiceTest {
 
         // The newly created SystemWideAlert's message should match our mocked SystemWideAlert's message
         SystemWideAlert result = systemWideAlertService.create(context, "Test message",
-            AllowSessionsEnum.ALLOW_ALL_SESSIONS, null, true);
+                                                               AllowSessionsEnum.ALLOW_ALL_SESSIONS, null, true);
         assertEquals(systemWideAlert.getMessage(), result.getMessage(), "TestCreate 0");
         // The newly created SystemWideAlert should match our mocked SystemWideAlert
         assertEquals(systemWideAlert, result, "TestCreate 1");
@@ -166,7 +166,6 @@ public class SystemWideAlertServiceTest {
         // Assert the admin user can log in
         assertTrue(systemWideAlertService.canNonAdminUserLogin(context), "CanUserMaintainSession 0");
     }
-
     @Test
     public void canUserMaintainSessionTrueTest() throws Exception {
         // Mock admin state
@@ -200,6 +199,7 @@ public class SystemWideAlertServiceTest {
         // Assert the non admin users cannot main session
         assertFalse(systemWideAlertService.canUserMaintainSession(context, eperson), "CanUserMaintainSession 2");
     }
+
 
 
 }

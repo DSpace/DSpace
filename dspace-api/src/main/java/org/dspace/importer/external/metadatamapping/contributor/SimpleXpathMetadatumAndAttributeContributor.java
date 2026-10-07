@@ -45,7 +45,8 @@ public class SimpleXpathMetadatumAndAttributeContributor extends SimpleXpathMeta
                 namespaces);
         List<Object> nodes = xpath.evaluate(t);
         for (Object el : nodes) {
-            if (el instanceof Element element) {
+            if (el instanceof Element) {
+                Element element = (Element) el;
                 String attributeValue = null;
                 // Look for a prefix if it exists and resolve to a namespace if in configured scope
                 // or NO_NAMESPACE if prefix can't be resolved, and extract the local attr name

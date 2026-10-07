@@ -220,6 +220,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             super.setMetadataSingleValue(context, community, field, null, value);
         }
 
+        community.addDetails(field.toString());
     }
 
     @Override
@@ -273,7 +274,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         communityDAO.save(context, community);
         if (community.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(), null,
-                                       DetailType.INFO, getIdentifiers(context, community)));
+                                       getIdentifiers(context, community)));
             community.clearModified();
         }
         if (community.isMetadataModified()) {
@@ -307,7 +308,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // register this as the admin group
         community.setAdmins(admins);
         context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
-                                   null, DetailType.INFO, getIdentifiers(context, community)));
+                                             null, getIdentifiers(context, community)));
         return admins;
     }
 
@@ -324,7 +325,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Remove the link to the community table.
         community.setAdmins(null);
         context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
-                                   null, DetailType.INFO, getIdentifiers(context, community)));
+                                             null, getIdentifiers(context, community)));
     }
 
     @Override
@@ -730,7 +731,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     public void updateLastModified(Context context, Community community) {
         //Also fire a modified event since the community HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY,
-                                   community.getID(), null, DetailType.INFO, getIdentifiers(context, community)));
+                                   community.getID(), null, getIdentifiers(context, community)));
 
     }
 

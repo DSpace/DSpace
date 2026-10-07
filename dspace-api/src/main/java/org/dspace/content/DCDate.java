@@ -390,11 +390,11 @@ public class DCDate {
 
     private synchronized String toStringInternal() {
         if (granularity == DateGran.YEAR) {
-            return "%4d".formatted(getYearUTC());
+            return String.format("%4d", getYearUTC());
         } else if (granularity == DateGran.MONTH) {
-            return "%4d-%02d".formatted(getYearUTC(), getMonthUTC());
+            return String.format("%4d-%02d", getYearUTC(), getMonthUTC());
         } else if (granularity == DateGran.DAY) {
-            return "%4d-%02d-%02d".formatted(getYearUTC(), getMonthUTC(), getDayUTC());
+            return String.format("%4d-%02d-%02d", getYearUTC(), getMonthUTC(), getDayUTC());
         } else {
             return fullIso.format(calendar);
         }
@@ -442,14 +442,14 @@ public class DCDate {
 
         // display date and time
         if (showTime && granularity == DateGran.TIME) {
-            return "%d-%s-%4d %02d:%02d:%02d".formatted(getDay(), monthName, getYear(), getHour(), getMinute(),
-                getSecond());
+            return String.format("%d-%s-%4d %02d:%02d:%02d", getDay(), monthName, getYear(), getHour(), getMinute(),
+                                 getSecond());
         } else if (granularity == DateGran.YEAR) {
-            return "%4d".formatted(getYear());
+            return String.format("%4d", getYear());
         } else if (granularity == DateGran.MONTH) {
-            return "%s-%4d".formatted(monthName, getYear());
+            return String.format("%s-%4d", monthName, getYear());
         } else {
-            return "%d-%s-%4d".formatted(getDay(), monthName, getYear());
+            return String.format("%d-%s-%4d", getDay(), monthName, getYear());
         }
     }
 
@@ -462,15 +462,15 @@ public class DCDate {
 
         // display date and time
         if (showTime && granularity == DateGran.TIME) {
-            return "%d-%s-%4d %02d:%02d:%02d"
-                .formatted(getDayUTC(), monthName, getYearUTC(), getHourUTC(), getMinuteUTC(),
-                    getSecondUTC());
+            return String
+                .format("%d-%s-%4d %02d:%02d:%02d", getDayUTC(), monthName, getYearUTC(), getHourUTC(), getMinuteUTC(),
+                        getSecondUTC());
         } else if (granularity == DateGran.YEAR) {
-            return "%4d".formatted(getYearUTC());
+            return String.format("%4d", getYearUTC());
         } else if (granularity == DateGran.MONTH) {
-            return "%s-%4d".formatted(monthName, getYearUTC());
+            return String.format("%s-%4d", monthName, getYearUTC());
         } else {
-            return "%d-%s-%4d".formatted(getDayUTC(), monthName, getYearUTC());
+            return String.format("%d-%s-%4d", getDayUTC(), monthName, getYearUTC());
         }
     }
 

@@ -491,7 +491,7 @@ public class XOAI {
 
         // Message output before processing - for debugging purposes
         if (verbose) {
-            println("Item %s with handle %s is about to be indexed".formatted(item.getID().toString(), handle));
+            println(String.format("Item %s with handle %s is about to be indexed", item.getID().toString(), handle));
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -509,7 +509,7 @@ public class XOAI {
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
-            println("Item %s with handle %s indexed".formatted(item.getID().toString(), handle));
+            println(String.format("Item %s with handle %s indexed", item.getID().toString(), handle));
         }
 
         return doc;

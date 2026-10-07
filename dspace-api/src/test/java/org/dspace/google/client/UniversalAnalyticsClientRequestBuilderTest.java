@@ -102,11 +102,10 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
 
-        String expectedRequestBodyWithoutTime = """
-            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF\
-            &dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item
-            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2\
-            &dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item""";
+        String expectedRequestBodyWithoutTime = "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
+            + "&dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item\n"
+            + "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
+            + "&dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item";
 
         assertThat(requestBodyWithoutTime, is(expectedRequestBodyWithoutTime));
 
@@ -132,13 +131,12 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
 
-        String expectedRequestBodyWithoutTime = """
-            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF\
-            &dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item
-            v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2\
-            &dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item
-            v=1&tid=UA-12345&cid=987&t=event&uip=192.168.1.13&ua=Postman&dr=\
-            &dp=%2Fapi%2Fdocuments%2F654&dt=Test+publication+3&ec=bitstream&ea=download&el=item""";
+        String expectedRequestBodyWithoutTime = "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
+            + "&dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item\n"
+            + "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
+            + "&dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item\n"
+            + "v=1&tid=UA-12345&cid=987&t=event&uip=192.168.1.13&ua=Postman&dr="
+            + "&dp=%2Fapi%2Fdocuments%2F654&dt=Test+publication+3&ec=bitstream&ea=download&el=item";
 
         assertThat(requestBodyWithoutTime, is(expectedRequestBodyWithoutTime));
 

@@ -16,6 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -180,7 +181,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             }
 
             // Validate directory
-            Path dirPath = Path.of(directory);
+            Path dirPath = Paths.get(directory);
             if (!Files.exists(dirPath)) {
                 if (mode.equals("export")) {
                     Files.createDirectories(dirPath);
@@ -286,8 +287,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         // If dates not provided, get them from SOLR
         if (StringUtils.isBlank(minDate) || StringUtils.isBlank(maxDate)) {
-            String statsUrl = "%s/select?q=*:*&rows=0&wt=json&stats=true&stats.field=%s".formatted(
-                baseUrl, dateField);
+            String statsUrl = String.format("%s/select?q=*:*&rows=0&wt=json&stats=true&stats.field=%s",
+                    baseUrl, dateField);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(statsUrl))
@@ -393,13 +394,13 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         // Build SOLR query for date range using filter query
         String query = "*:*";
-        String filterQuery = "%s:[%s TO %s]".formatted(dateField, range.start, range.end);
-        String url = "%s/select?q=%s&fq=%s&rows=%d&wt=%s".formatted(
-            baseUrl,
-            java.net.URLEncoder.encode(query, "UTF-8"),
-            java.net.URLEncoder.encode(filterQuery, "UTF-8"),
-            Integer.MAX_VALUE,
-            format);
+        String filterQuery = String.format("%s:[%s TO %s]", dateField, range.start, range.end);
+        String url = String.format("%s/select?q=%s&fq=%s&rows=%d&wt=%s",
+                baseUrl,
+                java.net.URLEncoder.encode(query, "UTF-8"),
+                java.net.URLEncoder.encode(filterQuery, "UTF-8"),
+                Integer.MAX_VALUE,
+                format);
 
         // Add field list
         List<String> fields = getAvailableFields(baseUrl);
@@ -423,8 +424,8 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         }
 
         // Write response directly to file
-        String filename = "solr_export_range_%04d.%s".formatted(rangeIndex, format);
-        Path filePath = Path.of(directory, filename);
+        String filename = String.format("solr_export_range_%04d.%s", rangeIndex, format);
+        Path filePath = Paths.get(directory, filename);
 
         log.debug("Thread '{}' writing to file: {}", currentThread.getName(), filename);
         long writeStart = System.currentTimeMillis();

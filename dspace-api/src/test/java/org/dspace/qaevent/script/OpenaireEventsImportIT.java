@@ -34,7 +34,6 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -323,7 +322,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         context.restoreAuthSystemState();
 
-        URL openaireURL = URI.create("http://api.openaire.eu/broker").toURL();
+        URL openaireURL = new URL("http://api.openaire.eu/broker");
 
         when(mockBrokerClient.listSubscriptions(openaireURL, "user@test.com")).thenReturn(of("sub1", "sub2", "sub3"));
 
@@ -394,7 +393,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void testImportFromOpenaireBrokerWithErrorDuringListSubscription() throws Exception {
 
-        URL openaireURL = URI.create("http://api.openaire.eu/broker").toURL();
+        URL openaireURL = new URL("http://api.openaire.eu/broker");
 
         when(mockBrokerClient.listSubscriptions(openaireURL, "user@test.com"))
             .thenThrow(new RuntimeException("Connection refused"));
@@ -430,7 +429,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         context.restoreAuthSystemState();
 
-        URL openaireURL = URI.create("http://api.openaire.eu/broker").toURL();
+        URL openaireURL = new URL("http://api.openaire.eu/broker");
 
         when(mockBrokerClient.listSubscriptions(openaireURL, "user@test.com")).thenReturn(of("sub1", "sub2", "sub3"));
 

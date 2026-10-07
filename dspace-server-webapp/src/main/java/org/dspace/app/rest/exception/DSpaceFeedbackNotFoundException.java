@@ -6,8 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.exception;
-import java.io.Serial;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Not Found")
 public class DSpaceFeedbackNotFoundException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = 4631940402294095433L;
 
     public DSpaceFeedbackNotFoundException(String message) {

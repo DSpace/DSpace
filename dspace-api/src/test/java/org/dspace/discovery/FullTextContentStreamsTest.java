@@ -171,11 +171,7 @@ public class FullTextContentStreamsTest {
         assertFalse(streams.isEmpty(), "Content stream should not be empty");
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
-        assertEquals("""
-
-            This is text 1
-            This is text 2
-            This is text 3""",
+        assertEquals("\nThis is text 1" + "\nThis is text 2\nThis is text 3",
             IOUtils.toString(inputStream, StandardCharsets.UTF_8),
             "The data in the input stream should match 'This is text 1'");
     }

@@ -76,15 +76,15 @@ public class MetadataExportIT
         assertThrows(ParseException.class, () -> {
             context.turnOffAuthorisationSystem();
             Community community = CommunityBuilder.createCommunity(context)
-                .build();
+                                                  .build();
             Collection collection = CollectionBuilder.createCollection(context, community)
-                .build();
+                                                     .build();
             Item item = ItemBuilder.createItem(context, collection)
-                .withAuthor("Donald, Smith")
-                .build();
+                                   .withAuthor("Donald, Smith")
+                                   .build();
             context.restoreAuthSystemState();
 
-            String[] args = new String[]{"metadata-export",
+            String[] args = new String[] {"metadata-export",
                 "-i", String.valueOf(item.getHandle())};
             TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 

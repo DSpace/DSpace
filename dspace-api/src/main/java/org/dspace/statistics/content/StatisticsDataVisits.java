@@ -421,7 +421,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
     protected void processAxis(Context context, DatasetGenerator datasetGenerator, List<DatasetQuery> queries)
         throws SQLException {
-        if (datasetGenerator instanceof DatasetDSpaceObjectGenerator dspaceObjAxis) {
+        if (datasetGenerator instanceof DatasetDSpaceObjectGenerator) {
+            DatasetDSpaceObjectGenerator dspaceObjAxis = (DatasetDSpaceObjectGenerator) datasetGenerator;
             // Get the types involved
             List<DSORepresentation> dsoRepresentations = dspaceObjAxis.getDsoRepresentations();
             for (int i = 0; i < dsoRepresentations.size(); i++) {
@@ -485,7 +486,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 queries.add(datasetQuery);
             }
-        } else if (datasetGenerator instanceof DatasetTypeGenerator typeAxis) {
+        } else if (datasetGenerator instanceof DatasetTypeGenerator) {
+            DatasetTypeGenerator typeAxis = (DatasetTypeGenerator) datasetGenerator;
             DatasetQuery datasetQuery = new DatasetQuery();
 
             // First make sure our query is in order
@@ -835,8 +837,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 //DS-3602: For clarity, adding "id:" to the right hand side of the search
                 //In the solr schema, "id" has been declared as the defaultSearchField so the field name is optional
-                if (dso instanceof DSpaceObjectLegacySupport support) {
-                    query += " (id:" + dso.getID() + " OR id:" + support.getLegacyId() + ")";
+                if (dso instanceof DSpaceObjectLegacySupport) {
+                    query += " (id:" + dso.getID() + " OR id:" + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
                 } else {
                     query += "id:" + dso.getID();
                 }
@@ -860,9 +862,9 @@ public class StatisticsDataVisits extends StatisticsData {
                     default:
                         break;
                 }
-                if (currentDso instanceof DSpaceObjectLegacySupport support) {
+                if (currentDso instanceof DSpaceObjectLegacySupport) {
                     owningStr = "(" + owningStr + ":" + currentDso.getID() + " OR "
-                        + owningStr + ":" + support.getLegacyId() + ")";
+                        + owningStr + ":" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
                 } else {
                     owningStr += ":" + currentDso.getID();
                 }

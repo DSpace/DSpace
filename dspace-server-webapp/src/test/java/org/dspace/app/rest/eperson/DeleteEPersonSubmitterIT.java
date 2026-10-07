@@ -317,7 +317,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
         Community parent = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup("reviewer", workflowUser)
+                                                 .withWorkflowGroup(1, workflowUser)
                                                  .build();
 
         XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection)

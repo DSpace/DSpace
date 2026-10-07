@@ -93,7 +93,8 @@ public class StatisticsDataWorkflow extends StatisticsData {
         if (0 < datasetGenerators.size()) {
             //At the moment we can only have one dataset generator
             DatasetGenerator datasetGenerator = datasetGenerators.get(0);
-            if (datasetGenerator instanceof DatasetTypeGenerator typeGenerator) {
+            if (datasetGenerator instanceof DatasetTypeGenerator) {
+                DatasetTypeGenerator typeGenerator = (DatasetTypeGenerator) datasetGenerator;
                 ObjectCount[] topCounts = solrLoggerService
                     .queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(),
                                      typeGenerator.isIncludeTotal(), null, facetMinCount);

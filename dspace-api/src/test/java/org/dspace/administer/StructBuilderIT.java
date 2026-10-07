@@ -145,19 +145,17 @@ public class StructBuilderIT
                     "</import_structure>\n";
 
     private static final String EXPORT_DOCUMENT =
-            """
-            <?xml version='1.0' encoding='UTF-8'?>
-            <import_structure>
-              <community>
-                <name>Top Community 0</name>
-                <description/><intro/><copyright/><sidebar/>
-                <collection>
-                  <name>Collection 0.0</name>
-                  <description/><intro/><copyright/><sidebar/><license/>
-                </collection>
-              </community>
-            </import_structure>
-            """;
+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                    "<import_structure>\n" +
+                    "  <community>\n" +
+                    "    <name>Top Community 0</name>\n" +
+                    "    <description/><intro/><copyright/><sidebar/>\n" +
+                    "    <collection>\n" +
+                    "      <name>Collection 0.0</name>\n" +
+                    "      <description/><intro/><copyright/><sidebar/><license/>\n" +
+                    "    </collection>\n" +
+                    "  </community>\n" +
+                    "</import_structure>\n";
 
     /**
      * Test of importStructure method, of class StructBuilder.

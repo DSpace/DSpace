@@ -124,7 +124,8 @@ public class XmlName {
     @Override
     public boolean equals(Object other) {
 
-        if (other instanceof XmlName otherName) {
+        if (other instanceof XmlName) {
+            XmlName otherName = (XmlName) other;
             return Strings.CS.equals(this.namespace, otherName.namespace) &&
                 Strings.CS.equals(this.localName, otherName.localName);
         }

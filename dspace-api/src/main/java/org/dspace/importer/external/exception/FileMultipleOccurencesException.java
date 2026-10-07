@@ -8,8 +8,6 @@
 
 package org.dspace.importer.external.exception;
 
-import java.io.Serial;
-
 /**
  * This exception could be throws when more than one element is found
  * in a method that works on one only.
@@ -19,7 +17,6 @@ import java.io.Serial;
 
 public class FileMultipleOccurencesException extends Exception {
 
-    @Serial
     private static final long serialVersionUID = 1222409723339501937L;
 
     public FileMultipleOccurencesException(String message, Throwable cause) {

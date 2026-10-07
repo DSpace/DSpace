@@ -151,7 +151,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         ObjectMapper mapper = new JsonMapper();
         JsonNode rootNode = mapper.readTree(json);
         JsonNode accessTokenNode = rootNode.get("access_token");
-        return accessTokenNode != null ? accessTokenNode.asString() : null;
+        return accessTokenNode.asText();
     }
 
     private Map<String, Map<String, String>> getLoginParams() {
@@ -518,14 +518,14 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     private String getValue(Object el) {
-        if (el instanceof Element element) {
-            return element.getText();
-        } else if (el instanceof Attribute attribute) {
-            return attribute.getValue();
-        } else if (el instanceof String string) {
-            return string;
-        } else if (el instanceof Text text) {
-            return text.getText();
+        if (el instanceof Element) {
+            return ((Element) el).getText();
+        } else if (el instanceof Attribute) {
+            return ((Attribute) el).getValue();
+        } else if (el instanceof String) {
+            return (String)el;
+        } else if (el instanceof Text) {
+            return ((Text) el).getText();
         } else {
             log.error("node of type: " + el.getClass());
             return "";

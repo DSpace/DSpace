@@ -119,7 +119,7 @@ public class SimpleMapConverterTest {
 
         assertThat(exception.getMessage(),
             is("An error occurs parsing " + dspaceDir.getAbsolutePath() + separator + "config" + separator
-                + "crosswalks" + separator + "test.properties"));
+                    + "crosswalks" + separator + "test.properties"));
 
         Throwable cause = exception.getCause();
         assertThat(cause, notNullValue());

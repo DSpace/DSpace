@@ -8,8 +8,6 @@
 
 package org.dspace.importer.external.exception;
 
-import java.io.Serial;
-
 /**
  * Represents a problem with the File content: e.g. null input stream, invalid content, ...
  *
@@ -18,7 +16,6 @@ import java.io.Serial;
 
 public class FileSourceException extends Exception {
 
-    @Serial
     private static final long serialVersionUID = 6895579588455260182L;
 
     public FileSourceException(String message, Throwable cause) {

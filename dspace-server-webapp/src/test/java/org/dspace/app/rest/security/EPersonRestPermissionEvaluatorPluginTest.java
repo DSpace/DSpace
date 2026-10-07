@@ -54,7 +54,7 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         authentication = mock(Authentication.class);
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert("WRITE");
         when(ePersonRestPermissionEvaluatorPlugin
-            .hasDSpacePermission(authentication, null, null, restPermission)).thenReturn(true);
+                 .hasDSpacePermission(authentication, null, null, restPermission)).thenReturn(true);
         ReflectionTestUtils.setField(ePersonRestPermissionEvaluatorPlugin, "requestService", requestService);
         when(requestService.getCurrentRequest()).thenReturn(null);
     }
@@ -69,7 +69,7 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         ops.add(canLoginOperation);
         Patch patch = new Patch(ops);
         assertFalse(ePersonRestPermissionEvaluatorPlugin
-            .hasPatchPermission(authentication, null, null, patch));
+                        .hasPatchPermission(authentication, null, null, patch));
 
     }
 
@@ -81,7 +81,7 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         ops.add(addOperation);
         Patch patch = new Patch(ops);
         assertTrue(ePersonRestPermissionEvaluatorPlugin
-            .hasPatchPermission(authentication, null, null, patch));
+                       .hasPatchPermission(authentication, null, null, patch));
 
     }
 

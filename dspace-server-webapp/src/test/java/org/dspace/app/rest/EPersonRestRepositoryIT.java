@@ -1120,7 +1120,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection")
-                                          .withWorkflowGroup("reviewer", ePerson)
+                                          .withWorkflowGroup(1, ePerson)
                                           .build();
 
 
@@ -1153,7 +1153,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         Collection collection = CollectionBuilder
             .createCollection(context, community)
-            .withWorkflowGroup("reviewer", ePerson)
+            .withWorkflowGroup(1, ePerson)
             .build();
         Group workflowGroup = collection.getWorkflowStep1(context);
         context.restoreAuthSystemState();

@@ -179,7 +179,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         throws IllegalAccessException, InstantiationException {
         assertThrows(ParseException.class, () -> {
             String fileLocation = new File(testProps.get("test.importcsv").toString()).getAbsolutePath();
-            String[] args = new String[]{"metadata-import", "-f", fileLocation, "-s"};
+            String[] args = new String[] {"metadata-import", "-f", fileLocation, "-s"};
             TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
             ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();

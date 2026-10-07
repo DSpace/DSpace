@@ -34,7 +34,7 @@ public class RegexPasswordValidatorTest extends AbstractUnitTest {
     @BeforeEach
     public void setup() {
         when(configurationService.getProperty("authentication-password.regex-validation.pattern"))
-            .thenReturn("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\da-zA-Z]).{8,15}$");
+        .thenReturn("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\da-zA-Z]).{8,15}$");
     }
 
     @Test

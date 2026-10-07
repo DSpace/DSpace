@@ -121,9 +121,11 @@ public class CurationTaskConfig {
                 for (TaskType task : step.getTask()) {
                     Task stepTask = new Task(task.getName());
                     for (Object thing : task.getWorkflowOrNotify()) {
-                        if (thing instanceof WorkflowType action) {
+                        if (thing instanceof WorkflowType) {
+                            WorkflowType action = (WorkflowType) thing;
                             stepTask.addPower(action.getValue().value());
-                        } else if (thing instanceof NotifyType notify) {
+                        } else if (thing instanceof NotifyType) {
+                            NotifyType notify = (NotifyType) thing;
                             stepTask.addContact(notify.getOn().value(), notify.getValue());
                         } else {
                             // SNH this branch is forbidden by the schema.

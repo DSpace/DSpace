@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serial;
 import java.time.Instant;
 
 import org.dspace.app.rest.RestResourceController;
@@ -26,7 +25,6 @@ import org.dspace.app.rest.RestResourceController;
         })
 public class QAEventRest extends BaseObjectRest<String> {
 
-    @Serial
     private static final long serialVersionUID = -5001130073350654793L;
     public static final String NAME = "qualityassuranceevent";
     public static final String PLURAL_NAME = "qualityassuranceevents";

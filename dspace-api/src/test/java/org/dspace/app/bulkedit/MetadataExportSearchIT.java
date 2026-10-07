@@ -80,7 +80,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
             int dayOfMonth = i + 1;
             issueDate += (dayOfMonth < 10 ? "0" + dayOfMonth : dayOfMonth);
             itemsSubject1[i] = ItemBuilder.createItem(context, collection)
-                .withTitle("%s item %d".formatted(subject1, i))
+                .withTitle(String.format("%s item %d", subject1, i))
                 .withSubject(subject1)
                 .withIssueDate(issueDate)
                 .build();
@@ -92,7 +92,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
             int dayOfMonth = i + 1;
             issueDate += (dayOfMonth < 10 ? "0" + dayOfMonth : dayOfMonth);
             itemsSubject2[i] = ItemBuilder.createItem(context, collection)
-                .withTitle("%s item %d".formatted(subject2, i))
+                .withTitle(String.format("%s item %d", subject2, i))
                 .withSubject(subject2)
                 .withIssueDate(issueDate)
                 .build();
@@ -191,7 +191,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     public void exportMetadataSearchMultipleFilters() throws Exception {
         int result = runDSpaceScript(
             "metadata-export-search", "-f", "subject,equals=" + subject1, "-f",
-            "title,equals=" + "%s item %d".formatted(subject1, 0), "-n", filename
+            "title,equals=" + String.format("%s item %d", subject1, 0), "-n", filename
         );
 
         assertEquals(0, result);
@@ -247,7 +247,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
         String[] args = new String[] {"metadata-export-search", "-f", "nonExisting,equals=" + subject1, "-f",
-            "title,equals=" + "%s item %d".formatted(subject1, 0), "-n", filename};
+            "title,equals=" + String.format("%s item %d", subject1, 0), "-n", filename};
         int result = ScriptLauncher.handleScript(
             args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
         );

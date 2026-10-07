@@ -99,16 +99,16 @@ public class CuratorReportTest
             LOG.info("Report:  {}", aReport);
         }
         Pattern pattern;
-        pattern = Pattern.compile("task1.*%s".formatted(site.getHandle()));
+        pattern = Pattern.compile(String.format("task1.*%s", site.getHandle()));
         Assertions.assertTrue(reportMatcher(report, pattern),
                 "A report should mention 'task1' and site's handle");
-        pattern = Pattern.compile("task1.*%s".formatted(community.getHandle()));
+        pattern = Pattern.compile(String.format("task1.*%s", community.getHandle()));
         Assertions.assertTrue(reportMatcher(report, pattern),
                 "A report should mention 'task1' and the community's handle");
-        pattern = Pattern.compile("task2.*%s".formatted(site.getHandle()));
+        pattern = Pattern.compile(String.format("task2.*%s", site.getHandle()));
         Assertions.assertTrue(reportMatcher(report, pattern),
                 "A report should mention 'task2' and the Site's handle");
-        pattern = Pattern.compile("task2.*%s".formatted(community.getHandle()));
+        pattern = Pattern.compile(String.format("task2.*%s", community.getHandle()));
         Assertions.assertTrue(reportMatcher(report, pattern),
                 "A report should mention 'task2' and the community's handle");
     }
@@ -141,8 +141,9 @@ public class CuratorReportTest
         @Override
         public int perform(Context context, DSpaceObject dso)
                 throws IOException {
-            curator.report("Task1 received 'perform' on taskId '%s' for object '%s'%n".formatted(
-                taskId, dso.getHandle()));
+            curator.report(String.format(
+                    "Task1 received 'perform' on taskId '%s' for object '%s'%n",
+                    taskId, dso.getHandle()));
             return Curator.CURATE_SUCCESS;
         }
     }

@@ -71,7 +71,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         "/sections/traditionalpageone/dc.contributor.author/%1$s";
 
     private static final String getPath(Object element) {
-        return SECTIONS_TRADITIONALPAGEONE_DC_CONTRIBUTOR_AUTHOR.formatted(element);
+        return String.format(SECTIONS_TRADITIONALPAGEONE_DC_CONTRIBUTOR_AUTHOR, element);
     }
 
     @Autowired
@@ -935,9 +935,9 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     @Test
     public void replaceMultipleTraditionalPageOnePlainTextAuthorTest() throws Exception {
         final boolean virtualMetadataEnabled =
-            configurationService.getBooleanProperty("item.enable-virtual-metadata", false);
+            configurationService.getBooleanProperty("relationship.enable-virtual-metadata", false);
 
-        configurationService.setProperty("item.enable-virtual-metadata", false);
+        configurationService.setProperty("relationship.enable-virtual-metadata", false);
         try {
             initPlainTextPublicationWorkspace();
 
@@ -963,7 +963,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            configurationService.setProperty("item.enable-virtual-metadata", virtualMetadataEnabled);
+            configurationService.setProperty("relationship.enable-virtual-metadata", virtualMetadataEnabled);
         }
     }
 
@@ -1664,8 +1664,9 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         final String authorField = "dc.contributor.author";
         final List<Matcher<? super Object>> matchers = new ArrayList<>();
-        IntStream.range(0, metadataValues.size()).forEach((i) ->
-            matchers.add(Matchers.is(MetadataMatcher.matchMetadata(authorField, metadataValues.get(i).getValue(), i))));
+        IntStream.range(0, metadataValues.size()).forEach((i) -> {
+            matchers.add(Matchers.is(MetadataMatcher.matchMetadata(authorField, metadataValues.get(i).getValue(), i)));
+        });
 
 
         getClient(token).perform(get("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID()))

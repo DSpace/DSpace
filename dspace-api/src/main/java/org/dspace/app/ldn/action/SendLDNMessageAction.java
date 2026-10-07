@@ -89,7 +89,7 @@ public class SendLDNMessageAction implements LDNAction {
     }
 
     private LDNActionStatus handleRedirect(CloseableHttpResponse oldResponse,
-                                        HttpPost originalRequest) throws HttpException {
+                                        HttpPost request) throws HttpException {
         Header[] urls = oldResponse.getHeaders(HttpHeaders.LOCATION);
         String url = urls.length > 0 && urls[0] != null ? urls[0].getValue() : null;
         if (url == null) {
@@ -98,11 +98,8 @@ public class SendLDNMessageAction implements LDNAction {
         }
         LDNActionStatus result = LDNActionStatus.ABORT;
         try {
-            // Create new request with redirect URL, copying headers and entity from original
-            HttpPost redirectRequest = new HttpPost(new URI(url));
-            redirectRequest.addHeader("Content-Type", "application/ld+json");
-            redirectRequest.setEntity(originalRequest.getEntity());
-            try (CloseableHttpResponse response = client.execute(redirectRequest)) {
+            request.setUri(new URI(url));
+            try (CloseableHttpResponse response = client.execute(request)) {
                 if (isSuccessful(response.getCode())) {
                     result = LDNActionStatus.CONTINUE;
                 }

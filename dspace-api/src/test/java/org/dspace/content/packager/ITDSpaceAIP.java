@@ -1136,7 +1136,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             return;
         }
 
-        if (dso instanceof Community community) {
+        if (dso instanceof Community) {
+            // Save this Community's info to the infoMap
+            Community community = (Community) dso;
             infoMap.put(community.getHandle(),
                         communityService.getTypeText(community) + valueseparator + community.getName());
 
@@ -1151,7 +1153,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             for (Collection c : collections) {
                 saveObjectInfo(c, infoMap);
             }
-        } else if (dso instanceof Collection collection) {
+        } else if (dso instanceof Collection) {
+            // Save this Collection's info to the infoMap
+            Collection collection = (Collection) dso;
             infoMap.put(collection.getHandle(),
                         collectionService.getTypeText(collection) + valueseparator + collection.getName());
 
@@ -1161,7 +1165,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
                 Item i = items.next();
                 saveObjectInfo(i, infoMap);
             }
-        } else if (dso instanceof Item item) {
+        } else if (dso instanceof Item) {
+            // Save this Item's info to the infoMap
+            Item item = (Item) dso;
             infoMap.put(item.getHandle(), itemService.getTypeText(item) + valueseparator + item.getName());
         }
     }

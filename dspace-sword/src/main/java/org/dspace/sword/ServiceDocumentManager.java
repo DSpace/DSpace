@@ -132,7 +132,8 @@ public class ServiceDocumentManager {
             // we are dealing with a partial or sub-service document
             DSpaceObject dso = urlManager.extractDSpaceObject(url);
 
-            if (dso instanceof Collection collection) {
+            if (dso instanceof Collection) {
+                Collection collection = (Collection) dso;
                 Workspace workspace = new Workspace();
                 workspace.setTitle(
                     collectionService.getMetadataFirstValue(collection,
@@ -147,7 +148,8 @@ public class ServiceDocumentManager {
                 }
 
                 service.addWorkspace(workspace);
-            } else if (dso instanceof Community community) {
+            } else if (dso instanceof Community) {
+                Community community = (Community) dso;
                 Workspace workspace = new Workspace();
                 workspace.setTitle(
                     communityService.getMetadataFirstValue(community,

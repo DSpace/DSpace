@@ -630,7 +630,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withWorkflowGroup("reviewer", admin, reviewer1)
+                .withWorkflowGroup(1, admin, reviewer1)
                 .build();
 
         final Group workflowGroup = col1.getWorkflowStep1(context);
@@ -1407,7 +1407,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withWorkflowGroup("reviewer", admin, reviewer1)
+                .withWorkflowGroup(1, admin, reviewer1)
                 .build();
         Group workflowGroup = col1.getWorkflowStep1(context);
 
@@ -1510,7 +1510,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection collection = CollectionBuilder.createCollection(context, community)
                 .withName("Collection")
                 .withAdminGroup(admin)
-                .withWorkflowGroup("reviewer", admin)
+                .withWorkflowGroup(1, admin)
                 .withSubmitterGroup(admin)
                 .build();
         Group adminGroup = collection.getAdministrators();
@@ -2274,8 +2274,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1")
                                            .withAdminGroup(adminCol1)
-                                           .withWorkflowGroup("reviewer", eperson)
-                                           .withWorkflowGroup("editor", eperson)
+                                           .withWorkflowGroup(1, eperson)
+                                           .withWorkflowGroup(2, eperson)
                                            .build();
 
         Group workflowGroupStep1 = col1.getWorkflowStep1(context);

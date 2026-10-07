@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -453,7 +453,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     // We use 'Paths' instead of splitting on slashes because these OSes use different path separators.
     private int countPathElements(String stringPath) {
         List<String> pathElements = new ArrayList<>();
-        Path.of(stringPath).forEach(p -> pathElements.add(p.toString()));
+        Paths.get(stringPath).forEach(p -> pathElements.add(p.toString()));
         return pathElements.size();
     }
 

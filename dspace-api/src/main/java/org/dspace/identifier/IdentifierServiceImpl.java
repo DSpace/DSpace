@@ -126,7 +126,8 @@ public class IdentifierServiceImpl implements IdentifierService {
         for (IdentifierProvider service : providers) {
             if (service.supports(type)) {
                 try {
-                    if (service instanceof FilteredIdentifierProvider filteredService) {
+                    if (service instanceof FilteredIdentifierProvider) {
+                        FilteredIdentifierProvider filteredService = (FilteredIdentifierProvider)service;
                         filteredService.register(context, dso, filter);
                     } else {
                         service.register(context, dso);
@@ -177,7 +178,8 @@ public class IdentifierServiceImpl implements IdentifierService {
                 // If the service supports filtering, look through the map and the first supported class
                 // we find, set the filter and break. If no filter was seen for this type, just let the provider
                 // use its own implementation.
-                if (service instanceof FilteredIdentifierProvider filteredService) {
+                if (service instanceof FilteredIdentifierProvider) {
+                    FilteredIdentifierProvider filteredService = (FilteredIdentifierProvider)service;
                     Filter filter = null;
                     for (Class<? extends Identifier> type : typeFilters.keySet()) {
                         if (filteredService.supports(type)) {

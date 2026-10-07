@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository.patch.operation.ldn;
 
+import static java.lang.String.format;
+
 import java.sql.SQLException;
 
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -51,7 +53,7 @@ public class NotifyServiceLdnUrlReplaceOperation extends PatchOperation<NotifySe
         }
 
         if (notifyService.findByLdnUrl(context,(String) ldnUrl) != null) {
-            throw new UnprocessableEntityException("LDN url already in use %s".formatted(
+            throw new UnprocessableEntityException(format("LDN url already in use %s",
                 (String) ldnUrl));
         }
 

@@ -8,7 +8,6 @@
 package org.dspace.identifier.doi.crossref;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import jakarta.annotation.Nullable;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -72,7 +71,7 @@ class BaseHttpClient {
                 return new HttpResponse(statusCode, content, url);
             }
         } catch (IOException | ParseException e) {
-            LOG.warn("Caught an exception: ", e);
+            LOG.warn("Caught an IOException: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -89,7 +88,7 @@ class BaseHttpClient {
     private String extractContent(CloseableHttpResponse response) throws IOException, ParseException {
         var entity = response.getEntity();
         if (entity != null) {
-            return EntityUtils.toString(entity, StandardCharsets.UTF_8);
+            return EntityUtils.toString(entity, "UTF-8");
         }
         return null;
     }

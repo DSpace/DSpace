@@ -73,7 +73,8 @@ public class StatisticsDataSearches extends StatisticsData {
         if (0 < datasetGenerators.size()) {
             //At the moment we can only have one dataset generator
             DatasetGenerator datasetGenerator = datasetGenerators.get(0);
-            if (datasetGenerator instanceof DatasetSearchGenerator typeGenerator) {
+            if (datasetGenerator instanceof DatasetSearchGenerator) {
+                DatasetSearchGenerator typeGenerator = (DatasetSearchGenerator) datasetGenerator;
 
                 if (typeGenerator.getMode() == DatasetSearchGenerator.Mode.SEARCH_OVERVIEW) {
                     StringBuilder fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -209,8 +210,8 @@ public class StatisticsDataSearches extends StatisticsData {
         String query;
         if (currentDso != null) {
             query = "scopeType:" + currentDso.getType() + " AND ";
-            if (currentDso instanceof DSpaceObjectLegacySupport support) {
-                query += " (scopeId:" + currentDso.getID() + " OR scopeId:" + support
+            if (currentDso instanceof DSpaceObjectLegacySupport) {
+                query += " (scopeId:" + currentDso.getID() + " OR scopeId:" + ((DSpaceObjectLegacySupport) currentDso)
                     .getLegacyId() + ")";
             } else {
                 query += "scopeId:" + currentDso.getID();

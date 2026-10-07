@@ -503,7 +503,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
                                           .withName("Collection 1")
-                                          .withWorkflowGroup("reviewer", admin)
+                                          .withWorkflowGroup(1, admin)
                                           .build();
 
         Item item = ItemBuilder.createItem(context, col)

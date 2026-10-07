@@ -107,14 +107,16 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
             opNode.set("op", nodeFactory.textNode(operation.getOp()));
             opNode.set("path", nodeFactory.textNode(operation.getPath()));
 
-            if (operation instanceof FromOperation fromOp) {
+            if (operation instanceof FromOperation) {
+
+                FromOperation fromOp = (FromOperation) operation;
                 opNode.set("from", nodeFactory.textNode(fromOp.getFrom()));
             }
 
             Object value = operation.getValue();
 
             if (value != null) {
-                opNode.set("value", value instanceof JsonValueEvaluator jve ? jve.getValueNode()
+                opNode.set("value", value instanceof JsonValueEvaluator ? ((JsonValueEvaluator) value).getValueNode()
                         : mapper.valueToTree(value));
             }
 
@@ -128,8 +130,8 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
 
         if (valueNode == null || valueNode.isNull()) {
             return null;
-        } else if (valueNode.isString()) {
-            return valueNode.asString();
+        } else if (valueNode.isTextual()) {
+            return valueNode.asText();
         } else if (valueNode.isFloatingPointNumber()) {
             return valueNode.asDouble();
         } else if (valueNode.isBoolean()) {
@@ -143,7 +145,7 @@ public class JsonPatchConverter implements PatchConverter<JsonNode> {
         }
 
         throw new PatchException(
-            "Unrecognized valueNode type at path %s and value node %s.".formatted(path, valueNode));
+            String.format("Unrecognized valueNode type at path %s and value node %s.", path, valueNode));
     }
 
 

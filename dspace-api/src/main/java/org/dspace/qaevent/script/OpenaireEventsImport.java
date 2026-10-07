@@ -14,7 +14,7 @@ import static org.dspace.core.Constants.ITEM;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
@@ -329,13 +329,9 @@ public class OpenaireEventsImport
 
     private URL getOpenaireBrokerUri() {
         try {
-            String brokerUrl = configurationService
-                .getProperty("qaevents.openaire.broker-url",
-                             "http://api.openaire.eu/broker");
-            return URI.create(brokerUrl).toURL();
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                "The configured OPENAIRE broker URL is not valid.", e);
+            return new URL(configurationService.getProperty("qaevents.openaire.broker-url", "http://api.openaire.eu/broker"));
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("The configured OPENAIRE broker URL is not valid.", e);
         }
     }
 

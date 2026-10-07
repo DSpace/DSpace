@@ -129,7 +129,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
                                           .build();
         Collection colWithWorkflow = CollectionBuilder.createCollection(context, community)
                 .withName("Collection WITH workflow")
-                .withWorkflowGroup("reviewer", admin)
+                .withWorkflowGroup(1, admin)
                 .build();
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
                                                           .withTitle("No workflow")
@@ -182,7 +182,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
                                               .withName("Parent Community")
                                               .build();
         Collection collection = CollectionBuilder.createCollection(context, community)
-                                                 .withWorkflowGroup("reviewer", admin)
+                                                 .withWorkflowGroup(1, admin)
                                                  .build();
         Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
@@ -841,7 +841,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // Build query with default parameters (except for workspaceConf)
         QueryResponse result = null;
         try {
-            result = solrSearchCore.getSolr().query(new SolrQuery("search.resourcetype:\"Item\"".formatted()));
+            result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
+                "search.resourcetype:\"Item\"")));
         } catch (SolrServerException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -888,7 +889,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // Build query with default parameters (except for workspaceConf)
         QueryResponse result = null;
         try {
-            result = solrSearchCore.getSolr().query(new SolrQuery("search.resourcetype:\"Item\"".formatted()));
+            result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
+                "search.resourcetype:\"Item\"")));
         } catch (SolrServerException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {

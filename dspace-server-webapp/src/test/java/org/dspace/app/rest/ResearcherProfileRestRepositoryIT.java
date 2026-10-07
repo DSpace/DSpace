@@ -2816,12 +2816,10 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         context.restoreAuthSystemState();
 
-        when(orcidClientMock.getAccessToken(code)).thenThrow(new OrcidClientException(400, """
-            {
-                "error": "invalid_grant",
-                "error_description": "Invalid authorization code: 123456"
-            }\
-            """));
+        when(orcidClientMock.getAccessToken(code)).thenThrow(new OrcidClientException(400, "{\n" +
+            "    \"error\": \"invalid_grant\",\n" +
+            "    \"error_description\": \"Invalid authorization code: 123456\"\n" +
+            "}"));
 
         getClient(getAuthToken(user.getEmail(), password))
             .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())

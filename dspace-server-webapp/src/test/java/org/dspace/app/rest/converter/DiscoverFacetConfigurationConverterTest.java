@@ -80,9 +80,9 @@ public class DiscoverFacetConfigurationConverterTest {
         assertNotNull(facetConfigurationRest);
         assertTrue(!facetConfigurationRest.getSidebarFacets().isEmpty());
         assertEquals(discoverySearchFilterFacet.getIndexFieldName(),
-            facetConfigurationRest.getSidebarFacets().get(0).getName());
+                     facetConfigurationRest.getSidebarFacets().get(0).getName());
         assertEquals(discoverySearchFilterFacet.getType(),
-            facetConfigurationRest.getSidebarFacets().get(0).getFacetType());
+                     facetConfigurationRest.getSidebarFacets().get(0).getFacetType());
     }
 
     @Test

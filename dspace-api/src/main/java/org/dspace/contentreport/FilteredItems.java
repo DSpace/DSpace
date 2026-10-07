@@ -7,7 +7,6 @@
  */
 package org.dspace.contentreport;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,6 @@ import org.dspace.content.Item;
  */
 public class FilteredItems implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 7980375013177658249L;
 
     /** Items included in the report */

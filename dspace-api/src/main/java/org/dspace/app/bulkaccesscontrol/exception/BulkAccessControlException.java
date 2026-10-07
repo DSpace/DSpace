@@ -7,8 +7,6 @@
  */
 package org.dspace.app.bulkaccesscontrol.exception;
 
-import java.io.Serial;
-
 /**
  * Exception for errors that occurs during the bulk access control
  *
@@ -17,7 +15,6 @@ import java.io.Serial;
  */
 public class BulkAccessControlException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = -74730626862418515L;
 
     /**

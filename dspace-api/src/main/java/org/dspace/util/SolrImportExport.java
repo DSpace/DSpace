@@ -10,8 +10,6 @@ package org.dspace.util;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.time.YearMonth;
@@ -25,9 +23,9 @@ import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -502,8 +500,8 @@ public class SolrImportExport {
     public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, String fromWhen,
                                    boolean overwrite)
         throws SolrServerException, IOException, SolrImportExportException {
-        log.info("Export Index [%s] to [%s] using [%s] Time Field[%s] FromWhen[%s]".formatted(indexName, toDir,
-            solrUrl, timeField, fromWhen));
+        log.info(String.format("Export Index [%s] to [%s] using [%s] Time Field[%s] FromWhen[%s]", indexName, toDir,
+                               solrUrl, timeField, fromWhen));
         if (StringUtils.isBlank(solrUrl)) {
             throw new SolrImportExportException(
                 "Could not construct solr URL for index" + indexName + ", aborting export.");
@@ -577,18 +575,15 @@ public class SolrImportExport {
 
             for (int i = 0; i < docsThisMonth; i += ROWS_PER_FILE) {
                 monthQuery.setStart(i);
-                URL url = URI.create(solrUrl + "/select?" + monthQuery.toString()).toURL();
+                URL url = new URL(solrUrl + "/select?" + monthQuery.toString());
 
                 File file = new File(toDir.getCanonicalPath(),
                                      makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
                 if (file.createNewFile() || overwrite) {
                     FileUtils.copyURLToFile(url, file);
-                    String message =
-                        ("Solr export to file [%s] complete.  Export for"
-                            + " Index [%s] Month [%s] Batch [%d]"
-                            + " Num Docs [%d]").formatted(
-                            file.getCanonicalPath(), indexName,
-                            monthStart, i, docsThisMonth);
+                    String message = String.format(
+                        "Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]",
+                        file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
                     log.info(message);
                 } else if (file.exists()) {
                     String message = String.format(
@@ -708,12 +703,8 @@ public class SolrImportExport {
      * @param exitCode the exit code to use. The method will call System#exit(int) with the given code.
      */
     private static void printHelpAndExit(Options options, int exitCode) {
-        HelpFormatter myhelp = HelpFormatter.builder().get();
-        try {
-            myhelp.printHelp(SolrImportExport.class.getSimpleName(), null, options, null, false);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        HelpFormatter myhelp = new HelpFormatter();
+        myhelp.printHelp(SolrImportExport.class.getSimpleName() + "\n", options);
         System.out.println("\n\nCommand Defaults");
         System.out.println("\tsolr-export-statistics  [-a export]  [-i statistics]");
         System.out.println("\tsolr-import-statistics  [-a import]  [-i statistics]");

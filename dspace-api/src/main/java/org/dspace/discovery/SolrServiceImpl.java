@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import jakarta.mail.MessagingException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
@@ -587,8 +588,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             Object value = doc.getFieldValue(SearchUtils.LAST_INDEXED_FIELD);
 
             // If it's a java.util.Date, convert to an Instant
-            if (value instanceof java.util.Date date) {
-                value = date.toInstant();
+            if (value instanceof java.util.Date) {
+                value = ((java.util.Date) value).toInstant();
             }
 
             if (value instanceof Instant lastIndexed) {
@@ -1155,6 +1156,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         for (FacetField.Count facetValue : facetValues) {
                             String displayedValue = transformDisplayedValue(context, facetField.getName(),
                                                                             facetValue.getName());
+
                             String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
                             String currentLocalePrefix = context.getCurrentLocale().getLanguage() + "_";
                             field = StringUtils.removeStart(field, currentLocalePrefix);
@@ -1237,7 +1239,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 getIndexFactoryByType(type);
         Optional<IndexableObject> indexableObject = indexableObjectService.findIndexableObject(context, id);
 
-        if (indexableObject.isEmpty()) {
+        if (!indexableObject.isPresent()) {
             log.warn("Not able to retrieve object RESOURCE_ID:" + id + " - RESOURCE_TYPE_ID:" + type);
         }
         return indexableObject.orElse(null);
@@ -1329,7 +1331,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if (value.matches("\\[\\d{1,4} TO \\d{1,4}\\]")) {
                         int minRange = Integer.parseInt(value.substring(1, value.length() - 1).split(" TO ")[0]);
                         int maxRange = Integer.parseInt(value.substring(1, value.length() - 1).split(" TO ")[1]);
-                        value = "[" + "%04d".formatted(minRange) + " TO " + "%04d".formatted(maxRange) + "]";
+                        value = "[" + String.format("%04d", minRange) + " TO " + String.format("%04d", maxRange) + "]";
                     }
                     filterQuery.append(value);
                 }
@@ -1378,9 +1380,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             //Add the more like this parameters !
             solrQuery.setParam(MoreLikeThisParams.MLT, true);
             //Add a comma separated list of the similar fields
+            @SuppressWarnings("unchecked")
             java.util.Collection<String> similarityMetadataFields = CollectionUtils
-                .collect(mltConfig.getSimilarityMetadataFields(),
-                         input -> input + "_mlt");
+                .collect(mltConfig.getSimilarityMetadataFields(), new Transformer() {
+                    @Override
+                    public Object transform(Object input) {
+                        //Add the mlt appendix !
+                        return input + "_mlt";
+                    }
+                });
 
             solrQuery.setParam(MoreLikeThisParams.SIMILARITY_FIELDS, StringUtils.join(similarityMetadataFields, ','));
             solrQuery.setParam(MoreLikeThisParams.MIN_TERM_FREQ, String.valueOf(mltConfig.getMinTermFrequency()));
@@ -1397,8 +1405,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 for (Object relatedDoc : relatedDocs) {
                     SolrDocument relatedDocument = (SolrDocument) relatedDoc;
                     IndexableObject relatedItem = findIndexableObject(context, relatedDocument);
-                    if (relatedItem instanceof IndexableItem indexableItem) {
-                        results.add(indexableItem.getIndexedObject());
+                    if (relatedItem instanceof IndexableItem) {
+                        results.add(((IndexableItem) relatedItem).getIndexedObject());
                     }
                 }
             }
@@ -1629,6 +1637,27 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return ClientUtils.escapeQueryChars(query);
     }
 
+    /**
+     * Utility method to format an autocomplete query over a specific field. Combines the escaped query with a
+     * wildcard search over the specified {@code autocompleteField}. This field is typically non-tokenized and
+     * allows recovering searches containing spaces as a single value.
+     *
+     * @param query the user input to search for
+     * @param autocompleteField non-tokenized field used for wildcard autocomplete
+     * @return the constructed Solr query, or the original query if blank
+     */
+    @Override
+    public String formatAutoCompleteQuery(String query, String autocompleteField) {
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = escapeQueryChars(query);
+            buildQuery.append("(").append(escapedQuery).append(" OR ").append(autocompleteField).append(":*")
+                .append(escapedQuery).append("*").append(")");
+            return buildQuery.toString();
+        }
+        return query;
+    }
+
     @Override
     public FacetYearRange getFacetYearRange(Context context, IndexableObject scope,
                                             DiscoverySearchFilterFacet facet, List<String> filterQueries,
@@ -1661,18 +1690,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         }
         return null;
-    }
-
-    @Override
-    public String formatAutoCompleteQuery(String query, String autocompleteField) {
-        if (StringUtils.isNotBlank(query)) {
-            StringBuilder buildQuery = new StringBuilder();
-            String escapedQuery = escapeQueryChars(query);
-            buildQuery.append("(").append(escapedQuery).append(" OR ").append(autocompleteField).append(":*")
-                .append(escapedQuery).append("*").append(")");
-            return buildQuery.toString();
-        }
-        return query;
     }
 
     @Override

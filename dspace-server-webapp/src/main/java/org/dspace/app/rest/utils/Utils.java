@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
@@ -252,8 +251,8 @@ public class Utils {
     private Serializable getIdentifierForLink(RestAddressableModel data) {
         // If the resource is identifiable by an ID, use it. Otherwise use toString() to represent it.
         Serializable identifier = data.toString();
-        if (data instanceof BaseObjectRest rest) {
-            identifier = rest.getId();
+        if (data instanceof BaseObjectRest) {
+            identifier = ((BaseObjectRest) data).getId();
         }
         return identifier;
     }
@@ -882,7 +881,8 @@ public class Utils {
         //Add the latest link to the list
         Link[] newList = Arrays.copyOf(oldLinks, oldLinks.length + 1);
         newList[oldLinks.length] = link;
-        if (linkedObject instanceof RestAddressableModel restObject) {
+        if (linkedObject instanceof RestAddressableModel) {
+            RestAddressableModel restObject = (RestAddressableModel) linkedObject;
             restObject.setEmbedLevel(childEmbedLevel);
             return converter.toResource(restObject, newList);
         } else if (linkedObject instanceof Page) {
@@ -996,14 +996,14 @@ public class Utils {
         URL dspaceUrlSSRObject = null;
         URL requestUrlObject;
         try {
-            dspaceUrlObject = URI.create(dspaceUrl).toURL();
-            requestUrlObject = URI.create(uri).toURL();
+            dspaceUrlObject = new URL(dspaceUrl);
+            requestUrlObject = new URL(uri);
             if (StringUtils.isNoneBlank(dspaceSSRUrl)) {
-                dspaceUrlSSRObject = URI.create(dspaceSSRUrl).toURL();
+                dspaceUrlSSRObject = new URL(dspaceSSRUrl);
             }
-        } catch (MalformedURLException | IllegalArgumentException ex) {
+        } catch (MalformedURLException ex) {
             throw new IllegalArgumentException(
-                "Configuration '%s' or request '%s' is malformed".formatted(dspaceUrl, uri));
+                    String.format("Configuration '%s' or request '%s' is malformed", dspaceUrl, uri));
         }
 
         // Check whether the URI could be valid.
@@ -1062,7 +1062,7 @@ public class Utils {
             if (!(repository instanceof ReloadableEntityObjectRepository)) {
                 throw new IllegalArgumentException("the supplied category and model are not" +
                     " for the right type of repository: " +
-                    "%s.%s".formatted(apiCategory, model));
+                    String.format("%s.%s", apiCategory, model));
             }
         } catch (RepositoryNotFoundException e) {
             throw new IllegalArgumentException("the repository for the category '" + apiCategory + "' and model '"

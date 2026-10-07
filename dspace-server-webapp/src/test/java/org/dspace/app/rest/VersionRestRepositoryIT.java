@@ -644,7 +644,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         @SuppressWarnings("deprecation")
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withWorkflowGroup("reviewer", admin)
+                                          .withWorkflowGroup(1, admin)
                                           .withName("Collection test").build();
 
         XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, col)

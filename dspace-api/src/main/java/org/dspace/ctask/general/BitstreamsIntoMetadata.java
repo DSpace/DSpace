@@ -52,8 +52,9 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
         status = Curator.CURATE_SKIP;
         boolean changed = false;
         logDebugMessage("The target dso is " + dso.getName());
-        if (dso instanceof Item item) {
+        if (dso instanceof Item) {
             try {
+                Item item = (Item) dso;
                 itemService.clearMetadata(context, item, "dc", "format", Item.ANY, Item.ANY);
                 for (Bundle bundle : item.getBundles()) {
                     if ("ORIGINAL".equals(bundle.getName())) {

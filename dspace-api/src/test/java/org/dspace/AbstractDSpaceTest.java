@@ -53,8 +53,7 @@ public class AbstractDSpaceTest {
     /**
      * Default constructor
      */
-    protected AbstractDSpaceTest() {
-    }
+    protected AbstractDSpaceTest() { }
 
     /**
      * log4j category
@@ -71,7 +70,6 @@ public class AbstractDSpaceTest {
      * any other services.
      */
     protected static DSpaceKernelImpl kernelImpl;
-
 
     /**
      * Obtain the TestName from JUnit, so that we can print it out in the test logs (see below)
@@ -96,7 +94,7 @@ public class AbstractDSpaceTest {
             //load the properties of the tests
             testProps = new Properties();
             URL properties = AbstractDSpaceTest.class.getClassLoader()
-                .getResource("test-config.properties");
+                                                   .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
             // Initialise the service manager kernel

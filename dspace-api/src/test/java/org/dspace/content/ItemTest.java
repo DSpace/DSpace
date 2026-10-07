@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,6 +65,7 @@ import org.dspace.services.ConfigurationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -106,10 +107,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     private AuthorizeService authorizeServiceSpy;
 
-    /**
-     * Original AuthorizeService (saved before spying for restoration in @After)
-     */
-    private AuthorizeService originalAuthorizeService;
 
 
     /**
@@ -133,12 +130,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             this.dspaceObject = it;
             context.restoreAuthSystemState();
 
-            // Save the original authorizeService before spying (for restoration in @After)
-            originalAuthorizeService = authorizeService;
-
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(originalAuthorizeService);
+            // Use mock with spiedInstance for Mockito 5.x compatibility with Spring proxies
+            // (Mockito 5.x doesn't allow spy() directly on Spring proxies as it detects them as mocks)
+            // Note: spiedInstance requires the mocked type to match the actual instance type
+            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
+            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
+                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
@@ -191,17 +190,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it = null;
         collection = null;
         owningCommunity = null;
-
-        // Restore the original authorizeService to prevent test pollution
-        if (originalAuthorizeService != null) {
-            ReflectionTestUtils.setField(collectionService, "authorizeService", originalAuthorizeService);
-            ReflectionTestUtils.setField(itemService, "authorizeService", originalAuthorizeService);
-            ReflectionTestUtils.setField(workspaceItemService, "authorizeService", originalAuthorizeService);
-            ReflectionTestUtils.setField(bundleService, "authorizeService", originalAuthorizeService);
-            ReflectionTestUtils.setField(bitstreamService, "authorizeService", originalAuthorizeService);
-            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(),
-                "authorizeService", originalAuthorizeService);
-        }
 
         try {
             super.destroy();
@@ -717,7 +705,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Now, update tests values to append a third value which is NOT virtual metadata
         String newValue = "new-metadata-value";
         String newAuthority = "auth0";
-        Integer newConfidence = 0;
+        int newConfidence = 0;
         values.add(newValue);
         authorities.add(newAuthority);
         confidences.add(newConfidence);
@@ -1689,7 +1677,15 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         Collection collection = it.getCollections().get(0);
         it.setOwningCollection(collection);
-        ItemService itemServiceSpy = spy(itemService);
+        // Use mock with custom default answer for Mockito 5.x compatibility with Spring proxies
+        final ItemService realItemService = itemService;
+        ItemService itemServiceSpy = mock(ItemService.class, withSettings().defaultAnswer(invocation -> {
+            try {
+                return invocation.getMethod().invoke(realItemService, invocation.getArguments());
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }));
 
         itemService.move(context, it, collection, collection);
         context.restoreAuthSystemState();

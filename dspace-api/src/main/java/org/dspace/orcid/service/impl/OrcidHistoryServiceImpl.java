@@ -7,6 +7,7 @@
  */
 package org.dspace.orcid.service.impl;
 
+import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
@@ -168,11 +169,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         String orcid = getMetadataValue(profileItem, "person.identifier.orcid")
             .orElseThrow(() -> new IllegalArgumentException(
-            "The related profileItem item (id = %s) does not have an orcid".formatted(profileItem.getID())));
+                format("The related profileItem item (id = %s) does not have an orcid", profileItem.getID())));
 
         String token = getAccessToken(context, profileItem)
             .orElseThrow(() -> new IllegalArgumentException(
-            "The related profileItem item (id = %s) does not have an access token".formatted(profileItem.getID())));
+                format("The related profileItem item (id = %s) does not have an access token", profileItem.getID())));
 
         OrcidOperation operation = calculateOperation(orcidQueue, forceAddition);
 

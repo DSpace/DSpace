@@ -47,7 +47,7 @@ public class OrcidRestConnector {
                 if (!isSuccessful(httpResponse)) {
                     var statusCode = getStatusCode(httpResponse);
                     var reason = httpResponse.getReasonPhrase();
-                    var error = "The request failed with:%d code, reason:%s ".formatted(statusCode, reason);
+                    var error = String.format("The request failed with:%d code, reason:%s ", statusCode, reason);
                     throw new OrcidConnectionException(error, statusCode);
                 }
                 try (InputStream responseStream = httpResponse.getEntity().getContent()) {
