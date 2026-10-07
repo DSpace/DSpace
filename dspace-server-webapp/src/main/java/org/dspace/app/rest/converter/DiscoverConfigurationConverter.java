@@ -32,7 +32,7 @@ public class DiscoverConfigurationConverter {
      * The requested configuration name and scope are kept on the REST object so that the self link can be built
      * from them, the same way {@link DiscoverFacetConfigurationConverter} does it.
      */
-    public SearchConfigurationRest convert(final String configurationName, final String scope,
+    public SearchConfigurationRest convert(String configurationName, String scope,
                                            DiscoveryConfiguration configuration, Projection projection) {
         SearchConfigurationRest searchConfigurationRest = new SearchConfigurationRest();
         searchConfigurationRest.setProjection(projection);
