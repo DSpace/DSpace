@@ -264,7 +264,7 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     }
 
     /**
-     * This method tests that when datacite.exact-id-only = true and we search for an valid ID that does not exist
+     * This method tests that when datacite.exact-id-only = true and we search for a valid ID that does not exist
      * -> we get no results
      */
     @Test

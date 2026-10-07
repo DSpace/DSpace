@@ -9,6 +9,10 @@ package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
@@ -20,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -29,7 +34,9 @@ import org.dspace.importer.external.crossref.CrossRefImportMetadataSourceService
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.services.ConfigurationService;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +53,9 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
     @Autowired
     private CrossRefImportMetadataSourceServiceImpl crossRefServiceImpl;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Test
     public void crossRefImportMetadataGetNoRecordsTest() throws Exception {
@@ -152,6 +162,93 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
         context.restoreAuthSystemState();
         crossRefServiceImpl.findMatchingRecords(testItem);
+    }
+
+
+    /**
+     * This method tests that when crossref.exact-id-only = true and we search for a valid ID that does not exist
+     * -> we get no results
+     */
+    @Test
+    public void crossRefExactIdOnlyEnabledDoesNotFallbackToQueryTest() throws Exception {
+        boolean originalCrossrefExactId = configurationService.getBooleanProperty("crossref.exact-id-only", false);
+
+        configurationService.setProperty("crossref.exact-id-only", true);
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try {
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse notFound = mockResponse("", 404, "Not Found");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(notFound);
+
+            Collection<ImportRecord> records =
+                crossRefServiceImpl.getRecords("10.99999/does-not-exist", 0, 2);
+            assertEquals(0, records.size());
+
+            ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
+            verify(httpClient, times(1)).execute(captor.capture());
+            assertTrue(captor.getValue().getURI().getPath().endsWith("/10.99999/does-not-exist"));
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+            configurationService.setProperty("crossref.exact-id-only", originalCrossrefExactId);
+        }
+    }
+
+    /**
+     * This method tests that when crossref.exact-id-only = false, and we don't give an exact ID match
+     * -> The fallback query is used to retrieve non-exact values
+     */
+    @Test
+    public void crossRefExactIdOnlyDisabledFallsBackToQueryTest() throws Exception {
+        boolean originalCrossrefExactId = configurationService.getBooleanProperty("crossref.exact-id-only", false);
+
+        configurationService.setProperty("crossref.exact-id-only", false);
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-test.json")) {
+            String queryResponse = IOUtils.toString(crossRefResp, Charset.defaultCharset());
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse notFound = mockResponse("", 404, "Not Found");
+            CloseableHttpResponse ok = mockResponse(queryResponse, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any()))
+                .thenReturn(notFound)
+                .thenReturn(ok);
+
+            Collection<ImportRecord> records =
+                crossRefServiceImpl.getRecords("10.99999/does-not-exist", 0, 2);
+            assertEquals(2, records.size());
+
+            ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
+            verify(httpClient, times(2)).execute(captor.capture());
+            assertTrue(captor.getAllValues().get(0).getURI().getPath().endsWith("/10.99999/does-not-exist"));
+            assertTrue(String.valueOf(captor.getAllValues().get(1).getURI().getQuery()).contains("query="));
+        } finally {
+            configurationService.setProperty("crossref.exact-id-only", originalCrossrefExactId);
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
+
+    /**
+     * This method tests that if crossref.exact-id-only = true and we didn't provide a valid DOI
+     * -> an empty list is returned
+     */
+    @Test
+    public void crossRefExactIdOnlyEnabledNonDoiReturnsEmptyTest() throws Exception {
+        boolean originalCrossrefExactId = configurationService.getBooleanProperty("crossref.exact-id-only", false);
+
+        configurationService.setProperty("crossref.exact-id-only", true);
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try {
+            liveImportClientImpl.setHttpClient(httpClient);
+
+            Collection<ImportRecord> records = crossRefServiceImpl.getRecords("test query", 0, 2);
+            assertEquals(0, records.size());
+            verify(httpClient, never()).execute(ArgumentMatchers.any());
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+            configurationService.setProperty("crossref.exact-id-only", originalCrossrefExactId);
+        }
     }
 
     private ArrayList<ImportRecord> getRecords() {
