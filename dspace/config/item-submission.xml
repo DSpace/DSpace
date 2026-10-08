@@ -318,6 +318,7 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
 
+            <!-- Uncomment this step to enabled metadata extraction from bitstreams, using configured sources such as GROBID -->
             <!-- <step id="extractionstep"/> -->
 
             <!-- Uncomment this step to allow the user to select a Creative Commons License -->
@@ -358,6 +359,7 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
 
+            <!-- Uncomment this step to enabled metadata extraction from bitstreams, using configured sources such as GROBID -->
             <!-- <step id="extractionstep"/> -->
 
             <!-- Uncomment this step to allow the user to select a Creative Commons License -->

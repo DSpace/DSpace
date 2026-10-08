@@ -376,20 +376,23 @@
 
     <!-- DataCite (2) :: Creator -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
-        <xsl:variable name="authority" select="@authority"/>
         <creator>
             <creatorName>
-                <xsl:call-template name="nameType">
-                    <xsl:with-param name="authority_value" select="$authority"/>
-                </xsl:call-template>
+                <xsl:if test="@authority">
+                    <xsl:call-template name="nameType">
+                        <xsl:with-param name="authority_value" select="@authority"/>
+                    </xsl:call-template>
+                </xsl:if>
                 <xsl:value-of select="." />
             </creatorName>
-            <xsl:call-template name="personOrcid">
-                <xsl:with-param name="authority_value" select="$authority"/>
-            </xsl:call-template>
-            <xsl:call-template name="organizationRor">
-                <xsl:with-param name="authority_value" select="$authority"/>
-            </xsl:call-template>
+            <xsl:if test="@authority">
+                <xsl:call-template name="personOrcid">
+                    <xsl:with-param name="authority_value" select="@authority"/>
+                </xsl:call-template>
+                <xsl:call-template name="organizationRor">
+                    <xsl:with-param name="authority_value" select="@authority"/>
+                </xsl:call-template>
+            </xsl:if>
         </creator>
     </xsl:template>
 
@@ -441,91 +444,110 @@
         Adds contributor and contributorType information
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]">
-        <xsl:variable name="authority" select="@authority"/>
         <xsl:choose>
             <xsl:when test="@qualifier='editor'"> 
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Editor</xsl:attribute>
                     <contributorName>
-                        <xsl:call-template name="nameType">
-                            <xsl:with-param name="authority_value" select="$authority"/>
-                        </xsl:call-template>
+                        <xsl:if test="@authority">
+                            <xsl:call-template name="nameType">
+                                <xsl:with-param name="authority_value" select="@authority"/>
+                            </xsl:call-template>
+                        </xsl:if>
                         <xsl:value-of select="." />
                     </contributorName>
-                    <xsl:call-template name="personOrcid">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
-                    <xsl:call-template name="organizationRor">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
+                    <xsl:if test="@authority">
+                        <xsl:call-template name="personOrcid">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                        <xsl:call-template name="organizationRor">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                    </xsl:if>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="@qualifier='advisor'"> 
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">RelatedPerson</xsl:attribute>
                     <contributorName>
-                        <xsl:call-template name="nameType">
-                            <xsl:with-param name="authority_value" select="$authority"/>
-                        </xsl:call-template>
+                        <xsl:if test="@authority">
+                            <xsl:call-template name="nameType">
+                                <xsl:with-param name="authority_value" select="@authority"/>
+                            </xsl:call-template>
+                        </xsl:if>
                         <xsl:value-of select="." />
                     </contributorName>
-                    <xsl:call-template name="personOrcid">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
-                    <xsl:call-template name="organizationRor">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
+                    <xsl:if test="@authority">
+                        <xsl:call-template name="personOrcid">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                        <xsl:call-template name="organizationRor">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                    </xsl:if>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="@qualifier='illustrator'"> 
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Other</xsl:attribute>
                     <contributorName>
-                        <xsl:call-template name="nameType">
-                            <xsl:with-param name="authority_value" select="$authority"/>
-                        </xsl:call-template>
+                        <xsl:if test="@authority">
+                            <xsl:call-template name="nameType">
+                                <xsl:with-param name="authority_value" select="@authority"/>
+                            </xsl:call-template>
+                        </xsl:if>
                         <xsl:value-of select="." />
                     </contributorName>
-                    <xsl:call-template name="personOrcid">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
-                    <xsl:call-template name="organizationRor">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
+                    <xsl:if test="@authority">
+                        <xsl:call-template name="personOrcid">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                        <xsl:call-template name="organizationRor">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                    </xsl:if>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="@qualifier='other'"> 
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Other</xsl:attribute>
                     <contributorName>
-                        <xsl:call-template name="nameType">
-                            <xsl:with-param name="authority_value" select="$authority"/>
-                        </xsl:call-template>
+                        <xsl:if test="@authority">
+                            <xsl:call-template name="nameType">
+                                <xsl:with-param name="authority_value" select="@authority"/>
+                            </xsl:call-template>
+                        </xsl:if>
                         <xsl:value-of select="." />
                     </contributorName>
-                    <xsl:call-template name="personOrcid">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
-                    <xsl:call-template name="organizationRor">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
+                    <xsl:if test="@authority">
+                        <xsl:call-template name="personOrcid">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                        <xsl:call-template name="organizationRor">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                    </xsl:if>
                 </xsl:element>
             </xsl:when>
             <xsl:when test="not(@qualifier)"> 
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">Other</xsl:attribute>
                     <contributorName>
-                        <xsl:call-template name="nameType">
-                            <xsl:with-param name="authority_value" select="$authority"/>
-                        </xsl:call-template>
+                        <xsl:if test="@authority">
+                            <xsl:call-template name="nameType">
+                                <xsl:with-param name="authority_value" select="@authority"/>
+                            </xsl:call-template>
+                        </xsl:if>
                         <xsl:value-of select="." />
                     </contributorName>
-                    <xsl:call-template name="personOrcid">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
-                    <xsl:call-template name="organizationRor">
-                        <xsl:with-param name="authority_value" select="$authority"/>
-                    </xsl:call-template>
+                    <xsl:if test="@authority">
+                        <xsl:call-template name="personOrcid">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                        <xsl:call-template name="organizationRor">
+                            <xsl:with-param name="authority_value" select="@authority"/>
+                        </xsl:call-template>
+                    </xsl:if>
                 </xsl:element>
             </xsl:when>
         </xsl:choose>

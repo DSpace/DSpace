@@ -10,21 +10,29 @@ package org.dspace.content.crosswalk;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -56,7 +64,7 @@ import org.jdom2.xpath.XPathFactory;
  * @author Alexey Maslov
  */
 public class OREIngestionCrosswalk
-    implements IngestionCrosswalk {
+        implements IngestionCrosswalk {
     /**
      * log4j category
      */
@@ -64,37 +72,37 @@ public class OREIngestionCrosswalk
 
     /* Namespaces */
     public static final Namespace ATOM_NS =
-        Namespace.getNamespace("atom", "http://www.w3.org/2005/Atom");
+            Namespace.getNamespace("atom", "http://www.w3.org/2005/Atom");
     private static final Namespace ORE_ATOM =
-        Namespace.getNamespace("oreatom", "http://www.openarchives.org/ore/atom/");
+            Namespace.getNamespace("oreatom", "http://www.openarchives.org/ore/atom/");
     private static final Namespace ORE_NS =
-        Namespace.getNamespace("ore", "http://www.openarchives.org/ore/terms/");
+            Namespace.getNamespace("ore", "http://www.openarchives.org/ore/terms/");
     private static final Namespace RDF_NS =
-        Namespace.getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+            Namespace.getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     private static final Namespace DCTERMS_NS =
-        Namespace.getNamespace("dcterms", "http://purl.org/dc/terms/");
+            Namespace.getNamespace("dcterms", "http://purl.org/dc/terms/");
     private static final Namespace DS_NS =
-        Namespace.getNamespace("ds", "http://www.dspace.org/objectModel/");
+            Namespace.getNamespace("ds", "http://www.dspace.org/objectModel/");
 
+    private String[] forbiddenHostUrls = null;
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
-                                                                                   .getBitstreamFormatService();
+            .getBitstreamFormatService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+            throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
         // If this list contains only the root already, just pass it on
         if (metadata.size() == 1) {
-            ingest(context, dso, metadata.get(0), createMissingMetadataFields);
+            ingest(context, dso, metadata.getFirst(), createMissingMetadataFields);
         } else {
             // Otherwise, wrap them up
-            Element wrapper = new Element("wrap", metadata.get(0).getNamespace());
+            Element wrapper = new Element("wrap", metadata.getFirst().getNamespace());
             wrapper.addContent(metadata);
 
             ingest(context, dso, wrapper, createMissingMetadataFields);
@@ -104,7 +112,7 @@ public class OREIngestionCrosswalk
 
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+            throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
         Instant timeStart = Instant.now();
 
@@ -118,21 +126,26 @@ public class OREIngestionCrosswalk
             return;
         }
 
+        var followRedirects = configurationService
+                .getBooleanProperty("oai.harvester.ore.follow-redirects", false);
+        var requestConfig = RequestConfig.custom()
+                .setRedirectsEnabled(followRedirects).build();
+
         Document doc = new Document();
         doc.addContent(root.detach());
 
         List<Element> aggregatedResources;
         String entryId;
         XPathExpression<Element> xpathLinks =
-            XPathFactory.instance()
+                XPathFactory.instance()
                         .compile("/atom:entry/atom:link[@rel=\"" + ORE_NS.getURI() + "aggregates" + "\"]",
-                                 Filters.element(), null, ATOM_NS);
+                                Filters.element(), null, ATOM_NS);
         aggregatedResources = xpathLinks.evaluate(doc);
 
         XPathExpression<Attribute> xpathAltHref =
-            XPathFactory.instance()
+                XPathFactory.instance()
                         .compile("/atom:entry/atom:link[@rel='alternate']/@href",
-                                 Filters.attribute(), null, ATOM_NS);
+                                Filters.attribute(), null, ATOM_NS);
         entryId = xpathAltHref.evaluateFirst(doc).getValue();
 
         // Next for each resource, create a bitstream
@@ -143,18 +156,24 @@ public class OREIngestionCrosswalk
         for (Element resource : aggregatedResources) {
             String href = resource.getAttributeValue("href");
             log.debug("ORE processing: " + href);
+            String processedURL;
+            try {
+                processedURL = new URIBuilder(href).build().toString();
+            } catch (URISyntaxException e) {
+                throw new CrosswalkException("Could not parse URI: " + href, e);
+            }
 
             String bundleName;
             Element desc = null;
             XPathExpression<Element> xpathDesc =
-                XPathFactory.instance()
-                    .compile("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" +
-                                 this.encodeForURL(href) + "\"][1]",
-                             Filters.element(), null, ATOM_NS, ORE_ATOM, RDF_NS);
+                    XPathFactory.instance()
+                            .compile("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" +
+                                            this.encodeForURL(href) + "\"][1]",
+                                    Filters.element(), null, ATOM_NS, ORE_ATOM, RDF_NS);
             desc = xpathDesc.evaluateFirst(doc);
 
             if (desc != null && desc.getChild("type", RDF_NS).getAttributeValue("resource", RDF_NS)
-                                    .equals(DS_NS.getURI() + "DSpaceBitstream")) {
+                    .equals(DS_NS.getURI() + "DSpaceBitstream")) {
                 bundleName = desc.getChildText("description", DCTERMS_NS);
                 log.debug("Setting bundle name to: " + bundleName);
             } else {
@@ -167,63 +186,81 @@ public class OREIngestionCrosswalk
             Bundle targetBundle;
 
             // if null, create the new bundle and add it in
-            if (targetBundles.size() == 0) {
+            if (targetBundles.isEmpty()) {
                 targetBundle = bundleService.create(context, item, bundleName);
                 itemService.addBundle(context, item, targetBundle);
             } else {
-                targetBundle = targetBundles.get(0);
+                targetBundle = targetBundles.getFirst();
             }
 
-            URL ARurl = null;
-            InputStream in = null;
-            if (href != null) {
-                try {
-                    // Make sure the url string escapes all the oddball characters
-                    String processedURL = encodeForURL(href);
-                    if (validResourceUri(entryId, processedURL)) {
-                        // Generate a request for the aggregated resource
-                        ARurl = new URL(processedURL);
-                        in = ARurl.openStream();
-                    } else {
-                        throw new FileNotFoundException("Failed to validate " + processedURL);
-                    }
-                } catch (FileNotFoundException fe) {
-                    log.error("The provided URI failed to return a resource: " + href);
-                } catch (ConnectException fe) {
-                    log.error("The provided URI was invalid: " + href);
+            if (StringUtils.isBlank(href)) {
+                throw new CrosswalkException("The href attribute is required for the ORE ingestion.");
+            }
+            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance()
+                    .buildWithRequestConfig(requestConfig)) {
+                if (!validResourceUri(processedURL)) {
+                    throw new FileNotFoundException("Invalid resource URI: " + processedURL);
                 }
-            } else {
-                throw new CrosswalkException("Entry did not contain link to resource: " + entryId);
-            }
-
-            // ingest and update
-            if (in != null) {
-                Bitstream newBitstream = bitstreamService.create(context, targetBundle, in);
-
-                String bsName = resource.getAttributeValue("title");
-                newBitstream.setName(context, bsName);
-
-                // Identify the format
-                String mimeString = resource.getAttributeValue("type");
-                BitstreamFormat bsFormat = bitstreamFormatService.findByMIMEType(context, mimeString);
-                if (bsFormat == null) {
-                    bsFormat = bitstreamFormatService.guessFormat(context, newBitstream);
+                // Generate a request for the aggregated resource
+                HttpGet httpGet = new HttpGet(processedURL);
+                HttpResponse response = httpClient.execute(httpGet);
+                if (response == null || response.getEntity() == null) {
+                    throw new FileNotFoundException(processedURL + " returned a null response or body");
                 }
-                newBitstream.setFormat(context, bsFormat);
-                bitstreamService.update(context, newBitstream);
-
-                bundleService.addBitstream(context, targetBundle, newBitstream);
-                bundleService.update(context, targetBundle);
-            } else {
-                throw new CrosswalkException("Could not retrieve bitstream: " + entryId);
+                if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                    throw new FileNotFoundException(processedURL
+                            + " returned a " + response.getStatusLine() + " response");
+                }
+                if (response.getEntity() == null || response.getEntity().getContent() == null) {
+                    throw new FileNotFoundException(processedURL + " returned an empty body");
+                }
+                // ingest and update
+                try (InputStream in = response.getEntity().getContent()) {
+                    ingestStreamAsBitstream(context, in, targetBundle, resource, entryId);
+                }
             }
-
         }
         log.info(
-            "OREIngest for Item " + item.getID() + " took: " +
-                (Instant.now().toEpochMilli() - timeStart.toEpochMilli()) + "ms.");
+                "OREIngest for Item " + item.getID() + " took: " +
+                        (Instant.now().toEpochMilli() - timeStart.toEpochMilli()) + "ms.");
     }
 
+    /**
+     * Read an input stream and ingest it as a bitstream to the target bundle
+     * @param context Dspace context
+     * @param inputStream input stream containing bitstream content
+     * @param targetBundle the target bundle for the new bitstream
+     * @param resource the ORE resource Element
+     * @param entryId the entry ID of the ORE resource
+     * @throws AuthorizeException if current user does not have permission to add / create bitstream
+     * @throws IOException if the input stream is null or unreadable
+     * @throws SQLException if bitstream or bundle database operations fail
+     */
+    void ingestStreamAsBitstream(Context context, InputStream inputStream,
+                                         Bundle targetBundle, Element resource, String entryId)
+            throws AuthorizeException, IOException, SQLException {
+        // ingest and update
+        if (inputStream != null) {
+            Bitstream newBitstream = bitstreamService.create(context, targetBundle, inputStream);
+
+            String bsName = resource.getAttributeValue("title");
+            newBitstream.setName(context, bsName);
+
+            // Identify the format
+            String mimeString = resource.getAttributeValue("type");
+            BitstreamFormat bsFormat = bitstreamFormatService.findByMIMEType(context, mimeString);
+            if (bsFormat == null) {
+                bsFormat = bitstreamFormatService.guessFormat(context, newBitstream);
+            }
+            newBitstream.setFormat(context, bsFormat);
+            bitstreamService.update(context, newBitstream);
+
+            bundleService.addBitstream(context, targetBundle, newBitstream);
+            bundleService.update(context, targetBundle);
+        } else {
+            throw new IOException("Could not read input stream for: " + entryId);
+        }
+    }
 
     /**
      * Helper method to escape all characters that are not part of the canon set
@@ -265,58 +302,101 @@ public class OREIngestionCrosswalk
 
     /**
      * Validate a resource URI against the host and scheme of the remote OAI endpoint, or a configured
-     * list of allowed prefixes.
-     * This still implicitly "trusts" the remote OAI server, but will reject resource URIs with a totally
-     * different hostname to avoid downloading malicious resources from a compromised endpoint.
+     * list of allowed prefixes. Some default forbidden hosts are also included to prevent SSRF.
      * Even if the URL prefix validation is disabled, schemes will still be enforced to http(s) so file:/// and
      * other unwanted schemes cannot be used
-     * @param entryUrl the entryId of the parent ORE resource
      * @param resourceUrl the resource URL of the aggregated ORE resource
      * @return result of the validation
      */
-    private boolean validResourceUri(String entryUrl, String resourceUrl) {
+    boolean validResourceUri(String resourceUrl) {
+        URI resourceUri;
         try {
-            Set<String> allowedSchemes = Set.of("http", "https");
-            URI entryUri = new URI(entryUrl).normalize();
-            URI resourceUri = new URI(resourceUrl).normalize();
-            String scheme = resourceUri.getScheme();
-
-            if (scheme == null ||
-                    !allowedSchemes.contains(scheme.toLowerCase(Locale.ROOT))) {
-                log.warn("Illegal scheme requested for ORE resource: {}", resourceUri);
-                return false;
-            }
-
-            if (configurationService.getBooleanProperty("oai.harvester.ore.file.validateUrlPrefix", false)) {
-                for (String allowedPrefix : configurationService
-                        .getArrayProperty("oai.harvester.ore.file.allowedUrlPrefix")) {
-                    URI allowedUri = new URI(allowedPrefix).normalize();
-                    // Return true on the first allowed prefix match
-                    if (Objects.equals(resourceUri.getScheme(), allowedUri.getScheme())
-                            && Objects.equals(resourceUri.getHost().toLowerCase(Locale.ROOT),
-                            allowedUri.getHost().toLowerCase(Locale.ROOT))) {
-                        return true;
-                    }
-                }
-
-                // If no allowed prefixes were matched, we require scheme + host to match the remote OAI server
-                if (!Objects.equals(entryUri.getScheme(), resourceUri.getScheme())) {
-                    log.warn("Illegal scheme requested for ORE resource: {}", resourceUri);
-                    return false;
-                }
-                if (!Objects.equals(
-                        entryUri.getHost().toLowerCase(Locale.ROOT),
-                        resourceUri.getHost().toLowerCase(Locale.ROOT))) {
-                    log.warn("Illegal host requested for ORE resource: {}", resourceUri);
-                    return false;
-                }
-            }
-
-            return true;
-
-        } catch (URISyntaxException e) {
-            log.warn("Could not validate ORE resource URI: {}", resourceUrl);
+            resourceUri = new URI(resourceUrl).normalize();
+        } catch (URISyntaxException | NullPointerException e) {
+            log.error("Invalid resource URI: " + resourceUrl);
             return false;
+        }
+        String resourceHost = resourceUri.getHost();
+
+        Set<String> allowedSchemes = Set.of("http", "https");
+        String resourceScheme = resourceUri.getScheme();
+        if (resourceScheme == null ||
+                !allowedSchemes.contains(resourceScheme.toLowerCase(Locale.ROOT))) {
+            log.warn("Illegal scheme requested for ORE resource: {}", resourceUrl);
+            return false;
+        }
+
+        initializeForbiddenHosts();
+        if (forbiddenHostUrls != null) {
+            for (String forbiddenHostUrl : forbiddenHostUrls) {
+                String forbiddenHost = extractHostname(forbiddenHostUrl);
+                if (forbiddenHost != null && Objects.equals(forbiddenHost, resourceHost)) {
+                    log.warn("Forbidden hostname in ORE resource URL: {}", resourceUrl);
+                    return false;
+                }
+            }
+        }
+
+        // This is now very strict - it is up to administrators to configure a list of allowed URL prefixes.
+        // If validateHost is set to 'true', and an empty list will cause every resource URL to be rejected
+        // Unlike forbidden URLs, we expect these to be hostnames rather than partial or full URIs as well
+        if (configurationService.getBooleanProperty("oai.harvester.ore.file.validateHost", false)) {
+            for (String allowedHost : configurationService
+                    .getArrayProperty("oai.harvester.ore.file.allowedHosts")) {
+                if (Objects.equals(resourceUri.getHost().toLowerCase(Locale.ROOT),
+                        allowedHost.toLowerCase(Locale.ROOT))) {
+                    return true;
+                }
+            }
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * To keep config easier to maintain with both plain hostnames like 'bad.example.com' and references
+     * to partial URLs elsewhere in configuration like ${dspace.ui.url}, we test to see which it is
+     * and return the string representing the hostname.
+     * @param urlOrHost URL, partial URL or hostname to extract and validate
+     * @return extracted hostname or null
+     */
+    String extractHostname(String urlOrHost) {
+        if (StringUtils.isBlank(urlOrHost)) {
+            return null;
+        }
+        try {
+            URI uri = new URI(urlOrHost);
+            String host = uri.getHost();
+            if (host != null) {
+                return host.toLowerCase(Locale.ROOT);
+            }
+        } catch (URISyntaxException e) {
+            // pass through
+        }
+        // Return plain lower-cased string as defaulg
+        return urlOrHost.toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Initialize forbidden hosts from config, if not set already
+     */
+    void initializeForbiddenHosts() {
+        if (forbiddenHostUrls == null) {
+            String dspaceServerUrl = configurationService.getProperty("dspace.server.url");
+            String dspaceUiUrl = configurationService.getProperty("dspace.ui.url");
+            String[] localAndEC2Hosts = {"localhost", "127.0.0.1", "[::1]", "169.254.169.254", "[fd00:ec2::254]"};
+            List<String> defaultForbiddenUrlPrefixes = new ArrayList<>();
+            Collections.addAll(defaultForbiddenUrlPrefixes, localAndEC2Hosts);
+            if (StringUtils.isNotBlank(dspaceServerUrl)) {
+                defaultForbiddenUrlPrefixes.add(dspaceServerUrl);
+            }
+            if (StringUtils.isNotBlank(dspaceUiUrl)) {
+                defaultForbiddenUrlPrefixes.add(dspaceUiUrl);
+            }
+            forbiddenHostUrls = configurationService.getArrayProperty(
+                    "oai.harvester.ore.file.forbiddenHostUrls",
+                    defaultForbiddenUrlPrefixes.toArray(new String[0]));
         }
     }
 

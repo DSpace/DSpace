@@ -193,6 +193,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             String fileName = file.getOriginalFilename();
             if (fileNames.contains(fileName)) {
                 throw new UnprocessableEntityException("There are two files with the same name: " + fileName);
+            } else if (StringUtils.containsAny(fileName, "..", "/", "\\")) {
+                // NOTE: This is just a "fail-fast", basic protection against a potential path traversal attack.
+                // Individual scripts MUST also contain their own path traversal protections.
+                throw new UnprocessableEntityException(
+                    "Filenames cannot contain path characters such as '..', '/', or '\\' : " + fileName);
             } else {
                 fileNames.add(fileName);
             }

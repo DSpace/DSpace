@@ -97,7 +97,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void start(Context context, Process process) throws SQLException;
+    public void start(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * This method will perform the logic needed to update the Process object in the database to represent
@@ -106,7 +106,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void fail(Context context, Process process) throws SQLException;
+    public void fail(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * This method will perform the logic needed to update the Process object in the database to represent
@@ -115,7 +115,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void complete(Context context, Process process) throws SQLException;
+    public void complete(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * The method will create a bitstream from the given inputstream with the given type as metadata and given name
@@ -146,7 +146,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void update(Context context, Process process) throws SQLException;
+    public void update(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * This method will retrieve the list of parameters from the Process in its String format and it will parse
@@ -277,6 +277,15 @@ public interface ProcessService {
      * @throws SQLException If something goes wrong
      */
     int countByUser(Context context, EPerson user) throws SQLException;
+
+    /**
+     * Authorize any action, to ensure only a process creator/owner or a repository administrator
+     * may read, update or delete an existing process.
+     * @param context DSpace context containing the current user
+     * @param process the process to check
+     * @return true if the current user may perform the action, or false
+     */
+    boolean authorizeActionBoolean(Context context, Process process);
 
     /**
      * Cleans up running processes by failing them an attaching their logs to the process objects.

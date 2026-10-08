@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +41,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.storage.secure.SecureFileAccess;
 import org.dspace.utils.DSpace;
 
 /**
@@ -352,8 +354,16 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                     validateZip(validationFileStream.get());
                 }
 
-                workFile = new File(itemImportService.getTempWorkDir() + File.separator
-                        + zipfilename + "-" + context.getCurrentUser().getID());
+                String workDir = itemImportService.getTempWorkDir();
+
+                // zipfilename is user controlled (via -z or -u param). So, we must validate the expected
+                // file path using SecureFileAccess to protect against path traversal attacks.
+                String fileName = zipfilename + "-" + context.getCurrentUser().getID();
+                String fileAbsolutePath = SecureFileAccess.calculateAbsolutePathUsingBaseDir(fileName, workDir);
+                Path validatedFilePath = SecureFileAccess.validatePathForWrite(fileAbsolutePath, List.of(workDir),
+                                                                               "ItemImport zip validation");
+
+                workFile = validatedFilePath.toFile();
                 FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
             } else {
                 throw new IllegalArgumentException(

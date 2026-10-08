@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Period;
 import java.util.Map;
@@ -1553,6 +1554,108 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Build a restricted Bitstream readable only by a group to which the test users do not belong.
+     *
+     * @return restricted Bitstream
+     * @throws Exception if the test object cannot be created
+     */
+    private Bitstream createRestrictedBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+        try {
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withName("Collection 1")
+                                               .build();
+            Group restrictedGroup = GroupBuilder.createGroup(context)
+                                                .withName("Restricted Group")
+                                                .build();
+
+            try (InputStream is = IOUtils.toInputStream("Secret file contents", StandardCharsets.UTF_8)) {
+                Item item = ItemBuilder.createItem(context, col1)
+                                       .withTitle("item 1")
+                                       .withIssueDate("2013-01-17")
+                                       .withAuthor("Doe, John")
+                                       .build();
+                return BitstreamBuilder.createBitstream(context, item, is)
+                                       .withName("secret.txt")
+                                       .withDescription("This bitstream is restricted")
+                                       .withMimeType("text/plain")
+                                       .withReaderGroup(restrictedGroup)
+                                       .build();
+            }
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
+     * A supplied access token must be validated before GET or HEAD can reach the Bitstream response handling.
+     */
+    @Test
+    public void restrictedBitstreamHeadWithUnvalidatedAccessTokenTest() throws Exception {
+        Bitstream restrictedBitstream = createRestrictedBitstream();
+        String contentUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
+
+        // Baseline: without an access token, anonymous is refused on both GET and HEAD.
+        getClient().perform(get(contentUrl)).andExpect(status().isUnauthorized());
+        getClient().perform(head(contentUrl)).andExpect(status().isUnauthorized());
+
+        // A bogus token must be rejected, not merely present.
+        getClient().perform(head(contentUrl).param("accessToken", "invalid_token"))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", "invalid_token"))
+                   .andExpect(status().isUnauthorized());
+
+        // A blank token must go through the normal Bitstream READ permission check.
+        getClient().perform(head(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    /**
+     * Access-token authorization must not be available when Request-a-Copy is disabled.
+     */
+    @Test
+    public void restrictedBitstreamHeadWithAccessTokenRequestACopyDisabledTest() throws Exception {
+        configurationService.setProperty("request.item.type", null);
+
+        Bitstream restrictedBitstream = createRestrictedBitstream();
+        String contentUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
+
+        getClient().perform(head(contentUrl)).andExpect(status().isUnauthorized());
+        getClient().perform(head(contentUrl).param("accessToken", "x"))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", "x"))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(head(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    /**
+     * Invalid token responses must not reveal whether a Bitstream UUID exists.
+     */
+    @Test
+    public void unknownBitstreamWithAccessTokenIsNotAnExistenceOracleTest() throws Exception {
+        Bitstream restrictedBitstream = createRestrictedBitstream();
+
+        String restrictedUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
+        String unknownUrl = "/api/core/bitstreams/" + UUID.randomUUID() + "/content";
+
+        int restrictedStatus = getClient().perform(head(restrictedUrl).param("accessToken", "invalid_token"))
+                                          .andReturn().getResponse().getStatus();
+        int unknownStatus = getClient().perform(head(unknownUrl).param("accessToken", "invalid_token"))
+                                       .andReturn().getResponse().getStatus();
+
+        assertEquals("An unauthorized caller must not be able to tell an existing restricted Bitstream apart "
+                         + "from a nonexistent one", restrictedStatus, unknownStatus);
     }
 
     @Test

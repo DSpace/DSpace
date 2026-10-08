@@ -34,7 +34,7 @@
         <ehcache.version>3.12.0</ehcache.version>
         <errorprone.version>2.50.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-annotations.version below -->
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <jackson-annotations.version>2.22</jackson-annotations.version>
         <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.5</jaxb-api.version>
@@ -47,7 +47,7 @@
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
         <slf4j.version>2.0.18</slf4j.version>
-        <tika.version>3.3.1</tika.version>
+        <tika.version>3.3.2</tika.version>
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <!-- WARNING: BouncyCastle is also required by the maven-gpg-plugin to sign code during release. Do not update
              unless the new BouncyCastle version is compatible both with tika-parsers and maven-gpg-plugin. -->
@@ -333,7 +333,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.10.3.0</version>
+                    <version>4.10.4.0</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
@@ -343,7 +343,7 @@
                         <dependency>
                             <groupId>com.github.spotbugs</groupId>
                             <artifactId>spotbugs</artifactId>
-                            <version>4.10.3</version>
+                            <version>4.10.4</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1431,7 +1431,7 @@
             <dependency>
                 <groupId>com.healthmarketscience.jackcess</groupId>
                 <artifactId>jackcess</artifactId>
-                <version>4.0.10</version>
+                <version>4.0.11</version>
             </dependency>
             <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
             <dependency>
@@ -1591,7 +1591,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
-                <version>4.5.0</version>
+                <version>4.6.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1650,7 +1650,7 @@
             <dependency>
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
-                <version>1.10.1</version>
+                <version>1.11.0</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.activation</groupId>
@@ -1828,20 +1828,6 @@
                 <artifactId>mockwebserver</artifactId>
                 <version>4.12.0</version>
                 <scope>test</scope>
-            </dependency>
-
-            <!-- Findbugs annotations -->
-            <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>3.0.2</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>annotations</artifactId>
-                <version>3.0.1u2</version>
-                <scope>provided</scope>
             </dependency>
 
             <!-- Converge miscellaneous transitive dependencies. -->
