@@ -124,6 +124,9 @@
                 <!-- "collection" is the search configuration for collection pages -->
                 <entry key="collection" value-ref="collectionConfiguration" />
 
+                <!-- Item-only configuration exposing the graph (chart) facets -->
+                <entry key="graphConfiguration" value-ref="graphConfiguration" />
+
                 <entry key="publication" value-ref="publication"/>
                 <!-- Same as the "publication" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
@@ -427,6 +430,45 @@
             </bean>
         </property>
         <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+    <!-- Item-only configuration exposing the graph (chart) facets. The graph facets rely on
+         Solr facet.missing, so they must run against an Item-only result set; the default
+         configuration includes communities and collections and would inflate the missing count. -->
+    <bean id="graphConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="id" value="graphConfiguration"/>
+        <property name="indexAlways" value="true"/>
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="graphPublicationByType" />
+                <ref bean="graphPublicationByDate" />
+            </list>
+        </property>
+        <property name="searchFilters">
+            <list>
+                <ref bean="graphPublicationByType" />
+                <ref bean="graphPublicationByDate" />
+            </list>
+        </property>
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitle" />
+                        <ref bean="sortDateIssued" />
+                        <ref bean="sortDateAccessioned"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="defaultFilterQueries">
+            <list>
+                <value>search.resourcetype:Item</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 

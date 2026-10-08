@@ -79,6 +79,11 @@
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="administrativeView" value-ref="administrativeView" />
 
+                <!-- Item-only configuration exposing the graph (chart) facets -->
+                <entry key="graphConfiguration" value-ref="graphConfiguration" />
+                <!-- Discovery configuration backing the research outputs explore section -->
+                <entry key="researchoutputs" value-ref="researchoutputs"/>
+
                 <entry key="publication" value-ref="publication"/>
                 <!-- Same as the "publication" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->

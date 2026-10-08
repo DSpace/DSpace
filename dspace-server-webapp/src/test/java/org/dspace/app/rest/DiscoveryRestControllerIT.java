@@ -5568,6 +5568,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/graphpubldate")
+                                .param("configuration", "graphConfiguration")
                                 .param("size", "3"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))
@@ -5585,14 +5586,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                        FacetValueMatcher.entryDateIssuedWithLabelAndCount("2018", 0))));
 
         GraphDiscoverSearchFilterFacet graphpubldateFacet =
-            (GraphDiscoverSearchFilterFacet) discoveryConfigurationService.getDiscoveryConfiguration(null)
-                                                                          .getSidebarFacet("graphpubldate");
+            (GraphDiscoverSearchFilterFacet) discoveryConfigurationService
+                .getDiscoveryConfiguration("graphConfiguration")
+                .getSidebarFacet("graphpubldate");
 
         try {
             // change the default configuration to disable the reverse direction
             graphpubldateFacet.setInverseDirection(false);
             graphpubldateFacet.setGraphType("bar.left-to-right");
             getClient().perform(get("/api/discover/facets/graphpubldate")
+                                    .param("configuration", "graphConfiguration")
                                     .param("size", "4"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$.type", is("discover")))
@@ -5614,6 +5617,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             graphpubldateFacet.setFillDateGaps(false);
             graphpubldateFacet.setGraphType("bar.right-to-left");
             getClient().perform(get("/api/discover/facets/graphpubldate")
+                                    .param("configuration", "graphConfiguration")
                                     .param("size", "4"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$.type", is("discover")))
@@ -5690,6 +5694,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/facets/graphitemtype")
+                                .param("configuration", "graphConfiguration")
                                 .param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))
