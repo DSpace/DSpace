@@ -968,6 +968,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void findOneMalformedUuidAnonymousReturnsNotFound() throws Exception {
+        getClient().perform(get("/api/core/collections/malformedUUUID"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void findCollectionWithParentCommunity() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
