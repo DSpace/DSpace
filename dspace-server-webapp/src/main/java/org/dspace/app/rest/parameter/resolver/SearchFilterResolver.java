@@ -34,10 +34,12 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
     public static final List<String> ALLOWED_SEARCH_OPERATORS =
         RestSearchOperator.getListOfAllowedSearchOperatorStrings();
 
+    @Override
     public boolean supportsParameter(final MethodParameter parameter) {
         return parameter.getParameterType().equals(SearchFilter.class) || isSearchFilterList(parameter);
     }
 
+    @Override
     public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
                                   final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         List<SearchFilter> result = new LinkedList<>();

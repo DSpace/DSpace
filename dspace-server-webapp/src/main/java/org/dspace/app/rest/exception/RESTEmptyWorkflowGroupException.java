@@ -50,10 +50,12 @@ public class RESTEmptyWorkflowGroupException extends UnprocessableEntityExceptio
         this.cause = cause;
     }
 
+    @Override
     public String getMessageKey() {
         return MESSAGE_KEY;
     }
 
+    @Override
     public String getLocalizedMessage(Context context) {
         return formatMessage(
             I18nUtil.getMessage(MESSAGE_KEY, context), cause

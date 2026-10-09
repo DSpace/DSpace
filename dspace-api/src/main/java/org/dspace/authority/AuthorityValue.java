@@ -237,8 +237,10 @@ public class AuthorityValue {
         this.field = String.valueOf(document.getFieldValue("field"));
         this.value = String.valueOf(document.getFieldValue("value"));
         this.deleted = (Boolean) document.getFieldValue("deleted");
-        this.creationDate = ((java.util.Date) document.getFieldValue("creation_date")).toInstant();
-        this.lastModified = ((java.util.Date) document.getFieldValue("last_modified_date")).toInstant();
+        this.creationDate = ((java.util.Date) // NOPMD - required by third-party API
+                document.getFieldValue("creation_date")).toInstant();
+        this.lastModified = ((java.util.Date) // NOPMD - required by third-party API
+                document.getFieldValue("last_modified_date")).toInstant();
     }
 
     /**

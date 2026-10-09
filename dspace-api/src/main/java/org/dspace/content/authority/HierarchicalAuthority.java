@@ -75,6 +75,7 @@ public interface HierarchicalAuthority extends ChoiceAuthority {
      * Provides an hint for the UI to preload some levels to improve the UX. It
      * usually mean that these preloaded level will be shown expanded by default
      */
+    @Override
     public Integer getPreloadLevel();
 
     @Override

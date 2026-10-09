@@ -41,6 +41,7 @@ public class SearchFilter {
         return Strings.CS.equals(operator, "authority");
     }
 
+    @Override
     public String toString() {
         return "SearchFilter{" +
             "name='" + name + '\'' +

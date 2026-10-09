@@ -31,10 +31,12 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
     @JsonIgnore
     private LinkedList<SearchFacetEntryRest> sidebarFacets = new LinkedList<>();
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -47,6 +49,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
         return PLURAL_NAME;
     }
 
+    @Override
     public Class getController() {
         return DiscoveryRestController.class;
     }

@@ -34,14 +34,17 @@ public class ProcessRest extends BaseObjectRest<Integer> {
     public static final String FILE_TYPES = "filetypes";
     public static final String OUTPUT = "output";
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }

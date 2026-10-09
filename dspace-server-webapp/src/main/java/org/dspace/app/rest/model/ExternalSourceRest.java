@@ -52,6 +52,7 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
      * Generic getter for the id
      * @return the id value of this ExternalSourceRest
      */
+    @Override
     public String getId() {
         return id;
     }
@@ -60,6 +61,7 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
      * Generic setter for the id
      * @param id   The id to be set on this ExternalSourceRest
      */
+    @Override
     public void setId(String id) {
         this.id = id;
     }

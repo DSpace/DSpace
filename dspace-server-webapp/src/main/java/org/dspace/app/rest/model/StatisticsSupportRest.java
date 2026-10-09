@@ -15,14 +15,17 @@ public class StatisticsSupportRest extends BaseObjectRest<String> {
     public static final String PLURAL_NAME = "statistics";
     public static final String CATEGORY = RestModel.STATISTICS;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return StatisticsRestController.class;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }

@@ -27,10 +27,12 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
         this.servletResponse = response;
     }
 
+    @Override
     public ServletRequest getServletRequest() {
         return servletRequest;
     }
 
+    @Override
     public HttpServletRequest getHttpServletRequest() {
         if (servletRequest instanceof HttpServletRequest) {
             return (HttpServletRequest) servletRequest;
@@ -39,10 +41,12 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
         return null;
     }
 
+    @Override
     public ServletResponse getServletResponse() {
         return servletResponse;
     }
 
+    @Override
     public HttpServletResponse getHttpServletResponse() {
         if (servletResponse instanceof HttpServletResponse) {
             return (HttpServletResponse) servletResponse;
@@ -51,10 +55,12 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
         return null;
     }
 
+    @Override
     public Object getAttribute(String name) {
         return servletRequest.getAttribute(name);
     }
 
+    @Override
     public void setAttribute(String name, Object o) {
         servletRequest.setAttribute(name, o);
     }

@@ -74,10 +74,12 @@ public class MatomoAsyncClientImpl extends MatomoAbstractClient<HttpClient, Http
         return null;
     }
 
+    @Override
     protected int getStatusCode(HttpResponse<String> response) {
         return response.statusCode();
     }
 
+    @Override
     protected String getResponseContent(HttpResponse<String> response) {
         try {
             return response.body();

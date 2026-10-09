@@ -26,6 +26,7 @@ public class AdministratorsOnlyQASecurity implements QASecurity {
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Override
     public Optional<String> generateFilterQuery(Context context, EPerson currentUser) {
         return Optional.empty();
     }
