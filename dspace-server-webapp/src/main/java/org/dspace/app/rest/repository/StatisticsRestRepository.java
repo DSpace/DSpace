@@ -45,10 +45,10 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
     }
 
     @Override
-    @PreAuthorize("hasPermission(#uuidObjectReportId, 'usagereport', 'READ')")
-    public UsageReportRest findOne(Context context, String uuidObjectReportId) {
-        UUID uuidObject = UUID.fromString(StringUtils.substringBefore(uuidObjectReportId, "_"));
-        String reportId = StringUtils.substringAfter(uuidObjectReportId, "_");
+    @PreAuthorize("hasPermission(#id, 'usagereport', 'READ')")
+    public UsageReportRest findOne(Context context, String id) {
+        UUID uuidObject = UUID.fromString(StringUtils.substringBefore(id, "_"));
+        String reportId = StringUtils.substringAfter(id, "_");
 
         UsageReportRest usageReportRest = null;
         try {
@@ -64,7 +64,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         return converter.toRest(usageReportRest, utils.obtainProjection());
     }
 
-    @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
+    @PreAuthorize("permitAll()")
     @SearchRestMethod(name = "object")
     public Page<UsageReportRest> findByObject(@Parameter(value = "uri", required = true) String uri,
             @Parameter(value = "category") String category, Pageable pageable,

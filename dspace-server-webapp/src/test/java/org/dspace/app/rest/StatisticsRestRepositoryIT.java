@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static java.io.InputStream.nullInputStream;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
@@ -1301,7 +1302,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                                 "/items/" + itemNotVisitedWithBitstreams.getID()))
                    // ** THEN **
-                   .andExpect(status().isUnauthorized());
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", hasNoJsonPath("$.points")));
         // We request a dso's TotalVisits usage stat report as admin
         getClient(adminToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api" +
@@ -1319,7 +1321,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemNotVisitedWithBitstreams.getID()))
             // ** THEN **
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasNoJsonPath("$.points")));
     }
 
     @Test
@@ -1342,20 +1345,23 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemNotVisitedWithBitstreams.getID()))
             // ** THEN **
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasNoJsonPath("$.points")));
         // We request a dso's TotalVisits usage stat report as logged in eperson and has read policy for this user
         getClient(loggedInToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemNotVisitedWithBitstreams.getID()))
             // ** THEN **
-            .andExpect(status().isForbidden());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasNoJsonPath("$.points")));
         // We request a dso's TotalVisits usage stat report as another logged in eperson and has no read policy for
         // this user
         getClient(anotherLoggedInUserToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemNotVisitedWithBitstreams.getID()))
             // ** THEN **
-            .andExpect(status().isForbidden());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasNoJsonPath("$.points")));
     }
 
     @Test
