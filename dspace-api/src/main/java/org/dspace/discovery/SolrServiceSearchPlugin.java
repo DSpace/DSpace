@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery;
 
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.dspace.core.Context;
 
 /**

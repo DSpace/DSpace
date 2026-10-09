@@ -20,7 +20,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class CrossRefConnectorTest extends AbstractDSpaceTest {

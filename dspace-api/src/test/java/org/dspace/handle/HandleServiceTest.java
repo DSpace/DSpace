@@ -7,22 +7,23 @@
  */
 package org.dspace.handle;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 public class HandleServiceTest extends AbstractUnitTest {
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected ConfigurationService configurationService = new DSpace().getConfigurationService();
 
-    @Before
+    @BeforeEach
     @Override
     public void init() {
         super.init();
@@ -60,7 +61,8 @@ public class HandleServiceTest extends AbstractUnitTest {
      * length of the identifier, where rejecting it is now linear. The bound is therefore a very
      * wide margin and is not sensitive to a slow CI machine.
      */
-    @Test(timeout = 10000)
+    @Test
+    @Timeout(10)
     public void testParseHandleRejectsLongUrlWithoutBacktracking() {
         // a line terminator is what made the URL unmatchable, since "." never matched one
         assertNull(handleService.parseHandle("http://a/handle/" + "a/handle/a".repeat(40000) + "\n"));

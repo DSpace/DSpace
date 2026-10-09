@@ -9,8 +9,8 @@ package org.dspace.app.bulkimport.model;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.util.MultiFormatDateDeserializer;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Class that model the value of ACCESS_CONDITION_CELL

@@ -7,8 +7,8 @@
  */
 package org.dspace.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -16,37 +16,40 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.client.ServiceUnavailableRetryStrategy;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
+import org.apache.hc.client5.http.HttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.TimeValue;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.MockServerRule;
+import org.mockserver.junit.jupiter.MockServerExtension;
 
 /**
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
+@ExtendWith(MockServerExtension.class)
 public class HttpConnectionPoolServiceTest
         extends AbstractDSpaceTest {
     private static ConfigurationService configurationService;
 
-    @Rule
-    public MockServerRule mockServerRule = new MockServerRule(this);
+    private final MockServerClient mockServerClient;
 
-    private MockServerClient mockServerClient;
+    public HttpConnectionPoolServiceTest(MockServerClient mockServerClient) {
+        this.mockServerClient = mockServerClient;
+    }
 
-    @BeforeClass
+    @BeforeAll
     public static void initClass() {
         configurationService = DSpaceServicesFactory.getInstance()
                 .getConfigurationService();
@@ -78,7 +81,7 @@ public class HttpConnectionPoolServiceTest
         );
 
         try (CloseableHttpClient httpClient = instance.getClient()) {
-            assertNotNull("getClient should always return a client", httpClient);
+            assertNotNull(httpClient, "getClient should always return a client");
 
             URI uri = new URIBuilder()
                     .setScheme("http")
@@ -87,24 +90,25 @@ public class HttpConnectionPoolServiceTest
                     .setPath(testPath)
                     .build();
             System.out.println(uri.toString());
-            HttpUriRequest request = RequestBuilder.get(uri)
+            ClassicHttpRequest request = ClassicRequestBuilder.get(uri)
                     .build();
             try (CloseableHttpResponse response = httpClient.execute(request)) {
-                assertEquals("Response status should be OK", HttpStatus.OK_200,
-                        response.getStatusLine().getStatusCode());
+                assertEquals(HttpStatus.OK_200, response.getCode(),
+                        "Response status should be OK");
             }
         }
     }
 
     /**
-     * Test of getClient method, of class HttpConnectionPoolService, with a DefaultServiceUnavailableRetryStrategy
+     * Test of getClient method, of class HttpConnectionPoolService, with a DefaultHttpRequestRetryStrategy
      * @throws java.io.IOException if a connection cannot be closed.
      * @throws java.net.URISyntaxException when an invalid URI is constructed.
      */
     @Test
-    public void testGetClientWithDefaultServiceUnavailableRetryStrategy()
+    public void testGetClientWithDefaultHttpRequestRetryStrategy()
             throws IOException, URISyntaxException {
-        ServiceUnavailableRetryStrategy retryStrategy = new DefaultServiceUnavailableRetryStrategy(3, 2000);
+        HttpRequestRetryStrategy retryStrategy =
+                new DefaultHttpRequestRetryStrategy(3, TimeValue.ofMilliseconds(2000));
         configurationService.setProperty("grobid.client.maxRetries", 3);
         configurationService.setProperty("grobid.client.retryInterval", 2000);
         configurationService.setProperty("grobid.service.url", "http://localhost:8070");
@@ -127,7 +131,7 @@ public class HttpConnectionPoolServiceTest
         ).respond(response().withStatusCode(HttpStatus.OK_200));
 
         try (CloseableHttpClient httpClient = instance.getClient(retryStrategy)) {
-            assertNotNull("getClient should always return a client", httpClient);
+            assertNotNull(httpClient, "getClient should always return a client");
 
             URI uri = new URIBuilder()
                     .setScheme("http")
@@ -136,11 +140,11 @@ public class HttpConnectionPoolServiceTest
                     .setPath(testPath)
                     .build();
             System.out.println(uri.toString());
-            HttpUriRequest request = RequestBuilder.get(uri)
+            ClassicHttpRequest request = ClassicRequestBuilder.get(uri)
                     .build();
             try (CloseableHttpResponse response = httpClient.execute(request)) {
-                assertEquals("Response status should be OK", HttpStatus.OK_200,
-                        response.getStatusLine().getStatusCode());
+                assertEquals(HttpStatus.OK_200, response.getCode(),
+                        "Response status should be OK");
             }
         }
     }

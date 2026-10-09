@@ -14,11 +14,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.content.DSpaceObject;
@@ -148,7 +148,7 @@ public class BasicLinkChecker extends AbstractCurationTask {
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().buildWithRequestConfig(config)) {
             URI uri = new URIBuilder(url).build();
             CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(uri));
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            int statusCode = httpResponse.getCode();
             int maxRedirect = configurationService.getIntProperty("curate.checklinks.max-redirect", 0);
             if ((statusCode == HttpURLConnection.HTTP_MOVED_TEMP || statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
                     statusCode == HttpURLConnection.HTTP_SEE_OTHER)) {

@@ -37,6 +37,7 @@ import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.RequestItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.SiteBuilder;
+import org.dspace.builder.SupervisionOrderBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 
@@ -69,6 +70,7 @@ public class AbstractBuilderCleanupUtil {
         map.put(ResourcePolicyBuilder.class.getName(), new ArrayList<>());
         map.put(RelationshipBuilder.class.getName(), new ArrayList<>());
         map.put(RequestItemBuilder.class.getName(), new ArrayList<>());
+        map.put(SupervisionOrderBuilder.class.getName(), new ArrayList<>());
         map.put(PoolTaskBuilder.class.getName(), new ArrayList<>());
         map.put(WorkflowItemBuilder.class.getName(), new ArrayList<>());
         map.put(WorkspaceItemBuilder.class.getName(), new ArrayList<>());

@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.authority.Choices;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -53,7 +52,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     @Override
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
-        throw new RuntimeException(e);
+        return null;
     }
 
 
@@ -61,7 +60,12 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final String element,
                                                                             final String qualifier,
                                                                             final String value) {
-        return addMetadataValue(dso, schema, element, qualifier, null, value, null, Choices.CF_UNSET);
+        try {
+            getService().addMetadata(context, dso, schema, element, qualifier, null, value);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
     }
 
     protected <B extends AbstractDSpaceObjectBuilder<T>> B addSecuredMetadataValue(final T dso, final String schema,
@@ -77,7 +81,12 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final String qualifier,
                                                                             final String language,
                                                                             final String value) {
-        return addMetadataValue(dso, schema, element, qualifier, language, value, null, Choices.CF_UNSET);
+        try {
+            getService().addMetadata(context, dso, schema, element, qualifier, language, value);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
     }
 
     protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
@@ -312,6 +321,5 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
             getService().delete(c, dso);
         }
         c.complete();
-        indexingService.commit();
     }
 }

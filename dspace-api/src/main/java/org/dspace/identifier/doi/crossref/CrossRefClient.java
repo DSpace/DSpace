@@ -13,12 +13,13 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.net.URIBuilder;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.jdom2.Document;
@@ -134,7 +135,8 @@ public class CrossRefClient {
         try {
             var post = new HttpPost(uri.build());
             var requestConfig = RequestConfig.custom()
-                    .setConnectionRequestTimeout(TIMEOUT).setSocketTimeout(TIMEOUT).build();
+                    .setConnectionRequestTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .setResponseTimeout(TIMEOUT, TimeUnit.MILLISECONDS).build();
             post.setConfig(requestConfig);
 
             return post;

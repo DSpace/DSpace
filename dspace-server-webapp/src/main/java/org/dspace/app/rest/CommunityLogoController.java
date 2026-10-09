@@ -34,8 +34,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,7 +83,7 @@ public class CommunityLogoController {
      * @throws AuthorizeException   If the user doesn't have the correct rights
      */
     @PreAuthorize("hasPermission(#uuid, 'COMMUNITY', 'WRITE')")
-    @RequestMapping(method = RequestMethod.POST,
+    @PostMapping(
             headers = "content-type=multipart/form-data")
     public ResponseEntity<RepresentationModel<?>> createLogo(HttpServletRequest request, @PathVariable UUID uuid,
                                                              @RequestParam(value = "file", required = false)

@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -31,10 +31,11 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link MetadataDeletion}.
@@ -50,7 +51,7 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         context.turnOffAuthorisationSystem();
@@ -99,8 +100,15 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         MetadataField titleField = metadataFieldService.findByElement(context, "dc", "title", null);
         MetadataField authorField = metadataFieldService.findByElement(context, "dc", "contributor", "author");
 
-        assertThat(metadataValueService.findByField(context, titleField), hasSize(2));
-        assertThat(metadataValueService.findByField(context, authorField), hasSize(2));
+        // Get counts before test - other tests may have created metadata values
+        int titleCountBefore = metadataValueService.findByField(context, titleField).size();
+        int authorCountBefore = metadataValueService.findByField(context, authorField).size();
+        // setup() created 2 items with titles and authors, so we should have at least 2 of each
+        assertThat(titleCountBefore, org.hamcrest.Matchers.greaterThanOrEqualTo(2));
+        assertThat(authorCountBefore, org.hamcrest.Matchers.greaterThanOrEqualTo(2));
+
+        // Commit the test data so the script's separate Context can see it
+        context.commit();
 
         configurationService.setProperty("bulkedit.allow-bulk-deletion", "dc.title");
 
@@ -109,8 +117,18 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         String[] args = new String[] { "metadata-deletion", "-m", "dc.title" };
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
 
-        assertThat(metadataValueService.findByField(context, titleField), empty());
-        assertThat(metadataValueService.findByField(context, authorField), hasSize(2));
+        // Use a fresh context for verification since the script ran with its own context
+        // and made changes that the test context's Hibernate session doesn't know about
+        try (Context verifyContext = new Context(Context.Mode.READ_ONLY)) {
+            MetadataField titleFieldFresh = metadataFieldService.findByElement(verifyContext, "dc", "title", null);
+            MetadataField authorFieldFresh = metadataFieldService.findByElement(verifyContext, "dc", "contributor",
+                    "author");
+
+            // After deletion, all dc.title values should be deleted (including from other tests)
+            assertThat(metadataValueService.findByField(verifyContext, titleFieldFresh), empty());
+            // Author values should remain unchanged
+            assertThat(metadataValueService.findByField(verifyContext, authorFieldFresh), hasSize(authorCountBefore));
+        }
 
         List<String> infoMessages = testDSpaceRunnableHandler.getInfoMessages();
         assertThat(infoMessages, hasSize(1));
@@ -123,8 +141,12 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         MetadataField titleField = metadataFieldService.findByElement(context, "dc", "title", null);
         MetadataField authorField = metadataFieldService.findByElement(context, "dc", "contributor", "author");
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        // Get counts before test - other tests may have created metadata values
+        int titleCountBefore = metadataValueService.findByField(context, titleField).size();
+        int authorCountBefore = metadataValueService.findByField(context, authorField).size();
+        // setup() created 2 items with titles and authors, so we should have at least 2 of each
+        assertThat(titleCountBefore, org.hamcrest.Matchers.greaterThanOrEqualTo(2));
+        assertThat(authorCountBefore, org.hamcrest.Matchers.greaterThanOrEqualTo(2));
 
         configurationService.setProperty("bulkedit.allow-bulk-deletion", "dc.type");
 
@@ -138,8 +160,9 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         assertThat(exception, instanceOf(IllegalArgumentException.class));
         assertThat(exception.getMessage(), is("The given metadata field cannot be bulk deleted"));
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        // Counts should remain unchanged since deletion was not allowed
+        assertEquals(titleCountBefore, metadataValueService.findByField(context, titleField).size());
+        assertEquals(authorCountBefore, metadataValueService.findByField(context, authorField).size());
     }
 
     @Test
@@ -148,8 +171,12 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         MetadataField titleField = metadataFieldService.findByElement(context, "dc", "title", null);
         MetadataField authorField = metadataFieldService.findByElement(context, "dc", "contributor", "author");
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        // Get counts before test - other tests may have created metadata values
+        int titleCountBefore = metadataValueService.findByField(context, titleField).size();
+        int authorCountBefore = metadataValueService.findByField(context, authorField).size();
+        // setup() created 2 items with titles and authors, so we should have at least 2 of each
+        assertThat(titleCountBefore, org.hamcrest.Matchers.greaterThanOrEqualTo(2));
+        assertThat(authorCountBefore, org.hamcrest.Matchers.greaterThanOrEqualTo(2));
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
@@ -161,8 +188,9 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         assertThat(exception, instanceOf(IllegalArgumentException.class));
         assertThat(exception.getMessage(), is("No metadata field found with name dc.unknown"));
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        // Counts should remain unchanged since the metadata field was unknown
+        assertEquals(titleCountBefore, metadataValueService.findByField(context, titleField).size());
+        assertEquals(authorCountBefore, metadataValueService.findByField(context, authorField).size());
     }
 
     private void createItem(Collection collection, String title, String author) {

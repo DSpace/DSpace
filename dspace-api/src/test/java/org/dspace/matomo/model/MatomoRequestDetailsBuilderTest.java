@@ -8,7 +8,7 @@
 package org.dspace.matomo.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,12 +45,15 @@ import org.dspace.service.ClientInfoService;
 import org.dspace.usage.UsageEvent;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
 
     MatomoRequestDetailsBuilder builder;
@@ -65,7 +68,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
 
     final String siteId = "test";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         enrichers = new ArrayList<>();
         builder = new MatomoRequestDetailsBuilder(enrichers, siteId);
@@ -117,7 +120,7 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
 
         try (MockedStatic<ContentServiceFactory> mock = Mockito.mockStatic(ContentServiceFactory.class)) {
             ContentServiceFactory serviceFactory = Mockito.mock(ContentServiceFactory.class);
-            Mockito.when(ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
+            mock.when(() -> ContentServiceFactory.getInstance()).thenReturn(serviceFactory);
             DSpaceObjectService<Bitstream> bitstreamService = Mockito.mock(BitstreamService.class);
             Mockito.when(serviceFactory.getDSpaceObjectService(bitstream))
                    .thenReturn(bitstreamService);

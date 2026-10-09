@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link PersonNameUtil}.

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.requestitem;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -32,10 +32,10 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test RequestPrimaryBitstreamMetadataStrategy
@@ -59,7 +59,7 @@ public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTes
 
     private static BitstreamService bitstreamService;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws SQLException {
         AbstractBuilder.init(); // AbstractUnitTest doesn't do this for us.
 
@@ -73,14 +73,14 @@ public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTes
         ctx.complete();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
         // AbstractUnitTest doesn't do this for us.
         AbstractBuilder.cleanupObjects();
         AbstractBuilder.destroy();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         String text = "test";
         InputStream inputStream = new ByteArrayInputStream(
@@ -114,7 +114,7 @@ public class RequestPrimaryBitstreamMetadataStrategyTest extends AbstractUnitTes
         instance.bitstreamService = bitstreamService;
 
         List<RequestItemAuthor> author = instance.getRequestItemAuthor(context, item);
-        assertEquals("Wrong bitstream author address", AUTHOR_EMAIL, author.get(0).getEmail());
+        assertEquals(AUTHOR_EMAIL, author.get(0).getEmail(), "Wrong bitstream author address");
     }
 
 }

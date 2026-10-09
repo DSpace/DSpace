@@ -36,6 +36,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.dao.LDNMessageDao;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
@@ -120,6 +122,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
+    /**
+     * Tracks items currently being deleted by rawDelete to prevent re-entrant deletion.
+     * versioningService.removeVersion() → delete() calls itemService.delete() recursively,
+     * which in Hibernate 7 causes StaleStateException due to double session.remove().
+     */
+    private static final ThreadLocal<java.util.Set<java.util.UUID>> deletingItems =
+        ThreadLocal.withInitial(java.util.HashSet::new);
+
     @Autowired(required = true)
     protected ItemDAO itemDAO;
 
@@ -196,6 +206,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired
     private QAEventsDAO qaEventsDao;
+
+    @Autowired
+    private LDNMessageDao ldnMessageDao;
 
     @Autowired
     private VersionHistoryService versionHistoryService;
@@ -863,6 +876,22 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {
+        // Reentrancy guard: versioningService.removeVersion() calls versioningService.delete()
+        // which recursively calls itemService.delete() for the same item. In Hibernate 7,
+        // the second session.remove() causes StaleStateException because the item was already
+        // deleted by the inner call. Skip the recursive call — the outer rawDelete handles it.
+        if (!deletingItems.get().add(item.getID())) {
+            return;
+        }
+        try {
+            rawDeleteInternal(context, item);
+        } finally {
+            deletingItems.get().remove(item.getID());
+        }
+    }
+
+    private void rawDeleteInternal(Context context, Item item)
+        throws AuthorizeException, SQLException, IOException {
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
@@ -876,6 +905,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
         }
+        // Flush after relationship deletions to synchronize the persistence context.
+        // forceDelete() calls itemService.update() which may modify metadata values on related items.
+        // Without flushing, a subsequent query's auto-flush may try to delete metadata values
+        // that were already removed, causing StaleStateException in Hibernate 7.
+        context.flush();
 
         // Remove bundles
         removeAllBundles(context, item);
@@ -918,6 +952,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             qaEventsDao.delete(context, qaEvent);
         }
 
+        // Nullify LDN message references to this item to prevent
+        // TransientPropertyValueException in Hibernate 7 during flush.
+        for (LDNMessageEntity ldnMsg : ldnMessageDao.findByDSpaceObject(context, item)) {
+            if (item.equals(ldnMsg.getObject())) {
+                ldnMsg.setObject(null);
+            }
+            if (item.equals(ldnMsg.getContext())) {
+                ldnMsg.setContext(null);
+            }
+        }
+
         //Only clear collections after we have removed everything else from the item
         item.clearCollections();
         item.setOwningCollection(null);
@@ -926,6 +971,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         if (configurationService.getBooleanProperty("item-deletion.authority-cleanup.enabled", false)) {
             removeAuthorityReferences(context, item);
         }
+
+        // Remove all resource policies right before removing the item entity.
+        // Must happen after all authorization checks but before itemDAO.delete() to prevent
+        // Hibernate 7 TransientPropertyValueException when managed ResourcePolicies reference
+        // a removed Item entity during auto-flush.
+        authorizeService.removeAllPolicies(context, item);
 
         // Finally remove item row
         itemDAO.delete(context, item);

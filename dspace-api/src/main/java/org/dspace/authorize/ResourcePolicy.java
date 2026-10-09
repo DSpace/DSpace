@@ -55,7 +55,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "resourcepolicy_seq", sequenceName = "resourcepolicy_seq", allocationSize = 1)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 

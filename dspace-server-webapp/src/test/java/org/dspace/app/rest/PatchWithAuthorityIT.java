@@ -34,7 +34,8 @@ import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests to validate that in case a patch requests contains an authority and interested field is
@@ -52,6 +53,7 @@ public class PatchWithAuthorityIT extends AbstractControllerIntegrationTest {
     private final MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
         .getInstance().getMetadataAuthorityService();
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

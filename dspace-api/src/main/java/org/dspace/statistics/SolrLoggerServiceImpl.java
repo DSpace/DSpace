@@ -52,20 +52,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.RemoteSolrException;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient.RemoteSolrException;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.LukeResponse;
@@ -110,7 +110,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Static holder for a HttpSolrClient connection pool to issue
+ * Static holder for a HttpJettySolrClient connection pool to issue
  * usage logging events to Solr from DSpace libraries, and some static query
  * composers.
  *
@@ -680,7 +680,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     public void removeIndex(String query) throws IOException,
         SolrServerException {
         solr.deleteByQuery(query);
-        solr.commit();
+        solr.commit(true, true, true);
     }
 
     @Override
@@ -751,7 +751,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         public void commit() throws IOException, SolrServerException {
-            solr.commit();
+            solr.commit(true, true, true);
         }
 
         /**
@@ -802,7 +802,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         try {
             processor.execute("-isBot:true");
-            solr.commit();
+            solr.commit(true, true, true);
         } catch (SolrServerException | IOException ex) {
             log.error("Failed while marking robot accesses.", ex);
         }
@@ -1135,7 +1135,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void shardSolrIndex() throws IOException, SolrServerException {
-        if (!(solr instanceof HttpSolrClient)) {
+        if (!(solr instanceof HttpJettySolrClient)) {
             return;
         }
 
@@ -1197,14 +1197,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             //Start by creating a new core
             String coreName = statisticsCoreBase + "-" + dcStart.getYearUTC();
-            HttpSolrClient statisticsYearServer = createCore((HttpSolrClient) solr, coreName);
+            HttpJettySolrClient statisticsYearServer = createCore((HttpJettySolrClient) solr, coreName);
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
             log.info("Moving: " + totalRecords + " records into core " + coreName);
 
             List<File> filesToUpload = new ArrayList<>();
             for (int i = 0; i < totalRecords; i += 10000) {
-                String solrRequestUrl = ((HttpSolrClient) solr).getBaseURL() + "/select";
+                String solrRequestUrl = ((HttpJettySolrClient) solr).getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, yearQueryParams);
 
                 HttpGet get = new HttpGet(solrRequestUrl);
@@ -1217,7 +1217,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                         + i
                         + ".csv");
                 try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
-                    HttpResponse response = hc.execute(get);
+                    ClassicHttpResponse response = hc.execute(get);
                     csvInputstream = response.getEntity().getContent();
                     //Write the csv output to a file !
                     FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
@@ -1237,7 +1237,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 contentStreamUpdateRequest.setParam("escape", "\\");
                 contentStreamUpdateRequest.setParam("skip", "_version_");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv, "text/csv;charset=utf-8");
+                // Solr 10 uses Path instead of File
+                contentStreamUpdateRequest.addFile(tempCsv.toPath(), "text/csv;charset=utf-8");
 
                 //Add parsing directives for the multivalued fields so that they are stored as separate values
                 // instead of one value
@@ -1263,14 +1264,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         FileUtils.deleteDirectory(tempDirectory);
     }
 
-    protected HttpSolrClient createCore(HttpSolrClient solr, String coreName)
+    protected HttpJettySolrClient createCore(HttpJettySolrClient solr, String coreName)
             throws IOException, SolrServerException {
         String baseSolrUrl = solr.getBaseURL().replace(statisticsCoreBase, ""); // Has trailing slash
 
         //DS-3458: Test to see if a solr core already exists.  If it exists,
         // return a connection to that core.  Otherwise create a new core and
         // return a connection to it.
-        HttpSolrClient returnServer = new HttpSolrClient.Builder(baseSolrUrl + coreName).build();
+        HttpJettySolrClient returnServer = new HttpJettySolrClient.Builder(baseSolrUrl + coreName).build();
         try {
             SolrPingResponse ping = returnServer.ping();
             log.debug("Ping of Solr Core {} returned with Status {}",
@@ -1290,7 +1291,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         create.setConfigSet(configSetName);
         create.setInstanceDir(coreName);
 
-        HttpSolrClient solrServer = new HttpSolrClient.Builder(baseSolrUrl).build();
+        HttpJettySolrClient solrServer = new HttpJettySolrClient.Builder(baseSolrUrl).build();
         create.process(solrServer);
         log.info("Created core with name: {} from configset {}", coreName, configSetName);
         return returnServer;
@@ -1324,7 +1325,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void reindexBitstreamHits(boolean removeDeletedBitstreams) throws Exception {
-        if (!(solr instanceof HttpSolrClient)) {
+        if (!(solr instanceof HttpJettySolrClient)) {
             return;
         }
 
@@ -1353,13 +1354,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 params.put(CommonParams.ROWS, String.valueOf(10000));
                 params.put(CommonParams.START, String.valueOf(i));
 
-                String solrRequestUrl = ((HttpSolrClient) solr).getBaseURL() + "/select";
+                String solrRequestUrl = ((HttpJettySolrClient) solr).getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, params);
 
                 HttpGet get = new HttpGet(solrRequestUrl);
                 List<String[]> rows;
                 try (CloseableHttpClient hc = DSpaceHttpClientFactory.getInstance().buildWithoutProxy()) {
-                    HttpResponse response = hc.execute(get);
+                    ClassicHttpResponse response = hc.execute(get);
                     InputStream csvOutput = response.getEntity().getContent();
                     Reader csvReader = new InputStreamReader(csvOutput);
                     rows = new CSVReader(csvReader).readAll();
@@ -1432,7 +1433,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update");
                 contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-                contentStreamUpdateRequest.addFile(tempCsv, "text/csv;charset=utf-8");
+                // Solr 10 uses Path instead of File
+                contentStreamUpdateRequest.addFile(tempCsv.toPath(), "text/csv;charset=utf-8");
 
                 solr.request(contentStreamUpdateRequest);
             }
@@ -1497,7 +1499,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void commit() throws IOException, SolrServerException {
-        solr.commit();
+        solr.commit(true, true, true);
     }
 
     protected void addDocumentsToFile(Context context, SolrDocumentList docs, File exportOutput)
@@ -1568,15 +1570,16 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      * initialization at the same time.
      */
     protected synchronized void initSolrYearCores() {
-        if (statisticYearCoresInit || !(solr instanceof HttpSolrClient) || !configurationService.getBooleanProperty(
-            "usage-statistics.shardedByYear", false)) {
+        if (statisticYearCoresInit || !(solr instanceof HttpJettySolrClient)
+            || !configurationService.getBooleanProperty(
+                "usage-statistics.shardedByYear", false)) {
             return;
         }
 
         //Base url should like : http://localhost:{port.number}/solr
-        String baseSolrUrl = ((HttpSolrClient) solr).getBaseURL().replace(statisticsCoreBase, "");
+        String baseSolrUrl = ((HttpJettySolrClient) solr).getBaseURL().replace(statisticsCoreBase, "");
 
-        try (HttpSolrClient enumClient = new HttpSolrClient.Builder(baseSolrUrl).build();) {
+        try (HttpJettySolrClient enumClient = new HttpJettySolrClient.Builder(baseSolrUrl).build();) {
             //Attempt to retrieve all the statistic year cores
             CoreAdminRequest coresRequest = new CoreAdminRequest();
             coresRequest.setAction(CoreAdminAction.STATUS);
@@ -1594,12 +1597,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             for (String statCoreName : statCoreNames) {
                 log.info("Loading core with name: " + statCoreName);
 
-                createCore((HttpSolrClient) solr, statCoreName);
+                createCore((HttpJettySolrClient) solr, statCoreName);
                 //Add it to our cores list so we can query it !
                 statisticYearCores
                     .add(baseSolrUrl.replace("http://", "").replace("https://", "") + statCoreName);
             }
-            var baseCore = ((HttpSolrClient) solr)
+            var baseCore = ((HttpJettySolrClient) solr)
                     .getBaseURL()
                     .replace("http://", "")
                     .replace("https://", "");

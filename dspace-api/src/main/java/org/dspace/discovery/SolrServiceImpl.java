@@ -36,8 +36,8 @@ import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
@@ -230,7 +230,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             log.info("Try to delete uniqueID:" + uniqueID);
             indexObjectServiceFactory.getIndexableObjectFactory(indexableObject).delete(indexableObject);
             if (commit) {
-                solrSearchCore.getSolr().commit();
+                solrSearchCore.getSolr().commit(true, true, true);
             }
         } catch (IOException | SolrServerException exception) {
             log.error(exception.getMessage(), exception);
@@ -271,7 +271,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     log.warn("Object not found in Solr index: " + searchUniqueID);
                 }
                 if (commit) {
-                    solrSearchCore.getSolr().commit();
+                    solrSearchCore.getSolr().commit(true, true, true);
                 }
             }
         } catch (SolrServerException e) {
@@ -365,7 +365,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
             if (solrSearchCore.getSolr() != null) {
-                solrSearchCore.getSolr().commit();
+                solrSearchCore.getSolr().commit(true, true, true);
             }
 
         } catch (IOException | SQLException | SolrServerException e) {
@@ -1082,7 +1082,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 log.info("ZombieDocs ");
                 zombieDocs.forEach(log::info);
                 solrSearchCore.getSolr().deleteById(zombieDocs);
-                solrSearchCore.getSolr().commit();
+                solrSearchCore.getSolr().commit(true, true, true);
             } else {
                 valid = true;
             }
@@ -1114,7 +1114,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             for (String facetName : response.getBucketBasedFacetNames()) {
                 BucketBasedJsonFacet facet = response.getBucketBasedFacets(facetName);
                 if (facet != null) {
-                    result.setTotalEntries(facet.getNumBucketsCount());
+                    result.setTotalEntries(facet.getNumBuckets());
                     for (BucketJsonFacet bucket : facet.getBuckets()) {
                         String facetValue = bucket.getVal() != null ? bucket.getVal().toString() : "";
                         String field = facetName + "_filter";
@@ -1618,7 +1618,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public void commit() throws SearchServiceException {
         try {
             if (solrSearchCore.getSolr() != null) {
-                solrSearchCore.getSolr().commit();
+                // Use soft commit to make documents visible without the expensive
+                // fsync + new searcher overhead of a hard commit. Solr's autoCommit
+                // (configured in solrconfig.xml) handles durability on its own schedule.
+                solrSearchCore.getSolr().commit(true, true, true);
             }
         } catch (IOException | SolrServerException e) {
             throw new SearchServiceException(e.getMessage(), e);

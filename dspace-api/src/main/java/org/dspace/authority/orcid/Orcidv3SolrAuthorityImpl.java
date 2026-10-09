@@ -144,12 +144,13 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
             return null;
         }
         initializeAccessToken();
-        try (InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"),
-                                                              accessToken)) {
+        try {
+            InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"),
+                                                             accessToken);
             XMLtoBio converter = new XMLtoBio();
             return converter.convertSinglePerson(bioDocument);
-        } catch (OrcidConnectionException | IOException e) {
-            log.error("Error retrieving ORCID bio for ID={}", id, e);
+        } catch (OrcidConnectionException e) {
+            log.error("Error retrieving ORCID bio for ID=" + id, e);
             return null;
         }
     }

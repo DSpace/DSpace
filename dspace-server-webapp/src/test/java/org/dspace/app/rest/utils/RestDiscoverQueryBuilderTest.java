@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT.VALUE;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.TYPE_HIERARCHICAL;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
@@ -38,19 +39,22 @@ import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.discovery.utils.DiscoverQueryBuilder;
 import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 /**
  * Unit tests for {@link RestDiscoverQueryBuilder}
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class RestDiscoverQueryBuilderTest {
 
     @InjectMocks
@@ -72,7 +76,7 @@ public class RestDiscoverQueryBuilderTest {
 
     private PageRequest page;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         discoveryConfiguration = new DiscoveryConfiguration();
         discoveryConfiguration.setDefaultFilterQueries(Arrays.asList("archived:true"));
@@ -179,20 +183,24 @@ public class RestDiscoverQueryBuilderTest {
                         page.getPageSize(), page.getOffset(), null, null);
     }
 
-    @Test(expected = DSpaceBadRequestException.class)
+    @Test
     public void testCatchIllegalArgumentException() throws Exception {
-        when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
-                                             any())).thenThrow(IllegalArgumentException.class);
-        restQueryBuilder
+        assertThrows(DSpaceBadRequestException.class, () -> {
+            when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
+                                                 any())).thenThrow(IllegalArgumentException.class);
+            restQueryBuilder
                 .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "TEST", page);
+        });
     }
 
-    @Test(expected = InvalidSearchRequestException.class)
+    @Test
     public void testCatchSearchServiceException() throws Exception {
-        when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
-                                             any())).thenThrow(SearchServiceException.class);
-        restQueryBuilder
+        assertThrows(InvalidSearchRequestException.class, () -> {
+            when(discoverQueryBuilder.buildQuery(any(), any(), any(), any(), any(), anyList(), any(), any(), any(),
+                                                 any())).thenThrow(SearchServiceException.class);
+            restQueryBuilder
                 .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
+        });
     }
 
     @Test

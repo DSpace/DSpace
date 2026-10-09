@@ -14,8 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -49,6 +47,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**
@@ -83,7 +83,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Autowired
     private ObjectMapper mapper;
 
-    @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
         super(dsoService);
         this.bs = dsoService;

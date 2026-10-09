@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.dspace.app.customurl.consumer.CustomUrlConsumerConfig;
 import org.dspace.app.rest.model.CollectionRest;
@@ -70,13 +69,16 @@ import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Test suite to verify the related entities creation via {@link CrisConsumer}.
@@ -125,6 +127,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private MetadataAuthorityService metadataAuthorityService;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -159,6 +162,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @AfterEach
     @Override
     public void destroy() throws Exception {
         poolTaskService.findAll(context).forEach(this::deletePoolTask);

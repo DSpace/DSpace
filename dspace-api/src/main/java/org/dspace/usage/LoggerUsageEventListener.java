@@ -30,8 +30,7 @@ public class LoggerUsageEventListener extends AbstractUsageEventListener {
 
         //Search events are already logged
         //UsageSearchEvent is already logged in the search classes, no need to repeat this logging
-        if (event instanceof UsageEvent && !(event instanceof UsageSearchEvent)) {
-            UsageEvent ue = (UsageEvent) event;
+        if (event instanceof UsageEvent ue && !(event instanceof UsageSearchEvent)) {
 
             log.info(LogHelper.getHeader(
                 ue.getContext(),

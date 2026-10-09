@@ -7,9 +7,10 @@
  */
 package org.dspace.content.crosswalk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -19,11 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.builder.BundleBuilder;
@@ -38,9 +38,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
@@ -60,7 +60,7 @@ public class OREIngestionCrosswalkTest extends AbstractIntegrationTestWithDataba
     private static final Namespace ATOM_NS = Namespace.getNamespace("atom", "http://www.w3.org/2005/Atom");
     private static final Namespace ORE_NS = Namespace.getNamespace("ore", "http://www.openarchives.org/ore/terms/");
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -77,7 +77,7 @@ public class OREIngestionCrosswalkTest extends AbstractIntegrationTestWithDataba
         context.setCurrentUser(admin);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         context.setCurrentUser(prevUser);
     }
@@ -94,41 +94,41 @@ public class OREIngestionCrosswalkTest extends AbstractIntegrationTestWithDataba
         crosswalk.ingest(context, item, entry, false);
 
         List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        assertTrue("Should have no bundles or empty bundle",
-                bundles.isEmpty() || bundles.getFirst().getBitstreams().isEmpty());
+        assertTrue(bundles.isEmpty() || bundles.getFirst().getBitstreams().isEmpty(),
+                   "Should have no bundles or empty bundle");
     }
 
-    @Test(expected = CrosswalkException.class)
+    @Test
     public void testIngestInvalidURISyntaxThrowsException() throws Exception {
         Element entry = createOREEntryWithInvalidURI();
-        crosswalk.ingest(context, item, entry, false);
+        assertThrows(CrosswalkException.class, () -> crosswalk.ingest(context, item, entry, false));
     }
 
     @Test
     public void testHostValidation() {
         // localhost = forbidden
         boolean result = crosswalk.validResourceUri("http://localhost:8080/resource");
-        assertFalse("localhost should be forbidden", result);
+        assertFalse(result, "localhost should be forbidden");
 
         // 127.0.0.1 = forbidden
         result = crosswalk.validResourceUri("http://127.0.0.1:8080/resource");
-        assertFalse("127.0.0.1 should be forbidden", result);
+        assertFalse(result, "127.0.0.1 should be forbidden");
 
         // allowed.example.com = not forbidden
         result = crosswalk.validResourceUri("http://allowed.example.com/resource");
-        assertTrue("External host should be allowed", result);
+        assertTrue(result, "External host should be allowed");
     }
 
     @Test
     public void testSchemeValidation() throws Exception {
         boolean result = crosswalk.validResourceUri("file:///etc/passwd");
-        assertFalse("file:// scheme should be forbidden", result);
+        assertFalse(result, "file:// scheme should be forbidden");
 
         result = crosswalk.validResourceUri("ftp://example.com/resource");
-        assertFalse("ftp:// scheme should be forbidden", result);
+        assertFalse(result, "ftp:// scheme should be forbidden");
 
         result = crosswalk.validResourceUri("https://example.com/resource");
-        assertTrue("https:// scheme should be allowed", result);
+        assertTrue(result, "https:// scheme should be allowed");
     }
 
     @Test
@@ -141,8 +141,8 @@ public class OREIngestionCrosswalkTest extends AbstractIntegrationTestWithDataba
             crosswalk.ingest(context, item, entry, false);
 
             List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-            assertFalse("Should have created bundle", bundles.isEmpty());
-            assertFalse("Bundle should have bitstream", bundles.getFirst().getBitstreams().isEmpty());
+            assertFalse(bundles.isEmpty(), "Should have created bundle");
+            assertFalse(bundles.getFirst().getBitstreams().isEmpty(), "Bundle should have bitstream");
         }
     }
 
@@ -158,17 +158,18 @@ public class OREIngestionCrosswalkTest extends AbstractIntegrationTestWithDataba
 
         crosswalk.ingestStreamAsBitstream(context, inputStream, bundle, resource, "test-entry");
 
-        assertFalse("Bundle should have bitstream", bundle.getBitstreams().isEmpty());
-        assertEquals("Bitstream should have correct name", "Test Document",
-                bundle.getBitstreams().getFirst().getName());
+        assertFalse(bundle.getBitstreams().isEmpty(), "Bundle should have bitstream");
+        assertEquals("Test Document", bundle.getBitstreams().getFirst().getName(),
+                     "Bitstream should have correct name");
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void testIngestStreamAsBitstreamNullStreamThrowsException() throws Exception {
         Element resource = new Element("link", ATOM_NS);
         resource.setAttribute("href", "http://example.com/test.pdf");
 
-        crosswalk.ingestStreamAsBitstream(context, null, bundle, resource, "test-entry");
+        assertThrows(IOException.class,
+                     () -> crosswalk.ingestStreamAsBitstream(context, null, bundle, resource, "test-entry"));
     }
 
     private Element createValidOREEntry() {
@@ -214,23 +215,21 @@ public class OREIngestionCrosswalkTest extends AbstractIntegrationTestWithDataba
 
         CloseableHttpClient mockClient = mock(CloseableHttpClient.class);
         DSpaceHttpClientFactory mockFactoryInstance = mock(DSpaceHttpClientFactory.class);
-        CloseableHttpResponse mockResponse = mockHttpResponse(statusCode, content);
+        ClassicHttpResponse mockResponse = mockHttpResponse(statusCode, content);
 
         when(mockFactoryInstance.buildWithRequestConfig(any())).thenReturn(mockClient);
-        when(mockClient.execute(any(HttpGet.class))).thenReturn(mockResponse);
+        when(mockClient.executeOpen(any(), any(HttpGet.class), any())).thenReturn(mockResponse);
         mockedFactory.when(DSpaceHttpClientFactory::getInstance).thenReturn(mockFactoryInstance);
 
         return mockedFactory;
     }
 
-    private CloseableHttpResponse mockHttpResponse(int statusCode, String content) throws IOException {
-        CloseableHttpResponse mockResponse = mock(CloseableHttpResponse.class);
+    private ClassicHttpResponse mockHttpResponse(int statusCode, String content) throws IOException {
+        ClassicHttpResponse mockResponse = mock(ClassicHttpResponse.class);
         HttpEntity mockEntity = mock(HttpEntity.class);
-        StatusLine mockStatus = mock(StatusLine.class);
 
-        when(mockStatus.getStatusCode()).thenReturn(statusCode);
+        when(mockResponse.getCode()).thenReturn(statusCode);
         when(mockEntity.getContent()).thenReturn(new ByteArrayInputStream(content.getBytes()));
-        when(mockResponse.getStatusLine()).thenReturn(mockStatus);
         when(mockResponse.getEntity()).thenReturn(mockEntity);
 
         return mockResponse;

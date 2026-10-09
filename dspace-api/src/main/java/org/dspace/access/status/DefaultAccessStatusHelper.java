@@ -199,7 +199,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         List<ResourcePolicy> readPolicies = new ArrayList<ResourcePolicy>();
         for (ResourcePolicy policy : policies) {
             EPerson eperson = policy.getEPerson();
-            if (eperson != null && currentUser != null && eperson.getID() == currentUser.getID()) {
+            if (eperson != null && currentUser != null && eperson.getID().equals(currentUser.getID())) {
                 readPolicies.add(policy);
                 continue;
             }

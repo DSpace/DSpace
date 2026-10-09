@@ -49,9 +49,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedResult;
 import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 
@@ -90,7 +90,7 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() {
         choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
 
@@ -114,7 +114,7 @@ public class OrcidAuthorityIT extends AbstractControllerIntegrationTest {
         when(orcidClientMock.getReadPublicAccessToken()).thenReturn(buildTokenResponse(READ_PUBLIC_TOKEN));
     }
 
-    @After
+    @AfterEach
     public void cleanUp() {
         OrcidAuthority.setAccessToken(null);
         orcidConfiguration.setClientId(originalClientId);

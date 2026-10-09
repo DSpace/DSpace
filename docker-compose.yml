@@ -92,7 +92,7 @@ services:
       additional_contexts:
         solrconfigs: ./dspace/solr/
       args:
-        SOLR_VERSION: "${SOLR_VER:-9.8}"
+        SOLR_VERSION: "${SOLR_VER:-10.0}"
     networks:
       dspacenet:
     ports:
@@ -131,7 +131,7 @@ services:
       precreate-core audit /opt/solr/server/solr/configsets/audit
       cp -r /opt/solr/server/solr/configsets/audit/* audit
       chown -R solr:solr /var/solr
-      runuser -u solr -- solr-foreground
+      runuser -u solr -- solr-foreground --user-managed
 volumes:
   assetstore:
   pgdata:

@@ -201,7 +201,16 @@ public class ProcessServiceImpl implements ProcessService {
         if (!authorizeActionBoolean(context, process)) {
             throw new AuthorizeException("Cannot delete process " + process.getID());
         }
-        for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
+        List<Bitstream> bitstreams = new ArrayList<>(ListUtils.emptyIfNull(process.getBitstreams()));
+        if (!bitstreams.isEmpty()) {
+            // Detach the bitstreams from the process and flush so the process2bitstream join rows are
+            // removed before the bitstreams themselves are deleted. Hibernate 7 otherwise schedules the
+            // bitstream deletes ahead of the join-row removal, violating the process2bitstream FK.
+            process.getBitstreams().clear();
+            update(context, process);
+            context.flush();
+        }
+        for (Bitstream bitstream : bitstreams) {
             bitstreamService.delete(context, bitstream);
         }
         processDAO.delete(context, process);
@@ -372,6 +381,8 @@ public class ProcessServiceImpl implements ProcessService {
         List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
                 context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), Instant.now());
         for (Process process : processesToBeFailed) {
+            // Best-effort: a single leftover process that cannot be failed must never abort startup
+            // cleanup of the remaining processes nor prevent the application from starting.
             context.turnOffAuthorisationSystem();
             try {
                 // Fail the process.
@@ -383,6 +394,9 @@ public class ProcessServiceImpl implements ProcessService {
                         "Process did not complete before tomcat shutdown.",
                         ProcessLogLevel.ERROR);
                 createLogBitstream(context, process);
+            } catch (Exception e) {
+                log.error("Failed to mark leftover process with ID {} as failed during startup cleanup.",
+                        process.getID(), e);
             } finally {
                 context.restoreAuthSystemState();
             }

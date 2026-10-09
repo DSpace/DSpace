@@ -109,6 +109,8 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
                     }
                 }
                 DCInputsReader dcirDefault = new DCInputsReader();
+                // Lookups without an explicit locale use the default, even when it is not a supported UI locale.
+                dcis.putIfAbsent(I18nUtil.getDefaultLocale(), dcirDefault);
                 Iterator pi = dcirDefault.getPairsNameIterator();
                 while (pi.hasNext()) {
                     names.add((String) pi.next());

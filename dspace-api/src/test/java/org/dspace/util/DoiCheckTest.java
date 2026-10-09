@@ -7,8 +7,8 @@
  */
 package org.dspace.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -16,7 +16,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.service.DoiCheck;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * Test class for the DoiCheck
@@ -28,14 +29,14 @@ public class DoiCheckTest {
     @Test
     public void checkDOIsTest() throws ParseException {
         for (String doi : DOIsToTest()) {
-            assertTrue("The: " + doi + "  is a doi!", DoiCheck.isDoi(doi));
+            assertTrue(DoiCheck.isDoi(doi), "The: " + doi + "  is a doi!");
         }
     }
 
     @Test
     public void checkWrongDOIsTest() throws ParseException {
         for (String key : wrongDOIsToTest()) {
-            assertFalse("This : " + key + "  isn't a doi!", DoiCheck.isDoi(key));
+            assertFalse(DoiCheck.isDoi(key), "This : " + key + "  isn't a doi!");
         }
     }
 
@@ -58,7 +59,8 @@ public class DoiCheckTest {
      * where rejecting it is now linear. The bound is therefore a very wide margin and is not
      * sensitive to a slow CI machine.
      */
-    @Test(timeout = 5000)
+    @Test
+    @Timeout(5)
     public void rejectsLongDigitRunWithoutBacktracking() {
         assertFalse(DoiCheck.isDoi("10.1234/1-" + "00".repeat(2000) + "!"));
     }

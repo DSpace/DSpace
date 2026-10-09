@@ -8,9 +8,9 @@
 
 package org.dspace.app.bulkedit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,8 +39,8 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase {
 
@@ -57,7 +57,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     private SearchService searchService;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
@@ -286,7 +286,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         try (Reader reader = Files.newReader(file, Charset.defaultCharset());
              CSVReader csvReader = new CSVReader(reader)) {
             List<String[]> lines = csvReader.readAll();
-            assertEquals("Unexpected extra items in export", 2, lines.size());
+            assertEquals(2, lines.size(), "Unexpected extra items in export");
         }
     }
 }

@@ -7,9 +7,9 @@
  */
 package org.dspace.ctask.general;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.dspace.identifier.VersionedHandleIdentifierProvider;
 import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Rudimentary test of the curation task.
@@ -73,8 +73,8 @@ public class CreateMissingIdentifiersIT
         curator.curate(context, item);
         System.out.format("With incompatible provider, result is '%s'.\n",
                 curator.getResult(TASK_NAME));
-        assertEquals("Curation should fail", Curator.CURATE_ERROR,
-                curator.getStatus(TASK_NAME));
+        assertEquals(Curator.CURATE_ERROR, curator.getStatus(TASK_NAME),
+                "Curation should fail");
 
         // Unregister this non-default provider
         unregisterProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
@@ -87,7 +87,7 @@ public class CreateMissingIdentifiersIT
          */
         curator.curate(context, item);
         int status = curator.getStatus(TASK_NAME);
-        assertEquals("Curation should succeed", Curator.CURATE_SUCCESS, status);
+        assertEquals(Curator.CURATE_SUCCESS, status, "Curation should succeed");
         configurationService.setProperty(P_TASK_DEF, prevTaskDef);
     }
 
@@ -117,8 +117,8 @@ public class CreateMissingIdentifiersIT
             // create item and assert it did not got any handle
             Item item = ItemBuilder.createItem(context, collection)
                     .build();
-            assertNull("Internal error in createMissingIdentifiersIT: item should not have a handle",
-                    item.getHandle());
+            assertNull(item.getHandle(),
+                    "Internal error in createMissingIdentifiersIT: item should not have a handle");
 
             // setup the curator
             Curator curator = new Curator();
@@ -136,9 +136,9 @@ public class CreateMissingIdentifiersIT
              */
             curator.curate(context, item.getID().toString());
             int status = curator.getStatus(TASK_NAME);
-            assertEquals("Curation should succeed", Curator.CURATE_SUCCESS, status);
+            assertEquals(Curator.CURATE_SUCCESS, status, "Curation should succeed");
             // assure we got a handle
-            assertNotNull("Curation task CreateMissingIdentifiers, did not assign a handle.", item.getHandle());
+            assertNotNull(item.getHandle(), "Curation task CreateMissingIdentifiers, did not assign a handle.");
         } finally {
             // restore the identifierProviders for following tests
             for (Class identifierProviderClass : identifierProviderClasses) {

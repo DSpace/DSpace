@@ -44,8 +44,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase {
 
@@ -64,7 +64,7 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
     private ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         itemService = ContentServiceFactory.getInstance().getItemService();

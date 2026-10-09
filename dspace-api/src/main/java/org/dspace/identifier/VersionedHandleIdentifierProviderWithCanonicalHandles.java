@@ -453,7 +453,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
 
         DSpaceObject itemWithCanonicalHandle = handleService.resolveToObject(context, canonical);
         if (itemWithCanonicalHandle != null) {
-            if (itemWithCanonicalHandle.getID() != previous.getItem().getID()) {
+            if (!itemWithCanonicalHandle.getID().equals(previous.getItem().getID())) {
                 log.warn("The previous version's item (" + previous.getItem().getID() +
                         ") does not match with the item containing handle " + canonical +
                         " (" + itemWithCanonicalHandle.getID() + ")");

@@ -382,6 +382,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return false;
         }
 
+        // Unproxy the DSpaceObject to get the actual entity type.
+        // In Hibernate 7 with JOINED inheritance, lazy-loaded DSpaceObjects
+        // return a DSpaceObject$HibernateProxy that cannot be cast to
+        // concrete subclasses (Item, Collection, etc.) needed by getParentObject().
+        o = (DSpaceObject) org.hibernate.Hibernate.unproxy(o);
+
         Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, e);
         if (cachedResult != null) {
             return cachedResult;

@@ -20,12 +20,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
@@ -88,8 +87,9 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -2582,7 +2582,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setPassword("somePassword");
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -2647,7 +2647,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setPassword("somePassword");
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
         try {
             getClient().perform(post("/api/eperson/epersons")
                                                                .param("token", newRegisterToken)
@@ -2710,7 +2710,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setSelfRegistered(true);
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
 
         try {
@@ -2784,7 +2784,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -2833,7 +2833,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -2881,7 +2881,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setPassword("somePassword");
         ePersonRest.setSelfRegistered(false);
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -2926,7 +2926,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setPassword("somePassword");
         ePersonRest.setSelfRegistered(true);
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         // enable Polish locale
         configurationService.setProperty("webui.supported.locales", "en, pl");
@@ -2992,7 +2992,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setPassword("somePassword");
         ePersonRest.setSelfRegistered(true);
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         // enable Polish locale
         configurationService.setProperty("webui.supported.locales", "en, pl");
@@ -3060,7 +3060,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         metadataRest.put("eperson.firstname", firstname);
         ePersonRest.setMetadata(metadataRest);
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -3107,7 +3107,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setPassword("somePassword");
         ePersonRest.setSelfRegistered(true);
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -3156,7 +3156,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
@@ -3618,7 +3618,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("lowercasepassword");
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -3663,7 +3663,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setPassword("Lowercasepassword");
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+        mapper = mapper.rebuild().annotationIntrospector(new IgnoreJacksonWriteOnlyAccess()).build();
 
         try {
             getClient().perform(post("/api/eperson/epersons")

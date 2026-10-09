@@ -28,8 +28,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link AuthorityLinkConsumer}.
@@ -56,7 +56,7 @@ public class AuthorityLinkConsumerIT extends AbstractIntegrationTestWithDatabase
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         context.turnOffAuthorisationSystem();
 

@@ -22,8 +22,8 @@ import java.util.List;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -43,7 +43,7 @@ public class OrcidV3AuthorDataProviderTest extends AbstractDSpaceTest {
 
     private OrcidV3AuthorDataProvider dataProvider;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         dataProvider = new OrcidV3AuthorDataProvider();
 

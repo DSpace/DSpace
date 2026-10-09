@@ -7,20 +7,20 @@
  */
 package org.dspace.app.util;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 
 import org.dspace.app.util.XMLUtils.PathRestrictedURIResolver;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Unit tests for {@link XMLUtils.PathRestrictedURIResolver}.
@@ -30,20 +30,20 @@ import org.junit.rules.TemporaryFolder;
  */
 public class XMLUtils_PathRestrictedURIResolverTest {
 
-    @Rule
-    public TemporaryFolder allowedFolder = new TemporaryFolder();
+    @TempDir
+    public Path allowedFolder;
 
-    @Rule
-    public TemporaryFolder disallowedFolder = new TemporaryFolder();
+    @TempDir
+    public Path disallowedFolder;
 
     private Path allowedDir;
     private Path allowedFile;
     private final String allowedFileName = "allowed.xsl";
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        allowedDir = allowedFolder.getRoot().toPath();
-        allowedFile = allowedFolder.newFile(allowedFileName).toPath();
+        allowedDir = allowedFolder;
+        allowedFile = Files.createFile(allowedFolder.resolve(allowedFileName));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class XMLUtils_PathRestrictedURIResolverTest {
         PathRestrictedURIResolver resolver = new PathRestrictedURIResolver(allowedDir.toString());
 
         // href points to an existing file in a disallowed folder
-        Path outsideFile = disallowedFolder.newFile("disallowed.xsl").toPath();
+        Path outsideFile = Files.createFile(disallowedFolder.resolve("disallowed.xsl"));
         String href = outsideFile.toUri().toString();
 
         TransformerException ex = assertThrows(TransformerException.class,
@@ -139,7 +139,7 @@ public class XMLUtils_PathRestrictedURIResolverTest {
     public void multipleAllowedPaths_isResolvedForSecondPath() throws Exception {
         // Provide multiple allowedBatPaths
         PathRestrictedURIResolver resolver = new PathRestrictedURIResolver(
-            disallowedFolder.getRoot().toString(), allowedDir.toString());
+            disallowedFolder.toString(), allowedDir.toString());
 
         // Ensure something in the *second* path will resolve correctly
         String href = allowedFile.toUri().toString();

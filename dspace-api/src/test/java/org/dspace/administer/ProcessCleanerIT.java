@@ -33,9 +33,9 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for {@link ProcessCleaner}.
@@ -51,7 +51,7 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
 
     private EPerson prevUser = null;
 
-    @Before
+    @BeforeEach
     public void setUser() {
         // buildProcess creates all processes with the 'admin' owner user so we should set that
         // as the current context user in tests which expect to find created processes
@@ -59,7 +59,7 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         context.setCurrentUser(admin);
     }
 
-    @After
+    @AfterEach
     public void restoreUser() {
        context.setCurrentUser(prevUser);
     }

@@ -7,15 +7,17 @@
  */
 package org.dspace.identifier.doi;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,8 +31,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.hibernate.engine.jdbc.ReaderInputStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -134,7 +135,7 @@ public class DOIMigratorIT extends AbstractIntegrationTestWithDatabase {
         String inputCSV = "ItemUUID,FromFieldName,FromValue,ToFieldName,ToValue\r\n"
             + items[0].getID().toString()
                 + ",dc.identifier,10.000/123456,dc.identifier.doi,https://doi.org/10.000/123456\r\n";
-        InputStream inputCSVStream = new ReaderInputStream(new StringReader(inputCSV));
+        InputStream inputCSVStream = new ByteArrayInputStream(inputCSV.getBytes(StandardCharsets.UTF_8));
 
         String[] args = { "--rehydrate" };
         System.setIn(inputCSVStream);
@@ -151,8 +152,7 @@ public class DOIMigratorIT extends AbstractIntegrationTestWithDatabase {
             if (field.getMetadataSchema().getName().equals("dc")
                     && field.getElement().equals("identifier")
                     && field.getQualifier().equals("doi")) {
-                assertFalse("This is the only dc.identifier.doi",
-                        haveDOIMetadata);
+                assertFalse(haveDOIMetadata, "This is the only dc.identifier.doi");
                 haveDOIMetadata = true;
 
                 assertEquals(metadataValue.getValue(), "https://doi.org/10.000/123456");

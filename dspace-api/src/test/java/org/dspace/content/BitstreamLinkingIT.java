@@ -31,8 +31,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 /**
  * Integration Tests for BitstreamLinkingService
  *
@@ -64,7 +64,7 @@ public class BitstreamLinkingIT extends AbstractIntegrationTestWithDatabase {
      *
      * @throws Exception passed through.
      */
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

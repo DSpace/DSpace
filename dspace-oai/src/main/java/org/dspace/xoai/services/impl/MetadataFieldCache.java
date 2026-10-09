@@ -35,6 +35,6 @@ public class MetadataFieldCache {
     }
 
     public void add(String field, int id) {
-        fields.put(field, new Integer(id));
+        fields.put(field, Integer.valueOf(id));
     }
 }

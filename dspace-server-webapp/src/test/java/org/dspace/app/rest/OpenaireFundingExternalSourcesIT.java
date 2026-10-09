@@ -17,14 +17,14 @@ import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class OpenaireFundingExternalSourcesIT extends AbstractControllerIntegrationTest {
 
     String token;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

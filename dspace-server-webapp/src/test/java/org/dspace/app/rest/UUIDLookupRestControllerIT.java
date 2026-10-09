@@ -31,8 +31,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.eperson.Group;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -160,7 +160,7 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    @Ignore
+    @Disabled
     /**
      * Test the proper redirection of a bundle's uuid
      *
@@ -301,7 +301,7 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    @Ignore
+    @Disabled
     /**
      * This test will check the return status code when no uuid is supplied. It currently fails as our
      * RestResourceController take the precedence over the UUIDLookupController returning a 404 Repository not found

@@ -32,9 +32,9 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -55,7 +55,7 @@ public class DiscoveryRestControllerMultiLanguageIT extends AbstractControllerIn
     @Autowired
     private ChoiceAuthorityService choiceAuthorityService;
 
-    @After
+    @AfterEach
     public void after() throws SubmissionConfigReaderException {
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();
@@ -65,7 +65,7 @@ public class DiscoveryRestControllerMultiLanguageIT extends AbstractControllerIn
         DCInputAuthority.getPluginNames();
     }
 
-    @Before
+    @BeforeEach
     public void before() {
         choiceAuthorityService.getChoiceAuthoritiesNames(); // initialize the ChoiceAuthorityService
     }

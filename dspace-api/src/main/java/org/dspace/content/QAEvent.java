@@ -12,12 +12,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.util.RawJsonDeserializer;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * This class represent the Quality Assurance broker data as loaded in our solr

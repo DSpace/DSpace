@@ -999,7 +999,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 // Look for it in the actual list of Collections
                 boolean found = false;
                 for (Collection collection : actualCollections) {
-                    if (collection.getID() != item.getOwningCollection().getID()) {
+                    if (!collection.getID().equals(item.getOwningCollection().getID())) {
                         // Is it there?
                         if (csvcollection.equals(collection.getHandle())) {
                             found = true;

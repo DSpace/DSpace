@@ -38,6 +38,7 @@ import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.hibernate.Hibernate;
 
 /**
  * This class is an addition to the AuthorizeManager that perform authorization
@@ -445,22 +446,24 @@ public class AuthorizeUtil {
      */
     public static void authorizeManagePolicy(Context c, ResourcePolicy rp)
         throws SQLException, AuthorizeException {
-        switch (rp.getdSpaceObject().getType()) {
+        // Unproxy to get the actual subclass when dSpaceObject is lazily loaded
+        DSpaceObject dso = (DSpaceObject) Hibernate.unproxy(rp.getdSpaceObject());
+        switch (dso.getType()) {
             case Constants.BITSTREAM:
-                authorizeManageBitstreamPolicy(c, (Bitstream) rp.getdSpaceObject());
+                authorizeManageBitstreamPolicy(c, (Bitstream) dso);
                 break;
             case Constants.BUNDLE:
-                authorizeManageBundlePolicy(c, (Bundle) rp.getdSpaceObject());
+                authorizeManageBundlePolicy(c, (Bundle) dso);
                 break;
 
             case Constants.ITEM:
-                authorizeManageItemPolicy(c, (Item) rp.getdSpaceObject());
+                authorizeManageItemPolicy(c, (Item) dso);
                 break;
             case Constants.COLLECTION:
-                authorizeManageCollectionPolicy(c, (Collection) rp.getdSpaceObject());
+                authorizeManageCollectionPolicy(c, (Collection) dso);
                 break;
             case Constants.COMMUNITY:
-                authorizeManageCommunityPolicy(c, (Community) rp.getdSpaceObject());
+                authorizeManageCommunityPolicy(c, (Community) dso);
                 break;
 
             default:
@@ -577,7 +580,7 @@ public class AuthorizeUtil {
             throw new AuthorizeException("not authorized to manage this group");
         }
         if (parentObject.getType() == Constants.COLLECTION) {
-            Collection collection = (Collection) parentObject;
+            Collection collection = (Collection) Hibernate.unproxy(parentObject);
 
             if (group.equals(collection.getSubmitters())) {
                 authorizeManageSubmittersGroup(context, collection);
@@ -604,7 +607,7 @@ public class AuthorizeUtil {
             return;
         }
         if (parentObject.getType() == Constants.COMMUNITY) {
-            Community community = (Community) parentObject;
+            Community community = (Community) Hibernate.unproxy(parentObject);
             authorizeManageAdminGroup(context, community);
             return;
         }

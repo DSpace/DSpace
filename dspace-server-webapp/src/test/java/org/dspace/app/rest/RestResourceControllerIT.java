@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CommunityBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for the {@link RestResourceController}

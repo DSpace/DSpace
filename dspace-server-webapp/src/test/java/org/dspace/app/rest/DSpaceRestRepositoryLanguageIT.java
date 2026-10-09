@@ -31,8 +31,8 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegrationTest {
@@ -42,7 +42,7 @@ public class DSpaceRestRepositoryLanguageIT extends AbstractControllerIntegratio
 
     private Collection collection;
 
-    @Before
+    @BeforeEach
     public void setup() {
         configurationService.setProperty("webui.supported.locales", List.of("en,de"));
 

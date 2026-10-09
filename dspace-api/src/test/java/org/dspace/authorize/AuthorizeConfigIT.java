@@ -7,11 +7,11 @@
  */
 package org.dspace.authorize;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.dspace.AbstractIntegrationTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This integration test verify that the {@link AuthorizeConfiguration} works

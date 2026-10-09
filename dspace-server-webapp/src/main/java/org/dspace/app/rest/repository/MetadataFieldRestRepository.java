@@ -18,9 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -50,6 +47,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 /**
  * This is the repository responsible to manage MetadataField Rest object
  *
@@ -246,7 +246,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                 getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
                 MetadataFieldRest.class
                                                             );
-        } catch (IOException excIO) {
+        } catch (IOException | JacksonException excIO) {
             throw new DSpaceBadRequestException("error parsing request body", excIO);
         }
 
@@ -323,7 +323,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         MetadataFieldRest metadataFieldRest;
         try {
             metadataFieldRest = mapper.readValue(jsonNode.toString(), MetadataFieldRest.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 

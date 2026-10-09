@@ -271,7 +271,9 @@ public class CrisConsumer implements Consumer {
 
         String authority = metadata.getAuthority();
 
-        if (isNestedMetadataPlaceholder(metadata) || isAuthoritySet(authority) || isAuthorityNotAllowed(metadata)) {
+        if (isNestedMetadataPlaceholder(metadata)
+            || (isAuthoritySet(authority) && !isUuidStrategyOverridingAuthority(metadata))
+            || isAuthorityNotAllowed(metadata)) {
             return true;
         }
 
@@ -281,6 +283,20 @@ public class CrisConsumer implements Consumer {
 
         return false;
 
+    }
+
+    /**
+     * A field configured for the UUID generation strategy must always create a fresh related item for each
+     * submission, so an authority assigned by an <em>uncertain</em> authority match (confidence below
+     * {@code CF_ACCEPTED}) -- e.g. an automatic {@code ChoiceAuthority} best-match resolved against the search
+     * index during submission -- must not cause the value to be skipped, otherwise that auto-resolution defeats
+     * the strategy by reusing an existing item. An authority that is already confirmed ({@code CF_ACCEPTED}, such
+     * as one this consumer set via {@link ChoiceAuthorityService#setReferenceWithAuthority} or a deliberate user
+     * selection) is still honoured, so re-processing of an already-linked value (e.g. on a later modify event)
+     * does not create duplicates.
+     */
+    private boolean isUuidStrategyOverridingAuthority(MetadataValue metadata) {
+        return isUuidStrategyEnabled(metadata) && metadata.getConfidence() < Choices.CF_ACCEPTED;
     }
 
     private boolean isAuthoritySet(String authority) {
@@ -369,9 +385,13 @@ public class CrisConsumer implements Consumer {
         Item relatedItem = workspaceItem.getItem();
         itemService.addMetadata(context, relatedItem, DSPACE.getName(), "sourceId", null, null, crisSourceId);
         if (!hasEntityType(relatedItem, entityType)) {
-            log.error("Inconstent configuration the related item " + relatedItem.getID().toString() + ", created from "
-                + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"
-                + " hasn't the expected [" + entityType + "] entityType");
+            // Set the entity type up-front (when the collection has no template item / use-template is off, it is
+            // not copied at creation time). This must be synchronous: the consumer only assigns entity types to
+            // ARCHIVED items via its own event (so it never runs for workflow/workspace related items), and the
+            // dspace.sourceId lookup that lets two metadata values (e.g. an author also listed as editor) resolve
+            // to the same related item filters by entity type -- so the type must be present before the next value
+            // in the same submission is processed.
+            itemService.addMetadata(context, relatedItem, DSPACE.getName(), "entity", "type", null, entityType);
         }
 
         if (isSubmissionEnabled(metadata)) {

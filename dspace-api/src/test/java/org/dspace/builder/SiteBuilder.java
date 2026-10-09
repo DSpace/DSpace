@@ -36,7 +36,6 @@ public class SiteBuilder extends AbstractDSpaceObjectBuilder<Site> {
 
             context.dispatchEvents();
 
-            indexingService.commit();
             return site;
         } catch (Exception e) {
             return handleException(e);

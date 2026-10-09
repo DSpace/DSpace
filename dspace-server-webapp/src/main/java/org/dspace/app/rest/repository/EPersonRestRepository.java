@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -54,6 +53,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 
 /**
@@ -105,7 +106,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         EPersonRest epersonRest = null;
         try {
             epersonRest = mapper.readValue(req.getInputStream(), EPersonRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
         }
         String token = req.getParameter("token");

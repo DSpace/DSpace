@@ -12,8 +12,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.UUID.randomUUID;
 import static org.dspace.content.Item.ANY;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,11 +34,13 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * Test suite with Mockito for the {@link ItemMetadataImportFiller}.
@@ -46,7 +48,8 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ItemMetadataImportFillerTest {
 
     @Mock
@@ -68,7 +71,7 @@ public class ItemMetadataImportFillerTest {
         MetadataValue metadataValue = buildMetadataValue("dc", "contributor", "author", "Mario Rossi");
         Item itemToFill = buildItem(UUID.randomUUID());
         boolean allowsUpdate = cut.allowsUpdate(context, metadataValue, itemToFill);
-        assertFalse("With an empty configuration update should not be allowed", allowsUpdate);
+        assertFalse(allowsUpdate, "With an empty configuration update should not be allowed");
     }
 
     /**
@@ -85,7 +88,7 @@ public class ItemMetadataImportFillerTest {
         cut.setConfigurations(configurations);
 
         boolean allowsUpdate = cut.allowsUpdate(context, metadataValue, itemToFill);
-        assertFalse("Without a configuration update should not be allowed", allowsUpdate);
+        assertFalse(allowsUpdate, "Without a configuration update should not be allowed");
     }
 
     /**
@@ -103,7 +106,7 @@ public class ItemMetadataImportFillerTest {
         cut.setAllowsUpdateByDefault(false);
 
         boolean allowsUpdate = cut.allowsUpdate(context, metadataValue, itemToFill);
-        assertFalse("Should be equals to the allowsUpdateByDefault value", allowsUpdate);
+        assertFalse(allowsUpdate, "Should be equals to the allowsUpdateByDefault value");
     }
 
     /**
@@ -121,7 +124,7 @@ public class ItemMetadataImportFillerTest {
         cut.setAllowsUpdateByDefault(true);
 
         boolean allowsUpdate = cut.allowsUpdate(context, metadataValue, itemToFill);
-        assertTrue("Should be equals to the allowsUpdateByDefault value", allowsUpdate);
+        assertTrue(allowsUpdate, "Should be equals to the allowsUpdateByDefault value");
     }
 
     /**
@@ -138,7 +141,7 @@ public class ItemMetadataImportFillerTest {
         cut.setConfigurations(configurations);
 
         boolean allowsUpdate = cut.allowsUpdate(context, metadataValue, itemToFill);
-        assertTrue("Should be equals to the configurated updateEnabled value", allowsUpdate);
+        assertTrue(allowsUpdate, "Should be equals to the configurated updateEnabled value");
     }
 
     /**
@@ -155,7 +158,7 @@ public class ItemMetadataImportFillerTest {
         cut.setConfigurations(configurations);
 
         boolean allowsUpdate = cut.allowsUpdate(context, metadataValue, itemToFill);
-        assertFalse("Should be equals to the configurated updateEnabled value", allowsUpdate);
+        assertFalse(allowsUpdate, "Should be equals to the configurated updateEnabled value");
     }
 
     /**

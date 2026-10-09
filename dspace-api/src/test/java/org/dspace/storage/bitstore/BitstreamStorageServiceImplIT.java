@@ -10,8 +10,9 @@ package org.dspace.storage.bitstore;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -32,11 +33,10 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDatabase {
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
@@ -49,10 +49,10 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
     private static final Integer SOURCE_STORE = 0;
     private static final Integer DEST_STORE = 1;
 
-    @Rule
-    public final TemporaryFolder tempStoreDir = new TemporaryFolder();
+    @TempDir
+    public File tempStoreDir;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -66,7 +66,7 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
         originalBitstores = bitstreamStorageService.getStores();
         Map<Integer, BitStoreService> stores = new HashMap<>();
         DSBitStoreService sourceStore = new DSBitStoreService();
-        sourceStore.setBaseDir(tempStoreDir.newFolder("src"));
+        sourceStore.setBaseDir(newFolder(tempStoreDir, "src"));
 
         stores.put(SOURCE_STORE, sourceStore);
         bitstreamStorageService.setStores(stores);
@@ -74,7 +74,7 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
         context.restoreAuthSystemState();
     }
 
-    @After
+    @AfterEach
     public void cleanUp() throws IOException {
         // Restore the bitstore storage stores
         bitstreamStorageService.setStores(originalBitstores);
@@ -236,9 +236,9 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
          * @param maxPuts the number of put calls to allow before throwing an
          * IOException
          */
-        public LimitedTempDSBitStoreService(TemporaryFolder tempStoreDir, int maxPuts) throws IOException {
+        public LimitedTempDSBitStoreService(File tempStoreDir, int maxPuts) throws IOException {
             super();
-            setBaseDir(tempStoreDir.newFolder());
+            setBaseDir(newFolder(tempStoreDir, "junit"));
             this.maxPuts = maxPuts;
         }
 
@@ -258,5 +258,23 @@ public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDa
                 super.put(bitstream, in);
             }
         }
+
+        private static File newFolder(File root, String... subDirs) throws IOException {
+            String subFolder = String.join("/", subDirs);
+            File result = new File(root, subFolder);
+            if (!result.mkdirs()) {
+                throw new IOException("Couldn't create folders " + root);
+            }
+            return result;
+        }
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

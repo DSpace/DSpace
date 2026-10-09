@@ -26,8 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +38,8 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Script for complete export and import of SOLR cores with multithreading support.
@@ -307,12 +307,12 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             JsonNode stats = jsonResponse.path("stats").path("stats_fields").path(dateField);
 
             if (StringUtils.isBlank(minDate)) {
-                String solrMinDate = stats.path("min").asText();
+                String solrMinDate = stats.path("min").asString("");
                 // Normalize to date-only format
                 minDate = solrMinDate.length() >= 10 ? solrMinDate.substring(0, 10) : solrMinDate;
             }
             if (StringUtils.isBlank(maxDate)) {
-                String solrMaxDate = stats.path("max").asText();
+                String solrMaxDate = stats.path("max").asString("");
                 // Normalize to date-only format
                 maxDate = solrMaxDate.length() >= 10 ? solrMaxDate.substring(0, 10) : solrMaxDate;
             }
@@ -621,7 +621,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         if (fieldsArray.isArray()) {
             for (JsonNode field : fieldsArray) {
-                String fieldName = field.path("name").asText();
+                String fieldName = field.path("name").asString("");
                 // Exclude problematic fields
                 if (!fieldName.startsWith("_") && !fieldName.equals("_version_") && !fieldName.equals("_root_")) {
                     fields.add(fieldName);
@@ -660,7 +660,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         if (docs.isArray() && docs.size() > 0) {
             JsonNode firstDoc = docs.get(0);
-            firstDoc.fieldNames().forEachRemaining(fieldName -> {
+            firstDoc.propertyNames().iterator().forEachRemaining(fieldName -> {
                 // Exclude problematic fields
                 if (!fieldName.startsWith("_") && !fieldName.equals("_version_") && !fieldName.equals("_root_")) {
                     fields.add(fieldName);
