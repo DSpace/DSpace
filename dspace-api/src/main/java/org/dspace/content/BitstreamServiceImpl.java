@@ -776,7 +776,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         boolean isProvenancePrivacyActive = configurationService.getBooleanProperty(
             "metadata.privacy.dc.description.provenance", false);
 
-        EPerson currentUser = context.getCurrentUser();
+        // The current user may belong to an earlier session; reattach it before reading its name
+        EPerson currentUser = context.getCurrentUser() == null ? null : context.reloadEntity(context.getCurrentUser());
         if (currentUser != null && !isProvenancePrivacyActive) {
             provMessage.append(currentUser.getFullName());
             provMessage.append(" (");
