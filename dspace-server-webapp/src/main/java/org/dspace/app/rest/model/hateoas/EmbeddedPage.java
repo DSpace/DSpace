@@ -36,6 +36,11 @@ public class EmbeddedPage extends EmbeddedPageHeader {
         embeddedPageContent.put(relation, page.getContent());
     }
 
+    @JsonProperty(value = "_links")
+    public Map<String, Object> getInternalLinks() {
+        return super.getLinks();
+    }
+
     @JsonProperty(value = "_embedded")
     public Map<String, List> getPageContent() {
         return embeddedPageContent;

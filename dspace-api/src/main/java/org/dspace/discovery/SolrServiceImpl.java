@@ -1259,6 +1259,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             String sortValue = transformSortValue(context,
                                                                   facetField.getName(), facetValue.getName());
                             String filterValue = displayedValue;
+                            if (StringUtils.isNotBlank(authorityValue)) {
+                                filterValue = authorityValue;
+                            }
 
                             if (StringUtils.isNotBlank(facetValue.getName())) {
                                 // as we are 0-based and the limit is set to 1 more than needed

@@ -264,7 +264,10 @@ public class DiscoverQueryBuilder implements InitializingBean {
             prefix = StringUtils.isNotBlank(prefix) ? prefix.toLowerCase() : null;
             queryArgs.addFacetField(new DiscoverFacetField(indexFieldName, facet.getType(), facetLimit,
                                                            facet.getSortOrderSidebar(),
-                                                           StringUtils.trimToNull(prefix)));
+                                                           StringUtils.trimToNull(prefix),
+                                                           facet.exposeMore(), facet.exposeMissing(),
+                                                           facet.exposeTotalElements(), facet.fillDateGaps(),
+                                                           facet.inverseDirection()));
         }
     }
 

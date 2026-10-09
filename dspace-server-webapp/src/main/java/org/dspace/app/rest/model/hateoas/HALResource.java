@@ -46,6 +46,9 @@ public abstract class HALResource<T> extends EntityModel<T> {
 
     public void setPageHeader(EmbeddedPageHeader page) {
         this.pageHeader = page;
+        for (Map.Entry<String, Object> entry : page.getLinks().entrySet()) {
+            add(Link.of(entry.getValue().toString(), entry.getKey()));
+        }
     }
 
     @Override
