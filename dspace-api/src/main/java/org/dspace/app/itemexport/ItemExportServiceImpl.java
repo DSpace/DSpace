@@ -11,13 +11,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -494,9 +494,9 @@ public class ItemExportServiceImpl implements ItemExportService {
 
         logInfo("Beginning export");
 
-        try (ZipOutputStream zos = new ZipOutputStream(
-                new BufferedOutputStream(new FileOutputStream(tempPath)))) {
-            zos.setLevel(9);
+        // Opened outside the cleanup below, so a rejected path is never deleted
+        ZipOutputStream zos = openExportZip(targetPath, tempPath);
+        try (zos) {
             int seq = seqStart;
             while (items.hasNext()) {
                 Item item = items.next();
@@ -505,12 +505,34 @@ public class ItemExportServiceImpl implements ItemExportService {
                 context.uncacheEntity(item);
                 seq++;
             }
+        } catch (Exception e) {
+            // Do not leave a partial archive behind
+            Files.deleteIfExists(Path.of(tempPath));
+            throw e;
         }
 
         // Atomic rename from temp to final
         if (!new File(tempPath).renameTo(new File(targetPath))) {
             logError("Unable to rename temp export file to " + targetPath);
         }
+    }
+
+    /**
+     * Open the temporary ZIP for an export, validating the final and temporary paths against the
+     * allowed export directories as {@link #zip(String, String)} does.
+     *
+     * @param targetPath the final ZIP path
+     * @param tempPath   the temporary path written to before the rename
+     * @return a ZipOutputStream on the temporary path
+     * @throws Exception if a path is not allowed or the file cannot be opened
+     */
+    protected ZipOutputStream openExportZip(String targetPath, String tempPath) throws Exception {
+        List<String> allowedDirs = getAllowedExportBaseDirs();
+        SecureFileAccess.validatePathForWrite(targetPath, allowedDirs, "itemexport");
+        ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(
+            SecureFileAccess.getOutputStream(tempPath, allowedDirs, "itemexport")));
+        zos.setLevel(9);
+        return zos;
     }
 
     /**
@@ -740,6 +762,11 @@ public class ItemExportServiceImpl implements ItemExportService {
 
                 // Write the bitstream data
                 if (!excludeBitstreams) {
+                    // Like the directory export, refuse a name that would escape the item's directory
+                    Path itemDir = Path.of(prefix).normalize();
+                    if (!itemDir.resolve(myName).normalize().startsWith(itemDir)) {
+                        throw new IOException("Illegal file path attempted for I/O (itemexport): " + myName);
+                    }
                     zos.putNextEntry(new ZipEntry(prefix + myName));
                     try (InputStream is = bitstreamService.retrieve(c, bitstream)) {
                         byte[] buf = new byte[2048];
@@ -879,10 +906,9 @@ public class ItemExportServiceImpl implements ItemExportService {
                         String tempPath = targetPath + "_tmp";
 
                         // Write all items directly to ZIP — no temp directory needed
-                        try (ZipOutputStream zos = new ZipOutputStream(
-                                new BufferedOutputStream(new FileOutputStream(tempPath)))) {
-                            zos.setLevel(9);
-
+                        // Opened outside the cleanup below, so a rejected path is never deleted
+                        ZipOutputStream zos = openExportZip(targetPath, tempPath);
+                        try (zos) {
                             for (String keyName : itemsMap.keySet()) {
                                 List<UUID> uuids = itemsMap.get(keyName);
                                 int seq = 1;
@@ -894,6 +920,10 @@ public class ItemExportServiceImpl implements ItemExportService {
                                     seq++;
                                 }
                             }
+                        } catch (Exception e) {
+                            // Do not leave a partial archive behind
+                            Files.deleteIfExists(Path.of(tempPath));
+                            throw e;
                         }
 
                         // Atomic rename from temp to final
