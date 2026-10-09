@@ -51,6 +51,7 @@ import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
+import org.dspace.app.rest.repository.ReloadableEntityObjectRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -217,6 +218,10 @@ public class RestResourceController implements InitializingBean {
     private <ID extends Serializable> HALResource<RestAddressableModel> findOneInternal(String apiCategory,
                                                                                            String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+        if (repository instanceof ReloadableEntityObjectRepository<?, ?> reloadableRepository &&
+            !reloadableRepository.getPKClass().isInstance(id)) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+        }
         Optional<RestAddressableModel> modelObject = Optional.empty();
         try {
             modelObject = repository.findById(id);

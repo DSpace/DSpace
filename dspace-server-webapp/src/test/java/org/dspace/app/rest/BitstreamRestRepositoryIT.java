@@ -1014,6 +1014,38 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findOneNonexistentUuidAnonymousReturnsNotFound() throws Exception {
+        getClient().perform(get("/api/core/bitstreams/" + UUID.randomUUID()))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findOneMalformedUuidAnonymousReturnsNotFound() throws Exception {
+        getClient().perform(get("/api/core/bitstreams/not-a-uuid"))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findOneItemUuidAnonymousReturnsNotFound() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+        Item item = ItemBuilder.createItem(context, collection)
+                               .withTitle("Item")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bitstreams/" + item.getID()))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void deleteOne() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
