@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,8 +51,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import jakarta.annotation.Nullable;
 
 /**
  * Service implementation for the Bitstream object.
@@ -309,10 +308,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         Bitstream bitstream = register(context, assetstore, bitstreamPath);
 
         bundleService.addBitstream(context, bundle, bitstream);
-        
+
         // Add provenance for bitstream registration
         addBitstreamCreationProvenance(context, bitstream, bundle);
-        
+
         return bitstream;
     }
 
@@ -723,11 +722,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         if (!configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             return false;
         }
-        
+
         if (bundle == null) {
             return false;
         }
-        
+
         String[] excludedBundles = configurationService.getArrayProperty("provenance.bitstream.bundles.exclude");
         if (excludedBundles != null) {
             String bundleName = bundle.getName();
@@ -737,7 +736,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 }
             }
         }
-        
+
         return true;
     }
 
@@ -752,7 +751,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      */
     private void addBitstreamCreationProvenance(Context context, Bitstream bitstream, Bundle bundle)
         throws SQLException, AuthorizeException {
-        
+
         if (!shouldTrackProvenance(bundle)) {
             return;
         }

@@ -646,11 +646,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if (!configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             return false;
         }
-        
+
         if (bundle == null) {
             return false;
         }
-        
+
         String[] excludedBundles = configurationService.getArrayProperty("provenance.bitstream.bundles.exclude");
         if (excludedBundles != null) {
             String bundleName = bundle.getName();
@@ -660,7 +660,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 }
             }
         }
-        
+
         return true;
     }
 
@@ -676,7 +676,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
      */
     private void addBitstreamDeletionProvenance(Context context, Bitstream bitstream, Bundle bundle, Item item)
         throws SQLException, AuthorizeException {
-        
+
         if (!shouldTrackProvenance(bundle) || item == null) {
             return;
         }
