@@ -12,6 +12,7 @@ import static org.dspace.discovery.SearchUtils.RESOURCE_TYPE_FIELD;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -260,13 +261,14 @@ public class GenerateSitemaps {
                     } else {
                         url = uiURLStem + "items/" + doc.getID();
                     }
+                    Instant lastMod = doc.getLastModified();
                     c.uncacheEntity(doc.getIndexedObject());
 
                     if (makeHTMLMap) {
-                        html.addURL(url, null);
+                        html.addURL(url, lastMod);
                     }
                     if (makeSitemapOrg) {
-                        sitemapsOrg.addURL(url, null);
+                        sitemapsOrg.addURL(url, lastMod);
                     }
                 }
                 offset += PAGE_SIZE;
