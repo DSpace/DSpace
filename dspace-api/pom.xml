@@ -670,12 +670,6 @@
             <artifactId>postgresql</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>jdbm</groupId>
-            <artifactId>jdbm</artifactId>
-            <version>1.0</version>
-        </dependency>
-
         <!-- For ImageMagick MediaFilters -->
         <dependency>
             <groupId>org.im4java</groupId>
