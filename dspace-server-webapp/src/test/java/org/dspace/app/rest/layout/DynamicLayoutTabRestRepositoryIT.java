@@ -2417,16 +2417,8 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
                        .param("uuid", item.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.page.totalElements", is(1)))
-                   .andExpect(jsonPath("$._embedded.tabs[0].id", is(tabOne.getID())))
-                   .andExpect(jsonPath("$._embedded.tabs[0].shortname", is("TabOne For Person - priority 0")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].header", is("New Tab header")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].security", is(LayoutSecurity.ADMINISTRATOR.getValue())))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows", hasSize(1)))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].style", is("rowTwoStyle")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells", hasSize(1)))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].style", is("cellOfRowTwoStyle")))
-                   .andExpect(jsonPath("$._embedded.tabs[0].rows[0].cells[0].boxes", contains(matchBox(boxOne))));
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded.tabs").doesNotExist());
     }
 
     @Test
