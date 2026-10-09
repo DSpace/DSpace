@@ -87,6 +87,22 @@ public class OpenPolicyFinderServiceUnitTest {
     }
 
     @Test
+    public void non200WithoutBody_returnsErrorAndDoesNotRetry() throws Exception {
+        CloseableHttpResponse httpResponse = mock(CloseableHttpResponse.class);
+        StatusLine statusLine = stubStatusLine(401, "Unauthorized");
+        when(httpResponse.getStatusLine()).thenReturn(statusLine);
+        when(httpResponse.getEntity()).thenReturn(null);
+        when(mockClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
+
+        OpenPolicyFinderResponse response = service.performRequest(
+            "publication", "issn", "equals", "0140-6736", 0, 1);
+
+        assertTrue("Expected isError on non-200 status without a body", response.isError());
+        assertEquals("Open Policy Finder return not OK status: 401", response.getMessage());
+        verify(mockClient, times(1)).execute(any(HttpUriRequest.class));
+    }
+
+    @Test
     public void networkError_returnsErrorWithExceptionMessage() throws Exception {
         when(mockClient.execute(any(HttpUriRequest.class)))
             .thenThrow(new IOException("connection refused"));

@@ -212,7 +212,10 @@ public class OpenPolicyFinderService {
                     if (statusCode != HttpStatus.SC_OK) {
                         opfResponse = errorBuilder.apply(
                             "Open Policy Finder return not OK status: " + statusCode);
-                        String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                        // A bodiless response (e.g. a bare 401) has no entity
+                        HttpEntity errorEntity = response.getEntity();
+                        String errorBody = null == errorEntity ? "(no response body)"
+                            : IOUtils.toString(errorEntity.getContent(), StandardCharsets.UTF_8);
                         log.error("Error from Open Policy Finder HTTP request: " + errorBody);
                         // The error body has consumed the response stream; skip the JSON parsing block
                         // below (which would otherwise throw "Attempted read from closed stream").
