@@ -79,6 +79,14 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     private transient BitstreamService bitstreamService;
 
+    /**
+     * Leading bytes of the content, captured while the content was being stored, so that
+     * format identification does not have to read the content back from the bitstore.
+     * Never persisted; dropped as soon as a format is assigned.
+     */
+    @Transient
+    private transient byte[] contentPrefix;
+
 
     /**
      * Protected constructor, create object using:
@@ -260,7 +268,22 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 
     void setFormat(BitstreamFormat bitstreamFormat) {
         this.bitstreamFormat = bitstreamFormat;
+        // Once a format is assigned the captured prefix is no longer needed; release it
+        // so long-running jobs holding many bitstreams in one session do not retain it.
+        this.contentPrefix = null;
         setModified();
+    }
+
+    /**
+     * @return the leading bytes captured while the content was stored, or {@code null}
+     *         if none were captured or a format has already been assigned
+     */
+    byte[] getContentPrefix() {
+        return contentPrefix;
+    }
+
+    void setContentPrefix(byte[] contentPrefix) {
+        this.contentPrefix = contentPrefix;
     }
 
     /**

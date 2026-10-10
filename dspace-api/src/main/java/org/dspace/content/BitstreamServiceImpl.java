@@ -7,8 +7,10 @@
  */
 package org.dspace.content;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
@@ -153,8 +156,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public Bitstream create(Context context, InputStream is) throws IOException, SQLException {
+        // Keep the leading bytes while storing, so that format identification does not have to
+        // read the content back from the bitstore (an extra round trip on stores such as S3)
+        ContentPrefixCapture prefixCapture = newContentPrefixCapture();
+        InputStream in = prefixCapture == null ? is : new TeeInputStream(is, prefixCapture);
+
         // Store the bits
-        UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), is);
+        UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), in);
 
         log.info(LogHelper.getHeader(context, "create_bitstream",
                                       "bitstream_id=" + bitstreamID));
@@ -162,6 +170,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
         setFormat(context, bitstream, null);
+        if (prefixCapture != null) {
+            bitstream.setContentPrefix(prefixCapture.toByteArray());
+        }
 
         context.addEvent(
             new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID,
@@ -169,6 +180,50 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 getIdentifiers(context, bitstream)));
 
         return bitstream;
+    }
+
+    /**
+     * @return a capture for the leading bytes of new content, or {@code null} when content-based
+     *         format identification or prefix capture is disabled
+     */
+    private ContentPrefixCapture newContentPrefixCapture() {
+        if (!configurationService.getBooleanProperty(BitstreamFormatServiceImpl.CFG_IDENTIFY_BY_CONTENT, true)) {
+            return null;
+        }
+        int limit = configurationService.getIntProperty(BitstreamFormatServiceImpl.CFG_CAPTURE_BYTES,
+                                                        BitstreamFormatServiceImpl.DEFAULT_CAPTURE_BYTES);
+        return limit > 0 ? new ContentPrefixCapture(limit) : null;
+    }
+
+    /**
+     * Output stream that keeps only the first {@code limit} bytes written to it.
+     */
+    private static final class ContentPrefixCapture extends OutputStream {
+        private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        private final int limit;
+
+        ContentPrefixCapture(int limit) {
+            this.limit = limit;
+        }
+
+        @Override
+        public void write(int b) {
+            if (buffer.size() < limit) {
+                buffer.write(b);
+            }
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) {
+            int n = Math.min(len, limit - buffer.size());
+            if (n > 0) {
+                buffer.write(b, off, n);
+            }
+        }
+
+        byte[] toByteArray() {
+            return buffer.toByteArray();
+        }
     }
 
     @Override

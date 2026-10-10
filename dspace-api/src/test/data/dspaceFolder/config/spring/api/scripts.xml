@@ -50,6 +50,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
     </bean>
 
+    <bean id="identify-formats" class="org.dspace.ctask.general.IdentifyFormatsScriptCliConfiguration">
+        <property name="description" value="Re-identify bitstream formats and correct those stored as Unknown"/>
+        <property name="dspaceRunnableClass" value="org.dspace.ctask.general.IdentifyFormatsScriptCli"/>
+    </bean>
+
     <bean id="filter-media" class="org.dspace.app.mediafilter.MediaFilterScriptConfiguration">
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
