@@ -8,8 +8,8 @@
 package org.dspace.eperson;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -73,14 +73,9 @@ public class CaptchaServiceImpl implements CaptchaService {
         params.add(new BasicNameValuePair("remoteip", ""));
 
         HttpPost httpPost = new HttpPost(verifyUri);
-        try {
-            httpPost.addHeader("Accept", "application/json");
-            httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
-            httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        httpPost.addHeader("Accept", "application/json");
+        httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        httpPost.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
             final ObjectMapper objectMapper = new ObjectMapper();
