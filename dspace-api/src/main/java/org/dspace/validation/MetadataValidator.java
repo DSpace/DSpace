@@ -190,7 +190,9 @@ public class MetadataValidator implements SubmissionStepValidator {
                                                 SubmissionStepConfig config) {
         if (input.isRelationshipField() && input.isRequired()) {
             String relationshipType = input.getRelationshipType();
-            if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
+            if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty() &&
+                    (input.getFieldName() == null ||
+                            itemService.getMetadataByMetadataString(item, input.getFieldName()).isEmpty())) {
                 try {
                     List<RelationshipType> relationTypes =
                         relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
