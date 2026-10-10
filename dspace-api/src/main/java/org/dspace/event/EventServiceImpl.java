@@ -73,6 +73,9 @@ public class EventServiceImpl implements EventService {
             poolConfig.setMaxTotalPerKey(100);
             poolConfig.setMaxIdlePerKey(5);
             poolConfig.setMaxTotal(100);
+            // Do not register the pool in the platform MBeanServer: that registration is never removed
+            // and keeps the pool, its dispatchers and their consumers reachable after the service is gone.
+            poolConfig.setJmxEnabled(false);
 
             try {
                 dispatcherFactory = new DispatcherPoolFactory();
