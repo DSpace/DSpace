@@ -90,12 +90,13 @@ public class Collected implements VirtualMetadataConfiguration {
     /**
      * this method will retrieve the metadata values from the given item for all the metadata fields listed
      * in the fields property and it'll return all those values as a list
-     * @param context   The relevant DSpace context
-     * @param item      The item that will be used to either retrieve metadata values from
+     *
+     * @param context The relevant DSpace context
+     * @param item    The item that will be used to either retrieve metadata values from
      * @return The String values for all of the retrieved metadatavalues
      */
-    public List<String> getValues(Context context, Item item) {
-        List<String> resultValues = new LinkedList<>();
+    public List<ValueResult> getValues(Context context, Item item) {
+        List<ValueResult> resultValues = new LinkedList<>();
         List<String> value = this.getFields();
         for (String s : value) {
             String[] splittedString = s.split("\\.");
@@ -111,7 +112,7 @@ public class Collected implements VirtualMetadataConfiguration {
 
             for (MetadataValue metadataValue : resultList) {
                 if (StringUtils.isNotBlank(metadataValue.getValue())) {
-                    resultValues.add(metadataValue.getValue());
+                    resultValues.add(new ValueResult(metadataValue.getValue()));
                 }
             }
         }
