@@ -27,7 +27,7 @@
     <Appenders>
         <!-- A1 is for most DSpace activity -->
         <Appender name='A1'
-                  filePattern="${log.dir}/dspace.log-%d{yyyy-MM-dd}"
+                  filePattern="${log.dir}/dspace.log-%d{yyyy-MM-dd}.gz"
                   type='RollingFile'
                   fileName='${log.dir}/dspace.log'
 
