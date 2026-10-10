@@ -437,4 +437,52 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.id), id));
         return singleResult(context, criteriaQuery);
     }
+
+    /**
+     * Helper to build the WHERE clause for date presence queries.
+     */
+    private String buildDatePresenceWhere(Boolean hasStartDate, Boolean hasEndDate) {
+        if (hasStartDate == null && hasEndDate == null) {
+            return " WHERE rp.startDate IS NOT NULL OR rp.endDate IS NOT NULL";
+        } else if (Boolean.TRUE.equals(hasStartDate) && Boolean.TRUE.equals(hasEndDate)) {
+            return " WHERE rp.startDate IS NOT NULL AND rp.endDate IS NOT NULL";
+        } else if (Boolean.TRUE.equals(hasStartDate) && hasEndDate == null) {
+            return " WHERE rp.startDate IS NOT NULL";
+        } else if (hasStartDate == null && Boolean.TRUE.equals(hasEndDate)) {
+            return " WHERE rp.endDate IS NOT NULL";
+        } else if (Boolean.TRUE.equals(hasStartDate) && Boolean.FALSE.equals(hasEndDate)) {
+            return " WHERE rp.startDate IS NOT NULL AND rp.endDate IS NULL";
+        } else if (Boolean.FALSE.equals(hasStartDate) && Boolean.TRUE.equals(hasEndDate)) {
+            return " WHERE rp.startDate IS NULL AND rp.endDate IS NOT NULL";
+        } else if (Boolean.FALSE.equals(hasStartDate) && Boolean.FALSE.equals(hasEndDate)) {
+            return " WHERE rp.startDate IS NULL AND rp.endDate IS NULL";
+        } else if (Boolean.FALSE.equals(hasStartDate) && hasEndDate == null) {
+            return " WHERE rp.startDate IS NULL";
+        } else if (hasStartDate == null && Boolean.FALSE.equals(hasEndDate)) {
+            return " WHERE rp.endDate IS NULL";
+        }
+        return "";
+    }
+
+    @Override
+    public List<ResourcePolicy> findByDate(Context context, Boolean hasStartDate, Boolean hasEndDate,
+                                                   int offset, int limit) throws SQLException {
+        StringBuilder queryBuilder = new StringBuilder("SELECT rp FROM ResourcePolicy rp");
+        queryBuilder.append(buildDatePresenceWhere(hasStartDate, hasEndDate));
+        queryBuilder.append(" ORDER BY rp.id");
+
+        Query query = createQuery(context, queryBuilder.toString());
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+
+        return list(query);
+    }
+
+    @Override
+    public int countByDate(Context context, Boolean hasStartDate, Boolean hasEndDate) throws SQLException {
+        StringBuilder queryBuilder = new StringBuilder("SELECT count(rp.id) FROM ResourcePolicy rp");
+        queryBuilder.append(buildDatePresenceWhere(hasStartDate, hasEndDate));
+        Query query = createQuery(context, queryBuilder.toString());
+        return count(query);
+    }
 }
