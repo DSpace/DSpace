@@ -146,7 +146,17 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
-        Query query = createQuery(context, "select b.id from Bitstream b where b.storeNumber = :storeNumber");
+        return findByStoreNumber(context, storeNumber, false);
+    }
+
+    @Override
+    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber,
+                                                  boolean excludeDeleted) throws SQLException {
+        String hql = "select b.id from Bitstream b where b.storeNumber = :storeNumber";
+        if (excludeDeleted) {
+            hql += " and b.deleted = false";
+        }
+        Query query = createQuery(context, hql);
         query.setParameter("storeNumber", storeNumber);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
