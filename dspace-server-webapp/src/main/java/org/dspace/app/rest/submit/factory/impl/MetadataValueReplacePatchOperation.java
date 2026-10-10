@@ -14,11 +14,11 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.utils.MetadataReplaceUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
 
 /**
  * Submission "replace" common PATCH operation.
@@ -38,25 +38,36 @@ public abstract class MetadataValueReplacePatchOperation<DSO extends DSpaceObjec
         return MetadataValueRest.class;
     }
 
-    protected void replaceValue(Context context, DSO source, String target, List<MetadataValue> list,
-                                MetadataValueRest object, int index)
-        throws SQLException {
-        String[] metadata = Utils.tokenize(target);
-        if (object.getSecurityLevel() != null) {
-            getDSpaceObjectService().replaceSecuredMetadata(context, source, metadata[0], metadata[1], metadata[2],
-                    object.getLanguage(), object.getValue(), object.getAuthority(),
-                    object.getConfidence(), index, object.getSecurityLevel());
-        } else {
-            getDSpaceObjectService().replaceMetadata(context, source, metadata[0], metadata[1], metadata[2],
-                    object.getLanguage(), object.getValue(), object.getAuthority(),
-                    object.getConfidence(), index);
-        }
-
+    /**
+     * Replaces values of an existing metadata value.
+     * @param context DSpace context.
+     * @param dso DSO that will have metadata modified.
+     * @param mdField Qualified name of the metadata field to modify.
+     * @param existingMdvs Current metadata values of {@code dso} for the field {@code mdField}.
+     * @param newMdv New values for the metadata value being modified.
+     * @param mdvIndex Index of the metadata value in {@code existingMdvs} to modify.
+     * @throws SQLException
+     */
+    protected void replaceValue(Context context,
+                                DSO dso,
+                                String mdField,
+                                List<MetadataValue> existingMdvs,
+                                MetadataValueRest newMdv,
+                                int mdvIndex
+    ) throws SQLException {
+        MetadataValue existingMdv = existingMdvs.get(mdvIndex);
+        DSpaceObjectService<DSO> dsoService = getDSpaceObjectService();
+        MetadataReplaceUtils.replaceValue(context, dsoService, dso, mdField, existingMdv, newMdv, mdvIndex);
     }
 
-    protected void setDeclaredField(Context context, DSO source, Object value, String metadata, String namedField,
-                                    List<MetadataValue> metadataByMetadataString, int index)
-        throws IllegalAccessException, SQLException {
+    protected void setDeclaredField(Context context,
+                                    DSO source,
+                                    Object value,
+                                    String metadata,
+                                    String namedField,
+                                    List<MetadataValue> metadataByMetadataString,
+                                    int index
+    ) throws IllegalAccessException, SQLException {
         // check field
         String raw = (String) value;
         for (Field field : MetadataValueRest.class.getDeclaredFields()) {
@@ -92,7 +103,6 @@ public abstract class MetadataValueReplacePatchOperation<DSO extends DSpaceObjec
             }
         }
     }
-
 
     protected abstract DSpaceObjectService<DSO> getDSpaceObjectService();
 }
