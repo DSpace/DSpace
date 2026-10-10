@@ -43,6 +43,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.eperson.EPerson;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
 import org.dspace.event.EventDetail;
@@ -183,6 +184,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         context.addEvent(
             new Event(Event.CREATE, Constants.BITSTREAM, b.getID(), Constants.ITEM, itemUUID,
                 b.getChecksum(), DetailType.BITSTREAM_CHECKSUM, getIdentifiers(context, b)));
+
+        // Add provenance for bitstream creation
+        addBitstreamCreationProvenance(context, b, bundle);
+
         return b;
     }
 
@@ -303,6 +308,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         Bitstream bitstream = register(context, assetstore, bitstreamPath);
 
         bundleService.addBitstream(context, bundle, bitstream);
+
+        // Add provenance for bitstream registration
+        addBitstreamCreationProvenance(context, bitstream, bundle);
+
         return bitstream;
     }
 
@@ -700,5 +709,93 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         return bitstream.getBundles().stream()
             .flatMap(bundle -> bundle.getItems().stream())
             .findFirst();
+    }
+
+    /**
+     * Check if provenance tracking should be enabled for the given bundle.
+     * Checks both the global enable flag and the bundle blacklist.
+     *
+     * @param bundle the bundle to check
+     * @return true if provenance should be tracked, false otherwise
+     */
+    private boolean shouldTrackProvenance(Bundle bundle) {
+        if (!configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
+            return false;
+        }
+
+        if (bundle == null) {
+            return false;
+        }
+
+        String[] excludedBundles = configurationService.getArrayProperty("provenance.bitstream.bundles.exclude");
+        if (excludedBundles != null) {
+            String bundleName = bundle.getName();
+            for (String excluded : excludedBundles) {
+                if (excluded.trim().equals(bundleName)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Add provenance metadata to the item for bitstream creation.
+     *
+     * @param context   the DSpace context
+     * @param bitstream the bitstream that was created
+     * @param bundle    the bundle containing the bitstream
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    private void addBitstreamCreationProvenance(Context context, Bitstream bitstream, Bundle bundle)
+        throws SQLException, AuthorizeException {
+
+        if (!shouldTrackProvenance(bundle)) {
+            return;
+        }
+
+        // Get the parent item from the bundle
+        Item item = (Item) bundleService.getParentObject(context, bundle);
+        if (item == null) {
+            return;
+        }
+
+        // Build provenance message
+        StringBuilder provMessage = new StringBuilder();
+        provMessage.append("Bitstream ");
+        provMessage.append(bitstream.getName() != null ? bitstream.getName() : "unnamed");
+        provMessage.append(" added to bundle ");
+        provMessage.append(bundle.getName());
+        provMessage.append(" on ");
+        provMessage.append(DCDate.getCurrent().toString());
+        provMessage.append(" by ");
+
+        // Check privacy setting
+        boolean isProvenancePrivacyActive = configurationService.getBooleanProperty(
+            "metadata.privacy.dc.description.provenance", false);
+
+        // The current user may belong to an earlier session; reattach it before reading its name
+        EPerson currentUser = context.getCurrentUser() == null ? null : context.reloadEntity(context.getCurrentUser());
+        if (currentUser != null && !isProvenancePrivacyActive) {
+            provMessage.append(currentUser.getFullName());
+            provMessage.append(" (");
+            provMessage.append(currentUser.getEmail());
+            provMessage.append(")");
+        } else if (currentUser != null) {
+            provMessage.append("automated process or privacy hidden");
+        } else {
+            provMessage.append("System");
+        }
+
+        provMessage.append(". Size: ");
+        provMessage.append(bitstream.getSizeBytes());
+        provMessage.append(" bytes.");
+
+        // Add provenance metadata to item
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                               "description", "provenance", "en", provMessage.toString());
+        itemService.update(context, item);
     }
 }

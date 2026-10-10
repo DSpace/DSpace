@@ -32,6 +32,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Action to add bitstreams listed in item contents file to the item in DSpace
@@ -43,6 +45,8 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
                                                                                    .getBitstreamFormatService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+                                                                                .getConfigurationService();
 
     public AddBitstreamsAction() {
         //empty
@@ -102,7 +106,8 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             }
         }
 
-        if (alterProvenance && bitstream_bundles_updated > 0) {
+        if (alterProvenance && bitstream_bundles_updated > 0
+            && configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
             DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");
 
             String append = ". Added " + Integer.toString(bitstream_bundles_updated)
