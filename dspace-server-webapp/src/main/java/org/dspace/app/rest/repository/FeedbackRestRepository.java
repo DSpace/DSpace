@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.DSpaceFeedbackNotFoundException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.FeedbackRest;
@@ -62,6 +63,14 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
     protected FeedbackRest createAndReturn(Context context) throws AuthorizeException, SQLException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         FeedbackRest feedbackRest = null;
+
+        // By default feedback submission is restricted to authenticated users. Anonymous submission
+        // can be re-enabled via the "feedback.allow-anonymous" configuration property. This is checked
+        // here (rather than in @PreAuthorize) because it depends on runtime configuration.
+        if (context.getCurrentUser() == null
+                && !configurationService.getBooleanProperty("feedback.allow-anonymous", false)) {
+            throw new RESTAuthorizationException("Submitting feedback requires an authenticated user");
+        }
 
         String recipientEmail = configurationService.getProperty("feedback.recipient");
         if (StringUtils.isBlank(recipientEmail)) {
