@@ -17,6 +17,7 @@ public class SubmissionCCLicenseFieldEnumRest {
     private String id;
     private String label;
     private String description;
+    private Boolean isdefault;
 
     public String getId() {
         return id;
@@ -40,5 +41,13 @@ public class SubmissionCCLicenseFieldEnumRest {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    public Boolean getDefault() {
+        return isdefault;
+    }
+
+    public void setDefault(final Boolean isdefault) {
+        this.isdefault = isdefault;
     }
 }

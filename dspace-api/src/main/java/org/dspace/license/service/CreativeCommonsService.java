@@ -102,6 +102,15 @@ public interface CreativeCommonsService {
      */
     public String getLicenseName(Item item);
 
+
+    /**
+     * Returns the stored license rights of the item
+     *
+     * @param item  - The item for which to retrieve the stored license rights
+     * @return the stored license rights of the item
+     */
+    public String getLicenseRights(Item item);
+
     /**
      * Get Creative Commons license RDF, returning Bitstream object.
      *
@@ -272,17 +281,32 @@ public interface CreativeCommonsService {
             throws AuthorizeException, SQLException;
 
     /**
+     * Update the license of the item with a new one based on the provided license URI
+     *
+     * @param context       - The relevant DSpace context
+     * @param licenseUri    - The license URI to be used in the update
+     * @param licenseRights - The license rights statement to be used in the update
+     * @param item          - The item for which to update the license
+     * @return true when the update was successful, false when not
+     * @throws AuthorizeException
+     * @throws SQLException
+     */
+    public boolean updateLicense(final Context context, String licenseUri, String licenseRights, final Item item)
+            throws AuthorizeException, SQLException;
+
+    /**
      * Add a new license to the item
      *
      * @param context       - The relevant Dspace context
      * @param item          - The item to which the license will be added
      * @param licenseUri    - The license URI to add
      * @param licenseName   - The license name to add
+     * @param licenseRights - The license rights to add
      * @param doc           - The license to document to add
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void addLicense(Context context, Item item, String licenseUri, String licenseName, Document doc)
+    public void addLicense(Context context, Item item, String licenseUri, String licenseName, String licenseRights, Document doc)
             throws SQLException, IOException, AuthorizeException;
 }
