@@ -226,5 +226,17 @@
         </property>
     </bean>
 
+    <bean id="rorDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="rorImportService"/>
+        <property name="sourceIdentifier" value="ror"/>
+        <property name="recordIdMetadata" value="organization.identifier.ror"/>
+        <property name="displayMetadata" value="organization.legalName"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
 
