@@ -247,10 +247,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -383,10 +383,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -505,10 +505,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -628,10 +628,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -750,10 +750,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -873,10 +873,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -995,10 +995,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -1115,7 +1115,7 @@
                 <!--DefaultSortOrder can either be desc or asc (desc is default)-->
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortByProjectsSelection" />
+                        <ref bean="sortByProjectsSelectionDesc" />
                         <ref bean="sortTitleAsc" />
                     </list>
                 </property>
@@ -1184,11 +1184,11 @@
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
-                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <!--<property name="defaultSort" ref="sortDateIssuedDesc"/>-->
                 <!--DefaultSortOrder can either be desc or asc (desc is default)-->
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortByResearchOutputsSelection" />
+                        <ref bean="sortByResearchOutputsSelectionDesc" />
                         <ref bean="sortTitleAsc" />
                     </list>
                 </property>
@@ -1324,10 +1324,10 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortScore" />
-                        <ref bean="sortTitle" />
-                        <ref bean="sortDateIssued" />
-                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScoreDesc" />
+                        <ref bean="sortTitleAsc" />
+                        <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessionedDesc"/>
                     </list>
                 </property>
             </bean>
@@ -1690,7 +1690,7 @@
     </bean>
 
     <!-- functional sorting -->
-    <bean name="sortByProjectsSelection" class="org.dspace.discovery.configuration.DiscoverySortFunctionConfiguration">
+    <bean name="sortByProjectsSelectionDesc" class="org.dspace.discovery.configuration.DiscoverySortFunctionConfiguration">
         <property name="defaultSortOrder" value="desc"/>
         <!--sort by frequency of relation.isProjectsSelectedFor. The placeholder {0} will be replaced with scope (UUID of researcher)-->
         <property name="function" value="termfreq"/>
@@ -1898,7 +1898,7 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortLastModified"/>
+                        <ref bean="sortLastModifiedDesc"/>
                         <ref bean="sortLastModifiedAsc"/>
                         <ref bean="sortQueueLastStartTimeDesc"/>
                         <ref bean="sortQueueLastStartTimeAsc"/>
