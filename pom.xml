@@ -61,6 +61,8 @@
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
              (used by Server webapp) -->
         <nimbus-jose-jwt.version>9.48</nimbus-jose-jwt.version>
+        <!-- TOTP library for Multi-Factor Authentication: https://github.com/jchambers/java-otp -->
+        <java-otp.version>1.0.0</java-otp.version>
 
         <!--=== OTHER MODULE-SPECIFIC DEPENDENCIES ===-->
         <!-- Jena is used by both RDF and SWORDv2 -->
