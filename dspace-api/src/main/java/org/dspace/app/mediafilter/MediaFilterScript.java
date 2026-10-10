@@ -7,9 +7,12 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +26,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
@@ -33,14 +39,15 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
- * MediaFilterManager is the class that invokes the media/format filters over the
+ * MediaFilterScript is the class that invokes the media/format filters over the
  * repository's content. A few command line flags affect the operation of the
- * MFM: -v verbose outputs all extracted text to STDOUT; -f force forces all
- * bitstreams to be processed, even if they have been before; -n noindex does not
- * recreate index after processing bitstreams; -i [identifier] limits processing
- * scope to a community, collection or item; -m [max] limits processing to a
- * maximum number of items; -fd [fromdate] takes only items starting from this date,
- * filtering by last_modified in the item table.
+ * script: -v verbose outputs all extracted text to STDOUT; -f force forces all
+ * bitstreams (accounting for date limit) to be processed, even if they have
+ * been before; -i [identifier] limits processing scope to a community,
+ * collection or item; -m [maximum] limits processing to a maximum number of items;
+ * -d [fromdate] takes only items starting from this date, filtering by last_modified
+ * in the item table; -a [autodate] will store the start time of the run and use
+ * that as fromdate for the next run.
  */
 public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
 
@@ -63,6 +70,9 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private String[] skipIds = null;
     private Map<String, List<String>> filterFormats = new HashMap<>();
     private LocalDate fromDate = null;
+    private boolean useAutoDate = false;
+
+    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     public MediaFilterScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
@@ -117,14 +127,28 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
         if (commandLine.hasOption('d')) {
             fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
+        } else {
+            fromDate = null;
         }
 
-
+        if (commandLine.hasOption('a')) {
+            useAutoDate = true;
+        }
     }
 
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
+            return;
+        }
+
+        if (useAutoDate && max2Process != Integer.MAX_VALUE) {
+            handler.logWarning("WARNING: using --maximum option with --autodate may result to saved date even though " +
+                                "not all items have been processed. Continuing anyway.");
+        }
+
+        if (useAutoDate && identifier != null) {
+            handler.logError("--identifier option cannot be used with --autodate");
             return;
         }
 
@@ -134,10 +158,15 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         mediaFilterService.setQuiet(isQuiet);
         mediaFilterService.setVerbose(isVerbose);
         mediaFilterService.setMax2Process(max2Process);
+        if (fromDate != null) {
+            mediaFilterService.setFromDate(Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        } else {
+            mediaFilterService.setFromDate(null);
+        }
+        mediaFilterService.setUseAutoDate(useAutoDate);
 
         //initialize an array of our enabled filters
         List<FormatFilter> filterList = new ArrayList<>();
-
 
         //set up each filter
         for (int i = 0; i < filterNames.length; i++) {
@@ -222,14 +251,20 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
             mediaFilterService.setSkipList(Arrays.asList(skipIds));
         }
 
-        if (fromDate != null) {
-            mediaFilterService.setFromDate(fromDate);
-        }
-
         Context c = null;
 
         try {
             c = new Context();
+
+            if (useAutoDate) {
+                MetadataField field = metadataFieldService.findByElement(c, "dspace", "filtermedia", "lastdate");
+                if (field == null) {
+                    throw new SQLException("Cannot find field dspace.filtermedia.lastdate from the Metadata "
+                                        + "Registry. Please update the registry by running\n"
+                                        + "./dspace registry-loader -metadata ../config/registries/dspace-types.xml\n"
+                                        + "in the [dspace]/bin/ directory.");
+                }
+            }
 
             // have to be super-user to do the filtering
             c.turnOffAuthorisationSystem();
