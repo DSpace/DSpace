@@ -65,7 +65,7 @@ public class CanClaimItemFeature implements AuthorizationFeature {
         return researcherProfileService.hasProfileType(item)
             && hasNotOwner(item)
             && hasNotAlreadyAProfile(context)
-            && haveSameEmail(item, context.getCurrentUser());
+            && haveSameEmail(context, item, context.getCurrentUser());
     }
 
     private boolean hasNotAlreadyAProfile(Context context) {
@@ -82,11 +82,19 @@ public class CanClaimItemFeature implements AuthorizationFeature {
         return StringUtils.isBlank(itemService.getMetadata(item, "dspace.object.owner"));
     }
 
-    private boolean haveSameEmail(Item item, EPerson currentUser) {
-        return itemService.getMetadataByMetadataString(item, "person.email").stream()
-            .map(MetadataValue::getValue)
-            .filter(StringUtils::isNotBlank)
-            .anyMatch(email -> email.equalsIgnoreCase(currentUser.getEmail()));
+    private boolean haveSameEmail(Context context, Item item, EPerson currentUser) {
+        // person.email is an admin-only field (metadata.hide.person.email = true) but
+        // we must still be able to inspect it here to decide whether the user may claim
+        // this profile.
+        context.turnOffAuthorisationSystem();
+        try {
+            return itemService.getMetadataByMetadataString(item, "person.email").stream()
+                .map(MetadataValue::getValue)
+                .filter(StringUtils::isNotBlank)
+                .anyMatch(email -> email.equalsIgnoreCase(currentUser.getEmail()));
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
     @Override
