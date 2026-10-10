@@ -64,7 +64,7 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
             }
 
             ResourcePolicy resourcePolicyToDelete = policies.get(idxToDelete);
-            item.getResourcePolicies().remove(resourcePolicyToDelete);
+            item.removeResourcePolicy(resourcePolicyToDelete);
             context.commit();
             resourcePolicyService.delete(context, resourcePolicyToDelete);
         } else {
