@@ -9,6 +9,8 @@ package org.dspace.app.rest.repository.patch.operation;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,26 +49,43 @@ public final class DSpaceObjectMetadataPatchUtils {
     }
 
     /**
-     * Extract metadataValue from Operation by parsing the json and mapping it to a MetadataValueRest
-     * @param operation     Operation whose value is begin parsed
+     * Extract metadataValue from Operation by parsing the json and mapping it to a MetadataValueRest.
+     * If the operation value is an array, only its first element is returned.
+     * @param operation     Operation whose value is being parsed
      * @return MetadataValueRest extracted from json in operation value
      */
     protected MetadataValueRest extractMetadataValueFromOperation(Operation operation) {
-        MetadataValueRest metadataValue = null;
+        return extractMetadataValueListFromOperation(operation).get(0);
+    }
+
+    /**
+     * Extract all metadata values from Operation by parsing the json and mapping each to a MetadataValueRest.
+     * Accepts a single json object, an array of json objects, or a plain string value.
+     * @param operation     Operation whose value is being parsed
+     * @return list of MetadataValueRest extracted from json in operation value (never empty)
+     * @throws DSpaceBadRequestException if no value could be extracted, e.g. for an empty array
+     */
+    protected List<MetadataValueRest> extractMetadataValueListFromOperation(Operation operation) {
+        List<MetadataValueRest> metadataValueList = new ArrayList<>();
         try {
             if (operation.getValue() != null) {
                 if (operation.getValue() instanceof JsonValueEvaluator) {
                     JsonNode valueNode = ((JsonValueEvaluator) operation.getValue()).getValueNode();
                     if (valueNode.isArray()) {
-                        metadataValue = mapper.treeToValue(valueNode.get(0), MetadataValueRest.class);
+                        for (JsonNode node : valueNode) {
+                            MetadataValueRest metadataValue = mapper.treeToValue(node, MetadataValueRest.class);
+                            metadataValueList.add(metadataValue);
+                        }
                     } else {
-                        metadataValue = mapper.treeToValue(valueNode, MetadataValueRest.class);
+                        MetadataValueRest metadataValue = mapper.treeToValue(valueNode, MetadataValueRest.class);
+                        metadataValueList.add(metadataValue);
                     }
                 }
                 if (operation.getValue() instanceof String) {
                     String valueString = (String) operation.getValue();
-                    metadataValue = new MetadataValueRest();
+                    MetadataValueRest metadataValue = new MetadataValueRest();
                     metadataValue.setValue(valueString);
+                    metadataValueList.add(metadataValue);
                 }
             }
         } catch (IOException e) {
@@ -74,10 +93,10 @@ public final class DSpaceObjectMetadataPatchUtils {
                     "DspaceObjectMetadataOperation.extractMetadataValueFromOperation trying to map json from " +
                     "operation.value to MetadataValue class.", e);
         }
-        if (metadataValue == null) {
+        if (metadataValueList.isEmpty()) {
             throw new DSpaceBadRequestException("Could not extract MetadataValue Object from Operation");
         }
-        return metadataValue;
+        return metadataValueList;
     }
 
     /**
