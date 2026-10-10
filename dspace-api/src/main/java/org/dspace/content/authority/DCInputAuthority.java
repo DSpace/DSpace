@@ -158,7 +158,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         int dflt = -1;
         int found = 0;
         List<Choice> v = new ArrayList<Choice>();
-        for (int i = 0; i < valuesLocale.length; ++i) {
+        for (int i = 0; valuesLocale != null && i < valuesLocale.length; ++i) {
             // In a DCInputAuthority context, a user will want to query the labels, not the values
             if (query == null || Strings.CI.contains(labelsLocale[i], query)) {
                 if (found >= start && v.size() < limit) {
@@ -180,7 +180,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         Locale currentLocale = I18nUtil.getSupportedLocale(locale);
         String[] valuesLocale = values.get(currentLocale.getLanguage());
         String[] labelsLocale = labels.get(currentLocale.getLanguage());
-        for (int i = 0; i < valuesLocale.length; ++i) {
+        for (int i = 0; valuesLocale != null && i < valuesLocale.length; ++i) {
             if (text.equalsIgnoreCase(valuesLocale[i])) {
                 Choice[] v = new Choice[1];
                 v[0] = new Choice(String.valueOf(i), valuesLocale[i], labelsLocale[i]);
