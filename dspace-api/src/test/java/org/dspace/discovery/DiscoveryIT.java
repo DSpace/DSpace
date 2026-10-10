@@ -905,6 +905,62 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         }
     }
 
+    /**
+     * Titles with leading punctuation/digits should sort as if those characters were stripped,
+     * matching ignoreLeadingNonAlphaNum / ignoreLeadingDigits on the sortTitle discovery bean.
+     */
+    @Test
+    public void sortByTitleIgnoresLeadingNonAlphaNumAndDigitsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Collection")
+                                                 .build();
+
+        // Without normalisation special/digit titles would sort before the plain ones.
+        // With normalisation, plain titles interleave: Apple, Apricot, Banana, Blueberry, Cherry, Date, Zebra
+        Item itemZebra = ItemBuilder.createItem(context, collection).withTitle("Zebra").build();
+        Item itemApple = ItemBuilder.createItem(context, collection).withTitle("!!!Apple").build();
+        Item itemBanana = ItemBuilder.createItem(context, collection).withTitle("123Banana").build();
+        Item itemCherry = ItemBuilder.createItem(context, collection).withTitle("##99Cherry").build();
+        Item itemApricot = ItemBuilder.createItem(context, collection).withTitle("Apricot").build();
+        Item itemBlueberry = ItemBuilder.createItem(context, collection).withTitle("Blueberry").build();
+        Item itemDate = ItemBuilder.createItem(context, collection).withTitle("Date").build();
+        context.restoreAuthSystemState();
+
+        assertEquals("Zebra", getSolrTitleSortValue(itemZebra));
+        assertEquals("Apple", getSolrTitleSortValue(itemApple));
+        assertEquals("Banana", getSolrTitleSortValue(itemBanana));
+        assertEquals("Cherry", getSolrTitleSortValue(itemCherry));
+        assertEquals("Apricot", getSolrTitleSortValue(itemApricot));
+        assertEquals("Blueberry", getSolrTitleSortValue(itemBlueberry));
+        assertEquals("Date", getSolrTitleSortValue(itemDate));
+
+        // Discovery sort by title ASC must use the normalised values
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setQuery("*:*");
+        discoverQuery.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
+        discoverQuery.addFilterQueries("location.coll:" + collection.getID());
+        discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.asc);
+
+        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+        List<String> titles = discoverResult.getIndexableObjects().stream()
+            .map(o -> ((Item) o.getIndexedObject()).getName())
+            .collect(Collectors.toList());
+
+        assertEquals(List.of("!!!Apple", "Apricot", "123Banana", "Blueberry", "##99Cherry", "Date", "Zebra"),
+            titles);
+    }
+
+    private String getSolrTitleSortValue(Item item) throws SolrServerException, IOException {
+        QueryResponse solrResponse = solrSearchCore.getSolr().query(new SolrQuery(
+            "search.resourcetype:\"Item\" AND search.resourceid:\"" + item.getID() + "\""));
+        assertEquals(1, solrResponse.getResults().size());
+        return (String) solrResponse.getResults().get(0).getFieldValue("dc.title_sort");
+    }
+
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
         assertSearchQuery(resourceType, size, size, 0, -1);
     }

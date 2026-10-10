@@ -2037,6 +2037,54 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
     }
 
+    /**
+     * Leading punctuation and digits on titles must be ignored when sorting by dc.title
+     * (ignoreLeadingNonAlphaNum / ignoreLeadingDigits on sortTitle).
+     */
+    @Test
+    public void discoverSearchObjectsSortedByTitleIgnoresLeadingNonAlphaNumAndDigits() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        // With normalisation, plain titles interleave: Apple, Apricot, Banana, Blueberry, Cherry, Date, Zebra
+        ItemBuilder.createItem(context, col1).withTitle("Zebra").build();
+        ItemBuilder.createItem(context, col1).withTitle("!!!Apple").build();
+        ItemBuilder.createItem(context, col1).withTitle("123Banana").build();
+        ItemBuilder.createItem(context, col1).withTitle("##99Cherry").build();
+        ItemBuilder.createItem(context, col1).withTitle("Apricot").build();
+        ItemBuilder.createItem(context, col1).withTitle("Blueberry").build();
+        ItemBuilder.createItem(context, col1).withTitle("Date").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("dsoType", "Item")
+                .param("scope", parentCommunity.getID().toString())
+                .param("sort", "dc.title,ASC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                )))
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+                        SearchResultMatcher.matchOnItemName("item", "items", "!!!Apple"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "Apricot"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "123Banana"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "Blueberry"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "##99Cherry"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "Date"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "Zebra")
+                )))
+                .andExpect(jsonPath("$.sort", is(
+                        SortOptionMatcher.sortByAndOrder("dc.title", "ASC")
+                )));
+    }
+
 
     // This test has been disable due to its innate dependency on knowing the facetLimit
     // This is currently untrue and resulted in hardcoding of expectations.
