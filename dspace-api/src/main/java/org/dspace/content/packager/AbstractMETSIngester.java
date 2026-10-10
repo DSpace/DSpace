@@ -35,6 +35,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -458,8 +459,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
         // -- Step 4 --
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
-        crosswalkObjectDmd(context, dso, manifest, callback, manifest
-            .getItemDmds(), params);
+        // Make the target collection available during authority resolution while crosswalking metadata.
+        Collection authorityCollection = null;
+        if (parent != null && parent.getType() == Constants.COLLECTION) {
+            authorityCollection = (Collection) parent;
+        }
+        crosswalkObjectDmdForIngest(context, dso, manifest, callback, manifest.getItemDmds(), params,
+                                    authorityCollection);
 
         // For Items, also sanity-check the metadata for minimum requirements.
         if (type == Constants.ITEM) {
@@ -625,6 +631,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
         // -- Step 4 --
         // Add all content files as bitstreams on new DSpace Object
+        Collection authorityCollection = null;
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
 
@@ -637,22 +644,22 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             addBitstreams(context, item, manifest, pkgFile, params, callback);
 
             // have subclass manage license since it may be extra package file.
-            Collection owningCollection = (Collection) ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
-                                                                            .getParentObject(context, dso);
-            if (owningCollection == null) {
+            authorityCollection = (Collection) ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
+                                                                    .getParentObject(context, dso);
+            if (authorityCollection == null) {
                 //We are probably dealing with an item that isn't archived yet
                 InProgressSubmission inProgressSubmission = workspaceItemService.findByItem(context, item);
                 if (inProgressSubmission == null) {
                     inProgressSubmission = WorkflowServiceFactory.getInstance().getWorkflowItemService()
                                                                  .findByItem(context, item);
                 }
-                owningCollection = inProgressSubmission.getCollection();
+                authorityCollection = inProgressSubmission.getCollection();
             }
 
-            itemService.populateWithTemplateItemMetadata(context, owningCollection, params.useCollectionTemplate(),
+            itemService.populateWithTemplateItemMetadata(context, authorityCollection, params.useCollectionTemplate(),
                 item);
 
-            addLicense(context, item, license, owningCollection
+            addLicense(context, item, license, authorityCollection
                 , params);
 
             // FIXME ?
@@ -668,8 +675,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
         // -- Step 5 --
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
-        crosswalkObjectDmd(context, dso, manifest, callback, manifest
-            .getItemDmds(), params);
+        crosswalkObjectDmdForIngest(context, dso, manifest, callback, manifest.getItemDmds(), params,
+                                    authorityCollection);
 
         // For Items, also sanity-check the metadata for minimum requirements.
         if (dso.getType() == Constants.ITEM) {
@@ -1017,7 +1024,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                     Element[] templateDmds = manifest.getDmdElements(templateDmdIds);
 
                     // Run our Descriptive metadata (dublin core, etc) crosswalks to add metadata to template item
-                    crosswalkObjectDmd(context, templateItem, manifest, callback, templateDmds, params);
+                    crosswalkObjectDmdForIngest(context, templateItem, manifest, callback, templateDmds, params,
+                                                collection);
 
                     // update the template item to save metadata changes
                     PackageUtils.updateDSpaceObject(context, templateItem);
@@ -1456,6 +1464,32 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                                             PackageParameters params) throws CrosswalkException,
         PackageValidationException, AuthorizeException, SQLException,
         IOException;
+
+    /**
+     * Crosswalk descriptive metadata while making the target collection available
+     * for authority resolution during ingest.
+     *
+     * @param context the DSpace context
+     * @param dso the target DSpace object
+     * @param manifest the METS manifest
+     * @param callback the ingest callback
+     * @param dmdSecs the descriptive metadata sections
+     * @param params package parameters
+     * @param collection the target collection for authority resolution
+     */
+    private void crosswalkObjectDmdForIngest(Context context, DSpaceObject dso, METSManifest manifest,
+                                             MdrefManager callback, Element[] dmds, PackageParameters params,
+                                             Collection collection)
+        throws CrosswalkException, PackageValidationException, AuthorizeException, SQLException, IOException {
+        try {
+            if (collection != null) {
+                DSpaceObjectServiceImpl.setIngestCollection(collection);
+            }
+            crosswalkObjectDmd(context, dso, manifest, callback, dmds, params);
+        } finally {
+            DSpaceObjectServiceImpl.clearIngestCollection();
+        }
+    }
 
     /**
      * Add license(s) to Item based on contents of METS and other policies. The
