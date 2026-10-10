@@ -1757,25 +1757,101 @@
 
         <!-- OpenAIRE document types
              https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/4.0.1/field_publicationtype.html
-             Based on COAR Vocabularies -> Controlled Vocabulary for Resource Type Genres (Version 2.0):
+             Based on COAR Vocabularies -> Controlled Vocabulary for Resource Type Genres (Version 3.2):
              http://vocabularies.coar-repositories.org/documentation/resource_types/
         -->
         <value-pairs value-pairs-name="openaire_types" dc-term="type">
             <pair>
-                <displayed-value>Interactive Resource</displayed-value>
-                <stored-value>interactive resource</stored-value>
+                <displayed-value>Artistic Work</displayed-value>
+                <stored-value>artistic work</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Website</displayed-value>
-                <stored-value>website</stored-value>
+                <displayed-value>Cartographic Material</displayed-value>
+                <stored-value>cartographic material</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Map</displayed-value>
+                <stored-value>map</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Collection</displayed-value>
+                <stored-value>collection</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Archival Collection</displayed-value>
+                <stored-value>archival collection</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Court Documents</displayed-value>
+                <stored-value>court documents</stored-value>
             </pair>
             <pair>
                 <displayed-value>Dataset</displayed-value>
                 <stored-value>dataset</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Interview</displayed-value>
-                <stored-value>interview</stored-value>
+                <displayed-value>- Aggregated Data</displayed-value>
+                <stored-value>aggregated data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Clinical Trial Data</displayed-value>
+                <stored-value>clinical trial data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Compiled Data</displayed-value>
+                <stored-value>compiled data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Encoded Data</displayed-value>
+                <stored-value>encoded data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Experimental Data</displayed-value>
+                <stored-value>experimental data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Genomic Data</displayed-value>
+                <stored-value>genomic data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Geospatial Data</displayed-value>
+                <stored-value>geospatial data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Laboratory Notebook</displayed-value>
+                <stored-value>laboratory notebook</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Measurement And Test Data</displayed-value>
+                <stored-value>measurement and test data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Observational Data</displayed-value>
+                <stored-value>observational data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Recorded Data</displayed-value>
+                <stored-value>recorded data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Simulation Data</displayed-value>
+                <stored-value>simulation data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Survey Data</displayed-value>
+                <stored-value>survey data</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Design</displayed-value>
+                <stored-value>design</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Industrial Design</displayed-value>
+                <stored-value>industrial design</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Layout Design</displayed-value>
+                <stored-value>layout design</stored-value>
             </pair>
             <pair>
                 <displayed-value>Image</displayed-value>
@@ -1794,8 +1870,60 @@
                 <stored-value>still image</stored-value>
             </pair>
             <pair>
+                <displayed-value>Interactive Resource</displayed-value>
+                <stored-value>interactive resource</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Website</displayed-value>
+                <stored-value>website</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Knowledge Organization System</displayed-value>
+                <stored-value>knowledge organization system</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Learning Object</displayed-value>
+                <stored-value>learning object</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>Other</displayed-value>
                 <stored-value>other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Patent</displayed-value>
+                <stored-value>patent</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- PCT Application</displayed-value>
+                <stored-value>pct application</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Design Patent</displayed-value>
+                <stored-value>design patent</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Plant Patent</displayed-value>
+                <stored-value>plant patent</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Plant Variety Protection</displayed-value>
+                <stored-value>plant variety protection</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Software Patent</displayed-value>
+                <stored-value>software patent</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Utility Model</displayed-value>
+                <stored-value>utility model</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Physical Sample</displayed-value>
+                <stored-value>physical sample</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Research Instrument</displayed-value>
+                <stored-value>research instrument</stored-value>
             </pair>
             <pair>
                 <displayed-value>Software</displayed-value>
@@ -1806,16 +1934,8 @@
                 <stored-value>research software</stored-value>
             </pair>
             <pair>
-                <displayed-value>Workflow</displayed-value>
-                <stored-value>workflow</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Cartographic Material</displayed-value>
-                <stored-value>cartographic material</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>- Map</displayed-value>
-                <stored-value>map</stored-value>
+                <displayed-value>- Source Code</displayed-value>
+                <stored-value>source code</stored-value>
             </pair>
             <pair>
                 <displayed-value>Sound</displayed-value>
@@ -1838,6 +1958,10 @@
                 <stored-value>bibliography</stored-value>
             </pair>
             <pair>
+                <displayed-value>- Blog Post</displayed-value>
+                <stored-value>blog post</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>- Book</displayed-value>
                 <stored-value>book</stored-value>
             </pair>
@@ -1846,8 +1970,20 @@
                 <stored-value>book part</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Conference Object</displayed-value>
-                <stored-value>conference object</stored-value>
+                <displayed-value>- Conference Output</displayed-value>
+                <stored-value>conference output</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>-- Conference Paper Not In Proceedings</displayed-value>
+                <stored-value>conference paper not in proceedings</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Conference Poster Not In Proceedings</displayed-value>
+                <stored-value>conference poster not in proceedings</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>-- Conference Presentation</displayed-value>
+                <stored-value>conference presentation</stored-value>
             </pair>
             <pair>
                 <displayed-value>-- Conference Proceedings</displayed-value>
@@ -1862,12 +1998,40 @@
                 <stored-value>conference poster</stored-value>
             </pair>
             <pair>
-                <displayed-value>-- Conference Paper Not In Proceedings</displayed-value>
-                <stored-value>conference paper not in proceedings</stored-value>
+                <displayed-value>- Journal</displayed-value>
+                <stored-value>journal</stored-value>
             </pair>
             <pair>
-                <displayed-value>-- Conference Poster Not In Proceedings</displayed-value>
-                <stored-value>conference poster not in proceedings</stored-value>
+                <displayed-value>-- Editorial</displayed-value>
+                <stored-value>editorial</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>-- Journal Article</displayed-value>
+                <stored-value>journal article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>--- Corrigendum</displayed-value>
+                <stored-value>corrigendum</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>--- Data Paper</displayed-value>
+                <stored-value>data paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>--- Research Article</displayed-value>
+                <stored-value>research article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>--- Review Article</displayed-value>
+                <stored-value>review article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>--- Software Paper</displayed-value>
+                <stored-value>software paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>-- Letter To The Editor</displayed-value>
+                <stored-value>letter to the editor</stored-value>
             </pair>
             <pair>
                 <displayed-value>- Lecture</displayed-value>
@@ -1878,64 +2042,32 @@
                 <stored-value>letter</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Periodical</displayed-value>
-                <stored-value>periodical</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>-- Journal</displayed-value>
-                <stored-value>journal</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>--- Contribution to Journal</displayed-value>
-                <stored-value>contribution to journal</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>---- Journal Article</displayed-value>
-                <stored-value>journal article</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>----- Data Paper</displayed-value>
-                <stored-value>data paper</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>----- Review Article</displayed-value>
-                <stored-value>review article</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>----- Research Article</displayed-value>
-                <stored-value>research article</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>----- Corrigendum</displayed-value>
-                <stored-value>corrigendum</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>----- Software Paper</displayed-value>
-                <stored-value>software paper</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>---- Editorial</displayed-value>
-                <stored-value>editorial</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>---- Letter to the Editor</displayed-value>
-                <stored-value>letter to the editor</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>-- Newspaper</displayed-value>
-                <stored-value>newspaper</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>--- Newspaper Article</displayed-value>
-                <stored-value>newspaper article</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>-- Magazine</displayed-value>
+                <displayed-value>- Magazine</displayed-value>
                 <stored-value>magazine</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Patent</displayed-value>
-                <stored-value>patent</stored-value>
+                <displayed-value>-- Magazine Article</displayed-value>
+                <stored-value>magazine article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Manuscript</displayed-value>
+                <stored-value>manuscript</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Musical Notation</displayed-value>
+                <stored-value>musical notation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Newspaper</displayed-value>
+                <stored-value>newspaper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>-- Newspaper Article</displayed-value>
+                <stored-value>newspaper article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Other Periodical</displayed-value>
+                <stored-value>other periodical</stored-value>
             </pair>
             <pair>
                 <displayed-value>- Preprint</displayed-value>
@@ -1946,20 +2078,20 @@
                 <stored-value>report</stored-value>
             </pair>
             <pair>
-                <displayed-value>-- Report Part</displayed-value>
-                <stored-value>report part</stored-value>
+                <displayed-value>-- Clinical Study</displayed-value>
+                <stored-value>clinical study</stored-value>
             </pair>
             <pair>
-                <displayed-value>-- Internal Report</displayed-value>
-                <stored-value>internal report</stored-value>
+                <displayed-value>-- Data Management Plan</displayed-value>
+                <stored-value>data management plan</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>-- Knowledge Synthesis Protocol</displayed-value>
+                <stored-value>knowledge synthesis protocol</stored-value>
             </pair>
             <pair>
                 <displayed-value>-- Memorandum</displayed-value>
                 <stored-value>memorandum</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>-- Other Type of Report</displayed-value>
-                <stored-value>other type of report</stored-value>
             </pair>
             <pair>
                 <displayed-value>-- Policy Report</displayed-value>
@@ -1970,12 +2102,8 @@
                 <stored-value>project deliverable</stored-value>
             </pair>
             <pair>
-                <displayed-value>--- Data Management Plan</displayed-value>
-                <stored-value>data management plan</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>-- Report to Funding Agency</displayed-value>
-                <stored-value>report to funding agency</stored-value>
+                <displayed-value>-- Research Protocol</displayed-value>
+                <stored-value>research protocol</stored-value>
             </pair>
             <pair>
                 <displayed-value>-- Research Report</displayed-value>
@@ -1998,12 +2126,16 @@
                 <stored-value>book review</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Technical Documentation</displayed-value>
-                <stored-value>technical documentation</stored-value>
+                <displayed-value>-- Commentary</displayed-value>
+                <stored-value>commentary</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Working Paper</displayed-value>
-                <stored-value>working paper</stored-value>
+                <displayed-value>-- Peer Review</displayed-value>
+                <stored-value>peer review</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>- Technical Documentation</displayed-value>
+                <stored-value>technical documentation</stored-value>
             </pair>
             <pair>
                 <displayed-value>- Thesis</displayed-value>
@@ -2018,32 +2150,24 @@
                 <stored-value>doctoral thesis</stored-value>
             </pair>
             <pair>
-                <displayed-value>-- Master Thesis</displayed-value>
+                <displayed-value>--Master Thesis</displayed-value>
                 <stored-value>master thesis</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Musical Notation</displayed-value>
-                <stored-value>musical notation</stored-value>
+                <displayed-value>- Transcription</displayed-value>
+                <stored-value>transcription</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Blog Post</displayed-value>
-                <stored-value>blog post</stored-value>
+                <displayed-value>- Working Paper</displayed-value>
+                <stored-value>working paper</stored-value>
             </pair>
             <pair>
-                <displayed-value>- Manuscript</displayed-value>
-                <stored-value>website</stored-value>
+                <displayed-value>Trademark</displayed-value>
+                <stored-value>trademark</stored-value>
             </pair>
             <pair>
-                <displayed-value>Learning Object</displayed-value>
-                <stored-value>learning object</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Clinical Trial</displayed-value>
-                <stored-value>clinical trial</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Clinical Study</displayed-value>
-                <stored-value>clinical study</stored-value>
+                <displayed-value>Workflow</displayed-value>
+                <stored-value>workflow</stored-value>
             </pair>
         </value-pairs>
 
