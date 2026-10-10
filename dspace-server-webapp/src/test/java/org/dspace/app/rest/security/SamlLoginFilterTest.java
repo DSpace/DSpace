@@ -115,6 +115,36 @@ public class SamlLoginFilterTest extends AbstractDSpaceTest {
     }
 
     @Test
+    public void testRedirectWithRedirectUrlParam() throws Exception {
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod",
+            "org.dspace.authenticate.SamlAuthentication");
+
+        configurationService.setProperty("dspace.ui.url","http://dspace.example.org");
+        configurationService.setProperty("dspace.server.url","http://dspace.example.org/server");
+
+        ((MockHttpServletRequest) request).setParameter("redirectUrl", "http://dspace.example.org/collections/123");
+
+        filter.doFilter(request, response, filterChain);
+
+        verify(response).sendRedirect("http://dspace.example.org/collections/123");
+    }
+
+    @Test
+    public void testRedirectWithInvalidRedirectUrlParam() throws Exception {
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod",
+            "org.dspace.authenticate.SamlAuthentication");
+
+        configurationService.setProperty("dspace.ui.url","http://dspace.example.org");
+        configurationService.setProperty("dspace.server.url","http://dspace.example.org/server");
+
+        ((MockHttpServletRequest) request).setParameter("redirectUrl", "http://evil.host.bad/steal");
+
+        filter.doFilter(request, response, filterChain);
+
+        verify(response).sendError(eq(400), anyString());
+    }
+
+    @Test
     public void testSamlAuthenticationNotEnabled() throws Exception {
         assertThrows(ProviderNotFoundException.class, () -> filter.attemptAuthentication(request, response));
     }
