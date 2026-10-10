@@ -64,7 +64,6 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
             getService().update(context, orcidHistory);
             context.dispatchEvents();
 
-            indexingService.commit();
         } catch (Exception e) {
             log.error("Error in OrcidHistoryBuilder.build(), error: ", e);
         }
@@ -108,7 +107,6 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
             }
             c.complete();
         }
-        indexingService.commit();
     }
 
     public OrcidHistoryBuilder withResponseMessage(String responseMessage) throws SQLException {
