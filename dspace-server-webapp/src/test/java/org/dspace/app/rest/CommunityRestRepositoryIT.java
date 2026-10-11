@@ -68,12 +68,11 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -727,10 +726,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
         String response = result.getResponse().getContentAsString();
-        JSONArray communities = new JSONObject(response).getJSONObject("_embedded").getJSONArray("communities");
+        JsonNode communities = new ObjectMapper().readTree(response).get("_embedded").get("communities");
         List<String> responseTitles = StreamSupport.stream(communities.spliterator(), false)
-                                        .map(JSONObject.class::cast)
-                                        .map(x -> x.getString("name"))
+                                        .map(x -> x.get("name").asString())
                                         .collect(Collectors.toList());
 
         assertEquals(orderedTitles, responseTitles);

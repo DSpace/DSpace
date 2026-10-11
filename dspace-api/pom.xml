@@ -1006,11 +1006,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20231013</version>
-        </dependency>
         <!-- Version managed in the parent POM -->
         <dependency>
             <groupId>org.jspecify</groupId>

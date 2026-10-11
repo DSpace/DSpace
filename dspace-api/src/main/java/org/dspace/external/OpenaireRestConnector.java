@@ -36,8 +36,9 @@ import org.apache.hc.core5.http.message.StatusLine;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.util.Util;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * based on OrcidRestConnector it's a rest connector for Openaire API providing
@@ -124,7 +125,7 @@ public class OpenaireRestConnector {
         try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
             ClassicHttpResponse getResponse = httpClient.execute(httpPost);
 
-            JSONObject responseObject = null;
+            JsonNode responseObject = null;
             try (InputStream is = getResponse.getEntity().getContent();
                  BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
                 String inputStr;
@@ -133,7 +134,7 @@ public class OpenaireRestConnector {
                     if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")
                             && inputStr.contains("expires_in")) {
                         try {
-                            responseObject = new JSONObject(inputStr);
+                            responseObject = new ObjectMapper().readTree(inputStr);
                         } catch (Exception e) {
                             // Not as valid as I'd hoped, move along
                             responseObject = null;
@@ -146,8 +147,8 @@ public class OpenaireRestConnector {
                         "client id and secret");
             }
 
-            return new OpenaireRestToken(responseObject.get("access_token").toString(),
-                    Long.valueOf(responseObject.get("expires_in").toString()));
+            return new OpenaireRestToken(responseObject.get("access_token").asString(),
+                    Long.valueOf(responseObject.get("expires_in").asString()));
         }
     }
 

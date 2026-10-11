@@ -28,8 +28,8 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.client.DSpaceHttpClientFactory;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Utility class for Orcid factory classes. This is used to parse the
@@ -121,9 +121,9 @@ public final class OrcidFactoryUtils {
             }
             // Parsing JSON response
             try (InputStream is = response.getEntity().getContent()) {
-                JSONObject responseObject = new JSONObject(new JSONTokener(is));
+                JsonNode responseObject = new ObjectMapper().readTree(is);
                 if (responseObject.has("access_token")) {
-                    String token = responseObject.getString("access_token");
+                    String token = responseObject.required("access_token").asString();
                     log.debug("Successfully retrieved ORCID access token");
                     return Optional.of(token);
                 } else {

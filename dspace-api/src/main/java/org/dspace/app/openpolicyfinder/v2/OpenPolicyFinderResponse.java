@@ -21,10 +21,9 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Model class for the Open Policy Finder API (JSON) response for a publication (journal) search
@@ -93,30 +92,29 @@ public class OpenPolicyFinderResponse implements Serializable {
      */
     private void parseJSON(InputStream jsonData) throws IOException {
         InputStreamReader streamReader = new InputStreamReader(jsonData, StandardCharsets.UTF_8);
-        JSONTokener jsonTokener = new JSONTokener(streamReader);
-        JSONObject httpResponse;
+        JsonNode httpResponse;
         try {
-            httpResponse = new JSONObject(jsonTokener);
+            httpResponse = new ObjectMapper().readTree(streamReader);
             if (httpResponse.has("items")) {
-                JSONArray items = httpResponse.getJSONArray("items");
+                JsonNode items = httpResponse.required("items");
 
                 // items array is search results, *not* journals or publishers - they are listed for each item
                 // - however, we only ever want one result since we're passing an "equals ISSN" query
-                if (items.length() > 0) {
+                if (items.size() > 0) {
                     metadata = new OpenPolicyFinderSystemMetadata();
                     this.journals = new ArrayList<>();
                     // Iterate search result items
-                    for (int itemIndex = 0; itemIndex < items.length(); itemIndex++) {
+                    for (int itemIndex = 0; itemIndex < items.size(); itemIndex++) {
                         List<OpenPolicyFinderPublisher> publishers = new ArrayList<>();
                         List<OpenPolicyFinderPublisherPolicy> policies = new ArrayList<>();
                         OpenPolicyFinderPublisher publisher = new OpenPolicyFinderPublisher();
                         OpenPolicyFinderJournal journal = new OpenPolicyFinderJournal();
 
-                        JSONObject item = items.getJSONObject(itemIndex);
+                        JsonNode item = items.required(itemIndex);
 
                         // Parse system metadata (per-item / result information)
                         if (item.has("system_metadata")) {
-                            JSONObject systemMetadata = item.getJSONObject("system_metadata");
+                            JsonNode systemMetadata = item.required("system_metadata");
                             metadata = parseSystemMetadata(systemMetadata);
                         }
 
@@ -125,16 +123,16 @@ public class OpenPolicyFinderResponse implements Serializable {
                         if (item.has("publisher_policy")) {
 
                             // Parse main publisher policies node
-                            JSONArray publisherPolicies = item.getJSONArray("publisher_policy");
-                            for (int i = 0; i < publisherPolicies.length(); i++) {
+                            JsonNode publisherPolicies = item.required("publisher_policy");
+                            for (int i = 0; i < publisherPolicies.size(); i++) {
 
-                                JSONObject policy = publisherPolicies.getJSONObject(i);
+                                JsonNode policy = publisherPolicies.required(i);
 
                                 // Special case - quickly check the policy for the 'paid access' option
                                 // and continue if found, then parse the rest of the policy
                                 String moniker = null;
                                 if (policy.has("internal_moniker")) {
-                                    moniker = policy.getString("internal_moniker");
+                                    moniker = policy.required("internal_moniker").asString();
                                 }
                                 // This seems to be usually policy(ies) for the journal proper
                                 // and then an "Open access option" which contains some of the info
@@ -144,14 +142,16 @@ public class OpenPolicyFinderResponse implements Serializable {
                                 if ("Open access option".equalsIgnoreCase(moniker)) {
                                     log.debug("This is the Open access options policy - a special case");
                                     if (policy.has("urls")) {
-                                        JSONArray urls = policy.getJSONArray("urls");
-                                        for (int u = 0; u < urls.length(); u++) {
-                                            JSONObject url = urls.getJSONObject(u);
-                                            if (url.has("description") &&
-                                                "Open Access".equalsIgnoreCase(url.getString("description"))) {
-                                                log.debug("Found OA paid access url: " + url.getString("url"));
-                                                publisher.setPaidAccessDescription(url.getString("description"));
-                                                publisher.setPaidAccessUrl(url.getString("url"));
+                                        JsonNode urls = policy.required("urls");
+                                        for (int u = 0; u < urls.size(); u++) {
+                                            JsonNode url = urls.required(u);
+                                            String description = url.has("description")
+                                                ? url.required("description").asString() : null;
+                                            if ("Open Access".equalsIgnoreCase(description)) {
+                                                String paidAccessUrl = url.required("url").asString();
+                                                log.debug("Found OA paid access url: " + paidAccessUrl);
+                                                publisher.setPaidAccessDescription(description);
+                                                publisher.setPaidAccessUrl(paidAccessUrl);
                                                 break;
                                             }
                                         }
@@ -169,11 +169,11 @@ public class OpenPolicyFinderResponse implements Serializable {
                             // set publisher name - note we're only looking for the first name here
                             // as per previous functionality (for simple display)
                             if (item.has("publishers")) {
-                                JSONArray publishersArray = item.getJSONArray("publishers");
-                                if (publishersArray.length() > 0) {
-                                    JSONObject publisherElement = publishersArray.getJSONObject(0);
+                                JsonNode publishersArray = item.required("publishers");
+                                if (publishersArray.size() > 0) {
+                                    JsonNode publisherElement = publishersArray.required(0);
                                     if (publisherElement.has("publisher")) {
-                                        JSONObject publisherJson = publisherElement.getJSONObject("publisher");
+                                        JsonNode publisherJson = publisherElement.required("publisher");
                                         publisher.setName(parsePublisherName(publisherJson));
                                         publisher.setUri(parsePublisherURL(publisherJson));
                                     }
@@ -200,7 +200,7 @@ public class OpenPolicyFinderResponse implements Serializable {
                 message = "No results found";
             }
 
-        } catch (JSONException e) {
+        } catch (JacksonException e) {
             log.error("Failed to parse Open Policy Finder response", e);
             error = true;
         } finally {
@@ -212,38 +212,38 @@ public class OpenPolicyFinderResponse implements Serializable {
      * Parse system metadata and return populated OpenPolicyFinderSystemMetadata object
      * @param systemMetadata
      */
-    private OpenPolicyFinderSystemMetadata parseSystemMetadata(JSONObject systemMetadata) {
+    private OpenPolicyFinderSystemMetadata parseSystemMetadata(JsonNode systemMetadata) {
 
         OpenPolicyFinderSystemMetadata metadata = new OpenPolicyFinderSystemMetadata();
 
         if (systemMetadata.has("uri")) {
-            this.uri = systemMetadata.getString("uri");
+            this.uri = systemMetadata.required("uri").asString();
             metadata.setUri(this.uri);
         } else {
             log.error("Open Policy Finder URI missing for API response item");
         }
         if (systemMetadata.has("id")) {
-            this.id = systemMetadata.getInt("id");
+            this.id = systemMetadata.required("id").asInt();
             metadata.setId(this.id);
         } else {
             log.error("Open Policy Finder internal ID missing for API response item");
         }
         // Get date created and added - DSpace expects this in the publisher object, though
         if (systemMetadata.has("date_created")) {
-            metadata.setDateCreated(systemMetadata.getString("date_created"));
+            metadata.setDateCreated(systemMetadata.required("date_created").asString());
         }
         if (systemMetadata.has("date_modified")) {
-            metadata.setDateModified(systemMetadata.getString("date_modified"));
+            metadata.setDateModified(systemMetadata.required("date_modified").asString());
         }
         // Is this item publicly visible?
         if (systemMetadata.has("publicly_visible")) {
             metadata.setPubliclyVisible ("yes".equals(systemMetadata
-                .getString("publicly_visible")));
+                .required("publicly_visible").asString()));
         }
         // Is this item listed in the DOAJ?
         if (systemMetadata.has("listed_in_doaj")) {
             metadata.setPubliclyVisible ("yes".equals(systemMetadata
-                .getString("listed_in_doaj")));
+                .required("listed_in_doaj").asString()));
         }
 
         return metadata;
@@ -257,19 +257,19 @@ public class OpenPolicyFinderResponse implements Serializable {
      * @param publisherName - the parsed publisher name
      * @return
      */
-    private OpenPolicyFinderJournal parseJournal(JSONObject item, String publisherName) {
+    private OpenPolicyFinderJournal parseJournal(JsonNode item, String publisherName) {
 
         OpenPolicyFinderJournal journal = new OpenPolicyFinderJournal();
 
         // set journal title
         if (item.has("title")) {
-            JSONArray titles = item.getJSONArray("title");
-            if (titles.length() > 0) {
+            JsonNode titles = item.required("title");
+            if (titles.size() > 0) {
                 List<String> titleList = new ArrayList<>();
-                for (int t = 0; t < titles.length(); t++) {
-                    JSONObject title = titles.getJSONObject(t);
+                for (int t = 0; t < titles.size(); t++) {
+                    JsonNode title = titles.required(t);
                     if (title.has("title")) {
-                        titleList.add(title.getString("title").trim());
+                        titleList.add(title.required("title").asString().trim());
                     }
                 }
                 journal.setTitles(titleList);
@@ -286,24 +286,24 @@ public class OpenPolicyFinderResponse implements Serializable {
 
         // Journal URL
         if (item.has("url")) {
-            journal.setUrl(item.getString("url"));
+            journal.setUrl(item.required("url").asString());
         }
 
         // set ISSNs
         if (item.has("issns")) {
-            JSONArray issns = item.getJSONArray("issns");
+            JsonNode issns = item.required("issns");
             // just get first - DSpace data model only allows for one
             List<String> issnList = new ArrayList<>();
-            for (int ii = 0; ii < issns.length(); ii++) {
-                JSONObject issn = issns.getJSONObject(ii);
-                issnList.add(issn.getString("issn").trim());
+            for (int ii = 0; ii < issns.size(); ii++) {
+                JsonNode issn = issns.required(ii);
+                issnList.add(issn.required("issn").asString().trim());
             }
             journal.setIssns(issnList);
         }
 
         // Is the item in DOAJ?
         if (item.has("listed_in_doaj")) {
-            journal.setInDOAJ("yes".equals(item.getString("listed_in_doaj")));
+            journal.setInDOAJ("yes".equals(item.required("listed_in_doaj").asString()));
         }
 
         return journal;
@@ -314,26 +314,26 @@ public class OpenPolicyFinderResponse implements Serializable {
      * @param policy - each publisher policy node in the JSON array
      * @return populated OpenPolicyFinderPublisherPolicy object
      */
-    private OpenPolicyFinderPublisherPolicy parsePublisherPolicy(JSONObject policy) {
+    private OpenPolicyFinderPublisherPolicy parsePublisherPolicy(JsonNode policy) {
 
         OpenPolicyFinderPublisherPolicy publisherPolicy = new OpenPolicyFinderPublisherPolicy();
 
         // Get and set monikers
         String moniker = null;
         if (policy.has("internal_moniker")) {
-            moniker = policy.getString("internal_moniker");
+            moniker = policy.required("internal_moniker").asString();
             publisherPolicy.setInternalMoniker(moniker);
         }
 
         // URLs (used to be Copyright Links)
         if (policy.has("urls")) {
-            JSONArray urls = policy.getJSONArray("urls");
+            JsonNode urls = policy.required("urls");
             Map<String, String> copyrightLinks = new TreeMap<>();
-            for (int u = 0; u < urls.length(); u++) {
-                JSONObject url = urls.getJSONObject(u);
+            for (int u = 0; u < urls.size(); u++) {
+                JsonNode url = urls.required(u);
                 if (url.has("description") && url.has("url")) {
-                    log.debug("Setting copyright URL: " + url.getString("url"));
-                    copyrightLinks.put(url.getString("url"), url.getString("description"));
+                    log.debug("Setting copyright URL: " + url.required("url").asString());
+                    copyrightLinks.put(url.required("url").asString(), url.required("description").asString());
                 }
             }
             publisherPolicy.setUrls(copyrightLinks);
@@ -346,7 +346,7 @@ public class OpenPolicyFinderResponse implements Serializable {
         int currentOption = 0;
         if (policy.has("permitted_oa")) {
             List<String> allowed = new ArrayList<>();
-            JSONArray permittedOA = policy.getJSONArray("permitted_oa");
+            JsonNode permittedOA = policy.required("permitted_oa");
             List<OpenPolicyFinderPermittedVersion> permittedVersions = new ArrayList<>();
 
             // Iterate each permitted OA version / option. The permitted_oa node is also known as a 'pathway' --
@@ -355,14 +355,14 @@ public class OpenPolicyFinderResponse implements Serializable {
             // As described below, where multiple versions are referenced in a single permitted_oa pathway, they will
             // be split out and treated separately. This keeps processing simple, especially later in display or
             // compliance checking when it is preferred to group / indicate rules by the article version
-            for (int p = 0; p < permittedOA.length(); p++) {
-                JSONObject permitted = permittedOA.getJSONObject(p);
+            for (int p = 0; p < permittedOA.size(); p++) {
+                JsonNode permitted = permittedOA.required(p);
                 // Although it adds redundancy, we will treat each 'article version' within
                 // the permitted_oa ("pathway") node as a separate version altogether to keep the rest of our display
                 // handled nicely. This was confirmed as an appropriate approach by JISC
                 if (permitted.has("article_version")) {
-                    JSONArray versions = permitted.getJSONArray("article_version");
-                    for (int v = 0; v < versions.length(); v++) {
+                    JsonNode versions = permitted.required("article_version");
+                    for (int v = 0; v < versions.size(); v++) {
                         // Parse this permitted_oa node but specifically looking for the article_version 'v'
                         OpenPolicyFinderPermittedVersion permittedVersion = parsePermittedVersion(permitted, v);
 
@@ -406,7 +406,7 @@ public class OpenPolicyFinderResponse implements Serializable {
      * @param permitted - each 'permitted_oa' node in the JSON array
      * @return populated OpenPolicyFinderPermittedVersion object
      */
-    private OpenPolicyFinderPermittedVersion parsePermittedVersion(JSONObject permitted, int index) {
+    private OpenPolicyFinderPermittedVersion parsePermittedVersion(JsonNode permitted, int index) {
 
         OpenPolicyFinderPermittedVersion permittedVersion = new OpenPolicyFinderPermittedVersion();
 
@@ -420,11 +420,11 @@ public class OpenPolicyFinderResponse implements Serializable {
 
         // Each 'permitted OA' can actually refer to multiple versions
         if (permitted.has("article_version")) {
-            JSONArray versions = permitted.getJSONArray("article_version");
+            JsonNode versions = permitted.required("article_version");
 
             // Get one particular article version to return as a PermittedVersion. The outer loop calling this
             // is iterating all permitted_oa and permitted_oa->article_version array members
-            articleVersion = versions.getString(index);
+            articleVersion = versions.required(index).asString();
             permittedVersion.setArticleVersion(articleVersion);
             log.debug("Added allowed version: " + articleVersion + " to list");
         }
@@ -433,9 +433,9 @@ public class OpenPolicyFinderResponse implements Serializable {
         // "preprint restrictions", etc., and just contained text rather than data
         if (permitted.has("conditions")) {
             List<String> conditionList = new ArrayList<>();
-            JSONArray conditions = permitted.getJSONArray("conditions");
-            for (int c = 0; c < conditions.length(); c++) {
-                conditionList.add(conditions.getString(c).trim());
+            JsonNode conditions = permitted.required("conditions");
+            for (int c = 0; c < conditions.size(); c++) {
+                conditionList.add(conditions.required(c).asString().trim());
             }
             permittedVersion.setConditions(conditionList);
         }
@@ -443,13 +443,13 @@ public class OpenPolicyFinderResponse implements Serializable {
         // Any prerequisites for this option (eg required by funder)
         List<String> prerequisites = new ArrayList<>();
         if (permitted.has("prerequisites")) {
-            JSONObject prereqs = permitted.getJSONObject("prerequisites");
+            JsonNode prereqs = permitted.required("prerequisites");
             if (prereqs.has("prerequisites_phrases")) {
-                JSONArray phrases = prereqs.getJSONArray("prerequisites_phrases");
-                for (int pp = 0; pp < phrases.length(); pp++) {
-                    JSONObject phrase = phrases.getJSONObject(pp);
+                JsonNode phrases = prereqs.required("prerequisites_phrases");
+                for (int pp = 0; pp < phrases.size(); pp++) {
+                    JsonNode phrase = phrases.required(pp);
                     if (phrase.has("phrase")) {
-                        prerequisites.add(phrase.getString("phrase").trim());
+                        prerequisites.add(phrase.required("phrase").asString().trim());
                     }
                 }
             }
@@ -459,14 +459,14 @@ public class OpenPolicyFinderResponse implements Serializable {
         // Locations where this version / option may be archived
         List<String> allowedLocations = new ArrayList<>();
         if (permitted.has("location")) {
-            JSONObject locations = permitted.getJSONObject("location");
+            JsonNode locations = permitted.required("location");
             if (locations.has("location_phrases")) {
-                JSONArray locationPhrases = locations.getJSONArray("location_phrases");
-                if (locationPhrases.length() > 0) {
-                    for (int l = 0; l < locationPhrases.length(); l++) {
-                        JSONObject locationPhrase = locationPhrases.getJSONObject(l);
+                JsonNode locationPhrases = locations.required("location_phrases");
+                if (locationPhrases.size() > 0) {
+                    for (int l = 0; l < locationPhrases.size(); l++) {
+                        JsonNode locationPhrase = locationPhrases.required(l);
                         if (locationPhrase.has("phrase")) {
-                            allowedLocations.add(locationPhrase.getString("phrase").trim());
+                            allowedLocations.add(locationPhrase.required("phrase").asString().trim());
                         }
                     }
                 }
@@ -477,15 +477,15 @@ public class OpenPolicyFinderResponse implements Serializable {
         List<String> licenses = new ArrayList<>();
         // required licences
         if (permitted.has("license")) {
-            JSONArray licences = permitted.getJSONArray("license");
-            for (int l = 0; l < licences.length(); l++) {
-                JSONObject licence = licences.getJSONObject(l);
+            JsonNode licences = permitted.required("license");
+            for (int l = 0; l < licences.size(); l++) {
+                JsonNode licence = licences.required(l);
                 if (licence.has("license_phrases")) {
-                    JSONArray phrases = licence.getJSONArray("license_phrases");
-                    for (int ll = 0; ll < phrases.length(); ll++) {
-                        JSONObject phrase = phrases.getJSONObject(ll);
+                    JsonNode phrases = licence.required("license_phrases");
+                    for (int ll = 0; ll < phrases.size(); ll++) {
+                        JsonNode phrase = phrases.required(ll);
                         if (phrase.has("phrase")) {
-                            licenses.add(phrase.getString("phrase").trim());
+                            licenses.add(phrase.required("phrase").asString().trim());
                         }
                     }
                 }
@@ -494,10 +494,10 @@ public class OpenPolicyFinderResponse implements Serializable {
         permittedVersion.setLicenses(licenses);
 
         if (permitted.has("embargo")) {
-            JSONObject embargo = permitted.getJSONObject("embargo");
+            JsonNode embargo = permitted.required("embargo");
             OpenPolicyFinderEmbargo OpenPolicyFinderEmbargo =
-                    new OpenPolicyFinderEmbargo(embargo.getInt("amount"),
-                            embargo.getString("units"));
+                    new OpenPolicyFinderEmbargo(embargo.required("amount").asInt(),
+                            embargo.required("units").asString());
             permittedVersion.setEmbargo(OpenPolicyFinderEmbargo);
         }
 
@@ -509,14 +509,14 @@ public class OpenPolicyFinderResponse implements Serializable {
      * @param publisher - array of publisher JSON data
      * @return first publisher name found (trimmed String)
      */
-    private String parsePublisherName(JSONObject publisher) {
+    private String parsePublisherName(JsonNode publisher) {
         String name = null;
         if (publisher.has("name")) {
-            JSONArray publisherNames = publisher.getJSONArray("name");
-            if (publisherNames.length() > 0) {
-                JSONObject publisherName = publisherNames.getJSONObject(0);
+            JsonNode publisherNames = publisher.required("name");
+            if (publisherNames.size() > 0) {
+                JsonNode publisherName = publisherNames.required(0);
                 if (publisherName.has("name")) {
-                    name = publisherName.getString("name").trim();
+                    name = publisherName.required("name").asString().trim();
                 }
             }
         }
@@ -529,9 +529,9 @@ public class OpenPolicyFinderResponse implements Serializable {
      * @param publisher - publisher object (from JSON array)
      * @return publisher URL as string
      */
-    private String parsePublisherURL(JSONObject publisher) {
+    private String parsePublisherURL(JsonNode publisher) {
         if (publisher.has("url")) {
-            return publisher.getString("url");
+            return publisher.required("url").asString();
         }
         return null;
     }

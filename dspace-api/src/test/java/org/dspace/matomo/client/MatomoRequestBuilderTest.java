@@ -16,18 +16,21 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.matomo.model.MatomoRequestDetails;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class MatomoRequestBuilderTest extends AbstractUnitTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     MatomoRequestBuilder matomoRequestBuilder;
 
@@ -37,39 +40,39 @@ public class MatomoRequestBuilderTest extends AbstractUnitTest {
     }
 
     @Test
-    public void testNull() throws JSONException {
+    public void testNull() {
         matomoRequestBuilder = new MatomoRequestBuilder();
         String json = matomoRequestBuilder.buildJSON(null);
         assertThat(json, emptyOrNullString());
     }
 
     @Test
-    public void testEmptyRequests() throws JSONException {
+    public void testEmptyRequests() {
         matomoRequestBuilder = new MatomoRequestBuilder();
         String json = matomoRequestBuilder.buildJSON(new MatomoBulkRequest("my-token", List.of()));
-        JSONObject jsonObject = new JSONObject(json);
-        assertThat(jsonObject.getString("token_auth"), is("my-token"));
+        JsonNode jsonObject = MAPPER.readTree(json);
+        assertThat(jsonObject.get("token_auth").asString(), is("my-token"));
 
         assertThat(jsonObject.has("requests"), is(true));
 
-        JSONArray requests = jsonObject.getJSONArray("requests");
+        JsonNode requests = jsonObject.get("requests");
         assertThat(requests, notNullValue());
-        assertThat(requests.length(), is(0));
+        assertThat(requests.size(), is(0));
     }
 
     @Test
-    public void testNullRequests() throws JSONException {
+    public void testNullRequests() {
         matomoRequestBuilder = new MatomoRequestBuilder();
         String json = matomoRequestBuilder.buildJSON(new MatomoBulkRequest("my-token", null));
-        JSONObject jsonObject = new JSONObject(json);
-        assertThat(jsonObject.getString("token_auth"), is("my-token"));
+        JsonNode jsonObject = MAPPER.readTree(json);
+        assertThat(jsonObject.get("token_auth").asString(), is("my-token"));
 
         assertThat(jsonObject.has("requests"), is(false));
     }
 
 
     @Test
-    public void testSinglelRequest() throws JSONException {
+    public void testSinglelRequest() {
         matomoRequestBuilder = new MatomoRequestBuilder();
         MatomoRequestDetails e1 =
             new MatomoRequestDetails()
@@ -77,15 +80,15 @@ public class MatomoRequestBuilderTest extends AbstractUnitTest {
                 .addParameter("idsite", "1")
                 .addParameter("action_name", "my-action");
         String json = matomoRequestBuilder.buildJSON(new MatomoBulkRequest("my-token", List.of(e1)));
-        JSONObject jsonObject = new JSONObject(json);
-        assertThat(jsonObject.getString("token_auth"), is("my-token"));
+        JsonNode jsonObject = MAPPER.readTree(json);
+        assertThat(jsonObject.get("token_auth").asString(), is("my-token"));
 
         assertThat(jsonObject.has("requests"), is(true));
 
-        JSONArray jsonArray = jsonObject.getJSONArray("requests");
-        assertThat(jsonArray.length(), is(1));
+        JsonNode jsonArray = jsonObject.get("requests");
+        assertThat(jsonArray.size(), is(1));
 
-        String requestUrl = jsonArray.getString(0);
+        String requestUrl = jsonArray.get(0).asString();
         assertThat(requestUrl, startsWith("?"));
 
         String[] parameters = requestUrl.substring(1).split("&");
@@ -96,7 +99,7 @@ public class MatomoRequestBuilderTest extends AbstractUnitTest {
     }
 
     @Test
-    public void testMultipleRequests() throws JSONException {
+    public void testMultipleRequests() {
         matomoRequestBuilder = new MatomoRequestBuilder();
         MatomoRequestDetails e1 =
             new MatomoRequestDetails()
@@ -109,16 +112,18 @@ public class MatomoRequestBuilderTest extends AbstractUnitTest {
                 .addParameter("idsite", "1")
                 .addParameter("action_name", "my-second-action");
         String json = matomoRequestBuilder.buildJSON(new MatomoBulkRequest("my-token", List.of(e1,e2)));
-        JSONObject jsonObject = new JSONObject(json);
-        assertThat(jsonObject.getString("token_auth"), is("my-token"));
+        JsonNode jsonObject = MAPPER.readTree(json);
+        assertThat(jsonObject.get("token_auth").asString(), is("my-token"));
 
         assertThat(jsonObject.has("requests"), is(true));
 
-        JSONArray jsonArray = jsonObject.getJSONArray("requests");
-        assertThat(jsonArray.length(), is(2));
+        JsonNode jsonArray = jsonObject.get("requests");
+        assertThat(jsonArray.size(), is(2));
 
 
-        List<Object> list = jsonArray.toList();
+        List<Object> list = StreamSupport.stream(jsonArray.spliterator(), false)
+                                          .map(JsonNode::asString)
+                                          .collect(Collectors.toList());
         assertThat(list.size(), is(2));
         assertThat(list,
             containsInAnyOrder(

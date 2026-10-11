@@ -23,7 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.dspace.services.ConfigurationService;
-import org.json.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
@@ -35,6 +34,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * ALTCHA (Proof of Work, cookie-less) controller to handle challenge requests.
@@ -111,7 +112,7 @@ public class AltchaCaptchaRestController implements InitializingBean {
             }
 
             // Set response body and headers
-            JSONObject jsonObject = new JSONObject();
+            ObjectNode jsonObject = new ObjectMapper().createObjectNode();
             jsonObject.put("algorithm", algorithm);
             jsonObject.put("challenge", challenge);
             jsonObject.put("salt", randomSalt);

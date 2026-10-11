@@ -38,10 +38,11 @@ import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.hamcrest.Matchers;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Integration test for collection harvest settings controller
@@ -90,16 +91,16 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     }
 
     /**
-     * Function to create a JSONObject containing the harvest settings
+     * Function to create a ObjectNode containing the harvest settings
      * @param harvestType           The harvest type
      * @param oaiSource             The OAI source
      * @param oaiSetId              The OAI set id
      * @param metadataConfigId      The metadata config id
-     * @return A JSONObject containing the given harvest settings
+     * @return A ObjectNode containing the given harvest settings
      */
-    public JSONObject createHarvestSettingsJson(String harvestType,
+    public ObjectNode createHarvestSettingsJson(String harvestType,
                                                 String oaiSource, String oaiSetId, String metadataConfigId) {
-        JSONObject json = new JSONObject();
+        ObjectNode json = new ObjectMapper().createObjectNode();
         json.put("harvest_type", harvestType);
         json.put("oai_source", oaiSource);
         json.put("oai_set_id", oaiSetId);
@@ -114,7 +115,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
         // Add harvest settings to collection
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+        ObjectNode json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
                 "col_1721.1_114174", "dc");
 
         getClient(token).perform(
@@ -161,7 +162,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void GetAndPutCollectionHarvestSettingsIfUserHasWriteRights() throws Exception {
         context.setCurrentUser(ePersonWithWriteRights);
         String token = getAuthToken(ePersonWithWriteRights.getEmail(), password);
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+        ObjectNode json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
                 "col_1721.1_114174", "dc");
 
         getClient(token).perform(
@@ -178,7 +179,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
 
     @Test
     public void getAndPutCollectionHarvestSettingsAnonymousUserException() throws Exception {
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+        ObjectNode json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
                 "col_1721.1_114174", "dc");
 
         getClient().perform(
@@ -192,7 +193,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void GetAndPutCollectionHarvestSettingsIfUserHasNoWriteRightsException() throws Exception {
         context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+        ObjectNode json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
                 "col_1721.1_114174", "dc");
 
         getClient(token).perform(
@@ -232,7 +233,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutWorksWithStandardSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+        ObjectNode json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
                 "col_1721.1_114174", "dc");
 
         getClient(token).perform(
@@ -244,17 +245,17 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
 
         assertTrue(harvestedCollection.getHarvestType()
-            == HarvestTypeEnum.valueOf(json.getString("harvest_type")).getValue());
-        assertTrue(harvestedCollection.getOaiSource().equals(json.getString("oai_source")));
-        assertTrue(harvestedCollection.getOaiSetId().equals(json.getString("oai_set_id")));
-        assertTrue(harvestedCollection.getHarvestMetadataConfig().equals(json.getString("metadata_config_id")));
+            == HarvestTypeEnum.valueOf(json.get("harvest_type").asString()).getValue());
+        assertTrue(harvestedCollection.getOaiSource().equals(json.get("oai_source").asString()));
+        assertTrue(harvestedCollection.getOaiSetId().equals(json.get("oai_set_id").asString()));
+        assertTrue(harvestedCollection.getHarvestMetadataConfig().equals(json.get("metadata_config_id").asString()));
     }
 
     @Test
     public void PutUnProcessableEntityIfIncorrectSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://mydspace.edu/oai/request",
+        ObjectNode json = createHarvestSettingsJson("METADATA_ONLY", "https://mydspace.edu/oai/request",
                 "col_1721.1_114174", "bc");
 
         getClient(token).perform(
@@ -268,7 +269,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutHarvestSettingsDeletedIfHarvestTypeIsNone() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("NONE", "", "", "dc");
+        ObjectNode json = createHarvestSettingsJson("NONE", "", "", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -311,7 +312,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutUnprocessableEntityIfHarvestTypeIncorrect() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("INCORRECT_HARVEST_TYPE", "https://mydspace.edu/oai/request",
+        ObjectNode json = createHarvestSettingsJson("INCORRECT_HARVEST_TYPE", "https://mydspace.edu/oai/request",
                 "col_1721.1_114174", "dc");
 
         getClient(token).perform(

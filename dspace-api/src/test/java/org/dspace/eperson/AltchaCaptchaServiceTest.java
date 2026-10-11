@@ -18,10 +18,11 @@ import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Basic tests to verity the Altcha captcha service can verify payloads from the client
@@ -47,7 +48,7 @@ public class AltchaCaptchaServiceTest extends AbstractUnitTest {
     @Test
     public void testValidJSONCaptchaPayloadValidation() {
         // Create raw JSON first, using previous known-good payload with our test hmac secret of "onetwothreesecret"
-        JSONObject json = new JSONObject();
+        ObjectNode json = new ObjectMapper().createObjectNode();
         json.put("algorithm", "SHA-256");
         json.put("salt", "dcf5eba26e");
         json.put("number", 4791);
@@ -64,7 +65,7 @@ public class AltchaCaptchaServiceTest extends AbstractUnitTest {
     public void testInvalidCaptchaPayloadValidation() {
         assertThrows(InvalidReCaptchaException.class, () -> {
             // Create raw JSON first
-            JSONObject json = new JSONObject();
+            ObjectNode json = new ObjectMapper().createObjectNode();
             json.put("algorithm", "SHA-256");
             json.put("challenge", "abcdefg");
             json.put("salt", "salt123");

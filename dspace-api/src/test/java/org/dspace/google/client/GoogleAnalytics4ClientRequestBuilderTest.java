@@ -21,10 +21,10 @@ import java.util.List;
 
 import org.dspace.google.GoogleAnalyticsEvent;
 import org.dspace.services.ConfigurationService;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Unit tests for {@link GoogleAnalytics4ClientRequestBuilder}.
@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class GoogleAnalytics4ClientRequestBuilderTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private GoogleAnalytics4ClientRequestBuilder requestBuilder;
 
@@ -87,13 +89,13 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event));
         assertThat(requestsBody, hasSize(1));
 
-        JSONObject requestBody = new JSONObject(requestsBody.get(0));
-        assertThat(requestBody.get("client_id"), is("123"));
+        JsonNode requestBody = MAPPER.readTree(requestsBody.get(0));
+        assertThat(requestBody.get("client_id").asString(), is("123"));
 
-        JSONArray eventsArray = requestBody.getJSONArray("events");
-        assertThat(eventsArray.length(), is(1));
+        JsonNode eventsArray = requestBody.get("events");
+        assertThat(eventsArray.size(), is(1));
 
-        assertEventJsonHasAttributes(eventsArray.getJSONObject(0), "item", "download", "bitstream", "192.168.1.25",
+        assertEventJsonHasAttributes(eventsArray.get(0), "item", "download", "bitstream", "192.168.1.25",
             "Chrome", "REF", "/api/documents/123", "Test publication");
 
     }
@@ -110,14 +112,14 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event1, event2));
         assertThat(requestsBody, hasSize(1));
 
-        JSONObject requestBody = new JSONObject(requestsBody.get(0));
-        assertThat(requestBody.get("client_id"), is("123"));
+        JsonNode requestBody = MAPPER.readTree(requestsBody.get(0));
+        assertThat(requestBody.get("client_id").asString(), is("123"));
 
-        JSONArray eventsArray = requestBody.getJSONArray("events");
-        assertThat(eventsArray.length(), is(2));
+        JsonNode eventsArray = requestBody.get("events");
+        assertThat(eventsArray.size(), is(2));
 
-        JSONObject eventJson1 = findEventJsonByDocumentTitle(eventsArray, "Test publication");
-        JSONObject eventJson2 = findEventJsonByDocumentTitle(eventsArray, "Test publication 2");
+        JsonNode eventJson1 = findEventJsonByDocumentTitle(eventsArray, "Test publication");
+        JsonNode eventJson2 = findEventJsonByDocumentTitle(eventsArray, "Test publication 2");
 
         assertThat(eventJson1, notNullValue());
         assertThat(eventJson2, notNullValue());
@@ -145,14 +147,14 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", of(event1, event2, event3));
         assertThat(requestsBody, hasSize(2));
 
-        JSONObject firstRequestBody = findRequestBodyByClientId(requestsBody, "123");
-        assertThat(firstRequestBody.get("client_id"), is("123"));
+        JsonNode firstRequestBody = findRequestBodyByClientId(requestsBody, "123");
+        assertThat(firstRequestBody.get("client_id").asString(), is("123"));
 
-        JSONArray firstEventsArray = firstRequestBody.getJSONArray("events");
-        assertThat(firstEventsArray.length(), is(2));
+        JsonNode firstEventsArray = firstRequestBody.get("events");
+        assertThat(firstEventsArray.size(), is(2));
 
-        JSONObject eventJson1 = findEventJsonByDocumentTitle(firstEventsArray, "Test publication");
-        JSONObject eventJson2 = findEventJsonByDocumentTitle(firstEventsArray, "Test publication 2");
+        JsonNode eventJson1 = findEventJsonByDocumentTitle(firstEventsArray, "Test publication");
+        JsonNode eventJson2 = findEventJsonByDocumentTitle(firstEventsArray, "Test publication 2");
 
         assertThat(eventJson1, notNullValue());
         assertThat(eventJson2, notNullValue());
@@ -163,49 +165,49 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         assertEventJsonHasAttributes(eventJson2, "item", "download", "bitstream", "192.168.1.25",
             "Mozilla Firefox", "REF-2", "/api/documents/12345", "Test publication 2");
 
-        JSONObject secondRequestBody = findRequestBodyByClientId(requestsBody, "987");
-        assertThat(secondRequestBody.get("client_id"), is("987"));
+        JsonNode secondRequestBody = findRequestBodyByClientId(requestsBody, "987");
+        assertThat(secondRequestBody.get("client_id").asString(), is("987"));
 
-        JSONArray secondEventsArray = secondRequestBody.getJSONArray("events");
-        assertThat(secondEventsArray.length(), is(1));
+        JsonNode secondEventsArray = secondRequestBody.get("events");
+        assertThat(secondEventsArray.size(), is(1));
 
-        assertEventJsonHasAttributes(secondEventsArray.getJSONObject(0), "item", "download", "bitstream",
+        assertEventJsonHasAttributes(secondEventsArray.get(0), "item", "download", "bitstream",
             "192.168.1.13", "Postman", "", "/api/documents/654", "Test publication 3");
 
     }
 
-    private void assertEventJsonHasAttributes(JSONObject event, String name, String action, String category,
+    private void assertEventJsonHasAttributes(JsonNode event, String name, String action, String category,
         String userIp, String userAgent, String documentReferrer, String documentPath, String documentTitle) {
 
-        assertThat(event.get("name"), is(name));
-        assertThat(event.getJSONObject("params"), notNullValue());
-        assertThat(event.getJSONObject("params").get("action"), is(action));
-        assertThat(event.getJSONObject("params").get("category"), is(category));
-        assertThat(event.getJSONObject("params").get("document_title"), is(documentTitle));
-        assertThat(event.getJSONObject("params").get("user_ip"), is(userIp));
-        assertThat(event.getJSONObject("params").get("user_agent"), is(userAgent));
-        assertThat(event.getJSONObject("params").get("document_referrer"), is(documentReferrer));
-        assertThat(event.getJSONObject("params").get("document_path"), is(documentPath));
-        assertThat(event.getJSONObject("params").get("time"), notNullValue());
+        assertThat(event.get("name").asString(), is(name));
+        assertThat(event.get("params"), notNullValue());
+        assertThat(event.get("params").get("action").asString(), is(action));
+        assertThat(event.get("params").get("category").asString(), is(category));
+        assertThat(event.get("params").get("document_title").asString(), is(documentTitle));
+        assertThat(event.get("params").get("user_ip").asString(), is(userIp));
+        assertThat(event.get("params").get("user_agent").asString(), is(userAgent));
+        assertThat(event.get("params").get("document_referrer").asString(), is(documentReferrer));
+        assertThat(event.get("params").get("document_path").asString(), is(documentPath));
+        assertThat(event.get("params").get("time"), notNullValue());
 
     }
 
-    private JSONObject findRequestBodyByClientId(List<String> requestsBody, String clientId) {
+    private JsonNode findRequestBodyByClientId(List<String> requestsBody, String clientId) {
         for (String requestBody : requestsBody) {
-            JSONObject requestBodyJson = new JSONObject(requestBody);
-            if (requestBodyJson.get("client_id").equals(clientId)) {
+            JsonNode requestBodyJson = MAPPER.readTree(requestBody);
+            if (requestBodyJson.get("client_id").asString().equals(clientId)) {
                 return requestBodyJson;
             }
         }
         return null;
     }
 
-    private JSONObject findEventJsonByDocumentTitle(JSONArray events, String documentTitle) {
+    private JsonNode findEventJsonByDocumentTitle(JsonNode events, String documentTitle) {
 
-        for (int i = 0; i < events.length(); i++) {
-            JSONObject event = events.getJSONObject(i);
-            assertThat(event.getJSONObject("params"), notNullValue());
-            if (event.getJSONObject("params").get("document_title").equals(documentTitle)) {
+        for (int i = 0; i < events.size(); i++) {
+            JsonNode event = events.get(i);
+            assertThat(event.get("params"), notNullValue());
+            if (event.get("params").get("document_title").asString().equals(documentTitle)) {
                 return event;
             }
         }

@@ -16,10 +16,9 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Model class for the Open Policy Finder API (JSON) response for a publisher search
@@ -76,27 +75,26 @@ public class OpenPolicyFinderPublisherResponse {
      */
     private void parseJSON(InputStream jsonData) throws IOException {
         InputStreamReader streamReader = new InputStreamReader(jsonData, StandardCharsets.UTF_8);
-        JSONTokener jsonTokener = new JSONTokener(streamReader);
-        JSONObject httpResponse;
+        JsonNode httpResponse;
         try {
-            httpResponse = new JSONObject(jsonTokener);
+            httpResponse = new ObjectMapper().readTree(streamReader);
             if (httpResponse.has("items")) {
-                JSONArray items = httpResponse.getJSONArray("items");
+                JsonNode items = httpResponse.required("items");
 
                 // items array in this context is publisher results - parsing is more simple than
                 // parsing the full journal / policy responses
-                if (items.length() > 0) {
+                if (items.size() > 0) {
                     metadata = new OpenPolicyFinderSystemMetadata();
                     this.publishers = new ArrayList<>();
                     // Iterate search result items
-                    for (int itemIndex = 0; itemIndex < items.length(); itemIndex++) {
+                    for (int itemIndex = 0; itemIndex < items.size(); itemIndex++) {
                         OpenPolicyFinderPublisher publisher = new OpenPolicyFinderPublisher();
 
-                        JSONObject item = items.getJSONObject(itemIndex);
+                        JsonNode item = items.required(itemIndex);
 
                         // Parse system metadata (per-item / result information)
                         if (item.has("system_metadata")) {
-                            JSONObject systemMetadata = item.getJSONObject("system_metadata");
+                            JsonNode systemMetadata = item.required("system_metadata");
                             metadata = parseSystemMetadata(systemMetadata);
                             if (metadata.getId() >= 0) {
                                 // Set publisher identifier to be the internal Open Policy Finder ID
@@ -123,7 +121,7 @@ public class OpenPolicyFinderPublisherResponse {
                 message = "No results found";
             }
 
-        } catch (JSONException e) {
+        } catch (JacksonException e) {
             log.error("Failed to parse Open Policy Finder response", e);
             error = true;
         } finally {
@@ -135,28 +133,28 @@ public class OpenPolicyFinderPublisherResponse {
      * Parse system metadata and return populated OpenPolicyFinderSystemMetadata object
      * @param systemMetadata
      */
-    private OpenPolicyFinderSystemMetadata parseSystemMetadata(JSONObject systemMetadata) {
+    private OpenPolicyFinderSystemMetadata parseSystemMetadata(JsonNode systemMetadata) {
 
         OpenPolicyFinderSystemMetadata metadata = new OpenPolicyFinderSystemMetadata();
 
         if (systemMetadata.has("uri")) {
-            this.uri = systemMetadata.getString("uri");
+            this.uri = systemMetadata.required("uri").asString();
             metadata.setUri(this.uri);
         } else {
             log.error("Open Policy Finder URI missing for API response item");
         }
         if (systemMetadata.has("id")) {
-            this.id = systemMetadata.getInt("id");
+            this.id = systemMetadata.required("id").asInt();
             metadata.setId(this.id);
         } else {
             log.error("Open Policy Finder internal ID missing for API response item");
         }
         // Get date created and added - DSpace expects this in the publisher object, though
         if (systemMetadata.has("date_created")) {
-            metadata.setDateCreated(systemMetadata.getString("date_created"));
+            metadata.setDateCreated(systemMetadata.required("date_created").asString());
         }
         if (systemMetadata.has("date_modified")) {
-            metadata.setDateModified(systemMetadata.getString("date_modified"));
+            metadata.setDateModified(systemMetadata.required("date_modified").asString());
         }
 
         return metadata;
@@ -167,14 +165,14 @@ public class OpenPolicyFinderPublisherResponse {
      * @param publisher - array of publisher JSON data
      * @return first publisher name found (trimmed String)
      */
-    private String parsePublisherName(JSONObject publisher) {
+    private String parsePublisherName(JsonNode publisher) {
         String name = null;
         if (publisher.has("name")) {
-            JSONArray publisherNames = publisher.getJSONArray("name");
-            if (publisherNames.length() > 0) {
-                JSONObject publisherName = publisherNames.getJSONObject(0);
+            JsonNode publisherNames = publisher.required("name");
+            if (publisherNames.size() > 0) {
+                JsonNode publisherName = publisherNames.required(0);
                 if (publisherName.has("name")) {
-                    name = publisherName.getString("name").trim();
+                    name = publisherName.required("name").asString().trim();
                 }
             }
         }
@@ -187,9 +185,9 @@ public class OpenPolicyFinderPublisherResponse {
      * @param publisher - publisher object (from JSON array)
      * @return publisher URL as string
      */
-    private String parsePublisherURL(JSONObject publisher) {
+    private String parsePublisherURL(JsonNode publisher) {
         if (publisher.has("url")) {
-            return publisher.getString("url");
+            return publisher.required("url").asString();
         }
         return null;
     }

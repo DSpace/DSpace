@@ -16,8 +16,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Basic services implementation for a Proof of Work Captcha like Altcha.
@@ -65,24 +66,24 @@ public class AltchaCaptchaServiceImpl implements CaptchaService {
         String captchaPayloadJson =
                 new String(Base64.decodeBase64(captchaPayloadHeader.getBytes(StandardCharsets.UTF_8)));
         // Parse as JSON
-        JSONObject captchaPayload = new JSONObject(captchaPayloadJson);
+        JsonNode captchaPayload = new ObjectMapper().readTree(captchaPayloadJson);
         // Extract data and validate work
         try {
             // Make sure the required fields are present
             if (captchaPayload.has("challenge") && captchaPayload.has("salt")
                     && captchaPayload.has("number") && captchaPayload.has("signature")
                     && captchaPayload.has("algorithm")) {
-                String algorithm = captchaPayload.getString("algorithm");
+                String algorithm = captchaPayload.required("algorithm").asString();
                 if (!"SHA-256".equals(algorithm)) {
                     throw new InvalidReCaptchaException("ALTCHA algorithm must be SHA-256, check config and payload");
                 }
                 // Get fields for code readability and debugging
-                String challenge = captchaPayload.getString("challenge");
-                String salt = captchaPayload.getString("salt");
-                String number = String.valueOf(captchaPayload.getNumber("number"));
-                String signature = captchaPayload.getString("signature");
+                String challenge = captchaPayload.required("challenge").asString();
+                String salt = captchaPayload.required("salt").asString();
+                String number = captchaPayload.required("number").asString();
+                String signature = captchaPayload.required("signature").asString();
                 // Calculate hash
-                String hash = CaptchaService.calculateHash(salt + number, captchaPayload.getString("algorithm"));
+                String hash = CaptchaService.calculateHash(salt + number, algorithm);
                 // Get hmacKey
                 String hmacKey = configurationService.getProperty("altcha.hmac.key");
                 if (hmacKey == null) {
