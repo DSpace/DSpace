@@ -862,12 +862,6 @@
             <version>3.6.5</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.coverity.security</groupId>
-            <artifactId>coverity-escapers</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-
         <!-- guava is needed by OAuth, Guice, Mockserver, ORCID, Solr, JClouds -->
         <dependency>
             <groupId>com.google.guava</groupId>

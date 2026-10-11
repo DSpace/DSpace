@@ -134,4 +134,19 @@ public class UtilsTest extends AbstractUnitTest {
         // remove the config we added
         configurationService.setProperty(configName, null);
     }
+
+    /**
+     * Test of addEntities method, of class Utils
+     */
+    @Test
+    public void testAddEntities() {
+        assertNull(Utils.addEntities(null));
+        assertEquals("", Utils.addEntities(""));
+        assertEquals("plainétext", Utils.addEntities("plainétext"),
+                     "Characters without special meaning are kept as is");
+        assertEquals("a&amp;b&lt;c&gt;d&quot;e&#39;f&#x2F;g&#x5C;h",
+                     Utils.addEntities("a&b<c>d\"e'f/g\\h"), "HTML special characters are encoded");
+        assertEquals("a&#x20;b&#x09;c&#x0A;d&#x0D;e&#x0C;f&#x2028;g&#x2029;h",
+                     Utils.addEntities("a b\tc\nd\re\ff g h"), "Whitespace and line separators are encoded");
+    }
 }

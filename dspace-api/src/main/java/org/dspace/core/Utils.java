@@ -42,7 +42,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.coverity.security.Escape;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
@@ -274,13 +273,41 @@ public final class Utils {
      * any metadata fields that could contain the characters {@code "<", ">", "&", "'"},
      * and double quotation marks. This will effectively disable HTML links
      * in metadata.
+     * <p>
+     * Besides the HTML special characters, whitespace, {@code /}, {@code \} and
+     * the Unicode line and paragraph separators are also encoded, so the result
+     * is safe in unquoted attribute values as well.
      *
      * @param value the metadata value to be scrubbed for display
      * @return the passed-in string, with html special characters replaced with
-     * entities.
+     * entities, or null if value is null.
      */
     public static String addEntities(String value) {
-        return Escape.html(value);
+        if (value == null) {
+            return null;
+        }
+        StringBuilder output = new StringBuilder(value.length() + 16);
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '\t' -> output.append("&#x09;");
+                case '\n' -> output.append("&#x0A;");
+                case '\f' -> output.append("&#x0C;");
+                case '\r' -> output.append("&#x0D;");
+                case '\'' -> output.append("&#39;");
+                case '\\' -> output.append("&#x5C;");
+                case ' ' -> output.append("&#x20;");
+                case '/' -> output.append("&#x2F;");
+                case '"' -> output.append("&quot;");
+                case '<' -> output.append("&lt;");
+                case '>' -> output.append("&gt;");
+                case '&' -> output.append("&amp;");
+                case ' ' -> output.append("&#x2028;");
+                case ' ' -> output.append("&#x2029;");
+                default -> output.append(c);
+            }
+        }
+        return output.toString();
     }
 
     /**
