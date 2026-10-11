@@ -7,17 +7,29 @@
  */
 package org.dspace.statistics.util;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.File;
-import java.net.URL;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.utils.DateUtils;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
 import org.apache.logging.log4j.Logger;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Get;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
@@ -124,27 +136,65 @@ public class StatisticsClient {
                 log.error("Unable to create spiders directory");
             }
 
-            for (String value : urls) {
-                value = value.trim();
-                System.out.println(" Downloading: " + value);
+            try (CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build()) {
+                for (String value : urls) {
+                    value = value.trim();
+                    System.out.println(" Downloading: " + value);
 
-                URL url = new URL(value);
-
-                Get get = new Get();
-                get.setProject(new Project());
-                get.setDest(new File(spiders, url.getHost() + url.getPath().replace("/", "-")));
-                get.setSrc(url);
-                get.setUseTimestamp(true);
-                get.execute();
-
+                    URI uri = URI.create(value);
+                    File destination = new File(spiders, uri.getHost() + uri.getRawPath().replace("/", "-"));
+                    download(httpClient, uri, destination);
+                }
             }
-
 
         } catch (Exception e) {
             System.err.println(" - Error: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    /**
+     * Download a URL to a file, unless the file is at least as recent as the remote copy.
+     * The file is only replaced once the download is complete, and gets the remote
+     * Last-Modified date so the next run can skip it when nothing changed.
+     *
+     * @param httpClient  the HTTP client to use
+     * @param uri         the URL to download
+     * @param destination the file to write to
+     * @throws IOException if the download fails or the server does not return the file
+     */
+    private static void download(CloseableHttpClient httpClient, URI uri, File destination) throws IOException {
+        HttpGet get = new HttpGet(uri);
+        if (destination.exists()) {
+            get.setHeader(HttpHeaders.IF_MODIFIED_SINCE,
+                          DateUtils.formatStandardDate(Instant.ofEpochMilli(destination.lastModified())));
+        }
+        httpClient.execute(get, response -> {
+            int status = response.getCode();
+            if (status == HttpStatus.SC_NOT_MODIFIED) {
+                System.out.println(" Not modified: " + destination.getName());
+                return null;
+            }
+            if (status != HttpStatus.SC_OK || response.getEntity() == null) {
+                throw new IOException("Unexpected HTTP status " + status + " for " + uri);
+            }
+            Path temporary = Files.createTempFile(destination.getParentFile().toPath(), destination.getName(), ".tmp");
+            try {
+                try (InputStream content = response.getEntity().getContent()) {
+                    Files.copy(content, temporary, REPLACE_EXISTING);
+                }
+                Files.move(temporary, destination.toPath(), REPLACE_EXISTING);
+            } finally {
+                Files.deleteIfExists(temporary);
+            }
+            Header lastModified = response.getFirstHeader(HttpHeaders.LAST_MODIFIED);
+            Instant remoteDate = lastModified == null ? null : DateUtils.parseStandardDate(lastModified.getValue());
+            if (remoteDate != null && !destination.setLastModified(remoteDate.toEpochMilli())) {
+                log.warn("Unable to set the modification date of {}", destination);
+            }
+            return null;
+        });
     }
 
 
