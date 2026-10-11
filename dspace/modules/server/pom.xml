@@ -354,6 +354,13 @@
             <version>3.1.11</version>
             <scope>test</scope>
         </dependency>
+        <!-- Jersey's injection provider, needed by Solr 10.x EmbeddedSolrServer -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>3.1.11</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj-streaming</artifactId>

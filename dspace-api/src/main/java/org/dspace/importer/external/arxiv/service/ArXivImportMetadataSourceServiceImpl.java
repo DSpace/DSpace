@@ -12,21 +12,20 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.jdom2.Document;
@@ -37,6 +36,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements a data source for querying ArXiv
@@ -47,7 +47,14 @@ import org.jdom2.xpath.XPathFactory;
 public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
     implements QuerySource {
 
-    private WebTarget webTarget;
+    /**
+     * Timeout in milliseconds for connecting to, and reading from, the arXiv API
+     */
+    private static final int TIMEOUT_MS = 10000;
+
+    @Autowired
+    private LiveImportClient liveImportClient;
+
     private String baseAddress;
 
     /**
@@ -142,8 +149,18 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
      */
     @Override
     public void init() throws Exception {
-        Client client = ClientBuilder.newClient();
-        webTarget = client.target(baseAddress);
+    }
+
+    /**
+     * Perform a GET request to the arXiv API.
+     *
+     * @param queryParams the query parameters, added to the URL in iteration order
+     * @return the response body, or an empty string if the request failed
+     */
+    private String executeQuery(Map<String, String> queryParams) {
+        Map<String, Map<String, String>> params = new HashMap<>();
+        params.put(LiveImportClientImpl.URI_PARAMETERS, queryParams);
+        return liveImportClient.executeHttpGetRequest(TIMEOUT_MS, baseAddress, params);
     }
 
     /**
@@ -207,17 +224,16 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             String queryString = query.getParameterAsClass("query", String.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer maxResult = query.getParameterAsClass("count", Integer.class);
-            WebTarget local = webTarget.queryParam("search_query", queryString);
+            Map<String, String> queryParams = new LinkedHashMap<>();
+            queryParams.put("search_query", queryString);
             if (maxResult != null) {
-                local = local.queryParam("max_results", String.valueOf(maxResult));
+                queryParams.put("max_results", String.valueOf(maxResult));
             }
             if (start != null) {
-                local = local.queryParam("start", String.valueOf(start));
+                queryParams.put("start", String.valueOf(start));
             }
-            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
-            Response response = invocationBuilder.get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
+            String responseString = executeQuery(queryParams);
+            if (StringUtils.isNotBlank(responseString)) {
 
                 SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
                 Document document = saxBuilder.build(new StringReader(responseString));
@@ -273,17 +289,16 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             String queryString = query.getParameterAsClass("query", String.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer maxResult = query.getParameterAsClass("count", Integer.class);
-            WebTarget local = webTarget.queryParam("search_query", queryString);
+            Map<String, String> queryParams = new LinkedHashMap<>();
+            queryParams.put("search_query", queryString);
             if (maxResult != null) {
-                local = local.queryParam("max_results", String.valueOf(maxResult));
+                queryParams.put("max_results", String.valueOf(maxResult));
             }
             if (start != null) {
-                local = local.queryParam("start", String.valueOf(start));
+                queryParams.put("start", String.valueOf(start));
             }
-            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
-            Response response = invocationBuilder.get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
+            String responseString = executeQuery(queryParams);
+            if (StringUtils.isNotBlank(responseString)) {
                 List<Element> elements = splitToRecords(responseString);
                 for (Element record : elements) {
                     results.add(transformSourceRecords(record));
@@ -326,11 +341,9 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
                     arxivid = arxivid.substring("arxiv:".length());
                 }
             }
-            WebTarget local = webTarget.queryParam("id_list", arxivid);
-            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
-            Response response = invocationBuilder.get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
+            Map<String, String> queryParams = Map.of("id_list", arxivid);
+            String responseString = executeQuery(queryParams);
+            if (StringUtils.isNotBlank(responseString)) {
                 List<Element> elements = splitToRecords(responseString);
                 for (Element record : elements) {
                     results.add(transformSourceRecords(record));
@@ -364,11 +377,9 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         public List<ImportRecord> call() throws Exception {
             String queryString = getQuery(this.query);
             List<ImportRecord> results = new ArrayList<ImportRecord>();
-            WebTarget local = webTarget.queryParam("search_query", queryString);
-            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
-            Response response = invocationBuilder.get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
+            Map<String, String> queryParams = Map.of("search_query", queryString);
+            String responseString = executeQuery(queryParams);
+            if (StringUtils.isNotBlank(responseString)) {
                 List<Element> elements = splitToRecords(responseString);
                 for (Element record : elements) {
                     results.add(transformSourceRecords(record));

@@ -12,19 +12,20 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
@@ -52,7 +53,13 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     private String baseAddress;
 
-    private WebTarget webTarget;
+    /**
+     * Timeout in milliseconds for connecting to, and reading from, the OpenAIRE API
+     */
+    private static final int TIMEOUT_MS = 10000;
+
+    @Autowired
+    private LiveImportClient liveImportClient;
 
     private String queryParam;
 
@@ -185,7 +192,6 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
      */
     @Override
     public void init() throws Exception {
-        Client client = ClientBuilder.newClient();
         if (baseAddress == null) {
             baseAddress = configurationService.getProperty("openaire.search.url",
                                                            "https://api.openaire.eu/search/publications");
@@ -193,7 +199,18 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
         if (queryParam == null) {
             queryParam = "title";
         }
-        webTarget = client.target(baseAddress);
+    }
+
+    /**
+     * Perform a GET request to the OpenAIRE search API.
+     *
+     * @param queryParams the query parameters, added to the URL in iteration order
+     * @return the response body, or an empty string if the request failed
+     */
+    private String executeQuery(Map<String, String> queryParams) {
+        Map<String, Map<String, String>> params = new HashMap<>();
+        params.put(LiveImportClientImpl.URI_PARAMETERS, queryParams);
+        return liveImportClient.executeHttpGetRequest(TIMEOUT_MS, baseAddress, params);
     }
 
     public class SearchByIdCallable  implements Callable<ImportRecord> {
@@ -211,11 +228,8 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
         @Override
         public ImportRecord call() throws Exception {
             List<ImportRecord> results = new ArrayList<ImportRecord>();
-            WebTarget localTarget = webTarget.queryParam("openairePublicationID", id);
-            Invocation.Builder invocationBuilder = localTarget.request();
-            Response response = invocationBuilder.get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
+            String responseString = executeQuery(Map.of("openairePublicationID", id));
+            if (StringUtils.isNotBlank(responseString)) {
                 List<Element> omElements = splitToRecords(responseString);
                 if (omElements != null) {
                     for (Element record : omElements) {
@@ -243,11 +257,8 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         @Override
         public Integer call() throws Exception {
-            WebTarget localTarget = webTarget.queryParam(queryParam, q);
-            Invocation.Builder invocationBuilder = localTarget.request();
-            Response response = invocationBuilder.get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
+            String responseString = executeQuery(Map.of(queryParam, q));
+            if (StringUtils.isNotBlank(responseString)) {
 
                 SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
                 Document document = saxBuilder.build(new StringReader(responseString));
@@ -286,14 +297,13 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         @Override
         public List<ImportRecord> call() throws Exception {
-            WebTarget localTarget = webTarget.queryParam(queryParam, q);
-            localTarget = localTarget.queryParam("page", page + 1);
-            localTarget = localTarget.queryParam("size", count);
+            Map<String, String> queryParams = new LinkedHashMap<>();
+            queryParams.put(queryParam, q);
+            queryParams.put("page", String.valueOf(page + 1));
+            queryParams.put("size", String.valueOf(count));
             List<ImportRecord> results = new ArrayList<ImportRecord>();
-            Invocation.Builder invocationBuilder = localTarget.request();
-            Response response = invocationBuilder.get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
+            String responseString = executeQuery(queryParams);
+            if (StringUtils.isNotBlank(responseString)) {
                 List<Element> omElements = splitToRecords(responseString);
                 if (omElements != null) {
                     for (Element record : omElements) {

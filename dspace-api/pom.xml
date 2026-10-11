@@ -646,6 +646,13 @@
             <version>3.1.11</version>
             <scope>test</scope>
         </dependency>
+        <!-- Jersey's injection provider, needed by Solr 10.x EmbeddedSolrServer -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>3.1.11</version>
+            <scope>test</scope>
+        </dependency>
         <!-- OpenTelemetry is required by Solr 10.x EmbeddedSolrServer -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
@@ -911,18 +918,11 @@
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <!-- Jersey / JAX-RS client (jakarta.ws.rs.*) dependencies needed to integrate with external sources/services -->
+        <!-- JAX-RS API only (no client implementation): EditItemService uses jakarta.ws.rs.NotFoundException -->
         <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <!-- Required because Jersey no longer includes a dependency injection provider by default.
-             Needed to support PubMed API call in "PubmedImportMetadataSourceServiceImpl.GetRecord" -->
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>${jersey.version}</version>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>3.1.0</version>
         </dependency>
 
         <!-- S3 -->

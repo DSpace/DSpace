@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <header>
+    <query>(title="repository")</query>
+    <locale>en_US</locale>
+    <size>10</size>
+    <page>1</page>
+    <total>1</total>
+    <fields/>
+  </header>
+  <results>
+    <result>
+      <header>
+        <dri:objIdentifier xmlns:dri="http://www.driver-repository.eu/namespace/dri">test________::0000</dri:objIdentifier>
+      </header>
+      <metadata>
+        <oaf:entity>
+          <oaf:result>
+            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">A test record for the OpenAIRE importer</title>
+            <creator rank="1">Doe, Jane</creator>
+            <description>An abstract used only by DSpace integration tests.</description>
+          </oaf:result>
+        </oaf:entity>
+      </metadata>
+    </result>
+  </results>
+</response>
