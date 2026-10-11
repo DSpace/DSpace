@@ -18,8 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.opencsv.CSVWriterBuilder;
-import com.opencsv.ICSVWriter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -234,22 +235,24 @@ public class Dataset {
 
     public ByteArrayOutputStream exportAsCSV() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ICSVWriter ecsvp = new CSVWriterBuilder(new OutputStreamWriter(baos, StandardCharsets.UTF_8))
-                .withSeparator(';')
-                .build();
-        //Generate the item row
-        List<String> colLabels = getColLabels();
-        colLabels.add(0, "");
-        ecsvp.writeNext(colLabels.toArray(new String[colLabels.size()]));
-        List<String> rowLabels = getRowLabels();
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+                .setDelimiter(';')
+                .setQuoteMode(QuoteMode.ALL_NON_NULL)
+                .setRecordSeparator("\n")
+                .get();
+        try (CSVPrinter ecsvp = new CSVPrinter(new OutputStreamWriter(baos, StandardCharsets.UTF_8), format)) {
+            //Generate the item row
+            List<String> colLabels = getColLabels();
+            colLabels.add(0, "");
+            ecsvp.printRecord(colLabels);
+            List<String> rowLabels = getRowLabels();
 
-        String[][] matrix = getMatrix();
-        for (int i = 0; i < rowLabels.size(); i++) {
-            String rowLabel = rowLabels.get(i);
-            ecsvp.writeNext((String[]) ArrayUtils.addAll(new String[] {rowLabel}, matrix[i]));
+            String[][] matrix = getMatrix();
+            for (int i = 0; i < rowLabels.size(); i++) {
+                String rowLabel = rowLabels.get(i);
+                ecsvp.printRecord((Object[]) ArrayUtils.addAll(new String[] {rowLabel}, matrix[i]));
+            }
         }
-        ecsvp.flush();
-        ecsvp.close();
         return baos;
     }
 

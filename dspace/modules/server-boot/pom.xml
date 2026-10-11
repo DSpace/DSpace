@@ -84,7 +84,7 @@
             <version>${test.solr.server.version}</version>
             <scope>test</scope>
             <exclusions>
-                <!-- Newer version brought in by opencsv -->
+                <!-- Newer version managed in the parent POM -->
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-text</artifactId>

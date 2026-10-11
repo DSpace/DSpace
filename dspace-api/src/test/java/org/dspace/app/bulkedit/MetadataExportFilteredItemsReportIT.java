@@ -24,8 +24,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.google.common.io.Files;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -94,12 +95,12 @@ public class MetadataExportFilteredItemsReportIT extends AbstractIntegrationTest
         context.restoreAuthSystemState();
     }
 
-    private void checkItemsPresentInFile(String filename, Item... items) throws IOException, CsvException {
+    private void checkItemsPresentInFile(String filename, Item... items) throws IOException {
         File file = new File(filename);
         Reader reader = Files.newReader(file, Charset.defaultCharset());
 
-        try (CSVReader csvReader = new CSVReader(reader)) {
-            List<String[]> lines = csvReader.readAll();
+        try (CSVParser csvReader = CSVFormat.DEFAULT.parse(reader)) {
+            List<String[]> lines = csvReader.stream().map(CSVRecord::values).toList();
             // length + 1 is because of 1 extra row for the headers
             assertEquals(items.length + 1, lines.size());
 

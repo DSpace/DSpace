@@ -21,8 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.io.Files;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -100,13 +101,13 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         context.restoreAuthSystemState();
     }
 
-    private void checkItemsPresentInFile(String filename, Item[] items) throws IOException, CsvException {
+    private void checkItemsPresentInFile(String filename, Item[] items) throws IOException {
         File file = new File(filename);
         Reader reader = Files.newReader(file, Charset.defaultCharset());
-        CSVReader csvReader = new CSVReader(reader);
+        CSVParser csvReader = CSVFormat.DEFAULT.parse(reader);
 
 
-        List<String[]> lines = csvReader.readAll();
+        List<String[]> lines = csvReader.stream().map(CSVRecord::values).toList();
         //length + 1 is because of 1 row extra for the headers
         assertEquals(items.length + 1, lines.size());
 
@@ -284,8 +285,8 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
 
         File file = new File(filename);
         try (Reader reader = Files.newReader(file, Charset.defaultCharset());
-             CSVReader csvReader = new CSVReader(reader)) {
-            List<String[]> lines = csvReader.readAll();
+             CSVParser csvReader = CSVFormat.DEFAULT.parse(reader)) {
+            List<String[]> lines = csvReader.stream().map(CSVRecord::values).toList();
             assertEquals(2, lines.size(), "Unexpected extra items in export");
         }
     }

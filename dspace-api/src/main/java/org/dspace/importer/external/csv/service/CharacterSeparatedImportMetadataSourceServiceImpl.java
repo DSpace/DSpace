@@ -10,16 +10,15 @@ package org.dspace.importer.external.csv.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
@@ -126,13 +125,19 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
     @Override
     protected List<PlainMetadataSourceDto> readData(InputStream inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> plainMetadataList = new ArrayList<>();
-        CSVParser parser = new CSVParserBuilder().withSeparator(separator).withQuoteChar(quoteCharacter)
-                .withEscapeChar(escapeCharacter).build();
+        // Spaces around a quoted value are ignored, so ' "a, b"' is read as 'a, b'
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+                .setDelimiter(separator)
+                .setQuote(quoteCharacter)
+                .setEscape(escapeCharacter)
+                .setIgnoreSurroundingSpaces(true)
+                .setTrailingData(true)
+                .get();
         try (
                 InputStreamReader inputReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                CSVReader csvReader = new CSVReaderBuilder(inputReader).withCSVParser(parser).build()) {
+                CSVParser csvReader = format.parse(inputReader)) {
             // read all row
-            List<String[]> lines = csvReader.readAll();
+            List<String[]> lines = csvReader.stream().map(CSVRecord::values).toList();
             int listSize = lines == null ? 0 : lines.size();
             int count = skipLines;
             // iterate over row (skipping the first skipLines)
@@ -158,7 +163,7 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
                 }
                 count++;
             }
-        } catch (IOException | CsvException e) {
+        } catch (IOException | UncheckedIOException e) {
             throw new FileSourceException("Error reading file", e);
         }
         return plainMetadataList;

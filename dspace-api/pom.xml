@@ -1008,10 +1008,10 @@
         </dependency>
 
         <!-- Used for Solr core export/import -->
+        <!-- Version managed in the parent POM -->
         <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>5.12.0</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
         </dependency>
 
         <!-- Email templating -->

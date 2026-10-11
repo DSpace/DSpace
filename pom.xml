@@ -1670,7 +1670,13 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.20.0</version>
             </dependency>
-            <!-- NOTE: We don't use commons-logging, commons-compress or commons-csv directly,
+            <!-- Used by dspace-api for reading and writing CSV files (also used by Apache Tika) -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>1.14.1</version>
+            </dependency>
+            <!-- NOTE: We don't use commons-logging or commons-compress directly,
                  but many dependencies rely on them. Only here specified to avoid dependency convergence issues. -->
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -1681,11 +1687,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>1.28.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-csv</artifactId>
-                <version>1.14.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

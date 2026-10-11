@@ -21,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
-import com.opencsv.CSVReader;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -75,8 +77,8 @@ public class DOIMigratorIT extends AbstractIntegrationTestWithDatabase {
 
         String capturedOutput = capturedOutputStream.toString("us-ascii");
         Reader capturedOutputReader = new StringReader(capturedOutput);
-        CSVReader csvReader = new CSVReader(capturedOutputReader);
-        Iterator<String[]> csvIterator = csvReader.iterator();
+        CSVParser csvReader = CSVFormat.DEFAULT.parse(capturedOutputReader);
+        Iterator<String[]> csvIterator = csvReader.stream().map(CSVRecord::values).iterator();
 
         String[] headerLine = csvIterator.next();
         // extremely basic sanity check
@@ -112,8 +114,8 @@ public class DOIMigratorIT extends AbstractIntegrationTestWithDatabase {
 
         String capturedOutput = capturedOutputStream.toString("us-ascii");
         Reader capturedOutputReader = new StringReader(capturedOutput);
-        CSVReader csvReader = new CSVReader(capturedOutputReader);
-        Iterator<String[]> csvIterator = csvReader.iterator();
+        CSVParser csvReader = CSVFormat.DEFAULT.parse(capturedOutputReader);
+        Iterator<String[]> csvIterator = csvReader.stream().map(CSVRecord::values).iterator();
 
         String[] headerLine = csvIterator.next();
         assertEquals(headerLine[0], "ItemUUID");

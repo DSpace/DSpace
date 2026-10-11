@@ -46,9 +46,11 @@ import java.util.Set;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.QuoteMode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1363,7 +1365,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                     ClassicHttpResponse response = hc.execute(get);
                     InputStream csvOutput = response.getEntity().getContent();
                     Reader csvReader = new InputStreamReader(csvOutput);
-                    rows = new CSVReader(csvReader).readAll();
+                    rows = CSVFormat.DEFAULT.parse(csvReader).stream().map(CSVRecord::values).toList();
                 }
                 String[][] csvParsed = rows.toArray(new String[rows.size()][]);
                 String[] header = csvParsed[0];
@@ -1377,11 +1379,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
                 File tempCsv = new File(tempDirectory.getPath() + File.separatorChar + "temp." + i + ".csv");
                 tempCsvFiles.add(tempCsv);
-                CSVWriter csvp = new CSVWriter(new FileWriter(tempCsv));
-                //csvp.setAlwaysQuote(false);
+                CSVPrinter csvp = new CSVPrinter(new FileWriter(tempCsv), CSVFormat.DEFAULT.builder()
+                        .setQuoteMode(QuoteMode.ALL_NON_NULL)
+                        .setRecordSeparator("\n")
+                        .get());
 
                 //Write the header !
-                csvp.writeNext((String[]) ArrayUtils.add(header, "bundleName"));
+                csvp.printRecord((Object[]) ArrayUtils.add(header, "bundleName"));
                 Map<String, String> bitBundleCache = new HashMap<>();
                 //Loop over each line (skip the headers though)!
                 for (int j = 1; j < csvParsed.length; j++) {
@@ -1420,7 +1424,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                             bundleName = "BITSTREAM_DELETED";
                         }
                     }
-                    csvp.writeNext((String[]) ArrayUtils.add(csvLine, bundleName));
+                    csvp.printRecord((Object[]) ArrayUtils.add(csvLine, bundleName));
                 }
 
                 //Loop over our parsed csv

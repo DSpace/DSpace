@@ -11,20 +11,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.UUID;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.QuoteMode;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -68,12 +72,17 @@ public class RepairDump {
         // Copy standard in to standard out, fixing problems.
         try (
                 Reader input = new InputStreamReader(System.in, StandardCharsets.UTF_8);
-                CSVReader csvReader = new CSVReader(input);
+                CSVParser csvReader = CSVFormat.DEFAULT.parse(input);
                 Writer output = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
-                CSVWriter csvWriter = new CSVWriter(output);
+                CSVPrinter csvWriter = new CSVPrinter(output, CSVFormat.DEFAULT.builder()
+                        .setQuoteMode(QuoteMode.ALL_NON_NULL)
+                        .setRecordSeparator("\n")
+                        .get());
                 ) {
+            Iterator<CSVRecord> records = csvReader.iterator();
+
             // Read the column headers.
-            String[] fields = csvReader.readNext();
+            String[] fields = records.hasNext() ? records.next().values() : new String[0];
 
             // Which column is "uid"?
             int uidIndex = -1;
@@ -89,10 +98,11 @@ public class RepairDump {
             }
 
             // Copy the headers to output.
-            csvWriter.writeNext(fields);
+            csvWriter.printRecord((Object[]) fields);
 
             // Copy records to output, repairing any problems that we find.
-            while (null != (fields = csvReader.readNext())) {
+            while (records.hasNext()) {
+                fields = records.next().values();
                 recordCount++;
 
                 // Set 'uid' to a new random UUID if empty.
@@ -108,12 +118,12 @@ public class RepairDump {
                 }
 
                 // Write repaired record.
-                csvWriter.writeNext(fields);
+                csvWriter.printRecord((Object[]) fields);
             }
         } catch (IOException ex) {
             System.err.format("Could not read the export at record %d:  ", recordCount);
             System.err.println(ex.getMessage());
-        } catch (CsvValidationException csve) {
+        } catch (UncheckedIOException csve) {
             System.err.format("Invalid line at record %d:  ", recordCount);
             System.err.println(csve.getMessage());
         } finally {

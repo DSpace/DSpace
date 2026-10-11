@@ -10,14 +10,14 @@ package org.dspace.importer.external.metadatamapping.contributor;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;
 import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto;
@@ -110,21 +110,27 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
     }
 
     private String[] splitToRecord(String value) {
-        List<String[]> rows;
         // For example, list of author must be: Author 1, author 2, author 3
         // if author name contains comma, is important to escape its in
         // this way: Author 1, \"Author 2, something\", Author 3
-        CSVParser parser = new CSVParserBuilder().withSeparator(delimiter).withQuoteChar(quote).withEscapeChar(escape)
-                .build();
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+                .setDelimiter(delimiter)
+                .setQuote(quote)
+                .setEscape(escape)
+                .setIgnoreSurroundingSpaces(true)
+                .setTrailingData(true)
+                .get();
         try (   Reader inputReader = new StringReader(value);
-                com.opencsv.CSVReader csvReader = new CSVReaderBuilder(inputReader).withCSVParser(parser).build()) {
-            rows = csvReader.readAll();
-        } catch (IOException | CsvException e) {
+                CSVParser csvReader = format.parse(inputReader)) {
+            //must be one row
+            Iterator<CSVRecord> rows = csvReader.iterator();
+            if (rows.hasNext()) {
+                return rows.next().values();
+            }
+        } catch (IOException | UncheckedIOException e) {
             //fallback, use the input as value
-            return new String[] { value };
         }
-        //must be one row
-        return rows.get(0);
+        return new String[] { value };
     }
 
 }

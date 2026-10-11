@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -24,14 +25,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.help.HelpFormatter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.QuoteMode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -225,8 +228,12 @@ public class DOIMigrator {
         // there is no real resource leak here, because in practice
         // input is always stdin (from a pipe); it’s no danger to
         // leave it open
-        CSVReader csvReader = new CSVReader(input);
-        Stream<String[]> rows = StreamSupport.stream(csvReader.spliterator(), false);
+        Stream<String[]> rows;
+        try {
+            rows = CSVFormat.DEFAULT.parse(input).stream().map(CSVRecord::values);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return rows.skip(1).map((String[] row) -> {
             if (row.length != csvColumns.length) {
                 throw new CSVMigrationsFormatError();
@@ -263,20 +270,20 @@ public class DOIMigrator {
 
     void doiMigrationsToCSV(Writer output, Stream<DOIMigration> doiMigrations)
             throws IOException {
-        CSVWriter csvWriter = new CSVWriter(output);
-        try {
-            csvWriter.writeNext(csvColumns, true);
-            doiMigrations.forEach((DOIMigration doiMigration) -> {
-                String[] cells = new String[csvColumns.length];
-                cells[0] = doiMigration.dspaceItem.getID().toString();
-                cells[1] = doiMigration.from.getMetadataField().toString('.');
-                cells[2] = doiMigration.from.getValue();
-                cells[3] = doiMigration.toFieldName.toString();
-                cells[4] = doiMigration.toValue.toString();
-                csvWriter.writeNext(cells, true);
-            });
-        } finally {
-            csvWriter.close();
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+            .setQuoteMode(QuoteMode.ALL_NON_NULL)
+            .setRecordSeparator("\n")
+            .get();
+        try (CSVPrinter csvWriter = new CSVPrinter(output, format)) {
+            csvWriter.printRecord((Object[]) csvColumns);
+            for (Iterator<DOIMigration> it = doiMigrations.iterator(); it.hasNext(); ) {
+                DOIMigration doiMigration = it.next();
+                csvWriter.printRecord(doiMigration.dspaceItem.getID().toString(),
+                                      doiMigration.from.getMetadataField().toString('.'),
+                                      doiMigration.from.getValue(),
+                                      doiMigration.toFieldName.toString(),
+                                      doiMigration.toValue.toString());
+            }
         }
     }
 
