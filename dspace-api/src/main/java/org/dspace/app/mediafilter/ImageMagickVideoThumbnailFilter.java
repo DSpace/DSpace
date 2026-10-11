@@ -14,9 +14,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 import org.dspace.content.Item;
-import org.im4java.core.ConvertCmd;
-import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
 
 
 /**
@@ -25,8 +22,6 @@ import org.im4java.core.IMOperation;
  * no bigger than. Creates only JPEGs.
  */
 public class ImageMagickVideoThumbnailFilter extends ImageMagickThumbnailFilter {
-    private static final int DEFAULT_WIDTH = 180;
-    private static final int DEFAULT_HEIGHT = 120;
     private static final int FRAME_NUMBER = 100;
 
     /**
@@ -57,20 +52,18 @@ public class ImageMagickVideoThumbnailFilter extends ImageMagickThumbnailFilter 
 
     @Override
     public File getThumbnailFile(File f, boolean verbose)
-        throws IOException, InterruptedException, IM4JavaException {
+        throws IOException, InterruptedException {
         File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
         f2.deleteOnExit();
-        ConvertCmd cmd = new ConvertCmd();
-        IMOperation op = new IMOperation();
-        op.autoOrient();
-        op.addImage("VIDEO:" + f.getAbsolutePath() + "[" + FRAME_NUMBER + "]");
-        op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
-                        configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
-        op.addImage(f2.getAbsolutePath());
+        ImageMagickCommand cmd = ImageMagickCommand.convert()
+            .add("-auto-orient")
+            .add("VIDEO:" + f.getAbsolutePath() + "[" + FRAME_NUMBER + "]")
+            .add("-thumbnail", thumbnailGeometry())
+            .add(f2.getAbsolutePath());
         if (verbose) {
-            System.out.println("IM Thumbnail Param: " + op);
+            System.out.println("IM Thumbnail Param: " + cmd);
         }
-        cmd.run(op);
+        cmd.run();
         return f2;
     }
 }

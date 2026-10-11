@@ -25,11 +25,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.im4java.core.ConvertCmd;
-import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
-import org.im4java.core.Info;
-import org.im4java.process.ProcessStarter;
 
 /**
  * Filter image bitstreams, scaling the image to be within the bounds of
@@ -48,7 +43,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
     static {
         String s = configurationService.getProperty(PRE + ".ProcessStarter");
-        ProcessStarter.setGlobalSearchPath(s);
+        ImageMagickCommand.setSearchPath(s);
     }
 
     public ImageMagickThumbnailFilter() {
@@ -99,21 +94,27 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
     }
 
     public File getThumbnailFile(File f, boolean verbose)
-        throws IOException, InterruptedException, IM4JavaException {
+        throws IOException, InterruptedException {
         File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
         f2.deleteOnExit();
-        ConvertCmd cmd = new ConvertCmd();
-        IMOperation op = new IMOperation();
-        op.autoOrient();
-        op.addImage(f.getAbsolutePath() + "[0]");
-        op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
-                        configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
-        op.addImage(f2.getAbsolutePath());
+        ImageMagickCommand cmd = ImageMagickCommand.convert()
+            .add("-auto-orient")
+            .add(f.getAbsolutePath() + "[0]")
+            .add("-thumbnail", thumbnailGeometry())
+            .add(f2.getAbsolutePath());
         if (verbose) {
-            System.out.println("IM Thumbnail Param: " + op);
+            System.out.println("IM Thumbnail Param: " + cmd);
         }
-        cmd.run(op);
+        cmd.run();
         return f2;
+    }
+
+    /**
+     * @return the ImageMagick geometry ("WIDTHxHEIGHT") that thumbnails must fit in
+     */
+    protected String thumbnailGeometry() {
+        return configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH) + "x"
+            + configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT);
     }
 
     /**
@@ -122,14 +123,13 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
      * generate an intermediate image file for use with getThumbnailFile.
      */
     public File getImageFile(File f, boolean verbose)
-        throws IOException, InterruptedException, IM4JavaException {
+        throws IOException, InterruptedException {
         // Writing an intermediate file to disk is inefficient, but since we're
         // doing it anyway, we should use a lossless format. IM's internal MIFF
         // is lossless like PNG and TIFF, but much faster.
         File f2 = new File(f.getParentFile(), f.getName() + ".miff");
         f2.deleteOnExit();
-        ConvertCmd cmd = new ConvertCmd();
-        IMOperation op = new IMOperation();
+        ImageMagickCommand cmd = ImageMagickCommand.convert();
 
         // Optionally override ImageMagick's default density of 72 DPI to use a
         // "supersample" when creating the PDF thumbnail. Note that I prefer to
@@ -140,7 +140,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         // we open the input file.
         String density = configurationService.getProperty(PRE + ".density");
         if (density != null) {
-            op.density(Integer.valueOf(density));
+            cmd.add("-density", String.valueOf(Integer.valueOf(density)));
         }
 
         // Check the PDF's MediaBox and CropBox to see if they are the same.
@@ -160,13 +160,13 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
         // This option must come *before* we open the input file.
         if (pdfPageCropBox != pdfPageMediaBox) {
-            op.define("pdf:use-cropbox=true");
+            cmd.add("-define", "pdf:use-cropbox=true");
         }
 
         String s = "[0]";
-        op.addImage(f.getAbsolutePath() + s);
+        cmd.add(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
-            op.flatten();
+            cmd.add("-flatten");
         }
 
         // PDFs using the CMYK color system can be handled specially if
@@ -174,18 +174,20 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         String cmyk_profile = configurationService.getProperty(PRE + ".cmyk_profile");
         String srgb_profile = configurationService.getProperty(PRE + ".srgb_profile");
         if (cmyk_profile != null && srgb_profile != null) {
-            Info imageInfo = new Info(f.getAbsolutePath() + s, true);
-            String imageClass = imageInfo.getImageClass();
+            // %r is the image class and colorspace, e.g. "DirectClass CMYK"
+            String imageClass = ImageMagickCommand.identify()
+                .add("-ping", "-format", "%r", f.getAbsolutePath() + s)
+                .run();
             if (imageClass.contains("CMYK")) {
-                op.profile(cmyk_profile);
-                op.profile(srgb_profile);
+                cmd.add("-profile", cmyk_profile);
+                cmd.add("-profile", srgb_profile);
             }
         }
-        op.addImage(f2.getAbsolutePath());
+        cmd.add(f2.getAbsolutePath());
         if (verbose) {
-            System.out.println("IM Image Param: " + op);
+            System.out.println("IM Image Param: " + cmd);
         }
-        cmd.run(op);
+        cmd.run();
         return f2;
     }
 
