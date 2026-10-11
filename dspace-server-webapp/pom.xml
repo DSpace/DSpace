@@ -349,19 +349,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>com.flipkart.zjsonpatch</groupId>
-            <artifactId>zjsonpatch</artifactId>
-            <version>0.4.16</version>
-            <exclusions>
-                <!-- Exclude Jackson 2 - managed by parent pom for IIIF module -->
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- HAL Browser (via WebJars) : https://github.com/mikekelly/hal-browser -->
         <!-- This is primarily used to pull in the HAL Browser core Javascript code ('js' folder), as we've overridden
              many dependencies below and the HTML pages in src/main/webapp/ -->
