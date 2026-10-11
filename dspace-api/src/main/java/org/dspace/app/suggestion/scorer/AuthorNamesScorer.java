@@ -9,6 +9,7 @@ package org.dspace.app.suggestion.scorer;
 
 import static org.dspace.app.suggestion.SuggestionUtils.getAllEntriesByMetadatum;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,9 +17,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
-import com.ibm.icu.text.Normalizer;
 import org.apache.commons.lang3.Strings;
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.content.Item;
@@ -136,17 +134,12 @@ public class AuthorNamesScorer implements EvidenceScorer {
      * @return cleaned up string
      * */
     private String normalize(String value) {
-        String norm = Normalizer.normalize(value, Normalizer.NFD);
+        String norm = Normalizer.normalize(value, Normalizer.Form.NFD);
         // Removes diacritical marks
         norm = norm.replaceAll("\\p{M}", "");
-        CharsetDetector cd = new CharsetDetector();
-        cd.setText(value.getBytes());
-        CharsetMatch detect = cd.detect();
-        if (detect != null && detect.getLanguage() != null) {
-            norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase(new Locale(detect.getLanguage()));
-        } else {
-            norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase();
-        }
+        // Lower case independently of the server's default locale, so that the same
+        // name always gives the same result (e.g. no dotless i under a Turkish locale)
+        norm = norm.replaceAll("[^\\p{L}]", " ").toLowerCase(Locale.ROOT);
         return Arrays.asList(norm.split("\\s+")).stream().sorted().collect(Collectors.joining());
     }
 

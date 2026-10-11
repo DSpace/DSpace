@@ -506,10 +506,6 @@
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.ibm.icu</groupId>
-            <artifactId>icu4j</artifactId>
-        </dependency>
         <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
         <dependency>
             <groupId>org.dspace</groupId>

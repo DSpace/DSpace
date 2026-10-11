@@ -7,11 +7,11 @@
  */
 package org.dspace.browse;
 
+import java.text.CollationElementIterator;
+import java.text.Collator;
+import java.text.RuleBasedCollator;
 import java.util.Locale;
 
-import com.ibm.icu.text.CollationElementIterator;
-import com.ibm.icu.text.Collator;
-import com.ibm.icu.text.RuleBasedCollator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
