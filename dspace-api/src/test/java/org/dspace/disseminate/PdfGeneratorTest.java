@@ -17,7 +17,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,6 +97,42 @@ public class PdfGeneratorTest {
             throw new AssertionError("Should have blocked XXE/DOCTYPE");
         } catch (RuntimeException e) {
             // Expected
+        }
+    }
+
+    @Test
+    public void testPageFormatLetter() throws IOException {
+        variables.put("page_format", "LETTER");
+        try (PDDocument document = pdfGenerator.generate(pdfGenerator.parseTemplate("dspace_coverpage", variables))) {
+            PDRectangle size = document.getPage(0).getMediaBox();
+            assertEquals(PDRectangle.LETTER.getWidth(), size.getWidth(), 1f, "Letter width");
+            assertEquals(PDRectangle.LETTER.getHeight(), size.getHeight(), 1f, "Letter height");
+        }
+    }
+
+    @Test
+    public void testPageFormatA4() throws IOException {
+        variables.put("page_format", "A4");
+        try (PDDocument document = pdfGenerator.generate(pdfGenerator.parseTemplate("dspace_coverpage", variables))) {
+            PDRectangle size = document.getPage(0).getMediaBox();
+            assertEquals(PDRectangle.A4.getWidth(), size.getWidth(), 1f, "A4 width");
+            assertEquals(PDRectangle.A4.getHeight(), size.getHeight(), 1f, "A4 height");
+        }
+    }
+
+    @Test
+    public void testTextAndClasspathLogoAreRendered() throws IOException {
+        try (PDDocument document = pdfGenerator.generate(pdfGenerator.parseTemplate("dspace_coverpage", variables))) {
+            String text = new PDFTextStripper().getText(document);
+            assertTrue(text.contains("Test Title"), "PDF should contain the title");
+            assertTrue(text.contains("Test Author"), "PDF should contain the author");
+
+            PDResources resources = document.getPage(0).getResources();
+            boolean hasImage = false;
+            for (COSName name : resources.getXObjectNames()) {
+                hasImage |= resources.getXObject(name) instanceof PDImageXObject;
+            }
+            assertTrue(hasImage, "PDF should contain the logo loaded from the classpath");
         }
     }
 }

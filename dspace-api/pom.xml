@@ -1174,17 +1174,11 @@
             </exclusions>
         </dependency>
 
+        <!-- Renders the HTML cover page to PDF, using PDFBox -->
         <dependency>
-            <groupId>org.xhtmlrenderer</groupId>
-            <artifactId>flying-saucer-pdf</artifactId>
-            <version>9.13.3</version>
-            <exclusions>
-                <!-- Conflicts with Hibernate. Use version that is brought in via Hibernate -->
-                <exclusion>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>io.github.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>1.1.97</version>
         </dependency>
 
         <dependency>

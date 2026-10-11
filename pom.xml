@@ -1772,6 +1772,12 @@
                 <artifactId>fontbox</artifactId>
                 <version>${pdfbox-version}</version>
             </dependency>
+            <!-- Used by openhtmltopdf; keep it in line with PDFBox -->
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>xmpbox</artifactId>
+                <version>${pdfbox-version}</version>
+            </dependency>
             <!-- Tika and Jena disagree on version of Xerces to use. Select latest -->
             <dependency>
                 <groupId>xerces</groupId>

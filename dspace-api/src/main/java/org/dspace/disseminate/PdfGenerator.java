@@ -12,13 +12,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.openhtmltopdf.extend.FSStream;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.dspace.app.util.XMLUtils;
@@ -27,7 +33,6 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.w3c.dom.Document;
-import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xml.sax.SAXException;
 
 /**
@@ -38,6 +43,8 @@ import org.xml.sax.SAXException;
  * Step 2 is to render the HTML to PDF.
  */
 public class PdfGenerator {
+
+    private static final String CLASSPATH_PROTOCOL = "classpath";
 
     /**
      * Render a HTML coverpage.
@@ -103,14 +110,41 @@ public class PdfGenerator {
 
     private void generate(String html, OutputStream out) {
         try {
-            var renderer = new ITextRenderer();
             DocumentBuilder builder = XMLUtils.getDocumentBuilder();
             Document doc = builder.parse(new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
-            renderer.setDocument(doc, null);
-            renderer.layout();
-            renderer.createPDF(out);
+            new PdfRendererBuilder()
+                .useFastMode()
+                .useProtocolsStreamImplementation(this::openClasspathResource, CLASSPATH_PROTOCOL)
+                .withW3cDocument(doc, null)
+                .toStream(out)
+                .run();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Resolve a "classpath:" URL in the template (e.g. the logo) to a resource of this class loader.
+     *
+     * @param url the URL, e.g. "classpath:dspace_logo.png"
+     * @return the resource, or null if it does not exist
+     */
+    private FSStream openClasspathResource(String url) {
+        String name = StringUtils.removeStart(StringUtils.removeStart(url, CLASSPATH_PROTOCOL + ":"), "/");
+        ClassLoader classLoader = PdfGenerator.class.getClassLoader();
+        if (classLoader.getResource(name) == null) {
+            return null;
+        }
+        return new FSStream() {
+            @Override
+            public InputStream getStream() {
+                return classLoader.getResourceAsStream(name);
+            }
+
+            @Override
+            public Reader getReader() {
+                return new InputStreamReader(getStream(), StandardCharsets.UTF_8);
+            }
+        };
     }
 }
