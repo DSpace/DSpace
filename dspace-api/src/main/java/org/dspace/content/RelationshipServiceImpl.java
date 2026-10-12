@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -778,6 +780,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
             // Configured relationships retain stored text; no legacy virtual copy is needed.
             deleteConfigBackedRelationship(context, relationship);
+            updateConfigBackedRelationshipItems(context, relationship);
             return;
         }
         delete(context, relationship, relationship.getRelationshipType().isCopyToLeft(),
@@ -827,6 +830,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             // The POC defaults to retaining bibliographic text on endpoint/link deletion.
             // Full projection deletion is an explicit compound-service operation.
             deleteConfigBackedRelationship(context, relationship);
+            updateConfigBackedRelationshipItems(context, relationship);
             return;
         }
         log.info(org.dspace.core.LogHelper.getHeader(context, "delete_relationship",
@@ -1286,10 +1290,13 @@ public class RelationshipServiceImpl implements RelationshipService {
             return;
         }
 
+        Map<UUID, Item> survivingItems = new LinkedHashMap<>();
+
         if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_ALL)) {
             // Option 1: Copy all virtual metadata of this item to its related items. Iterate over all of the item's
             //           relationships and copy their data.
             for (Relationship relationship : findByItem(context, item)) {
+                collectSurvivingConfigBackedItem(item, relationship, survivingItems);
                 deleteRelationshipCopyVirtualMetadata(context, item, relationship);
             }
         } else if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_CONFIGURED)) {
@@ -1301,6 +1308,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 // and relationships without a RelationshipType have no legacy virtual metadata,
                 // so no virtual metadata needs to be copied before deleting the relationship.
                 if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
+                    collectSurvivingConfigBackedItem(item, relationship, survivingItems);
                     forceDelete(context, relationship, false, false);
                     continue;
                 }
@@ -1324,6 +1332,19 @@ public class RelationshipServiceImpl implements RelationshipService {
                 for (Relationship relationship : findByItemAndRelationshipType(context, item, relationshipType)) {
                     deleteRelationshipCopyVirtualMetadata(context, item, relationship);
                 }
+            }
+        }
+        // Update surviving endpoints once to trigger MODIFY_METADATA events, since these relationships are deleted
+        // before ItemServiceImpl#rawDelete() can process them.
+        // Bypass authorization because the user may not have WRITE permission on the surviving Items.
+        if (!survivingItems.isEmpty()) {
+            context.turnOffAuthorisationSystem();
+            try {
+                for (Item survivor : survivingItems.values()) {
+                    itemService.update(context, survivor);
+                }
+            } finally {
+                context.restoreAuthSystemState();
             }
         }
     }
@@ -1359,6 +1380,55 @@ public class RelationshipServiceImpl implements RelationshipService {
             copyToRight = false;
         }
         forceDelete(context, relationshipToDelete, copyToLeft, copyToRight);
+    }
+
+    /**
+     * Collect the surviving endpoint of a config-backed or type-less relationship,
+     * excluding the Item being deleted and avoiding duplicates by UUID.
+     *
+     * @param item           the Item being deleted
+     * @param relationship   the relationship being removed
+     * @param survivingItems map of surviving Items to update
+     */
+    private void collectSurvivingConfigBackedItem(Item item, Relationship relationship,
+                                                  Map<UUID, Item> survivingItems) {
+        if (!relationship.isConfigurationBacked() && relationship.getRelationshipType() != null) {
+            return;
+        }
+
+        Item survivor = relationship.getLeftItem().getID().equals(item.getID())
+            ? relationship.getRightItem() : relationship.getLeftItem();
+
+        if (!survivor.getID().equals(item.getID())) {
+            survivingItems.put(survivor.getID(), survivor);
+        }
+    }
+
+    /**
+     * Update both distinct endpoints after deleting a config-backed relationship
+     * to persist metadata changes and trigger MODIFY_METADATA events.
+     * Authorization is temporarily disabled because WRITE permission on either
+     * endpoint is sufficient to delete the relationship.
+     *
+     * @param context      the DSpace context
+     * @param relationship the deleted relationship
+     * @throws SQLException       if a database error occurs
+     * @throws AuthorizeException if an Item update fails authorization
+     */
+    private void updateConfigBackedRelationshipItems(Context context, Relationship relationship)
+        throws SQLException, AuthorizeException {
+        Item left = relationship.getLeftItem();
+        Item right = relationship.getRightItem();
+
+        context.turnOffAuthorisationSystem();
+        try {
+            itemService.update(context, left);
+            if (!left.getID().equals(right.getID())) {
+                itemService.update(context, right);
+            }
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
 }

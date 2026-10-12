@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -925,8 +926,33 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Remove relationships after removing authority references as the new relationship handling relies on
         // authority. This prevents relationship cleanup from affecting authority information.
+        Map<UUID, Item> survivingItems = new LinkedHashMap<>();
+
         for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
+            if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
+                // Collect the other endpoint if it is not the Item being deleted, avoiding duplicate updates.
+                Item survivor = relationship.getLeftItem().getID().equals(item.getID())
+                    ? relationship.getRightItem() : relationship.getLeftItem();
+
+                if (!survivor.getID().equals(item.getID())) {
+                    survivingItems.put(survivor.getID(), survivor);
+                }
+            }
+
             relationshipService.forceDelete(context, relationship, false, false);
+        }
+
+        // Update each surviving endpoint once to persist metadata changes and trigger MODIFY_METADATA events.
+        // Bypass authorization for these internal updates, as the user may not have WRITE access to the survivors.
+        if (!survivingItems.isEmpty()) {
+            context.turnOffAuthorisationSystem();
+            try {
+                for (Item survivor : survivingItems.values()) {
+                    update(context, survivor);
+                }
+            } finally {
+                context.restoreAuthSystemState();
+            }
         }
 
         // Finally remove item row

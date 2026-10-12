@@ -10,6 +10,7 @@ package org.dspace.content.authority;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -18,8 +19,11 @@ import static org.junit.Assert.assertThrows;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -34,7 +38,10 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.core.Constants;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.eperson.EPerson;
+import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.junit.Before;
@@ -297,4 +304,193 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     private MetadataValue author() {
         return itemService.getMetadata(owner, "dc", "contributor", "author", Item.ANY).get(0);
     }
+
+
+    @Test
+    public void testConfigBackedDeletionGeneratesMetadataEvents() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
+        context.getEvents().clear();
+
+        relationshipService.delete(context, relationship);
+
+        assertMetadataEvents(owner, 1);
+        assertMetadataEvents(target, 1);
+    }
+
+    @Test
+    public void testConfigBackedDeletionWithCopyFlagsGeneratesMetadataEvents() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
+        context.getEvents().clear();
+
+        relationshipService.delete(context, relationship, false, false);
+
+        assertMetadataEvents(owner, 1);
+        assertMetadataEvents(target, 1);
+    }
+
+    @Test
+    public void testRemovingRelationshipAndMetadataGeneratesMetadataEvents() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
+        context.getEvents().clear();
+
+        service.removeRelationshipAndMetadata(context, relationship);
+
+        assertMetadataEvents(owner, 1);
+        assertMetadataEvents(target, 1);
+    }
+
+    @Test
+    public void testItemDeletionGeneratesSurvivingEndpointEvent() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        service.promoteResolvedAuthority(context, owner, author(), target);
+        context.getEvents().clear();
+
+        itemService.delete(context, target);
+
+        assertMetadataEvents(owner, 1);
+    }
+
+    @Test
+    public void testCopyAllVirtualMetadataDeletionGeneratesSurvivingEndpointEvent() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        service.promoteResolvedAuthority(context, owner, author(), target);
+        context.getEvents().clear();
+
+        relationshipService.deleteMultipleRelationshipsCopyVirtualMetadata(
+            context, new String[] { "all" }, target);
+
+        assertMetadataEvents(owner, 1);
+    }
+
+    @Test
+    public void testCopyConfiguredVirtualMetadataDeletionGeneratesSurvivingEndpointEvent() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        service.promoteResolvedAuthority(context, owner, author(), target);
+        context.getEvents().clear();
+
+        relationshipService.deleteMultipleRelationshipsCopyVirtualMetadata(
+            context, new String[] { "configured" }, target);
+
+        assertMetadataEvents(owner, 1);
+    }
+
+    @Test
+    public void testDeletingMultipleRelationshipsUpdatesSurvivorOnce() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item secondTarget = ItemBuilder.createItem(context, collection)
+                                       .withTitle("second person")
+                                       .withEntityType("Person")
+                                       .build();
+
+        service.promoteResolvedAuthority(context, owner, author(), target);
+
+        itemService.addMetadata(context, owner, "dc", "contributor", "author",
+                                null, "Second Author");
+        List<MetadataValue> authors =
+            itemService.getMetadata(owner, "dc", "contributor", "author", Item.ANY);
+
+        service.promoteResolvedAuthority(context, owner, authors.get(authors.size() - 1), secondTarget);
+        context.getEvents().clear();
+
+        itemService.delete(context, owner);
+
+        assertMetadataEvents(target, 1);
+        assertMetadataEvents(secondTarget, 1);
+    }
+
+    @Test
+    public void testConfigBackedDeletionWithWriteOnOneEndpoint() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withEmail("relationship-test@example.com")
+                                     .withPassword("password")
+                                     .build();
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.addPolicy(context, owner, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        context.getEvents().clear();
+
+        relationshipService.delete(context, relationship);
+
+        assertMetadataEvents(owner, 1);
+        assertMetadataEvents(target, 1);
+    }
+
+    @Test
+    public void testItemDeletionWithoutWriteOnSurvivor() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        service.promoteResolvedAuthority(context, owner, author(), target);
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withEmail("item-deletion-test@example.com")
+                                     .withPassword("password")
+                                     .build();
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.addPolicy(context, target, Constants.DELETE, user);
+        authorizeService.addPolicy(context, target, Constants.REMOVE, user);
+        authorizeService.addPolicy(context, target, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        context.getEvents().clear();
+
+        itemService.delete(context, target);
+
+        assertMetadataEvents(owner, 1);
+    }
+
+    @Test
+    public void testCopyVirtualDeletionWithoutWriteOnSurvivor() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withEmail("copy-virtual-test@example.com")
+                                     .withPassword("password")
+                                     .build();
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.addPolicy(context, target, Constants.WRITE, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        context.getEvents().clear();
+
+        relationshipService.deleteMultipleRelationshipsCopyVirtualMetadata(
+            context, new String[] { "configured" }, target);
+
+        assertMetadataEvents(owner, 1);
+    }
+
+    private void assertMetadataEvents(Item item, long expectedCount) {
+        long count = context.getEvents().stream()
+                            .filter(event -> event.getEventType() == Event.MODIFY_METADATA)
+                            .filter(event -> item.getID().equals(event.getSubjectID()))
+                            .count();
+
+        assertThat(count, is(expectedCount));
+    }
+
 }
