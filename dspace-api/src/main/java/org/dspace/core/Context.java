@@ -737,23 +737,6 @@ public class Context implements AutoCloseable {
         currentUserPreviousState = null;
     }
 
-    /**
-     *  Close the context, aborting any open transactions (if any).
-     * @throws Throwable
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        /*
-         * If a context is garbage-collected, we roll back and free up the
-         * database connection if there is one.
-         */
-        if (dbConnection != null && dbConnection.isTransActionAlive()) {
-            abort();
-        }
-
-        super.finalize();
-    }
-
     public void shutDownDatabase() throws SQLException {
         dbConnection.shutdown();
     }
