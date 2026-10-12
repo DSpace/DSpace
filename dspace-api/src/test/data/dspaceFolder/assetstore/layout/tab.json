@@ -89,29 +89,13 @@
               "collapsed": false,
               "minor": false,
               "style": null,
-              "container": true,
               "security": 0,
-              "boxType": "METADATA",
+              "boxType": "METRICS",
               "metadataSecurityFields": [],
-              "maxColumns": 2,
               "configuration": {
-                "type": "boxmetadataconfiguration",
-                "rows": [
-                  {
-                    "style": "container row",
-                    "cells": [
-                      {
-                        "fields": [
-                          {
-                            "metadata": "dc.title",
-                            "label": "Name",
-                            "fieldType": "metadata"
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
+                "type": "boxmetricsconfiguration",
+                "maxColumns": 2,
+                "metrics": ["views", "downloads"]
               }
             }
           ]

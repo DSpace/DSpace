@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value = DynamicLayoutBoxRelationConfigurationRest.class,
             name = DynamicLayoutBoxRelationConfigurationRest.NAME),
     @Type(value = DynamicLayoutMetadataConfigurationRest.class, name = DynamicLayoutMetadataConfigurationRest.NAME),
+    @Type(value = DynamicLayoutMetricsConfigurationRest.class, name = DynamicLayoutMetricsConfigurationRest.NAME),
 })
 public interface DynamicLayoutBoxConfigurationRest {
 }
