@@ -923,7 +923,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             removeAuthorityReferences(context, item);
         }
 
-        // Remove relationships
+        // Remove relationships after removing authority references as the new relationship handling relies on
+        // authority. This prevents relationship cleanup from affecting authority information.
         for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
         }

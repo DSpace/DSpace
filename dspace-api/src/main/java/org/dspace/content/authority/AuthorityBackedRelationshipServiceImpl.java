@@ -235,6 +235,13 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         }
     }
 
+    /**
+     * Determines whether removing this value would remove the last primary relationship
+     * metadata value for the configured field on this endpoint, requiring deletion
+     * of the relationship rather than only the metadata value.
+     *
+     * @throws IllegalArgumentException if the relationship is not configuration-backed
+     */
     private boolean isFinalAnchor(Context context, MetadataValue value) throws SQLException {
         Relationship relationship = value.getRelationship();
         if (!relationship.isConfigurationBacked()) {
@@ -258,6 +265,11 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
                 && RelationshipConfigurationServiceImpl.fieldName(other).equals(field));
     }
 
+    /**
+     * Removes a stored relationship metadata value, recording its removal event and
+     * clearing its relationship association. If the owning metadata collection is
+     * currently being iterated, the caller handles removing the value from the collection.
+     */
     private void deleteRelationshipMetadata(Context context, MetadataValue value,
                                   DSpaceObject metadataOwnerWithActiveIterator)
         throws SQLException, AuthorizeException {
@@ -271,6 +283,11 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         }
     }
 
+    /**
+     * Checks WRITE authorization for all affected metadata owners before any changes
+     * are made, ensuring a multi-value operation does not partially modify the
+     * relationship before an authorization failure is discovered.
+     */
     private void authorizeRelationshipMetadataValues(Context context, List<MetadataValue> values)
         throws SQLException, AuthorizeException {
         // Validate all permissions before the first mutation, including the other side.
@@ -307,6 +324,11 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         }
     }
 
+    /**
+     * Returns the opposite endpoint of the relationship for the supplied metadata owner.
+     *
+     * @throws IllegalArgumentException if the owner is null or not a relationship endpoint
+     */
     private Item opposite(Relationship relationship, DSpaceObject owner) {
         if (owner == null) {
             throw new IllegalArgumentException("A metadata owner is required");
@@ -326,7 +348,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
 
     private void validateAuthorityTarget(MetadataValue value, Item target) {
         if (isUuid(value.getAuthority()) && !UUID.fromString(value.getAuthority()).equals(target.getID())) {
-            throw new IllegalArgumentException("UUID authority cache disagrees with the durable relationship");
+            throw new IllegalArgumentException("Authority target UUID does not match the relationship target UUID");
         }
     }
 

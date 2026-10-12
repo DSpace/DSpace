@@ -194,6 +194,11 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
                              .iterator();
     }
 
+    /**
+     * Resolves pending authority references on an Item to the referenced target Item.
+     * Updates matching metadata authority values and promotes them to durable relationships
+     * when the target is archived. The referencing Item is updated after processing.
+     */
     private void updateReferences(Context context, Item itemWithReference, Item item, List<String> authorities)
         throws SQLException, AuthorizeException {
 
