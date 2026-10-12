@@ -96,7 +96,7 @@ public class ArXivImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
     }
 
     /**
-     * This method tests that if arxiv.exact-id-only = true and we didn't provide a valid DOI
+     * This method tests that if arxiv.exact-id-only = true and we didn't provide a valid Arxiv ID
      * -> an empty list is returned
      */
     @Test
