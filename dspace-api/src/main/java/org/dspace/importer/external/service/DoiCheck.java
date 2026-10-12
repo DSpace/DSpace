@@ -41,8 +41,6 @@ public class DoiCheck {
                                                                "|10.1207/[\\w\\d]+\\&\\d+_\\d+",
                                                            Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern NON_DOI_PATH_SUFFIX = Pattern.compile(
-            "(?i)/(pdf|epdf|fulltext|full|html|abstract|xml)$");
 
     private DoiCheck() {}
 
@@ -80,23 +78,16 @@ public class DoiCheck {
             value = matcher.group();
         }
 
-        // remove trailing punctuation copied from prose, e.g. ., ,
-        value = value.replaceAll("[.,;:]+$", "");
-
-        // remove non-DOI path suffixes after an otherwise valid DOI where applicable
-        value = NON_DOI_PATH_SUFFIX.matcher(value).replaceAll("");
-
         // return only the normalized DOI, e.g. 10.1038/s41561-018-0221-6
         return value.trim();
     }
 
     private static String urlDecode(String value) {
-        // decode repeatedly so double-encoding is handled, e.g. %252F → %2F → /
-        String decoded = value;
-        while (decoded.contains("%")) {
-            decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+        try {
+            return URLDecoder.decode(value.replace("+", "%2B"), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            return value;
         }
-        return decoded;
     }
 
 }
