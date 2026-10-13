@@ -34,7 +34,6 @@ import org.dspace.importer.external.crossref.CrossRefImportMetadataSourceService
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.services.ConfigurationService;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -53,9 +52,6 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
     @Autowired
     private CrossRefImportMetadataSourceServiceImpl crossRefServiceImpl;
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Test
     public void crossRefImportMetadataGetNoRecordsTest() throws Exception {
@@ -166,14 +162,13 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
 
     /**
-     * This method tests that when crossref.exact-id-only = true and we search for a valid ID that does not exist
+     * This method tests that when exactIdOnly = true and we search for a valid ID that does not exist
      * -> we get no results
      */
     @Test
     public void crossRefExactIdOnlyEnabledDoesNotFallbackToQueryTest() throws Exception {
-        boolean originalCrossrefExactId = configurationService.getBooleanProperty("crossref.exact-id-only", false);
-
-        configurationService.setProperty("crossref.exact-id-only", true);
+        boolean originalExactIdOnly = crossRefServiceImpl.isExactIdOnly();
+        crossRefServiceImpl.setExactIdOnly(true);
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try {
@@ -190,19 +185,18 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             assertTrue(captor.getValue().getURI().getPath().endsWith("/10.99999/does-not-exist"));
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
-            configurationService.setProperty("crossref.exact-id-only", originalCrossrefExactId);
+            crossRefServiceImpl.setExactIdOnly(originalExactIdOnly);
         }
     }
 
     /**
-     * This method tests that when crossref.exact-id-only = false, and we don't give an exact ID match
+     * This method tests that when exactIdOnly = false, and we don't give an exact ID match
      * -> The fallback query is used to retrieve non-exact values
      */
     @Test
     public void crossRefExactIdOnlyDisabledFallsBackToQueryTest() throws Exception {
-        boolean originalCrossrefExactId = configurationService.getBooleanProperty("crossref.exact-id-only", false);
-
-        configurationService.setProperty("crossref.exact-id-only", false);
+        boolean originalExactIdOnly = crossRefServiceImpl.isExactIdOnly();
+        crossRefServiceImpl.setExactIdOnly(false);
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-test.json")) {
@@ -223,20 +217,19 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             assertTrue(captor.getAllValues().get(0).getURI().getPath().endsWith("/10.99999/does-not-exist"));
             assertTrue(String.valueOf(captor.getAllValues().get(1).getURI().getQuery()).contains("query="));
         } finally {
-            configurationService.setProperty("crossref.exact-id-only", originalCrossrefExactId);
+            crossRefServiceImpl.setExactIdOnly(originalExactIdOnly);
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
     }
 
     /**
-     * This method tests that if crossref.exact-id-only = true and we didn't provide a valid DOI
+     * This method tests that if exactIdOnly = true and we didn't provide a valid DOI
      * -> an empty list is returned
      */
     @Test
     public void crossRefExactIdOnlyEnabledNonDoiReturnsEmptyTest() throws Exception {
-        boolean originalCrossrefExactId = configurationService.getBooleanProperty("crossref.exact-id-only", false);
-
-        configurationService.setProperty("crossref.exact-id-only", true);
+        boolean originalExactIdOnly = crossRefServiceImpl.isExactIdOnly();
+        crossRefServiceImpl.setExactIdOnly(true);
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try {
@@ -247,7 +240,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             verify(httpClient, never()).execute(ArgumentMatchers.any());
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
-            configurationService.setProperty("crossref.exact-id-only", originalCrossrefExactId);
+            crossRefServiceImpl.setExactIdOnly(originalExactIdOnly);
         }
     }
 

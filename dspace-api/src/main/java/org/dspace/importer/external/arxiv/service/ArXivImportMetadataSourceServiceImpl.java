@@ -33,7 +33,6 @@ import org.dspace.importer.external.datamodel.RecordsCount;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.dspace.services.ConfigurationService;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -42,7 +41,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements a data source for querying ArXiv
@@ -59,8 +57,8 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     private WebTarget webTarget;
     private String baseAddress;
 
-    @Autowired
-    private ConfigurationService configurationService;
+    /** When true, only exact arXiv id lookups are used (no query fallback) */
+    private boolean exactIdOnly = false;
 
     /**
      * Find the number of records matching the query string in ArXiv. Supports pagination.
@@ -523,8 +521,12 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         return trimmed.replaceFirst("(?i)^arxiv:", "");
     }
 
-    private boolean isExactIdOnly() {
-        return configurationService.getBooleanProperty("arxiv.exact-id-only", false);
+    public boolean isExactIdOnly() {
+        return exactIdOnly;
+    }
+
+    public void setExactIdOnly(boolean exactIdOnly) {
+        this.exactIdOnly = exactIdOnly;
     }
 
     private List<ImportRecord> emptyIfNull(List<ImportRecord> records) {

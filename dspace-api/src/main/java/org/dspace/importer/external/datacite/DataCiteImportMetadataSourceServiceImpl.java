@@ -58,6 +58,9 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     private String entityFilterQuery;
 
+    /** When true, only exact DOI lookups are used (no query fallback). */
+    private boolean exactIdOnly = false;
+
     private List<Map<String, String>> excludeExactDoiRules = Collections.emptyList();
     private List<Map<String, String>> allowExactDoiRules = Collections.emptyList();
 
@@ -67,6 +70,14 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     public void setEntityFilterQuery(String entityFilterQuery) {
         this.entityFilterQuery = entityFilterQuery;
+    }
+
+    public boolean isExactIdOnly() {
+        return exactIdOnly;
+    }
+
+    public void setExactIdOnly(boolean exactIdOnly) {
+        this.exactIdOnly = exactIdOnly;
     }
 
     public void setExcludeExactDoiRules(List<Map<String, String>> excludeExactDoiRules) {
@@ -144,10 +155,6 @@ public class DataCiteImportMetadataSourceServiceImpl
         return searchByQuery(query, start, count);
     }
 
-
-    private boolean isExactIdOnly() {
-        return configurationService.getBooleanProperty("datacite.exact-id-only", false);
-    }
 
     /**
      * Exact DOI lookup (GET {datacite.url}/{normalized-doi})

@@ -33,7 +33,6 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.kernel.ServiceManager;
-import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,9 +51,6 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
     @Autowired
     private LiveImportClientImpl liveImportClientImpl;
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     //@Autowired
     private DataCiteImportMetadataSourceServiceImpl dataCiteServiceImpl;
@@ -264,13 +260,13 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     }
 
     /**
-     * This method tests that when datacite.exact-id-only = true and we search for a valid ID that does not exist
+     * This method tests that when exactIdOnly = true and we search for a valid ID that does not exist
      * -> we get no results
      */
     @Test
     public void dataCiteExactIdOnlyEnabledDoesNotFallbackToQueryTest() throws Exception {
-        boolean originalDataciteExactId = configurationService.getBooleanProperty("datacite.exact-id-only", false);
-        configurationService.setProperty("datacite.exact-id-only", true);
+        boolean originalExactIdOnly = dataCiteServiceImpl.isExactIdOnly();
+        dataCiteServiceImpl.setExactIdOnly(true);
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try {
@@ -287,20 +283,19 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
             assertTrue(captor.getValue().getURI().getPath().endsWith("/10.99999/does-not-exist"));
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
-            configurationService.setProperty("datacite.exact-id-only", originalDataciteExactId);
+            dataCiteServiceImpl.setExactIdOnly(originalExactIdOnly);
         }
     }
 
 
     /**
-     * This method tests that when datacite.exact-id-only = false, and we don't give an exact ID match
+     * This method tests that when exactIdOnly = false, and we don't give an exact ID match
      * -> The fallback query is used to retrieve non-exact values
      */
     @Test
     public void dataCiteExactIdOnlyDisabledFallsBackToQueryTest() throws Exception {
-        boolean originalDataciteExactId = configurationService.getBooleanProperty("datacite.exact-id-only", false);
-
-        configurationService.setProperty("datacite.exact-id-only", false);
+        boolean originalExactIdOnly = dataCiteServiceImpl.isExactIdOnly();
+        dataCiteServiceImpl.setExactIdOnly(false);
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-test2.json")) {
@@ -321,19 +316,19 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
             assertTrue(captor.getAllValues().get(0).getURI().getPath().endsWith("/10.99999/does-not-exist"));
             assertTrue(String.valueOf(captor.getAllValues().get(1).getURI().getQuery()).contains("query="));
         } finally {
-            configurationService.setProperty("datacite.exact-id-only", originalDataciteExactId);
+            dataCiteServiceImpl.setExactIdOnly(originalExactIdOnly);
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
     }
 
     /**
-     * This method tests that if datacite.exact-id-only = true and we didn't provide a valid DOI
+     * This method tests that if exactIdOnly = true and we didn't provide a valid DOI
      * -> an empty list is returned
      */
     @Test
     public void dataCiteExactIdOnlyEnabledNonDoiReturnsEmptyTest() throws Exception {
-        boolean originalDataciteExactId = configurationService.getBooleanProperty("datacite.exact-id-only", false);
-        configurationService.setProperty("datacite.exact-id-only", true);
+        boolean originalExactIdOnly = dataCiteServiceImpl.isExactIdOnly();
+        dataCiteServiceImpl.setExactIdOnly(true);
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try {
@@ -344,7 +339,7 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
             verify(httpClient, never()).execute(ArgumentMatchers.any());
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
-            configurationService.setProperty("datacite.exact-id-only", originalDataciteExactId);
+            dataCiteServiceImpl.setExactIdOnly(originalExactIdOnly);
         }
     }
 

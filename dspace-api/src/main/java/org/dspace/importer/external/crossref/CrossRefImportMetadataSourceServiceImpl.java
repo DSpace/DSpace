@@ -36,7 +36,6 @@ import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,11 +50,11 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     private String url;
 
-    @Autowired
-    private LiveImportClient liveImportClient;
+    /** When true, only exact DOI lookups are used (no query fallback). */
+    private boolean exactIdOnly = false;
 
     @Autowired
-    private ConfigurationService configurationService;
+    private LiveImportClient liveImportClient;
 
     @Override
     public String getImportSource() {
@@ -200,8 +199,12 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         return DoiCheck.isDoi(normalized) ? normalized : StringUtils.EMPTY;
     }
 
-    private boolean isExactIdOnly() {
-        return configurationService.getBooleanProperty("crossref.exact-id-only", false);
+    public boolean isExactIdOnly() {
+        return exactIdOnly;
+    }
+
+    public void setExactIdOnly(boolean exactIdOnly) {
+        this.exactIdOnly = exactIdOnly;
     }
 
     /**

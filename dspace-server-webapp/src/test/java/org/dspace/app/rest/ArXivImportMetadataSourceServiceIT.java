@@ -31,7 +31,6 @@ import jakarta.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl;
 import org.dspace.importer.external.datamodel.ImportRecord;
-import org.dspace.services.ConfigurationService;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,18 +43,14 @@ public class ArXivImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
     @Autowired
     private ArXivImportMetadataSourceServiceImpl arXivServiceImpl;
 
-    @Autowired
-    private ConfigurationService configurationService;
-
     /**
-     * This method tests that when arxiv.exact-id-only = true and we search for a valid ID that does not exist
+     * This method tests that when exactIdOnly = true and we search for a valid ID that does not exist
      * -> we get no results
      */
     @Test
     public void arxivExactIdOnlyEnabledDoesNotFallbackToQueryTest() throws Exception {
-        boolean originalArxivExactId = configurationService.getBooleanProperty("arxiv.exact-id-only", false);
-
-        configurationService.setProperty("arxiv.exact-id-only", true);
+        boolean originalExactIdOnly = arXivServiceImpl.isExactIdOnly();
+        arXivServiceImpl.setExactIdOnly(true);
         try (InputStream emptyFeed = getClass().getResourceAsStream("arxiv-empty.xml");
              MockedStatic<ClientBuilder> clientBuilder = mockStatic(ClientBuilder.class)) {
             String emptyResponse = IOUtils.toString(emptyFeed, Charset.defaultCharset());
@@ -66,19 +61,18 @@ public class ArXivImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
             verify(webTarget).queryParam(eq("id_list"), eq("1234.56789"));
             verify(webTarget, never()).queryParam(eq("search_query"), any());
         } finally {
-            configurationService.setProperty("arxiv.exact-id-only", originalArxivExactId);
+            arXivServiceImpl.setExactIdOnly(originalExactIdOnly);
         }
     }
 
     /**
-     * This method tests that when arxiv.exact-id-only = false, and we don't give an exact ID match
+     * This method tests that when exactIdOnly = false, and we don't give an exact ID match
      * -> The fallback query is used to retrieve non-exact values
      */
     @Test
     public void arxivExactIdOnlyDisabledFallsBackToQueryTest() throws Exception {
-        boolean originalArxivExactId = configurationService.getBooleanProperty("arxiv.exact-id-only", false);
-
-        configurationService.setProperty("arxiv.exact-id-only", false);
+        boolean originalExactIdOnly = arXivServiceImpl.isExactIdOnly();
+        arXivServiceImpl.setExactIdOnly(false);
         try (InputStream emptyFeed = getClass().getResourceAsStream("arxiv-empty.xml");
              InputStream queryFeed = getClass().getResourceAsStream("arxiv-query-test.xml");
              MockedStatic<ClientBuilder> clientBuilder = mockStatic(ClientBuilder.class)) {
@@ -91,19 +85,18 @@ public class ArXivImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
             verify(webTarget).queryParam(eq("id_list"), eq("1234.56789"));
             verify(webTarget).queryParam(eq("search_query"), eq("1234.56789"));
         } finally {
-            configurationService.setProperty("arxiv.exact-id-only", originalArxivExactId);
+            arXivServiceImpl.setExactIdOnly(originalExactIdOnly);
         }
     }
 
     /**
-     * This method tests that if arxiv.exact-id-only = true and we didn't provide a valid Arxiv ID
+     * This method tests that if exactIdOnly = true and we didn't provide a valid Arxiv ID
      * -> an empty list is returned
      */
     @Test
     public void arxivExactIdOnlyEnabledNonIdReturnsEmptyTest() throws Exception {
-        boolean originalArxivExactId = configurationService.getBooleanProperty("arxiv.exact-id-only", false);
-
-        configurationService.setProperty("arxiv.exact-id-only", true);
+        boolean originalExactIdOnly = arXivServiceImpl.isExactIdOnly();
+        arXivServiceImpl.setExactIdOnly(true);
         try (MockedStatic<ClientBuilder> clientBuilder = mockStatic(ClientBuilder.class)) {
             WebTarget webTarget = mockArxivClient(clientBuilder, "");
 
@@ -111,7 +104,7 @@ public class ArXivImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
             assertEquals(0, records.size());
             verify(webTarget, never()).queryParam(anyString(), any());
         } finally {
-            configurationService.setProperty("arxiv.exact-id-only", originalArxivExactId);
+            arXivServiceImpl.setExactIdOnly(originalExactIdOnly);
         }
     }
 
