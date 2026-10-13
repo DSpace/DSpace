@@ -80,6 +80,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.DOI;
@@ -865,8 +866,19 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
+        ArrayList<EventDetail> detailList = new ArrayList<>();
+        detailList.add(new EventDetail(DetailType.HANDLE, item.getHandle()));
+        // Add the parent collection handle EventDetail
+        UUID collectionID = item.getOwningCollection() == null ? null : item.getOwningCollection().getID();
+        try {
+            String  collectionHandle = collectionService.find(context, collectionID).getHandle();
+            detailList.add(new EventDetail(DetailType.PARENT_HANDLE, collectionHandle));
+        } catch (SQLException e) {
+            throw new SQLException("Could not find collection with ID " + collectionID, e);
+        }
+
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
-            item.getHandle(), DetailType.HANDLE, getIdentifiers(context, item)));
+                detailList, getIdentifiers(context, item)));
 
         log.info(LogHelper.getHeader(context, "delete_item", "item_id="
             + item.getID()));
