@@ -37,4 +37,17 @@
 		</constructor-arg>
 	</bean>
 
+	<bean class="org.dspace.content.authority.AuthorityNameAuthorityFilter">
+		<property name="supportedAuthorities">
+			<util:list>
+				<value>PersonOrgUnitAuthority</value>
+			</util:list>
+		</property>
+		<constructor-arg name="customQueries">
+			<util:list>
+                <value>dspace.entity.type:Person OR dspace.entity.type:OrgUnit</value>
+			</util:list>
+		</constructor-arg>
+	</bean>
+
 </beans>
