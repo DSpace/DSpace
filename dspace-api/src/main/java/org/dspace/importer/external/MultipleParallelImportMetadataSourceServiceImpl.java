@@ -18,8 +18,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.dspace.content.Item;
+import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.datamodel.RecordsCount;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.components.QuerySource;
 
@@ -70,75 +72,49 @@ public class MultipleParallelImportMetadataSourceServiceImpl implements QuerySou
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        List<Future<Integer>> futureList = new ArrayList<>();
-        int result = 0;
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(String query) throws MetadataSourceException {
+        List<Future<RecordsCount>> futureList = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
-            futureList.add(executorService.submit(() -> innerProvider.getRecordsCount(query)));
+            futureList.add(executorService.submit(() -> innerProvider.getRecordsCountResult(query)));
         }
-        for (Future<Integer> future: futureList) {
-            try {
-                Integer count = future.get();
-                result += Objects.isNull(count) ? 0 : count;
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return result;
+        return preferExactCount(futureList);
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
-        List<Future<Integer>> futureList = new ArrayList<>();
-        int result = 0;
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(Query query) throws MetadataSourceException {
+        List<Future<RecordsCount>> futureList = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
-            futureList.add(executorService.submit(() -> innerProvider.getRecordsCount(query)));
+            futureList.add(executorService.submit(() -> innerProvider.getRecordsCountResult(query)));
         }
-        for (Future<Integer> future: futureList) {
-            try {
-                Integer count = future.get();
-                result += Objects.isNull(count) ? 0 : count;
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return result;
+        return preferExactCount(futureList);
     }
 
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         List<Future<Collection<ImportRecord>>> futureList = new ArrayList<>();
-        List<ImportRecord> result = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
             futureList.add(executorService.submit(() -> innerProvider.getRecords(query, start, count)));
         }
-        for (Future<Collection<ImportRecord>> future: futureList) {
-            try {
-                Collection<ImportRecord> importRecords = future.get();
-                result.addAll(Objects.isNull(importRecords) ? Collections.emptyList() : importRecords);
-            } catch (InterruptedException | ExecutionException e) {
-                //
-            }
-        }
-        return result;
+        return preferExact(futureList);
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         List<Future<Collection<ImportRecord>>> futureList = new ArrayList<>();
-        List<ImportRecord> result = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
             futureList.add(executorService.submit(() -> innerProvider.getRecords(query)));
         }
-        for (Future<Collection<ImportRecord>> future: futureList) {
-            try {
-                Collection<ImportRecord> importRecords = future.get();
-                result.addAll(Objects.isNull(importRecords) ? Collections.emptyList() : importRecords);
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return result;
+        return preferExact(futureList);
     }
 
     @Override
@@ -149,37 +125,67 @@ public class MultipleParallelImportMetadataSourceServiceImpl implements QuerySou
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         List<Future<Collection<ImportRecord>>> futureList = new ArrayList<>();
-        List<ImportRecord> result = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
             futureList.add(executorService.submit(() -> innerProvider.findMatchingRecords(query)));
         }
-        for (Future<Collection<ImportRecord>> future: futureList) {
-            try {
-                Collection<ImportRecord> importRecords = future.get();
-                result.addAll(Objects.isNull(importRecords) ? Collections.emptyList() : importRecords);
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return result;
+        return preferExact(futureList);
     }
 
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         List<Future<Collection<ImportRecord>>> futureList = new ArrayList<>();
-        List<ImportRecord> result = new ArrayList<>();
         for (QuerySource innerProvider : innerProviders) {
             futureList.add(executorService.submit(() -> innerProvider.findMatchingRecords(item)));
         }
-        for (Future<Collection<ImportRecord>> future: futureList) {
+        return preferExact(futureList);
+    }
+
+    /**
+     * If any provider returned {@link ExactImportRecords}, only those results are kept.
+     */
+    private Collection<ImportRecord> preferExact(List<Future<Collection<ImportRecord>>> futureList) {
+        List<Collection<ImportRecord>> results = new ArrayList<>();
+        for (Future<Collection<ImportRecord>> future : futureList) {
             try {
                 Collection<ImportRecord> importRecords = future.get();
-                result.addAll(Objects.isNull(importRecords) ? Collections.emptyList() : importRecords);
+                results.add(Objects.isNull(importRecords) ? Collections.emptyList() : importRecords);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
         }
-        return result;
+        boolean anyExact = results.stream().anyMatch(ExactImportRecords.class::isInstance);
+        List<ImportRecord> merged = new ArrayList<>();
+        for (Collection<ImportRecord> importRecords : results) {
+            if (!anyExact || importRecords instanceof ExactImportRecords) {
+                merged.addAll(importRecords);
+            }
+        }
+        return merged;
+    }
+
+    /**
+     * If any provider returned an exact count, only exact counts are summed.
+     */
+    private RecordsCount preferExactCount(List<Future<RecordsCount>> futureList) {
+        List<RecordsCount> results = new ArrayList<>();
+        for (Future<RecordsCount> future : futureList) {
+            try {
+                RecordsCount count = future.get();
+                if (count != null) {
+                    results.add(count);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        boolean anyExact = results.stream().anyMatch(RecordsCount::isExact);
+        int total = 0;
+        for (RecordsCount count : results) {
+            if (!anyExact || count.isExact()) {
+                total += count.getCount();
+            }
+        }
+        return anyExact ? RecordsCount.exact(total) : RecordsCount.query(total);
     }
 }
