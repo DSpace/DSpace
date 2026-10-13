@@ -25,6 +25,7 @@ import org.dspace.importer.external.liveimportclient.service.LiveImportClientImp
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -45,12 +46,16 @@ public class DataCiteProjectImportMetadataSourceServiceIT extends AbstractLiveIm
     // @Autowired
     private DataCiteProjectImportMetadataSourceServiceImpl dataCiteProjectServiceImpl;
 
-    @Test
-    public void dataCiteProjectImportMetadataGetRecordsTest() throws Exception {
-        context.turnOffAuthorisationSystem();
+    @Before
+    public void setup() throws Exception {
         ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
         dataCiteProjectServiceImpl = serviceManager.getServiceByName("DataCiteProjectImportService",
                 DataCiteProjectImportMetadataSourceServiceImpl.class);
+    }
+
+    @Test
+    public void dataCiteProjectImportMetadataGetRecordsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCiteProject-test.json")) {
@@ -66,6 +71,40 @@ public class DataCiteProjectImportMetadataSourceServiceIT extends AbstractLiveIm
                     0, -1);
             assertEquals(1, recordsImported.size());
             matchRecords(new ArrayList<>(recordsImported), collection2match);
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void dataCiteProjectAcceptsResourceTypeGeneralProjectTest() throws Exception {
+        assertEquals(1, getExactDoiImportSize("dataCite-proj-accept-rtg-project.json", "10.1234/proj-rtg-project"));
+    }
+
+    @Test
+    public void dataCiteProjectAcceptsOtherProjectTest() throws Exception {
+        assertEquals(1, getExactDoiImportSize("dataCite-proj-accept-other-project.json", "10.1234/proj-other-project"));
+    }
+
+    @Test
+    public void dataCiteProjectRejectsResourceTypeGeneralDatasetTest() throws Exception {
+        assertEquals(0, getExactDoiImportSize("dataCite-proj-reject-rtg-dataset.json", "10.1234/proj-rtg-dataset"));
+    }
+
+    @Test
+    public void dataCiteProjectRejectsResourceTypeGeneralTextTest() throws Exception {
+        assertEquals(0, getExactDoiImportSize("dataCite-proj-reject-rtg-text.json", "10.1234/proj-rtg-text"));
+    }
+
+    private int getExactDoiImportSize(String jsonResource, String doi) throws Exception {
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try (InputStream dataCiteResp = getClass().getResourceAsStream(jsonResource)) {
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse response =
+                    mockResponse(IOUtils.toString(dataCiteResp, Charset.defaultCharset()), 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+            return dataCiteProjectServiceImpl.getRecords(doi, 0, -1).size();
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
