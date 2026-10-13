@@ -52,6 +52,17 @@
           class="org.dspace.importer.external.datacite.DataCiteImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="DataCiteMetadataFieldMapping"/>
         <property name="entityFilterQuery" value="${datacite.publicationimport.entityfilterquery}" />
+        <property name="excludeExactDoiRules">
+            <list>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Project"/>
+                </map>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Other"/>
+                    <entry key="types.resourceType" value="Project"/>
+                </map>
+            </list>
+        </property>
     </bean>
     <bean id="DataCiteMetadataFieldMapping"
           class="org.dspace.importer.external.datacite.DataCiteFieldMapping">
@@ -61,6 +72,17 @@
           class="org.dspace.importer.external.datacite.DataCiteProjectImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="DataCiteProjectMetadataFieldMapping"/>
         <property name="entityFilterQuery" value="${datacite.projectimport.entityfilterquery}" />
+        <property name="allowExactDoiRules">
+            <list>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Project"/>
+                </map>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Other"/>
+                    <entry key="types.resourceType" value="Project"/>
+                </map>
+            </list>
+        </property>
     </bean>
     <bean id="DataCiteProjectMetadataFieldMapping"
           class="org.dspace.importer.external.datacite.DataCiteProjectFieldMapping">

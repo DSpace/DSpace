@@ -58,12 +58,23 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     private String entityFilterQuery;
 
+    private List<Map<String, String>> excludeExactDoiRules = Collections.emptyList();
+    private List<Map<String, String>> allowExactDoiRules = Collections.emptyList();
+
     public String getEntityFilterQuery() {
         return entityFilterQuery;
     }
 
     public void setEntityFilterQuery(String entityFilterQuery) {
         this.entityFilterQuery = entityFilterQuery;
+    }
+
+    public void setExcludeExactDoiRules(List<Map<String, String>> excludeExactDoiRules) {
+        this.excludeExactDoiRules = excludeExactDoiRules != null ? excludeExactDoiRules : Collections.emptyList();
+    }
+
+    public void setAllowExactDoiRules(List<Map<String, String>> allowExactDoiRules) {
+        this.allowExactDoiRules = allowExactDoiRules != null ? allowExactDoiRules : Collections.emptyList();
     }
 
     @Override
@@ -154,7 +165,8 @@ public class DataCiteImportMetadataSourceServiceImpl
             return records;
         }
         JsonNode attributes = jsonNode.at("/data/attributes");
-        if (!attributes.isMissingNode()) {
+
+        if (!attributes.isMissingNode() && matchesExactDoiFilters(attributes)) {
             records.add(transformSourceRecords(attributes.toString()));
         }
         return records;
@@ -274,5 +286,22 @@ public class DataCiteImportMetadataSourceServiceImpl
     public String getID(String query) {
         String normalized = DoiCheck.purgeDoiValue(query);
         return DoiCheck.isDoi(normalized) ? normalized : StringUtils.EMPTY;
+    }
+
+    private boolean matchesRule(JsonNode attributes, Map<String, String> rule) {
+        return rule.entrySet().stream().allMatch(entry -> {
+            String path = "/" + entry.getKey().replace(".", "/");
+            String actual = attributes.at(path).asText("");
+            return entry.getValue().equalsIgnoreCase(actual);
+        });
+    }
+
+    private boolean matchesExactDoiFilters(JsonNode attributes) {
+        if (excludeExactDoiRules.stream().anyMatch(rule -> matchesRule(attributes, rule))) {
+            return false;
+        }
+
+        return allowExactDoiRules.isEmpty()
+            || allowExactDoiRules.stream().anyMatch(rule -> matchesRule(attributes, rule));
     }
 }

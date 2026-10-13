@@ -347,4 +347,50 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
             configurationService.setProperty("datacite.exact-id-only", originalDataciteExactId);
         }
     }
+
+    /**
+     * resourceTypeGeneral=Project -> should be rejected
+     */
+    @Test
+    public void dataCitePublicationRejectsResourceTypeGeneralProjectTest() throws Exception {
+        assertEquals(0, getExactDoiImportSize("dataCite-pub-reject-rtg-project.json", "10.1234/pub-rtg-project"));
+    }
+
+    /**
+     * resourceTypeGeneral=Other, resourceType=Project -> should be rejected
+     */
+    @Test
+    public void dataCitePublicationRejectsOtherProjectTest() throws Exception {
+        assertEquals(0, getExactDoiImportSize("dataCite-pub-reject-other-project.json", "10.1234/pub-other-project"));
+    }
+
+    /**
+     * resourceTypeGeneral=Dataset -> should be accepted
+     */
+    @Test
+    public void dataCitePublicationAcceptsResourceTypeGeneralDatasetTest() throws Exception {
+        assertEquals(1, getExactDoiImportSize("dataCite-pub-accept-rtg-dataset.json", "10.1234/pub-rtg-dataset"));
+    }
+
+    /**
+     * resourceTypeGeneral=Text -> should be accepted
+     */
+    @Test
+    public void dataCitePublicationAcceptsResourceTypeGeneralTextTest() throws Exception {
+        assertEquals(1, getExactDoiImportSize("dataCite-pub-accept-rtg-text.json", "10.1234/pub-rtg-text"));
+    }
+
+    private int getExactDoiImportSize(String jsonResource, String doi) throws Exception {
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try (InputStream dataCiteResp = getClass().getResourceAsStream(jsonResource)) {
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse response =
+                    mockResponse(IOUtils.toString(dataCiteResp, Charset.defaultCharset()), 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+            return dataCiteServiceImpl.getRecords(doi, 0, -1).size();
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
 }
