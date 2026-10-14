@@ -34,6 +34,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.ldap.AuthenticationException;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
@@ -41,6 +42,7 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.ldap.filter.PresentFilter;
 import org.springframework.ldap.query.LdapQueryBuilder;
+import org.springframework.ldap.query.SearchScope;
 import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.ldap.support.LdapUtils;
 
@@ -417,6 +419,36 @@ public class LDAPAuthentication implements AuthenticationMethod {
     }
 
     /**
+     * Translate the value of "authentication-ldap.search_scope" (0 = object, 1 = one level,
+     * 2 = subtree, the same numbers as javax.naming.directory.SearchControls) into the
+     * Spring LDAP search scope used when looking up the DN of a user.
+     * <p>
+     * When the property is not set, subtree is used: it is the default documented in
+     * authentication-ldap.cfg and the scope Spring LDAP queries use when none is given.
+     * An invalid value is logged and treated the same way.
+     *
+     * @param value the configured value, possibly null
+     * @return the search scope to use
+     */
+    static SearchScope parseSearchScope(String value) {
+        if (StringUtils.isBlank(value)) {
+            return SearchScope.SUBTREE;
+        }
+        switch (value.trim()) {
+            case "0":
+                return SearchScope.OBJECT;
+            case "1":
+                return SearchScope.ONELEVEL;
+            case "2":
+                return SearchScope.SUBTREE;
+            default:
+                log.warn("Invalid value '{}' for authentication-ldap.search_scope (expected 0, 1 or 2);"
+                             + " using subtree scope", value);
+                return SearchScope.SUBTREE;
+        }
+    }
+
+    /**
      * Internal class to manage LDAP query and results, mainly
      * because there are multiple values to return.
      */
@@ -436,7 +468,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
         final String ldap_provider_url;
         final String ldap_id_field;
         final String ldap_search_context;
-        final String ldap_search_scope;
+        final SearchScope ldap_search_scope;
 
         final String ldap_email_field;
         final String ldap_givenname_field;
@@ -455,7 +487,8 @@ public class LDAPAuthentication implements AuthenticationMethod {
             ldap_provider_url = configurationService.getProperty("authentication-ldap.provider_url");
             ldap_id_field = configurationService.getProperty("authentication-ldap.id_field");
             ldap_search_context = configurationService.getProperty("authentication-ldap.search_context");
-            ldap_search_scope = configurationService.getProperty("authentication-ldap.search_scope");
+            ldap_search_scope = parseSearchScope(
+                configurationService.getProperty("authentication-ldap.search_scope"));
             ldap_email_field = configurationService.getProperty("authentication-ldap.email_field");
             ldap_givenname_field = configurationService.getProperty("authentication-ldap.givenname_field");
             ldap_surname_field = configurationService.getProperty("authentication-ldap.surname_field");
@@ -498,7 +531,11 @@ public class LDAPAuthentication implements AuthenticationMethod {
                 log.debug("Searching for user using Spring LDAP filter: {}", filter.toString());
 
                 List<String> foundDNs = ldapTemplate.search(
-                    LdapQueryBuilder.query().base(ldap_search_context).filter(filter),
+                    // The scope must be set explicitly: LdapQueryBuilder searches the whole
+                    // subtree by default, which ignores authentication-ldap.search_scope and
+                    // finds several DNs when entries below the user also match the id field.
+                    LdapQueryBuilder.query().searchScope(ldap_search_scope)
+                        .base(ldap_search_context).filter(filter),
                     (ContextMapper<String>) (originalCtx) -> {
                         DirContextOperations ctx = (DirContextOperations) originalCtx;
 
@@ -553,13 +590,22 @@ public class LDAPAuthentication implements AuthenticationMethod {
             }
 
             try {
-                boolean authenticated = ldapTemplate.authenticate(
-                    LdapUtils.newLdapName(dn),
-                    new PresentFilter(ldap_id_field).toString(),
+                // Object scope: the base is the DN of the user, found by getDNOfUser, and
+                // only that entry has to be checked. With LdapTemplate's default subtree
+                // scope, entries below the user that also have the id field are found too,
+                // and authenticate() fails with IncorrectResultSizeDataAccessException.
+                ldapTemplate.authenticate(
+                    LdapQueryBuilder.query().searchScope(SearchScope.OBJECT)
+                        .base(LdapUtils.newLdapName(dn))
+                        .filter(new PresentFilter(ldap_id_field)),
                     password
                 );
-                return authenticated;
+                return true;
 
+            } catch (AuthenticationException e) {
+                // Wrong password: an ordinary failed login, not an error.
+                log.debug(LogHelper.getHeader(context, "ldap_authentication", "type=failed_auth " + e));
+                return false;
             } catch (Exception e) {
                 log.warn(LogHelper.getHeader(context, "ldap_authentication", "type=failed_auth " + e));
                 return false;
