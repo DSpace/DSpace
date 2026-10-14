@@ -935,6 +935,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                     ? relationship.getRightItem() : relationship.getLeftItem();
 
                 if (!survivor.getID().equals(item.getID())) {
+                    // Ensure the surviving Item is managed by the current Hibernate session before updating it.
+                    survivor = context.reloadEntity(survivor);
                     survivingItems.put(survivor.getID(), survivor);
                 }
             }

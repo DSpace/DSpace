@@ -1296,7 +1296,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             // Option 1: Copy all virtual metadata of this item to its related items. Iterate over all of the item's
             //           relationships and copy their data.
             for (Relationship relationship : findByItem(context, item)) {
-                collectSurvivingConfigBackedItem(item, relationship, survivingItems);
+                collectSurvivingConfigBackedItem(context, item, relationship, survivingItems);
                 deleteRelationshipCopyVirtualMetadata(context, item, relationship);
             }
         } else if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_CONFIGURED)) {
@@ -1308,7 +1308,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 // and relationships without a RelationshipType have no legacy virtual metadata,
                 // so no virtual metadata needs to be copied before deleting the relationship.
                 if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
-                    collectSurvivingConfigBackedItem(item, relationship, survivingItems);
+                    collectSurvivingConfigBackedItem(context, item, relationship, survivingItems);
                     forceDelete(context, relationship, false, false);
                     continue;
                 }
@@ -1390,8 +1390,8 @@ public class RelationshipServiceImpl implements RelationshipService {
      * @param relationship   the relationship being removed
      * @param survivingItems map of surviving Items to update
      */
-    private void collectSurvivingConfigBackedItem(Item item, Relationship relationship,
-                                                  Map<UUID, Item> survivingItems) {
+    private void collectSurvivingConfigBackedItem(Context context, Item item, Relationship relationship,
+                                                  Map<UUID, Item> survivingItems) throws SQLException {
         if (!relationship.isConfigurationBacked() && relationship.getRelationshipType() != null) {
             return;
         }
@@ -1400,6 +1400,8 @@ public class RelationshipServiceImpl implements RelationshipService {
             ? relationship.getRightItem() : relationship.getLeftItem();
 
         if (!survivor.getID().equals(item.getID())) {
+            // Ensure the surviving Item is managed by the current Hibernate session before updating it.
+            survivor = context.reloadEntity(survivor);
             survivingItems.put(survivor.getID(), survivor);
         }
     }
