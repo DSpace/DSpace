@@ -352,8 +352,11 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         }
     }
 
+    /**
+     * Checks whether two Relationships have the same persisted database ID.
+     */
     private boolean sameRelationship(Relationship first, Relationship second) {
-        return first == second || first.getID() != null && Objects.equals(first.getID(), second.getID());
+        return first.getID() != null && Objects.equals(first.getID(), second.getID());
     }
 
     private boolean isUuid(String value) {

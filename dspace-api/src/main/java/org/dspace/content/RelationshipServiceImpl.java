@@ -136,18 +136,21 @@ public class RelationshipServiceImpl implements RelationshipService {
     public Relationship createConfigBackedRelationship(Context context, Item leftItem, Item rightItem,
                                                        String relationshipConfigKey)
         throws SQLException, AuthorizeException {
+
         RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(relationshipConfigKey);
         relationshipConfigurationService.validate(context, configuration, leftItem, rightItem);
-        assertWriteOnEitherItem(context, leftItem, rightItem);
-        authorizeService.authorizeAction(context, leftItem, Constants.READ);
-        authorizeService.authorizeAction(context, rightItem, Constants.READ);
+
+        authorizeRelationshipCreation(context, leftItem, rightItem);
+
         Relationship relationship = new Relationship();
         relationship.setLeftItem(leftItem);
         relationship.setRightItem(rightItem);
         relationship.setRelationshipConfigKey(configuration.getId());
         Relationship created = relationshipDAO.create(context, relationship);
+
         leftItem.setMetadataModified();
         rightItem.setMetadataModified();
+
         return created;
     }
 
@@ -1433,4 +1436,20 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
+    /**
+     * Verifies that the current user has WRITE permission on at least one
+     * relationship endpoint and READ permission on both endpoints.
+     *
+     * @param context current DSpace context
+     * @param leftItem left endpoint of the relationship
+     * @param rightItem right endpoint of the relationship
+     * @throws SQLException if a database error occurs during authorization
+     * @throws AuthorizeException if the required permissions are missing
+     */
+    private void authorizeRelationshipCreation(Context context, Item leftItem, Item rightItem)
+        throws SQLException, AuthorizeException {
+        assertWriteOnEitherItem(context, leftItem, rightItem);
+        authorizeService.authorizeAction(context, leftItem, Constants.READ);
+        authorizeService.authorizeAction(context, rightItem, Constants.READ);
+    }
 }

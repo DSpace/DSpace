@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThrows;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
@@ -238,6 +239,106 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         assertThat(metadataValueService.findByRelationship(context, relationship), hasSize(0));
         // Includes configured rows even in the path which excludes legacy tilted types.
         assertThat(relationshipService.findByItem(context, target, -1, -1, true), hasSize(1));
+    }
+
+    @Test
+    public void testConfigBackedCreationWithWriteLeftAndReadBoth() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withEmail("relationship-create-left@example.com")
+                                     .withPassword("password")
+                                     .build();
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.removeAllPolicies(context, owner);
+        authorizeService.removeAllPolicies(context, target);
+        authorizeService.addPolicy(context, owner, Constants.WRITE, user);
+        authorizeService.addPolicy(context, owner, Constants.READ, user);
+        authorizeService.addPolicy(context, target, Constants.READ, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        Relationship relationship = relationshipService.createConfigBackedRelationship(
+            context, owner, target, "authority:dc.contributor.author");
+
+        assertThat(relationship, notNullValue());
+        assertThat(relationship.getLeftItem(), equalTo(owner));
+        assertThat(relationship.getRightItem(), equalTo(target));
+    }
+
+    @Test
+    public void testConfigBackedCreationWithWriteRightAndReadBoth() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withEmail("relationship-create-right@example.com")
+                                     .withPassword("password")
+                                     .build();
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.removeAllPolicies(context, owner);
+        authorizeService.removeAllPolicies(context, target);
+        authorizeService.addPolicy(context, owner, Constants.READ, user);
+        authorizeService.addPolicy(context, target, Constants.WRITE, user);
+        authorizeService.addPolicy(context, target, Constants.READ, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        Relationship relationship = relationshipService.createConfigBackedRelationship(
+            context, owner, target, "authority:dc.contributor.author");
+
+        assertThat(relationship, notNullValue());
+        assertThat(relationship.getLeftItem(), equalTo(owner));
+        assertThat(relationship.getRightItem(), equalTo(target));
+    }
+
+    @Test
+    public void testConfigBackedCreationWithReadOnBothItemsIsDenied() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withEmail("relationship-create-read-only@example.com")
+                                     .withPassword("password")
+                                     .build();
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.removeAllPolicies(context, owner);
+        authorizeService.removeAllPolicies(context, target);
+        authorizeService.addPolicy(context, owner, Constants.READ, user);
+        authorizeService.addPolicy(context, target, Constants.READ, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        assertThrows(AuthorizeException.class,
+                     () -> relationshipService.createConfigBackedRelationship(
+                         context, owner, target, "authority:dc.contributor.author"));
+    }
+
+    @Test
+    public void testConfigBackedCreationWithWriteLeftAndNoReadRightIsDenied() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withEmail("relationship-create-no-read@example.com")
+                                     .withPassword("password")
+                                     .build();
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.removeAllPolicies(context, owner);
+        authorizeService.removeAllPolicies(context, target);
+        authorizeService.addPolicy(context, owner, Constants.WRITE, user);
+        authorizeService.addPolicy(context, owner, Constants.READ, user);
+
+        context.setCurrentUser(user);
+        context.restoreAuthSystemState();
+
+        assertThrows(AuthorizeException.class,
+                     () -> relationshipService.createConfigBackedRelationship(
+                         context, owner, target, "authority:dc.contributor.author"));
     }
 
     /**
