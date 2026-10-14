@@ -91,7 +91,8 @@ public class RelationshipVersioningUtils {
                 "rightward name %s between left item with uuid %s, handle %s and right item with uuid %s, handle %s " +
                 "has latest version status set to %s",
                 updateLeftSide ? "left" : "right", relationship.getID(),
-                relationship.getRelationshipType().getRightwardType(),
+                (relationship.isConfigurationBacked() ? relationship.getRelationshipConfigKey()
+                    : relationship.getRelationshipType().getRightwardType()),
                 relationship.getLeftItem().getID(), relationship.getLeftItem().getHandle(),
                 relationship.getRightItem().getID(), relationship.getRightItem().getHandle(), lvs
             );
@@ -102,7 +103,9 @@ public class RelationshipVersioningUtils {
         log.info(
             "set latest version status from {} to {} for relationship with id {}, rightward name {} " +
             "between left item with uuid {}, handle {} and right item with uuid {}, handle {}",
-            lvs, newVersionStatus, relationship.getID(), relationship.getRelationshipType().getRightwardType(),
+            lvs, newVersionStatus, relationship.getID(),
+                (relationship.isConfigurationBacked() ? relationship.getRelationshipConfigKey()
+                    : relationship.getRelationshipType().getRightwardType()),
             relationship.getLeftItem().getID(), relationship.getLeftItem().getHandle(),
             relationship.getRightItem().getID(), relationship.getRightItem().getHandle()
         );
