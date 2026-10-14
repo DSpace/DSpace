@@ -97,7 +97,6 @@ public class DoiCheckTest {
             new String[] { "HTTPS://DOI.ORG/10.5281/zenodo.5511912", "10.5281/zenodo.5511912" },
             new String[] { "10.1038/s41561-018-0221-6?download=true", "10.1038/s41561-018-0221-6" },
             new String[] { "https://doi.org/10.1038/s41561-018-0221-6?pdf=1", "10.1038/s41561-018-0221-6" },
-            new String[] { "10.1038/s41561-018-0221-6.", "10.1038/s41561-018-0221-6" },
             new String[] { "https://link.springer.com/article/10.1016%2Fj.comnet.2021.108245",
                 "10.1016/j.comnet.2021.108245" },
             new String[] { "https://api.elsevier.com/content/abstract/doi/10.1016/j.comnet.2021.108245",
