@@ -37,15 +37,15 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 
 /**
- * A utility class to convert the classic dspace.log (as generated
- * by log4j) files into an intermediate format for ingestion into
- * the new solr stats.
+ * A utility class to convert the classic {@code dspace.log} (as generated
+ * by {@code log4j}) files into an intermediate format for ingestion into
+ * the new Solr stats.
  *
  * @author Stuart Lewis
  * @see StatisticsImporter
  */
 public class ClassicDSpaceLogConverter {
-    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ClassicDSpaceLogConverter.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * A DSpace context
@@ -58,7 +58,8 @@ public class ClassicDSpaceLogConverter {
     private boolean verbose = false;
 
     /**
-     * Whether to include actions logged by org.dspace.usage.LoggerUsageEventListener
+     * Whether to include actions logged by
+     * {@link org.dspace.usage.LoggerUsageEventListener}.
      */
     private boolean newEvents = false;
 
@@ -93,7 +94,8 @@ public class ClassicDSpaceLogConverter {
      *
      * @param c  The context
      * @param v  Whether or not to provide verbose output
-     * @param nE Whether to include actions logged by org.dspace.usage.LoggerUsageEventListener
+     * @param nE Whether to include actions logged by
+     *           {@link org.dspace.usage.LoggerUsageEventListener}.
      */
     public ClassicDSpaceLogConverter(Context c, boolean v, boolean nE) {
         // Set up some variables
@@ -203,6 +205,10 @@ public class ClassicDSpaceLogConverter {
                         ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents)) {
                         handle = lline.getParams().substring(7);
                         dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
+                        if (null == dso) {
+                            log.warn("Unknown Handle {}", handle);
+                            continue;
+                        }
                         id = "" + dso.getID();
                     } else if ((lline.getAction().equals("view_collection")) &&
                         ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents)) {
@@ -334,6 +340,7 @@ public class ClassicDSpaceLogConverter {
             newEvents);
 
         // Set up the log analyser
+        LogAnalyser.setParameters(null, null, null, null, null, null, false);
         try {
             LogAnalyser.readConfig();
         } catch (IOException ioe) {
