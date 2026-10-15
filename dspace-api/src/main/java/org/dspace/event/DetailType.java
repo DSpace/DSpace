@@ -23,6 +23,7 @@ package org.dspace.event;
  *   <li>{@code ACTION}: Represents the action performed during the event.</li>
  *   <li>{@code EPERSON_EMAIL}: Represents the email of the EPerson associated with the event.</li>
  *   <li>{@code INFO}: Represents additional information about the event.</li>
+ *   <li>{@code PARENT_HANDLE}: Represents the handle of the parent object.</li>
  * </ul>
  *
  * <p>This enum is used in conjunction with the {@link EventDetail} class to provide

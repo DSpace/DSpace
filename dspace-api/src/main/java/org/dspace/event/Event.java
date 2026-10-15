@@ -314,17 +314,15 @@ public class Event implements Serializable {
      * @param eventType   action type, e.g. Event.ADD.
      * @param subjectType DSpace Object Type of subject e.g. Constants.ITEM.
      * @param subjectID   database ID of subject instance.
-     * @param detailList  detail type information that depends on context.
-     * @param identifiers array containing all identifiers of the dso or an empty array
+     * @param detailList  list of EventDetails
      */
-    public Event(int eventType, int subjectType, UUID subjectID,
-                 ArrayList<EventDetail> detailList, ArrayList<String> identifiers) {
+    public Event(int eventType, int subjectType, UUID subjectID, ArrayList<EventDetail> detailList) {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
         timeStamp = Instant.now().toEpochMilli();
         this.detailList = (ArrayList<EventDetail>) detailList.clone();
-        this.identifiers = (ArrayList<String>) identifiers.clone();
+        this.identifiers = new ArrayList<>();
     }
 
     /**

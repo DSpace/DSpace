@@ -867,18 +867,21 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
         ArrayList<EventDetail> detailList = new ArrayList<>();
+        // Add the item handle to the EventDetails.
         detailList.add(new EventDetail(DetailType.HANDLE, item.getHandle()));
-        // Add the parent collection handle EventDetail
-        UUID collectionID = item.getOwningCollection() == null ? null : item.getOwningCollection().getID();
-        try {
-            String  collectionHandle = collectionService.find(context, collectionID).getHandle();
-            detailList.add(new EventDetail(DetailType.PARENT_HANDLE, collectionHandle));
-        } catch (SQLException e) {
-            throw new SQLException("Could not find collection with ID " + collectionID, e);
+        UUID collectionID = item.getOwningCollection() == null ? null : item.getOwningCollection().getID();;
+        if (collectionID != null) {
+            try {
+                // If it's available, add the parent collection handle to the EventDetails
+                Collection collection = collectionService.find(context, collectionID);
+                if (collection != null) {
+                    detailList.add(new EventDetail(DetailType.PARENT_HANDLE, collection.getHandle()));
+                }
+            } catch (SQLException e) {
+                log.error("Could not find collection with ID " + collectionID, e);
+            }
         }
-
-        context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
-                detailList, getIdentifiers(context, item)));
+        context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(), detailList));
 
         log.info(LogHelper.getHeader(context, "delete_item", "item_id="
             + item.getID()));
