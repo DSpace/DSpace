@@ -7,10 +7,6 @@
  */
 package org.dspace.external.provider.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,45 +20,36 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.external.OrcidConnectionException;
-import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
-import org.dspace.external.provider.orcid.xml.XMLtoBio;
-import org.dspace.orcid.model.factory.OrcidFactoryUtils;
-import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.client.OrcidConfiguration;
+import org.dspace.orcid.exception.OrcidClientException;
 import org.orcid.jaxb.model.v3.release.record.Email;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.Record;
-import org.orcid.jaxb.model.v3.release.search.Result;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedResult;
+import org.orcid.jaxb.model.v3.release.search.expanded.ExpandedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV3 External
- * Data lookup
+ * Data lookup. It uses the modern {@link OrcidClient} for all ORCID API calls, supporting both
+ * public and member API endpoints based on configuration.
  */
 public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     private static final Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
 
-    private OrcidRestConnector orcidRestConnector;
-    private String OAUTHUrl;
+    @Autowired
+    private OrcidClient orcidClient;
 
-    private String clientId;
-    private String clientSecret;
-
-    private String accessToken;
+    @Autowired
+    private OrcidConfiguration orcidConfiguration;
 
     private String sourceIdentifier;
 
     private String orcidUrl;
-
-    private XMLtoBio converter;
-
-    /**
-     * Maximum retries to allow for the access token retrieval
-     */
-    private int maxClientRetries = 3;
 
     private Map<String, String> externalIdentifiers;
 
@@ -75,49 +62,33 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
     }
 
     public OrcidV3AuthorDataProvider() {
-        converter = new XMLtoBio();
     }
 
     /**
-     * Initialize the accessToken that is required for all subsequent calls to ORCID.
-     *
-     * @throws java.io.IOException passed through from HTTPclient.
+     * Initialization method — no longer needs to retrieve access tokens since
+     * {@link OrcidClient} handles authentication internally.
      */
-    public void init() throws IOException {
-        // Initialize access token at spring instantiation. If it fails, the access token will be null rather
-        // than causing a fatal Spring startup error
-        initializeAccessToken();
-    }
-
-    /**
-     * Initialize access token, logging an error and decrementing remaining retries if an IOException is thrown.
-     * If the optional access token result is empty, set to null instead.
-     */
-    public void initializeAccessToken() {
-        // If we have reaches max retries or the access token is already set, return immediately
-        if (maxClientRetries <= 0 || StringUtils.isNotBlank(accessToken)) {
-            if (maxClientRetries <= 0) {
-                log.warn("Maximum retry attempts reached for ORCID token retrieval");
-            }
-            return;
-        }
-        try {
-            accessToken = OrcidFactoryUtils.retrieveAccessToken(clientId, clientSecret, OAUTHUrl).orElse(null);
-        } catch (IOException e) {
-            log.error("Error retrieving ORCID access token, {} retries left", --maxClientRetries);
-        }
+    public void init() {
+        // No-op: OrcidClient handles token management
     }
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
-        initializeAccessToken();
         Record record = getRecord(id);
+        if (record == null) {
+            return Optional.empty();
+        }
         ExternalDataObject externalDataObject = convertToExternalDataObject(record);
         return Optional.of(externalDataObject);
     }
 
-    protected ExternalDataObject convertToExternalDataObject(org.orcid.jaxb.model.v3.release.record.Record record) {
-        initializeAccessToken();
+    /**
+     * Convert an ORCID Record to an ExternalDataObject with rich metadata.
+     *
+     * @param record the ORCID Record
+     * @return the ExternalDataObject
+     */
+    protected ExternalDataObject convertToExternalDataObject(Record record) {
         Person person = record.getPerson();
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
         if (person.getName() != null) {
@@ -268,7 +239,7 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     private void appendAffiliations(
         ExternalDataObject externalDataObject,
-        org.orcid.jaxb.model.v3.release.record.Record record) {
+        Record record) {
 
         if (record == null) {
             return;
@@ -316,25 +287,35 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     /**
      * Retrieve a Record object based on a given orcid identifier.
+     *
      * @param id orcid identifier
-     * @return Record
+     * @return Record, or null if invalid or not found
      */
-    public org.orcid.jaxb.model.v3.release.record.Record getRecord(String id) {
+    public Record getRecord(String id) {
         log.debug("getRecord called with ID={}", id);
         if (!isValid(id)) {
             return null;
         }
-        if (orcidRestConnector == null) {
-            log.error("ORCID REST connector is null, returning null ORCID Person Bio");
+        try {
+            if (orcidConfiguration.isApiConfigured()) {
+                return orcidClient.getRecord(getAccessToken(), id);
+            } else {
+                return orcidClient.getRecord(id);
+            }
+        } catch (OrcidClientException e) {
+            log.error("Error retrieving ORCID record for ID={}", id, e);
             return null;
         }
-        initializeAccessToken();
-        try (InputStream bioDocument = orcidRestConnector.get(id, accessToken)) {
-            return converter.convertToRecord(bioDocument);
-        } catch (OrcidConnectionException | IOException e) {
-            log.error("Error retrieving ORCID bio for ID={}", id, e);
-            return null;
-        }
+    }
+
+    /**
+     * Retrieve an access token for API calls. Uses a read-public token obtained
+     * via client credentials.
+     *
+     * @return the access token
+     */
+    private String getAccessToken() {
+        return orcidClient.getReadPublicAccessToken().getAccessToken();
     }
 
     /**
@@ -348,39 +329,29 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
-        initializeAccessToken();
         if (limit > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
         if (start > MAX_INDEX) {
             throw new IllegalArgumentException("The starting number of results to retrieve cannot exceed 10000.");
         }
-        // Check REST connector is initialized
-        if (orcidRestConnector == null) {
-            log.error("ORCID REST connector is not initialized, returning empty list");
-            return Collections.emptyList();
-        }
 
-        String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
-                + "&start=" + start
-                + "&rows=" + limit;
-        log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
-        try (InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken)) {
-            List<Result> results = converter.convert(bioDocument);
-            List<org.orcid.jaxb.model.v3.release.record.Record> bios = new LinkedList<>();
-            for (Result result : results) {
-                OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
-                if (orcidIdentifier != null) {
-                    log.debug("Found OrcidId=" + orcidIdentifier.getPath());
-                    String orcid = orcidIdentifier.getPath();
-                    org.orcid.jaxb.model.v3.release.record.Record bio = getRecord(orcid);
-                    if (bio != null) {
-                        bios.add(bio);
+        log.debug("searchExternalDataObjects query={} start={} limit={}", query, start, limit);
+        try {
+            ExpandedSearch searchResult = performSearch(query, start, limit);
+            List<Record> records = new LinkedList<>();
+            for (ExpandedResult result : searchResult.getResults()) {
+                String orcid = result.getOrcidId();
+                if (orcid != null) {
+                    log.debug("Found OrcidId={}", orcid);
+                    Record record = getRecord(orcid);
+                    if (record != null) {
+                        records.add(record);
                     }
                 }
             }
-            return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
-        } catch (OrcidConnectionException | IOException e) {
+            return records.stream().map(this::convertToExternalDataObject).collect(Collectors.toList());
+        } catch (OrcidClientException e) {
             log.error("Error searching ORCID for query={}", query, e);
             return Collections.emptyList();
         }
@@ -393,27 +364,37 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public int getNumberOfResults(String query) {
-        if (orcidRestConnector == null) {
-            log.error("ORCID REST connector is null, returning 0");
-            return 0;
-        }
-        initializeAccessToken();
-        String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
-                + "&start=" + 0
-                + "&rows=" + 0;
-        log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
-        try (InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken)) {
-            return Math.min(converter.getNumberOfResultsFromXml(bioDocument), MAX_INDEX);
-        } catch (OrcidConnectionException | IOException e) {
+        log.debug("getNumberOfResults query={}", query);
+        try {
+            ExpandedSearch searchResult = performSearch(query, 0, 0);
+            Long numFound = searchResult.getNumFound();
+            return Math.min(numFound != null ? numFound.intValue() : 0, MAX_INDEX);
+        } catch (OrcidClientException e) {
             log.error("Error getting number of results from ORCID for query={}", query, e);
             return 0;
         }
     }
 
+    /**
+     * Perform an ORCID expanded search, using the member API if configured or the public API otherwise.
+     *
+     * @param query the search query
+     * @param start the start index
+     * @param rows  the number of rows
+     * @return the ExpandedSearch result
+     */
+    private ExpandedSearch performSearch(String query, int start, int rows) {
+        if (orcidConfiguration.isApiConfigured()) {
+            return orcidClient.expandedSearch(getAccessToken(), query, start, rows);
+        } else {
+            return orcidClient.expandedSearch(query, start, rows);
+        }
+    }
 
     /**
-     * Generic setter for the sourceIdentifier
-     * @param sourceIdentifier   The sourceIdentifier to be set on this OrcidV3AuthorDataProvider
+     * Generic setter for the sourceIdentifier.
+     *
+     * @param sourceIdentifier The sourceIdentifier to be set on this OrcidV3AuthorDataProvider
      */
     @Autowired(required = true)
     public void setSourceIdentifier(String sourceIdentifier) {
@@ -421,7 +402,8 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
     }
 
     /**
-     * Generic getter for the orcidUrl
+     * Generic getter for the orcidUrl.
+     *
      * @return the orcidUrl value of this OrcidV3AuthorDataProvider
      */
     public String getOrcidUrl() {
@@ -429,8 +411,9 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
     }
 
     /**
-     * Generic setter for the orcidUrl
-     * @param orcidUrl   The orcidUrl to be set on this OrcidV3AuthorDataProvider
+     * Generic setter for the orcidUrl.
+     *
+     * @param orcidUrl The orcidUrl to be set on this OrcidV3AuthorDataProvider
      */
     @Autowired(required = true)
     public void setOrcidUrl(String orcidUrl) {
@@ -438,41 +421,19 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
     }
 
     /**
-     * Generic setter for the OAUTHUrl
-     * @param OAUTHUrl   The OAUTHUrl to be set on this OrcidV3AuthorDataProvider
+     * Getter for the externalIdentifiers map.
+     *
+     * @return the externalIdentifiers mapping
      */
-    public void setOAUTHUrl(String OAUTHUrl) {
-        this.OAUTHUrl = OAUTHUrl;
-    }
-
-    /**
-     * Generic setter for the clientId
-     * @param clientId   The clientId to be set on this OrcidV3AuthorDataProvider
-     */
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    /**
-     * Generic setter for the clientSecret
-     * @param clientSecret   The clientSecret to be set on this OrcidV3AuthorDataProvider
-     */
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
-
-    public OrcidRestConnector getOrcidRestConnector() {
-        return orcidRestConnector;
-    }
-
-    public void setOrcidRestConnector(OrcidRestConnector orcidRestConnector) {
-        this.orcidRestConnector = orcidRestConnector;
-    }
-
     public Map<String, String> getExternalIdentifiers() {
         return externalIdentifiers;
     }
 
+    /**
+     * Setter for the externalIdentifiers map.
+     *
+     * @param externalIdentifiers the mapping of ORCID external ID types to DSpace metadata fields
+     */
     public void setExternalIdentifiers(Map<String, String> externalIdentifiers) {
         this.externalIdentifiers = externalIdentifiers;
     }
