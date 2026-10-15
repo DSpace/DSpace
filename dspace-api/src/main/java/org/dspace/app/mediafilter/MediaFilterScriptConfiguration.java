@@ -54,6 +54,18 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
 
         options.addOption("d", "fromdate", true, "Process only item from specified last modified date");
 
+        Option bundleOption = Option.builder("b")
+                                    .longOpt("bundle")
+                                    .hasArg()
+                                    .hasArgs()
+                                    .valueSeparator(',')
+                                    .desc(
+                                            "Process bitstreams in the specified bundle(s)\n" +
+                                                    "Separate multiple with a comma (,)\n" +
+                                                    "(default: ORIGINAL)")
+                                    .build();
+        options.addOption(bundleOption);
+
         Option skipOption = Option.builder("s")
                                   .longOpt("skip")
                                   .hasArg()
