@@ -135,17 +135,23 @@
          </lst>
     </requestHandler>
 
-    <!-- IndexBasedSpellChecker uses Solr index as basis for a parallel index used for spell checking -->
+    <!-- DirectSolrSpellChecker reads directly from the main Solr index at query time.
+         No separate build step is needed, eliminating timeout issues on large repositories.
+         See: https://solr.apache.org/guide/solr/latest/query-guide/spell-checking.html -->
     <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
         <str name="queryAnalyzerFieldType">textSpell</str>
 
         <lst name="spellchecker">
-          <str name="classname">solr.IndexBasedSpellChecker</str>
+          <str name="classname">solr.DirectSolrSpellChecker</str>
           <str name="name">default</str>
           <str name="field">a_spell</str>
-          <str name="spellcheckIndexDir">./spellchecker</str>
-          <str name="buildOnOptimize">true</str>
-          <str name="spellcheck.onlyMorePopular">false</str>
+          <str name="distanceMeasure">internal</str>
+          <float name="accuracy">0.5</float>
+          <int name="maxEdits">2</int>
+          <int name="minPrefix">1</int>
+          <int name="maxInspections">5</int>
+          <float name="thresholdTokenFrequency">.0001</float>
+          <int name="minQueryLength">4</int>
         </lst>
     </searchComponent>
 
