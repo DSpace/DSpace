@@ -17,6 +17,8 @@ on things we will look for in your PR.
 
 We also provide a [Code Style Guide](CODE_STYLE.md) (detailing how to format your code) and a [Code Conventions Guide](CODE_CONVENTIONS.md) (detailing established coding best practices).
 
+If you use AI / LLM tools to help write code, please be aware of our [AI Contribution Policy](https://wiki.lyrasis.org/display/DSPACE/AI+Contribution+Policy). We allow for AI usage in development. But we ask you to disclose any AI usage and describe how you verified any generated code.
+
 Additional details on the code contribution process can be found in our [Code Contribution Guidelines](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines)
 
 ## Contribute documentation

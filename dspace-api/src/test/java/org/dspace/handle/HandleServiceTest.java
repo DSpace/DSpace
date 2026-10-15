@@ -54,6 +54,18 @@ public class HandleServiceTest extends AbstractUnitTest {
         assertEquals("111222333/111", handleService.parseHandle("https://fake.canonical.prefix/111222333/111"));
     }
 
+    /**
+     * A URL that can never yield a handle has to be rejected promptly. The greedy ".+" in the
+     * replaced pattern retried every "/handle/" segment in turn, needing time quadratic in the
+     * length of the identifier, where rejecting it is now linear. The bound is therefore a very
+     * wide margin and is not sensitive to a slow CI machine.
+     */
+    @Test(timeout = 10000)
+    public void testParseHandleRejectsLongUrlWithoutBacktracking() {
+        // a line terminator is what made the URL unmatchable, since "." never matched one
+        assertNull(handleService.parseHandle("http://a/handle/" + "a/handle/a".repeat(40000) + "\n"));
+    }
+
     @Test
     public void testParseHandleByAdditionalPrefix() {
         // note: handle pattern after prefix is not checked
@@ -69,5 +81,10 @@ public class HandleServiceTest extends AbstractUnitTest {
         assertEquals("111222333/111", handleService.parseHandle("http://hdl.handle.net/111222333/111"));
         assertEquals("111222333/111", handleService.parseHandle("https://whatever/handle/111222333/111"));
         assertEquals("111222333/111", handleService.parseHandle("http://whatever/handle/111222333/111"));
+        // a repository deployed under a context path
+        assertEquals("111222333/111", handleService.parseHandle("https://whatever/jspui/handle/111222333/111"));
+        // the replaced pattern was greedy, so a nested "/handle/" resolved to the last one
+        assertEquals("111222333/111",
+                     handleService.parseHandle("https://whatever/handle/x/handle/111222333/111"));
     }
 }

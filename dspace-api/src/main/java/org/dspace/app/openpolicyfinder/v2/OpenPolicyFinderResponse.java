@@ -58,6 +58,14 @@ public class OpenPolicyFinderResponse implements Serializable {
     // Open Policy Finder URI (the human page version of this API response)
     private String uri;
 
+    // Grand total of hits across all pages, as reported by the API "totalHits" field.
+    // Defaults to the number of parsed items when the field is absent (e.g. legacy fixtures).
+    private int totalHits;
+
+    // Cursor for the next page, as reported by the API "next_search_after" field.
+    // Null/absent on the last page. Provided for future deep-paging; not used by the authority path.
+    private String nextSearchAfter;
+
     @JsonIgnore
     private Instant retrievalTime = Instant.now();
 
@@ -97,8 +105,14 @@ public class OpenPolicyFinderResponse implements Serializable {
         JSONObject httpResponse;
         try {
             httpResponse = new JSONObject(jsonTokener);
+            // Cursor for the next page (absent/null on the last page); optional plumbing for deep-paging
+            this.nextSearchAfter = httpResponse.optString("next_search_after", null);
             if (httpResponse.has("items")) {
                 JSONArray items = httpResponse.getJSONArray("items");
+
+                // Grand total across all pages. Fall back to the parsed item count when the API does not
+                // report "totalHits" (protects legacy fixtures that predate this field).
+                this.totalHits = httpResponse.optInt("totalHits", items.length());
 
                 // items array is search results, *not* journals or publishers - they are listed for each item
                 // - however, we only ever want one result since we're passing an "equals ISSN" query
@@ -192,6 +206,8 @@ public class OpenPolicyFinderResponse implements Serializable {
                     }
 
                 } else {
+                    // No items on this page; capture the reported total (0 when present)
+                    this.totalHits = httpResponse.optInt("totalHits", 0);
                     error = true;
                     message = "No results found";
                 }
@@ -567,5 +583,46 @@ public class OpenPolicyFinderResponse implements Serializable {
 
     public Instant getRetrievalTime() {
         return retrievalTime;
+    }
+
+    /**
+     * Get the grand total of hits across all pages, as reported by the API {@code totalHits} field.
+     * When the API does not report the value (e.g. legacy responses), this defaults to the number of
+     * parsed items.
+     *
+     * @return the total number of hits for the search
+     */
+    public int getTotalHits() {
+        return totalHits;
+    }
+
+    /**
+     * Set the grand total of hits across all pages.
+     *
+     * @param totalHits the total number of hits for the search
+     */
+    public void setTotalHits(int totalHits) {
+        this.totalHits = totalHits;
+    }
+
+    /**
+     * Get the cursor for the next page, as reported by the API {@code next_search_after} field.
+     * This is {@code null} on the last page. It is provided for future deep-paging support and is not
+     * required by the authority autocomplete path, which stays well under the API's 10,000-record
+     * {@code search_after} threshold.
+     *
+     * @return the next-page cursor, or {@code null} if there are no further pages
+     */
+    public String getNextSearchAfter() {
+        return nextSearchAfter;
+    }
+
+    /**
+     * Set the cursor for the next page.
+     *
+     * @param nextSearchAfter the next-page cursor
+     */
+    public void setNextSearchAfter(String nextSearchAfter) {
+        this.nextSearchAfter = nextSearchAfter;
     }
 }

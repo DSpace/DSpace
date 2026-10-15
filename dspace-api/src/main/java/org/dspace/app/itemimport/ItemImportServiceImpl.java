@@ -111,6 +111,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
+import org.dspace.storage.secure.SecureFileAccess;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.InitializingBean;
@@ -202,7 +203,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         //Ensure tempWorkDir exists
         File tempWorkDirFile = new File(tempWorkDir);
         if (!tempWorkDirFile.exists()) {
-            boolean success = tempWorkDirFile.mkdir();
+            boolean success = tempWorkDirFile.mkdirs();
             if (success) {
                 logInfo("Created org.dspace.app.batchitemimport.work.dir of: " + tempWorkDir);
             } else {
@@ -1984,9 +1985,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             logError("Unable to create temporary directory: " + tempdir.getAbsolutePath());
         }
         String sourcedir = destinationDir + System.getProperty("file.separator") + zipfile.getName();
-        String zipDir = destinationDir + System.getProperty("file.separator") + zipfile.getName() + System
-            .getProperty("file.separator");
+        String zipDir = sourcedir + System.getProperty("file.separator");
+        File sourcedirFile = new File(sourcedir);
 
+        // Create the source directory we will be unzipping into. We must pre-create this directory to validate
+        // the final path of each zip entry using SecureFileAccess (see below)
+        if (!sourcedirFile.exists() && !sourcedirFile.mkdirs()) {
+            logError("Unable to create directory for unzipping: " + sourcedir);
+        }
 
         // 3
         String sourceDirForZip = sourcedir;
@@ -1997,13 +2003,22 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             while (entries.hasMoreElements()) {
                 entry = entries.nextElement();
                 String entryName = entry.getName();
-                File outFile = new File(zipDir + entryName);
+
                 // Verify that this file/directory will be extracted into our zipDir (and not somewhere else!)
-                if (!outFile.toPath().normalize().startsWith(zipDir)) {
+                Path validatedOutPath;
+                try {
+                    String fileAbsolutePath =
+                        SecureFileAccess.calculateAbsolutePathUsingBaseDir(entryName, zipDir);
+                    validatedOutPath = SecureFileAccess.validatePathForWrite(fileAbsolutePath, List.of(zipDir),
+                                                                             "ItemImport zip entry extraction");
+                } catch (IOException e) {
                     throw new IOException("Bad zip entry: '" + entryName
                                               + "' in file '" + zipfile.getAbsolutePath() + "'!"
-                                              + " Cannot process this file or directory.");
+                                              + " Cannot process this file or directory.", e);
                 }
+
+                File outFile = validatedOutPath.toFile();
+
                 if (entry.isDirectory()) {
                     if (!outFile.mkdirs()) {
                         logError("Unable to create contents directory: " + zipDir + entry.getName());
@@ -2049,6 +2064,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     out.close();
                 }
             }
+        } catch (Exception e) {
+            // If an error occurs in unzipping, cleanup the directory we were unzipping this file into
+            if (sourcedirFile.exists()) {
+                FileUtils.deleteDirectory(sourcedirFile);
+            }
+            // Then throw error upwards
+            throw e;
         } finally {
             //Close zip file
             zf.close();
