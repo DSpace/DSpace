@@ -584,8 +584,8 @@ public class LDAPAuthentication implements AuthenticationMethod {
          */
         protected boolean ldapAuthenticate(String dn, String password, Context context) {
             if (StringUtils.isBlank(password)) {
-                log.debug(LogHelper.getHeader(context, "ldap_authentication",
-                                              "type=failed_auth empty password for DN " + dn));
+                log.warn(LogHelper.getHeader(context, "ldap_authentication",
+                                             "type=failed_auth empty password for DN " + dn));
                 return false;
             }
 
