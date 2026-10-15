@@ -38,6 +38,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -169,6 +170,9 @@ public class SolrBrowseDAO implements BrowseDAO {
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
+    protected ConfigurationService configurationService =
+        DSpaceServicesFactory.getInstance().getConfigurationService();
+
     // administrative attributes for this class
 
 
@@ -183,6 +187,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         if (sResponse == null) {
             DiscoverQuery query = new DiscoverQuery();
             addLocationScopeFilter(query);
+            addExtraFilter(query);
             addDefaultFilterQueries(query);
             if (distinct) {
                 // We use a json.facet query for metadata browsing because it allows us to limit the results
@@ -266,6 +271,13 @@ public class SolrBrowseDAO implements BrowseDAO {
             }
         }
         return sResponse;
+    }
+
+    private void addExtraFilter(DiscoverQuery query) {
+        String filter = configurationService.getProperty("browse.solr." + facetField + ".filter");
+        if (StringUtils.isNotBlank(filter)) {
+            query.addFilterQueries(filter);
+        }
     }
 
     private void addLocationScopeFilter(DiscoverQuery query) {
@@ -361,6 +373,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         throws BrowseException {
         DiscoverQuery query = new DiscoverQuery();
         addLocationScopeFilter(query);
+        addExtraFilter(query);
         addDefaultFilterQueries(query);
         query.setMaxResults(0);
         query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);

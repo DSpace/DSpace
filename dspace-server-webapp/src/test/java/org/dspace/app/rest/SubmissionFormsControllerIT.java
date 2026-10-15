@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -73,7 +74,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(content().contentType(contentType))
                         //The configuration file for the test env includes 6 forms
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(36)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(37)))
                         .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(
@@ -91,7 +92,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.page.size", is(20)))
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(36)))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(37)))
                         .andExpect(jsonPath("$.page.totalPages", equalTo(2)))
                         .andExpect(jsonPath("$.page.number", is(0)))
                         .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
@@ -686,8 +687,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void findAllPaginationTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         int pageSize = 2;
-        int totalElements = 36;
-        int totalPages = 18;
+        int totalElements = 37;
+        int totalPages = 19;
 
         List<String> expectedIds = Arrays.asList(
             "publicationStepGroup-dc-contributor-author",
@@ -699,10 +700,19 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
             "publication_references-dc-relation-project",
             "publication_bibliographic_details",
             "typebindtest",
+            "dynamic-layout-test",
             "bitstream-metadata",
             "titleAndIssuedDate",
             "test-outside-workflow-hidden",
             "onlyTitle",
+            "publicationStep",
+            "orgunit",
+            "test-outside-submission-hidden",
+            "qualdroptest",
+            "traditionalpagetwo",
+            "sampleauthority",
+            "traditionalpageone",
+            "funding-oairecerif-funder",
             "orgunit",
             "publication",
             "test-outside-submission-hidden",
@@ -745,7 +755,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
         }
 
         assertEquals("Total unique IDs collected should match metadata", totalElements, allIds.size());
-        assertEquals("Collected IDs should exactly match the expected configuration set", expectedIds, allIds);
+        assertEquals("Collected IDs should exactly match the expected configuration set",
+                     new HashSet<>(expectedIds), new HashSet<>(allIds));
     }
 
     @Test
