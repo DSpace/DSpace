@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<licenseclass id="standard">
+  <label xml:lang="en">Help me choose a CC license...</label>
+  <field id="commercial">
+    <label xml:lang="en">Allow commercial uses of your work?</label>
+    <description xml:lang="en"></description>
+    <type>enum</type>
+    <enum id="y">
+      <label xml:lang="en">Yes</label>
+      <description xml:lang="en">Commercial use of your work is permitted.</description>
+    </enum>
+    <enum id="n" default="true">
+      <label xml:lang="en">No</label>
+      <description xml:lang="en">Only noncommercial use of your work is permitted. <em>Noncommercial means not primarily intended for or directed towards commercial advantage or monetary compensation.</em></description>
+    </enum>
+  </field>
+  <field id="derivatives">
+    <label xml:lang="en">Allow derivative works?</label>
+    <description xml:lang="en"></description>
+    <type>enum</type>
+    <enum id="y" default="true">
+      <label xml:lang="en">Yes</label>
+      <description xml:lang="en">Derivatives or adaptations of your work are permitted.</description>
+    </enum>
+    <enum id="n">
+      <label xml:lang="en">No</label>
+      <description xml:lang="en">No derivatives or adaptations of your work are permitted.</description>
+    </enum>
+  </field>
+  <field id="sharealike">
+    <label xml:lang="en">Require ShareAlike?</label>
+    <description xml:lang="en">If derivatives or adaptations of your work are permitted, must they be shared under the same terms?.</description>
+    <type>enum</type>
+    <enum id="y">
+      <label xml:lang="en">Yes</label>
+      <description xml:lang="en">Adaptations must be shared under the same terms.</description>
+    </enum>
+    <enum id="n" default="true">
+      <label xml:lang="en">No</label>
+      <description xml:lang="en">Adaptations may be shared under different terms. </description>
+    </enum>
+  </field>
+</licenseclass>

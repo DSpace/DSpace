@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<result>
+  <license-uri>http://creativecommons.org/publicdomain/zero/1.0/</license-uri>
+  <license-name>CC0 1.0 Universal</license-name>
+  <license-rights>This work has been marked as dedicated to the public domain.</license-rights>
+   <deprecated>false</deprecated>
+  <rdf>
+    <rdf:RDF xmlns="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <Work xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about=""><license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/></Work><License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+    <permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+    <permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+    <permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+  </License>
+</rdf:RDF>
+  </rdf>
+  <licenserdf>
+    <rdf:RDF xmlns="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+    <permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+    <permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+    <permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+  </License>
+</rdf:RDF>
+  </licenserdf>
+  <html>
+    <p xmlns:dct="http://purl.org/dc/terms/">
+  <a rel="license" href="http://creativecommons.org/publicdomain/zero/1.0/">
+    <img src="http://i.creativecommons.org/p/zero/1.0/88x31.png" style="border-style: none;" alt="CC0"/>
+  </a>
+  <br/>
+  To the extent possible under law,
+  <span rel="dct:publisher" resource="[_:publisher]">the person who associated CC0</span>
+  with this work has waived all copyright and related or neighboring
+  rights to this work.
+</p>
+  </html>
+</result>
