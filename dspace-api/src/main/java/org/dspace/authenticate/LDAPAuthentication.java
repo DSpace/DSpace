@@ -33,7 +33,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.springframework.ldap.AuthenticationException;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
@@ -585,6 +584,8 @@ public class LDAPAuthentication implements AuthenticationMethod {
          */
         protected boolean ldapAuthenticate(String dn, String password, Context context) {
             if (StringUtils.isBlank(password)) {
+                log.debug(LogHelper.getHeader(context, "ldap_authentication",
+                                              "type=failed_auth empty password for DN " + dn));
                 return false;
             }
 
@@ -601,11 +602,10 @@ public class LDAPAuthentication implements AuthenticationMethod {
                 );
                 return true;
 
-            } catch (AuthenticationException e) {
-                // Wrong password: an ordinary failed login, not an error.
-                log.debug(LogHelper.getHeader(context, "ldap_authentication", "type=failed_auth " + e));
-                return false;
             } catch (Exception e) {
+                // authenticate() throws on a wrong password instead of returning false, so this
+                // also covers ordinary failed logins. Logged at warn, as before, because the
+                // cause is often a configuration error in local.cfg.
                 log.warn(LogHelper.getHeader(context, "ldap_authentication", "type=failed_auth " + e));
                 return false;
             }
