@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -283,7 +284,7 @@ public class DSpaceSwordAPI {
                 if (deposit.isMultipart() || deposit.isEntryOnly()) {
                     String entry = deposit.getSwordEntry().toString();
                     ByteArrayInputStream bais = new ByteArrayInputStream(
-                        entry.getBytes());
+                        entry.getBytes(StandardCharsets.UTF_8));
                     Bitstream entryBitstream = bitstreamService.create(
                         context, swordBundle, bais);
 
@@ -442,7 +443,8 @@ public class DSpaceSwordAPI {
 
         //write companion file with headers
         PrintWriter pw = new PrintWriter(
-            new BufferedWriter(new FileWriter(headersFile)));
+            new BufferedWriter(new FileWriter(headersFile, StandardCharsets.UTF_8))
+        );
 
         pw.println("Filename=" + deposit.getFilename());
         pw.println("Content-Type=" + deposit.getMimeType());
@@ -479,7 +481,7 @@ public class DSpaceSwordAPI {
         File headersFile = new File(path, filenameBase + "-headers");
 
         String entry = deposit.getSwordEntry().toString();
-        ByteArrayInputStream is = new ByteArrayInputStream(entry.getBytes());
+        ByteArrayInputStream is = new ByteArrayInputStream(entry.getBytes(StandardCharsets.UTF_8));
         OutputStream fos = new BufferedOutputStream(
             new FileOutputStream(packageFile));
         Utils.copy(is, fos);
@@ -488,7 +490,8 @@ public class DSpaceSwordAPI {
 
         //write companion file with headers
         PrintWriter pw = new PrintWriter(
-            new BufferedWriter(new FileWriter(headersFile)));
+            new BufferedWriter(new FileWriter(headersFile, StandardCharsets.UTF_8))
+        );
 
         pw.println("Filename=" + deposit.getFilename());
         pw.println("Content-Type=" + deposit.getMimeType());

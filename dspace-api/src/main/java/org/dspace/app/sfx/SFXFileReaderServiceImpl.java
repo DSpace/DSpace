@@ -10,6 +10,7 @@ package org.dspace.app.sfx;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,7 +24,6 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -186,10 +186,10 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
                                     fullDate = fullDate.substring(0, 10);
                                 }
                                 if (myquery.equals("")) {
-                                    myquery = querystring + URLEncoder.encode(fullDate, Constants.DEFAULT_ENCODING);
+                                    myquery = querystring + URLEncoder.encode(fullDate, StandardCharsets.UTF_8);
                                 } else {
                                     myquery = myquery + "&" + querystring + URLEncoder
-                                        .encode(fullDate, Constants.DEFAULT_ENCODING);
+                                        .encode(fullDate, StandardCharsets.UTF_8);
                                 }
                             } else {
                                 // Contributor Author
@@ -206,18 +206,18 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
                                     }
 
                                     if (myquery.equals("")) {
-                                        myquery = querystring + URLEncoder.encode(dpnName, Constants.DEFAULT_ENCODING);
+                                        myquery = querystring + URLEncoder.encode(dpnName, StandardCharsets.UTF_8);
                                     } else {
                                         myquery = myquery + "&" + querystring + URLEncoder
-                                            .encode(dpnName, Constants.DEFAULT_ENCODING);
+                                            .encode(dpnName, StandardCharsets.UTF_8);
                                     }
                                 } else {
                                     if (myquery.equals("")) {
                                         myquery = querystring + URLEncoder
-                                            .encode(dcvalue.get(0).getValue(), Constants.DEFAULT_ENCODING);
+                                            .encode(dcvalue.get(0).getValue(), StandardCharsets.UTF_8);
                                     } else {
                                         myquery = myquery + "&" + querystring + URLEncoder
-                                            .encode(dcvalue.get(0).getValue(), Constants.DEFAULT_ENCODING);
+                                            .encode(dcvalue.get(0).getValue(), StandardCharsets.UTF_8);
                                     }
                                 }
                             }
