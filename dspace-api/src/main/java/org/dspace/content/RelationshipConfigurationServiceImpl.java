@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Ben Bosman (ben . bosman at atmire.com)
  */
 public class RelationshipConfigurationServiceImpl implements RelationshipConfigurationService {
-    private static final String AUTHORITY_PREFIX = "authority:";
+    public static final String AUTHORITY_PREFIX = "authority:";
 
     @Autowired
     private ChoiceAuthorityService choiceAuthorityService;
