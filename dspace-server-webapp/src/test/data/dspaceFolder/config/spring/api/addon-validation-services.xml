@@ -13,6 +13,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+    <bean name="org.dspace.app.util.TypeBindUtils" class="org.dspace.app.util.TypeBindUtils"/>
+
     <bean name="org.dspace.validation.service.impl.ValidationServiceImpl"
           class="org.dspace.validation.service.impl.ValidationServiceImpl"/>
     <bean name="validationServiceFactory"
@@ -23,6 +25,9 @@
         <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
         <property name="metadataAuthorityService" ref="org.dspace.content.authority.MetadataAuthorityServiceImpl"/>
+        <property name="typeBindUtils" ref="org.dspace.app.util.TypeBindUtils"/>
+        <property name="relationshipTypeService" ref="org.dspace.content.RelationshipTypeServiceImpl"/>
+        <property name="relationshipService" ref="org.dspace.content.RelationshipServiceImpl"/>
     </bean>
 
     <bean name="uploadValidation" class="org.dspace.validation.UploadValidator">
