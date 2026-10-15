@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -27,6 +28,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.iiif.model.generator.ContentAsTextGenerator;
@@ -35,6 +37,7 @@ import org.dspace.app.iiif.model.generator.SearchResultGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.SolrAuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -87,7 +90,12 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
                 .getBooleanProperty("discovery.solr.url.validation.enabled");
         UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
         if (urlValidator.isValid(solrService) || validationEnabled) {
-            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
+            CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                    SolrAuthUtils.addAuthenticationIfConfigured(builder, "iiif.search", "solr",
+                            configurationService));
+            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
+                    .withHttpClient(httpClient)
+                    .build();
             solrServer.setUseMultiPartPost(true);
             SolrQuery solrQuery = getSolrQuery(adjustQuery(query), manifestId);
             QueryRequest req = new QueryRequest(solrQuery);
