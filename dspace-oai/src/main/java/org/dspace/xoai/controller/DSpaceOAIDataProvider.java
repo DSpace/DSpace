@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.lyncode.xoai.dataprovider.OAIDataProvider;
 import com.lyncode.xoai.dataprovider.OAIRequestParameters;
+import com.lyncode.xoai.dataprovider.core.XOAIContext;
 import com.lyncode.xoai.dataprovider.core.XOAIManager;
+import com.lyncode.xoai.dataprovider.data.internal.MetadataFormat;
 import com.lyncode.xoai.dataprovider.exceptions.InvalidContextException;
 import com.lyncode.xoai.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
@@ -51,6 +54,13 @@ import org.dspace.xoai.services.api.xoai.IdentifyResolver;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceResumptionTokenFormatter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -142,6 +152,16 @@ public class DSpaceOAIDataProvider {
             context = contextService.getContext();
 
             XOAIManager manager = xoaiManagerResolver.getManager();
+            XOAIContext xoaiContextObj = manager.getContextManager().getOAIContext(xoaiContext);
+            List<String> metadataPrefixes = new ArrayList<>();
+            if (xoaiContextObj != null) {
+                for (MetadataFormat format : xoaiContextObj.getFormats()) {
+                    metadataPrefixes.add(format.getPrefix());
+                }
+            }
+            if (metadataPrefixes.isEmpty()) {
+                metadataPrefixes.add("oai_dc");
+            }
 
             OAIDataProvider dataProvider = new OAIDataProvider(manager, xoaiContext,
                                                                identifyResolver.getIdentify(),
@@ -166,39 +186,46 @@ public class DSpaceOAIDataProvider {
                 }
             }
 
-            if (shouldServeAsHTML) {
-                response.setContentType("text/html");
-                out = new ByteArrayOutputStream();
-            } else {
-                response.setContentType("text/xml");
-            }
-            response.setCharacterEncoding("UTF-8");
-
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             String identification = xoaiContext + parameters.requestID();
 
             if (cacheService.isActive()) {
                 if (!cacheService.hasCache(identification)) {
                     cacheService.store(identification, dataProvider.handle(parameters));
                 }
-
-                cacheService.handle(identification, out);
+                cacheService.handle(identification, baos);
             } else {
-                dataProvider.handle(parameters, out);
+                dataProvider.handle(parameters, baos);
+            }
+
+            byte[] xmlBytes = baos.toByteArray();
+            byte[] modifiedBytes = xmlBytes;
+            if (shouldServeAsHTML) {
+                try {
+                    modifiedBytes = addMetadataPrefixes(xmlBytes, metadataPrefixes);
+                } catch (JDOMException | IOException e) {
+                    log.warn("Could not add metadata prefixes to XML; using original response.", e);
+                    modifiedBytes = xmlBytes;
+                }
             }
 
             if (shouldServeAsHTML) {
+                response.setContentType("text/html");
                 OutputStream responseOut = response.getOutputStream();
-                Source source = new StreamSource(new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray()));
+                Source source = new StreamSource(new ByteArrayInputStream(modifiedBytes));
                 Result result = new StreamResult(responseOut);
                 Transformer htmlTransformer = htmlTransformerFactory.newTransformer(
                         new StreamSource(new ByteArrayInputStream(htmlTransformerSource)));
                 htmlTransformer.transform(source, result);
-                out = responseOut;
+                responseOut.flush();
+                responseOut.close();
+            } else {
+                response.setContentType("text/xml");
+                response.setCharacterEncoding("UTF-8");
+                response.getOutputStream().write(modifiedBytes);
+                response.getOutputStream().flush();
+                response.getOutputStream().close();
             }
-
-            out.flush();
-            out.close();
-
             closeContext(context);
 
         } catch (InvalidContextException e) {
@@ -252,4 +279,29 @@ public class DSpaceOAIDataProvider {
         return map;
     }
 
+    /**
+     * Adds an extension element to the XML response containing the list of supported metadataPrefixes.
+     * This allows style.xsl to create dynamic dropdowns.
+     */
+    private byte[] addMetadataPrefixes(byte[] xmlBytes, List<String> prefixes)
+            throws JDOMException, IOException {
+        if (prefixes == null || prefixes.isEmpty()) {
+            return xmlBytes;
+        }
+        SAXBuilder builder = XMLUtils.getSAXBuilder();
+        Document doc = builder.build(new ByteArrayInputStream(xmlBytes));
+        Element root = doc.getRootElement();
+        Namespace dsNs = Namespace.getNamespace("ds", "http://www.dspace.org/xmlns/oai-extension");
+        Element prefixesElem = new Element("metadataPrefixes", dsNs);
+        for (String prefix : prefixes) {
+            Element p = new Element("metadataPrefix", dsNs);
+            p.setText(prefix);
+            prefixesElem.addContent(p);
+        }
+        root.addContent(prefixesElem);
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        outputter.output(doc, out);
+        return out.toByteArray();
+    }
 }

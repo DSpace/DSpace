@@ -12,6 +12,7 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oai="http://www.openarchives.org/OAI/2.0/"
 	xmlns:lyn="http://www.lyncode.com/fakeNamespace" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
 	xmlns:dc="http://purl.org/dc/doc:elements/1.1/"
+    xmlns:ds="http://www.dspace.org/xmlns/oai-extension"
     xmlns:verb="http://informatik.hu-berlin.de/xmlverbatim"
     xmlns:oai_id="http://www.openarchives.org/OAI/2.0/oai-identifier"
     exclude-result-prefixes="oai lyn oai_dc dc verb oai_id">
@@ -65,28 +66,32 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" title="Listing records (with metadata)">
-                                        <xsl:if test="/oai:OAI-PMH/oai:request/@verb = 'ListRecords'">
-                                            <xsl:attribute name="class">active nav-link</xsl:attribute>
-                                        </xsl:if>
-                                        <xsl:attribute name="href">
-                                            <xsl:value-of
-                                                    select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListRecords&amp;metadataPrefix=oai_dc')"></xsl:value-of>
-                                        </xsl:attribute>
-                                        Records
-                                    </a>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-link nav-link dropdown-toggle" data-toggle="dropdown">
+                                            Records
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <xsl:for-each select="/oai:OAI-PMH/ds:metadataPrefixes/ds:metadataPrefix">
+                                                <a class="dropdown-item" href="{concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListRecords&amp;metadataPrefix=', .)}">
+                                                    <xsl:value-of select="."/>
+                                                </a>
+                                            </xsl:for-each>
+                                        </div>
+                                    </div>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" title="Listing identifiers only">
-                                        <xsl:if test="/oai:OAI-PMH/oai:request/@verb = 'ListIdentifiers'">
-                                            <xsl:attribute name="class">active nav-link</xsl:attribute>
-                                        </xsl:if>
-                                        <xsl:attribute name="href">
-                                            <xsl:value-of
-                                                    select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListIdentifiers&amp;metadataPrefix=oai_dc')"></xsl:value-of>
-                                        </xsl:attribute>
-                                        Identifiers
-                                    </a>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-link nav-link dropdown-toggle" data-toggle="dropdown">
+                                            Identifiers
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <xsl:for-each select="/oai:OAI-PMH/ds:metadataPrefixes/ds:metadataPrefix">
+                                                <a class="dropdown-item" href="{concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListIdentifiers&amp;metadataPrefix=', .)}">
+                                                    <xsl:value-of select="."/>
+                                                </a>
+                                            </xsl:for-each>
+                                        </div>
+                                    </div>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" title="Metadata Formats available">
