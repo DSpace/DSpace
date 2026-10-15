@@ -39,6 +39,8 @@ import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
+import org.springframework.ldap.filter.Filter;
+import org.springframework.ldap.filter.OrFilter;
 import org.springframework.ldap.filter.PresentFilter;
 import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.ldap.support.LdapNameBuilder;
@@ -325,7 +327,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
                             log.info(LogHelper.getHeader(context,
                                                           "type=ldap-login", "type=ldap_but_already_email"));
                             context.turnOffAuthorisationSystem();
-                            setEpersonAttributes(context, eperson, ldap, Optional.of(netid), email);
+                            setEpersonAttributes(context, eperson, ldap, Optional.of(ldap.uid), email);
                             ePersonService.update(context, eperson);
                             context.dispatchEvents();
                             context.restoreAuthSystemState();
@@ -342,7 +344,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
                                 try {
                                     context.turnOffAuthorisationSystem();
                                     eperson = ePersonService.create(context);
-                                    setEpersonAttributes(context, eperson, ldap, Optional.of(netid), email);
+                                    setEpersonAttributes(context, eperson, ldap, Optional.of(ldap.uid), email);
                                     eperson.setCanLogIn(true);
                                     authenticationService.initEPerson(context, request, eperson);
                                     ePersonService.update(context, eperson);
@@ -424,6 +426,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
 
         private Logger log = null;
 
+        protected String uid = null;
         protected String ldapEmail = null;
         protected String ldapGivenName = null;
         protected String ldapSurname = null;
@@ -443,6 +446,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
         final String ldap_surname_field;
         final String ldap_phone_field;
         final String ldap_group_field;
+        private boolean includeMailFilter;
         final boolean useTLS;
 
         private LdapTemplate ldapTemplate;
@@ -461,6 +465,8 @@ public class LDAPAuthentication implements AuthenticationMethod {
             ldap_surname_field = configurationService.getProperty("authentication-ldap.surname_field");
             ldap_phone_field = configurationService.getProperty("authentication-ldap.phone_field");
             ldap_group_field = configurationService.getProperty("authentication-ldap.login.groupmap.attribute");
+            includeMailFilter =
+                configurationService.getBooleanProperty("authentication-ldap.include_mail_filter", false);
             useTLS = configurationService.getBooleanProperty("authentication-ldap.starttls", false);
 
             setupSpringLdap(configurationService);
@@ -493,14 +499,22 @@ public class LDAPAuthentication implements AuthenticationMethod {
 
         protected String getDNOfUser(Context context, String netid) {
             try {
-                EqualsFilter filter = new EqualsFilter(ldap_id_field, netid);
-
+                Filter filter;
+                if (includeMailFilter) {
+                    filter = new OrFilter().or(
+                        new EqualsFilter(ldap_id_field, netid)).or(new EqualsFilter(ldap_email_field, netid)
+                    );
+                } else {
+                    filter = new EqualsFilter(ldap_id_field, netid);
+                }
                 log.debug("Searching for user using Spring LDAP filter: {}", filter.toString());
 
                 List<String> foundDNs = ldapTemplate.search(
                     LdapQueryBuilder.query().base(ldap_search_context).filter(filter),
                     (ContextMapper<String>) (originalCtx) -> {
                         DirContextOperations ctx = (DirContextOperations) originalCtx;
+
+                        this.uid = ctx.getStringAttribute(ldap_id_field);
 
                         if (ldap_email_field != null) {
                             this.ldapEmail = ctx.getStringAttribute(ldap_email_field);
