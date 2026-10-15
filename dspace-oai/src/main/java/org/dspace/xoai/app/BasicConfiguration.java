@@ -75,7 +75,7 @@ public class BasicConfiguration {
 
     @Bean
     public XOAICacheService xoaiCacheService() {
-        if (configurationService().getBooleanProperty("oai", "cache.enabled", true)) {
+        if (configurationService().getBooleanProperty("oai.cache.enabled", true)) {
             try {
                 return new DSpaceXOAICacheService(xoaiManagerResolver().getManager());
             } catch (XOAIManagerResolverException e) {
