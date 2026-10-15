@@ -126,6 +126,7 @@
 
     <bean class="org.dspace.identifier.DOIServiceImpl"/>
 
+    <bean class="org.dspace.license.CCLicenseCSVRepository"/>
     <bean class="org.dspace.license.CreativeCommonsServiceImpl"/>
     <bean class="org.dspace.license.CCLicenseConnectorServiceImpl"/>
 
