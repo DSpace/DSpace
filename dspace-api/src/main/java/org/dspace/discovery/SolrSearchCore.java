@@ -83,6 +83,9 @@ public class SolrSearchCore {
                     log.debug("Solr URL: {}", solrService);
                     HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
                             .withHttpClient(httpConnectionPoolService.getClient())
+                            .withSocketTimeout(
+                                configurationService.getIntProperty("discovery.solr.socketTimeout", 120000)
+                            )
                             .build();
 
                     solrServer.setBaseURL(solrService);
