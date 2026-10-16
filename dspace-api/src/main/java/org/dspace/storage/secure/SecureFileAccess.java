@@ -38,7 +38,7 @@ public final class SecureFileAccess {
 
     /**
      * Calculates the "real path" for as much of the given path as exists,
-     * (traversing existing symlinks) with non-existent folders/files being
+     * (traversing existing symlinks) with non-existent directories/files being
      * appended to the existing path, and then validating the result against the
      * allowed base paths, which is then returned.
      *
@@ -48,6 +48,10 @@ public final class SecureFileAccess {
      *
      * Callers MUST use the returned Path, as the validation only applies to
      * that path.
+     *
+     * The validated path reflects the state of the filesystem when this
+     * method executes. It does not prevent another process from replacing a
+     * validated path component before the caller opens the file.
      *
      * @param filePath the unvalidated file path, usually derived from user input or configuration
      *             This MUST be an absolute path, and the caller is expected to calculate it based on best
@@ -70,7 +74,7 @@ public final class SecureFileAccess {
 
         for (String allowedBasePath : allowedBasePaths) {
             if (allowedBasePath == null) {
-                throw new IOException("Null base path can not be provided for validation");
+                throw new IOException("Null base path cannot be provided for validation");
             }
 
             Path basePath = Path.of(allowedBasePath)
@@ -141,7 +145,7 @@ public final class SecureFileAccess {
             resolvedPath = resolvedPath.resolve(element);
         }
 
-        return resolvedPath.normalize();
+        return resolvedPath;
     }
 
     /**
@@ -209,9 +213,9 @@ public final class SecureFileAccess {
     /**
      * Get an output stream after validating file path.
      *
-     * Only existing elements of the given path are validated (including
-     * traversal of existing symlinks), with  non-existent folders/files being
-     * appended to the validated path.,
+     * Existing elements of the given path are validated (including traversal of
+     * existing symlinks) with non-existent directories/files being appended,
+     * and then validating the result against the allowed base paths.
      *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
@@ -225,10 +229,12 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get a buffered writer after validating file path. As with {@link #getOutputStream},
-     * only existing elements of the given path are validated (including
-     * traversal of existing symlinks), with  non-existent folders/files being
-     * appended to the validated path.,
+     * Get a buffered writer after validating file path.
+     *
+     * As with {@link #getOutputStream}, existing elements of the given path are
+     * validated (including traversal of existing symlinks) with non-existent
+     * directories/files being appended, and then validating the result against
+     * the allowed base paths.
      *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration

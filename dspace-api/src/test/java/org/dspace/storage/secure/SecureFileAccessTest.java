@@ -262,7 +262,7 @@ public class SecureFileAccessTest {
     }
 
     /**
-     * A dangling symbolic link used as the final path element mmust
+     * A dangling symbolic link used as the final path element must
      * cause validation to fail.
      */
     @Test
@@ -292,7 +292,7 @@ public class SecureFileAccessTest {
         assertFalse(Files.exists(requestedPath));
 
         assertThrows(
-            IOException.class,
+            NoSuchFileException.class,
             () -> SecureFileAccess.validatePathForWrite(
                 requestedPath.toString(),
                 List.of(basePath.toString()),
@@ -341,6 +341,43 @@ public class SecureFileAccessTest {
                 .formatted(PURPOSE, relativePath),
             exception.getMessage()
         );
+    }
+
+    /**
+     * Callers must use returned Path from "validatePathForWrite" method, as
+     * parent references are normalized before symbolic links are resolved.
+     */
+    @Test
+    public void validatePathForWriteReturnPathMayBeDistinctFromGivenPath()
+        throws Exception {
+        Path basePath = createDirectory("base");
+        Path outsidePath = createDirectory("outside");
+
+        // base/link -> outside
+        Path linkPath = createSymbolicLinkOrSkip(
+            basePath.resolve("link"),
+             outsidePath
+        );
+
+        // The requested path, "base/link/../new-file.txt", contains a symbolic
+        // link. Without normalization, when the write is performed, the
+        // symbolic link would be resolved first, converting
+        // "base/link/../new-file.txt" to "outside/../new-file.txt", and
+        // thus result in a "new-file.txt" being written into same directory
+        // that has "base" and "outside" as children. This would violate the
+        // validation guarantee provided by the "validatePathForWrite" method.
+        Path requestedPath = linkPath.resolve("..").resolve("new-file.txt");
+
+        Path validatedPath = SecureFileAccess.validatePathForWrite(
+            requestedPath.toString(),
+            List.of(basePath.toString()),
+            PURPOSE
+        );
+
+        // Path validated by "validatePathForWrite" is lexically distinct from
+        // requestedPath, but is the same as requestedPath after normalization.
+        assertFalse(validatedPath.equals(requestedPath));
+        assertEquals(validatedPath, requestedPath.normalize());
     }
 
     /**
