@@ -204,8 +204,12 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get an output stream after validating file path. New files can't use toRealPath() for link calculation so
-     * there is a bit of a trade-off in allowing some symlink traversal to occur
+     * Get an output stream after validating file path.
+     *
+     * Only existing elements of the given path are validated (including
+     * traversal of existing symlinks), with  non-existent folders/files being
+     * appended to the validated path.,
+     *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
@@ -218,9 +222,11 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get a buffered writer after validating file path. As with {@link #getOutputStream}, new files
-     * can't use toRealPath() for link calculation so there is a trade-off allowing some symlink
-     * traversal to occur.
+     * Get a buffered writer after validating file path. As with {@link #getOutputStream},
+     * only existing elements of the given path are validated (including
+     * traversal of existing symlinks), with  non-existent folders/files being
+     * appended to the validated path.,
+     *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
