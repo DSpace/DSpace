@@ -26,6 +26,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+/**
+ * Unit tests for {@link SecureFileAccess}
+ */
 public class SecureFileAccessTest {
 
     private static final String PURPOSE = "test";
