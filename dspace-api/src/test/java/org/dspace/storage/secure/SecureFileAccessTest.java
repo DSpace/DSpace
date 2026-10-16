@@ -259,6 +259,48 @@ public class SecureFileAccessTest {
     }
 
     /**
+     * A dangling symbolic link used as the final path element mmust
+     * cause validation to fail.
+     */
+    @Test
+    public void validatePathForWriteRejectsDanglingSymlinkAsFinalElement()
+            throws Exception {
+        Path basePath = createDirectory("base");
+        Path outsidePath = createDirectory("outside");
+
+        // The target must not exist, but its parent must exist so that opening
+        // the symbolic link for writing could create the target.
+        Path missingOutsideFile = outsidePath.resolve("missing-outside.txt");
+        assertFalse(Files.exists(missingOutsideFile, LinkOption.NOFOLLOW_LINKS));
+
+        // The requested output path itself is a dangling symbolic link.
+        Path requestedPath = createSymbolicLinkOrSkip(
+            basePath.resolve("new.txt"),
+            missingOutsideFile
+        );
+
+        // Confirm that the link entry exists even though its target does not.
+        BasicFileAttributes attributes = Files.readAttributes(
+            requestedPath,
+            BasicFileAttributes.class,
+            LinkOption.NOFOLLOW_LINKS
+        );
+        assertTrue(attributes.isSymbolicLink());
+        assertFalse(Files.exists(requestedPath));
+
+        assertThrows(
+            IOException.class,
+            () -> SecureFileAccess.validatePathForWrite(
+                requestedPath.toString(),
+                List.of(basePath.toString()),
+                PURPOSE
+            )
+        );
+
+        assertFalse(Files.exists(missingOutsideFile, LinkOption.NOFOLLOW_LINKS));
+    }
+
+    /**
      * Lexical traversal using ".." must not permit a target outside the
      * allowed base.
      */
