@@ -34,28 +34,36 @@ public final class SecureFileAccess {
     private SecureFileAccess() {}
 
     /**
-     * Validate a given path against allowed base paths.
-     *
      * Calculates the "real path" for as much of the given path as exists,
      * (traversing existing symlinks) with non-existent folders/files being
-     * appended to the existing path, and then validating against the
-     * allowed base paths.
+     * appended to the existing path, and then validating the result against the
+     * allowed base paths, which is then returned.
      *
-     * @param file the unvalidated file, usually derived from user input or configuration
+     * <strong>Note:</strong> Due to the resolution of symbolic links and
+     * parent references, this method may return a Path that is lexically
+     * distinct from the given path.
+     *
+     * Callers MUST use the returned Path, as the validation only applies to
+     * that path.
+     *
+     * @param filePath the unvalidated file path, usually derived from user input or configuration
      *             This MUST be an absolute path, and the caller is expected to calculate it based on best
      *             context (e.g. configured base path, CWD, dspace.dir, and so on)
      * @param allowedBasePaths list of allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
+     * @return a validated Path for as much of the given path as exists. Callers
+     *             MUST use this returned Path, as the validation only applies
+     *             to this path.
      * @throws IOException on validation failure
      */
-    public static Path validatePathForWrite(String file, List<String> allowedBasePaths, String purpose)
+    public static Path validatePathForWrite(String filePath, List<String> allowedBasePaths, String purpose)
             throws IOException {
-        Path filePath = Path.of(file);
-        if (!filePath.isAbsolute()) {
-            throw new IOException("Absolute path required for I/O (%s): %s".formatted(purpose, file));
+        Path unvalidatedPath = Path.of(filePath);
+        if (!unvalidatedPath.isAbsolute()) {
+            throw new IOException("Absolute path required for I/O (%s): %s".formatted(purpose, filePath));
         }
 
-        Path resolvedPath = resolvePathForWrite(filePath);
+        Path resolvedPath = resolvePathForWrite(unvalidatedPath);
 
         for (String allowedBasePath : allowedBasePaths) {
             if (allowedBasePath == null) {
@@ -73,7 +81,7 @@ public final class SecureFileAccess {
 
         // If no valid path was resolved and returned by now
         // we raise an exception and treat this as illegal access
-        throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
+        throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, filePath));
     }
 
     /**
