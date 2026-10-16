@@ -89,7 +89,7 @@ public final class SecureFileAccess {
      * to exist.
      *
      * Before validation, existing segments of the path are converted to the
-     * "real path" (traversing symlinks), with non-existent segments of the path
+     * "real path" (traversing symlinks). Non-existent segments of the path
      * are then appended to the real path in their original order.
      *
      * Note: The validated path reflects the state of the filesystem when this
