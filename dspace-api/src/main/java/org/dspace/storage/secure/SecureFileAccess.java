@@ -24,8 +24,11 @@ import java.util.Deque;
 import java.util.List;
 
 /**
- * Decent I/O path validation - not perfect when symlinks are used and we are writing
- * as 'toRealPath' check on the resolved path fails for new files
+ * Decent I/O path validation
+ *
+ * For new files/directories, validates as much of the given path as exists,
+ * including the traversal of symlinks. Non-existent directories/files are
+ * then appended onto the validated portion of the path.
  *
  * @author Kim Shepherd <kim-at-shepherd-dot-nz>
  */
