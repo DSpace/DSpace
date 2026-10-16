@@ -103,17 +103,34 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
         f2.deleteOnExit();
         ConvertCmd cmd = new ConvertCmd();
-        IMOperation op = new IMOperation();
-        op.autoOrient();
-        op.addImage(f.getAbsolutePath() + "[0]");
-        op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
-                        configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
-        op.addImage(f2.getAbsolutePath());
+        IMOperation op = buildThumbnailOperation(f, f2);
         if (verbose) {
             System.out.println("IM Thumbnail Param: " + op);
         }
         cmd.run(op);
         return f2;
+    }
+
+    /**
+     * Build the ImageMagick operation that creates a thumbnail of the first
+     * page or frame of an image.
+     * <p>
+     * The input image is added before the operators that act on it. ImageMagick 7
+     * rejects an operator such as {@code -auto-orient} that appears before any
+     * image has been read ("no images found for operation").
+     *
+     * @param source the image file to create a thumbnail from
+     * @param thumbnail the file to write the thumbnail to
+     * @return the operation to run with a {@link ConvertCmd}
+     */
+    IMOperation buildThumbnailOperation(File source, File thumbnail) {
+        IMOperation op = new IMOperation();
+        op.addImage(source.getAbsolutePath() + "[0]");
+        op.autoOrient();
+        op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
+                        configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
+        op.addImage(thumbnail.getAbsolutePath());
+        return op;
     }
 
     /**
