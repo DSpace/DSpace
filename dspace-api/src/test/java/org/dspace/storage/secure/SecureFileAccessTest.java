@@ -262,7 +262,7 @@ public class SecureFileAccessTest {
     }
 
     /**
-     * A dangling symbolic link used as the final path element mmust
+     * A dangling symbolic link used as the final path element must
      * cause validation to fail.
      */
     @Test
@@ -292,7 +292,7 @@ public class SecureFileAccessTest {
         assertFalse(Files.exists(requestedPath));
 
         assertThrows(
-            IOException.class,
+            NoSuchFileException.class,
             () -> SecureFileAccess.validatePathForWrite(
                 requestedPath.toString(),
                 List.of(basePath.toString()),
