@@ -68,4 +68,22 @@ public interface RelationshipConfigurationService {
      */
     void validate(Context context, RelationshipTypeConfiguration configuration, Item left, Item right)
         throws SQLException;
+
+    /**
+     * Validates the relationship endpoints using the given configuration, optionally allowing unarchived Items.
+     *
+     * When {@code allowUnarchivedItems} is true, the archived-state requirement is skipped for both Items.
+     * All other configured endpoint requirements, including entity types, are still validated.
+     * Authorization is handled separately by the relationship service.
+     *
+     * @param context              current DSpace context
+     * @param configuration        relationship configuration to validate against
+     * @param left                 proposed left endpoint of the Relationship
+     * @param right                proposed right endpoint of the Relationship
+     * @param allowUnarchivedItems whether to allow unarchived Items during validation
+     * @throws IllegalArgumentException if either endpoint does not satisfy the configured relationship requirements
+     * @throws SQLException             if a database error occurs during validation
+     */
+    void validate(Context context, RelationshipTypeConfiguration configuration, Item left, Item right,
+                  boolean allowUnarchivedItems) throws SQLException;
 }

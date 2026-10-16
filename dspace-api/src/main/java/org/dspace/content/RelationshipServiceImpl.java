@@ -155,6 +155,32 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
+    public Relationship createConfigBackedRelationshipForVersion(Context context, Item leftItem, Item rightItem,
+                                                                 String relationshipConfigKey,
+                                                                 LatestVersionStatus latestVersionStatus)
+        throws SQLException, AuthorizeException {
+
+        RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(relationshipConfigKey);
+
+        // Allow the new Item version to be unarchived while still validating the configured relationship semantics.
+        relationshipConfigurationService.validate(context, configuration, leftItem, rightItem, true);
+
+        authorizeRelationshipCreation(context, leftItem, rightItem);
+
+        Relationship relationship = new Relationship();
+        relationship.setLeftItem(leftItem);
+        relationship.setRightItem(rightItem);
+        relationship.setRelationshipConfigKey(configuration.getId());
+        relationship.setLatestVersionStatus(latestVersionStatus);
+        Relationship created = relationshipDAO.create(context, relationship);
+
+        leftItem.setMetadataModified();
+        rightItem.setMetadataModified();
+
+        return created;
+    }
+
+    @Override
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (relationship.isConfigurationBacked()) {
             throw new IllegalArgumentException("Use createConfigBackedRelationship for configured relationships");

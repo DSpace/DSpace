@@ -101,10 +101,17 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @Override
     public void validate(Context context, RelationshipTypeConfiguration configuration, Item left, Item right)
         throws SQLException {
+        validate(context, configuration, left, right, false);
+    }
+
+    @Override
+    public void validate(Context context, RelationshipTypeConfiguration configuration, Item left, Item right,
+                         boolean allowUnarchivedItems) throws SQLException {
         if (left == null || right == null || configuration == null || configuration.getId() == null) {
             throw new IllegalArgumentException("A relationship requires two items and configured semantics");
         }
-        if (!left.isArchived() || !right.isArchived()) {
+        // Allow unarchived Items when copying relationships to a new Item version.
+        if (!allowUnarchivedItems && (!left.isArchived() || !right.isArchived())) {
             throw new IllegalArgumentException("Concrete relationships require two archived items");
         }
         validateType(configuration.getLeftEntityTypes(), left, "left");
