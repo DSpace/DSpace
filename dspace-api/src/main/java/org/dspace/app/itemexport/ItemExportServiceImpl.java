@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -998,22 +999,29 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Override
     public void zip(String strSource, String target) throws Exception {
         ZipOutputStream cpZipOutputStream = null;
-        String tempFileName = target + "_tmp";
-        SecureFileAccess.validatePathForWrite(target, getAllowedExportBaseDirs(), "itemexport");
+        Path validatedTarget = SecureFileAccess.validatePathForWrite(target, getAllowedExportBaseDirs(), "itemexport");
+
+        Path tempFileCandidate = validatedTarget.resolveSibling(validatedTarget.getFileName() + "_tmp");
+        String validatedTempFileName = SecureFileAccess.validatePathForWrite(
+            tempFileCandidate.toString(), getAllowedExportBaseDirs(), "itemexport"
+        ).toString();
+
         try {
             File cpFile = new File(strSource);
             if (!cpFile.isFile() && !cpFile.isDirectory()) {
                 return;
             }
-            File targetFile = new File(tempFileName);
+            File targetFile = new File(validatedTempFileName);
             if (!targetFile.createNewFile()) {
                 logWarn("Target file already exists: " + targetFile.getName());
             }
 
-            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, getAllowedExportBaseDirs(), "itemexport");
+            OutputStream fos = SecureFileAccess.getOutputStream(
+                validatedTempFileName, getAllowedExportBaseDirs(), "itemexport"
+            );
             cpZipOutputStream = new ZipOutputStream(fos);
             cpZipOutputStream.setLevel(9);
-            zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
+            zipFiles(cpFile, strSource, validatedTempFileName, cpZipOutputStream);
             cpZipOutputStream.finish();
             cpZipOutputStream.close();
             cpZipOutputStream = null;
@@ -1022,7 +1030,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             System.gc();
 
             deleteDirectory(cpFile);
-            if (!targetFile.renameTo(new File(target))) {
+            if (!targetFile.renameTo(validatedTarget.toFile())) {
                 logError("Unable to rename file");
             }
         } finally {
@@ -1057,7 +1065,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 }
                 String strAbsPath = cpFile.getPath();
                 int startIndex = strSource.length();
-                if (!Strings.CS.endsWith(strSource, File.separator)) {
+                if (!StringUtils.endsWith(strSource, File.separator)) {
                     startIndex++;
                 }
                 String strZipEntryName = strAbsPath.substring(startIndex, strAbsPath.length());
