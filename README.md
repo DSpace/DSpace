@@ -12,7 +12,7 @@
 
 DSpace open source software is a turnkey repository application used by more than
 2,000 organizations and institutions worldwide to provide durable access to digital resources.
-For more information, visit http://www.dspace.org/
+For more information, visit https://dspace.org/
 
 DSpace consists of both a Java-based backend and an Angular-based frontend.
 
@@ -20,35 +20,38 @@ DSpace consists of both a Java-based backend and an Angular-based frontend.
     * The REST Contract is at https://github.com/DSpace/RestContract
 * Frontend (https://github.com/DSpace/dspace-angular/) is the User Interface built on the REST API
 
-Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPUI). Those UIs are no longer supported in v7 and above.
-* A maintenance branch for older versions is still available, see `dspace-6_x` for 6.x maintenance.
-
 ## Downloads
 
 * Backend (REST API): https://github.com/DSpace/DSpace/releases
 * Frontend (User Interface): https://github.com/DSpace/dspace-angular/releases
+
+On our wiki, you may also find a [list of all past releases, including their current levels of support](https://wiki.lyrasis.org/spaces/DSPACE/pages/69010426/Releases).
 
 ## Documentation / Installation
 
 Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
 
 The latest DSpace Installation instructions are available at:
-https://wiki.lyrasis.org/display/DSDOC9x/Installing+DSpace
+https://wiki.lyrasis.org/display/DSDOC10x/Installing+DSpace
 
 Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
-## Running DSpace 9 in Docker
+## Running DSpace in Docker
 
 NOTE: At this time, we do not have production-ready Docker images for DSpace.
 That said, we do have quick-start Docker Compose scripts for development or testing purposes.
 
-See [Running DSpace 9 with Docker Compose](dspace/src/main/docker-compose/README.md)
+See [Running DSpace with Docker Compose](dspace/src/main/docker-compose/README.md)
 
 ## Contributing
 
-See [Contributing documentation](CONTRIBUTING.md)
+See our [Contributing guidelines](CONTRIBUTING.md) for general tips on contributing back to DSpace.
+
+For developers, we also provide guidelines for:
+* [Code Style](CODE_STYLE.md) - our code formatting rules
+* [Code Conventions](CODE_CONVENTIONS.md) - our established coding best practices
 
 ## Getting Help
 
@@ -124,7 +127,7 @@ run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?q
 ## License
 
 DSpace source code is freely available under a standard [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause).
-The full license is available in the [LICENSE](LICENSE) file or online at http://www.dspace.org/license/
+The full license is available in the [LICENSE](LICENSE) file or online at https://dspace.org/license/
 
 DSpace uses third-party libraries which may be distributed under different licenses. Those licenses are listed
 in the [LICENSES_THIRD_PARTY](LICENSES_THIRD_PARTY) file.

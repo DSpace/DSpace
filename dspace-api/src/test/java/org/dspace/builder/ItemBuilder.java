@@ -85,6 +85,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
                                 "date", "issued", new DCDate(issueDate).toString());
     }
 
+
+
     public ItemBuilder withTitleForLanguage(final String title, final String language) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "title", null, language, title);
     }
@@ -214,6 +216,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, schema, element, qualifier, language, value, authority, confidence);
     }
 
+    public ItemBuilder withSecuredMetadata(String schema, String element, String qualifier,
+                                           String value, Integer securityLevel) {
+        return addSecuredMetadataValue(item, schema, element, qualifier, value, securityLevel);
+    }
+
     public ItemBuilder withPolicyEPerson(String value, String authority) {
         return addMetadataValue(item, DSPACE.getName(), "policy", "eperson", null, value, authority, CF_ACCEPTED);
     }
@@ -230,8 +237,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "scopus", scopus);
     }
 
+    public ItemBuilder withLegacyId(String legacyId) {
+        return addMetadataValue(item, "dspace", "legacyId", null, legacyId);
+    }
+
     public ItemBuilder withIsniIdentifier(String isni) {
         return addMetadataValue(item, "person", "identifier", "isni", isni);
+    }
+
+    public ItemBuilder withPatentNo(String patentNo) {
+        return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
     }
 
     public ItemBuilder withFullName(String fullname) {

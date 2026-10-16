@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.dspace.content.Item;
@@ -168,7 +167,7 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     results.add(transformSourceRecords(records.get(1)));
                 }
             } else {
-                throw new BadRequestException("id provided : " + scieloId + " is not an ScieloID");
+                throw new MetadataSourceException("id provided : " + scieloId + " is not an ScieloID");
             }
             return results;
         }

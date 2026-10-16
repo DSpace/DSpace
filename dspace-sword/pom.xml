@@ -72,7 +72,7 @@
         <dependency>
             <groupId>xom</groupId>
             <artifactId>xom</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.6</version>
         </dependency>
     </dependencies>
 

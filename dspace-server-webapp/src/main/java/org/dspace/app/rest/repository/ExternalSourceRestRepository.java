@@ -82,7 +82,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ExternalSourceRest findOne(Context context, String externalSourceName) {
         ExternalDataProvider externalDataProvider = externalDataService.getExternalDataProvider(externalSourceName);
         if (externalDataProvider == null) {
@@ -93,7 +93,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<ExternalSourceRest> findAll(Context context, Pageable pageable) {
         List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders();
         return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
@@ -107,7 +107,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
      * @param entityType    Entity type label
      * @return
      */
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findByEntityType")
     public Page<ExternalSourceRest> findByEntityType(Context context, Pageable pageable,
           @Parameter(required = true, value = "entityType") String entityType) {

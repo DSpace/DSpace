@@ -39,6 +39,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -101,7 +102,7 @@ public class DSpaceOAIDataProvider {
                 String styleSheetPath = manager.getStyleSheet();
                 Resource styleSheetResource = resourceLoader.getResource("classpath:" + styleSheetPath);
                 htmlTransformerSource = styleSheetResource.getContentAsByteArray();
-                htmlTransformerFactory = TransformerFactory.newInstance();
+                htmlTransformerFactory = XMLUtils.getTransformerFactory();
                 // run for potential exceptions only as a sanity check on the XSLT:
                 htmlTransformerFactory.newTransformer(
                         new StreamSource(new ByteArrayInputStream(htmlTransformerSource)));

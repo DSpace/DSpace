@@ -57,7 +57,6 @@ public interface DataProcessingStep extends RestProcessingStep {
      */
     <T extends Serializable> T getData(SubmissionService submissionService, InProgressSubmission obj,
                                        SubmissionStepConfig config) throws Exception;
-
     /**
      * Method to react to a patch request against the step managed section data
      * 

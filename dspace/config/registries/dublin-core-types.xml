@@ -283,6 +283,34 @@
     <scope_note>Uniform Resource Identifier</scope_note>
   </dc-type>
 
+  <dc-type>
+	  <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>isi</qualifier>
+    <scope_note>Web of Knowledge Identifier</scope_note>
+  </dc-type>
+
+  <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>pmid</qualifier>
+        <scope_note>Pubmed ID</scope_note>
+  </dc-type>
+
+  <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>adsbibcode</qualifier>
+        <scope_note>ADS Identifier</scope_note>
+  </dc-type>
+
+  <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>arxiv</qualifier>
+        <scope_note>arXiv Identifier</scope_note>
+  </dc-type>
+
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
@@ -690,18 +718,74 @@
         <scope_note></scope_note>
     </dc-type>
 
-  <dc-type>
-    <schema>dc</schema>
+    <dc-type>
+      <schema>dc</schema>
     <element>identifier</element>
     <qualifier>patentnumber</qualifier>
     <scope_note>The Patent Number Identifier</scope_note>
   </dc-type>
 
-    <dc-type>
-        <schema>dc</schema>
-        <element>identifier</element>
-        <qualifier>openalex</qualifier>
-        <scope_note>The OpenAlex identifier</scope_note>
-    </dc-type>
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>patentno</qualifier>
+    <scope_note>The Patent Number</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>publication</qualifier>
+    <scope_note>Journal name, volume, and issue details.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>isbn</qualifier>
+    <scope_note>International Standard Book Number.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>doi</qualifier>
+    <scope_note>Digital Object Identifier (persistent link).</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>volume</qualifier>
+    <scope_note>Journal or book volume number.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>issue</qualifier>
+    <scope_note>Journal issue or part number.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>startpage</qualifier>
+    <scope_note>First page of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>description</element>
+    <qualifier>endpage</qualifier>
+    <scope_note>Last page of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dc</schema>
+      <element>identifier</element>
+      <qualifier>openalex</qualifier>
+      <scope_note>The OpenAlex identifier</scope_note>
+  </dc-type>
 
 </dspace-dc-types>

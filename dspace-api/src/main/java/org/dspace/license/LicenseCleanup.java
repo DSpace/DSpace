@@ -23,11 +23,11 @@ import java.util.Properties;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -57,7 +57,7 @@ public class LicenseCleanup {
 
     static {
         try {
-            templates = TransformerFactory.newInstance().newTemplates(
+            templates = XMLUtils.getTransformerFactory().newTemplates(
                 new StreamSource(CreativeCommonsServiceImpl.class
                                      .getResourceAsStream("LicenseCleanup.xsl")));
         } catch (TransformerConfigurationException e) {

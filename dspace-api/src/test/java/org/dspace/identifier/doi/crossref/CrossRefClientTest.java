@@ -88,6 +88,37 @@ public class CrossRefClientTest {
     }
 
     @Test
+    public void sendDepositRequest_200withDoctypeAndExternalEntity_doesNotResolveEntity() throws Exception {
+        // The deposit endpoint response must be parsed without resolving DOCTYPE / external entities.
+        // A SYSTEM entity pointing at a sentinel must never be fetched, and a DOCTYPE must be refused
+        // rather than expanded into the document. Before the fix the bare SAXBuilder resolved the
+        // entity (file read / outbound request); after the fix the hardened builder refuses the DOCTYPE.
+        MockWebServer sentinel = new MockWebServer();
+        sentinel.start();
+        sentinel.enqueue(new MockResponse().setResponseCode(200).setBody("PWNED"));
+        String sentinelUrl = sentinel.url("/xxe-callback").toString();
+
+        server.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                         + "<!DOCTYPE doi_batch_diagnostic [\n"
+                         + "  <!ENTITY xxe SYSTEM \"" + sentinelUrl + "\">\n"
+                         + "]>\n"
+                         + "<doi_batch_diagnostic status=\"completed\">\n"
+                         + "  <record_diagnostic status=\"Success\">&xxe;</record_diagnostic>\n"
+                         + "</doi_batch_diagnostic>"));
+
+        // The DOCTYPE is refused by the hardened parser, surfacing as a BAD_ANSWER parse failure.
+        assertThatExceptionOfType(DOIIdentifierException.class)
+                .isThrownBy(() -> client.sendDepositRequest("metadata"))
+                .matches(ex -> ex.getCode() == DOIIdentifierException.BAD_ANSWER);
+
+        // The SYSTEM entity must not have been dereferenced.
+        assertThat(sentinel.getRequestCount()).isEqualTo(0);
+        sentinel.shutdown();
+    }
+
+    @Test
     public void sendDepositRequest_200withFailureMessage_throwsDOIIdentifierExceptionWithBadRequest() throws Exception {
         server.enqueue(new MockResponse()
                        .setResponseCode(200)
