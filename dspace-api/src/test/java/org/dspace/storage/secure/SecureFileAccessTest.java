@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -245,10 +246,10 @@ public class SecureFileAccessTest {
 
         Path requestedPath = danglingLink.resolve("new-file.txt");
 
-        // Path should be rejected (throwing an IOException) because the
-        // non-existent target is outside of the base path
+        // Path should be rejected (throwing a NoSuchFileException) because the
+        // link cannot be resolved
         assertThrows(
-            IOException.class,
+            NoSuchFileException.class,
             () -> SecureFileAccess.validatePathForWrite(
                 requestedPath.toString(),
                 List.of(basePath.toString()),
