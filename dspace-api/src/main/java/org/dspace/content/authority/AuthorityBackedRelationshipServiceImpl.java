@@ -7,6 +7,8 @@
  */
 package org.dspace.content.authority;
 
+import static org.dspace.content.RelationshipConfigurationServiceImpl.AUTHORITY_PREFIX;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -237,32 +239,54 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
 
     /**
      * Determines whether removing this value would remove the last primary relationship
-     * metadata value for the configured field on this endpoint, requiring deletion
-     * of the relationship rather than only the metadata value.
+     * metadata value for the configured field on this endpoint, or the last associated
+     * metadata value, requiring deletion of the relationship rather than only the metadata value.
+     *
+     * For authority-backed relationships, the relationship metadata field is derived
+     * from the persisted configuration key, even when the original configuration is unavailable.
      *
      * @throws IllegalArgumentException if the relationship is not configuration-backed
+     *                                  or its configuration cannot be resolved
      */
     private boolean isFinalAnchor(Context context, MetadataValue value) throws SQLException {
         Relationship relationship = value.getRelationship();
         if (!relationship.isConfigurationBacked()) {
-            // Legacy typed relationship metadata require explicit migration/policy first.
+            // Legacy typed relationships require explicit migration/policy first.
             throw new IllegalArgumentException(
-                    "Migrate this legacy relationship before editing its stored relationship metadata values");
+                "Migrate this legacy relationship before editing its stored relationship metadata values");
         }
-        RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(
-            relationship.getRelationshipConfigKey());
+
+        String configurationKey = relationship.getRelationshipConfigKey();
         String field = RelationshipConfigurationServiceImpl.fieldName(value);
         boolean ownerOnLeft = value.getDSpaceObject().getID().equals(relationship.getLeftItem().getID());
-        String anchor = ownerOnLeft ? configuration.getLeftMetadataField() : configuration.getRightMetadataField();
-        if (!field.equals(anchor)) {
-            return false;
+
+        // Determine the primary metadata field identifying the relationship,
+        // using the persisted authority key when available.
+        String anchor;
+        if (configurationKey != null && configurationKey.startsWith(AUTHORITY_PREFIX)) {
+            // Compatibility keys retain the original anchor field, so cleanup does not
+            // depend on the authority configuration still being available.
+            anchor = ownerOnLeft ? configurationKey.substring(AUTHORITY_PREFIX.length()) : null;
+        } else {
+            RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(configurationKey);
+            anchor = ownerOnLeft ? configuration.getLeftMetadataField() : configuration.getRightMetadataField();
         }
-        // One language-specific value may be removed without destroying another
-        // variant of the same anchor. Association, not place, identifies the group.
-        return metadataValueService.findByRelationship(context, relationship).stream().noneMatch(other ->
-            !other.getID().equals(value.getID())
-                && other.getDSpaceObject().getID().equals(value.getDSpaceObject().getID())
-                && RelationshipConfigurationServiceImpl.fieldName(other).equals(field));
+
+        List<MetadataValue> values = metadataValueService.findByRelationship(context, relationship);
+
+        if (field.equals(anchor)) {
+            // One language-specific value may be removed without destroying another
+            // variant of the same anchor. Association, not place, identifies the group.
+            return values.stream().noneMatch(other ->
+                                                 !other.getID().equals(value.getID())
+                                                     && other.getDSpaceObject().getID()
+                                                             .equals(value.getDSpaceObject().getID())
+                                                     && RelationshipConfigurationServiceImpl.fieldName(other)
+                                                                                            .equals(field));
+        }
+
+        // Removing the last dependent value must also clean up the relationship.
+        return values.stream().noneMatch(other -> !other.getID().equals(value.getID()));
     }
 
     /**
