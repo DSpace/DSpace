@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DynamicLayoutBoxConfigurationRest;
 import org.dspace.app.rest.model.DynamicLayoutMetadataConfigurationRest;
@@ -29,6 +30,7 @@ import org.dspace.layout.DynamicLayoutBox;
 import org.dspace.layout.DynamicLayoutBoxTypes;
 import org.dspace.layout.DynamicLayoutField;
 import org.dspace.layout.DynamicLayoutFieldBitstream;
+import org.dspace.layout.DynamicLayoutFieldMetadata;
 import org.dspace.layout.DynamicMetadataGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -113,7 +115,7 @@ public class DynamicLayoutMetadataBoxConfigurator implements DynamicLayoutBoxCon
             for (Cell cell : row.getCells()) {
                 int priority = 0;
                 for (Field field : cell.getFields()) {
-                    DynamicLayoutField fieldEntity = new DynamicLayoutField();
+                    DynamicLayoutField fieldEntity = buildLayoutField(context, field);
                     fieldEntity.setLabel(field.getLabel());
                     fieldEntity.setLabelAsHeading(field.isLabelAsHeading());
                     fieldEntity.setMetadataField(getMetadataField(context, field.getMetadata()));
@@ -134,6 +136,22 @@ public class DynamicLayoutMetadataBoxConfigurator implements DynamicLayoutBoxCon
             rowIndex++;
         }
 
+    }
+
+    private DynamicLayoutField buildLayoutField(Context context, Field field) {
+        if (Strings.CI.equals(field.getFieldType(), DynamicLayoutFieldBitstream.BITSTREAM_FIELD_TYPE)) {
+            DynamicLayoutFieldBitstream fieldEntity = new DynamicLayoutFieldBitstream();
+            Bitstream bitstream = field.getBitstream();
+            if (bitstream != null) {
+                fieldEntity.setBundle(bitstream.getBundle());
+                fieldEntity.setMetadataValue(bitstream.getMetadataValue());
+                if (StringUtils.isNotBlank(bitstream.getMetadataField())) {
+                    fieldEntity.setMetadataField(getMetadataField(context, bitstream.getMetadataField()));
+                }
+            }
+            return fieldEntity;
+        }
+        return new DynamicLayoutFieldMetadata();
     }
 
     private void setAdditionalAttributesByType(DynamicLayoutField layoutField, Field field) {

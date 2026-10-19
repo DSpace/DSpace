@@ -38,6 +38,8 @@ import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.layout.DynamicLayoutBox;
 import org.dspace.layout.DynamicLayoutBoxTypes;
 import org.dspace.layout.DynamicLayoutField;
+import org.dspace.layout.DynamicLayoutFieldBitstream;
+import org.dspace.layout.DynamicLayoutFieldMetadata;
 import org.dspace.layout.LayoutSecurity;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -304,5 +306,62 @@ public class DynamicLayoutBoxConverterIT extends AbstractControllerIntegrationTe
         assertThat(rest.getStyle(), nullValue());
         assertThat(rest.getMetadataSecurityFields(), empty());
         assertEquals(rest.getConfiguration(), null);
+    }
+
+    @Test
+    public void testMetadataBoxToModelBuildsTypedFields() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        context.restoreAuthSystemState();
+
+        Field metadataField = new Field();
+        metadataField.setMetadata("dc.title");
+        metadataField.setLabel("Title");
+        metadataField.setFieldType("metadata");
+
+        DynamicLayoutMetadataConfigurationRest.Bitstream bitstreamData =
+            new DynamicLayoutMetadataConfigurationRest.Bitstream();
+        bitstreamData.setBundle("ORIGINAL");
+        bitstreamData.setMetadataValue("dc.type");
+
+        Field bitstreamField = new Field();
+        bitstreamField.setLabel("Attachment");
+        bitstreamField.setFieldType("bitstream");
+        bitstreamField.setBitstream(bitstreamData);
+
+        Cell cell = new Cell();
+        cell.setFields(List.of(metadataField, bitstreamField));
+
+        Row row = new Row();
+        row.setCells(List.of(cell));
+
+        DynamicLayoutMetadataConfigurationRest configuration = new DynamicLayoutMetadataConfigurationRest();
+        configuration.setRows(List.of(row));
+
+        DynamicLayoutBoxRest boxRest = new DynamicLayoutBoxRest();
+        boxRest.setEntityType("Publication");
+        boxRest.setBoxType("METADATA");
+        boxRest.setShortname("box");
+        boxRest.setSecurity(LayoutSecurity.PUBLIC.getValue());
+        boxRest.setConfiguration(configuration);
+
+        DynamicLayoutBox box = converter.toModel(context, boxRest);
+
+        List<DynamicLayoutField> fields = box.getLayoutFields();
+        assertThat(fields, hasSize(2));
+
+        DynamicLayoutField first = fields.get(0);
+        assertThat(first, instanceOf(DynamicLayoutFieldMetadata.class));
+        assertThat(first.getType(), is("METADATA"));
+        assertThat(first.getMetadataField(), notNullValue());
+        assertThat(first.getMetadataField().toString('.'), is("dc.title"));
+
+        DynamicLayoutField second = fields.get(1);
+        assertThat(second, instanceOf(DynamicLayoutFieldBitstream.class));
+        assertThat(second.getType(), is("BITSTREAM"));
+        DynamicLayoutFieldBitstream bitstream = (DynamicLayoutFieldBitstream) second;
+        assertThat(bitstream.getBundle(), is("ORIGINAL"));
+        assertThat(bitstream.getMetadataValue(), is("dc.type"));
     }
 }

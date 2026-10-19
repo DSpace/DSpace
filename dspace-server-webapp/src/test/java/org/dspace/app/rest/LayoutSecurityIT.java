@@ -7,8 +7,10 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
@@ -2711,6 +2714,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
     @Test
     public void restConfiguredAdministratorBoxRespectsSecurityTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -2733,11 +2737,13 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         DynamicLayoutTabRest rest = parseLayoutJson("tab-admin-secured-abstract.json");
         ObjectMapper mapper = new ObjectMapper();
 
+        AtomicReference<Integer> tabIdRef = new AtomicReference<>();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(post("/api/layout/tabs")
                              .content(mapper.writeValueAsBytes(rest))
                              .contentType(contentType))
-                             .andExpect(status().isCreated());
+                             .andExpect(status().isCreated())
+                             .andDo(result -> tabIdRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
 
@@ -2762,6 +2768,9 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.metadata['dc.title'].[0].value",
                                    is("Public item A")))
                    .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
+
+        getClient(tokenAdmin).perform(delete("/api/layout/tabs/" + tabIdRef.get()))
+                             .andExpect(status().isNoContent());
     }
 
     private DynamicLayoutTabRest parseLayoutJson(String name) throws Exception {
