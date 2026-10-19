@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,10 +27,13 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Relationship.LatestVersionStatus;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.dao.MetadataValueDAO;
 import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataConfiguration;
@@ -39,12 +44,24 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.utils.RelationshipVersioningUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Default implementation of {@link RelationshipService}.
+ *
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
+ */
 public class RelationshipServiceImpl implements RelationshipService {
 
     private static final Logger log = LogManager.getLogger();
 
     @Autowired(required = true)
     protected RelationshipDAO relationshipDAO;
+
+    @Autowired
+    private MetadataValueDAO metadataValueDAO;
+
+    @Autowired
+    private RelationshipConfigurationService relationshipConfigurationService;
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -116,7 +133,58 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
+    public Relationship createConfigBackedRelationship(Context context, Item leftItem, Item rightItem,
+                                                       String relationshipConfigKey)
+        throws SQLException, AuthorizeException {
+
+        RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(relationshipConfigKey);
+        relationshipConfigurationService.validate(context, configuration, leftItem, rightItem);
+
+        authorizeRelationshipCreation(context, leftItem, rightItem);
+
+        Relationship relationship = new Relationship();
+        relationship.setLeftItem(leftItem);
+        relationship.setRightItem(rightItem);
+        relationship.setRelationshipConfigKey(configuration.getId());
+        Relationship created = relationshipDAO.create(context, relationship);
+
+        leftItem.setMetadataModified();
+        rightItem.setMetadataModified();
+
+        return created;
+    }
+
+    @Override
+    public Relationship createConfigBackedRelationshipForVersion(Context context, Item leftItem, Item rightItem,
+                                                                 String relationshipConfigKey,
+                                                                 LatestVersionStatus latestVersionStatus)
+        throws SQLException, AuthorizeException {
+
+        RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(relationshipConfigKey);
+
+        // Allow the new Item version to be unarchived while still validating the configured relationship semantics.
+        relationshipConfigurationService.validate(context, configuration, leftItem, rightItem, true);
+
+        authorizeRelationshipCreation(context, leftItem, rightItem);
+
+        Relationship relationship = new Relationship();
+        relationship.setLeftItem(leftItem);
+        relationship.setRightItem(rightItem);
+        relationship.setRelationshipConfigKey(configuration.getId());
+        relationship.setLatestVersionStatus(latestVersionStatus);
+        Relationship created = relationshipDAO.create(context, relationship);
+
+        leftItem.setMetadataModified();
+        rightItem.setMetadataModified();
+
+        return created;
+    }
+
+    @Override
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException {
+        if (relationship.isConfigurationBacked()) {
+            throw new IllegalArgumentException("Use createConfigBackedRelationship for configured relationships");
+        }
         if (isRelationshipValidToCreate(context, relationship)) {
             if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
@@ -137,10 +205,33 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
+    /**
+     * Assert that the current user has WRITE permission on at least one of the two items involved in a
+     * type-less relationship. Used by the type-less delete path, which does not go through the
+     * type-driven permission checks.
+     *
+     * @param context The relevant DSpace context
+     * @param leftItem The left item of the relationship
+     * @param rightItem The right item of the relationship
+     * @throws SQLException       If something goes wrong
+     * @throws AuthorizeException If the user has WRITE permission on neither item
+     */
+    private void assertWriteOnEitherItem(Context context, Item leftItem, Item rightItem)
+        throws SQLException, AuthorizeException {
+        if (!authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) &&
+            !authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
+            throw new AuthorizeException(
+                "You do not have write rights on this relationship's items");
+        }
+    }
+
     @Override
     public Relationship move(
         Context context, Relationship relationship, Integer newLeftPlace, Integer newRightPlace
     ) throws SQLException, AuthorizeException {
+        if (relationship.isConfigurationBacked()) {
+            throw new IllegalArgumentException("Move the metadata projection, not legacy relationship place columns");
+        }
         if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
             authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
 
@@ -164,6 +255,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     public Relationship move(
         Context context, Relationship relationship, Item newLeftItem, Item newRightItem
     ) throws SQLException, AuthorizeException {
+        if (relationship.isConfigurationBacked()) {
+            throw new IllegalArgumentException("Use the compound service to replace a relationship endpoint");
+        }
         // If the new Item is the same as the current Item, don't move
         newLeftItem = newLeftItem != relationship.getLeftItem() ? newLeftItem : null;
         newRightItem = newRightItem != relationship.getRightItem() ? newRightItem : null;
@@ -531,6 +625,22 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private boolean isRelationshipValidToCreate(Context context, Relationship relationship) throws SQLException {
         RelationshipType relationshipType = relationship.getRelationshipType();
+        if (relationship.isConfigurationBacked()) {
+            relationshipConfigurationService.validate(context,
+                relationshipConfigurationService.getByKey(relationship.getRelationshipConfigKey()),
+                relationship.getLeftItem(), relationship.getRightItem());
+            for (MetadataValue value : metadataValueDAO.findByRelationship(context, relationship)) {
+                UUID owner = value.getDSpaceObject().getID();
+                if (!owner.equals(relationship.getLeftItem().getID())
+                    && !owner.equals(relationship.getRightItem().getID())) {
+                    throw new IllegalArgumentException("Metadata owner is not an endpoint of its relationship");
+                }
+            }
+            return true;
+        }
+        if (relationshipType == null) {
+            throw new IllegalArgumentException("Relationship has neither a legacy type nor configured semantics");
+        }
 
         if (!verifyEntityTypes(relationship.getLeftItem(), relationshipType.getLeftType())) {
             log.warn("The relationship has been deemed invalid since the leftItem" +
@@ -629,11 +739,29 @@ public class RelationshipServiceImpl implements RelationshipService {
             relationshipDAO.findByItem(context, item, limit, offset, excludeTilted, excludeNonLatest);
 
         list.sort((o1, o2) -> {
-            int relationshipType = o1.getRelationshipType().getLeftwardType()
-                .compareTo(o2.getRelationshipType().getLeftwardType());
+            // Sort by relationship configuration key if defined, otherwise by leftward type.
+            // Configuration-backed relationships with the same key are then sorted by ID;
+            // legacy relationships retain their place ordering.
+            String leftwardType1 = o1.isConfigurationBacked() ? o1.getRelationshipConfigKey()
+                : o1.getRelationshipType() != null ? o1.getRelationshipType().getLeftwardType() : null;
+            String leftwardType2 = o2.isConfigurationBacked() ? o2.getRelationshipConfigKey()
+                : o2.getRelationshipType() != null ? o2.getRelationshipType().getLeftwardType() : null;
+            int relationshipType;
+            if (leftwardType1 == null && leftwardType2 == null) {
+                relationshipType = 0;
+            } else if (leftwardType1 == null) {
+                relationshipType = 1;
+            } else if (leftwardType2 == null) {
+                relationshipType = -1;
+            } else {
+                relationshipType = leftwardType1.compareTo(leftwardType2);
+            }
             if (relationshipType != 0) {
                 return relationshipType;
             } else {
+                if (o1.isConfigurationBacked() || o2.isConfigurationBacked()) {
+                    return Integer.compare(o1.getID(), o2.getID());
+                }
                 if (o1.getLeftItem() == item) {
                     return o1.getLeftPlace() - o2.getLeftPlace();
                 } else {
@@ -678,13 +806,62 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
+        if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
+            // Configured relationships retain stored text; no legacy virtual copy is needed.
+            deleteConfigBackedRelationship(context, relationship);
+            updateConfigBackedRelationshipItems(context, relationship);
+            return;
+        }
         delete(context, relationship, relationship.getRelationshipType().isCopyToLeft(),
                relationship.getRelationshipType().isCopyToRight());
+    }
+
+    /**
+     * Detach stored projections before removing a configured link. SET NULL is
+     * only a database safeguard; clearing the managed objects avoids stale session
+     * state and clearing internal authorities prevents automatic re-creation.
+     */
+    private void deleteConfigBackedRelationship(Context context, Relationship relationship)
+        throws SQLException, AuthorizeException {
+        deleteConfigBackedRelationship(context, relationship, true);
+    }
+
+    /**
+     * Detach stored projections before removing a configured link.
+     *
+     * @param clearInternalAuthority whether UUID authority references to either endpoint should be cleared
+     */
+    private void deleteConfigBackedRelationship(Context context, Relationship relationship,
+                                                boolean clearInternalAuthority)
+        throws SQLException, AuthorizeException {
+        assertWriteOnEitherItem(context, relationship.getLeftItem(), relationship.getRightItem());
+        for (MetadataValue value : metadataValueDAO.findByRelationship(context, relationship)) {
+            value.setRelationship(null);
+            if (clearInternalAuthority) {
+                String authority = value.getAuthority();
+                if (authority != null && (authority.equals(relationship.getLeftItem().getID().toString())
+                    || authority.equals(relationship.getRightItem().getID().toString()))) {
+                    value.setAuthority(null);
+                }
+                value.setConfidence(Choices.CF_UNSET);
+            }
+            value.getDSpaceObject().setMetadataModified();
+        }
+        relationshipDAO.delete(context, relationship);
+        relationship.getLeftItem().setMetadataModified();
+        relationship.getRightItem().setMetadataModified();
     }
 
     @Override
     public void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException {
+        if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
+            // The POC defaults to retaining bibliographic text on endpoint/link deletion.
+            // Full projection deletion is an explicit compound-service operation.
+            deleteConfigBackedRelationship(context, relationship);
+            updateConfigBackedRelationshipItems(context, relationship);
+            return;
+        }
         log.info(org.dspace.core.LogHelper.getHeader(context, "delete_relationship",
                                                       "relationship_id=" + relationship.getID() + "&" +
                                                           "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
@@ -706,6 +883,13 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                       "relationship_id=" + relationship.getID() + "&" +
                                                           "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
+        if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
+            // Item deletion already applies the configured authority-cleanup policy before relationships are removed.
+            // Preserve authority/confidence here so force deletion cannot override that policy
+            //      (including disabled mode).
+            deleteConfigBackedRelationship(context, relationship, false);
+            return;
+        }
         if (copyToItemPermissionCheck(context, relationship, copyToLeftItem, copyToRightItem)) {
             // To delete a relationship, a user must have WRITE permissions on one of the related Items
             deleteRelationshipAndCopyToItem(context, relationship, copyToLeftItem, copyToRightItem);
@@ -741,6 +925,11 @@ public class RelationshipServiceImpl implements RelationshipService {
      * @throws SQLException     If something goes wrong
      */
     private void updateItemsInRelationship(Context context, Relationship relationship) throws SQLException {
+        if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
+            relationship.getLeftItem().setMetadataModified();
+            relationship.getRightItem().setMetadataModified();
+            return;
+        }
         // Since this call is performed after creating, updating or deleting the relationships, the permissions have
         // already been verified. The following updateItem calls can however call the
         // ItemService.update() functions which would fail if the user doesn't have permission on both items.
@@ -1130,10 +1319,13 @@ public class RelationshipServiceImpl implements RelationshipService {
             return;
         }
 
+        Map<UUID, Item> survivingItems = new LinkedHashMap<>();
+
         if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_ALL)) {
             // Option 1: Copy all virtual metadata of this item to its related items. Iterate over all of the item's
             //           relationships and copy their data.
             for (Relationship relationship : findByItem(context, item)) {
+                collectSurvivingConfigBackedItem(context, item, relationship, survivingItems);
                 deleteRelationshipCopyVirtualMetadata(context, item, relationship);
             }
         } else if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_CONFIGURED)) {
@@ -1141,6 +1333,14 @@ public class RelationshipServiceImpl implements RelationshipService {
             //           of the item's relationships and copy their data depending on the
             //           configuration.
             for (Relationship relationship : findByItem(context, item)) {
+                // Configuration-backed relationship metadata is already stored as MetadataValues,
+                // and relationships without a RelationshipType have no legacy virtual metadata,
+                // so no virtual metadata needs to be copied before deleting the relationship.
+                if (relationship.isConfigurationBacked() || relationship.getRelationshipType() == null) {
+                    collectSurvivingConfigBackedItem(context, item, relationship, survivingItems);
+                    forceDelete(context, relationship, false, false);
+                    continue;
+                }
                 boolean copyToLeft = relationship.getRelationshipType().isCopyToLeft();
                 boolean copyToRight = relationship.getRelationshipType().isCopyToRight();
                 if (relationship.getLeftItem().getID().equals(item.getID())) {
@@ -1161,6 +1361,19 @@ public class RelationshipServiceImpl implements RelationshipService {
                 for (Relationship relationship : findByItemAndRelationshipType(context, item, relationshipType)) {
                     deleteRelationshipCopyVirtualMetadata(context, item, relationship);
                 }
+            }
+        }
+        // Update surviving endpoints once to trigger MODIFY_METADATA events, since these relationships are deleted
+        // before ItemServiceImpl#rawDelete() can process them.
+        // Bypass authorization because the user may not have WRITE permission on the surviving Items.
+        if (!survivingItems.isEmpty()) {
+            context.turnOffAuthorisationSystem();
+            try {
+                for (Item survivor : survivingItems.values()) {
+                    itemService.update(context, survivor);
+                }
+            } finally {
+                context.restoreAuthSystemState();
             }
         }
     }
@@ -1198,4 +1411,71 @@ public class RelationshipServiceImpl implements RelationshipService {
         forceDelete(context, relationshipToDelete, copyToLeft, copyToRight);
     }
 
+    /**
+     * Collect the surviving endpoint of a config-backed or type-less relationship,
+     * excluding the Item being deleted and avoiding duplicates by UUID.
+     *
+     * @param item           the Item being deleted
+     * @param relationship   the relationship being removed
+     * @param survivingItems map of surviving Items to update
+     */
+    private void collectSurvivingConfigBackedItem(Context context, Item item, Relationship relationship,
+                                                  Map<UUID, Item> survivingItems) throws SQLException {
+        if (!relationship.isConfigurationBacked() && relationship.getRelationshipType() != null) {
+            return;
+        }
+
+        Item survivor = relationship.getLeftItem().getID().equals(item.getID())
+            ? relationship.getRightItem() : relationship.getLeftItem();
+
+        if (!survivor.getID().equals(item.getID())) {
+            // Ensure the surviving Item is managed by the current Hibernate session before updating it.
+            survivor = context.reloadEntity(survivor);
+            survivingItems.put(survivor.getID(), survivor);
+        }
+    }
+
+    /**
+     * Update both distinct endpoints after deleting a config-backed relationship
+     * to persist metadata changes and trigger MODIFY_METADATA events.
+     * Authorization is temporarily disabled because WRITE permission on either
+     * endpoint is sufficient to delete the relationship.
+     *
+     * @param context      the DSpace context
+     * @param relationship the deleted relationship
+     * @throws SQLException       if a database error occurs
+     * @throws AuthorizeException if an Item update fails authorization
+     */
+    private void updateConfigBackedRelationshipItems(Context context, Relationship relationship)
+        throws SQLException, AuthorizeException {
+        Item left = relationship.getLeftItem();
+        Item right = relationship.getRightItem();
+
+        context.turnOffAuthorisationSystem();
+        try {
+            itemService.update(context, left);
+            if (!left.getID().equals(right.getID())) {
+                itemService.update(context, right);
+            }
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
+     * Verifies that the current user has WRITE permission on at least one
+     * relationship endpoint and READ permission on both endpoints.
+     *
+     * @param context current DSpace context
+     * @param leftItem left endpoint of the relationship
+     * @param rightItem right endpoint of the relationship
+     * @throws SQLException if a database error occurs during authorization
+     * @throws AuthorizeException if the required permissions are missing
+     */
+    private void authorizeRelationshipCreation(Context context, Item leftItem, Item rightItem)
+        throws SQLException, AuthorizeException {
+        assertWriteOnEitherItem(context, leftItem, rightItem);
+        authorizeService.authorizeAction(context, leftItem, Constants.READ);
+        authorizeService.authorizeAction(context, rightItem, Constants.READ);
+    }
 }

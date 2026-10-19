@@ -19,6 +19,7 @@ import jakarta.persistence.criteria.Root;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataField_;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.dao.MetadataValueDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -96,4 +97,20 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         return count(createQuery(context, "SELECT count(*) FROM MetadataValue"));
     }
 
+    @Override
+    public List<MetadataValue> findByRelationship(Context context, Relationship relationship) throws SQLException {
+        Query query = createQuery(context, "SELECT m FROM MetadataValue m "
+            + "JOIN FETCH m.metadataField WHERE m.relationship = :relationship "
+            + "ORDER BY m.dSpaceObject.id, m.metadataField.id, m.place, m.id");
+        query.setParameter("relationship", relationship);
+        return list(query);
+    }
+
+    @Override
+    public int countByRelationship(Context context, Relationship relationship) throws SQLException {
+        Query query = createQuery(context,
+            "SELECT count(m) FROM MetadataValue m WHERE m.relationship = :relationship");
+        query.setParameter("relationship", relationship);
+        return count(query);
+    }
 }
