@@ -28,7 +28,6 @@ import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.util.DigestUtils;
