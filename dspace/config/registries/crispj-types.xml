@@ -1,0 +1,61 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris project Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>crispj</name>
+        <namespace>http://dspace.org/crispj</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>crispj</schema>
+        <element>coordinator</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispj</schema>
+        <element>partnerou</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispj</schema>
+        <element>investigator</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispj</schema>
+        <element>coinvestigators</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispj</schema>
+        <element>funder</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispj</schema>
+        <element>openaireid</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crispj</schema>
+        <element>organization</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

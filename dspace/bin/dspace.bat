@@ -38,6 +38,9 @@ REM If JAVA_OPTS specified, use those options
 REM Otherwise, default Java to using 256MB of memory
 if "%JAVA_OPTS%"=="" set "JAVA_OPTS=-Xmx256m -Dfile.encoding=UTF-8"
 
+REM Add log4j2 configuration to JAVA_OPTS
+set "JAVA_OPTS=%JAVA_OPTS% -Dlog4j2.configurationFile=%cd%\config\log4j2-cli.xml"
+
 REM Execute Java
 java %JAVA_OPTS% -classpath "%DSPACE_CLASSPATH%" org.dspace.app.launcher.ScriptLauncher %*
 

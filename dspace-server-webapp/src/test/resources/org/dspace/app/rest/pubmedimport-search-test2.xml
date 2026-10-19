@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2023//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_230101.dtd">
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation Status="MEDLINE" Owner="NLM">
+            <PMID Version="1">21975942</PMID>
+            <DateCompleted>
+                <Year>2012</Year>
+                <Month>01</Month>
+                <Day>13</Day>
+            </DateCompleted>
+            <DateRevised>
+                <Year>2016</Year>
+                <Month>10</Month>
+                <Day>21</Day>
+            </DateRevised>
+            <Article PubModel="Print">
+                <Journal>
+                    <ISSN IssnType="Electronic">1934-8258</ISSN>
+                    <JournalIssue CitedMedium="Internet">
+                        <Volume>Chapter 6</Volume>
+                        <PubDate>
+                            <Year>2011</Year>
+                            <Month>Oct</Month>
+                        </PubDate>
+                    </JournalIssue>
+                    <Title>Current protocols in human genetics</Title>
+                    <ISOAbbreviation>Curr Protoc Hum Genet</ISOAbbreviation>
+                </Journal>
+                <ArticleTitle>Searching NCBI Databases Using Entrez.</ArticleTitle>
+                <Pagination>
+                    <StartPage>Unit6.10</StartPage>
+                    <MedlinePgn>Unit6.10</MedlinePgn>
+                </Pagination>
+                <ELocationID EIdType="doi" ValidYN="Y">10.1002/0471142905.hg0610s71</ELocationID>
+                <Abstract>
+                    <AbstractText>One of the most widely used interfaces for the retrieval of information from biological databases is the NCBI Entrez system. Entrez capitalizes on the fact that there are pre-existing, logical relationships between the individual entries found in numerous public databases. The existence of such natural connections, mostly biological in nature, argued for the development of a method through which all the information about a particular biological entity could be found without having to sequentially visit and query disparate databases. Two basic protocols describe simple, text-based searches, illustrating the types of information that can be retrieved through the Entrez system. An alternate protocol builds upon the first basic protocol, using additional, built-in features of the Entrez system, and providing alternative ways to issue the initial query. The support protocol reviews how to save frequently issued queries. Finally, Cn3D, a structure visualization tool, is also discussed.</AbstractText>
+                    <CopyrightInformation>&#xa9; 2011 by John Wiley &amp; Sons, Inc.</CopyrightInformation>
+                </Abstract>
+                <AuthorList CompleteYN="Y">
+                    <Author ValidYN="Y">
+                        <LastName>Gibney</LastName>
+                        <ForeName>Gretchen</ForeName>
+                        <Initials>G</Initials>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Baxevanis</LastName>
+                        <ForeName>Andreas D</ForeName>
+                        <Initials>AD</Initials>
+                    </Author>
+                </AuthorList>
+                <Language>eng</Language>
+                <PublicationTypeList>
+                    <PublicationType UI="D016428">Journal Article</PublicationType>
+                </PublicationTypeList>
+            </Article>
+            <MedlineJournalInfo>
+                <Country>United States</Country>
+                <MedlineTA>Curr Protoc Hum Genet</MedlineTA>
+                <NlmUniqueID>101287858</NlmUniqueID>
+                <ISSNLinking>1934-8258</ISSNLinking>
+            </MedlineJournalInfo>
+            <CitationSubset>IM</CitationSubset>
+            <MeshHeadingList>
+                <MeshHeading>
+                    <DescriptorName UI="D000818" MajorTopicYN="N">Animals</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D003628" MajorTopicYN="N">Database Management Systems</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D016208" MajorTopicYN="Y">Databases, Factual</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D016247" MajorTopicYN="N">Information Storage and Retrieval</DescriptorName>
+                    <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D020407" MajorTopicYN="Y">Internet</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D008968" MajorTopicYN="N">Molecular Conformation</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D009317" MajorTopicYN="N">National Library of Medicine (U.S.)</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D039781" MajorTopicYN="N">PubMed</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D014481" MajorTopicYN="N" Type="Geographic">United States</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D014584" MajorTopicYN="Y">User-Computer Interface</DescriptorName>
+                </MeshHeading>
+            </MeshHeadingList>
+        </MedlineCitation>
+        <PubmedData>
+            <History>
+                <PubMedPubDate PubStatus="entrez">
+                    <Year>2011</Year>
+                    <Month>10</Month>
+                    <Day>7</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="pubmed">
+                    <Year>2011</Year>
+                    <Month>10</Month>
+                    <Day>7</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="medline">
+                    <Year>2012</Year>
+                    <Month>1</Month>
+                    <Day>14</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+            </History>
+            <PublicationStatus>ppublish</PublicationStatus>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">21975942</ArticleId>
+                <ArticleId IdType="doi">10.1002/0471142905.hg0610s71</ArticleId>
+            </ArticleIdList>
+        </PubmedData>
+    </PubmedArticle>
+</PubmedArticleSet>

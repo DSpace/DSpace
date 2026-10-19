@@ -12,10 +12,10 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -79,6 +79,9 @@ public class ItemAddBundleController {
     @Autowired
     Utils utils;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /**
      * Method to add a Bundle to an Item with the given UUID in the URL. This will create a Bundle with the
      * name provided in the request and attach this to the Item that matches the UUID in the URL.
@@ -101,7 +104,7 @@ public class ItemAddBundleController {
 
         BundleRest bundleRest;
         try {
-            bundleRest = new ObjectMapper().readValue(request.getInputStream(), BundleRest.class);
+            bundleRest = mapper.readValue(request.getInputStream(), BundleRest.class);
         } catch (IOException excIO) {
             throw new UnprocessableEntityException("Could not parse request body");
         }

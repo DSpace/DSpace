@@ -17,9 +17,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +43,7 @@ import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -93,7 +96,9 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
+            Object unwrappedAuthorizeService = AopTestUtils.getUltimateTargetObject(authorizeService);
+            authorizeServiceSpy = (AuthorizeService) mock(unwrappedAuthorizeService.getClass(),
+                withSettings().spiedInstance(unwrappedAuthorizeService).defaultAnswer(CALLS_REAL_METHODS));
             // "Wire" our spy to be used by the current loaded itemService, bundleService & bitstreamService
             // (To ensure it uses the spy instead of the real service)
             ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
@@ -514,6 +519,41 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
 
     /**
+     * Test removeBitstream method and also the unsetPrimaryBitstreamID method, of class Bundle.
+     */
+    @Test
+    public void testRemoveBitstreamAuthAndUnsetPrimaryBitstreamID()
+            throws IOException, SQLException, AuthorizeException {
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bundle REMOVE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
+        // Allow Bitstream DELETE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.DELETE));
+
+
+        context.turnOffAuthorisationSystem();
+        //set a value different than default
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+        bundleService.addBitstream(context, b, bs);
+        b.setPrimaryBitstreamID(bs);
+        context.restoreAuthSystemState();
+
+        assertThat("testRemoveBitstreamAuthAndUnsetPrimaryBitstreamID 0", b.getPrimaryBitstream(), equalTo(bs));
+        //remove bitstream
+        bundleService.removeBitstream(context, b, bs);
+        //is -1 when not set
+        assertThat("testRemoveBitstreamAuthAndUnsetPrimaryBitstreamID 1", b.getPrimaryBitstream(), equalTo(null));
+    }
+
+    /**
      * Test of update method, of class Bundle.
      */
     @Test
@@ -598,9 +638,9 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Test
     public void testReplaceAllBitstreamPolicies() throws SQLException, AuthorizeException {
         List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
-        newpolicies.add(resourcePolicyService.create(context));
-        newpolicies.add(resourcePolicyService.create(context));
-        newpolicies.add(resourcePolicyService.create(context));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
         bundleService.replaceAllBitstreamPolicies(context, b, newpolicies);
 
         List<ResourcePolicy> bspolicies = bundleService.getBundlePolicies(context, b);

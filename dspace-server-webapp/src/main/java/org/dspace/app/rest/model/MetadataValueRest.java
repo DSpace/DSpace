@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * An embeddable representation of the Metadata to use in with DSpace REST
@@ -25,6 +27,9 @@ public class MetadataValueRest {
     int confidence;
 
     int place = -1;
+
+    @JsonInclude(Include.NON_NULL)
+    Integer securityLevel;
 
     public MetadataValueRest() {
     }
@@ -71,5 +76,13 @@ public class MetadataValueRest {
 
     public void setPlace(int place) {
         this.place = place;
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(Integer securityLevel) {
+        this.securityLevel = securityLevel;
     }
 }

@@ -117,7 +117,7 @@ public class RdfIT extends AbstractWebClientIntegrationTest {
         // Turtle response should include the RDF identifier of Community
         assertThat(response.getBody(), containsString(communityIdentifier));
         // Turtle response should also note that this Community is part of our Site object
-        assertThat(response.getBody(), containsString("dspace:isPartOfRepository  <" + siteIdentifier + "> ;"));
+        assertThat(response.getBody(), containsString("dspace:isPartOfRepository  <" + siteIdentifier + ">;"));
     }
 
     @Test

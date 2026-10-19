@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.suggestion.SuggestionProvider;
+import org.dspace.app.suggestion.SuggestionService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -43,6 +45,9 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private SuggestionService suggestionService;
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String source, String id) {
@@ -96,15 +101,36 @@ public class ExternalDataServiceImpl implements ExternalDataService {
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
         for (MetadataValueDTO metadataValueDTO : externalDataObject.getMetadata()) {
-            itemService.addMetadata(context, item, metadataValueDTO.getSchema(), metadataValueDTO.getElement(),
-                                    metadataValueDTO.getQualifier(), metadataValueDTO.getLanguage(),
-                                    metadataValueDTO.getValue(), metadataValueDTO.getAuthority(),
-                                    metadataValueDTO.getConfidence());
+            if (metadataValueDTO.getValue() == null) {
+                // skip invalid metadata
+                continue;
+            }
+            if (metadataValueDTO.getAuthority() == null) {
+                itemService.addMetadata(context, item, metadataValueDTO.getSchema(), metadataValueDTO.getElement(),
+                                        metadataValueDTO.getQualifier(), metadataValueDTO.getLanguage(),
+                                        metadataValueDTO.getValue());
+            } else {
+                itemService.addMetadata(context, item, metadataValueDTO.getSchema(), metadataValueDTO.getElement(),
+                                        metadataValueDTO.getQualifier(), metadataValueDTO.getLanguage(),
+                                        metadataValueDTO.getValue(), metadataValueDTO.getAuthority(),
+                                        metadataValueDTO.getConfidence());
+            }
         }
 
         log.info(LogHelper.getHeader(context, "create_item_from_externalDataObject", "Created item" +
-            "with id: " + item.getID() + " from source: " + externalDataObject.getSource() + " with identifier: " +
-            externalDataObject.getId()));
+                                     " with id: " + item.getID() +
+                                     " from source: " + externalDataObject.getSource() +
+                                     " with identifier: " + externalDataObject.getId()));
+        try {
+            List<SuggestionProvider> providers = suggestionService.getSuggestionProviders();
+            if (providers != null) {
+                for (SuggestionProvider p : providers) {
+                    p.flagRelatedSuggestionsAsProcessed(context, externalDataObject);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Got problems with the solr suggestion storage service: " + e.getMessage(), e);
+        }
         return workspaceItem;
     }
 

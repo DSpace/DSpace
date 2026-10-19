@@ -39,6 +39,7 @@ public class OrcidWorkFieldMapping {
      * The metadata fields related to the work external identifiers.
      */
     private Map<String, String> externalIdentifierFields = new HashMap<>();
+    private Map<String, List<String>> externalIdentifierPartOfMap = new HashMap<>();
 
     /**
      * The metadata field related to the work publication date.
@@ -127,6 +128,15 @@ public class OrcidWorkFieldMapping {
 
     public void setExternalIdentifierFields(String externalIdentifierFields) {
         this.externalIdentifierFields = parseConfigurations(externalIdentifierFields);
+    }
+
+    public Map<String, List<String>> getExternalIdentifierPartOfMap() {
+        return this.externalIdentifierPartOfMap;
+    }
+
+    public void setExternalIdentifierPartOfMap(
+            HashMap<String, List<String>> externalIdentifierPartOfMap) {
+        this.externalIdentifierPartOfMap = externalIdentifierPartOfMap;
     }
 
     public String getPublicationDateField() {

@@ -10,12 +10,12 @@ package org.dspace.ctask.testing;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Logs what it was asked to do, samples run parameters and task
@@ -32,13 +32,12 @@ import org.slf4j.LoggerFactory;
  */
 public class PropertyParameterTestingTask
         extends AbstractCurationTask {
-    private static final Logger LOG
-            = LoggerFactory.getLogger(PropertyParameterTestingTask.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     @Override
-    public void init(Curator curator, String taskId)
+    public void init(Context ctx, Curator curator, String taskId)
             throws IOException {
-        super.init(curator, taskId);
+        super.init(ctx, curator, taskId);
         LOG.info("Received 'init' on task {}", taskId);
         // Display some properties.
         LOG.info("taskProperty = '{}'; runParameter = '{}'",
@@ -46,7 +45,7 @@ public class PropertyParameterTestingTask
     }
 
     @Override
-    public int perform(DSpaceObject dso)
+    public int perform(Context ctx, DSpaceObject dso)
             throws IOException {
         LOG.info("Received 'perform' on {}", dso);
         return Curator.CURATE_SUCCESS;

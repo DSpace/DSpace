@@ -55,6 +55,7 @@
         <property name="map">
             <map>
                 <entry key="upload" value-ref="uploadConfigurationDefault" />
+                <entry key="upload-no-required-metadata" value-ref="uploadConfigurationPublicationTestPatch" />
             </map>
         </property>
     </bean>
@@ -82,6 +83,48 @@
             <list>
                 <ref bean="embargoed" />
                 <ref bean="administrator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultBulkAccessConditionConfiguration"
+          class="org.dspace.app.bulkaccesscontrol.model.BulkAccessConditionConfiguration">
+        <property name="name" value="default"/>
+        <property name="itemAccessConditionOptions">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="administrator"/>
+                <ref bean="embargoed" />
+                <ref bean="lease"/>
+            </list>
+        </property>
+        <property name="bitstreamAccessConditionOptions">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="administrator"/>
+                <ref bean="embargoed" />
+                <ref bean="lease"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="bulkAccessConditionConfigurationService"
+          class="org.dspace.app.bulkaccesscontrol.service.BulkAccessConditionConfigurationService">
+        <property name="bulkAccessConditionConfigurations">
+            <list>
+                <ref bean="defaultBulkAccessConditionConfiguration"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="uploadConfigurationPublicationTestPatch" class="org.dspace.submit.model.UploadConfiguration">
+        <property name="name" value="upload-no-required-metadata"/>
+        <property name="metadata" value="bitstream-metadata" />
+        <property name="options">
+            <list>
+                <ref bean="administrator"/>
+                <ref bean="openAccess"/>
+                <ref bean="embargoed" />
             </list>
         </property>
     </bean>

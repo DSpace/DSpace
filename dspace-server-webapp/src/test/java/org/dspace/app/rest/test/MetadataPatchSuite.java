@@ -11,10 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import javax.ws.rs.core.MediaType;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.junit.Assert;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -24,16 +23,19 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  * Utility class for performing metadata patch tests sourced from a common json file (see constructor).
  */
 public class MetadataPatchSuite {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper mapper;
+
     private final JsonNode suite;
 
     /**
      * Initializes the suite by parsing the json file of tests.
      *
+     * @param mapper the initialized ObjectMapper (e.g. from Spring Boot)
      * @throws Exception if there is an error reading the file.
      */
-    public MetadataPatchSuite() throws Exception {
-        suite = objectMapper.readTree(getClass().getResourceAsStream("metadata-patch-suite.json"));
+    public MetadataPatchSuite(ObjectMapper mapper) throws Exception {
+        this.mapper = mapper;
+        suite = mapper.readTree(getClass().getResourceAsStream("metadata-patch-suite.json"));
     }
 
     /**
@@ -79,7 +81,7 @@ public class MetadataPatchSuite {
                 .andExpect(status().is(expectedStatus));
         if (expectedStatus >= 200 && expectedStatus < 300) {
           String responseBody = resultActions.andReturn().getResponse().getContentAsString();
-          JsonNode responseJson =  objectMapper.readTree(responseBody);
+          JsonNode responseJson =  mapper.readTree(responseBody);
           String responseMetadata = responseJson.get("metadata").toString();
           if (!responseMetadata.equals(expectedMetadata)) {
               Assert.fail("Expected metadata in " + verb + " response: " + expectedMetadata

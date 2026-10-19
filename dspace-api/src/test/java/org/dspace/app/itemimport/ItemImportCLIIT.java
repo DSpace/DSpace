@@ -8,6 +8,7 @@
 package org.dspace.app.itemimport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -33,19 +34,21 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.flywaydb.core.internal.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Basic integration testing for the SAF Import feature via CLI {@link ItemImportCLI}.
- * https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
+ * https://wiki.lyrasis.org/display/DSDOC9x/Importing+and+Exporting+Items+via+Simple+Archive+Format
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String ZIP_NAME = "saf.zip";
+    private static final String PDF_NAME = "test.pdf";
     private static final String publicationTitle = "A Tale of Two Cities";
     private static final String personTitle = "Person Test";
 
@@ -55,6 +58,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private Collection collection;
     private Path tempDir;
     private Path workDir;
+    private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
     @Before
     @Override
@@ -73,7 +77,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         RelationshipTypeBuilder.createRelationshipTypeBuilder(
                         context, publication, person, "isAuthorOfPublication",
-                        "isPublicationOfAuthor", 0, null, 0, null)
+                        "isPublicationOfAuthor", 0, null, 0,
+                        null)
                 .withCopyToLeft(false).withCopyToRight(true).build();
         context.restoreAuthSystemState();
 
@@ -88,9 +93,9 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     @After
     @Override
     public void destroy() throws Exception {
-        PathUtils.deleteDirectory(tempDir);
+        PathUtils.deleteOnExit(tempDir);
         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
-            PathUtils.delete(path);
+            PathUtils.deleteOnExit(path);
         }
         super.destroy();
     }
@@ -226,6 +231,10 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         checkMetadata();
         checkMetadataWithAnotherSchema();
         checkBitstream();
+
+        // confirm that TEMP_DIR still exists
+        File workTempDir = new File(workDir + File.separator + TEMP_DIR);
+        assertTrue(workTempDir.exists());
     }
 
     @Test
@@ -252,6 +261,23 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
 
         checkMetadata();
         checkRelationship();
+    }
+
+    @Test
+    public void importItemByZipSafInvalidMimetype() throws Exception {
+        // use sample PDF file
+        Files.copy(getClass().getResourceAsStream("test.pdf"),
+                   Path.of(tempDir.toString() + "/" + PDF_NAME));
+
+        String[] args = new String[] { "import", "-a", "-e", admin.getEmail(), "-c", collection.getID().toString(),
+                                       "-s", tempDir.toString(), "-z", PDF_NAME, "-m", tempDir.toString()
+                                                                                       + "/mapfile.out" };
+        try {
+            perfomImportScript(args);
+        } catch (Exception e) {
+            // should throw an exception due to invalid mimetype
+            assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+        }
     }
 
     @Test
@@ -524,7 +550,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkMetadata() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item item = itemService.findArchivedByMetadataField(context, "dc", "title", null,
+                publicationTitle).next();
         assertEquals(item.getName(), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dc.date.issued"), "1990");
         assertEquals(itemService.getMetadata(item, "dc.title.alternative"), "J'aime les Printemps");
@@ -535,7 +562,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkMetadataWithAnotherSchema() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item item = itemService.findArchivedByMetadataField(context, "dc", "title", null,
+                publicationTitle).next();
         assertEquals(item.getName(), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dcterms.title"), publicationTitle);
     }
@@ -545,7 +573,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkBitstream() throws Exception {
-        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
+        Bitstream bitstream = itemService.findArchivedByMetadataField(context, "dc", "title",
+                        null, publicationTitle).next()
                 .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
         assertEquals(bitstream.getName(), "file1.txt");
     }
@@ -555,7 +584,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkItemDeletion() throws Exception {
-        Iterator<Item> itemIterator = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle);
+        Iterator<Item> itemIterator = itemService.findArchivedByMetadataField(context, "dc", "title",
+                null, publicationTitle);
         assertEquals(itemIterator.hasNext(), false);
     }
 
@@ -564,8 +594,10 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkRelationship() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
-        Item author = itemService.findByMetadataField(context, "dc", "title", null, personTitle).next();
+        Item item = itemService.findArchivedByMetadataField(context, "dc", "title", null,
+                publicationTitle).next();
+        Item author = itemService.findArchivedByMetadataField(context, "dc", "title", null,
+                personTitle).next();
         List<Relationship> relationships = relationshipService.findByItem(context, item);
         assertEquals(1, relationships.size());
         assertEquals(author.getID(), relationships.get(0).getRightItem().getID());

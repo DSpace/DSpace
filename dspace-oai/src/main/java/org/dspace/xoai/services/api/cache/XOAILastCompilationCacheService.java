@@ -8,13 +8,13 @@
 package org.dspace.xoai.services.api.cache;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 
 
 public interface XOAILastCompilationCacheService {
     boolean hasCache();
 
-    void put(Date date) throws IOException;
+    void put(Instant date) throws IOException;
 
-    Date get() throws IOException;
+    Instant get() throws IOException;
 }

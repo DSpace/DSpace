@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -75,7 +75,7 @@ public class SitemapRestController {
         File sitemapOutputDir = new File(configurationService.getProperty("sitemap.dir"));
         if (sitemapOutputDir.exists() && sitemapOutputDir.isDirectory()) {
             // List of all files and directories inside sitemapOutputDir
-            File sitemapFilesList[] = sitemapOutputDir.listFiles();
+            File[] sitemapFilesList = sitemapOutputDir.listFiles();
             for (File sitemapFile : sitemapFilesList) {
                 if (name.equalsIgnoreCase(sitemapFile.getName())) {
                     if (sitemapFile.isFile()) {
@@ -126,12 +126,6 @@ public class SitemapRestController {
                 .with(response);
 
             sender.withLastModified(foundSitemapFile.lastModified());
-
-            // Determine if we need to send the file as a download or if the browser can open it inline
-            long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
-            if (dispositionThreshold >= 0 && foundSitemapFile.length() > dispositionThreshold) {
-                sender.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
-            }
 
             Context context = ContextUtil.obtainContext(request);
 

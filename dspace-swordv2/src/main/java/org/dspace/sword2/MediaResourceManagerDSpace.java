@@ -10,8 +10,8 @@ package org.dspace.sword2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +77,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             MediaResource mr = new MediaResource(stream,
                                                  bitstream.getFormat(context).getMIMEType(), null, true);
             mr.setContentMD5(bitstream.getChecksum());
-            mr.setLastModified(this.getLastModified(context, bitstream));
+            mr.setLastModified(java.util.Date.from(this.getLastModified(context, bitstream)));
             return mr;
         } catch (IOException | SQLException e) {
             throw new SwordServerException(e);
@@ -228,23 +228,23 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
         }
     }
 
-    private Date getLastModified(Context context, Bitstream bitstream)
+    private Instant getLastModified(Context context, Bitstream bitstream)
         throws SQLException {
-        Date lm = null;
+        Instant lm = null;
         List<Bundle> bundles = bitstream.getBundles();
         for (Bundle bundle : bundles) {
             List<Item> items = bundle.getItems();
             for (Item item : items) {
-                Date possible = item.getLastModified();
+                Instant possible = item.getLastModified();
                 if (lm == null) {
                     lm = possible;
-                } else if (possible.getTime() > lm.getTime()) {
+                } else if (possible.isAfter(lm)) {
                     lm = possible;
                 }
             }
         }
         if (lm == null) {
-            return new Date();
+            return Instant.now();
         }
         return lm;
     }
@@ -253,7 +253,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                                                AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription
@@ -390,8 +390,8 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                     .createMediaResourceReceipt(context, item, config);
             }
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription
                 .append("Total time for deposit processing: " + delta +
@@ -421,7 +421,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                                     AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription
@@ -520,8 +520,8 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             //ReceiptGenerator genny = new ReceiptGenerator();
             //DepositReceipt receipt = genny.createReceipt(context, result, config);
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription
                 .append("Total time for deposit processing: " + delta +
@@ -551,7 +551,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                                       AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription
@@ -649,8 +649,8 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                 receipt = genny.createReceipt(context, result, config, true);
             }
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription
                 .append("Total time for add processing: " + delta + " ms");

@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.service.AuthorityValueService;
@@ -80,14 +81,22 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
             throws SQLException, AuthorizeException {
         List<AuthorityValue> values = new ArrayList<>();
         for (String metadataField : metadataFields) {
-            List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, metadataField);
+
+            String[] fieldParts = metadataField.split("\\.");
+            String schema = (fieldParts.length > 0 ? fieldParts[0] : null);
+            String element = (fieldParts.length > 1 ? fieldParts[1] : null);
+            String qualifier = (fieldParts.length > 2 ? fieldParts[2] : null);
+
+            // Get metadata values without virtual metadata
+            List<MetadataValue> metadataValues = itemService.getMetadata(item, schema, element, qualifier, Item.ANY,
+                false);
             for (MetadataValue metadataValue : metadataValues) {
                 String content = metadataValue.getValue();
                 String authorityKey = metadataValue.getAuthority();
                  // We only want to update our item IF our UUID is not present
                 // or if we need to generate one.
                 boolean requiresItemUpdate = StringUtils.isBlank(authorityKey) ||
-                        StringUtils.startsWith(authorityKey, AuthorityValueService.GENERATE);
+                        Strings.CS.startsWith(authorityKey, AuthorityValueService.GENERATE);
                 AuthorityValue value = null;
                 if (StringUtils.isBlank(authorityKey) && cache != null) {
                     // This is a value currently without an authority. So query
@@ -140,12 +149,12 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 !metadataAuthorityKey.startsWith(AuthorityValueService.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly
             // necessary here but it prevents exceptions in solr
-            AuthorityValue value = authorityValueService.findByUID(context, metadataAuthorityKey);
+            AuthorityValue value = authorityValueService.findByUID(metadataAuthorityKey);
             if (value != null) {
                 return value;
             }
         }
-        return authorityValueService.generate(context, metadataAuthorityKey,
+        return authorityValueService.generate(metadataAuthorityKey,
                 metadataContent, metadataField.replaceAll("\\.", "_"));
     }
 

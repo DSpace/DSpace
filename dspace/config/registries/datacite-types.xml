@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dspace-dc-types SYSTEM "dspace-dc-types.dtd">
+
+<!--
+  This document was based on the OpenAIRE4 Guidelines for Literature Repositories
+  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/index.html
+  -->
+  
+<dspace-dc-types>
+    <dspace-header>
+        <title>OpenAIRE4 Datacite fields definition</title>
+    </dspace-header>
+    
+    <dc-schema>
+        <name>datacite</name>
+        <namespace>http://datacite.org/schema/kernel-4</namespace>
+    </dc-schema>
+
+    <!--
+      OpenAIRE4 Guidelines
+      21 - Geolocation -->	
+    <dc-type>
+        <schema>datacite</schema>
+        <element>geoLocation</element>
+        <scope_note>Spatial region or named place where the data was gathered or about which the data is focused.</scope_note>
+    </dc-type>
+        
+    <!-- specific type required by OpenAIRE4 Guidelines -->
+    <dc-type>
+        <schema>datacite</schema>
+        <element>subject</element>
+        <qualifier>fos</qualifier>
+        <scope_note>Fields of Science and Technology - OECD</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>datacite</schema>
+        <element>relation</element>
+        <qualifier>isReviewedBy</qualifier>
+        <scope_note>Reviewd by</scope_note>
+    </dc-type>    
+    
+    <dc-type>
+        <schema>datacite</schema>
+        <element>relation</element>
+    	<qualifier>isReferencedBy</qualifier>
+		<scope_note>Referenced by</scope_note>
+	</dc-type>	
+	
+    <dc-type>
+        <schema>datacite</schema>
+        <element>relation</element>
+    	<qualifier>isSupplementedBy</qualifier>
+		<scope_note>Supplemented by</scope_note>
+	</dc-type>
+
+</dspace-dc-types>

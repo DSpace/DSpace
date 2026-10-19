@@ -10,18 +10,16 @@ package org.dspace.event;
 import org.dspace.core.Context;
 
 /**
- * Interface for content event consumers. Note that the consumer cannot tell if
- * it is invoked synchronously or asynchronously; the consumer interface and
- * sequence of calls is the same for both. Asynchronous consumers may see more
- * consume() calls between the start and end of the event stream, if they are
- * invoked asynchronously, once in a long time period, rather than synchronously
- * after every Context.commit().
- *
- * @version $Revision$
+ * Interface for content event consumers. Note that the consumer cannot tell
+ * if it is invoked synchronously or asynchronously; the consumer interface
+ * and sequence of calls is the same for both. Asynchronous consumers may see
+ * more consume() calls between the start and end of the event stream, if they
+ * are invoked asynchronously, once in a long time period, rather than
+ * synchronously after every Context.commit().
  */
 public interface Consumer {
     /**
-     * Initialize - allocate any resources required to operate. This may include
+     * Allocate any resources required to operate. This may include
      * initializing any pooled JMS resources. Called ONCE when created by the
      * dispatcher pool. This should be used to set up expensive resources that
      * will remain for the lifetime of the consumer.
@@ -31,12 +29,17 @@ public interface Consumer {
     public void initialize() throws Exception;
 
     /**
-     * Consume an event; events may get filtered at the dispatcher level, hiding
-     * it from the consumer. This behavior is based on the dispatcher/consumer
-     * configuration. Should include logic to initialize any resources required
-     * for a batch of events.
+     * Consume an event.  Events may be filtered by a dispatcher, hiding them
+     * from the consumer.  This behavior is based on the dispatcher/consumer
+     * configuration.  Should include logic to initialize any resources
+     * required for a batch of events.
      *
-     * @param ctx   the execution context object
+     * <p>This method <em>must not</em> commit the context.  Committing causes
+     * re-dispatch of the event queue, which can result in infinite recursion
+     * leading to memory exhaustion as seen in
+     * {@link https://github.com/DSpace/DSpace/pull/8756}.
+     *
+     * @param ctx   the current DSpace session
      * @param event the content event
      * @throws Exception if error
      */

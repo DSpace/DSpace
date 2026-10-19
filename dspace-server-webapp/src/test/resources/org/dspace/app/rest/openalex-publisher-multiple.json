@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "count": 2,
+    "db_response_time_ms": 15,
+    "page": 1,
+    "per_page": 2,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/P4310320990",
+      "display_name": "Elsevier BV"
+    },
+    {
+      "id": "https://openalex.org/P4310320175",
+      "display_name": "Masson"
+    }
+  ],
+  "group_by": []
+}

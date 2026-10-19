@@ -6,14 +6,12 @@
 # http://www.dspace.org/license/
 #
 
-version: "3.7"
-
 services:
   dspace-cli:
     environment:
-    - AIPZIP=https://github.com/DSpace-Labs/AIP-Files/raw/main/dogAndReport.zip
-    - ADMIN_EMAIL=test@test.edu
-    - AIPDIR=/tmp/aip-dir
+    - AIPZIP=${AIPZIP:-https://github.com/DSpace-Labs/AIP-Files/raw/main/dogAndReport.zip}
+    - ADMIN_EMAIL=${ADMIN_EMAIL:-test@test.edu}
+    - AIPDIR=${AIPDIR:-/tmp/aip-dir}
     entrypoint:
       - /bin/bash
       - '-c'

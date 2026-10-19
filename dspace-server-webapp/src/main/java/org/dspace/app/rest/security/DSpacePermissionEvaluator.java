@@ -38,13 +38,13 @@ public class DSpacePermissionEvaluator implements PermissionEvaluator {
      * expression system. This corresponds to the DSpace action. Not null.
      * @return true if the permission is granted by one of the plugins, false otherwise
      */
+    @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         for (RestPermissionEvaluatorPlugin permissionEvaluatorPlugin : permissionEvaluatorPluginList) {
             if (permissionEvaluatorPlugin.hasPermission(authentication, targetDomainObject, permission)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -59,6 +59,7 @@ public class DSpacePermissionEvaluator implements PermissionEvaluator {
      * expression system. This corresponds to the DSpace action. Not null.
      * @return true if the permission is granted by one of the plugins, false otherwise
      */
+    @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                                  Object permission) {
         for (RestPermissionEvaluatorPlugin permissionEvaluatorPlugin : permissionEvaluatorPluginList) {

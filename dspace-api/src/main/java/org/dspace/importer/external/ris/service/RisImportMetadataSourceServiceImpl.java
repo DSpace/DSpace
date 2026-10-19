@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
 import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.service.components.AbstractPlainMetadataSource;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;

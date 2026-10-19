@@ -98,7 +98,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
      */
     @Override
     public Namespace[] getNamespaces() {
-        Namespace result[] = new Namespace[1];
+        Namespace[] result = new Namespace[1];
         result[0] = XSLTCrosswalk.DIM_NS;
         return result;
     }
@@ -288,7 +288,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             dc.add(makeDC("identifier", "uri", site.getURL()));
         }
 
-        return XSLTDisseminationCrosswalk.createDIM(dso, dc);
+        return XSLTDisseminationCrosswalk.createDIM(context, dso, dc);
     }
 
     private static MetadataValueDTO makeDC(String element, String qualifier, String value) {

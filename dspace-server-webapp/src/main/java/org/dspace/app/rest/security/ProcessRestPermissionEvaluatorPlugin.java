@@ -10,7 +10,9 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
@@ -19,8 +21,6 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(ProcessRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private RequestService requestService;
@@ -48,25 +48,28 @@ public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
                                        DSpaceRestPermission restPermission) {
 
-        if (!StringUtils.equalsIgnoreCase(targetType, ProcessRest.NAME)) {
+        if (!Strings.CI.equals(targetType, ProcessRest.NAME)) {
             return false;
         }
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
+        if (context == null) {
+            return false;
+        }
 
         try {
             int processId = Integer.parseInt(targetId.toString());
             Process process = processService.find(context, processId);
+            // This previously returned true, to allow a 404 to be thrown later. However, this assists enumeration
+            // of sequential process IDs. It is better to simply return 'unauthorized' here.
             if (process == null) {
-                return true;
+                return false;
             }
-            if (!((context.getCurrentUser() == null) || (!context.getCurrentUser().equals(process.getEPerson())
-                && !authorizeService.isAdmin(context)))) {
-                return true;
-            }
+            // Only the process owner or an administrator may perform any action
+            return processService.authorizeActionBoolean(context, process);
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
         return false;
     }

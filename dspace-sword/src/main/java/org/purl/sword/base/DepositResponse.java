@@ -173,7 +173,7 @@ public class DepositResponse {
         } catch (ParsingException ex) {
             throw new UnmarshallException("Unable to parse the XML", ex);
         } catch (IOException ex) {
-            throw new UnmarshallException("Error acessing the file?", ex);
+            throw new UnmarshallException("Error accessing the file?", ex);
         }
     }
 
@@ -205,7 +205,7 @@ public class DepositResponse {
         } catch (ParsingException ex) {
             throw new UnmarshallException("Unable to parse the XML", ex);
         } catch (IOException ex) {
-            throw new UnmarshallException("Error acessing the file?", ex);
+            throw new UnmarshallException("Error accessing the file?", ex);
         }
     }
 

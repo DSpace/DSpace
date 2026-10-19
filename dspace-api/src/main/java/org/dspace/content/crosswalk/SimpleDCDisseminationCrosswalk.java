@@ -53,10 +53,10 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
     private static final String schemaLocation =
         DC_NS.getURI() + " " + DC_XSD;
 
-    private static final Namespace namespaces[] =
+    private static final Namespace[] namespaces =
         {DC_NS, XSI_NS};
 
-    private static final String aliases[] = {"SimpleDC", "DC"};
+    private static final String[] aliases = {"SimpleDC", "DC"};
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
 

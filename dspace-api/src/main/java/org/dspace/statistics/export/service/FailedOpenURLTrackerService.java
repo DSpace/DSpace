@@ -37,7 +37,7 @@ public interface FailedOpenURLTrackerService {
     /**
      * Creates a new OpenURLTracker
      * @param context
-     * @return the creatred OpenURLTracker
+     * @return the created OpenURLTracker
      * @throws SQLException
      */
     OpenURLTracker create(Context context) throws SQLException;

@@ -11,26 +11,40 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.util.factory.UtilServiceFactory;
-import org.dspace.app.util.service.MetadataExposureService;
+import org.dspace.authority.AuthoritySearchService;
+import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.SolrAuthority;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -45,20 +59,28 @@ import org.dspace.xoai.data.DSpaceItem;
 public class ItemUtils {
     private static final Logger log = LogManager.getLogger(ItemUtils.class);
 
-    private static final MetadataExposureService metadataExposureService
-            = UtilServiceFactory.getInstance().getMetadataExposureService();
-
     private static final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
-
-    private static final RelationshipService relationshipService
-            = ContentServiceFactory.getInstance().getRelationshipService();
 
     private static final BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
 
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private static final AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
+
+    private static final AuthoritySearchService authoritySearchService
+            = AuthorityServiceFactory.getInstance().getAuthoritySearchService();
+
+    private static final MetadataAuthorityService metadataAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
+    private static final ChoiceAuthorityService choiceAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+
     /**
      * Default constructor
      */
@@ -103,23 +125,26 @@ public class ItemUtils {
             bundle.getElement().add(bitstreams);
             List<Bitstream> bits = b.getBitstreams();
             for (Bitstream bit : bits) {
+                // Check if bitstream is null and log the error
+                if (bit == null) {
+                    log.error("Null bitstream found, check item uuid: " + item.getID());
+                    break;
+                }
+                boolean primary = false;
+                // Check if current bitstream is in original bundle + 1 of the 2 following
+                // Bitstream = primary bitstream in bundle -> true
+                // No primary bitstream found in bundle-> only the first one gets flagged as "primary"
+                if (b.getName() != null && b.getName().equals("ORIGINAL") && (b.getPrimaryBitstream() != null
+                        && b.getPrimaryBitstream().getID() == bit.getID()
+                        || b.getPrimaryBitstream() == null && bit.getID() == bits.get(0).getID())) {
+                    primary = true;
+                }
+
                 Element bitstream = create("bitstream");
                 bitstreams.getElement().add(bitstream);
-                String url = "";
-                String bsName = bit.getName();
-                String sid = String.valueOf(bit.getSequenceID());
+
                 String baseUrl = configurationService.getProperty("oai.bitstream.baseUrl");
-                String handle = null;
-                // get handle of parent Item of this bitstream, if there
-                // is one:
-                List<Bundle> bn = bit.getBundles();
-                if (!bn.isEmpty()) {
-                    List<Item> bi = bn.get(0).getItems();
-                    if (!bi.isEmpty()) {
-                        handle = bi.get(0).getHandle();
-                    }
-                }
-                url = baseUrl + "/bitstreams/" + bit.getID().toString() + "/download";
+                String url = baseUrl + "/bitstreams/" + bit.getID().toString() + "/download";
 
                 String cks = bit.getChecksum();
                 String cka = bit.getChecksumAlgorithm();
@@ -131,21 +156,90 @@ public class ItemUtils {
                     bitstream.getField().add(createValue("name", name));
                 }
                 if (oname != null) {
-                    bitstream.getField().add(createValue("originalName", name));
+                    bitstream.getField().add(createValue("originalName", oname));
                 }
                 if (description != null) {
                     bitstream.getField().add(createValue("description", description));
                 }
+                // Add bitstream embargo information (READ policy present, for Anonymous group with a start date)
+                addResourcePolicyInformation(context, bit, bitstream);
+
                 bitstream.getField().add(createValue("format", bit.getFormat(context).getMIMEType()));
                 bitstream.getField().add(createValue("size", "" + bit.getSizeBytes()));
                 bitstream.getField().add(createValue("url", url));
                 bitstream.getField().add(createValue("checksum", cks));
                 bitstream.getField().add(createValue("checksumAlgorithm", cka));
                 bitstream.getField().add(createValue("sid", bit.getSequenceID() + ""));
+                // Add primary bitstream field to allow locating easily the primary bitstream information
+                bitstream.getField().add(createValue("primary", primary + ""));
             }
         }
 
         return bundles;
+    }
+
+    /**
+     * Sanitizes a string to remove characters that are invalid
+     * in XML 1.0 using a hardcoded regex to avoid escaping special characters twice.
+     * @param value The string to sanitize.
+     * @return A sanitized string, or null if the input was null.
+     */
+    private static String sanitize(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        // Strips characters that are illegal in XML 1.0 (per the XML spec, https://www.w3.org/TR/xml/#charsets)
+        // The allowed character set is: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        // This regex matches everything OUTSIDE that allowed set, i.e. it removes:
+        //   - C0 control characters other than tab (\x09), LF (\x0A), and CR (\x0D)
+        //   (i.e. \x00-\x08, \x0B, \x0C, \x0E-\x1F)
+        //   - The UTF-16 surrogate range \uD800-\uDFFF
+        //   - The non-characters \uFFFE and \uFFFF
+        return value.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD]", "");
+    }
+
+    /**
+     * This method will add metadata information about associated resource policies for a give bitstream.
+     * It will parse of relevant policies and add metadata information
+     * @param context
+     * @param bitstream the bitstream object
+     * @param bitstreamEl the bitstream metadata object to add resource policy information to
+     * @throws SQLException
+     */
+    private static void addResourcePolicyInformation(Context context, Bitstream bitstream, Element bitstreamEl)
+            throws SQLException {
+        // Pre-filter access policies by DSO (bitstream) and Action (READ)
+        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ);
+
+        // Create resourcePolicies container
+        Element resourcePolicies = create("resourcePolicies");
+
+        for (ResourcePolicy policy : policies) {
+            String groupName = policy.getGroup() != null ? policy.getGroup().getName() : null;
+            String user = policy.getEPerson() != null ? policy.getEPerson().getName() : null;
+            String action = Constants.actionText[policy.getAction()];
+            LocalDate startDate = policy.getStartDate();
+            LocalDate endDate = policy.getEndDate();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+
+            Element resourcePolicyEl = create("resourcePolicy");
+            resourcePolicyEl.getField().add(createValue("group", groupName));
+            resourcePolicyEl.getField().add(createValue("user", user));
+            resourcePolicyEl.getField().add(createValue("action", action));
+            // Only add start-date if group is different to anonymous, or there is an active embargo
+            if (startDate != null && startDate.isAfter(LocalDate.now())) {
+                resourcePolicyEl.getField().add(createValue("start-date", formatter.format(startDate)));
+            }
+            if (endDate != null) {
+                resourcePolicyEl.getField().add(createValue("end-date", formatter.format(endDate)));
+            }
+            // Add resourcePolicy to list of resourcePolicies
+            resourcePolicies.getElement().add(resourcePolicyEl);
+        }
+        // Add list of resource policies to the corresponding Bitstream XML Element
+        bitstreamEl.getElement().add(resourcePolicies);
     }
 
     private static Element createLicenseElement(Context context, Item item)
@@ -158,13 +252,17 @@ public class ItemUtils {
             List<Bitstream> licBits = licBundle.getBitstreams();
             if (!licBits.isEmpty()) {
                 Bitstream licBit = licBits.get(0);
-                InputStream in;
+                if (authorizeService.authorizeActionBoolean(context, licBit, Constants.READ)) {
+                    InputStream in;
 
-                in = bitstreamService.retrieve(context, licBit);
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                Utils.bufferedCopy(in, out);
-                license.getField().add(createValue("bin", Base64Utils.encode(out.toString())));
-
+                    in = bitstreamService.retrieve(context, licBit);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    Utils.bufferedCopy(in, out);
+                    license.getField().add(createValue("bin", Base64Utils.encode(out.toString())));
+                } else {
+                    log.info("Missing READ rights for license bitstream. Did not include license bitstream for item: "
+                            + item.getID() + ".");
+                }
             }
         }
         return license;
@@ -217,13 +315,64 @@ public class ItemUtils {
             valueElem = language;
         }
 
-        valueElem.getField().add(createValue("value", val.getValue()));
+        valueElem.getField().add(createValue("value", sanitize(val.getValue())));
         if (val.getAuthority() != null) {
             valueElem.getField().add(createValue("authority", val.getAuthority()));
             if (val.getConfidence() != Choices.CF_NOVALUE) {
                 valueElem.getField().add(createValue("confidence", val.getConfidence() + ""));
             }
+            addOrcidIdentifier(valueElem, val);
         }
+    }
+
+    /**
+     * Adds a ORCID identifier field to the provided Element, if applicable.
+     */
+    private static void addOrcidIdentifier(Element valueElem, MetadataValue mdValue) {
+        // Stop if the metadata value's field isn't enabled for ORCID authorities.
+        if (!isOrcidAuthorityControlled(mdValue.getMetadataField())) {
+            return;
+        }
+
+        // Virtual authorities refer to relationships, not to entries in the authority core, so skip them.
+        if (StringUtils.startsWith(mdValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+            return;
+        }
+
+        try {
+            // Query the authority core using the authority key on the metadata value.
+            SolrQuery query = new SolrQuery();
+            query.setQuery("id:\"" + ClientUtils.escapeQueryChars(mdValue.getAuthority()) + "\"");
+            SolrDocumentList results = authoritySearchService.search(query).getResults();
+
+            if (results.getNumFound() > 0 && results.get(0).get("orcid_id") != null) {
+                // If there is one, add the ORCID identifier to the Element.
+                valueElem.getField().add(createValue("orcid_id", (String) results.get(0).get("orcid_id")));
+            }
+        } catch (Exception e) {
+            String message = "Could not retrieve the ORCID identifier for authority "
+                    + mdValue.getAuthority() + " of metadata field " + mdValue.getMetadataField().toString('.');
+            log.error(message, e);
+            System.err.println(message + ": " + e.getMessage());
+        }
+    }
+
+    private static boolean isOrcidAuthorityControlled(MetadataField field) {
+        String fieldKey = metadataAuthorityService.makeFieldKey(field);
+        if (!metadataAuthorityService.isAuthorityControlled(fieldKey)) {
+            return false;
+        }
+        ChoiceAuthority choiceAuthority = null;
+        try {
+            String authorityName = choiceAuthorityService.getChoiceAuthorityName(
+                field.getMetadataSchema().getName(), field.getElement(), field.getQualifier(), Constants.ITEM, null);
+            if (authorityName != null) {
+                choiceAuthority = choiceAuthorityService.getChoiceAuthorityByAuthorityName(authorityName);
+            }
+        } catch (IllegalArgumentException | IllegalStateException ignored) {
+            // ignored: choiceAuthority should stay null on failure
+        }
+        return choiceAuthority instanceof SolrAuthority;
     }
 
     /**
@@ -238,15 +387,12 @@ public class ItemUtils {
         // read all metadata into Metadata Object
         metadata = new Metadata();
 
-        List<MetadataValue> vals = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+
+        List<MetadataValue> vals = UtilServiceFactory.getInstance().getMetadataSecurityService()
+                                                     .getPermissionFilteredMetadataValues(context, item);
         for (MetadataValue val : vals) {
             MetadataField field = val.getMetadataField();
             try {
-                // Don't expose fields that are hidden by configuration
-                if (metadataExposureService.isHidden(context, field.getMetadataSchema().getName(), field.getElement(),
-                        field.getQualifier())) {
-                    continue;
-                }
 
                 Element schema = getElement(metadata.getElement(), field.getMetadataSchema().getName());
                 if (schema == null) {

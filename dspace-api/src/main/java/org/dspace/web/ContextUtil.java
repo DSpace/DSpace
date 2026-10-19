@@ -10,10 +10,10 @@ package org.dspace.web;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Locale;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
@@ -141,7 +141,7 @@ public class ContextUtil {
      * Initialize a new Context object
      *
      * @return a DSpace Context Object
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     private static Context initializeContext() throws SQLException {
         // Create a new Context

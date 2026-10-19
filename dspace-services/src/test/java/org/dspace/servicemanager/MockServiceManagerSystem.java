@@ -80,6 +80,11 @@ public class MockServiceManagerSystem implements ServiceManagerSystem {
         return this.sms.getServicesNames();
     }
 
+    @Override
+    public <T> Map<String, T> getServicesWithNamesByType(Class<T> type) {
+        return this.sms.getServicesWithNamesByType(type);
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.kernel.ServiceManager#isServiceExists(java.lang.String)
      */

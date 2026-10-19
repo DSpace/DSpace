@@ -12,14 +12,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Utils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Native DSpace (or "Directory Scatter" if you prefer) asset store.
@@ -126,13 +130,13 @@ public class DSBitStoreService extends BaseBitStoreService {
     /**
      * Obtain technical metadata about an asset in the asset store.
      *
-     * @param bitstream The asset to describe
-     * @param attrs     A Map whose keys consist of desired metadata fields
-     * @return attrs
-     * A Map with key/value pairs of desired metadata
-     * @throws java.io.IOException If a problem occurs while obtaining metadata
+     * @param  bitstream The asset to describe
+     * @param  attrs     A List of desired metadata fields
+     * @return           attrs A Map with key/value pairs of desired metadata
+     * @throws           java.io.IOException If a problem occurs while obtaining
+     *                   metadata
      */
-    public Map about(Bitstream bitstream, Map attrs) throws IOException {
+    public Map<String, Object> about(Bitstream bitstream, List<String> attrs) throws IOException {
         try {
             // potentially expensive, since it may calculate the checksum
             File file = getFile(bitstream);
@@ -248,7 +252,18 @@ public class DSBitStoreService extends BaseBitStoreService {
             log.debug("Local filename for " + sInternalId + " is "
                           + bufFilename.toString());
         }
-        return new File(bufFilename.toString());
+        File bitstreamFile = new File(bufFilename.toString());
+        Path normalizedPath = bitstreamFile.toPath().normalize();
+        String[] allowedAssetstoreRoots = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getArrayProperty("assetstore.allowed.roots", new String[]{});
+        if (!normalizedPath.startsWith(baseDir.getCanonicalPath())
+            && !StringUtils.startsWithAny(normalizedPath.toString(), allowedAssetstoreRoots)) {
+            log.error("Bitstream path outside of assetstore root requested:" +
+                    "bitstream={}, path={}, assetstore={}",
+                    bitstream.getID(), normalizedPath, baseDir.getCanonicalPath());
+            throw new IOException("Illegal bitstream path constructed");
+        }
+        return bitstreamFile;
     }
 
     public boolean isRegisteredBitstream(String internalId) {

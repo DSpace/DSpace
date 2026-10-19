@@ -16,7 +16,9 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -25,21 +27,19 @@ import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
  * {@link RestPermissionEvaluatorPlugin} class that evaluate READ, WRITE and DELETE permissions over a Subscription
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 @Component
 public class SubscriptionRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(SubscriptionRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private RequestService requestService;
@@ -55,7 +55,7 @@ public class SubscriptionRestPermissionEvaluatorPlugin extends RestObjectPermiss
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
 
         if (!READ.equals(restPermission) && !WRITE.equals(restPermission) && !DELETE.equals(restPermission)
-            || !StringUtils.equalsIgnoreCase(targetType, NAME)) {
+            || !Strings.CI.equals(targetType, NAME)) {
             return false;
         }
 
@@ -76,7 +76,7 @@ public class SubscriptionRestPermissionEvaluatorPlugin extends RestObjectPermiss
             Subscription subscription = subscribeService.findById(context, Integer.parseInt(targetId.toString()));
             return Objects.nonNull(subscription) ? currentUser.equals(subscription.getEPerson()) : false;
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
         return false;
     }

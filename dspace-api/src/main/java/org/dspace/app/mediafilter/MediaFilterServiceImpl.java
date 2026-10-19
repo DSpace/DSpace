@@ -8,13 +8,21 @@
 package org.dspace.app.mediafilter;
 
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.mediafilter.service.MediaFilterService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -36,6 +44,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ThrowableUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -87,6 +96,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected boolean isVerbose = false;
     protected boolean isQuiet = false;
     protected boolean isForce = false; // default to not forced
+    protected LocalDate fromDate = null;
 
     protected MediaFilterServiceImpl() {
 
@@ -114,6 +124,15 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             for (Community topLevelCommunity : topLevelCommunities) {
                 applyFiltersCommunity(context, topLevelCommunity);
             }
+        } else if (fromDate != null) {
+            Iterator<Item> itemIterator =
+                    itemService.findByLastModifiedSince(
+                            context,
+                            fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                    );
+            while (itemIterator.hasNext() && processed < max2Process) {
+                applyFiltersItem(context, itemIterator.next());
+            }
         } else {
             //otherwise, just find every item and process
             Iterator<Item> itemIterator = itemService.findAll(context);
@@ -126,12 +145,18 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void applyFiltersCommunity(Context context, Community community)
         throws Exception {   //only apply filters if community not in skip-list
+        // ensure that the community is attached to the current hibernate session
+        // as we are committing after each item (handles, sub-communties and
+        // collections are lazy attributes)
+        community = context.reloadEntity(community);
         if (!inSkipList(community.getHandle())) {
             List<Community> subcommunities = community.getSubcommunities();
             for (Community subcommunity : subcommunities) {
                 applyFiltersCommunity(context, subcommunity);
             }
-
+            // ensure that the community is attached to the current hibernate session
+            // as we are committing after each item
+            community = context.reloadEntity(community);
             List<Collection> collections = community.getCollections();
             for (Collection collection : collections) {
                 applyFiltersCollection(context, collection);
@@ -142,6 +167,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void applyFiltersCollection(Context context, Collection collection)
         throws Exception {
+        // ensure that the collection is attached to the current hibernate session
+        // as we are committing after each item (handles are lazy attributes)
+        collection = context.reloadEntity(collection);
         //only apply filters if collection not in skip-list
         if (!inSkipList(collection.getHandle())) {
             Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
@@ -165,6 +193,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
             // clear item objects from context cache and internal cache
             c.uncacheEntity(currentItem);
+            // commit after each item to release DB resources
+            c.commit();
             currentItem = null;
         }
     }
@@ -221,23 +251,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                         filtered = true;
                     }
                 } catch (Exception e) {
-                    String handle = myItem.getHandle();
-                    List<Bundle> bundles = myBitstream.getBundles();
-                    long size = myBitstream.getSizeBytes();
-                    String checksum = myBitstream.getChecksum() + " (" + myBitstream.getChecksumAlgorithm() + ")";
-                    int assetstore = myBitstream.getStoreNumber();
-
                     // Printout helpful information to find the errored bitstream.
-                    StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
-                    sb.append("\tItem Handle: ").append(handle);
-                    for (Bundle bundle : bundles) {
-                        sb.append("\tBundle Name: ").append(bundle.getName());
-                    }
-                    sb.append("\tFile Size: ").append(size);
-                    sb.append("\tChecksum: ").append(checksum);
-                    sb.append("\tAsset Store: ").append(assetstore);
-                    logError(sb.toString());
-                    logError(e.getMessage(), e);
+                    logError(formatBitstreamDetails(myItem.getHandle(), myBitstream));
+                    logError(ThrowableUtils.formatCauseChain(e));
                 }
             } else if (filterClass instanceof SelfRegisterInputFormats) {
                 // Filter implements self registration, so check to see if it should be applied
@@ -314,26 +330,12 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         String newName = formatFilter.getFilteredName(source.getName());
 
         // check if destination bitstream exists
-        Bundle existingBundle = null;
-        List<Bitstream> existingBitstreams = new ArrayList<Bitstream>();
-        List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
-
-        if (bundles.size() > 0) {
-            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
-            for (Bundle bundle : bundles) {
-                List<Bitstream> bitstreams = bundle.getBitstreams();
-
-                for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName().trim().equals(newName.trim())) {
-                        existingBundle = bundle;
-                        existingBitstreams.add(bitstream);
-                    }
-                }
-            }
-        }
+        Pair<List<Bitstream>, Bundle> bitstreamsAndBundle = getBitstreamsDerivedFromFilter(item, source, formatFilter);
+        List<Bitstream> existingBitstreams = bitstreamsAndBundle.getLeft();
+        Bundle existingBundle = bitstreamsAndBundle.getRight();
 
         // if exists and overwrite = false, exit
-        if (!overWrite && (existingBitstreams.size() > 0)) {
+        if (!overWrite && (!existingBitstreams.isEmpty())) {
             if (!isQuiet) {
                 logInfo("SKIPPED: bitstream " + source.getID()
                                        + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
@@ -365,8 +367,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 return false;
             }
 
+            List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
             Bundle targetBundle; // bundle we're modifying
-            if (bundles.size() < 1) {
+            if (bundles.isEmpty()) {
                 // create new bundle if needed
                 targetBundle = bundleService.create(context, item, formatFilter.getBundleName());
             } else {
@@ -388,24 +391,14 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             bitstreamService.update(context, b);
 
             //Set permissions on the derivative bitstream
-            //- First remove any existing policies
-            authorizeService.removeAllPolicies(context, b);
-
-            //- Determine if this is a public-derivative format
-            if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
-                //- Set derivative bitstream to be publicly accessible
-                Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
-                authorizeService.addPolicy(context, b, Constants.READ, anonymous);
-            } else {
-                //- replace the policies using the same in the source bitstream
-                authorizeService.replaceAllPolicies(context, source, b);
-            }
+            updatePoliciesOfDerivativeBitstream(context, b, formatFilter, source);
 
             //do post-processing of the generated bitstream
             formatFilter.postProcessBitstream(context, item, b);
 
         } catch (OutOfMemoryError oome) {
             logError("!!! OutOfMemoryError !!!");
+            logError(formatBitstreamDetails(item.getHandle(), source));
         }
 
         // we are overwriting, so remove old bitstream
@@ -419,6 +412,105 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
 
         return true;
+    }
+
+    @Override
+    public Pair<List<Bitstream>, Bundle> getBitstreamsDerivedFromFilter(Item item, Bitstream sourceBitstream,
+                                                                        FormatFilter formatFilter) throws Exception {
+        Bundle lastBundle = null;
+        String filteredName = formatFilter.getFilteredName(sourceBitstream.getName());
+        List<Bitstream> derivedBitstreams = new ArrayList<>();
+        List<Bundle> bundleList = itemService.getBundles(item, formatFilter.getBundleName());
+        if (!bundleList.isEmpty()) {
+            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
+            for (Bundle bundle : bundleList) {
+                List<Bitstream> bitstreamList = bundle.getBitstreams();
+                for (Bitstream bitstream : bitstreamList) {
+                    if (bitstream.getName().trim().equals(filteredName.trim())) {
+                        lastBundle = bundle;
+                        derivedBitstreams.add(bitstream);
+                    }
+                }
+            }
+        }
+        return Pair.of(derivedBitstreams, lastBundle);
+    }
+
+    @Override
+    public void updatePoliciesOfDerivativeBitstreams(Context context, Item item, Bitstream source)
+        throws SQLException, AuthorizeException {
+
+        if (filterClasses == null) {
+            return;
+        }
+
+        for (FormatFilter formatFilter : filterClasses) {
+            for (Bitstream bitstream : findDerivativeBitstreams(item, source, formatFilter)) {
+                updatePoliciesOfDerivativeBitstream(context, bitstream, formatFilter, source);
+            }
+        }
+    }
+
+    /**
+     * find derivative bitstreams related to source bitstream
+     *
+     * @param item item containing bitstreams
+     * @param source source bitstream
+     * @param formatFilter formatFilter
+     * @return list of derivative bitstreams from source bitstream
+     * @throws SQLException If something goes wrong in the database
+     */
+    private List<Bitstream> findDerivativeBitstreams(Item item, Bitstream source, FormatFilter formatFilter)
+        throws SQLException {
+
+        String bitstreamName = formatFilter.getFilteredName(source.getName());
+        List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
+
+        return bundles.stream()
+                      .flatMap(bundle ->
+                          bundle.getBitstreams().stream())
+                      .filter(bitstream ->
+                          Strings.CS.equals(bitstream.getName().trim(), bitstreamName.trim()))
+                      .collect(Collectors.toList());
+    }
+
+    /**
+     * update resource polices of derivative bitstreams.
+     * by remove all resource policies and
+     * set derivative bitstreams to be publicly accessible or
+     * replace derivative bitstreams policies using
+     * the same in the source bitstream. If the bundle name
+     * is configured in the list of restricted-bundles it will
+     * have all policies cleared
+     *
+     * @param context the context
+     * @param bitstream derivative bitstream
+     * @param formatFilter formatFilter
+     * @param source the source bitstream
+     * @throws SQLException If something goes wrong in the database
+     * @throws AuthorizeException if authorization error
+     */
+    private void updatePoliciesOfDerivativeBitstream(Context context, Bitstream bitstream, FormatFilter formatFilter,
+                                                     Bitstream source) throws SQLException, AuthorizeException {
+
+        authorizeService.removeAllPolicies(context, bitstream);
+
+        // Return early after clearing policies if any bundle of this bitstream
+        // is in the list of admin-only bundles
+        var restrictedBundles = List.of(configurationService.getArrayProperty(
+                    "core.authorization.restricted-bundle",Constants.DEFAULT_RESTRICTED_BUNDLES));
+        for (Bundle bundle : bitstream.getBundles()) {
+            if (restrictedBundles.contains(bundle.getName())) {
+                return;
+            }
+        }
+
+        if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
+            Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
+            authorizeService.addPolicy(context, bitstream, Constants.READ, anonymous);
+        } else {
+            authorizeService.replaceAllPolicies(context, source, bitstream);
+        }
     }
 
     @Override
@@ -436,6 +528,37 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         } else {
             return false;
         }
+    }
+
+    /**
+     * Describe a Bitstream in detail.  Format a single line of text with
+     * information such as Bitstore index, backing file ID, size, checksum,
+     * enclosing Item and Bundles.
+     *
+     * @param itemHandle Handle of the Item by which we found the Bitstream.
+     * @param bitstream the Bitstream to be described.
+     * @return Bitstream details.
+     */
+    private String formatBitstreamDetails(String itemHandle,
+            Bitstream bitstream) {
+        List<Bundle> bundles;
+        try {
+            bundles = bitstream.getBundles();
+        } catch (SQLException ex) {
+            logError("Unexpected error fetching Bundles", ex);
+            bundles = Collections.EMPTY_LIST;
+        }
+        StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
+        sb.append("\tItem Handle: ").append(itemHandle);
+        for (Bundle bundle : bundles) {
+            sb.append("\tBundle Name: ").append(bundle.getName());
+        }
+        sb.append("\tFile Size: ").append(bitstream.getSizeBytes());
+        sb.append("\tChecksum: ").append(bitstream.getChecksum())
+                .append(" (").append(bitstream.getChecksumAlgorithm()).append(')');
+        sb.append("\tAsset Store: ").append(bitstream.getStoreNumber());
+        sb.append("\tInternal ID: ").append(bitstream.getInternalId());
+        return sb.toString();
     }
 
     private void logInfo(String message) {
@@ -498,5 +621,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void setLogHandler(DSpaceRunnableHandler handler) {
         this.handler = handler;
+    }
+
+    @Override
+    public void setFromDate(LocalDate fromDate) {
+        this.fromDate = fromDate;
     }
 }

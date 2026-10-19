@@ -16,10 +16,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang3.StringUtils;
+import jakarta.annotation.Nullable;
+import jakarta.annotation.PostConstruct;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkFactory;
@@ -151,12 +151,12 @@ public class ConverterService {
     private Annotation getAnnotationForRestObject(BaseObjectRest restObject) {
         BaseObjectRest baseObjectRest = restObject;
         DSpaceRestRepository repositoryToUse = utils
-            .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
+            .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getTypePlural());
         Annotation preAuthorize = null;
         int maxDepth = 0;
         // DS-4530 exclude the AOP Proxy from determining the annotations
         for (Method m : AopUtils.getTargetClass(repositoryToUse).getMethods()) {
-            if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
+            if (Strings.CI.equals(m.getName(), "findOne")) {
                 int depth = howManySuperclass(m.getDeclaringClass());
                 if (depth > maxDepth) {
                     preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
@@ -179,7 +179,7 @@ public class ConverterService {
 
     private Annotation getDefaultFindOnePreAuthorize() {
         for (Method m : DSpaceRestRepository.class.getMethods()) {
-            if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
+            if (Strings.CI.equals(m.getName(), "findOne")) {
                 Annotation annotation = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
                 if (annotation != null) {
                     return annotation;

@@ -71,7 +71,7 @@ public abstract class XmlElement {
     }
 
     /**
-     * Create a new insatnce. Set the prefix, local name and the namespace URI.
+     * Create a new instance. Set the prefix, local name and the namespace URI.
      *
      * @param prefix       The prefix.
      * @param localName    The element's local name.

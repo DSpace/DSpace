@@ -16,7 +16,7 @@
     <bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>
 
     <alias name="OrcidSource" alias="AuthoritySource"/>
-    <bean name="OrcidSource" class="org.dspace.authority.orcid.MockOrcid" />
+    <bean name="OrcidSource" class="org.dspace.authority.orcid.MockOrcid" init-method="init" />
  
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">

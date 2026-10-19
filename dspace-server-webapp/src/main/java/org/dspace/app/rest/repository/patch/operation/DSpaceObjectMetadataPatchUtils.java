@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
@@ -31,7 +32,8 @@ import org.springframework.stereotype.Component;
 @Component
 public final class DSpaceObjectMetadataPatchUtils {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper mapper;
 
     @Autowired
     private MetadataFieldService metadataFieldService;
@@ -56,9 +58,9 @@ public final class DSpaceObjectMetadataPatchUtils {
                 if (operation.getValue() instanceof JsonValueEvaluator) {
                     JsonNode valueNode = ((JsonValueEvaluator) operation.getValue()).getValueNode();
                     if (valueNode.isArray()) {
-                        metadataValue = objectMapper.treeToValue(valueNode.get(0), MetadataValueRest.class);
+                        metadataValue = mapper.treeToValue(valueNode.get(0), MetadataValueRest.class);
                     } else {
-                        metadataValue = objectMapper.treeToValue(valueNode, MetadataValueRest.class);
+                        metadataValue = mapper.treeToValue(valueNode, MetadataValueRest.class);
                     }
                 }
                 if (operation.getValue() instanceof String) {
@@ -135,10 +137,20 @@ public final class DSpaceObjectMetadataPatchUtils {
      * @param context       Context the retrieve metadataField from service with string
      * @param operation     Operation of the patch
      * @return              The metadataField corresponding to the md element string of the operation
+     *                      Null if no metadata field is passed in the operation
+     * @throws UnprocessableEntityException if an invalid metadata field is passed in the operation
      */
-    protected MetadataField getMetadataField(Context context, Operation operation) throws SQLException {
+    protected MetadataField getMetadataField(Context context, Operation operation)
+        throws SQLException, UnprocessableEntityException {
         String mdElement = this.extractMdFieldStringFromOperation(operation);
-        return metadataFieldService.findByString(context, mdElement, '.');
+        if (StringUtils.isBlank(mdElement)) {
+            return null;
+        }
+        MetadataField metadataField = metadataFieldService.findByString(context, mdElement, '.');
+        if (metadataField == null) {
+            throw new UnprocessableEntityException("Metadata field does not exist");
+        }
+        return metadataField;
     }
 
     /**

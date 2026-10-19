@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<rioxx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.rioxx.net/schema/v3.0/rioxx/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rioxxterms="http://docs.rioxx.net/schema/v3.0/rioxxterms/">
+    <dc:description>Data on Secchi disc depth (the depth at which a standard white disc lowered into the water just becomes invisible to a surface observer) show that water clarity in the North Sea declined during the 20th century, with likely consequences for marine primary production. However, the causes of this trend remain unknown. Here we analyse the hypothesis that changes in the North Sea's wave climate were largely responsible by causing an increase in the concentrations of suspended particulate matter (SPM) in the water column through the resuspension of seabed sediments. First, we analysed the broad-scale statistical relationships between SPM and bed shear stress due to waves and tides. We used hindcasts of wave and current data to construct a space–time dataset of bed shear stress between 1997 and 2017 across the northwest European Continental Shelf and compared the results with satellite-derived SPM concentrations. Bed shear stress was found to drive most of the inter-annual variation in SPM in the hydrographically mixed waters of the central and southern North Sea. We then used a long-term wave reanalysis to construct a time series of bed shear stress from 1900 to 2010. This shows that bed shear stress increased significantly across much of the shelf during this period, with increases of over 20 % in the southeastern North Sea. An increase in bed shear stress of this magnitude would have resulted in a large reduction in water clarity. Wave-driven processes are rarely included in projections of climate change impacts on marine ecosystems, but our analysis indicates that this should be reconsidered for shelf sea regions.</dc:description>
+
+    <dc:language>en</dc:language>
+
+    <rioxxterms:publisher>
+        <rioxxterms:name>European Geosciences Union</rioxxterms:name>
+        <rioxxterms:id>https://isni.org/isni/0000000110927289</rioxxterms:id>
+    </rioxxterms:publisher>
+
+    <dc:source>1812-0792</dc:source>
+
+    <dc:title>Increasing turbidity in the North Sea during the 20th century due to changing wave climate</dc:title>
+
+    <dcterms:dateAccepted>2019-10-02</dcterms:dateAccepted>
+
+    <rioxxterms:creator
+            first-named-author="true">
+        <rioxxterms:name>Wilson, Robert J.</rioxxterms:name>
+        <rioxxterms:id>https://orcid.org/0000-0002-0592-366X</rioxxterms:id>
+    </rioxxterms:creator>
+
+    <rioxxterms:creator>
+        <rioxxterms:name>Heath, Michael R.</rioxxterms:name>
+        <rioxxterms:id>https://orcid.org/0000-0001-6602-3107</rioxxterms:id>
+        <rioxxterms:id> https://viaf.org/viaf/15147423189944882613</rioxxterms:id>
+    </rioxxterms:creator>
+
+    <rioxxterms:publication_date>2019-12-09</rioxxterms:publication_date>
+
+    <rioxxterms:record_public_release_date>2019-10-15</rioxxterms:record_public_release_date>
+
+    <dc:type>https://purl.org/coar/resource_type/c_2df8fbb1</dc:type>
+
+    <rioxxterms:grant
+            funder_name="Australian Research Council"
+            funder_id="https://ror.org/05mmh0f86">
+        DP190101507
+    </rioxxterms:grant>
+
+    <rioxxterms:grant
+            funder_name="John Templeton Foundation"
+            funder_id="https://ror.org/035tnyy05">
+        61387
+    </rioxxterms:grant>
+
+    <dc:identifier>https://strathprints.strath.ac.uk/70117/</dc:identifier>
+
+    <dc:relation
+            rel="item"
+            type="application/pdf"
+            coar_type="https://purl.org/coar/resource_type/c_6501"
+            coar_version="https://purl.org/coar/version/c_ab4af688f83e57aa"
+            deposit_date="2019-12-11"
+            resource_exposed_date="2019-12-11"
+            access_rights_="https://purl.org/coar/access_right/c_abf2"
+            license_ref="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+        https://strathprints.strath.ac.uk/70117/7/Wilson_Heath_OS2019_Increasing_turbidity_in_the_North_Sea_during_the_20th_century.pdf
+    </dc:relation>
+
+    <!-- Other expressions (or 'instances') - publisher version -->
+    <rioxxterms:ext_relation
+            rel="cite-as"
+            coar_type="https://purl.org/coar/resource_type/c_6501"
+            coar_version="https://purl.org/coar/version/c_970fb48d4fbd8a85">
+        https://doi.org/10.1007/s11229-020-02724-x
+    </rioxxterms:ext_relation>
+
+    <!-- related  dataset -->
+    <rioxxterms:ext_relation
+            rel="cite-as"
+            coar_type="https://purl.org/coar/resource_type/c_ddb1">
+        https://doi.org/10.15129/5d28213e-8f9f-402a-b550-fc588518cb8b
+    </rioxxterms:ext_relation >
+
+    <!-- related software -->
+    <rioxxterms:ext_relation
+            rel="cite-as"
+            coar_type="https://purl.org/coar/resource_type/QH80-2R4E">
+        https://doi.org/10.5281/zenodo.3478185
+    </rioxxterms:ext_relation>
+</rioxx>

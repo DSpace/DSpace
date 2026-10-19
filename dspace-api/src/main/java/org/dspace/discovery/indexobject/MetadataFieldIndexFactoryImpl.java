@@ -64,6 +64,7 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
         // add read permission on doc for anonymous group
         doc.addField("read", "g" + anonymousGroup.getID());
+        doc.addField(FIELD_NAME_VARIATIONS + "_sort", fieldName);
         return doc;
     }
 

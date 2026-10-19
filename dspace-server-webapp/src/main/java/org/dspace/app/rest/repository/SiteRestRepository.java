@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(SiteRest.CATEGORY + "." + SiteRest.NAME)
+@Component(SiteRest.CATEGORY + "." + SiteRest.PLURAL_NAME)
 public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRest> {
 
     private final SiteService sitesv;

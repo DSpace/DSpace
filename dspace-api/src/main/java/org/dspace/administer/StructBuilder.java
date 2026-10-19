@@ -16,7 +16,6 @@ import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTIO
 import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
@@ -43,9 +41,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchemaEnum;
@@ -53,7 +53,9 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -126,25 +128,37 @@ public class StructBuilder {
     private StructBuilder() { }
 
     /**
-     * Main method to be run from the command line to import a structure into
-     * DSpacee or export existing structure to a file.The command is of the form:
+     * Main method to be run from the command line to import a community/collection structure into
+     * DSpace or export the existing structure to an XML file.
      *
-     * <p>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}
+     * <p>This method provides two primary operations:</p>
+     * <ul>
+     *   <li><b>Import:</b> Creates communities and collections from an XML structure file</li>
+     *   <li><b>Export:</b> Exports the current DSpace community/collection hierarchy to XML</li>
+     * </ul>
      *
-     * <p>to import, or
+     * <p><b>Import Usage:</b></p>
+     * <pre>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}</pre>
      *
-     * <p>{@code StructBuilder -x -e [administrator email] -o [output file]}</p>
+     * <p><b>Export Usage:</b></p>
+     * <pre>{@code StructBuilder -x -e [administrator email] -o [output file]}</pre>
      *
-     * <p>to export.  The output will contain exactly the same as the source XML
-     * document, but with the Handle for each imported item added as an attribute.
+     * <p>The output will contain the same structure as the source XML document, but with the Handle
+     * for each imported community and collection added as an attribute for reference.</p>
      *
+     * <p><b>Additional Options:</b></p>
+     * <ul>
+     *   <li>{@code -k, --keep-handles}: Apply Handles from the input document during import</li>
+     *   <li>{@code -p, --parent}: Specify a parent community ID or Handle (optional)</li>
+     *   <li>{@code -h, --help}: Display help information</li>
+     * </ul>
      *
-     * @param argv command line arguments.
-     * @throws ParserConfigurationException passed through.
-     * @throws SQLException passed through.
-     * @throws FileNotFoundException if input or output could not be opened.
-     * @throws TransformerException if the input document is invalid.
-     * @throws XPathExpressionException passed through.
+     * @param argv command line arguments containing options for import/export operations
+     * @throws ParserConfigurationException if a DocumentBuilder cannot be created with the requested configuration
+     * @throws SQLException if a database access error occurs during community/collection operations
+     * @throws IOException if the input file cannot be read or output file cannot be written
+     * @throws TransformerException if the input XML document is invalid or cannot be processed
+     * @throws XPathExpressionException if an XPath expression cannot be evaluated
      */
     public static void main(String[] argv)
         throws ParserConfigurationException, SQLException,
@@ -168,6 +182,10 @@ public class StructBuilder {
         options.addOption(Option.builder("o").longOpt("output")
                 .desc("File to receive the structure map ('-' for standard out).")
                 .hasArg().argName("output").required().build());
+
+        options.addOption(Option.builder("p").longOpt("parent")
+                .desc("Parent community or handle (optional)")
+                .hasArg().argName("parent").required(false).build());
 
         // Parse the command line.
         CommandLineParser parser = new DefaultParser();
@@ -202,6 +220,11 @@ public class StructBuilder {
             outputStream = new FileOutputStream(output);
         }
 
+        String parentID = null;
+        if (line.hasOption('p')) {
+            parentID = line.getOptionValue('p');
+        }
+
         // create a context
         Context context = new Context();
 
@@ -212,6 +235,30 @@ public class StructBuilder {
         } catch (SQLException ex) {
             System.err.format("That user could not be found:  %s%n", ex.getMessage());
             System.exit(1);
+        }
+
+        // Resolve optional "parent community" ID or handle to a community
+        Community parent = null;
+        if (parentID != null) {
+            DSpaceObject dso = handleService.resolveToObject(context, parentID);
+            if (dso != null) {
+                if (dso.getType() == Constants.COMMUNITY) {
+                    parent = (Community) dso;
+                } else {
+                    System.out.println("The handle provided for the -p option does not resolve to a community. " +
+                        parentID + " is an object of type: " + Constants.typeText[dso.getType()]);
+                    System.exit(0);
+                }
+            } else {
+                // Not a handle, see if it is an ID
+                Community community = communityService.findByIdOrLegacyId(context, parentID);
+                if (community != null) {
+                    parent = community;
+                } else {
+                    System.out.println("The value provided for -p is not a valid community ID or handle: " + parentID);
+                    System.exit(0);
+                }
+            }
         }
 
         // Export? Import?
@@ -233,7 +280,7 @@ public class StructBuilder {
             }
 
             boolean keepHandles = options.hasOption("k");
-            importStructure(context, inputStream, outputStream, keepHandles);
+            importStructure(context, inputStream, outputStream, parent, keepHandles);
 
             inputStream.close();
             outputStream.close();
@@ -250,6 +297,7 @@ public class StructBuilder {
      * @param context
      * @param input XML which describes the new communities and collections.
      * @param output input, annotated with the new objects' identifiers.
+     * @param parent Community beneath which to attach this structure
      * @param keepHandles true if Handles should be set from input.
      * @throws IOException
      * @throws ParserConfigurationException
@@ -258,7 +306,7 @@ public class StructBuilder {
      * @throws SQLException
      */
     static void importStructure(Context context, InputStream input,
-            OutputStream output, boolean keepHandles)
+            OutputStream output, Community parent, boolean keepHandles)
             throws IOException, ParserConfigurationException, SQLException,
             TransformerException, XPathExpressionException {
 
@@ -311,6 +359,7 @@ public class StructBuilder {
         communityMap.put("sidebar", MD_SIDEBAR_TEXT);
 
         collectionMap.put("name", MD_NAME);
+        collectionMap.put("shared-workspace", CrisConstants.MD_SHARED_WORKSPACE);
         collectionMap.put("description", MD_SHORT_DESCRIPTION);
         collectionMap.put("intro", MD_INTRODUCTORY_TEXT);
         collectionMap.put("copyright", MD_COPYRIGHT_TEXT);
@@ -325,7 +374,7 @@ public class StructBuilder {
                                              .evaluate(document, XPathConstants.NODESET);
 
             // run the import starting with the top level communities
-            elements = handleCommunities(context, first, null, keepHandles);
+            elements = handleCommunities(context, first, parent, keepHandles);
         } catch (TransformerException ex) {
             System.err.format("Input content not understood:  %s%n", ex.getMessage());
             System.exit(1);
@@ -613,8 +662,8 @@ public class StructBuilder {
      */
     private static org.w3c.dom.Document loadXML(InputStream input)
         throws IOException, ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
+        // This builder factory does not disable external DTD, entities, etc.
+        DocumentBuilder builder = XMLUtils.getTrustedDocumentBuilder();
 
         org.w3c.dom.Document document = builder.parse(input);
 
@@ -802,7 +851,7 @@ public class StructBuilder {
 
             // default the short description to the empty string
             collectionService.setMetadataSingleValue(context, collection,
-                    MD_SHORT_DESCRIPTION, Item.ANY, " ");
+                    MD_SHORT_DESCRIPTION, null, " ");
 
             // import the rest of the metadata
             for (Map.Entry<String, MetadataFieldName> entry : collectionMap.entrySet()) {

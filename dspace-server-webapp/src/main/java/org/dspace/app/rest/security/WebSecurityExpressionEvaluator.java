@@ -8,10 +8,10 @@
 package org.dspace.app.rest.security;
 
 import java.util.List;
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;

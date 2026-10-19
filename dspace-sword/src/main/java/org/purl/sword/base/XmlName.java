@@ -9,7 +9,7 @@ package org.purl.sword.base;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
@@ -126,8 +126,8 @@ public class XmlName {
 
         if (other instanceof XmlName) {
             XmlName otherName = (XmlName) other;
-            return StringUtils.equals(this.namespace, otherName.namespace) &&
-                StringUtils.equals(this.localName, otherName.localName);
+            return Strings.CS.equals(this.namespace, otherName.namespace) &&
+                Strings.CS.equals(this.localName, otherName.localName);
         }
 
         return false;

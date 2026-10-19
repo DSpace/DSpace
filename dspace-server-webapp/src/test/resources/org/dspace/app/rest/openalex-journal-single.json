@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "count": 1,
+    "db_response_time_ms": 49,
+    "page": 1,
+    "per_page": 2,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/S41354064",
+      "issn_l": "0931-7597",
+      "issn": [
+        "0931-7597",
+        "1522-2667",
+        "1431-5890"
+      ],
+      "display_name": "ChemInform",
+      "host_organization": "https://openalex.org/P4310320595",
+      "host_organization_name": "Wiley",
+      "host_organization_lineage": [
+        "https://openalex.org/P4310320595"
+      ],
+      "ids": {
+        "openalex": "https://openalex.org/S41354064",
+        "issn_l": "0931-7597",
+        "issn": [
+          "0931-7597",
+          "1522-2667",
+          "1431-5890"
+        ],
+        "mag": "41354064",
+        "wikidata": "https://www.wikidata.org/entity/Q29043776"
+      },
+      "homepage_url": "http://www.cheminform.com/journal",
+      "country_code": "DE",
+      "alternate_titles": [
+        "ChemInform (Weinheim. CD-ROM)",
+        "Chemischer Informationsdienst (Internet)",
+        "Chem Inform (Print)",
+        "Chemischer Informationsdienst (CD-ROM)",
+        "ChemInform (Weinheim. Print)",
+        "ChemInform (Weinheim. Internet)",
+        "Chemischer Informationsdienst"
+      ],
+      "abbreviated_title": "CI",
+      "type": "journal"
+    }
+  ],
+  "group_by": []
+}

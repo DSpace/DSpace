@@ -1,4 +1,4 @@
-# example spider filder by domain regular expressions courtesy of OSU Libraries
+# example spider filter by domain regular expressions courtesy of OSU Libraries
 # https://raw.github.com/osulibraries/DSpace/osukb/dspace/config/Spiders-DomainName.txt
 (.*)\.fastsearch\.net\.
 (.*)\.scoutjet\.com\.

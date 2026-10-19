@@ -7,11 +7,13 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
@@ -44,14 +46,8 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/api/" + CommunityRest.CATEGORY + "/" + CommunityRest.PLURAL_NAME
-    + CommunityLogoController.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/logo")
+    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/" + CommunityRest.LOGO)
 public class CommunityLogoController {
-
-    /**
-     * Regular expression in the request mapping to accept UUID as identifier
-     */
-    protected static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
-        "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
 
     @Autowired
     protected Utils utils;

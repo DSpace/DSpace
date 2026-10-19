@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<metadata
+        xmlns="http://www.lyncode.com/xoai"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.lyncode.com/xoai http://www.lyncode.com/xsd/xoai.xsd">
+    <element name="dspace">
+        <element name="entity">
+            <element name="type">
+                <element name="none">
+                    <field name="value">Publication</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="dcterms">
+        <element name="dateAccepted">
+            <element name="none">
+                <field name="value">2023-11-07</field>
+            </element>
+        </element>
+    </element>
+    <element name="dc">
+        <element name="contributor">
+            <element name="author">
+                <element name="none">
+                    <field name="value">Tsigaridis, Konstantinos G.</field>
+                    <field name="authority">virtual::44</field>
+                    <field name="confidence">-1</field>
+                    <field name="value">Wang, Rui</field>
+                    <field name="authority">virtual::46</field>
+                    <field name="confidence">-1</field>
+                    <field name="value">Ellefson, Michelle R.</field>
+                    <field name="authority">virtual::47</field>
+                    <field name="confidence">-1</field>
+                </element>
+            </element>
+        </element>
+        <element name="date">
+            <element name="accessioned">
+                <element name="none">
+                    <field name="value">2023-11-07T11:34:10Z</field>
+                </element>
+            </element>
+            <element name="available">
+                <element name="none">
+                    <field name="value">2023-11-07T11:34:10Z</field>
+                </element>
+            </element>
+            <element name="issued">
+                <element name="none">
+                    <field name="value">2022-11-30</field>
+                </element>
+            </element>
+        </element>
+        <element name="identifier">
+            <element name="uri">
+                <element name="none">
+                    <field name="value">https://example.org/handle/1811/160</field>
+                </element>
+            </element>
+        </element>
+        <element name="language">
+            <element name="iso">
+                <element name="none">
+                    <field name="value">eng</field>
+                </element>
+            </element>
+        </element>
+        <element name="title">
+            <element name="none">
+                <field name="value">The Intercorrelation Between Executive Function, Physics Problem Solving, Mathematical, and Matrix Reasoning Skills: Reflections from a Small-Scale Experiment</field>
+            </element>
+        </element>
+        <element name="type">
+            <element name="none">
+                <field name="value">Article</field>
+            </element>
+        </element>
+    </element>
+    <element name="relation">
+        <element name="isAuthorOfPublication">
+            <element name="none">
+                <field name="value">a57363fa-f82e-4684-bd76-f7bc1e893603</field>
+                <field name="authority">virtual::44</field>
+                <field name="confidence">-1</field>
+                <field name="value">e00b3d0d-65e2-4c30-825d-1a4839845790</field>
+                <field name="authority">virtual::46</field>
+                <field name="confidence">-1</field>
+                <field name="value">bdd38a03-206d-4f9b-bafb-70e060ad176f</field>
+                <field name="authority">virtual::47</field>
+                <field name="confidence">-1</field>
+            </element>
+            <element name="latestForDiscovery">
+                <element name="none">
+                    <field name="value">a57363fa-f82e-4684-bd76-f7bc1e893603</field>
+                    <field name="authority">virtual::44</field>
+                    <field name="confidence">-1</field>
+                    <field name="value">e00b3d0d-65e2-4c30-825d-1a4839845790</field>
+                    <field name="authority">virtual::46</field>
+                    <field name="confidence">-1</field>
+                    <field name="value">bdd38a03-206d-4f9b-bafb-70e060ad176f</field>
+                    <field name="authority">virtual::47</field>
+                    <field name="confidence">-1</field>
+                </element>
+            </element>
+        </element>
+        <element name="isJournalOfPublication">
+            <element name="none">
+                <field name="value">05a400b1-ff0b-4e40-80cd-a7d1b712ace2</field>
+                <field name="authority">virtual::71</field>
+                <field name="confidence">-1</field>
+            </element>
+        </element>
+        <element name="isJournalIssueOfPublication">
+            <element name="none">
+                <field name="value">7524a0cf-3ea2-40c7-a265-d583425ed4d7</field>
+                <field name="authority">virtual::71</field>
+                <field name="confidence">-1</field>
+            </element>
+            <element name="latestForDiscovery">
+                <element name="none">
+                    <field name="value">7524a0cf-3ea2-40c7-a265-d583425ed4d7</field>
+                    <field name="authority">virtual::71</field>
+                    <field name="confidence">-1</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="person">
+        <element name="identifier">
+            <element name="orcid">
+                <element name="none">
+                    <field name="value">0000-0003-0407-9767</field>
+                    <field name="authority">virtual::47</field>
+                    <field name="confidence">-1</field>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="creativeworkseries">
+        <element name="issn">
+            <element name="none">
+                <field name="value">2634-9876</field>
+                <field name="authority">virtual::71</field>
+                <field name="confidence">-1</field>
+            </element>
+        </element>
+    </element>
+    <element name="bundles">
+        <element name="bundle">
+            <field name="name">ORIGINAL</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">Tsigaridis et al., 2022.pdf</field>
+                    <field name="format">application/pdf</field>
+                    <field name="size">1554917</field>
+                    <field name="url">https://example.org/bitstreams/9121e795-0af3-4ff3-be2a-4b28418fb269/download</field>
+                    <field name="checksum">42d8cd076931e43e02d0af70a36d704e</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">1</field>
+                    <field name="primary">true</field>
+                    <element name="resourcePolicies">
+                        <element name="resourcePolicy">
+                            <field name="group">Anonymous</field>
+                            <field name="user">Anonymous</field>
+                            <field name="action">READ</field>
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+        <element name="bundle">
+            <field name="name">THUMBNAIL</field>
+            <element name="bitstreams">
+                <element name="bitstream">
+                    <field name="name">cerj_volume_9_thumbnail.jpg</field>
+                    <field name="format">image/jpeg</field>
+                    <field name="size">14513</field>
+                    <field name="url">https://example.org/bitstreams/16245937-10bb-46db-9817-683a5ebd8d63/download</field>
+                    <field name="checksum">8c39d691daa8e5f9d668668db7910cd6</field>
+                    <field name="checksumAlgorithm">MD5</field>
+                    <field name="sid">2</field>
+                    <field name="primary">false</field>
+                    <element name="resourcePolicies">
+                        <element name="resourcePolicy">
+                            <field name="group">Anonymous</field>
+                            <field name="user">Anonymous</field>
+                            <field name="action">READ</field>
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element name="others">
+        <field name="handle">1811/160</field>
+        <field name="identifier">oai:example.org:1811/160</field>
+        <field name="lastModifyDate">2023-12-13 13:07:56.51</field>
+        <element name="access-status">
+            <field name="value">open.access</field>
+        </element>
+    </element>
+    <element name="repository">
+        <field name="url">https://example.org</field>
+        <field name="name">Diamond DSpace (dev)</field>
+        <field name="mail">support@example.org</field>
+    </element>
+    <element name="license"/>
+</metadata>

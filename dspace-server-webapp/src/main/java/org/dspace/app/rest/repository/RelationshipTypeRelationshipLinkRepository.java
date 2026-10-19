@@ -8,9 +8,9 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.model.RelationshipTypeRest;
 import org.dspace.app.rest.projection.Projection;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "relationshipType" subresource of an individual Relationship.
  */
-@Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME + "." + RelationshipRest.RELATIONSHIP_TYPE)
+@Component(RelationshipRest.CATEGORY + "." + RelationshipRest.PLURAL_NAME + "." + RelationshipRest.RELATIONSHIP_TYPE)
 public class RelationshipTypeRelationshipLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

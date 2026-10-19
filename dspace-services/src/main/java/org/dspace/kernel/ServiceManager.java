@@ -77,6 +77,18 @@ public interface ServiceManager {
     public List<String> getServicesNames();
 
     /**
+     * Allows developers to get the desired service singleton by the provided type. <br>
+     * This should return all instantiated objects of the type specified with their names
+     * (may not all be singletons).
+     *
+     * @param <T>  Class type
+     * @param type the type for the requested service (this will typically be the interface class but can be concrete
+     *            as well)
+     * @return map with service's name and service singletons
+     */
+    public <T> Map<String, T> getServicesWithNamesByType(Class<T> type);
+
+    /**
      * Allows adding singleton services and providers in at runtime or
      * after the service manager has started up.
      * This is primarily useful for registering providers, filters, and

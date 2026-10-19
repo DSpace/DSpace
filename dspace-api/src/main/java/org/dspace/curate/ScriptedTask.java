@@ -16,7 +16,7 @@ import org.dspace.core.Context;
  * ScriptedTask describes a rather generic ability to perform an operation
  * upon a DSpace object. It's semantics are identical to the CurationTask interface,
  * but is designed to be implemented in scripting languages, rather than
- * Java. For this reason, the 'perform' methods are renamed to accomodate
+ * Java. For this reason, the 'perform' methods are renamed to accommodate
  * languages (like Ruby) that lack method overloading.
  *
  * @author richardrodgers
@@ -27,20 +27,22 @@ public interface ScriptedTask {
      * Since the curator can provide services to the task, this represents
      * curation DI.
      *
+     * @param ctx DSpace context object
      * @param curator the Curator controlling this task
      * @param taskId  identifier task should use in invoking services
      * @throws IOException if IO error
      */
-    public void init(Curator curator, String taskId) throws IOException;
+    public void init(Context ctx, Curator curator, String taskId) throws IOException;
 
     /**
      * Perform the curation task upon passed DSO
      *
+     * @param ctx DSpace context object
      * @param dso the DSpace object
      * @return status code
      * @throws IOException if IO error
      */
-    public int performDso(DSpaceObject dso) throws IOException;
+    public int performDso(Context ctx, DSpaceObject dso) throws IOException;
 
     /**
      * Perform the curation task for passed id

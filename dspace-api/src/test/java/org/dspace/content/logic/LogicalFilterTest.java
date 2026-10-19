@@ -57,8 +57,10 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.junit.After;
 import org.junit.Before;
@@ -81,6 +83,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    private EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     // Logger
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LogicalFilterTest.class);
@@ -603,6 +606,10 @@ public class LogicalFilterTest extends AbstractUnitTest {
                 groupService.setName(g, "Test Group");
                 groupService.update(context, g);
                 authorizeService.addPolicy(context, itemOne, Constants.READ, g);
+                EPerson e = epersonService.create(context);
+                epersonService.update(context, e);
+                authorizeService.removeAllPolicies(context, itemThree);
+                authorizeService.addPolicy(context, itemThree, Constants.READ, e);
                 context.restoreAuthSystemState();
             } catch (AuthorizeException | SQLException e) {
                 fail("Exception thrown adding group READ policy to item: " + itemOne + ": " + e.getMessage());
@@ -620,6 +627,9 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Test the filter on itemTwo - this item has no policies: expect false
             assertFalse("itemTwo unexpectedly matched the 'is readable by Test Group' test",
                 filter.getResult(context, itemTwo));
+            // Test the filter on itemThree - this item has only a person related policy: expect false
+            assertFalse("itemThree unexpectedly matched the 'is readable by Test Group' test",
+                filter.getResult(context, itemThree));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the ReadableByGroup filter" + e.getMessage());

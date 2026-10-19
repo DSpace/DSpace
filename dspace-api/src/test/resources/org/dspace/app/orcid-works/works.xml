@@ -77,6 +77,7 @@
             </common:source>
             <work:title>
                 <common:title>Another cautionary tale.</common:title>
+                <common:title>Second title</common:title>
             </work:title>
             <work:type>journal-article</work:type>
             <common:publication-date>

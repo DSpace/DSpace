@@ -48,7 +48,7 @@ public class IIIFController {
      * @param id DSpace Item uuid
      * @return manifest as JSON
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest")
+    @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest", produces = "application/json")
     public String findOne(@PathVariable UUID id) {
         Context context = ContextUtil.obtainCurrentRequestContext();
         return iiifFacade.getManifest(context, id);

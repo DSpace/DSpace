@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!--
+    DSpace 'audit' core.
+
+    For more details about configurations options that may appear in
+    this file, see http://wiki.apache.org/solr/SolrConfigXml. 
+-->
+<config>
+  <luceneMatchVersion>8.8.1</luceneMatchVersion>
+
+  <dataDir>${solr.data.dir:}</dataDir>
+
+  <directoryFactory name="DirectoryFactory" 
+                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/> 
+
+  <codecFactory class="solr.SchemaCodecFactory"/>
+
+  <schemaFactory class="ClassicIndexSchemaFactory"/>
+
+  <indexConfig>
+    <ramBufferSizeMB>32</ramBufferSizeMB>
+    <maxBufferedDocs>1000</maxBufferedDocs>
+    <lockType>${solr.lock.type:native}</lockType>
+    <!-- Set to true to "write detailed debug information from the
+             indexing process as Solr log messages" -->
+    <infoStream>false</infoStream>
+  </indexConfig>
+
+  <updateHandler class="solr.DirectUpdateHandler2">
+
+    <updateLog>
+      <str name="dir">${solr.ulog.dir:}</str>
+    </updateLog>
+ 
+     <autoCommit> 
+       <maxDocs>10000</maxDocs> <!--Commit every 10.000 documents-->
+       <maxTime>${solr.autoCommit.maxTime:10000}</maxTime> <!--Default commit every 10 seconds-->
+       <openSearcher>true</openSearcher> 
+     </autoCommit>
+
+     <autoSoftCommit> 
+       <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime> 
+     </autoSoftCommit>
+
+  </updateHandler>
+
+  <query>
+    <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
+
+    <!-- Cache used by SolrIndexSearcher for filters (DocSets) for
+         unordered sets of *all* documents that match a query. Caches results of 'fq' search param. -->
+    <filterCache class="solr.search.CaffeineCache"
+                 size="512"
+                 initialSize="512"
+                 autowarmCount="0"/>
+
+    <!-- Caches results of previous searches - ordered lists of document ids
+        (DocList) based on a query, a sort, and the range of documents requested. -->
+    <queryResultCache class="solr.search.CaffeineCache"
+                      size="512"
+                      initialSize="512"
+                      autowarmCount="0"/>
+
+    <!-- Caches Lucene Document objects (the stored fields for each
+       document).  Since Lucene internal document ids are transient,
+       this cache will not be autowarmed. -->
+    <documentCache class="solr.search.CaffeineCache"
+                   size="512"
+                   initialSize="512"
+                   autowarmCount="0"/>
+    
+    <enableLazyFieldLoading>true</enableLazyFieldLoading>
+
+    <queryResultWindowSize>20</queryResultWindowSize>
+
+    <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
+
+    <useColdSearcher>false</useColdSearcher>
+
+    <maxWarmingSearchers>2</maxWarmingSearchers>
+
+  </query>
+  
+  <requestDispatcher handleSelect="false" >
+    <requestParsers enableRemoteStreaming="true" 
+                    multipartUploadLimitInKB="2048000"
+                    formdataUploadLimitInKB="2048"
+                    addHttpRequestToContext="false"/>
+
+    <httpCaching never304="true" />
+  </requestDispatcher>
+
+    <!-- Process requests to /select path -->
+    <requestHandler name="/select" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <int name="rows">10</int>
+            <str name="df">search_text</str>
+            <str name="q.op">AND</str>
+        </lst>
+        <arr name="last-components">
+            <str>spellcheck</str>
+        </arr>
+    </requestHandler>
+
+    <!-- Processes updates to the index -->
+    <requestHandler name="/update" class="solr.UpdateRequestHandler">
+        <lst name="defaults">
+            <str name="update.chain">uuid</str>
+        </lst>
+    </requestHandler>
+
+    <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
+        <lst name="defaults">
+            <str name="stream.contentType">application/json</str>
+            <str name="update.chain">uuid</str>
+        </lst>
+    </requestHandler>
+
+    <requestHandler name="/spell" class="solr.SearchHandler" lazy="true">
+        <lst name="defaults">
+            <str name="spellcheck.onlyMorePopular">false</str>
+            <str name="spellcheck.extendedResults">false</str>
+            <str name="spellcheck.count">1</str>
+        </lst>
+        <arr name="last-components">
+            <str>spellcheck</str>
+        </arr>
+    </requestHandler>
+
+
+  <searchComponent name="tvComponent" class="solr.TermVectorComponent"/>
+
+  <searchComponent name="terms" class="solr.TermsComponent"/>
+
+  <!-- IndexBasedSpellChecker uses Solr index as basis for a parallel index used for spell checking -->
+  <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
+      <str name="queryAnalyzerFieldType">textSpell</str>
+
+      <lst name="spellchecker">
+          <str name="classname">solr.IndexBasedSpellChecker</str>
+          <str name="name">default</str>
+          <str name="field">a_spell</str>
+          <str name="spellcheckIndexDir">./spellchecker</str>
+          <str name="buildOnOptimize">true</str>
+          <str name="spellcheck.onlyMorePopular">false</str>
+      </lst>
+  </searchComponent>
+
+  <!-- Required for DSpace to ensure that unique identifiers are added to each solr document -->
+  <updateRequestProcessorChain name="uuid">    
+    <processor class="solr.UUIDUpdateProcessorFactory">
+      <str name="fieldName">uid</str>
+    </processor>    
+    <processor class="solr.RunUpdateProcessorFactory" />
+  </updateRequestProcessorChain>
+
+</config>

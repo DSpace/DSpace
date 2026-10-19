@@ -11,8 +11,8 @@ import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.NAME)
+@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.PLURAL_NAME)
 @ConditionalOnProperty(value = "researcher-profile.entity-type")
 public class ResearcherProfileRestRepository extends DSpaceRestRepository<ResearcherProfileRest, UUID> {
 

@@ -20,12 +20,14 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  */
 public class VocabularyEntryRest implements RestModel {
     public static final String NAME = "vocabularyEntry";
+    public static final String PLURAL_NAME = "vocabularyEntries";
 
     @JsonInclude(Include.NON_NULL)
     private String authority;
     private String display;
     private String value;
     private Map<String, String> otherInformation;
+    private String source;
 
     /**
      * The Vocabulary Entry Details resource if available related to this entry
@@ -73,8 +75,21 @@ public class VocabularyEntryRest implements RestModel {
         return vocabularyEntryDetailsRest;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     @Override
     public String getType() {
         return VocabularyEntryRest.NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }

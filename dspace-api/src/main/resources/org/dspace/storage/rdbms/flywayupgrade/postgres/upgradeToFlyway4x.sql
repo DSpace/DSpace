@@ -15,7 +15,7 @@
 --
 -----------------
 -- This is the PostgreSQL upgrade script from Flyway v4.2.0, copied/borrowed from:
--- https://github.com/flyway/flyway/blob/flyway-4.2.0/flyway-core/src/main/resources/org/flywaydb/core/internal/dbsupport/oracle/upgradeMetaDataTable.sql
+-- https://github.com/flyway/flyway/blob/flyway-4.2.0/flyway-core/src/main/resources/org/flywaydb/core/internal/dbsupport/postgresql/upgradeMetaDataTable.sql
 --
 -- The variables in this script are replaced in FlywayUpgradeUtils.upgradeFlywayTable()
 ------------------

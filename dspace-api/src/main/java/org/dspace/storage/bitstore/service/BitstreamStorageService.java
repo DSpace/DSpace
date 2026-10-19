@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
@@ -92,7 +92,7 @@ public interface BitstreamStorageService {
      * @param assetstore    The assetstore number for the bitstream to be
      *                      registered
      * @param bitstreamPath The relative path of the bitstream to be registered.
-     *                      The path is relative to the path of ths assetstore.
+     *                      The path is relative to the path of this assetstore.
      * @return The ID of the registered bitstream
      * @throws SQLException       If a problem occurs accessing the RDBMS
      * @throws IOException        if IO error
@@ -102,7 +102,7 @@ public interface BitstreamStorageService {
     public UUID register(Context context, Bitstream bitstream, int assetstore, String bitstreamPath)
         throws SQLException, IOException, AuthorizeException;
 
-    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException;
+    public Map<String, Object> computeChecksum(Context context, Bitstream bitstream) throws IOException;
 
     /**
      * Does the internal_id column in the bitstream row indicate the bitstream
@@ -142,21 +142,6 @@ public interface BitstreamStorageService {
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException;
 
     /**
-     * Clone the given bitstream to a new bitstream with a new ID.
-     * Metadata of the given bitstream are also copied to the new bitstream.
-     * 
-     * @param context
-     *            DSpace context object
-     * @param bitstream
-     *            the bitstream to be cloned
-     * @return id of the clone bitstream.
-     * @throws SQLException if database error
-     * @throws IOException if IO error
-     * @throws AuthorizeException if authorization error
-     */
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException;
-
-    /**
      * Print out (log/out) a listing of the assetstores configured, and how many assets they contain
      *
      * @param context The relevant DSpace Context.
@@ -190,5 +175,12 @@ public interface BitstreamStorageService {
      */
     @Nullable
     Long getLastModified(Bitstream bitstream) throws IOException;
+
+
+    /**
+     * Sets the number for the incoming store
+     * @param incoming
+     */
+    public void setIncomingExternal(int incoming);
 
 }

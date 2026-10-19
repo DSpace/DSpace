@@ -55,7 +55,7 @@ public class SimpleMetadataContributor implements MetadataContributor<PlainMetad
     /**
      * Retrieve the metadata associated with the given object.
      * It match the key found in PlainMetadataSourceDto instance with the key passed to constructor.
-     * In case of success, new metadatum is constructer (using field elements and PlainMetadataSourceDto value)
+     * In case of success, new metadatum is constructor (using field elements and PlainMetadataSourceDto value)
      * and added to the list.
      *
      * @param t A class to retrieve metadata and key to match from. t and contained list "metadata" MUST be not null.

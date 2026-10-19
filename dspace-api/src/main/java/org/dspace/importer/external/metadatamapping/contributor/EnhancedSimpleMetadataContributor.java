@@ -95,8 +95,8 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
         values = new LinkedList<>();
         for (PlainMetadataKeyValueItem metadatum : t.getMetadata()) {
             if (getKey().equals(metadatum.getKey())) {
-                String[] splitted = splitToRecord(metadatum.getValue());
-                for (String value : splitted) {
+                String[] split = splitToRecord(metadatum.getValue());
+                for (String value : split) {
                     MetadatumDTO dcValue = new MetadatumDTO();
                     dcValue.setValue(value);
                     dcValue.setElement(getField().getElement());
@@ -120,7 +120,7 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
                 com.opencsv.CSVReader csvReader = new CSVReaderBuilder(inputReader).withCSVParser(parser).build()) {
             rows = csvReader.readAll();
         } catch (IOException | CsvException e) {
-            //fallback, use the inpu as value
+            //fallback, use the input as value
             return new String[] { value };
         }
         //must be one row

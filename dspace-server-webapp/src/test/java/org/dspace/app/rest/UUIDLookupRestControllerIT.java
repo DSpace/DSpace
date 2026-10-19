@@ -17,6 +17,8 @@ import java.util.UUID;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -31,6 +33,7 @@ import org.dspace.content.Site;
 import org.dspace.eperson.Group;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration test for the UUIDLookup endpoint
@@ -38,6 +41,9 @@ import org.junit.Test;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
     @Test
     /**
@@ -305,6 +311,37 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
     public void testMissingIdentifierParameter() throws Exception {
         getClient().perform(get("/api/dso/find"))
                         .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testUnauthorized() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .build();
+        for (ResourcePolicy rp : resourcePolicyService.find(context, community)) {
+            resourcePolicyService.delete(context, rp);
+        }
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/dso/find")
+                                .param("uuid", community.getID().toString()))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testForbidden() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .build();
+        for (ResourcePolicy rp : resourcePolicyService.find(context, community)) {
+            resourcePolicyService.delete(context, rp);
+        }
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/dso/find")
+                                .param("uuid", community.getID().toString()))
+            .andExpect(status().isForbidden());
     }
 
 }

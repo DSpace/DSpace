@@ -9,6 +9,7 @@ package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
 
+import jakarta.persistence.Query;
 import org.dspace.content.Bundle;
 import org.dspace.content.dao.BundleDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
@@ -30,5 +31,14 @@ public class BundleDAOImpl extends AbstractHibernateDSODAO<Bundle> implements Bu
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) from Bundle"));
+    }
+
+    @Override
+    public int countBitstreams(Context context, Bundle bundle) throws SQLException {
+        Query query = createQuery(
+            context, "SELECT count(bi.id) from Bundle bu join bu.bitstreams bi where bu.id = :bundleID"
+        );
+        query.setParameter("bundleID", bundle.getID());
+        return count(query);
     }
 }

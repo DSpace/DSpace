@@ -32,16 +32,9 @@ public class MarkerTask
     public static final String LANGUAGE = null;
 
     @Override
-    public int perform(DSpaceObject dso)
+    public int perform(Context context, DSpaceObject dso)
             throws IOException {
         if (dso instanceof Item) {
-            Context context;
-            try {
-                context = Curator.curationContext();
-            } catch (SQLException ex) {
-                throw new IOException("Failed to get a Context:", ex);
-            }
-
             Item item = (Item) dso;
             String marker = String.format("Marked by %s on %s",
                     MarkerTask.class.getCanonicalName(),

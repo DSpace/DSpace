@@ -9,7 +9,6 @@
 package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.Options;
-import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
@@ -27,11 +26,6 @@ public class MetadataExportSearchScriptConfiguration<T extends MetadataExportSea
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
         this.dspaceRunnableclass = dspaceRunnableClass;
-    }
-
-    @Override
-    public boolean isAllowedToExecute(Context context) {
-        return true;
     }
 
     @Override

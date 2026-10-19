@@ -28,7 +28,7 @@ import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
- * A utility class that will send all the worklfow items
+ * A utility class that will send all the workflow items
  * back to their submitters
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)

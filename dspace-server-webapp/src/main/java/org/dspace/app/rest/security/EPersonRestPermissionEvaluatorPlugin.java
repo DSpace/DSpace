@@ -11,9 +11,12 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
@@ -27,8 +30,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EPersonRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     AuthorizeService authorizeService;
@@ -59,6 +60,9 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
             return false;
         }
         if (Constants.getTypeID(targetType) != Constants.EPERSON) {
+            return false;
+        }
+        if (targetId == null) {
             return false;
         }
 
@@ -84,7 +88,7 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
                 return true;
             }
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
 
 
@@ -100,9 +104,9 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         Request currentRequest = requestService.getCurrentRequest();
         if (currentRequest != null) {
             HttpServletRequest httpServletRequest = currentRequest.getHttpServletRequest();
-            if (operations.size() > 0
-                && StringUtils.equalsIgnoreCase(operations.get(0).getOp(), PatchOperation.OPERATION_ADD)
-                && StringUtils.equalsIgnoreCase(operations.get(0).getPath(),
+            if (!operations.isEmpty()
+                && Strings.CI.equals(operations.get(0).getOp(), PatchOperation.OPERATION_ADD)
+                && Strings.CI.equals(operations.get(0).getPath(),
                 EPersonPasswordAddOperation.OPERATION_PASSWORD_CHANGE)
                 && StringUtils.isNotBlank(httpServletRequest.getParameter("token"))) {
                 return true;

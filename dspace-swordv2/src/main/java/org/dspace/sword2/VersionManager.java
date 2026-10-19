@@ -9,8 +9,10 @@ package org.dspace.sword2;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -112,9 +114,8 @@ public class VersionManager {
 
         // there is nowhere in the metadata to say when this file was moved, so we
         // are going to drop it into the description
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String desc = bitstream.getDescription();
-        String newDesc = "[Deleted on: " + sdf.format(new Date()) + "] ";
+        String newDesc = "[Deleted on: " + Instant.now().toString() + "] ";
         if (desc != null) {
             newDesc += desc;
         }
@@ -151,9 +152,8 @@ public class VersionManager {
 
     private void archiveBundle(Context context, Item item, Bundle source)
         throws SQLException, AuthorizeException, IOException {
-        // get the datestamped root bundle name
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String oldName = "VER" + sdf.format(new Date());
+        // get the datestamped root bundle name (YYYY-MM-DD format)
+        String oldName = "VER" + DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now(ZoneOffset.UTC));
         oldName = this.getNumberedName(item, oldName, 0);
 
         Bundle old = bundleService.create(context, item, oldName);

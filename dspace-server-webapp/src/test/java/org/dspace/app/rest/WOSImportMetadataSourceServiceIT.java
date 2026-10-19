@@ -51,7 +51,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        try (InputStream file = getClass().getResourceAsStream("wos-responce.xml")) {
+        try (InputStream file = getClass().getResourceAsStream("wos-response.xml")) {
             String wosXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -80,7 +80,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        try (InputStream file = getClass().getResourceAsStream("wos-responce.xml")) {
+        try (InputStream file = getClass().getResourceAsStream("wos-response.xml")) {
             String wosXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -112,7 +112,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
                 "Preservice science teachers coding science simulations:"
                 + " epistemological understanding, coding skills, and lesson design");
         MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "1042-1629");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.1007/s11423-022-10119-7");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1007/s11423-022-10119-7");
         MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
                 "National and state science learning standards urge K-12 educators to offer authentic Science,"
                 + " Technology, Engineering, and Mathematics learning experiences.");
@@ -136,6 +136,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO subject15 = createMetadatumDTO("dc", "subject", null, "Coding concepts");
         MetadatumDTO subject16 = createMetadatumDTO("dc", "subject", null, "Lesson design");
         MetadatumDTO subject17 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
+        MetadatumDTO publisher = createMetadatumDTO("dc", "publisher", null, "SPRINGER");
         MetadatumDTO other = createMetadatumDTO("dc", "identifier", "other", "WOS:000805105200003");
         metadatums.add(edition);
         metadatums.add(date);
@@ -166,6 +167,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums.add(subject15);
         metadatums.add(subject16);
         metadatums.add(subject17);
+        metadatums.add(publisher);
         metadatums.add(other);
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
@@ -182,7 +184,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         "The latent structure of global scientific development");
 
         MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "2397-3374");
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", null, "10.1038/s41562-022-01367-x");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1038/s41562-022-01367-x");
         MetadatumDTO description2 = createMetadatumDTO("dc", "description", "abstract",
                 "Science is essential to innovation and economic prosperity."
                 + "By examining the scientific output of each country,"
@@ -205,6 +207,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO subject26 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
         MetadatumDTO subject27 = createMetadatumDTO("dc", "subject", null, "Science & Technology");
         MetadatumDTO subject28 = createMetadatumDTO("dc", "subject", null, "Life Sciences & Biomedicine");
+        MetadatumDTO publisher2 = createMetadatumDTO("dc", "publisher", null, "NATURE PORTFOLIO");
         MetadatumDTO other2 = createMetadatumDTO("dc", "identifier", "other", "WOS:000805100600001");
         MetadatumDTO rid = createMetadatumDTO("person", "identifier", "rid", "C-6334-2011");
         MetadatumDTO rid2 = createMetadatumDTO("person", "identifier", "rid", "B-1251-2008");
@@ -236,6 +239,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums2.add(subject26);
         metadatums2.add(subject27);
         metadatums2.add(subject28);
+        metadatums2.add(publisher2);
         metadatums2.add(other2);
         metadatums2.add(rid);
         metadatums2.add(rid2);

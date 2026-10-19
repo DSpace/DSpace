@@ -7,7 +7,7 @@
  */
 package org.dspace.service;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Service that can be used to retrieve information about DSpace clients

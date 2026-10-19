@@ -17,10 +17,12 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Suspendable;
@@ -41,8 +43,8 @@ public class RequiredMetadata extends AbstractCurationTask {
     protected Map<String, List<String>> reqMap = new HashMap<String, List<String>>();
 
     @Override
-    public void init(Curator curator, String taskId) throws IOException {
-        super.init(curator, taskId);
+    public void init(Context ctx, Curator curator, String taskId) throws IOException {
+        super.init(ctx, curator, taskId);
         try {
             reader = new DCInputsReader();
         } catch (DCInputsReaderException dcrE) {
@@ -57,7 +59,7 @@ public class RequiredMetadata extends AbstractCurationTask {
      * @throws IOException if IO error
      */
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
         if (dso.getType() == Constants.ITEM) {
             Item item = (Item) dso;
             int count = 0;
@@ -69,7 +71,7 @@ public class RequiredMetadata extends AbstractCurationTask {
                     handle = "in workflow";
                 }
                 sb.append("Item: ").append(handle);
-                for (String req : getReqList(item.getOwningCollection().getHandle())) {
+                for (String req : getReqList(item.getOwningCollection())) {
                     List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, req);
                     if (vals.size() == 0) {
                         sb.append(" missing required field: ").append(req);
@@ -91,14 +93,14 @@ public class RequiredMetadata extends AbstractCurationTask {
         }
     }
 
-    protected List<String> getReqList(String handle) throws DCInputsReaderException {
-        List<String> reqList = reqMap.get(handle);
+    protected List<String> getReqList(Collection collection) throws DCInputsReaderException {
+        List<String> reqList = reqMap.get(collection.getHandle());
         if (reqList == null) {
             reqList = reqMap.get("default");
         }
         if (reqList == null) {
             reqList = new ArrayList<String>();
-            List<DCInputSet> inputSet = reader.getInputsByCollectionHandle(handle);
+            List<DCInputSet> inputSet = reader.getInputsByCollection(collection);
             for (DCInputSet inputs : inputSet) {
                 for (DCInput[] row : inputs.getFields()) {
                     for (DCInput input : row) {

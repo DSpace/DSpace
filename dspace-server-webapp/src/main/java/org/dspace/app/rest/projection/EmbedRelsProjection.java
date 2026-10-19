@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -50,7 +50,7 @@ public class EmbedRelsProjection extends AbstractProjection {
     public EmbedRelsProjection(Set<String> embedRels, Set<String> embedSizes) {
         this.embedRels = embedRels;
         this.embedSizes = embedSizes.stream()
-                                    .filter(embedSize -> StringUtils.contains(embedSize, "="))
+                                    .filter(embedSize -> Strings.CS.contains(embedSize, "="))
                                     .map(embedSize -> embedSize.split("="))
                                     .collect(Collectors.toMap(
                                         split -> split[0],

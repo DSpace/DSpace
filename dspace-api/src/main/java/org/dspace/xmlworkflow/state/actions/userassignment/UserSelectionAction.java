@@ -9,8 +9,8 @@ package org.dspace.xmlworkflow.state.actions.userassignment;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -88,7 +88,7 @@ public abstract class UserSelectionAction extends Action {
         throws WorkflowConfigurationException, SQLException;
 
     /**
-     * A boolean indicating wether or not the task pool is used for this type of user selection
+     * A boolean indicating whether or not the task pool is used for this type of user selection
      *
      * @return a boolean
      */

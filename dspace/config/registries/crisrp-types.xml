@@ -1,0 +1,116 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Cris researcher's page Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>crisrp</name>
+        <namespace>http://dspace.org/crisrp</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>qualification</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>qualification</element>
+        <qualifier>role</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>qualification</element>
+        <qualifier>start</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>qualification</element>
+        <qualifier>end</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>education</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>education</element>
+        <qualifier>start</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>education</element>
+        <qualifier>end</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>education</element>
+        <qualifier>role</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>site</element>
+        <qualifier>title</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>name</element>
+        <qualifier>alternative</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>name</element>
+        <qualifier>translated</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>name</element>
+        <qualifier>variant</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>workgroup</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>country</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisrp</schema>
+        <element>name</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+</dspace-dc-types>

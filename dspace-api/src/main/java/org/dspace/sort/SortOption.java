@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
@@ -311,7 +311,7 @@ public class SortOption {
      */
     public static SortOption getSortOption(String name) throws SortException {
         for (SortOption so : SortOption.getSortOptions()) {
-            if (StringUtils.equals(name, so.getName())) {
+            if (Strings.CS.equals(name, so.getName())) {
                 return so;
             }
         }

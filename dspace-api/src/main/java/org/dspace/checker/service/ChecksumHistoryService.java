@@ -8,7 +8,7 @@
 package org.dspace.checker.service;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 
 import org.dspace.checker.ChecksumResultCode;
@@ -29,7 +29,8 @@ public interface ChecksumHistoryService {
 
     public void addHistory(Context context, MostRecentChecksum mostRecentChecksum) throws SQLException;
 
-    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode result) throws SQLException;
+    public int deleteByDateAndCode(Context context, Instant retentionDate, ChecksumResultCode result)
+        throws SQLException;
 
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException;
 

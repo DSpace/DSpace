@@ -15,12 +15,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
@@ -29,8 +31,6 @@ import org.dspace.services.model.RequestInterceptor.RequestInterruptionException
 import org.dspace.services.sessions.model.HttpRequestImpl;
 import org.dspace.services.sessions.model.InternalRequestImpl;
 import org.dspace.utils.servicemanager.OrderedServiceComparator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public final class StatelessRequestServiceImpl implements RequestService {
 
-    private static final Logger log = LoggerFactory.getLogger(StatelessRequestServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     private ConfigurationService configurationService;
 
@@ -110,8 +110,8 @@ public final class StatelessRequestServiceImpl implements RequestService {
                     log.warn(message);
                     throw new RequestInterruptionException(message, e);
                 } catch (Exception e) {
-                    log.warn("Request interceptor (" + requestInterceptor + ") failed to execute on start (" + req
-                        .getRequestId() + "): " + e.getMessage());
+                    log.warn("Request interceptor ({}) failed to execute on start ({}): {}",
+                        () -> requestInterceptor, req::getRequestId, e::getMessage);
                 }
             }
         }
@@ -149,15 +149,14 @@ public final class StatelessRequestServiceImpl implements RequestService {
                         requestInterceptor.onEnd(requestId, (failure == null), failure);
                     } catch (RequestInterruptionException e) {
                         log.warn(
-                            "Attempt to stop request from ending by an exception from the interceptor (" +
-                                requestInterceptor + "), cannot stop requests from ending though so request end " +
-                                "continues, this may be an error: " + e
-                                .getMessage());
+                            "Attempt to stop request from ending by an exception from the interceptor ({}),"
+                                + " cannot stop requests from ending though so request end"
+                                + " continues, this may be an error: {}",
+                            () -> requestInterceptor, e::getMessage);
                     } catch (Exception e) {
                         log.warn(
-                            "Request interceptor (" + requestInterceptor + ") failed to execute on end (" + requestId
-                                + "): " + e
-                                .getMessage());
+                            "Request interceptor ({}) failed to execute on end ({}): {}",
+                            () -> requestInterceptor, () -> requestId, e::getMessage);
                     }
                 }
             }

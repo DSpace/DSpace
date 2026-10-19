@@ -51,7 +51,7 @@ echo.
 echo NOTE: If you want to run the Handle Server as a backend process, re-execute this script
 echo using the Windows "start" command. For example, "start /B start-handle-server.bat"
 echo.
-java %JAVA_OPTS% -cp "%DSPACE_CLASSPATH%" -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main %HANDLEDIR%  >> "%LOGDIR%/handle-server.log"
+java %JAVA_OPTS% -cp "%DSPACE_CLASSPATH%" -Ddspace.log.init.disable=true -Dlog4j2.configurationFile=log4j2-handle-plugin.xml net.handle.server.Main %HANDLEDIR%  >> "%LOGDIR%/handle-server.log"
 
 REM Clean up DSPACE_CLASSPATH variable
 set DSPACE_CLASSPATH=

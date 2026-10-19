@@ -702,8 +702,10 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                 script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
             }
             if (script != null) {
-                script.initialize(args, testDSpaceRunnableHandler, null);
-                script.run();
+                if (DSpaceRunnable.StepResult.Continue
+                        .equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                    script.run();
+                }
             }
             if (testDSpaceRunnableHandler.getException() != null) {
                 throw testDSpaceRunnableHandler.getException();
@@ -719,7 +721,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
      *
      * @param value the value of the dc.identifier.other to query for
      *
-     * @return first retrived UUID
+     * @return first retrieved UUID
      */
     private UUID getUUIDByIdentifierOther(String value) throws Exception {
         ArrayList<UUID> uuidList = new ArrayList<>();

@@ -8,8 +8,8 @@
 package org.dspace.xoai.services.impl;
 
 import java.sql.SQLException;
-import javax.inject.Inject;
 
+import jakarta.inject.Inject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;

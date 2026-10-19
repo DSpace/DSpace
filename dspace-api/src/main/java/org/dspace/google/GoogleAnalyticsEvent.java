@@ -7,6 +7,7 @@
  */
 package org.dspace.google;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import org.springframework.util.Assert;
@@ -35,7 +36,7 @@ public final class GoogleAnalyticsEvent {
         this.documentReferrer = documentReferrer;
         this.documentPath = documentPath;
         this.documentTitle = documentTitle;
-        this.time = System.currentTimeMillis();
+        this.time = Instant.now().toEpochMilli();
     }
 
     public String getClientId() {

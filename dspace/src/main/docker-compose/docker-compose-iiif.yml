@@ -10,9 +10,12 @@
 # Test environment for DSpace + Cantaloupe for IIIF support. See README for instructions.
 # This should NEVER be used in production scenarios.
 #
-version: '3.7'
 networks:
-  dspacenet:
+  # Default to using network named 'dspacenet' from docker-compose.yml.
+  # Its full name will be prepended with the project name (e.g. "-p d7" means it will be named "d7_dspacenet")
+  default:
+    name: ${COMPOSE_PROJECT_NAME}_dspacenet
+    external: true
 services:
   dspace-iiif:
     container_name: dspace-iiif
@@ -21,8 +24,6 @@ services:
     # Using UCLA Library image as it seems to be most maintained at this time. There is no official image.
     # https://hub.docker.com/r/uclalibrary/cantaloupe
     image: uclalibrary/cantaloupe:5.0.4-0
-    networks:
-      dspacenet:
     ports:
       - '8182:8182'
     # For a guide of environment variables that can be used, see

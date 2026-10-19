@@ -11,9 +11,10 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -24,8 +25,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -39,12 +38,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(BitstreamMetadataReadPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private RequestService requestService;
-    @Autowired
-    private DSpaceObjectUtils dspaceObjectUtil;
     @Autowired
     AuthorizeService authorizeService;
     @Autowired
@@ -61,18 +58,24 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
 
             try {
                 UUID dsoUuid = UUID.fromString(targetId.toString());
-                DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
-                if (dso instanceof Bitstream) {
-                    return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
+                // Resolve the target as a Bitstream directly: this plugin only handles Bitstreams, and the
+                // untyped DSpaceObjectUtils#findDSpaceObject sweep logs a spurious Hibernate
+                // ObjectNotFoundException here (see #12839).
+                Bitstream bitstream = bitstreamService.find(context, dsoUuid);
+                if (bitstream != null) {
+                    return this.metadataReadPermissionOnBitstream(context, bitstream);
                 }
             } catch (SQLException e) {
-                log.error(e.getMessage(), e);
+                log.error(e::getMessage, e);
             }
         }
         return false;
     }
 
     public boolean metadataReadPermissionOnBitstream(Context context, Bitstream bitstream) throws SQLException {
+        if (bitstream.isDeleted()) {
+            return true; // Let downstream REST layer handle with 404
+        }
         if (authorizeService.isAdmin(context, bitstream)) {
             // Is Admin on bitstream
             return true;

@@ -101,7 +101,7 @@ public class ItemDepositor extends Depositor {
         DepositResult result = si.ingest(swordService, deposit, item);
         swordService.message("Archive ingest completed successfully");
 
-        // if there's an item availalble, and we want to keep the original
+        // if there's an item available, and we want to keep the original
         // then do that
         try {
             if (swordConfig.isKeepOriginal()) {

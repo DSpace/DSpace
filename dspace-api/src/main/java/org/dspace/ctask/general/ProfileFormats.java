@@ -19,6 +19,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Distributive;
@@ -43,18 +44,18 @@ public class ProfileFormats extends AbstractCurationTask {
      * @throws IOException if IO error
      */
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
         fmtTable.clear();
-        distribute(dso);
-        formatResults();
+        distribute(context, dso);
+        formatResults(context);
         return Curator.CURATE_SUCCESS;
     }
 
     @Override
-    protected void performItem(Item item) throws SQLException, IOException {
+    protected void performItem(Context context, Item item) throws SQLException, IOException {
         for (Bundle bundle : item.getBundles()) {
             for (Bitstream bs : bundle.getBitstreams()) {
-                String fmt = bs.getFormat(Curator.curationContext()).getShortDescription();
+                String fmt = bs.getFormat(context).getShortDescription();
                 Integer count = fmtTable.get(fmt);
                 if (count == null) {
                     count = 1;
@@ -66,11 +67,11 @@ public class ProfileFormats extends AbstractCurationTask {
         }
     }
 
-    private void formatResults() throws IOException {
+    private void formatResults(Context context) throws IOException {
         try {
             StringBuilder sb = new StringBuilder();
             for (String fmt : fmtTable.keySet()) {
-                BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(Curator.curationContext(), fmt);
+                BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(context, fmt);
                 sb.append(String.format("%6d", fmtTable.get(fmt))).append(" (").
                     append(bitstreamFormatService.getSupportLevelText(bsf).charAt(0)).append(") ").
                       append(bsf.getDescription()).append("\n");

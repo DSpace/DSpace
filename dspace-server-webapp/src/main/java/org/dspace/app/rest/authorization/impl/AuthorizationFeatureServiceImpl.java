@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -61,7 +61,7 @@ public class AuthorizationFeatureServiceImpl implements AuthorizationFeatureServ
     @Override
     public AuthorizationFeature find(String name) {
         for (AuthorizationFeature feature : features) {
-            if (StringUtils.equals(name, feature.getName())) {
+            if (Strings.CS.equals(name, feature.getName())) {
                 return feature;
             }
         }

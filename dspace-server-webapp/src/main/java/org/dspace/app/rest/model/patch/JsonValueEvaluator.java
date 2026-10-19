@@ -7,10 +7,9 @@
  */
 package org.dspace.app.rest.model.patch;
 
-import javax.annotation.Nonnull;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nonnull;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 
 /**

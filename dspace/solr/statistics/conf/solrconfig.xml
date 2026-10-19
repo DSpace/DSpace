@@ -32,14 +32,16 @@
 
     <codecFactory class="solr.SchemaCodecFactory"/>
 
-    <!-- Use classic schema.xml & disallow programmatic changes to schema at runtime -->
+    <!-- Use classic schema.xml & disallow programmatic changes to
+         schema at runtime -->
     <schemaFactory class="ClassicIndexSchemaFactory"/>
 
     <indexConfig>
         <ramBufferSizeMB>32</ramBufferSizeMB>
         <maxBufferedDocs>1000</maxBufferedDocs>
         <lockType>${solr.lock.type:native}</lockType>
-        <!-- Set to true to "write detailed debug information from the indexing process as Solr log messages" -->
+        <!-- Set to true to "write detailed debug information from the
+             indexing process as Solr log messages" -->
         <infoStream>false</infoStream>
     </indexConfig>
 
@@ -48,7 +50,7 @@
         <!-- How often should commits be done automatically -->
         <autoCommit>
             <maxDocs>10000</maxDocs> <!--Commit every 10.000 documents-->
-            <maxTime>${solr.autoCommit.maxTime:900000}</maxTime> <!--Default commit every 15 minutes-->
+            <maxTime>${solr.autoCommit.maxTime:10000}</maxTime> <!--Ten seconds-->
             <openSearcher>true</openSearcher>
         </autoCommit>
 
@@ -62,14 +64,16 @@
         <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
 
         <!-- Cache used by SolrIndexSearcher for filters (DocSets) for
-             unordered sets of *all* documents that match a query. Caches results of 'fq' search param. -->
+             unordered sets of *all* documents that match a
+             query. Caches results of 'fq' search param. -->
         <filterCache class="solr.search.CaffeineCache"
                      size="512"
                      initialSize="512"
                      autowarmCount="0"/>
 
-        <!-- Caches results of previous searches - ordered lists of document ids
-         (DocList) based on a query, a sort, and the range of documents requested. -->
+        <!-- Caches results of previous searches - ordered lists of
+             document ids (DocList) based on a query, a sort, and the
+             range of documents requested. -->
         <queryResultCache class="solr.search.CaffeineCache"
                           size="512"
                           initialSize="512"
@@ -91,7 +95,8 @@
         <slowQueryThresholdMillis>1000</slowQueryThresholdMillis>
     </query>
 
-    <!-- Controls how the Solr HTTP RequestDispatcher responds to requests -->
+    <!-- Controls how the Solr HTTP RequestDispatcher responds to
+         requests -->
     <requestDispatcher handleSelect="false" >
         <requestParsers enableRemoteStreaming="true"
                         multipartUploadLimitInKB="-1"
@@ -113,7 +118,8 @@
 
     <!-- Processes updates to the index -->
     <requestHandler name="/update" class="solr.UpdateRequestHandler">
-        <!-- Update chain processor required by DSpace to auto generate the UUID field in solr -->
+        <!-- Update chain processor required by DSpace to auto
+             generate the UUID field in solr -->
         <lst name="defaults">
             <str name="update.chain">uuid</str>
         </lst>
@@ -126,7 +132,8 @@
         </lst>
     </requestHandler>
 
-    <!-- Required for DSpace to ensure that unique identifiers are added to each solr document -->
+    <!-- Required for DSpace to ensure that unique identifiers are
+         added to each solr document -->
     <updateRequestProcessorChain name="uuid">
         <processor class="solr.UUIDUpdateProcessorFactory">
             <str name="fieldName">uid</str>

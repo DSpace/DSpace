@@ -10,11 +10,11 @@ package org.dspace.identifier.dao.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -71,6 +71,12 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
 
     @Override
     public List<DOI> findByStatus(Context context, List<Integer> statuses) throws SQLException {
+        return findByStatus(context, statuses, -1, -1);
+    }
+
+    @Override
+    public List<DOI> findByStatus(Context context, List<Integer> statuses, int limit, int offset)
+        throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
@@ -80,7 +86,8 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
             orPredicates.add(criteriaBuilder.equal(doiRoot.get(DOI_.status), status));
         }
         criteriaQuery.where(criteriaBuilder.or(orPredicates.toArray(new Predicate[] {})));
-        return list(context, criteriaQuery, false, DOI.class, -1, -1);
+        criteriaQuery.orderBy(criteriaBuilder.asc(doiRoot.get(DOI_.id)));
+        return list(context, criteriaQuery, false, DOI.class, limit, offset);
     }
 
     @Override

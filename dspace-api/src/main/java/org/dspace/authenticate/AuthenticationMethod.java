@@ -9,9 +9,9 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -54,7 +54,7 @@ public interface AuthenticationMethod {
     public static final int BAD_CREDENTIALS = 2;
 
     /**
-     * Not allowed to login this way without X.509 certificate.
+     * Not allowed to login this way without a certificate.
      */
     public static final int CERT_REQUIRED = 3;
 
@@ -124,8 +124,8 @@ public interface AuthenticationMethod {
      * Predicate, is this an implicit authentication method.
      * An implicit method gets credentials from the environment (such as
      * an HTTP request or even Java system properties) rather than the
-     * explicit username and password.  For example, a method that reads
-     * the X.509 certificates in an HTTPS request is implicit.
+     * explicit username and password. For example, a method that provides
+     * IP-based authentication is implicit.
      *
      * @return true if this method uses implicit authentication.
      */
@@ -154,6 +154,22 @@ public interface AuthenticationMethod {
         throws SQLException;
 
     /**
+     * Returns true if the special groups returned by
+     * {@link org.dspace.authenticate.AuthenticationMethod#getSpecialGroups(Context, HttpServletRequest)}
+     * should be implicitly be added to the groups related to the current user. By
+     * default this is true if the authentication method is the actual
+     * authentication mechanism used by the user.
+     * @param  context A valid DSpace context.
+     * @param  request The request that started this operation, or null if not
+     *                 applicable.
+     * @return         true is the special groups must be considered, false
+     *                 otherwise
+     */
+    public default boolean areSpecialGroupsApplicable(Context context, HttpServletRequest request) {
+        return getName().equals(context.getAuthenticationMethod()) || isUsed(context, request);
+    }
+
+    /**
      * Authenticate the given or implicit credentials.
      * This is the heart of the authentication method: test the
      * credentials for authenticity, and if accepted, attempt to match
@@ -172,7 +188,7 @@ public interface AuthenticationMethod {
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. passwd) don't match
-     * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
+     * <br>CERT_REQUIRED   - not allowed to login this way without a cert.
      * <br>NO_SUCH_USER    - user not found using this method.
      * <br>BAD_ARGS        - user/pw not appropriate for this method
      * @throws SQLException if database error

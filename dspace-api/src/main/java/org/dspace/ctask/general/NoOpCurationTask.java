@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 
@@ -20,7 +21,7 @@ public class NoOpCurationTask extends AbstractCurationTask {
     protected String result = null;
 
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
+    public int perform(Context context, DSpaceObject dso) throws IOException {
 
         if (dso instanceof Item) {
             Item item = (Item) dso;

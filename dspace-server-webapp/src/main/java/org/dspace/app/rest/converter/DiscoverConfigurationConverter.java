@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -79,6 +79,15 @@ public class DiscoverConfigurationConverter
                 sortOption.setActualName(discoverySearchSortConfiguration.getType());
                 sortOption.setSortOrder(discoverySearchSortConfiguration.getDefaultSortOrder().name());
                 searchConfigurationRest.addSortOption(sortOption);
+            }
+
+            DiscoverySortFieldConfiguration defaultSortField = searchSortConfiguration.getDefaultSortField();
+            if (defaultSortField != null) {
+                SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
+                sortOption.setName(defaultSortField.getMetadataField());
+                sortOption.setActualName(defaultSortField.getType());
+                sortOption.setSortOrder(defaultSortField.getDefaultSortOrder().name());
+                searchConfigurationRest.setDefaultSortOption(sortOption);
             }
         }
 

@@ -7,18 +7,11 @@
  */
 package org.dspace.app.harvest;
 
-import java.sql.SQLException;
-
 import org.apache.commons.cli.Options;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfiguration<T> {
-    @Autowired
-    private AuthorizeService authorizeService;
 
     private Class<T> dspaceRunnableClass;
 
@@ -32,13 +25,6 @@ public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfigu
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
 
-    public boolean isAllowedToExecute(final Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
-        }
-    }
 
     public Options getOptions() {
         Options options = new Options();

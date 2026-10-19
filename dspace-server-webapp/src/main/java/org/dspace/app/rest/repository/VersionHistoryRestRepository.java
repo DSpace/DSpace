@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Repository for the operations on the {@link VersionHistoryRest} endpoints
  */
-@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.NAME)
+@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.PLURAL_NAME)
 public class VersionHistoryRestRepository extends DSpaceRestRepository<VersionHistoryRest, Integer> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionHistoryRestRepository.class);

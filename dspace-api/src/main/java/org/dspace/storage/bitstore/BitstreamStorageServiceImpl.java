@@ -10,24 +10,27 @@ package org.dspace.storage.bitstore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
+import jakarta.annotation.Nullable;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
+import org.dspace.content.service.BitstreamLinkingService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,10 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected ChecksumHistoryService checksumHistoryService;
+    @Autowired(required = true)
+    protected BitstreamLinkingService bitstreamLinkingService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     /**
      * asset stores
@@ -87,6 +94,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
     protected BitstreamStorageServiceImpl() {
 
+    }
+
+    @Override
+    public void setIncomingExternal(int incoming) {
+        this.incoming = incoming;
     }
 
     @Override
@@ -147,7 +159,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @param assetstore    The assetstore number for the bitstream to be
      *                      registered
      * @param bitstreamPath The relative path of the bitstream to be registered.
-     *                      The path is relative to the path of ths assetstore.
+     *                      The path is relative to the path of this assetstore.
      * @return The ID of the registered bitstream
      * @throws SQLException If a problem occurs accessing the RDBMS
      * @throws IOException  if IO error
@@ -165,12 +177,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         bitstream.setStoreNumber(assetstore);
         bitstreamService.update(context, bitstream);
 
-        Map wantedMetadata = new HashMap();
-        wantedMetadata.put("size_bytes", null);
-        wantedMetadata.put("checksum", null);
-        wantedMetadata.put("checksum_algorithm", null);
+        List<String> wantedMetadata = List.of("size_bytes", "checksum", "checksum_algorithm");
+        Map<String, Object> receivedMetadata = this.getStore(assetstore).about(bitstream, wantedMetadata);
 
-        Map receivedMetadata = this.getStore(assetstore).about(bitstream, wantedMetadata);
         if (MapUtils.isEmpty(receivedMetadata)) {
             String message = "Not able to register bitstream:" + bitstream.getID() + " at path: " + bitstreamPath;
             log.error(message);
@@ -200,13 +209,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
-    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException {
-        Map wantedMetadata = new HashMap();
-        wantedMetadata.put("checksum", null);
-        wantedMetadata.put("checksum_algorithm", null);
-
-        Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
-        return receivedMetadata;
+    public Map<String, Object> computeChecksum(Context context, Bitstream bitstream) throws IOException {
+        return this.getStore(bitstream.getStoreNumber()).about(bitstream, List.of("checksum", "checksum_algorithm"));
     }
 
     @Override
@@ -224,25 +228,68 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Override
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException {
         Context context = new Context(Context.Mode.BATCH_EDIT);
-        int commitCounter = 0;
+
+        int offset = 0;
+        int limit = 100;
+
+        int cleanedBitstreamCount = 0;
+
+        int deletedBitstreamCount = bitstreamService.countDeletedBitstreams(context);
+        System.out.println("Found " + deletedBitstreamCount + " deleted bitstream to cleanup");
 
         try {
             context.turnOffAuthorisationSystem();
 
-            List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context);
-            for (Bitstream bitstream : storage) {
-                UUID bid = bitstream.getID();
-                Map wantedMetadata = new HashMap();
-                wantedMetadata.put("size_bytes", null);
-                wantedMetadata.put("modified", null);
-                Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
+            while (cleanedBitstreamCount < deletedBitstreamCount) {
+
+                List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context, limit, offset);
+
+                if (CollectionUtils.isEmpty(storage)) {
+                    break;
+                }
+
+                for (Bitstream bitstream : storage) {
+                    UUID bid = bitstream.getID();
+                    List<String> wantedMetadata = List.of("size_bytes", "modified");
+                    Map<String, Object> receivedMetadata = this.getStore(bitstream.getStoreNumber())
+                        .about(bitstream, wantedMetadata);
 
 
-                // Make sure entries which do not exist are removed
-                if (MapUtils.isEmpty(receivedMetadata)) {
-                    log.debug("bitstore.about is empty, so file is not present");
+                    // Make sure entries which do not exist are removed
+                    if (MapUtils.isEmpty(receivedMetadata)) {
+                        log.debug("bitstore.about is empty, so file is not present");
+                        if (deleteDbRecords) {
+                            log.debug("deleting record");
+                            if (verbose) {
+                                System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                            }
+                            checksumHistoryService.deleteByBitstream(context, bitstream);
+                            if (verbose) {
+                                System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                            }
+                            bitstreamService.expunge(context, bitstream);
+                        }
+                        context.uncacheEntity(bitstream);
+                        continue;
+                    }
+
+                    // This is a small chance that this is a file which is
+                    // being stored -- get it next time.
+                    if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString()))) {
+                        log.debug("file is recent");
+                        context.uncacheEntity(bitstream);
+                        continue;
+                    }
+
+                    // Check whether the bitstore file should be kept before
+                    // expunging the database record, because expunge() would
+                    // make the bitstream entity stale for subsequent queries.
+                    boolean isRegistered = isRegisteredBitstream(bitstream.getInternalId());
+                    boolean hasDuplicate = !bitstreamService
+                        .findDuplicateInternalIdentifier(context, bitstream).isEmpty();
+
                     if (deleteDbRecords) {
-                        log.debug("deleting record");
+                        log.debug("deleting db record");
                         if (verbose) {
                             System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
                         }
@@ -252,64 +299,41 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                         }
                         bitstreamService.expunge(context, bitstream);
                     }
+
+                    if (isRegistered) {
+                        context.uncacheEntity(bitstream);
+                        continue; // do not delete registered bitstreams from the bitstore
+                    }
+
+                    // Since versioning allows for multiple bitstreams, only
+                    // remove the file if no other bitstream shares this
+                    // internal identifier
+                    if (!hasDuplicate) {
+                        this.getStore(bitstream.getStoreNumber()).remove(bitstream);
+
+                        String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
+                        if (log.isDebugEnabled()) {
+                            log.debug(message);
+                        }
+                        if (verbose) {
+                            System.out.println(message);
+                        }
+                    }
+
                     context.uncacheEntity(bitstream);
-                    continue;
                 }
 
-                // This is a small chance that this is a file which is
-                // being stored -- get it next time.
-                if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString()))) {
-                    log.debug("file is recent");
-                    context.uncacheEntity(bitstream);
-                    continue;
+                // Commit actual changes to DB after dispatch events
+                System.out.print("Performing incremental commit to the database...");
+                context.commit();
+                System.out.println(" Incremental commit done!");
+
+                cleanedBitstreamCount = cleanedBitstreamCount + storage.size();
+
+                if (!deleteDbRecords) {
+                    offset = offset + limit;
                 }
 
-                if (deleteDbRecords) {
-                    log.debug("deleting db record");
-                    if (verbose) {
-                        System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
-                    }
-                    checksumHistoryService.deleteByBitstream(context, bitstream);
-                    if (verbose) {
-                        System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
-                    }
-                    bitstreamService.expunge(context, bitstream);
-                }
-
-                if (isRegisteredBitstream(bitstream.getInternalId())) {
-                    context.uncacheEntity(bitstream);
-                    continue;            // do not delete registered bitstreams
-                }
-
-
-                // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on
-                // another place
-                if (bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty()) {
-                    this.getStore(bitstream.getStoreNumber()).remove(bitstream);
-
-                    String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
-                    if (log.isDebugEnabled()) {
-                        log.debug(message);
-                    }
-                    if (verbose) {
-                        System.out.println(message);
-                    }
-                }
-
-                // Make sure to commit our outstanding work every 100
-                // iterations. Otherwise you risk losing the entire transaction
-                // if we hit an exception, which isn't useful at all for large
-                // amounts of bitstreams.
-                commitCounter++;
-                if (commitCounter % 100 == 0) {
-                    context.dispatchEvents();
-                    // Commit actual changes to DB after dispatch events
-                    System.out.print("Performing incremental commit to the database...");
-                    context.commit();
-                    System.out.println(" Incremental commit done!");
-                }
-
-                context.uncacheEntity(bitstream);
             }
 
             System.out.print("Committing changes to the database...");
@@ -332,50 +356,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Nullable
     @Override
     public Long getLastModified(Bitstream bitstream) throws IOException {
-        Map attrs = new HashMap();
-        attrs.put("modified", null);
-        attrs = this.getStore(bitstream.getStoreNumber()).about(bitstream, attrs);
-        if (attrs == null || !attrs.containsKey("modified")) {
+        Map<String, Object> metadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, List.of("modified"));
+        if (metadata == null || !metadata.containsKey("modified")) {
             return null;
         }
-        return Long.valueOf(attrs.get("modified").toString());
-    }
-
-    /**
-     * @param context   The relevant DSpace Context.
-     * @param bitstream the bitstream to be cloned
-     * @return id of the clone bitstream.
-     * A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    @Override
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
-        Bitstream clonedBitstream = null;
-        try {
-            // Update our bitstream but turn off the authorization system since permissions
-            // haven't been set at this point in time.
-            context.turnOffAuthorisationSystem();
-            clonedBitstream = bitstreamService.clone(context, bitstream);
-            clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
-
-            List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY,
-                    Item.ANY);
-
-            for (MetadataValue metadataValue : metadataValues) {
-                bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(),
-                        metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
-                        metadataValue.getConfidence());
-            }
-            bitstreamService.update(context, clonedBitstream);
-        } catch (AuthorizeException e) {
-            log.error(e);
-            // Can never happen since we turn off authorization before we update
-        } finally {
-            context.restoreAuthSystemState();
-        }
-        return clonedBitstream;
+        return Long.valueOf(metadata.get("modified").toString());
     }
 
     /**
@@ -418,7 +403,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             //modulo
             if ((processedCounter % batchCommitSize) == 0) {
                 log.info("Migration Commit Checkpoint: " + processedCounter);
-                context.dispatchEvents();
+                context.commit();
             }
         }
 
@@ -473,14 +458,15 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @return True if this file is too recent to be deleted
      */
     protected boolean isRecent(Long lastModified) {
-        long now = new java.util.Date().getTime();
+        long now = Instant.now().toEpochMilli();
 
-        if (lastModified >= now) {
+        if (lastModified == null || lastModified >= now) {
             return true;
         }
 
-        // Less than one hour old
-        return (now - lastModified) < (1 * 60 * 1000);
+        long waitWindowHours = configurationService.getLongProperty("bitstream.cleanup.isRecent.hours", 1L);
+        long waitWindowMilli = TimeUnit.HOURS.toMillis(waitWindowHours);
+        return (now - lastModified) < waitWindowMilli;
     }
 
     protected BitStoreService getStore(int position) throws IOException {

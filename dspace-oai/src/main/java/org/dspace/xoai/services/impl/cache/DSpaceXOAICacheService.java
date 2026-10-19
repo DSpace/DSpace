@@ -18,7 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
+import java.time.Instant;
 import javax.xml.stream.XMLStreamException;
 
 import com.lyncode.xoai.dataprovider.core.XOAIManager;
@@ -49,7 +49,7 @@ public class DSpaceXOAICacheService implements XOAICacheService {
         return baseDir;
     }
 
-    private static String getStaticHead(XOAIManager manager, Date date) {
+    private static String getStaticHead(XOAIManager manager, Instant date) {
         if (staticHead == null) {
             staticHead = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + ((manager.hasStyleSheet()) ? ("<?xml-stylesheet type=\"text/xsl\" href=\""
@@ -92,7 +92,7 @@ public class DSpaceXOAICacheService implements XOAICacheService {
     @Override
     public void handle(String requestID, OutputStream out) throws IOException {
         InputStream in = new FileInputStream(this.getCacheFile(requestID));
-        write(getStaticHead(manager, new Date()), out);
+        write(getStaticHead(manager, Instant.now()), out);
         copy(in, out);
         in.close();
     }

@@ -7,6 +7,8 @@
  */
 package org.dspace.sword2;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -107,7 +109,7 @@ public class SwordUrlManager {
                     "Unable to construct service document urls, due to missing/invalid " +
                         "config in sword2.url and/or dspace.server.url");
             }
-            sUrl = buildSWORDUrl("swordv2");
+            sUrl = dspaceUrl + "/" + swordPath;
         }
         return sUrl;
     }
@@ -133,7 +135,7 @@ public class SwordUrlManager {
 
             String iid = location.substring(cBaseUrl.length());
             if (iid.endsWith(".atom")) {
-                // this is the atom url, so we need to strip that to ge tthe item id
+                // this is the atom url, so we need to strip that to ge the item id
                 iid = iid.substring(0, iid.length() - ".atom".length());
             } else if (iid.endsWith(".rdf")) {
                 // this is the rdf url so we need to strip that to get the item id
@@ -386,10 +388,10 @@ public class SwordUrlManager {
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
-                    bitstream.getSequenceID() + "/" + bitstream.getName();
+                    bitstream.getSequenceID() + "/" + URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
             } else {
                 bsLink = bsLink + "/retrieve/" + bitstream.getID() + "/" +
-                    bitstream.getName();
+                    URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
             }
 
             return bsLink;
@@ -401,7 +403,7 @@ public class SwordUrlManager {
     public String getActionableBitstreamUrl(Bitstream bitstream)
         throws DSpaceSwordException {
         return this.getSwordBaseUrl() + "/edit-media/bitstream/" +
-            bitstream.getID() + "/" + bitstream.getName();
+            bitstream.getID() + "/" + URLEncoder.encode(bitstream.getName(), StandardCharsets.UTF_8);
     }
 
     public boolean isActionableBitstreamUrl(Context context, String url) {
@@ -458,10 +460,9 @@ public class SwordUrlManager {
         throws DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
 
-        // if the item is in the workspace, we need to give it it's own special identifier
+        // if the item is in the workspace, we need to give it its own special identifier
         if (wft.isItemInWorkspace(context, item)) {
-            String urlTemplate = configurationService
-                .getProperty("swordv2-server", "workspace.url-template");
+            String urlTemplate = configurationService.getProperty("swordv2-server.workspace.url-template");
             if (urlTemplate != null) {
                 return urlTemplate.replace("#wsid#", Integer.toString(
                     wft.getWorkspaceItem(context, item).getID()));

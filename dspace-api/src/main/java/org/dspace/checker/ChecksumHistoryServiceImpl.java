@@ -8,7 +8,7 @@
 package org.dspace.checker;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +74,8 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
         if (mostRecentChecksum.getBitstream().isDeleted()) {
             checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.BITSTREAM_MARKED_DELETED);
         } else {
-            checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
+            checksumResult = checksumResultService.findByCode(context,
+                    mostRecentChecksum.getChecksumResult().getResultCode());
         }
 
         checksumHistory.setResult(checksumResult);
@@ -93,7 +94,7 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
      * @throws SQLException if database error occurs.
      */
     @Override
-    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode checksumResultCode)
+    public int deleteByDateAndCode(Context context, Instant retentionDate, ChecksumResultCode checksumResultCode)
         throws SQLException {
         return checksumHistoryDAO.deleteByDateAndCode(context, retentionDate, checksumResultCode);
     }
@@ -108,10 +109,10 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
 
     @Override
     public int prune(Context context, Map<ChecksumResultCode, Long> interests) throws SQLException {
-        long now = System.currentTimeMillis();
+        long now = Instant.now().toEpochMilli();
         int count = 0;
         for (Map.Entry<ChecksumResultCode, Long> interest : interests.entrySet()) {
-            count += deleteByDateAndCode(context, new Date(now - interest.getValue().longValue()),
+            count += deleteByDateAndCode(context, Instant.ofEpochMilli(now - interest.getValue().longValue()),
                                          interest.getKey());
         }
         return count;

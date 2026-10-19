@@ -66,8 +66,6 @@ public class StatisticsClient {
 
         options.addOption("m", "mark-spiders", false, "Update isBot Flag in Solr");
         options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
-        options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
-        options.addOption("o", "optimize", false, "Run maintenance on the SOLR index");
         options.addOption("b", "reindex-bitstreams", false, "Reindex the bitstreams to ensure we have the bundle name");
         options.addOption("e", "export", false,
                           "Export SOLR view statistics data to usage-statistics-intermediate-format");
@@ -88,13 +86,9 @@ public class StatisticsClient {
         if (line.hasOption("u")) {
             StatisticsClient.updateSpiderFiles();
         } else if (line.hasOption('m')) {
-            solrLoggerService.markRobotsByIP();
+            solrLoggerService.markRobots();
         } else if (line.hasOption('f')) {
-            solrLoggerService.deleteRobotsByIsBotFlag();
-        } else if (line.hasOption('i')) {
-            solrLoggerService.deleteRobotsByIP();
-        } else if (line.hasOption('o')) {
-            solrLoggerService.optimizeSOLR();
+            solrLoggerService.deleteRobots();
         } else if (line.hasOption('b')) {
             solrLoggerService.reindexBitstreamHits(line.hasOption('r'));
         } else if (line.hasOption('e')) {
@@ -107,7 +101,7 @@ public class StatisticsClient {
     }
 
     /**
-     * Method to update Spiders in config directory.
+     * Method to update Spiders in configuration directory.
      */
     private static void updateSpiderFiles() {
         try {

@@ -48,14 +48,8 @@ public class IIIFUtils {
 
     // The DSpace bundle for other content related to item.
     protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
-
     // The canvas position will be appended to this string.
     private static final String CANVAS_PATH_BASE = "/canvas/c";
-
-    // metadata used to enable the iiif features on the item
-    public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
-    // metadata used to enable the iiif search service on the item
-    public static final String METADATA_IIIF_SEARCH_ENABLED = "iiif.search.enabled";
     // metadata used to override the title/name exposed as label to iiif client
     public static final String METADATA_IIIF_LABEL = "iiif.label";
     // metadata used to override the description/abstract exposed as label to iiif client
@@ -138,9 +132,8 @@ public class IIIFUtils {
      * @return true if the bitstream can be used as IIIF resource
      */
     public boolean isIIIFBitstream(Context context, Bitstream b) {
-        return checkImageMimeType(getBitstreamMimeType(b, context)) && b.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
+        return checkImageMimeType(getBitstreamMimeType(b, context)) &&
+                IIIFSharedUtils.isNotIIIFDisabled(b);
     }
 
     /**
@@ -175,7 +168,7 @@ public class IIIFUtils {
     }
 
     /**
-     * Retrives a bitstream based on its position in the IIIF bundle.
+     * Retrieves a bitstream based on its position in the IIIF bundle.
      *
      * @param context        DSpace Context
      * @param item           DSpace Item
@@ -361,7 +354,7 @@ public class IIIFUtils {
      * 
      * @param item        the dspace item
      * @param defaultHint the default hint to apply if nothing else is defined at
-     *                    the item leve
+     *                    the item level
      * @return the iiif viewing hint for the item
      */
     public String getIIIFViewingHint(Item item, String defaultHint) {

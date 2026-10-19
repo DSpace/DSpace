@@ -17,20 +17,20 @@
            http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean class="org.dspace.subscriptions.SubscriptionEmailNotificationServiceImpl">
-        <constructor-arg name="subscriptionType2generators">
-            <!-- The keys of the map used by the script "subscription-send"
-             org.dspace.subscriptions.SubscriptionEmailNotification
-             currently we support only 'content' type.   
-              --> 
-            <map>
-                <entry key="content" value-ref="contentNotifyGenerator"/>
-            </map>
-        </constructor-arg>
         <constructor-arg name="contentUpdates">
             <!-- Currently we support subscriptions ONLY for Community & Collection -->
             <map>
                 <entry key="community" value-ref="communityUpdates"/>
                 <entry key="collection" value-ref="collectionUpdates"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="subscriptionType2generators">
+            <!-- The keys of the map used by the script "subscription-send"
+             org.dspace.subscriptions.SubscriptionEmailNotification
+             currently we support only 'content' type.
+              -->
+            <map>
+                <entry key="content" value-ref="contentNotifyGenerator"/>
             </map>
         </constructor-arg>
     </bean>
@@ -57,8 +57,21 @@
     </bean>
 
     <!-- This list includes metadata values we want to include on the e-mail body of the notification -->
-    <util:list id="generalMetadataEntity">
-        <value>dc.title</value>
+    <util:list id="generalMetadataEntity" value-type="org.apache.commons.lang3.tuple.ImmutablePair">
+        <bean class="org.apache.commons.lang3.tuple.ImmutablePair">
+            <constructor-arg value="dc.title"/>
+            <constructor-arg value="Title"/>
+        </bean>
+
+        <bean class="org.apache.commons.lang3.tuple.ImmutablePair">
+            <constructor-arg value="dc.contributor.author"/>
+            <constructor-arg value="Author(s)"/>
+        </bean>
+
+        <bean class="org.apache.commons.lang3.tuple.ImmutablePair">
+            <constructor-arg value="dc.identifier.uri"/>
+            <constructor-arg value="URL"/>
+        </bean>
     </util:list>
 
     <bean id="communityUpdates" class="org.dspace.subscriptions.objectupdates.CommunityUpdates" />

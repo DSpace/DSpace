@@ -9,6 +9,7 @@ package org.dspace.app.rest.model.step;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
@@ -18,6 +19,11 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class DataUpload implements SectionData {
+
+    /*
+     * primary bitstream uuid
+     */
+    private UUID primary;
 
     @JsonUnwrapped
     private List<UploadBitstreamRest> files;
@@ -32,4 +38,13 @@ public class DataUpload implements SectionData {
     public void setFiles(List<UploadBitstreamRest> files) {
         this.files = files;
     }
+
+    public UUID getPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(UUID primary) {
+        this.primary = primary;
+    }
+
 }

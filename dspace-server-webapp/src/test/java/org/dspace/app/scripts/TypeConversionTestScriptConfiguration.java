@@ -11,7 +11,6 @@ import java.io.InputStream;
 
 import org.apache.commons.cli.Options;
 import org.dspace.app.rest.converter.ScriptConverter;
-import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
@@ -26,10 +25,6 @@ public class TypeConversionTestScriptConfiguration<T extends TypeConversionTestS
 
     public void setDspaceRunnableClass(final Class<T> dspaceRunnableClass) {
 
-    }
-
-    public boolean isAllowedToExecute(final Context context) {
-        return true;
     }
 
     public Options getOptions() {

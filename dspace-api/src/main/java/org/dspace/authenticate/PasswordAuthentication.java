@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,7 +82,7 @@ public class PasswordAuthentication
             // No conditions set, so must be able to self register
             return true;
         } else {
-            // Itterate through all domains
+            // Iterate through all domains
             String check;
             email = email.trim().toLowerCase();
             for (int i = 0; i < domains.length; i++) {
@@ -188,7 +188,7 @@ public class PasswordAuthentication
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but password doesn't match
-     * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
+     * <br>CERT_REQUIRED   - not allowed to login this way without a cert.
      * <br>NO_SUCH_USER    - no EPerson with matching email address.
      * <br>BAD_ARGS        - missing username, or user matched but cannot login.
      * @throws SQLException if database error
@@ -213,7 +213,7 @@ public class PasswordAuthentication
                 // cannot login this way
                 return BAD_ARGS;
             } else if (eperson.getRequireCertificate()) {
-                // this user can only login with x.509 certificate
+                // this user can only login with a certificate
                 log.warn(LogHelper.getHeader(context, "authenticate",
                                               "rejecting PasswordAuthentication because " + username + " requires " +
                                                   "certificate."));

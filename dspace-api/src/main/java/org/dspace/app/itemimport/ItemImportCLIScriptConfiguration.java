@@ -37,6 +37,9 @@ public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfigurat
         options.addOption(Option.builder("z").longOpt("zip")
                 .desc("name of zip file")
                 .hasArg().required(false).build());
+        options.addOption(Option.builder("u").longOpt("url")
+                .desc("url of zip file")
+                .hasArg().build());
         options.addOption(Option.builder("c").longOpt("collection")
                 .desc("destination collection(s) Handle or database ID")
                 .hasArg().required(false).build());

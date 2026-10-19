@@ -34,35 +34,44 @@ configuration file into a DSpace 7.x (or above) item-submission.xml -->
 
   <xsl:template name="transformSteps">
     <xsl:for-each select="/item-submission/step-definitions/step">
-      <step-definition>
-        <xsl:attribute name="id">
-          <xsl:value-of select="@id"/>
-        </xsl:attribute>
-        <heading>
-          <xsm:value-of select="./heading"/>
-        </heading>
-        <processing-class>
-          <xsm:value-of select="./processing-class"/>
-        </processing-class>
-        <type>
+      <xsl:if test="@id != 'complete'">
+        <step-definition>
+          <xsl:attribute name="id">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <heading>
+            <xsm:value-of select="./heading"/>
+          </heading>
+          <processing-class>
+            <xsl:choose>
+              <xsl:when test="@id='collection'">
+                <xsl:text>org.dspace.app.rest.submit.step.CollectionStep</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsm:value-of select="./processing-class"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </processing-class>
+          <type>
+            <xsl:choose>
+              <xsl:when test="@id='collection' or @id='upload' or @id='licence' or @id='sample'">
+                <xsl:value-of select="@id"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>submission-form</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </type>
           <xsl:choose>
-            <xsl:when test="@id='collection' or @id='upload' or @id='licence' or @id='sample'">
-              <xsl:value-of select="@id"/>
+            <xsl:when test="@id='collection'">
+              <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
             </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>submission-form</xsl:text>
-            </xsl:otherwise>
+            <xsl:when test="@id='license'">
+              <scope visibilityOutside="read-only">submission</scope>
+            </xsl:when>
           </xsl:choose>
-        </type>
-        <xsl:choose>
-          <xsl:when test="@id='collection'">
-            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
-          </xsl:when>
-          <xsl:when test="@id='license'">
-            <scope visibilityOutside="read-only">submission</scope>
-          </xsl:when>
-        </xsl:choose>
-      </step-definition>
+        </step-definition>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
 

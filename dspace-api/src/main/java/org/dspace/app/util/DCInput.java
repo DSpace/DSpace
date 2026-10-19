@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class representing a line in an input form.
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DCInput {
 
-    private static final Logger log = LoggerFactory.getLogger(DCInput.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * the DC element name
@@ -163,7 +163,7 @@ public class DCInput {
      * The scope of the input sets, this restricts hidden metadata fields from
      * view by the end user during submission.
      */
-    public static final String SUBMISSION_SCOPE = "submit";
+    public static final String SUBMISSION_SCOPE = "submission";
 
     /**
      * Class constructor for creating a DCInput object based on the contents of
@@ -183,7 +183,7 @@ public class DCInput {
         }
 
         //check if the input have a language tag
-        language = Boolean.valueOf(fieldMap.get("language"));
+        language = Boolean.parseBoolean(fieldMap.get("language"));
         valueLanguageList = new ArrayList<>();
         if (language) {
             String languageNameTmp = fieldMap.get("value-pairs-name");
@@ -219,7 +219,7 @@ public class DCInput {
             || "yes".equalsIgnoreCase(closedVocabularyStr);
 
         // parsing of the <type-bind> element (using the colon as split separator)
-        typeBind = new ArrayList<String>();
+        typeBind = new ArrayList<>();
         String typeBindDef = fieldMap.get("type-bind");
         if (typeBindDef != null && typeBindDef.trim().length() > 0) {
             String[] types = typeBindDef.split(",");
@@ -262,7 +262,7 @@ public class DCInput {
 
     /**
      * Is this DCInput for display in the given scope? The scope should be
-     * either "workflow" or "submit", as per the input forms definition. If the
+     * either "workflow" or "submission", as per the input forms definition. If the
      * internal visibility is set to "null" then this will always return true.
      *
      * @param scope String identifying the scope that this input's visibility
@@ -499,6 +499,32 @@ public class DCInput {
     }
 
     /**
+     * Gets all the stored values in the value-pairs.
+     *
+     * @return all the stored values
+     */
+    public List<String> getAllStoredValues() {
+        List<String> storedString = new ArrayList<String>();
+        for (int i = 1; i < valueList.size(); i += 2) {
+            storedString.add(valueList.get(i));
+        }
+        return storedString;
+    }
+
+    /**
+     * Gets all the stored value languages in the value-pairs.
+     *
+     * @return all the stored values
+     */
+    public List<String> getAllLanguageValues() {
+        List<String> storedString = new ArrayList<String>();
+        for (int i = 1; i < valueLanguageList.size(); i += 2) {
+            storedString.add(valueLanguageList.get(i));
+        }
+        return storedString;
+    }
+
+    /**
      * The closed attribute of the vocabulary tag for this field as set in
      * submission-forms.xml
      *
@@ -523,7 +549,7 @@ public class DCInput {
      * @return true when there is no type restriction or typeName is allowed
      */
     public boolean isAllowedFor(String typeName) {
-        if (typeBind.size() == 0) {
+        if (typeBind.isEmpty()) {
             return true;
         }
 

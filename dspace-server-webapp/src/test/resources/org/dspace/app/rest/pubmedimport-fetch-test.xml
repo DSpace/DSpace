@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE eSearchResult PUBLIC "-//NLM//DTD esearch 20060628//EN" "https://eutils.ncbi.nlm.nih.gov/eutils/dtd/20060628/esearch.dtd">
+<eSearchResult>
+    <Count>1</Count>
+    <RetMax>1</RetMax>
+    <RetStart>0</RetStart>
+    <QueryKey>1</QueryKey>
+    <WebEnv>MCID_64784b5ab65e3b2b2253cd3a</WebEnv>
+    <IdList>
+        <Id>36708638</Id>
+    </IdList>
+    <TranslationSet/>
+    <QueryTranslation>"10 1016 j nepr 2023 103548"[All Fields]</QueryTranslation>
+</eSearchResult>

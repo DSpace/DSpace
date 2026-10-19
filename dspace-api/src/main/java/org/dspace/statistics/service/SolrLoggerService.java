@@ -12,8 +12,8 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
@@ -56,8 +56,22 @@ public interface SolrLoggerService {
     public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
                          EPerson currentUser);
 
+    /**
+     * Store a usage event into Solr.
+     *
+     * @param dspaceObject the object used.
+     * @param request      the current request context.
+     * @param currentUser  the current session's user.
+     * @param referrer     the optional referrer.
+     */
+    public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
+                         EPerson currentUser, String referrer);
+
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser);
+
+    public void postView(DSpaceObject dspaceObject,
+                         String ip, String userAgent, String xforwardedfor, EPerson currentUser, String referrer);
 
     public void postSearch(DSpaceObject resultObject, HttpServletRequest request, EPerson currentUser,
                            List<String> queries, int rpp, String sortBy, String order, int page, DSpaceObject scope);
@@ -97,15 +111,18 @@ public interface SolrLoggerService {
                                                 List oldFieldVals, String field)
         throws IOException;
 
-    public void markRobotsByIP();
+    /**
+     * Scan the entire 'statistics' collection for documents that should be
+     * marked 'isBot:true' according to
+     * {@link org.dspace.statistics.util.SpiderDetector#isSpider(java.lang.String,
+     * java.lang.String, java.lang.String, java.lang.String)}.
+     */
+    public void markRobots();
 
-    public void markRobotByUserAgent(String agent);
-
-    public void deleteRobotsByIsBotFlag();
-
-    public void deleteIP(String ip);
-
-    public void deleteRobotsByIP();
+    /**
+     * Delete all 'statistics' documents having 'isBot:true'.
+     */
+    public void deleteRobots();
 
     /*
      * update(String query, boolean addField, String fieldName, Object
@@ -244,19 +261,6 @@ public interface SolrLoggerService {
                                String dateEnd, List<String> facetQueries, String sort, boolean ascending,
                                int facetMinCount, boolean defaultFilterQueries)
             throws SolrServerException, IOException;
-
-    /**
-     * Returns in a filterQuery string all the ip addresses that should be ignored
-     *
-     * @return a string query with ip addresses
-     */
-    public String getIgnoreSpiderIPs();
-
-    /**
-     * Maintenance to keep a SOLR index efficient.
-     * Note: This might take a long time.
-     */
-    public void optimizeSOLR();
 
     public void shardSolrIndex() throws IOException, SolrServerException;
 

@@ -15,26 +15,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = CommunityRest.COLLECTIONS,
-                method = "getCollections"
-        ),
-        @LinkRest(
-                name = CommunityRest.LOGO,
-                method = "getLogo"
-        ),
-        @LinkRest(
-                name = CommunityRest.SUBCOMMUNITIES,
-                method = "getSubcommunities"
-        ),
-        @LinkRest(
-                name = CommunityRest.PARENT_COMMUNITY,
-                method = "getParentCommunity"
-        ),
-        @LinkRest(
-                name = CommunityRest.ADMIN_GROUP,
-                method = "getAdminGroup"
-        )
+    @LinkRest(name = CommunityRest.COLLECTIONS, method = "getCollections"),
+    @LinkRest(name = CommunityRest.LOGO, method = "getLogo"),
+    @LinkRest(name = CommunityRest.SUBCOMMUNITIES, method = "getSubcommunities"),
+    @LinkRest(name = CommunityRest.PARENT_COMMUNITY, method = "getParentCommunity"),
+    @LinkRest(name = CommunityRest.ADMIN_GROUP, method = "getAdminGroup")
 })
 public class CommunityRest extends DSpaceObjectRest {
     public static final String NAME = "community";
@@ -57,5 +42,20 @@ public class CommunityRest extends DSpaceObjectRest {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    private int archivedItemsCount;
+
+    public int getArchivedItemsCount() {
+        return archivedItemsCount;
+    }
+
+    public void setArchivedItemsCount(int archivedItemsCount) {
+        this.archivedItemsCount = archivedItemsCount;
     }
 }

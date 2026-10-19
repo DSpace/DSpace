@@ -56,10 +56,12 @@
         <constructor-arg value="dc.description.abstract"/>
     </bean>
 
-    <bean id="arxivPublishedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+    <bean id="arxivPublishedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathDateFormatMetadataContributor">
         <property name="field" ref="arxiv.published"/>
         <property name="query" value="ns:published"/>
         <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
+        <property name="dateFormatFrom" value="yyyy-MM-dd'T'HH:mm:ss'Z'"/>
+        <property name="dateFormatTo" value="yyyy-MM-dd"></property>
     </bean>
     <bean id="arxiv.published" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.date.issued"/>
@@ -67,11 +69,11 @@
 
     <bean id="arxivDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.arxiv.doi"/>
-        <property name="query" value="arxiv:doi"/>
-        <property name="prefixToNamespaceMapping" ref="arxivArxivPrefixToNamespaceMapping"/>
+        <property name="query" value="ns:link[@title='doi']/@href"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     <bean id="arxiv.arxiv.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="arxivJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
@@ -94,7 +96,7 @@
 
     <bean id="arxivAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.author.name"/>
-        <property name="query" value="ns:author/name"/>
+        <property name="query" value="ns:author/ns:name"/>
         <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     <bean id="arxiv.author.name" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -111,9 +113,5 @@
         key-type="java.lang.String" value-type="java.lang.String">
     	<entry key="http://arxiv.org/schemas/atom" value="arxiv" />
     </util:map>
-
-    <bean class="java.lang.Integer" id="maxRetry">
-        <constructor-arg value="3"/>
-    </bean>
 
 </beans>

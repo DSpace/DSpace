@@ -165,6 +165,16 @@ public interface OrcidQueueService {
     public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
 
     /**
+     * Get the OrcidQueue records where the given item is the entity.
+     *
+     * @param  context      DSpace context object
+     * @param  item         the item to search for
+     * @return              the found OrcidQueue records
+     * @throws SQLException if database error
+     */
+    public List<OrcidQueue> findByEntity(Context context, Item item) throws SQLException;
+
+    /**
      * Get all the OrcidQueue records with attempts less than the given attempts.
      *
      * @param  context      DSpace context object

@@ -67,7 +67,7 @@ public class CuratorTest extends AbstractUnitTest {
         // Get and configure a Curator.
         Curator instance = new Curator();
         instance.setReporter(System.out); // Send any report to standard out.
-        instance.addTask(TASK_NAME);
+        instance.addTask(context, TASK_NAME);
 
         // Configure the run.
         Map<String, String> parameters = new HashMap<>();
@@ -107,7 +107,7 @@ public class CuratorTest extends AbstractUnitTest {
         StringBuilder reporterOutput = new StringBuilder();
         curator.setReporter(reporterOutput); // Send any report to our StringBuilder.
 
-        curator.addTask(TASK_NAME);
+        curator.addTask(context, TASK_NAME);
         Item item = mock(Item.class);
         when(item.getType()).thenReturn(2);
         when(item.getHandle()).thenReturn("testHandle");

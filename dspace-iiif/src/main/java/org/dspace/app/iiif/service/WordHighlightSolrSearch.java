@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
@@ -118,22 +119,26 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     }
 
     /**
-     * Constructs a solr search URL.
+     * Constructs a solr search URL. Compatible with solr-ocrhighlighting-0.7.2.
+     * https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.2
      *
      * @param query the search terms
      * @param manifestId the id of the manifest in which to search
      * @return solr query
      */
     private SolrQuery getSolrQuery(String query, String manifestId) {
+        String safeQuery = ClientUtils.escapeQueryChars(query);
+        String safeManifestId = ClientUtils.escapeQueryChars(manifestId);
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.set("q", "ocr_text:" + query + " AND manifest_url:\"" + manifestId + "\"");
+        solrQuery.set("q", "ocr_text:" + safeQuery + " AND manifest_url:\"" + safeManifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
         solrQuery.set("hl", "true");
         solrQuery.set("hl.ocr.fl", "ocr_text");
         solrQuery.set("hl.ocr.contextBlock", "line");
         solrQuery.set("hl.ocr.contextSize", "2");
-        solrQuery.set("hl.snippets", "10");
-        solrQuery.set("hl.ocr.trackPages", "off");
+        solrQuery.set("hl.snippets", "8192");
+        solrQuery.set("hl.ocr.maxPassages", "8192");
+        solrQuery.set("hl.ocr.trackPages", "on");
         solrQuery.set("hl.ocr.limitBlock","page");
         solrQuery.set("hl.ocr.absoluteHighlights", "true");
 

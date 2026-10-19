@@ -15,10 +15,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.login.PostLoggedInAction;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
@@ -28,8 +30,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,7 +40,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 /**
- * This class is responsible for authenticating a user via REST
+ * This class is responsible for authenticating a user via REST.
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonRestAuthenticationProvider implements AuthenticationProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(EPersonRestAuthenticationProvider.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String MANAGE_ACCESS_GROUP = "MANAGE_ACCESS_GROUP";
 
@@ -85,7 +85,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         } else {
             // Otherwise, this is a new login & we need to attempt authentication
             log.debug("Request to authenticate new login");
-            return authenticateNewLogin(authentication);
+            return authenticateNewLogin(context, authentication);
         }
     }
 
@@ -107,56 +107,43 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
      * If login is successful, returns a NEW Authentication class containing the logged in EPerson and their list of
      * GrantedAuthority objects.  If login fails, a BadCredentialsException is thrown. If no valid login found implicit
      * or explicit, then null is returned.
+     *
+     * @param context The current DSpace context
      * @param authentication Authentication class to attempt authentication.
      * @return new Authentication class containing logged-in user information or null
      */
-    private Authentication authenticateNewLogin(Authentication authentication) {
-        Context newContext = null;
+    private Authentication authenticateNewLogin(Context context, Authentication authentication) {
         Authentication output = null;
 
         if (authentication != null) {
-            try {
-                newContext = new Context();
-                String name = authentication.getName();
-                String password = Objects.toString(authentication.getCredentials(), null);
+            String name = authentication.getName();
+            String password = Objects.toString(authentication.getCredentials(), null);
 
-                int implicitStatus = authenticationService.authenticateImplicit(newContext, null, null, null, request);
+            int implicitStatus = authenticationService.authenticateImplicit(context, null, null, null, request);
 
-                if (implicitStatus == AuthenticationMethod.SUCCESS) {
-                    log.info(LogHelper.getHeader(newContext, "login", "type=implicit"));
-                    output = createAuthentication(newContext);
-                } else {
-                    int authenticateResult = authenticationService
-                        .authenticate(newContext, name, password, null, request);
-                    if (AuthenticationMethod.SUCCESS == authenticateResult) {
+            if (implicitStatus == AuthenticationMethod.SUCCESS) {
+                log.info(LogHelper.getHeader(context, "login", "type=implicit"));
+                output = createAuthentication(context);
+            } else {
+                int authenticateResult = authenticationService.authenticate(context, name, password, null, request);
+                if (AuthenticationMethod.SUCCESS == authenticateResult) {
 
-                        log.info(LogHelper
-                                     .getHeader(newContext, "login", "type=explicit"));
+                    log.info(LogHelper.getHeader(context, "login", "type=explicit"));
 
-                        output = createAuthentication(newContext);
+                    output = createAuthentication(context);
 
-                        for (PostLoggedInAction action : postLoggedInActions) {
-                            try {
-                                action.loggedIn(newContext);
-                            } catch (Exception ex) {
-                                log.error("An error occurs performing post logged in action", ex);
-                            }
+                    for (PostLoggedInAction action : postLoggedInActions) {
+                        try {
+                            action.loggedIn(context);
+                        } catch (Exception ex) {
+                            log.error("An error occurs performing post logged in action", ex);
                         }
+                    }
 
-                    } else {
-                        log.info(LogHelper.getHeader(newContext, "failed_login", "email="
-                            + name + ", result="
-                            + authenticateResult));
-                        throw new BadCredentialsException("Login failed");
-                    }
-                }
-            } finally {
-                if (newContext != null && newContext.isValid()) {
-                    try {
-                        newContext.complete();
-                    } catch (SQLException e) {
-                        log.error(e.getMessage() + " occurred while trying to close", e);
-                    }
+                } else {
+                    log.info(LogHelper.getHeader(context, "failed_login",
+                            "email={}, result={}"), name, authenticateResult);
+                    throw new BadCredentialsException("Login failed");
                 }
             }
         }
@@ -182,7 +169,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             return new DSpaceAuthentication(ePerson, getGrantedAuthorities(context));
 
         } else {
-            log.info(LogHelper.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
+            log.info(LogHelper.getHeader(context, "failed_login", "No eperson with a non-blank e-mail address found"));
             throw new BadCredentialsException("Login failed");
         }
     }

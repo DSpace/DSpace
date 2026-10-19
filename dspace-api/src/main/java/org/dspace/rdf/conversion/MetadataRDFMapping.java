@@ -14,15 +14,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -139,7 +140,7 @@ public class MetadataRDFMapping {
     }
 
     public boolean matchesName(String name) {
-        return StringUtils.equalsIgnoreCase(this.name, name);
+        return Strings.CI.equals(this.name, name);
     }
 
     public boolean fulfills(String value) {
@@ -159,7 +160,7 @@ public class MetadataRDFMapping {
     }
 
     public void convert(String value, String lang, String dsoIRI, Model m) {
-        log.debug("Using convertion for field " + name + " on value: " + value
+        log.debug("Using conversion for field " + name + " on value: " + value
                       + " for " + dsoIRI + ".");
         // run over all results
         for (Iterator<Resource> iter = this.results.iterator(); iter.hasNext(); ) {
@@ -282,7 +283,7 @@ public class MetadataRDFMapping {
         String uri = predicate.getURI();
         if (uri == null) {
             log.debug("A result predicate is blank node, but not a "
-                          + "ResourceGenerator. Ingoring this result.");
+                          + "ResourceGenerator. Ignoring this result.");
             return null;
         }
         return m.createProperty(uri);
@@ -447,7 +448,7 @@ public class MetadataRDFMapping {
 
             if (!modifierNode.isResource()) {
                 log.error("The modifier of a result is a Literal not an Resource! "
-                              + "Ingoring this result.");
+                              + "Ignoring this result.");
                 return null;
             }
             Resource modifier = modifierNode.asResource();

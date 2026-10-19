@@ -18,14 +18,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import org.dspace.app.util.XMLUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -101,7 +102,7 @@ public class CurationTaskConfig {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
         // Give our configuration schema to the parser.
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        SchemaFactory schemaFactory = XMLUtils.getSchemaFactory(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = schemaFactory.newSchema(CurationTaskConfig.class.getResource("workflow-curation.xsd"));
         unmarshaller.setSchema(schema);
 

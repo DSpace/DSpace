@@ -8,8 +8,8 @@
 package org.dspace.event;
 
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
@@ -56,7 +56,7 @@ public class TestConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
         EPerson ep = ctx.getCurrentUser();
         String user = (ep == null) ? "(none)" : ep.getEmail();
-        String detail = event.getDetail();
+        EventDetail detail = event.getDetail();
 
         String msg = "EVENT: called TestConsumer.consume(): EventType="
             + event.getEventTypeAsString()
@@ -71,7 +71,7 @@ public class TestConsumer implements Consumer {
             + ", Identifiers="
             + ArrayUtils.toString(event.getIdentifiers())
             + ", TimeStamp="
-            + applyDateFormat(new Date(event.getTimeStamp()))
+            + DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(event.getTimeStamp()))
             + ", user=\""
             + user
             + "\""
@@ -109,10 +109,4 @@ public class TestConsumer implements Consumer {
         }
 
     }
-
-    private String applyDateFormat(Date thisDate) {
-        return new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss.SSS Z").format(thisDate);
-    }
-
-
 }

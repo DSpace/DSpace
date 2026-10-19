@@ -9,7 +9,7 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -51,8 +51,8 @@ public class LoginOnBehalfOfFeature implements AuthorizationFeature {
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        if (!StringUtils.equals(object.getType(), SiteRest.NAME) &&
-            !StringUtils.equals(object.getType(), EPersonRest.NAME)) {
+        if (!Strings.CS.equals(object.getType(), SiteRest.NAME) &&
+            !Strings.CS.equals(object.getType(), EPersonRest.NAME)) {
             return false;
         }
         if (!authorizeService.isAdmin(context)) {
@@ -61,10 +61,10 @@ public class LoginOnBehalfOfFeature implements AuthorizationFeature {
         if (!configurationService.getBooleanProperty("webui.user.assumelogin")) {
             return false;
         }
-        if (StringUtils.equals(object.getType(), EPersonRest.NAME)) {
+        if (Strings.CS.equals(object.getType(), EPersonRest.NAME)) {
             EPersonRest ePersonRest = (EPersonRest) object;
             EPerson currentUser = context.getCurrentUser();
-            if (StringUtils.equalsIgnoreCase(currentUser.getEmail(), ePersonRest.getEmail())) {
+            if (Strings.CI.equals(currentUser.getEmail(), ePersonRest.getEmail())) {
                 return false;
             }
 

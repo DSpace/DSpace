@@ -9,9 +9,10 @@ package org.dspace.app.rest.submit.step;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -27,8 +28,11 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.app.util.TypeBindUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipMetadataService;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
@@ -51,6 +55,9 @@ public class DescribeStep extends AbstractProcessingStep {
     private final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private RelationshipMetadataService relationshipMetadataService =
+        ContentServiceFactory.getInstance().getRelationshipMetadataService();
+
     public DescribeStep() throws DCInputsReaderException {
         inputReader = new DCInputsReader();
     }
@@ -70,15 +77,11 @@ public class DescribeStep extends AbstractProcessingStep {
 
     private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
                            DCInputSet inputConfig) throws DCInputsReaderException {
-        String documentTypeValue = "";
-        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
-                configurationService.getProperty("submit.type-bind.field", "dc.type"));
-        if (documentType.size() > 0) {
-            documentTypeValue = documentType.get(0).getValue();
-        }
+        List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj);
 
         // Get list of all field names (including qualdrop names) allowed for this dc.type
-        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentTypeValue);
+        List<String> allowedFieldNames =
+            inputConfig.populateAllowedFieldNames(documentTypes.stream().map(MetadataValue::getValue).toList());
 
         // Loop input rows and process submitted metadata
         for (DCInput[] row : inputConfig.getFields()) {
@@ -88,8 +91,18 @@ public class DescribeStep extends AbstractProcessingStep {
                     for (Object qualifier : input.getPairs()) {
                         fieldsName.add(input.getFieldName() + "." + (String) qualifier);
                     }
+                } else if (Strings.CI.equals(input.getInputType(), "group") ||
+                    Strings.CI.equals(input.getInputType(), "inline-group")) {
+                    log.debug("Called child form:" + config.getId() + "-" +
+                             Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    DCInputSet inputConfigChild = inputReader.getInputsByFormName(config.getId() + "-" + Utils
+                        .standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    readField(obj, config, data, inputConfigChild);
                 } else {
-                    fieldsName.add(input.getFieldName());
+                    String fieldName = input.getFieldName();
+                    if (fieldName != null) {
+                        fieldsName.add(fieldName);
+                    }
                 }
 
 
@@ -160,7 +173,9 @@ public class DescribeStep extends AbstractProcessingStep {
             PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
                         .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
             String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
-            if (inputConfig.isFieldPresent(split[0])) {
+            String fieldName = split[0];
+            Optional<DCInput> field = inputConfig.getField(fieldName);
+            if (field.isPresent()) {
                 patchOperation.perform(context, currentRequest, source, op);
             } else {
                 throw new UnprocessableEntityException("The field " + split[0] + " is not present in section "
@@ -177,8 +192,8 @@ public class DescribeStep extends AbstractProcessingStep {
                     for (Object qualifier : input.getPairs()) {
                         fieldsName.add(input.getFieldName() + "." + (String) qualifier);
                     }
-                } else if (StringUtils.equalsIgnoreCase(input.getInputType(), "group") ||
-                        StringUtils.equalsIgnoreCase(input.getInputType(), "inline-group")) {
+                } else if (Strings.CI.equals(input.getInputType(), "group") ||
+                        Strings.CI.equals(input.getInputType(), "inline-group")) {
                     log.info("Called child form:" + configId + "-" +
                         Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
                     DCInputSet inputConfigChild = inputReader.getInputsByFormName(configId + "-" + Utils

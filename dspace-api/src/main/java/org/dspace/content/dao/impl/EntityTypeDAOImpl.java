@@ -10,11 +10,11 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.EntityType;
 import org.dspace.content.EntityType_;
 import org.dspace.content.dao.EntityTypeDAO;
@@ -53,15 +53,15 @@ public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implemen
         orderList.add(criteriaBuilder.desc(entityTypeRoot.get(EntityType_.label)));
         criteriaQuery.select(entityTypeRoot).orderBy(orderList);
         criteriaQuery.where(entityTypeRoot.get(EntityType_.LABEL).in(names));
-        return list(context, criteriaQuery, false, EntityType.class, limit, offset);
+        return list(context, criteriaQuery, true, EntityType.class, limit, offset);
     }
 
     @Override
     public int countEntityTypesByNames(Context context, List<String> names) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EntityType.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<EntityType> entityTypeRoot = criteriaQuery.from(EntityType.class);
-        criteriaQuery.select(entityTypeRoot);
+        criteriaQuery.select(criteriaBuilder.count(entityTypeRoot));
         criteriaQuery.where(entityTypeRoot.get(EntityType_.LABEL).in(names));
         return count(context, criteriaQuery, criteriaBuilder, entityTypeRoot);
     }

@@ -15,12 +15,15 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DSpaceObjectUtilsImpl implements DSpaceObjectUtils {
 
     @Autowired
     private ContentServiceFactory contentServiceFactory;
+    @Autowired
+    private HandleService handleService;
 
     /**
      * Retrieve a DSpaceObject from its uuid. As this method need to iterate over all the different services that
@@ -43,5 +46,33 @@ public class DSpaceObjectUtilsImpl implements DSpaceObjectUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Retrieve a DSpaceObject from its uuid or handle. As this method need to iterate over all the different services
+     * that support concrete class of DSpaceObject it has poor performance. Please consider the use of the direct
+     * service (ItemService, CommunityService, etc.) if you know in advance the type of DSpaceObject that you are
+     * looking for
+     *
+     * @param context DSpace context
+     * @param id the uuid or handle to lookup
+     * @return the DSpaceObject if any with the supplied uuid or handle
+     * @throws SQLException
+     */
+    public DSpaceObject findDSpaceObject(Context context, String id) throws SQLException {
+        DSpaceObject dso = handleService.resolveToObject(context, id);
+        // if the id did not resolve to a handle, check if it is a uuid
+        if (dso == null) {
+            UUID uuid = null;
+            try {
+                uuid = UUID.fromString(id);
+            } catch (IllegalArgumentException iae) {
+                // nothing to do here. We check later fo empty uuids anyway
+            }
+            if (uuid != null) {
+                dso = findDSpaceObject(context, uuid);
+            }
+        }
+        return dso;
     }
 }

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 
@@ -109,7 +109,7 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
      */
     @Override
     public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
-        if (!StringUtils.contains(licenseURI, "invalid")) {
+        if (!Strings.CS.contains(licenseURI, "invalid")) {
             InputStream cclicense = null;
             try {
                 cclicense = getClass().getResourceAsStream("cc-license-rdf.xml");

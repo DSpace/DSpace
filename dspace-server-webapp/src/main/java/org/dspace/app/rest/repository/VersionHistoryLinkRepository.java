@@ -8,9 +8,9 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.Projection;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * This is the Repository that takes care of the retrieval of the {@link VersionHistory} object
  * for a given {@link Version}
  */
-@Component(VersionRest.CATEGORY + "." + VersionRest.NAME + "." + VersionRest.VERSION_HISTORY)
+@Component(VersionRest.CATEGORY + "." + VersionRest.PLURAL_NAME + "." + VersionRest.VERSION_HISTORY)
 public class VersionHistoryLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

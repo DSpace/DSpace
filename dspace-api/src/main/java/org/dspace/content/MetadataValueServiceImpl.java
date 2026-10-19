@@ -52,7 +52,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
         metadataValue.setMetadataField(metadataField);
         metadataValue.setDSpaceObject(dso);
         dso.addMetadata(metadataValue);
-//An update here isn't needed, this is persited upon the merge of the owning object
+//An update here isn't needed, this is persisted upon the merge of the owning object
 //        metadataValueDAO.save(context, metadataValue);
         metadataValue = metadataValueDAO.create(context, metadataValue);
         log.info(LogHelper.getHeader(context, "add_metadatavalue",

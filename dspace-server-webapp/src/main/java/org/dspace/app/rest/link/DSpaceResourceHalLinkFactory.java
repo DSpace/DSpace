@@ -21,6 +21,8 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Component;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource, RestResourceController> {
 
     @Autowired

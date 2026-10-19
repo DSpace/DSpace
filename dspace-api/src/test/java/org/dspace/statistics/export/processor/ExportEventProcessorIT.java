@@ -18,8 +18,8 @@ import static org.mockito.Mockito.when;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.CharEncoding;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
@@ -62,6 +62,7 @@ public class ExportEventProcessorIT extends AbstractIntegrationTestWithDatabase 
         configurationService.setProperty("irus.statistics.tracker.enabled", true);
         configurationService.setProperty("irus.statistics.tracker.type-field", "dc.type");
         configurationService.setProperty("irus.statistics.tracker.type-value", "Excluded type");
+        configurationService.setProperty("oai.identifier.prefix", "localhost");
 
         context.turnOffAuthorisationSystem();
         publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();

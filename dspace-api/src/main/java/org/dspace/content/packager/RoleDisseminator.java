@@ -310,8 +310,8 @@ public class RoleDisseminator implements PackageDisseminator {
             for (EPerson member : group.getMembers()) {
                 writer.writeEmptyElement(MEMBER);
                 writer.writeAttribute(ID, String.valueOf(member.getID()));
-                if (null != member.getName()) {
-                    writer.writeAttribute(NAME, member.getName());
+                if (null != member.getEmail()) {
+                    writer.writeAttribute(NAME, member.getEmail());
                 }
             }
             writer.writeEndElement();
@@ -431,7 +431,7 @@ public class RoleDisseminator implements PackageDisseminator {
 
         if (emitPassword) {
             PasswordHash password = ePersonService.getPasswordHash(eperson);
-            if (null != password) {
+            if (null != password && password.getHashString() != null) {
                 writer.writeStartElement(PASSWORD_HASH);
 
                 String algorithm = password.getAlgorithm();

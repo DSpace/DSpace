@@ -18,12 +18,13 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(method = "getEperson", name = AuthorizationRest.EPERSON),
-        @LinkRest(method = "getFeature", name = AuthorizationRest.FEATURE),
-        @LinkRest(method = "getObject", name = AuthorizationRest.OBJECT)
+    @LinkRest(method = "getEperson", name = AuthorizationRest.EPERSON),
+    @LinkRest(method = "getFeature", name = AuthorizationRest.FEATURE),
+    @LinkRest(method = "getObject", name = AuthorizationRest.OBJECT)
 })
 public class AuthorizationRest extends BaseObjectRest<String> {
     public static final String NAME = "authorization";
+    public static final String PLURAL_NAME = "authorizations";
     public static final String CATEGORY = RestAddressableModel.AUTHORIZATION;
 
     public static final String EPERSON = "eperson";
@@ -34,6 +35,14 @@ public class AuthorizationRest extends BaseObjectRest<String> {
     @JsonProperty(access = Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

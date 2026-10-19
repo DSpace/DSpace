@@ -10,7 +10,7 @@ package org.dspace.checker.service;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.core.Context;
 
@@ -35,7 +35,7 @@ public interface SimpleReporterService {
      *                      if io error occurs
      * @throws SQLException if database error
      */
-    public int getDeletedBitstreamReport(Context context, Date startDate, Date endDate,
+    public int getDeletedBitstreamReport(Context context, Instant startDate, Instant endDate,
                                          OutputStreamWriter osw) throws IOException, SQLException;
 
     /**
@@ -51,7 +51,7 @@ public interface SimpleReporterService {
      *                      if io error occurs
      * @throws SQLException if database error
      */
-    public int getChangedChecksumReport(Context context, Date startDate, Date endDate,
+    public int getChangedChecksumReport(Context context, Instant startDate, Instant endDate,
                                         OutputStreamWriter osw) throws IOException, SQLException;
 
     /**
@@ -67,12 +67,13 @@ public interface SimpleReporterService {
      *                      if io error occurs
      * @throws SQLException if database error
      */
-    public int getBitstreamNotFoundReport(Context context, Date startDate, Date endDate,
+    public int getBitstreamNotFoundReport(Context context, Instant startDate, Instant endDate,
                                           OutputStreamWriter osw) throws IOException, SQLException;
 
     /**
      * The bitstreams that were set to not be processed report for the specified
-     * date range.
+     * date range. This includes bitstreams that are marked as deleted and bitstreams
+     * that are not found from the assetstore.
      *
      * @param context   context
      * @param startDate the start date range.
@@ -83,7 +84,7 @@ public interface SimpleReporterService {
      *                      if io error occurs
      * @throws SQLException if database error
      */
-    public int getNotToBeProcessedReport(Context context, Date startDate, Date endDate,
+    public int getNotToBeProcessedReport(Context context, Instant startDate, Instant endDate,
                                          OutputStreamWriter osw) throws IOException, SQLException;
 
     /**

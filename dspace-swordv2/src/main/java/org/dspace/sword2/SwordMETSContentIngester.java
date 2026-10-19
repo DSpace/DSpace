@@ -10,10 +10,12 @@ package org.dspace.sword2;
 import java.io.File;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
@@ -28,6 +30,7 @@ import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
+import org.swordapp.server.UriRegistry;
 
 public class SwordMETSContentIngester extends AbstractSwordContentIngester {
     /**
@@ -60,7 +63,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
         throws DSpaceSwordException, SwordError, SwordAuthException,
         SwordServerException {
         try {
-            // if we are actuall given an item in the deposit result of a previous operation
+            // if we are actually given an item in the deposit result of a previous operation
             // then we do an ingestToItem
             if (result != null) {
                 Item item = result.getItem();
@@ -140,7 +143,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             // get reference to item so that we can report on it
             Item installedItem = (Item) ingestedObject;
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, installedItem, verboseDescription);
 
@@ -181,6 +184,12 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
         } catch (RuntimeException re) {
             log.error("caught exception: ", re);
             throw re;
+        } catch (AuthorizeException e) {
+            log.error("caught exception: ", e);
+            throw new SwordAuthException(e);
+        } catch (CrosswalkException e) {
+            log.error("caught exception: ", e);
+            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, e.getMessage(), e);
         } catch (Exception e) {
             log.error("caught exception: ", e);
             throw new DSpaceSwordException(e);
@@ -250,7 +259,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             // get reference to item so that we can report on it
             Item installedItem = (Item) ingestedObject;
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, installedItem, verboseDescription);
 

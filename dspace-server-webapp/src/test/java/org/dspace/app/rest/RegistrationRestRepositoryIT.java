@@ -7,40 +7,64 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.repository.RegistrationRestRepository.TOKEN_QUERY_PARAM;
 import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_FORGOT;
 import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_QUERY_PARAM;
 import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_REGISTER;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.Strings;
 import org.dspace.app.rest.matcher.RegistrationMatcher;
 import org.dspace.app.rest.model.RegistrationRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.RegistrationRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.core.Email;
 import org.dspace.eperson.CaptchaServiceImpl;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.RegistrationData;
+import org.dspace.eperson.RegistrationTypeEnum;
 import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.eperson.service.CaptchaService;
+import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -50,9 +74,34 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     @Autowired
     private RegistrationDataDAO registrationDataDAO;
     @Autowired
+    private RegistrationDataService registrationDataService;
+    @Autowired
     private ConfigurationService configurationService;
     @Autowired
     private RegistrationRestRepository registrationRestRepository;
+    @Autowired
+    private ObjectMapper mapper;
+
+    private static MockedStatic<Email> emailMockedStatic;
+
+    @After
+    public void tearDown() throws Exception {
+        Iterator<RegistrationData> iterator = registrationDataDAO.findAll(context, RegistrationData.class).iterator();
+        while (iterator.hasNext()) {
+            RegistrationData registrationData = iterator.next();
+            registrationDataDAO.delete(context, registrationData);
+        }
+    }
+
+    @BeforeClass
+    public static void init() throws Exception {
+        emailMockedStatic = Mockito.mockStatic(Email.class);
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        emailMockedStatic.close();
+    }
 
     @Test
     public void findByTokenTestExistingUserTest() throws Exception {
@@ -111,7 +160,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     private void createTokenForEmail(String email) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(email);
         getClient().perform(post("/api/eperson/registrations")
@@ -122,11 +170,37 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void findByTokenWithoutToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithEmptyToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", ""))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithBlankToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", "  "))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByTokenWithTooLongToken() throws Exception {
+        getClient().perform(get("/api/eperson/registrations/search/findByToken")
+            .param("token", "t".repeat(49))) // token length cannot be longer than 48 characters
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void registrationFlowTest() throws Exception {
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         assertEquals(0, registrationDataList.size());
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
 
@@ -138,7 +212,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
             String newEmail = "newEPersonTest@gmail.com";
             registrationRest.setEmail(newEmail);
@@ -149,8 +223,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertTrue(registrationDataList.size() == 2);
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
-                           StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) ||
+                           Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
             configurationService.setProperty("user.registration", false);
 
             newEmail = "newEPersonTestTwo@gmail.com";
@@ -162,8 +236,47 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().is(HttpServletResponse.SC_UNAUTHORIZED));
 
             assertEquals(2, registrationDataList.size());
-            assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
-                           !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(!Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) &&
+                           !Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
+    public void registrationWithExistingEmailTest() throws Exception {
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        assertEquals(0, registrationDataList.size());
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+
+        try {
+            // First registration
+            getClient().perform(post("/api/eperson/registrations")
+                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+                            .content(mapper.writeValueAsBytes(registrationRest))
+                            .contentType(contentType))
+                    .andExpect(status().isCreated());
+
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(1, registrationDataList.size());
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+
+            // Try to register the same email again
+            getClient().perform(post("/api/eperson/registrations")
+                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+                            .content(mapper.writeValueAsBytes(registrationRest))
+                            .contentType(contentType))
+                    .andExpect(status().isCreated()); // or .isUnprocessableEntity() depending on API behavior
+
+            // Make sure the duplicate was not created
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(1, registrationDataList.size());
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -182,7 +295,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             String email = "testPerson@test.com";
             registrationRest.setEmail(email);
 
-            ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
@@ -190,7 +302,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), email));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), email));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -209,7 +321,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             String email = "testPerson@bladibla.com";
             registrationRest.setEmail(email);
 
-            ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
@@ -226,7 +337,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void testRegisterDomainNotRegisteredMailAddressRegistred() throws Exception {
+    public void testRegisterMailAddressRegistered() throws Exception {
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         try {
             context.turnOffAuthorisationSystem();
@@ -236,18 +347,18 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                           .withCanLogin(true)
                           .build();
             context.restoreAuthSystemState();
-            configurationService.setProperty("authentication-password.domain.valid", "test.com");
+
             RegistrationRest registrationRest = new RegistrationRest();
             registrationRest.setEmail(email);
 
-            ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
-                       .andExpect(status().isUnprocessableEntity());
+                       .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-            assertEquals(0, registrationDataList.size());
+            assertEquals(1, registrationDataList.size());
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), email));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -265,7 +376,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         try {
             assertEquals(0, registrationDataList.size());
 
-            ObjectMapper mapper = new ObjectMapper();
             RegistrationRest registrationRest = new RegistrationRest();
             registrationRest.setEmail(eperson.getEmail());
             getClient().perform(post("/api/eperson/registrations")
@@ -275,7 +385,34 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(status().isCreated());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
+    public void testUnauthorizedForgotPasswordTest() throws Exception {
+        configurationService.setProperty("user.registration", false);
+        configurationService.setProperty("user.forgot-password", false);
+
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        try {
+            assertEquals(0, registrationDataList.size());
+
+            RegistrationRest registrationRest = new RegistrationRest();
+            registrationRest.setEmail(eperson.getEmail());
+            getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_FORGOT)
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isUnauthorized());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(0, registrationDataList.size());
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -292,12 +429,12 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         String originVresion = configurationService.getProperty("google.recaptcha.version");
         reloadCaptchaProperties("true", "test-secret", "v2");
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
 
-        // when reCAPTCHA enabled and request doesn't contain "X-Recaptcha-Token” header
+        // when reCAPTCHA enabled and request doesn't contain "x-captcha-payload” header
         getClient().perform(post("/api/eperson/registrations")
+                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                    .content(mapper.writeValueAsBytes(registrationRest))
                    .contentType(contentType))
                    .andExpect(status().isForbidden());
@@ -312,15 +449,14 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         String originVresion = configurationService.getProperty("google.recaptcha.version");
         reloadCaptchaProperties("true", "test-secret", "v2");
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
 
         String captchaToken = "invalid-captcha-Token";
-        // when reCAPTCHA enabled and request contains Invalid "X-Recaptcha-Token” header
+        // when reCAPTCHA enabled and request contains Invalid "x-captcha-payload” header
         getClient().perform(post("/api/eperson/registrations")
                    .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
-                   .header("X-Recaptcha-Token", captchaToken)
+                   .header("x-captcha-payload", captchaToken)
                    .content(mapper.writeValueAsBytes(registrationRest))
                    .contentType(contentType))
                    .andExpect(status().isForbidden());
@@ -350,42 +486,46 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         assertEquals(0, registrationDataList.size());
 
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
+
+        Email emailSpy = Mockito.spy(Email.class);
+        doNothing().when(emailSpy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(emailSpy);
+
         try {
-            // will throw InvalidReCaptchaException because 'X-Recaptcha-Token' not equal captchaToken
+            // will throw InvalidReCaptchaException because 'x-captcha-payload' not equal captchaToken
             getClient().perform(post("/api/eperson/registrations")
                        .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
-                       .header("X-Recaptcha-Token", captchaToken1)
+                       .header("x-captcha-payload", captchaToken1)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
                        .andExpect(status().isForbidden());
 
             getClient().perform(post("/api/eperson/registrations")
                        .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
-                       .header("X-Recaptcha-Token", captchaToken)
+                       .header("x-captcha-payload", captchaToken)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
                        .andExpect(status().isCreated());
 
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
             String newEmail = "newEPersonTest@gmail.com";
             registrationRest.setEmail(newEmail);
             getClient().perform(post("/api/eperson/registrations")
                        .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
-                       .header("X-Recaptcha-Token", captchaToken)
+                       .header("x-captcha-payload", captchaToken)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
                        .andExpect(status().isCreated());
 
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertTrue(registrationDataList.size() == 2);
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
-                       StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) ||
+                       Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
 
             configurationService.setProperty("user.registration", false);
 
@@ -393,14 +533,14 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             registrationRest.setEmail(newEmail);
             getClient().perform(post("/api/eperson/registrations")
                        .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
-                       .header("X-Recaptcha-Token", captchaToken)
+                       .header("x-captcha-payload", captchaToken)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
                        .andExpect(status().is(HttpServletResponse.SC_UNAUTHORIZED));
 
             assertEquals(2, registrationDataList.size());
-            assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
-                       !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            assertTrue(!Strings.CI.equals(registrationDataList.get(0).getEmail(), newEmail) &&
+                       !Strings.CI.equals(registrationDataList.get(1).getEmail(), newEmail));
         } finally {
             registrationRestRepository.setCaptchaService(captchaService);
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
@@ -421,7 +561,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void accountEndpoint_WithoutAccountTypeParam() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
         getClient().perform(post("/api/eperson/registrations")
@@ -432,7 +571,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void accountEndpoint_WrongAccountTypeParam() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
         getClient().perform(post("/api/eperson/registrations")
@@ -440,6 +578,670 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             .content(mapper.writeValueAsBytes(registrationRest))
             .contentType(contentType))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void registrationWithInvalidEmailFormatTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("invalid-email!!!!");
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithEmptyEmailTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("");
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithNullEmailTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(null);
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithValidEmailAndTooLongNetidTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("test@dspace.local");
+        registrationRest.setNetId("n".repeat(65)); // 65 characters, exceeds the max of 64
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void registrationWithValidEmailAndNetidTest() throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail("test@dspace.local");
+        registrationRest.setNetId("n".repeat(64)); // 64 characters, within the max of 64
+
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void givenRegistrationData_whenPatchInvalidValue_thenUnprocessableEntityResponse()
+        throws Exception {
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+
+        // Create first registration request of type "external-login" with an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String token = registrationData.getToken();
+        String newMail = null;
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+        newMail = "test@email.com";
+        patchContent = getPatchContent(
+            List.of(new AddOperation("/email", newMail))
+        );
+
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isUnprocessableEntity());
+
+        newMail = "invalidemail!!!!";
+        patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void givenRegistrationData_whenPatchWithInvalidToken_thenUnprocessableEntityResponse()
+        throws Exception {
+        // Create first registration request of type "external-login" with an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.ORCID);
+
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String newMail = "validemail@email.com";
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        // patch for replace email with null token
+        String token = null;
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+        // patch for replace email with empty token
+        token = "";
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+        // patch for replace email with not existing token
+        token = "notexistingtoken";
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isUnauthorized());
+
+        // when patch for replace email with too long token
+        token = "t".repeat(49); // token length cannot be longer than 48 characters
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+        context.turnOffAuthorisationSystem();
+        registrationData = context.reloadEntity(registrationData);
+        registrationDataService.markAsExpired(context, registrationData);
+        context.commit();
+        context.restoreAuthSystemState();
+
+        registrationData = context.reloadEntity(registrationData);
+
+        assertThat(registrationData.getExpires(), notNullValue());
+
+        token = registrationData.getToken();
+        newMail = "validemail@email.com";
+        patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void givenRegistrationDataWithEmail_whenPatchWithDifferentToken_thenThrowError()
+        throws Exception {
+        // Create first registration request of type "external-login" with an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String tokenOne = registrationData.getToken();
+
+        // Create second registration request of type "external-login" with a different associated email address.
+        RegistrationData registration2Data =
+            createNewRegistrationData(null, "different@example.org", RegistrationTypeEnum.ORCID);
+
+        assertThat(registration2Data, notNullValue());
+        assertThat(registration2Data.getToken(), not(emptyOrNullString()));
+
+        String tokenTwo = registration2Data.getToken();
+
+        // Create patch content to modify the email fo the first registration
+        String newMail = "vins-01@fake.mail";
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        // Here we are attempting to patch the *first* registration using the token from the *second* registration
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, tokenTwo)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then unauthorized error is thrown
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void givenRegistrationDataWithEmail_whenPatchForReplaceEmail_thenSuccessfullResponse()
+        throws Exception {
+        // Create a registration request of type "external-login" with an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String token = registrationData.getToken();
+        String newMail = "vins-01@fake.mail";
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then successful response returned
+                   .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void givenRegistrationDataWithoutEmail_whenPatchForAddEmail_thenSuccessfullResponse()
+        throws Exception {
+        // Create a registration request of type "external-login" without an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData("0000-1111-2222-3333", null, RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String token = registrationData.getToken();
+        String newMail = "vins-01@fake.mail";
+        String patchContent = getPatchContent(
+            List.of(new AddOperation("/email", newMail))
+        );
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then successful response returned
+                   .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void givenRegistrationDataWithEmail_whenPatchForReplaceEmail_thenNewRegistrationDataCreated()
+        throws Exception {
+        // Create a registration request of type "external-login" with an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String token = registrationData.getToken();
+        String newMail = "vins-01@fake.mail";
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then successful response returned
+                   .andExpect(status().is2xxSuccessful());
+
+        // then email updated with new registration
+        RegistrationData newRegistration = registrationDataService.findByEmail(context, newMail);
+        assertThat(newRegistration, notNullValue());
+        assertThat(newRegistration.getToken(), not(emptyOrNullString()));
+        assertThat(newRegistration.getEmail(), equalTo(newMail));
+
+        // verify token and email are both changed in updated registration
+        assertThat(newRegistration.getEmail(), not(equalTo(registrationData.getEmail())));
+        assertThat(newRegistration.getToken(), not(equalTo(registrationData.getToken())));
+
+        // verify prior registration data is nullified
+        registrationData = context.reloadEntity(registrationData);
+        assertThat(registrationData, nullValue());
+
+        // Attempt to update the registration data a SECOND TIME.
+        // It should be possible but email & token will change again.
+        String token2 = newRegistration.getToken();
+        String newMail2 = "person1@example.org";
+        String patchContent2 = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail2))
+        );
+
+        // Second patch to replace email again using the updated token
+        getClient().perform(patch("/api/eperson/registrations/" + newRegistration.getID())
+                                .param(TOKEN_QUERY_PARAM, token2)
+                                .content(patchContent2)
+                                .contentType(contentType))
+                   // then successful response returned
+                   .andExpect(status().is2xxSuccessful());
+
+        // Again find the updated registration and verify it's valid
+        RegistrationData newRegistration2 = registrationDataService.findByEmail(context, newMail2);
+        assertThat(newRegistration2, notNullValue());
+        assertThat(newRegistration2.getToken(), not(emptyOrNullString()));
+        assertThat(newRegistration2.getEmail(), equalTo(newMail2));
+
+        // verify token and email are both changed in updated registration
+        assertThat(newRegistration2.getEmail(), not(equalTo(newRegistration.getEmail())));
+        assertThat(newRegistration2.getToken(), not(equalTo(newRegistration.getToken())));
+
+        // verify prior registration data is nullified (again)
+        newRegistration = context.reloadEntity(newRegistration);
+        assertThat(newRegistration, nullValue());
+    }
+
+    @Test
+    public void givenRegistrationDataWithoutEmail_whenPatchForReplaceEmail_thenNewRegistrationDataCreated()
+        throws Exception {
+        // Create a registration request of type "external-login" without an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData("0000-1111-2222-3333", null, RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String token = registrationData.getToken();
+        String newMail = "vins-01@fake.mail";
+        String patchContent = getPatchContent(
+            List.of(new AddOperation("/email", newMail))
+        );
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then successful response returned
+                   .andExpect(status().is2xxSuccessful());
+
+        // then email updated with new registration
+        RegistrationData newRegistration = registrationDataService.findByEmail(context, newMail);
+        assertThat(newRegistration, notNullValue());
+        assertThat(newRegistration.getToken(), not(emptyOrNullString()));
+        assertThat(newRegistration.getEmail(), equalTo(newMail));
+
+        assertThat(newRegistration.getEmail(), not(equalTo(registrationData.getEmail())));
+        assertThat(newRegistration.getToken(), not(equalTo(registrationData.getToken())));
+
+        registrationData = context.reloadEntity(registrationData);
+        assertThat(registrationData, nullValue());
+    }
+
+    @Test
+    public void givenRegistrationDataWithoutEmail_whenPatchForAddEmail_thenExternalLoginSent() throws Exception {
+        // Create a registration request of type "external-login" without an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData("0000-1111-2222-3333", null, RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        String token = registrationData.getToken();
+        String newMail = "vins-01@fake.mail";
+        String patchContent = getPatchContent(
+            List.of(new AddOperation("/email", newMail))
+        );
+
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then successful response returned
+                   .andExpect(status().is2xxSuccessful());
+
+        // then verification email sent
+        verify(spy, times(1)).addRecipient(newMail);
+        verify(spy).addArgument(
+            ArgumentMatchers.contains(
+                RegistrationTypeEnum.ORCID.getLink()
+            )
+        );
+        verify(spy, times(1)).send();
+    }
+
+    @Test
+    public void givenRegistrationDataWithEmail_whenPatchForNewEmail_thenExternalLoginSent() throws Exception {
+        // Create a registration request of type "external-login" without an associated email address.
+        // NOTE: We'll add an email to this registration data via PATCH below
+        RegistrationData registrationData =
+            createNewRegistrationData("0000-1111-2222-3333", null, RegistrationTypeEnum.ORCID);
+
+        String token = registrationData.getToken();
+        String newMail = "vincenzo.mecca@orcid.com";
+        String patchContent = getPatchContent(
+            List.of(new AddOperation("/email", newMail))
+        );
+
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        // when patch for add email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().is2xxSuccessful());
+
+        verify(spy, times(1)).addRecipient(newMail);
+        verify(spy).addArgument(
+            ArgumentMatchers.contains(
+                registrationData.getRegistrationType().getLink()
+            )
+        );
+        verify(spy, times(1)).send();
+
+        registrationData = registrationDataService.findByEmail(context, newMail);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        token = registrationData.getToken();
+        newMail = "vins-01@fake.mail";
+        patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().is2xxSuccessful());
+
+        // then verification email sent
+        verify(spy, times(1)).addRecipient(newMail);
+        verify(spy).addArgument(
+            ArgumentMatchers.contains(
+                registrationData.getRegistrationType().getLink()
+            )
+        );
+        verify(spy, times(1)).send();
+    }
+
+    @Test
+    public void givenRegistrationDataWithEmail_whenPatchForExistingEPersonEmail_thenReviewAccountLinkSent()
+        throws Exception {
+        // Create a registration request of type "external-login" with an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData("0000-0000-0000-0000", "test@example.org", RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        context.turnOffAuthorisationSystem();
+        final EPerson vins =
+            EPersonBuilder.createEPerson(context)
+                          .withEmail("vins-01@fake.mail")
+                          .withNameInMetadata("Vincenzo", "Mecca")
+                          .withOrcid("0101-0101-0101-0101")
+                          .build();
+        context.restoreAuthSystemState();
+
+        String token = registrationData.getToken();
+        String vinsEmail = vins.getEmail();
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", vins.getEmail()))
+        );
+
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().is2xxSuccessful());
+
+        // then verification email sent
+        verify(spy, times(1)).addRecipient(vinsEmail);
+        verify(spy).addArgument(
+            ArgumentMatchers.contains(
+                RegistrationTypeEnum.VALIDATION_ORCID.getLink()
+            )
+        );
+        verify(spy, times(1)).send();
+    }
+
+    @Test
+    public void givenRegistrationDataWithoutEmail_whenPatchForExistingAccount_thenReviewAccountSent() throws Exception {
+        // Create a registration request of type "external-login" without an associated email address.
+        RegistrationData registrationData =
+            createNewRegistrationData("0000-1111-2222-3333", null, RegistrationTypeEnum.ORCID);
+
+        assertThat(registrationData, notNullValue());
+        assertThat(registrationData.getToken(), not(emptyOrNullString()));
+
+        context.turnOffAuthorisationSystem();
+        final EPerson vins =
+            EPersonBuilder.createEPerson(context)
+                          .withEmail("vins-01@fake.mail")
+                          .withNameInMetadata("Vincenzo", "Mecca")
+                          .withOrcid("0101-0101-0101-0101")
+                          .build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String token = registrationData.getToken();
+        String vinsEmail = vins.getEmail();
+        String patchContent = getPatchContent(
+            List.of(new AddOperation("/email", vins.getEmail()))
+        );
+
+        Email spy = Mockito.spy(Email.class);
+        doNothing().when(spy).send();
+
+        emailMockedStatic.when(() -> Email.getEmail(any())).thenReturn(spy);
+
+        // when patch for replace email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationData.getID())
+                                .param(TOKEN_QUERY_PARAM, token)
+                                .content(patchContent)
+                                .contentType(contentType))
+                   .andExpect(status().is2xxSuccessful());
+
+        // then verification email sent
+        verify(spy, times(1)).addRecipient(vinsEmail);
+        verify(spy).addArgument(
+            ArgumentMatchers.contains(
+                RegistrationTypeEnum.VALIDATION_ORCID.getLink()
+            )
+        );
+        verify(spy, times(1)).send();
+    }
+
+    @Test
+    public void givenNonExternalRegistrationData_whenPatch_throwError() throws Exception {
+        // PATCH of registration data REQUIRES the "external-login" type. So, we'll verify that all other types fail.
+
+        // Create patch content to replace the email to something different
+        String newMail = "different@example.org";
+        String patchContent = getPatchContent(
+            List.of(new ReplaceOperation("/email", newMail))
+        );
+
+        // Create a registration request of type "forgot" with an associated email address.
+        RegistrationData registrationDataForgot =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.FORGOT);
+
+        // Attempt to patch the "forgot" request with a new email
+        // Expect it to fail as this would be a potential vulnerability allowing attackers to change the linked account
+        getClient().perform(patch("/api/eperson/registrations/" + registrationDataForgot.getID())
+                                .param(TOKEN_QUERY_PARAM, registrationDataForgot.getToken())
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then unauthorized error is thrown
+                   .andExpect(status().isUnauthorized());
+
+        // Create a registration request of type "register" with an associated email address.
+        RegistrationData registrationDataRegister =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.REGISTER);
+
+        // Attempt to patch the "register" request with a new email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationDataRegister.getID())
+                                .param(TOKEN_QUERY_PARAM, registrationDataRegister.getToken())
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then unauthorized error is thrown
+                   .andExpect(status().isUnauthorized());
+
+        // Create a registration request of type "change-password" with an associated email address.
+        RegistrationData registrationDataChangePass =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.CHANGE_PASSWORD);
+
+        // Attempt to patch the "change-password" request with a new email
+        // Expect it to fail as this would be a potential vulnerability allowing attackers to change the linked account
+        getClient().perform(patch("/api/eperson/registrations/" + registrationDataChangePass.getID())
+                                .param(TOKEN_QUERY_PARAM, registrationDataChangePass.getToken())
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then unauthorized error is thrown
+                   .andExpect(status().isUnauthorized());
+
+        // Create a registration request of type "invitation" with an associated email address.
+        RegistrationData registrationDataInvitation =
+            createNewRegistrationData(null, "test@example.org", RegistrationTypeEnum.INVITATION);
+
+        // Attempt to patch the "invitation" request with a new email
+        getClient().perform(patch("/api/eperson/registrations/" + registrationDataInvitation.getID())
+                                .param(TOKEN_QUERY_PARAM, registrationDataInvitation.getToken())
+                                .content(patchContent)
+                                .contentType(contentType))
+                   // then unauthorized error is thrown
+                   .andExpect(status().isUnauthorized());
+    }
+
+    private RegistrationData createNewRegistrationData(
+        String netId, String email, RegistrationTypeEnum type
+    ) throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        RegistrationData registrationData =
+            registrationDataService.create(context, netId, type);
+        registrationData.setEmail(email);
+        context.commit();
+        context.restoreAuthSystemState();
+        return registrationData;
     }
 
 }

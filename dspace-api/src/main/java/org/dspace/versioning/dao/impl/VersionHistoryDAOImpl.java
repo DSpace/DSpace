@@ -10,11 +10,11 @@ package org.dspace.versioning.dao.impl;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -47,7 +47,7 @@ public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> 
         criteriaQuery.select(versionHistoryRoot);
         criteriaQuery.where(criteriaBuilder.equal(join.get(Version_.item), item));
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(join.get(Version_.versionNumber)));
         criteriaQuery.orderBy(orderList);
 

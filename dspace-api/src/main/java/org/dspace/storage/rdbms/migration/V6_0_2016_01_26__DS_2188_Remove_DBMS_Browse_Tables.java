@@ -58,7 +58,7 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables extends BaseJava
         // Keep looping (incrementing our index by 1) until we've hit three index
         // tables that have not been found.
         // We don't actually know how many index tables will be in each database,
-        // and there are no guarrantees it'll match the highest index of the site's
+        // and there are no guarantees it'll match the highest index of the site's
         // existing "webui.browse.index.#" settings.
         // Since that's the case, we'll just keep searching for index tables,
         // until we encounter a total of three that are not found.

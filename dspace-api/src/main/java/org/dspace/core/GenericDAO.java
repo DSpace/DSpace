@@ -103,6 +103,17 @@ public interface GenericDAO<T> {
     public T findByID(Context context, Class clazz, UUID id) throws SQLException;
 
     /**
+     * Fetch the entity identified by its String primary key.
+     *
+     * @param context current DSpace context.
+     * @param clazz   class of entity to be found.
+     * @param id      primary key of the database record.
+     * @return the found entity.
+     * @throws SQLException
+     */
+    public T findByID(Context context, Class clazz, String id) throws SQLException;
+
+    /**
      * Execute a JPQL query and return a collection of results.
      *
      * @param context The relevant DSpace Context.

@@ -203,12 +203,8 @@ public class BrowseEngine {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
-            if (scope.getBrowseIndex() != null && OrderFormat.TITLE.equals(scope.getBrowseIndex().getDataType())) {
-                // For browsing by title, apply the same normalization applied to indexed titles
-                dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
-            } else {
-                dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
-            }
+            // Set startsWith or dateStartsWith params on SolrBrowseDAO
+            addStartsWithParams(bs);
 
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
@@ -367,6 +363,30 @@ public class BrowseEngine {
         }
     }
 
+    private void addStartsWithParams(BrowserScope bs) throws BrowseException {
+        if (StringUtils.isNotBlank(scope.getStartsWith())) {
+            boolean isDateBrowse = bs.getSortOption().getType().equals("date");
+            if (!isDateBrowse) {
+                if (scope.getBrowseIndex() != null
+                        && OrderFormat.TITLE.equals(scope.getBrowseIndex().getDataType())) {
+                    // For browsing by title, apply the same normalization applied to indexed titles
+                    dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
+                } else {
+                    dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+                }
+                // clear the old date starts with
+                dao.setDateStartsWith(null);
+            } else {
+                // For "date" sort browses ({@code webui.itemlist.sort-option.*} config):
+                // sets a date specific filter where the startsWith query is the start date,
+                // eg `fq=bi_sort_*_sort:+["1940-02" TO + ]`
+                dao.setDateStartsWith(scope.getStartsWith().trim());
+                // clear the old non date starts with
+                dao.setStartsWith(null);
+            }
+        }
+    }
+
     /**
      * Browse the archive by single values (such as the name of an author).  This
      * produces a BrowseInfo object that contains Strings as the results of
@@ -422,9 +442,6 @@ public class BrowseEngine {
                 }
             }
 
-            // this is the total number of results in answer to the query
-            int total = getTotalResults(true);
-
             // set the ordering field (there is only one option)
             dao.setOrderField("sort_value");
 
@@ -443,6 +460,9 @@ public class BrowseEngine {
             // assemble the offset and limit
             dao.setOffset(offset);
             dao.setLimit(scope.getResultsPerPage());
+
+            // this is the total number of results in answer to the query
+            int total = getTotalResults(true);
 
             // Holder for the results
             List<String[]> results = null;
@@ -680,32 +700,8 @@ public class BrowseEngine {
         // tell the browse query whether we are distinct
         dao.setDistinct(distinct);
 
-        // ensure that the select is set to "*"
-        String[] select = {"*"};
-        dao.setCountValues(select);
-
-        // FIXME: it would be nice to have a good way of doing this in the DAO
-        // now reset all of the fields that we don't want to have constraining
-        // our count, storing them locally to reinstate later
-        String focusField = dao.getJumpToField();
-        String focusValue = dao.getJumpToValue();
-        int limit = dao.getLimit();
-        int offset = dao.getOffset();
-
-        dao.setJumpToField(null);
-        dao.setJumpToValue(null);
-        dao.setLimit(-1);
-        dao.setOffset(-1);
-
         // perform the query and get the result
         int count = dao.doCountQuery();
-
-        // now put back the values we removed for this method
-        dao.setJumpToField(focusField);
-        dao.setJumpToValue(focusValue);
-        dao.setLimit(limit);
-        dao.setOffset(offset);
-        dao.setCountValues(null);
 
         log.debug(LogHelper.getHeader(context, "get_total_results_return", "return=" + count));
 

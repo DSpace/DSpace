@@ -21,7 +21,7 @@ import org.dspace.profile.OrcidProfileSyncPreference;
 import org.dspace.profile.OrcidSynchronizationMode;
 
 /**
- * Service that handle the the syncronization between a DSpace profile and the
+ * Service that handle the the synchronization between a DSpace profile and the
  * relative ORCID profile, if any.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)

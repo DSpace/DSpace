@@ -47,10 +47,12 @@ public class MockSolrServer {
     private static final Logger log = LogManager.getLogger();
 
     /** Shared embedded Solr connections, by name. */
-    private static final ConcurrentMap<String, SolrClient> loadedCores = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, SolrClient> loadedCores
+            = new ConcurrentHashMap<>();
 
     /** Reference counts for each core. */
-    private static final ConcurrentMap<String, AtomicLong> usersPerCore = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, AtomicLong> usersPerCore
+            = new ConcurrentHashMap<>();
 
     /** Container for embedded Solr cores. */
     private static CoreContainer container = null;
@@ -81,7 +83,7 @@ public class MockSolrServer {
     /**
      * Ensure that this instance's core is loaded.  Create it if necessary.
      */
-    protected void initSolrServer() {
+    private void initSolrServer() {
         solrServer = loadedCores.get(coreName);
         if (solrServer == null) {
             solrServer = initSolrServerForCore(coreName);
@@ -103,7 +105,13 @@ public class MockSolrServer {
         if (server == null) {
             initSolrContainer();
 
-            server = new EmbeddedSolrServer(container, coreName);
+            server = new EmbeddedSolrServer(container, coreName) {
+                // This ugliness should be fixed in Solr 8.9.
+                // https://issues.apache.org/jira/browse/SOLR-15085
+                @Override public void close() { // Copied from Solr's own tests
+                    // Do not close shared core container!
+                }
+            };
 
             //Start with an empty index
             try {
@@ -123,6 +131,11 @@ public class MockSolrServer {
      * Remove all records.
      */
     public void reset() {
+        if (null == solrServer) {
+            log.warn("reset called with no server connection");
+            return;
+        }
+
         try {
             solrServer.deleteByQuery("*:*");
         } catch (SolrServerException | IOException ex) {
@@ -160,7 +173,8 @@ public class MockSolrServer {
     private static synchronized void initSolrContainer() {
         if (container == null) {
             Path solrDir = Paths.get(AbstractDSpaceIntegrationTest.getDspaceDir(), "solr");
-            log.info("Initializing SOLR CoreContainer with directory {}", solrDir.toAbsolutePath().toString());
+            log.info("Initializing SOLR CoreContainer with directory {}",
+                    solrDir.toAbsolutePath().toString());
             container = new CoreContainer(solrDir, new Properties());
             container.load();
             log.info("SOLR CoreContainer initialized");

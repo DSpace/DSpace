@@ -20,12 +20,13 @@ import java.util.Map;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -118,7 +119,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         jurisdiction = configurationService.getProperty("cc.license.jurisdiction", "");
 
         try {
-            templates = TransformerFactory.newInstance().newTemplates(
+            templates = XMLUtils.getTransformerFactory().newTemplates(
                     new StreamSource(CreativeCommonsServiceImpl.class
                                              .getResourceAsStream("CreativeCommons.xsl")));
         } catch (TransformerConfigurationException e) {
@@ -623,7 +624,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     private boolean containsAnswerEnum(final String enumAnswer, final CCLicenseField ccLicenseField) {
         List<CCLicenseFieldEnum> fieldEnums = ccLicenseField.getFieldEnum();
         for (CCLicenseFieldEnum fieldEnum : fieldEnums) {
-            if (StringUtils.equals(fieldEnum.getId(), enumAnswer)) {
+            if (Strings.CS.equals(fieldEnum.getId(), enumAnswer)) {
                 return true;
             }
         }
@@ -632,7 +633,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     private CCLicenseField findCCLicenseField(final String field, final List<CCLicenseField> ccLicenseFieldList) {
         for (CCLicenseField ccLicenseField : ccLicenseFieldList) {
-            if (StringUtils.equals(ccLicenseField.getId(), field)) {
+            if (Strings.CS.equals(ccLicenseField.getId(), field)) {
                 return ccLicenseField;
             }
         }

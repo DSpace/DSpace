@@ -9,16 +9,21 @@ package org.dspace.app.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.content.Collection;
+import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
 
 /**
  * Tests for parsing and utilities on submission config forms / readers
@@ -28,6 +33,9 @@ import org.junit.Test;
 public class SubmissionConfigTest extends AbstractUnitTest {
 
     DCInputsReader inputReader;
+
+    @Mock
+    private Collection col1;
 
     @BeforeClass
     public static void setUpClass() {
@@ -55,6 +63,8 @@ public class SubmissionConfigTest extends AbstractUnitTest {
         String typeBindSubmissionName = "typebindtest";
         String typeBindSubmissionStepName = "typebindtest";
 
+        when(col1.getHandle()).thenReturn(typeBindHandle);
+
         // Expected field lists from typebindtest form
         List<String> allConfiguredFields = new ArrayList<>();
         allConfiguredFields.add("dc.title");
@@ -65,7 +75,8 @@ public class SubmissionConfigTest extends AbstractUnitTest {
 
         // Get submission configuration
         SubmissionConfig submissionConfig =
-                new SubmissionConfigReader().getSubmissionConfigByCollection(typeBindHandle);
+                SubmissionServiceFactory.getInstance().getSubmissionConfigService()
+                    .getSubmissionConfigByCollection(col1);
         // Submission name should match name defined in item-submission.xml
         assertEquals(typeBindSubmissionName, submissionConfig.getSubmissionName());
         // Step 0 - our process only has one step. It should not be null and have the ID typebindtest
@@ -74,15 +85,21 @@ public class SubmissionConfigTest extends AbstractUnitTest {
         assertEquals(typeBindSubmissionStepName, submissionStepConfig.getId());
         // Get inputs and allowed fields
         DCInputSet inputConfig = inputReader.getInputsByFormName(submissionStepConfig.getId());
-        List<String> allowedFieldsForBook = inputConfig.populateAllowedFieldNames("Book");
-        List<String> allowedFieldsForBookChapter = inputConfig.populateAllowedFieldNames("Book chapter");
-        List<String> allowedFieldsForArticle = inputConfig.populateAllowedFieldNames("Article");
-        List<String> allowedFieldsForNoType = inputConfig.populateAllowedFieldNames(null);
+        List<String> allowedFieldsForBook = inputConfig.populateAllowedFieldNames(List.of("Book"));
+        List<String> allowedFieldsForBookChapter = inputConfig.populateAllowedFieldNames(List.of("Book chapter"));
+        List<String> allowedFieldsForArticle = inputConfig.populateAllowedFieldNames(List.of("Article"));
+        List<String> allowedFieldsForArticleAndBook = inputConfig.populateAllowedFieldNames(List.of("Article", "Book"));
+        List<String> allowedFieldsForBookAndArticle = inputConfig.populateAllowedFieldNames(List.of("Book", "Article"));
+        List<String> allowedFieldsForNoType = inputConfig.populateAllowedFieldNames(Collections.emptyList());
+        List<String> allowedFieldsForWrongTypes = inputConfig.populateAllowedFieldNames(List.of("foo", "bar"));
         // Book and book chapter should be allowed all 5 fields (each is bound to dc.identifier.isbn)
         assertEquals(allConfiguredFields, allowedFieldsForBook);
         assertEquals(allConfiguredFields, allowedFieldsForBookChapter);
+        assertEquals(allConfiguredFields, allowedFieldsForArticleAndBook);
+        assertEquals(allConfiguredFields, allowedFieldsForBookAndArticle);
         // Article and type should match a subset of the fields without ISBN
         assertEquals(unboundFields, allowedFieldsForArticle);
         assertEquals(unboundFields, allowedFieldsForNoType);
+        assertEquals(unboundFields, allowedFieldsForWrongTypes);
     }
 }

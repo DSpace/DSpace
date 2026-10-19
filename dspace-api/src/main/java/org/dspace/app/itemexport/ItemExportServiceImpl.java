@@ -11,17 +11,19 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,11 +31,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Bitstream;
@@ -59,6 +63,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
+import org.dspace.storage.secure.SecureFileAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -113,11 +118,28 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     }
 
+    /**
+     * Get the configured list of allowed base directories for item export.
+     * @return list of absolute allowed base paths. If this is an empty list, it will forbid all exports
+     *         but in practice, it will always at least default to workDir, and
+     *         {@link getExportWorkDirectory} throws an Exception if not set
+     */
+    protected List<String> getAllowedExportBaseDirs() throws Exception {
+        String workDir = getExportWorkDirectory();
+        String[] configured =
+            configurationService.getArrayProperty("org.dspace.app.itemexport.allowed.dir", new String[]{workDir});
+        return Arrays.stream(configured)
+                     .map(String::trim)
+                     .collect(Collectors.toList());
+    }
 
     @Override
     public void exportItem(Context c, Iterator<Item> i,
                            String destDirName, int seqStart, boolean migrate,
                            boolean excludeBitstreams) throws Exception {
+        destDirName = SecureFileAccess.validatePathForWrite(
+            destDirName, getAllowedExportBaseDirs(), "itemexport").toString();
+
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
         int subDirSuffix = 0;
@@ -230,13 +252,11 @@ public class ItemExportServiceImpl implements ItemExportService {
             filename = "metadata_" + schema + ".xml";
         }
 
-        File outFile = new File(destDir, filename);
+        logInfo("Attempting to create metadata file " + filename + " in " + destDir);
 
-        logInfo("Attempting to create file " + outFile);
-
-        if (outFile.createNewFile()) {
-            BufferedOutputStream out = new BufferedOutputStream(
-                new FileOutputStream(outFile));
+        try (BufferedOutputStream out = new BufferedOutputStream(SecureFileAccess.getOutputStream(
+                new File(destDir, filename).getPath(),
+                List.of(destDir.getPath()), "itemexport"))) {
 
             List<MetadataValue> dcorevalues = itemService.getMetadata(i, schema, Item.ANY, Item.ANY,
                                                                       Item.ANY);
@@ -313,10 +333,8 @@ public class ItemExportServiceImpl implements ItemExportService {
 
             utf8 = "</dublin_core>\n".getBytes("UTF-8");
             out.write(utf8, 0, utf8.length);
-
-            out.close();
-        } else {
-            throw new Exception("Cannot create dublin_core.xml in " + destDir);
+        } catch (IOException e) {
+            throw new IOException("Cannot create " + filename + " in " + destDir, e);
         }
     }
 
@@ -335,24 +353,16 @@ public class ItemExportServiceImpl implements ItemExportService {
         }
         String filename = "handle";
 
-        File outFile = new File(destDir, filename);
-
-        if (outFile.createNewFile()) {
-            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
-
+        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
+                new File(destDir, filename).getPath(),
+                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
             out.println(i.getHandle());
-
-            // close the contents file
-            out.close();
-        } else {
-            throw new Exception("Cannot create file " + filename + " in "
-                                    + destDir);
         }
     }
 
     /**
      * Create the 'collections' file.  List handles of all Collections which
-     * contain this Item.  The "owning" Collection is listed first.
+     * contain this Item. The "owning" Collection is listed first.
      *
      * @param item list collections holding this Item.
      * @param destDir write the file here.
@@ -360,20 +370,19 @@ public class ItemExportServiceImpl implements ItemExportService {
      */
     protected void writeCollections(Item item, File destDir)
             throws IOException {
-        File outFile = new File(destDir, "collections");
-        if (outFile.createNewFile()) {
-            try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-                String ownerHandle = item.getOwningCollection().getHandle();
-                out.println(ownerHandle);
-                for (Collection collection : item.getCollections()) {
-                    String collectionHandle = collection.getHandle();
-                    if (!collectionHandle.equals(ownerHandle)) {
-                        out.println(collectionHandle);
-                    }
+        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
+                new File(destDir, "collections").getPath(),
+                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
+            Collection owningCollection = item.getOwningCollection();
+            // The owning collection is null for workspace and workflow items
+            if (owningCollection != null) {
+                out.println(owningCollection.getHandle());
+            }
+            for (Collection collection : item.getCollections()) {
+                if (!collection.equals(owningCollection)) {
+                    out.println(collection.getHandle());
                 }
             }
-        } else {
-            throw new IOException("Cannot create 'collections' in " + destDir);
         }
     }
 
@@ -392,10 +401,9 @@ public class ItemExportServiceImpl implements ItemExportService {
      */
     protected void writeBitstreams(Context c, Item i, File destDir,
                                    boolean excludeBitstreams) throws Exception {
-        File outFile = new File(destDir, "contents");
-
-        if (outFile.createNewFile()) {
-            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
+        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
+                new File(destDir, "contents").getPath(),
+                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
 
             List<Bundle> bundles = i.getBundles();
 
@@ -427,33 +435,26 @@ public class ItemExportServiceImpl implements ItemExportService {
                     // written
 
                     while (!excludeBitstreams && !isDone) {
-                        if (myName.contains(File.separator)) {
-                            String dirs = myName.substring(0, myName
-                                .lastIndexOf(File.separator));
-                            File fdirs = new File(destDir + File.separator
-                                                      + dirs);
-                            if (!fdirs.exists() && !fdirs.mkdirs()) {
-                                logError("Unable to create destination directory");
-                            }
+                        File fout = SecureFileAccess.validatePathForWrite(
+                            new File(destDir, myName).getPath(),
+                            List.of(destDir.getPath()), "itemexport").toFile();
+                        // Allow nested dirs in file name but still validate to parent file dir
+                        File parentDir = fout.getParentFile();
+                        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
+                            logError("Unable to create destination directory");
                         }
 
-                        File fout = new File(destDir, myName);
-
-                        if (fout.createNewFile()) {
-                            InputStream is = bitstreamService.retrieve(c, bitstream);
-                            FileOutputStream fos = new FileOutputStream(fout);
-                            Utils.bufferedCopy(is, fos);
-                            // close streams
-                            is.close();
-                            fos.close();
-
+                        // Filename collision detection.
+                        if (!Files.exists(fout.toPath())) {
+                            try (InputStream is = bitstreamService.retrieve(c, bitstream);
+                                 OutputStream fos = SecureFileAccess.getOutputStream(
+                                     fout.getPath(), List.of(destDir.getPath()), "itemexport")) {
+                                Utils.bufferedCopy(is, fos);
+                            }
                             isDone = true;
                         } else {
-                            myName = myPrefix + "_" + oldName; // keep
-                            // appending
-                            // numbers to the
-                            // filename until
-                            // unique
+                            myName = myPrefix + "_" + oldName;
+                            // keep appending numbers to the filename until unique
                             myPrefix++;
                         }
                     }
@@ -471,11 +472,6 @@ public class ItemExportServiceImpl implements ItemExportService {
 
                 }
             }
-
-            // close the contents file
-            out.close();
-        } else {
-            throw new Exception("Cannot create contents in " + destDir);
         }
     }
 
@@ -484,13 +480,18 @@ public class ItemExportServiceImpl implements ItemExportService {
                             String destDirName, String zipFileName,
                             int seqStart, boolean migrate,
                             boolean excludeBitstreams) throws Exception {
+        destDirName = SecureFileAccess.validatePathForWrite(
+            destDirName, getAllowedExportBaseDirs(), "itemexport").toString();
+
         String workDir = getExportWorkDirectory() +
             System.getProperty("file.separator") +
             zipFileName;
+        workDir = SecureFileAccess.validatePathForWrite(
+            workDir, List.of(getExportWorkDirectory()), "itemexport").toString();
 
         File wkDir = new File(workDir);
         if (!wkDir.exists() && !wkDir.mkdirs()) {
-            logError("Unable to create working direcory");
+            logError("Unable to create working directory");
         }
 
         File dnDir = new File(destDirName);
@@ -498,11 +499,18 @@ public class ItemExportServiceImpl implements ItemExportService {
             logError("Unable to create destination directory");
         }
 
-        // export the items using normal export method
-        exportItem(context, items, workDir, seqStart, migrate, excludeBitstreams);
+        try {
+            // export the items using normal export method (this exports items to our workDir)
+            exportItem(context, items, workDir, seqStart, migrate, excludeBitstreams);
 
-        // now zip up the export directory created above
-        zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
+            // now zip up the workDir directory created above
+            zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
+        } finally {
+            // Cleanup workDir created above, if it still exists
+            if (wkDir.exists()) {
+                deleteDirectory(wkDir);
+            }
+        }
     }
 
     @Override
@@ -671,7 +679,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         context.turnOffAuthorisationSystem();
 
                         String fileName = assembleFileName("item", eperson,
-                                                           new Date());
+                                                           LocalDate.now());
                         String workParentDir = getExportWorkDirectory()
                             + System.getProperty("file.separator")
                             + fileName;
@@ -718,7 +726,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         try {
                             emailErrorMessage(eperson, e1.getMessage());
                         } catch (Exception e) {
-                            // wont throw here
+                            // won't throw here
                         }
                         throw new IllegalStateException(e1);
                     } finally {
@@ -743,16 +751,16 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     @Override
     public String assembleFileName(String type, EPerson eperson,
-                                   Date date) throws Exception {
+                                   LocalDate date) throws Exception {
         // to format the date
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MMM_dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MMM_dd");
         String downloadDir = getExportDownloadDirectory(eperson);
         // used to avoid name collision
         int count = 1;
         boolean exists = true;
         String fileName = null;
         while (exists) {
-            fileName = type + "_export_" + sdf.format(date) + "_" + count + "_"
+            fileName = type + "_export_" + formatter.format(date) + "_" + count + "_"
                 + eperson.getID();
             exists = new File(downloadDir
                                   + System.getProperty("file.separator") + fileName + ".zip")
@@ -789,7 +797,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 "A dspace.cfg entry for 'org.dspace.app.itemexport.work.dir' does not exist.");
         }
         // clean work dir path from duplicate separators
-        return StringUtils.replace(exportDir, File.separator + File.separator, File.separator);
+        return Strings.CS.replace(exportDir, File.separator + File.separator, File.separator);
     }
 
     @Override
@@ -908,14 +916,12 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void deleteOldExportArchives(EPerson eperson) throws Exception {
         int hours = configurationService
             .getIntProperty("org.dspace.app.itemexport.life.span.hours");
-        Calendar now = Calendar.getInstance();
-        now.setTime(new Date());
-        now.add(Calendar.HOUR, -hours);
+        Instant modifiedTime = Instant.now().minus(hours, ChronoUnit.HOURS);
         File downloadDir = new File(getExportDownloadDirectory(eperson));
         if (downloadDir.exists()) {
             File[] files = downloadDir.listFiles();
             for (File file : files) {
-                if (file.lastModified() < now.getTimeInMillis()) {
+                if (file.lastModified() < modifiedTime.toEpochMilli()) {
                     if (!file.delete()) {
                         logError("Unable to delete export file");
                     }
@@ -928,9 +934,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Override
     public void deleteOldExportArchives() throws Exception {
         int hours = configurationService.getIntProperty("org.dspace.app.itemexport.life.span.hours");
-        Calendar now = Calendar.getInstance();
-        now.setTime(new Date());
-        now.add(Calendar.HOUR, -hours);
+        Instant modifiedTime = Instant.now().minus(hours, ChronoUnit.HOURS);
         File downloadDir = new File(configurationService.getProperty("org.dspace.app.itemexport.download.dir"));
         if (downloadDir.exists()) {
             // Get a list of all the sub-directories, potentially one for each ePerson.
@@ -939,7 +943,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 // For each sub-directory delete any old files.
                 File[] files = dir.listFiles();
                 for (File file : files) {
-                    if (file.lastModified() < now.getTimeInMillis()) {
+                    if (file.lastModified() < modifiedTime.toEpochMilli()) {
                         if (!file.delete()) {
                             logError("Unable to delete old files");
                         }
@@ -995,6 +999,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void zip(String strSource, String target) throws Exception {
         ZipOutputStream cpZipOutputStream = null;
         String tempFileName = target + "_tmp";
+        SecureFileAccess.validatePathForWrite(target, getAllowedExportBaseDirs(), "itemexport");
         try {
             File cpFile = new File(strSource);
             if (!cpFile.isFile() && !cpFile.isDirectory()) {
@@ -1005,7 +1010,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 logWarn("Target file already exists: " + targetFile.getName());
             }
 
-            FileOutputStream fos = new FileOutputStream(tempFileName);
+            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, getAllowedExportBaseDirs(), "itemexport");
             cpZipOutputStream = new ZipOutputStream(fos);
             cpZipOutputStream.setLevel(9);
             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
@@ -1052,7 +1057,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 }
                 String strAbsPath = cpFile.getPath();
                 int startIndex = strSource.length();
-                if (!StringUtils.endsWith(strSource, File.separator)) {
+                if (!Strings.CS.endsWith(strSource, File.separator)) {
                     startIndex++;
                 }
                 String strZipEntryName = strAbsPath.substring(startIndex, strAbsPath.length());

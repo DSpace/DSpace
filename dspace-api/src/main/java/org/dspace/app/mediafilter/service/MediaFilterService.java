@@ -7,11 +7,16 @@
  */
 package org.dspace.app.mediafilter.service;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.mediafilter.FormatFilter;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -92,6 +97,35 @@ public interface MediaFilterService {
         throws Exception;
 
     /**
+     * Returns all {@code item}'s bitstreams that are derived from {@code formatFilter}.
+     *
+     * @param item
+     * @param sourceBitstream
+     * @param formatFilter
+     * @return
+     * @throws Exception
+     */
+    Pair<List<Bitstream>, Bundle> getBitstreamsDerivedFromFilter(Item item, Bitstream sourceBitstream,
+                                                                 FormatFilter formatFilter)
+        throws Exception;
+
+    /**
+     * update resource polices of derivative bitstreams
+     * related to source bitstream.
+     * set derivative bitstreams to be publicly accessible or
+     * replace derivative bitstreams policies using
+     * the same in the source bitstream.
+     *
+     * @param context context
+     * @param item item containing bitstreams
+     * @param source source bitstream
+     * @throws SQLException If something goes wrong in the database
+     * @throws AuthorizeException if authorization error
+     */
+    public void updatePoliciesOfDerivativeBitstreams(Context context, Item item, Bitstream source)
+        throws SQLException, AuthorizeException;
+
+    /**
      * Return the item that is currently being processed/filtered
      * by the MediaFilterManager.
      * <p>
@@ -131,4 +165,6 @@ public interface MediaFilterService {
      * @param handler
      */
     public void setLogHandler(DSpaceRunnableHandler handler);
+
+    public void setFromDate(LocalDate fromDate);
 }

@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dspace.core.Constants;
 import org.springframework.util.FileCopyUtils;
 
@@ -71,18 +72,11 @@ public class MigrationUtils {
                 // {tablename}_{columnname(s)}_{suffix}
                 // see: http://stackoverflow.com/a/4108266/3750035
                 constraintName = StringUtils.lowerCase(tableName);
-                if (!StringUtils.equals(constraintSuffix, "pkey")) {
+                if (!Strings.CS.equals(constraintSuffix, "pkey")) {
                     constraintName += "_" + StringUtils.lowerCase(columnName);
                 }
 
                 constraintName += "_" + StringUtils.lowerCase(constraintSuffix);
-                cascade = true;
-                break;
-            case "oracle":
-                // In Oracle, constraints are listed in the USER_CONS_COLUMNS table
-                constraintNameSQL = "SELECT CONSTRAINT_NAME " +
-                    "FROM USER_CONS_COLUMNS " +
-                    "WHERE TABLE_NAME = ? AND COLUMN_NAME = ?";
                 cascade = true;
                 break;
             case "h2":
@@ -115,7 +109,7 @@ public class MigrationUtils {
 
         // As long as we have a constraint name, drop it
         if (constraintName != null && !constraintName.isEmpty()) {
-            // This drop constaint SQL should be the same in all databases
+            // This drop constraint SQL should be the same in all databases
             String dropConstraintSQL = "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName;
             if (cascade) {
                 dropConstraintSQL += " CASCADE";
@@ -159,9 +153,6 @@ public class MigrationUtils {
             case "postgres":
             case "postgresql":
                 dropTableSQL = "DROP TABLE IF EXISTS " + tableName + " CASCADE";
-                break;
-            case "oracle":
-                dropTableSQL = "DROP TABLE " + tableName + " CASCADE CONSTRAINTS";
                 break;
             case "h2":
                 dropTableSQL = "DROP TABLE IF EXISTS " + tableName + " CASCADE";
@@ -208,9 +199,6 @@ public class MigrationUtils {
             case "postgresql":
                 dropSequenceSQL = "DROP SEQUENCE IF EXISTS " + sequenceName;
                 break;
-            case "oracle":
-                dropSequenceSQL = "DROP SEQUENCE " + sequenceName;
-                break;
             case "h2":
                 dropSequenceSQL = "DROP SEQUENCE IF EXISTS " + sequenceName;
                 break;
@@ -255,9 +243,6 @@ public class MigrationUtils {
             case "postgres":
             case "postgresql":
                 dropViewSQL = "DROP VIEW IF EXISTS " + viewName + " CASCADE";
-                break;
-            case "oracle":
-                dropViewSQL = "DROP VIEW " + viewName + " CASCADE CONSTRAINTS";
                 break;
             case "h2":
                 dropViewSQL = "DROP VIEW IF EXISTS " + viewName + " CASCADE";

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * This class has been added to allow the MockObjectRest to act as an actual BaseObjectRest since they're
  * expected to have a RestRepository
  */
-@Component(MockObjectRest.CATEGORY + "." + MockObjectRest.NAME)
+@Component(MockObjectRest.CATEGORY + "." + MockObjectRest.PLURAL_NAME)
 public class MockObjectRestRepository extends DSpaceRestRepository<MockObjectRest, Long> {
 
     // Added a permitAll preAuthorize annotation to allow the object to be used in tests by every user

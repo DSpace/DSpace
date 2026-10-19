@@ -28,6 +28,7 @@ public class MockObjectRest extends BaseObjectRest<Long> {
     public static final String CATEGORY = "test";
 
     public static final String NAME = "testobject";
+    public static final String PLURAL_NAME = "testobjects";
 
     public static final String O_CHILDREN = "optionallyEmbeddedChildren";
 
@@ -64,6 +65,11 @@ public class MockObjectRest extends BaseObjectRest<Long> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public String getValue() {

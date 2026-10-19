@@ -319,20 +319,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <a data-toggle="collapse">
-                            <xsl:attribute name="href">#<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="card-header">
-                                <h5>Metadata</h5>
-                            </div>
-                        </a>
-                        <div class="collapse">
-                            <xsl:attribute name="id"><xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
-                            <div class="card-body">
-                                <xsl:apply-templates select="oai:metadata/*" />
-                            </div>
-                        </div>
-                    </div>
+                    <xsl:if test="oai:metadata">
+	                    <div class="card">
+	                        <a data-toggle="collapse">
+	                            <xsl:attribute name="href">#<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
+	                            <div class="card-header">
+	                                <h5>Metadata</h5>
+	                            </div>
+	                        </a>
+	                        <div class="collapse">
+	                            <xsl:attribute name="id"><xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
+	                            <div class="card-body">
+	                                <xsl:apply-templates select="oai:metadata/*" />
+	                            </div>
+	                        </div>
+	                    </div>
+		    </xsl:if>
                 </div>
             </div>
         </xsl:for-each>
@@ -378,14 +380,16 @@
                                 </xsl:for-each>
                             </div>
                     </div>
-                    <div class="card">
-                            <div class="card-header">
-                                <h5>Metadata</h5>
-                            </div>
-                            <div class="card-body">
-                                <xsl:apply-templates select="oai:metadata/*" />
-                            </div>
-                    </div>
+                    <xsl:if test="oai:metadata">
+	                    <div class="card">
+	                            <div class="card-header">
+	                                <h5>Metadata</h5>
+	                            </div>
+	                            <div class="card-body">
+	                                <xsl:apply-templates select="oai:metadata/*" />
+	                            </div>
+	                    </div>
+                    </xsl:if>
                 </div>
             </div>
         </xsl:for-each>
@@ -522,15 +526,14 @@
 				<xsl:choose>
 					<xsl:when test="normalize-space($path/../oai:resumptionToken/text()) = ''">
 					<!-- on the last page of results we have to assume that @completeListSize is available -->
-						<xsl:value-of
-							select="$total - $count" />
+						<xsl:value-of select="(number($total) - $count) + 1" />
 						-
 						<xsl:value-of select="$total" />
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="$cursor * $count" />
+						<xsl:value-of select="(number($cursor) * $count) + 1" />
 						-
-						<xsl:value-of select="($cursor+1) * $count" />
+						<xsl:value-of select="(number($cursor) + 1) * $count" />
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>

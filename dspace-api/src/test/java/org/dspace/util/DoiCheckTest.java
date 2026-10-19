@@ -14,7 +14,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.service.DoiCheck;
 import org.junit.Test;
 
@@ -50,6 +50,17 @@ public class DoiCheckTest {
             "10.11467/isss2003.7.1_11",
             "10.3972/water973.0145.db"
         );
+    }
+
+    /**
+     * A value that starts like a DOI but cannot be one has to be rejected promptly. Three
+     * adjacent unbounded digit runs in the pattern needed time cubic in the length of the value,
+     * where rejecting it is now linear. The bound is therefore a very wide margin and is not
+     * sensitive to a slow CI machine.
+     */
+    @Test(timeout = 5000)
+    public void rejectsLongDigitRunWithoutBacktracking() {
+        assertFalse(DoiCheck.isDoi("10.1234/1-" + "00".repeat(2000) + "!"));
     }
 
     private List<String> wrongDOIsToTest() {

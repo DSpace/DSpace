@@ -12,12 +12,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.AllowSessionsEnum;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 /**
  * The repository for the SystemWideAlert workload
  */
-@Component(SystemWideAlertRest.CATEGORY + "." + SystemWideAlertRest.NAME)
+@Component(SystemWideAlertRest.CATEGORY + "." + SystemWideAlertRest.PLURAL_NAME)
 public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWideAlertRest, Integer> {
 
     private static final Logger log = LogManager.getLogger();
@@ -50,6 +50,9 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -110,7 +113,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
 
         SystemWideAlertRest systemWideAlertRest;
         try {
-            systemWideAlertRest = new ObjectMapper().readValue(jsonNode.toString(), SystemWideAlertRest.class);
+            systemWideAlertRest = mapper.readValue(jsonNode.toString(), SystemWideAlertRest.class);
         } catch (JsonProcessingException e) {
             throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
         }
@@ -153,7 +156,6 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
 
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         SystemWideAlertRest systemWideAlertRest;
         try {
             ServletInputStream input = req.getInputStream();

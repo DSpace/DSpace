@@ -10,7 +10,7 @@ package org.dspace.scripts.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -97,7 +97,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void start(Context context, Process process) throws SQLException;
+    public void start(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * This method will perform the logic needed to update the Process object in the database to represent
@@ -106,7 +106,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void fail(Context context, Process process) throws SQLException;
+    public void fail(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * This method will perform the logic needed to update the Process object in the database to represent
@@ -115,7 +115,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void complete(Context context, Process process) throws SQLException;
+    public void complete(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * The method will create a bitstream from the given inputstream with the given type as metadata and given name
@@ -146,7 +146,7 @@ public interface ProcessService {
      * @param process   The Process object to be updated
      * @throws SQLException If something goes wrong
      */
-    public void update(Context context, Process process) throws SQLException;
+    public void update(Context context, Process process) throws SQLException, AuthorizeException;
 
     /**
      * This method will retrieve the list of parameters from the Process in its String format and it will parse
@@ -253,6 +253,47 @@ public interface ProcessService {
      * @return                    The list of all Processes which match requirements
      * @throws AuthorizeException If something goes wrong
      */
-    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Date date)
+    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Instant date)
         throws SQLException;
+
+    /**
+     * Returns a list of all Process objects in the database by the given user.
+     *
+     * @param context The relevant DSpace context
+     * @param user    The user to search for
+     * @param limit   The limit for the amount of Processes returned
+     * @param offset  The offset for the Processes to be returned
+     * @return The list of all Process objects in the Database
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findByUser(Context context, EPerson user, int limit, int offset) throws SQLException;
+
+    /**
+     * Count all the processes which is related to the given user.
+     *
+     * @param context The relevant DSpace context
+     * @param user    The user to search for
+     * @return The number of results matching the query
+     * @throws SQLException If something goes wrong
+     */
+    int countByUser(Context context, EPerson user) throws SQLException;
+
+    /**
+     * Authorize any action, to ensure only a process creator/owner or a repository administrator
+     * may read, update or delete an existing process.
+     * @param context DSpace context containing the current user
+     * @param process the process to check
+     * @return true if the current user may perform the action, or false
+     */
+    boolean authorizeActionBoolean(Context context, Process process);
+
+    /**
+     * Cleans up running processes by failing them an attaching their logs to the process objects.
+     *
+     * @param context   The DSpace context
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException;
 }
