@@ -11,15 +11,20 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
+import org.dspace.app.rest.model.DynamicLayoutTabRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -2701,6 +2706,69 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + itemA.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
+    }
+
+    @Test
+    public void restConfiguredAdministratorBoxRespectsSecurityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Public item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        itemService.addMetadata(context, itemA, "dc", "description", "abstract", null, "A secured abstract");
+        context.restoreAuthSystemState();
+
+        DynamicLayoutTabRest rest = parseLayoutJson("tab-admin-secured-abstract.json");
+        ObjectMapper mapper = new ObjectMapper();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/layout/tabs")
+                             .content(mapper.writeValueAsBytes(rest))
+                             .contentType(contentType))
+                             .andExpect(status().isCreated());
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+        // An admin can see the dc.description.abstract metadata
+        getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata['dc.description.abstract'].[0].value",
+                                             is("A secured abstract")))
+                             .andExpect(jsonPath("$.metadata['dc.title'].[0].value",
+                                             is("Public item A")));
+
+        // A non-admin user must NOT see the dc.description.abstract metadata
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.metadata['dc.title'].[0].value",
+                                               is("Public item A")))
+                               .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
+
+        // An anonymous user must NOT see the dc.description.abstract metadata
+        getClient().perform(get("/api/core/items/" + itemA.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata['dc.title'].[0].value",
+                                   is("Public item A")))
+                   .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
+    }
+
+    private DynamicLayoutTabRest parseLayoutJson(String name) throws Exception {
+        String baseTestDir = "./target/testing/dspace/assetstore/layout/";
+        try (FileInputStream fis = new FileInputStream(new File(baseTestDir, name))) {
+            return new ObjectMapper().readValue(fis, DynamicLayoutTabRest.class);
+        }
     }
 
 }
