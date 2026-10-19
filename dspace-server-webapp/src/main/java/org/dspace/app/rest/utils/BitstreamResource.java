@@ -21,11 +21,11 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.dspace.disseminate.factory.DisseminateServiceFactory;
 import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
 
 /**
@@ -45,9 +45,7 @@ public class BitstreamResource extends AbstractResource {
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private CitationDocumentService citationDocumentService =
-        new DSpace().getServiceManager()
-                    .getServicesByType(CitationDocumentService.class).get(0);
+    private CitationDocumentService citationDocumentService = DisseminateServiceFactory.getInstance().getCitationDocumentService();
 
     public BitstreamResource(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
         boolean shouldGenerateCoverPage) {
