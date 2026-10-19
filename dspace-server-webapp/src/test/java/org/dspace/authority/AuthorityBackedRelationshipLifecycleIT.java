@@ -364,7 +364,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
             List.of(Map.of("value", "Updated Author"))
         ));
 
-        getClient(token).perform(patch("/api/core/edititems/" + publication.getID() + ":FULL")
+        getClient(token).perform(patch("/api/core/edititems/" + publication.getID() + ":MODE1")
                                      .content(getPatchContent(operations))
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
