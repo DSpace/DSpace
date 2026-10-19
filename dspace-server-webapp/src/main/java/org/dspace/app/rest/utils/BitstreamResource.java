@@ -52,7 +52,8 @@ public class BitstreamResource extends AbstractResource {
 
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    protected final CitationDocumentService citationDocumentService = DisseminateServiceFactory.getInstance().getCitationDocumentService();
+    protected final CitationDocumentService citationDocumentService =
+                                                DisseminateServiceFactory.getInstance().getCitationDocumentService();
 
     protected BitstreamDocument document;
 
