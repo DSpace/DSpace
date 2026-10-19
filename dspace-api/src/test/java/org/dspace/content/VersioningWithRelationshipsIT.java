@@ -599,7 +599,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
 
     /**
      * Tests that multiple configuration-backed relationships sharing the same endpoints
-     * are correctly matched using their associated metadata when installing a new Item version.
+     * have their latest-version statuses updated independently without requiring Relationship matching.
      */
     @Test
     public void test_installNewVersionWithDuplicateConfigBackedRelationshipEndpoints() throws Exception {
