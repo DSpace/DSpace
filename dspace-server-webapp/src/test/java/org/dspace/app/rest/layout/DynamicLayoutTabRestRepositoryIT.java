@@ -671,9 +671,9 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
      * current user and available data.
      * The expected result is a list of tabs derived from the item type, where the item type is:
      * <ul>
-     *     <li>submissionName.Authority of metadata configured in property {@code dspace.metadata.layout.tab}</li>
+     *     <li>submissionName.Authority of metadata configured in property {@code dynamic.layout.tab.metadata}</li>
      *     <li>If null, submissionName.value of that metadata</li>
-     *     <li>if null, Authority of metadata configured in property {@code dspace.metadata.layout.tab}</li>
+     *     <li>if null, Authority of metadata configured in property {@code dynamic.layout.tab.metadata}</li>
      *     <li>If null, value of that metadata</li>
      *     <li>if null, submission name of item</li>
      *     <li>If null, value of entity type (metadata {@code dspace.entity.type})</li>
@@ -684,7 +684,7 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
     @Test
     public void findByItemMetadata() throws Exception {
         configurationService.setProperty("authority.controlled.dc.type", "true");
-        configurationService.setProperty("dspace.metadata.layout.tab", "dc.type");
+        configurationService.setProperty("dynamic.layout.tab.metadata", "dc.type");
         metadataAuthorityService.clearCache();
         context.turnOffAuthorisationSystem();
 

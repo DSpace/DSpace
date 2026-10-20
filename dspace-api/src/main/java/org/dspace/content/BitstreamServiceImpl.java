@@ -645,7 +645,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public boolean isValidThumbnail(Context context, Bitstream thumbnail) throws SQLException {
         return thumbnail != null &&
-            configurationService.getIntProperty("cris.layout.thumbnail.maxsize", 250000) >= thumbnail.getSizeBytes() &&
+            configurationService.getIntProperty("dynamic.layout.thumbnail.maxsize", 250000) >=
+                thumbnail.getSizeBytes() &&
             Strings.CI.contains(thumbnail.getFormat(context).getMIMEType(), "image/");
     }
 

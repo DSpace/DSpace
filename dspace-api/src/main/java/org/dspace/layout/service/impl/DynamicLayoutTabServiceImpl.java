@@ -199,7 +199,7 @@ public class DynamicLayoutTabServiceImpl implements DynamicLayoutTabService {
         String submissionName = getSubmissionDefinitionName(item);
 
         List<DynamicLayoutTab> layoutTabs =
-            Optional.ofNullable(this.configurationService.getProperty("dspace.metadata.layout.tab"))
+            Optional.ofNullable(this.configurationService.getProperty("dynamic.layout.tab.metadata"))
                     .map(metadataField -> this.itemService.getMetadataByMetadataString(item, metadataField))
                     .filter(metadatas -> !metadatas.isEmpty())
                     .map(metadatas -> metadatas.get(0))
