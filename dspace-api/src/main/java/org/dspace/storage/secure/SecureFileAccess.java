@@ -26,10 +26,6 @@ import java.util.List;
 /**
  * Decent I/O path validation
  *
- * For new files/directories, validates as much of the given path as exists,
- * including the traversal of symlinks. Non-existent directories/files are
- * then appended onto the validated portion of the path.
- *
  * @author Kim Shepherd <kim-at-shepherd-dot-nz>
  */
 public final class SecureFileAccess {
@@ -37,13 +33,15 @@ public final class SecureFileAccess {
     private SecureFileAccess() {}
 
     /**
-     * Calculates the "real path" for as much of the given path as exists,
-     * (traversing existing symlinks) with non-existent directories/files being
-     * appended to the existing path, and then validating the result against the
-     * allowed base paths, which is then returned.
+     * Normalizes the given Path, removing redundant elements, such as
+     * parent references (i.e., ".."). The existing segments of the path are
+     * converted to the "real path" (traversing symlinks). Non-existent
+     * segments of the path are appended to the real path in their original
+     * order. The final Path is validated against the allowed base paths and
+     * returned. An IOException is thrown if validation fails.
      *
-     * <strong>Note:</strong> Due to the resolution of symbolic links and
-     * parent references, this method may return a Path that is lexically
+     * <strong>Note:</strong> Due to path normalization and resolution of
+     * symbolic links, this method may return a Path that is lexically
      * distinct from the given path.
      *
      * Callers MUST use the returned Path, as the validation only applies to
@@ -95,13 +93,15 @@ public final class SecureFileAccess {
      * Resolves a Path intended for writing without requiring the complete path
      * to exist.
      *
-     * Before validation, existing segments of the path are converted to the
-     * "real path" (traversing symlinks). Non-existent segments of the path
-     * are then appended to the real path in their original order.
+     * Normalizes the given Path, removing redundant elements, such as
+     * parent references (i.e., ".."). The existing segments of the path are
+     * then converted to the "real path" (traversing symlinks). Non-existent
+     * segments of the path are then appended to the real path in their original
+     * order.
      *
-     * Note: The validated path reflects the state of the filesystem when this
+     * Note: The resolved path reflects the state of the filesystem when this
      * method executes. It does not prevent another process from replacing a
-     * validated path component before the caller opens the file.
+     * resolved path component before the caller opens the file.
      *
      * @param path the absolute path intended for writing
      * @return the normalized path formed from the real path of the nearest
@@ -150,7 +150,6 @@ public final class SecureFileAccess {
 
     /**
      * Validate a given path against an allowed base path.
-     * More secure than the 'write' variant because we can explicitly resolve links as well.
      *
      * @param file the unvalidated file, usually derived from user input or configuration
      *             This MUST be an absolute path, and the caller is expected to calculate it based on best
@@ -211,11 +210,9 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get an output stream after validating file path.
-     *
-     * Existing elements of the given path are validated (including traversal of
-     * existing symlinks) with non-existent directories/files being appended,
-     * and then validating the result against the allowed base paths.
+     * Returns an output stream after validating the given file path using
+     * {@link #validatePathForWrite}, throwing an IOException if validation
+     * fails.
      *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
@@ -229,12 +226,9 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get a buffered writer after validating file path.
-     *
-     * As with {@link #getOutputStream}, existing elements of the given path are
-     * validated (including traversal of existing symlinks) with non-existent
-     * directories/files being appended, and then validating the result against
-     * the allowed base paths.
+     * Returns a buffered writer after validating the given file path using
+     * {@link #validatePathForWrite}, throwing an IOException if validation
+     * fails.
      *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
