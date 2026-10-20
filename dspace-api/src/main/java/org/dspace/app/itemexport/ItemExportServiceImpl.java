@@ -1059,10 +1059,12 @@ public class ItemExportServiceImpl implements ItemExportService {
                 zipFiles(aFList, strSource, strTarget, cpZipOutputStream);
             }
         } else {
+            // Skip if strTarget file, if it happens to be in the directory
+            // being zipped.
+            if (Files.isSameFile(cpFile.toPath(), Path.of(strTarget))) {
+                return;
+            }
             try {
-                if (cpFile.getAbsolutePath().equalsIgnoreCase(strTarget)) {
-                    return;
-                }
                 String strAbsPath = cpFile.getPath();
                 int startIndex = strSource.length();
                 if (!Strings.CS.endsWith(strSource, File.separator)) {
