@@ -100,10 +100,12 @@ public class DynamicLayoutTabRestRepository extends DSpaceRestRepository<Dynamic
         Context context = obtainContext();
         List<DynamicLayoutTab> tabList = service.findByItem(context, itemUuid);
         getRequestService().getCurrentRequest().setAttribute(SCOPE_ITEM_ATTRIBUTE, itemUuid);
-        Page<DynamicLayoutTabRest> restTabs = converter.toRestPage(tabList, pageable, utils.obtainProjection());
-        restTabs = filterTabWithoutRows(pageable, restTabs);
+        List<DynamicLayoutTabRest> restTabs = tabList.stream()
+            .map(tab -> (DynamicLayoutTabRest) converter.toRest(tab, utils.obtainProjection()))
+            .collect(Collectors.toList());
+        restTabs = filterTabWithoutRows(restTabs);
         restTabs = filterFieldsWithAdvancedAttachmentRenderType(context, restTabs, itemUuid);
-        return utils.getPage(restTabs.toList(), restTabs.getPageable());
+        return utils.getPage(restTabs, pageable);
     }
 
     /**
@@ -218,20 +220,19 @@ public class DynamicLayoutTabRestRepository extends DSpaceRestRepository<Dynamic
         }
     }
 
-    private Page<DynamicLayoutTabRest> filterTabWithoutRows(Pageable pageable, Page<DynamicLayoutTabRest> restTabs) {
-        List<DynamicLayoutTabRest> listOfTabs =
-            restTabs.filter(tab -> CollectionUtils.isNotEmpty(tab.getRows())).toList();
-        return utils.getPage(listOfTabs, pageable);
+    private List<DynamicLayoutTabRest> filterTabWithoutRows(List<DynamicLayoutTabRest> restTabs) {
+        return restTabs.stream()
+            .filter(tab -> CollectionUtils.isNotEmpty(tab.getRows()))
+            .collect(Collectors.toList());
     }
 
-    private Page<DynamicLayoutTabRest> filterFieldsWithAdvancedAttachmentRenderType(Context context,
-                                                                                 Page<DynamicLayoutTabRest> restTabs,
+    private List<DynamicLayoutTabRest> filterFieldsWithAdvancedAttachmentRenderType(Context context,
+                                                                                 List<DynamicLayoutTabRest> listOfTabs,
                                                                                  String itemUuid) throws SQLException {
-        List<DynamicLayoutTabRest> listOfTabs = restTabs.toList();
         Item item = itemService.find(context, UUID.fromString(itemUuid));
 
         if (hasOriginalBitstream(item)) {
-            return restTabs;
+            return listOfTabs;
         }
 
         // Get DynamicLayoutBoxRest with boxType=METADATA
@@ -263,7 +264,7 @@ public class DynamicLayoutTabRestRepository extends DSpaceRestRepository<Dynamic
                 .getRows().removeIf(row -> row.getCells().isEmpty());
         });
 
-        return utils.getPage(listOfTabs, restTabs.getPageable());
+        return listOfTabs;
     }
 
     private List<DynamicLayoutBoxRest> findBoxesByType(List<DynamicLayoutTabRest> tabs, String type) {

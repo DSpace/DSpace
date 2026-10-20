@@ -2364,6 +2364,102 @@ public class DynamicLayoutTabRestRepositoryIT extends AbstractControllerIntegrat
 
     }
 
+    @Test
+    public void findByItemSecondPageReturnsContent() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Test Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withName("Test Collection")
+            .build();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+            .build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withPersonIdentifierFirstName("Danilo")
+            .withPersonIdentifierLastName("Di Nuzzo")
+            .withEntityType(eType.getLabel())
+            .build();
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
+
+        buildTabWithField(eType, firstName, 0, "tab-one");
+        buildTabWithField(eType, firstName, 1, "tab-two");
+        DynamicLayoutTab tabThree = buildTabWithField(eType, firstName, 2, "tab-three");
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/layout/tabs/search/findByItem")
+                .param("uuid", item.getID().toString())
+                .param("page", "1")
+                .param("size", "2"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)))
+            .andExpect(jsonPath("$.page.totalPages", Matchers.is(2)))
+            .andExpect(jsonPath("$.page.number", Matchers.is(1)))
+            .andExpect(jsonPath("$._embedded.tabs", contains(matchTab(tabThree))));
+    }
+
+    @Test
+    public void findByItemPaginationReportsFilteredTotal() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Test Community")
+            .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withName("Test Collection")
+            .build();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+            .build();
+        Item item = ItemBuilder.createItem(context, collection)
+            .withPersonIdentifierFirstName("Danilo")
+            .withPersonIdentifierLastName("Di Nuzzo")
+            .withEntityType(eType.getLabel())
+            .build();
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
+        MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
+
+        buildTabWithField(eType, firstName, 0, "tab-one");
+        // a tab with no displayable rows: filtered out before pagination
+        DynamicLayoutTabBuilder.createTab(context, eType, 1)
+            .withShortName("empty-tab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .addMetadatasecurity(provenance)
+            .build();
+        DynamicLayoutTab tabThree = buildTabWithField(eType, firstName, 2, "tab-three");
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/layout/tabs/search/findByItem")
+                .param("uuid", item.getID().toString())
+                .param("page", "1")
+                .param("size", "1"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)))
+            .andExpect(jsonPath("$.page.totalPages", Matchers.is(2)))
+            .andExpect(jsonPath("$.page.number", Matchers.is(1)))
+            .andExpect(jsonPath("$._embedded.tabs", contains(matchTab(tabThree))));
+    }
+
+    private DynamicLayoutTab buildTabWithField(EntityType eType, MetadataField field, int priority, String shortName)
+        throws Exception {
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, eType, false, false)
+            .withShortname(shortName + "-box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .build();
+        DynamicLayoutFieldBuilder.createMetadataField(context, field, 0, 1)
+            .withLabel("LABEL")
+            .withRendering("TEXT")
+            .withBox(box)
+            .build();
+        return DynamicLayoutTabBuilder.createTab(context, eType, priority)
+            .withShortName(shortName)
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .addBoxIntoNewRow(box)
+            .build();
+    }
+
     private DynamicLayoutTabRest parseJson(String name) throws Exception {
         return new ObjectMapper().readValue(getFileInputStream(name), DynamicLayoutTabRest.class);
     }
