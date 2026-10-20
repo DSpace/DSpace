@@ -1219,6 +1219,60 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
                    is(securityFieldsSize));
     }
 
+    @Test
+    public void testDeletingTabDoesNotDeleteItsAlternativeTab() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+        Group group = GroupBuilder.createGroup(context).withName("Researchers").build();
+
+        DynamicLayoutTab alternativeTab = DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("alternative")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .build();
+
+        DynamicLayoutTab tab = DynamicLayoutTabBuilder.createTab(context, personType, 1)
+            .withShortName("restricted")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .addTab2SecurityGroups(group, alternativeTab)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        context.turnOffAuthorisationSystem();
+        tabService.delete(context, tab);
+        context.commit();
+        context.restoreAuthSystemState();
+
+        assertThat(context.reloadEntity(alternativeTab), notNullValue());
+    }
+
+    @Test
+    public void testDeletingBoxDoesNotDeleteItsAlternativeBox() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+        Group group = GroupBuilder.createGroup(context).withName("Researchers").build();
+
+        DynamicLayoutBox alternativeBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withShortname("alternative")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .build();
+
+        DynamicLayoutBoxBuilder boxBuilder = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withShortname("restricted")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .addBox2SecurityGroups(group, alternativeBox);
+        DynamicLayoutBox box = boxBuilder.build();
+
+        context.restoreAuthSystemState();
+
+        context.turnOffAuthorisationSystem();
+        boxBuilder.delete(context, box);
+        context.commit();
+        context.restoreAuthSystemState();
+
+        assertThat(context.reloadEntity(alternativeBox), notNullValue());
+    }
+
     private EntityType createEntityType(String entityType) {
         return EntityTypeBuilder.createEntityTypeBuilder(context, entityType).build();
     }

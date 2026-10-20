@@ -94,7 +94,7 @@ public class DynamicLayoutTab2SecurityGroup implements Serializable {
     @JoinColumn(name = "group_id", insertable = false, updatable = false)
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "alternative_tab_id")
     private DynamicLayoutTab alternativeTab;
 

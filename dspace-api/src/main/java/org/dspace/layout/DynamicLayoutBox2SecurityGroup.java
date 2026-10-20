@@ -94,7 +94,7 @@ public class DynamicLayoutBox2SecurityGroup implements Serializable {
     @JoinColumn(name = "group_id", insertable = false, updatable = false)
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinColumn(name = "alternative_box_id", nullable = true)
     private DynamicLayoutBox alternativeBox;
 
