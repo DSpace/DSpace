@@ -757,6 +757,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         if (isNegativeMatch(value) && metadata.size() == 0) {
             return true;
         }
+        if (isNegativeMatch(value)) {
+            return metadata.stream().allMatch(metadataValue -> matchesMetadataValue(metadataValue, value));
+        }
         return metadata.stream().anyMatch(metadataValue -> matchesMetadataValue(metadataValue, value));
     }
 

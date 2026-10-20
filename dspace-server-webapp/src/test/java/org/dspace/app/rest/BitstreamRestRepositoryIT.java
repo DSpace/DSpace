@@ -2690,6 +2690,79 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findShowableByItemWithNegativeMetadataValueFilter() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .build();
+
+        Bundle bundle = BundleBuilder.createBundle(context, publicItem1).withName("ORIGINAL").build();
+
+        // Bitstream carrying the excluded value among several dc.type values
+        Bitstream thumbnail = null;
+        try (InputStream is = toInputStream("thumbnail", CharEncoding.UTF_8)) {
+            thumbnail = BitstreamBuilder.createBitstream(context, bundle, is)
+                .withName("thumbnail.jpg")
+                .withMimeType("image/jpeg")
+                .withMetadata("dc", "type", null, null, "Thumbnail")
+                .withMetadata("dc", "type", null, null, "Image")
+                .build();
+        }
+
+        // Bitstream without the excluded value
+        Bitstream text = null;
+        try (InputStream is = toInputStream("text", CharEncoding.UTF_8)) {
+            text = BitstreamBuilder.createBitstream(context, bundle, is)
+                .withName("article.pdf")
+                .withMimeType("application/pdf")
+                .withMetadata("dc", "type", null, null, "Text")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // Negative filter must exclude the multi-valued bitstream that still contains "Thumbnail"
+        getClient().perform(get("/api/core/bitstreams/search/showableByItem")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", bundle.getName())
+                       .param("filterMetadata", "dc.type")
+                       .param("filterMetadataValue", "!Thumbnail")
+                       .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", contains(
+                       BitstreamMatcher.matchBitstreamEntry(text)
+                   )));
+
+        // Positive filter still matches the multi-valued bitstream
+        getClient().perform(get("/api/core/bitstreams/search/showableByItem")
+                       .param("uuid", publicItem1.getID().toString())
+                       .param("name", bundle.getName())
+                       .param("filterMetadata", "dc.type")
+                       .param("filterMetadataValue", "Thumbnail")
+                       .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", hasSize(1)))
+                   .andExpect(jsonPath("$._embedded.bitstreams", contains(
+                       BitstreamMatcher.matchBitstreamEntry(thumbnail)
+                   )));
+
+    }
+
+    @Test
     public void findByItemIdAndBundleName() throws Exception {
 
         context.turnOffAuthorisationSystem();
