@@ -72,12 +72,18 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
 
     private void buildTabRow(Sheet sheet, DynamicLayoutTab tab) {
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, tab.getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(tab));
         createCell(row, 1, tab.getShortName());
         createCell(row, 2, tab.getHeader());
         createCell(row, 3, String.valueOf(tab.getPriority()));
         createCell(row, 4, convertToString(tab.isLeading()));
         createCell(row, 5, toSecurity(tab.getSecurity()));
+    }
+
+    private String toEntityColumn(DynamicLayoutTab tab) {
+        String label = tab.getEntity().getLabel();
+        String customFilter = tab.getCustomFilter();
+        return customFilter == null || customFilter.isEmpty() ? label : label + "." + customFilter;
     }
 
     private void buildTab(Workbook workbook, List<DynamicLayoutTab> tabs) {
