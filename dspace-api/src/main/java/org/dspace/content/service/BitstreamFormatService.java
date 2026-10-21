@@ -128,4 +128,16 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      * @throws SQLException if database error
      */
     public BitstreamFormat guessFormat(Context context, Bitstream bitstream) throws SQLException;
+
+    /**
+     * Determine whether a bitstream of the given format may be uploaded, according to the
+     * configurable upload format whitelist. When the whitelist is disabled (the default),
+     * every format is allowed. When it is enabled, only formats whose support level is at
+     * least the configured minimum are allowed; an unidentified format ({@code null}) is
+     * treated as "Unknown" and is not allowed.
+     *
+     * @param bitstreamFormat the format to check (may be {@code null} if unidentified)
+     * @return {@code true} if a bitstream of this format may be uploaded, {@code false} otherwise
+     */
+    public boolean isUploadAllowed(BitstreamFormat bitstreamFormat);
 }
