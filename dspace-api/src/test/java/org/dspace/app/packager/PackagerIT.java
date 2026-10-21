@@ -13,11 +13,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import com.google.common.collect.Iterators;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -62,6 +65,10 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     protected Collection col1;
     protected Item article;
     File tempFile;
+
+    private static final String COLLECTION_METS =
+            "/org/dspace/content/packager/collection-with-entity-type-mets.xml";
+    private static final String COLLECTION_METS_TITLE = "Testcollection: allow_dspace_metadata_for_collection_mets";
 
     @Before
     public void setup() throws IOException {
@@ -169,6 +176,31 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         assertEquals("123456789/0100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
         // it would have the old handle.
         itemService.delete(context, testItem);
+    }
+
+    @Test
+    public void packagerImportColWithDspaceMetadataFromMetsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configService.setProperty("upload.temp.dir", tempFile.getParent());
+
+        // AIP containing only a METS manifest with dc.title and dspace.entity.type
+        try (InputStream mets = getClass().getResourceAsStream(COLLECTION_METS);
+             ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(tempFile))) {
+            assertNotNull(mets);
+            zip.putNextEntry(new ZipEntry(METSManifest.MANIFEST_FILE));
+            mets.transferTo(zip);
+            zip.closeEntry();
+        }
+
+        runDSpaceScript("packager", "-r", "-u", "-e", "admin@email.com", "-t", "AIP",
+                "-p", child1.getHandle(), "-o", "ignoreHandle=true", tempFile.getPath());
+
+        Collection collection = collectionService.findAll(context).stream()
+                .filter(c -> COLLECTION_METS_TITLE.equals(c.getName()))
+                .findFirst().orElse(null);
+        assertNotNull(collection);
+        assertEquals("Publication",
+                collectionService.getMetadataFirstValue(collection, "dspace", "entity", "type", Item.ANY));
     }
 
     private String getID() throws IOException, MetadataValidationException {
