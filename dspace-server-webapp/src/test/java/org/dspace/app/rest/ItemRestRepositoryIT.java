@@ -485,10 +485,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.metadata").isNotEmpty());
 
         // No metadata is retrieved since user is not administering the item's collection
+        // Only the metadata configured through item.withdrawn.publicField is retrieved, since
+        // the user is not administering the item's collection
         getClient().perform(get("/api/core/items/" + nonAdministeredItem.getID())
             .param("projection", "full"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.metadata").isEmpty());
+            .andExpect(jsonPath("$.metadata['dc.title'][0].value", Matchers.is("Public item 2")))
+            .andExpect(jsonPath("$.metadata['dc.date.issued']").doesNotExist())
+            .andExpect(jsonPath("$.metadata['dc.contributor.author']").doesNotExist())
+            .andExpect(jsonPath("$.metadata['dc.subject']").doesNotExist());
 
 
     }
@@ -4236,7 +4241,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                  .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
                  .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
-                 .andExpect(jsonPath("$.metadata").isEmpty())
+                 .andExpect(jsonPath("$.metadata['dc.title'][0].value", Matchers.is("Public item 1")))
+                 .andExpect(jsonPath("$.metadata['dc.date.issued']").doesNotExist())
+                 .andExpect(jsonPath("$.metadata['dc.contributor.author']").doesNotExist())
+                 .andExpect(jsonPath("$.metadata['dc.subject']").doesNotExist())
                  .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
                  .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
                  .andExpect(jsonPath("$._links.self.href",
@@ -4269,7 +4277,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                    .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
                    .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
-                   .andExpect(jsonPath("$.metadata").isEmpty())
+                   .andExpect(jsonPath("$.metadata['dc.title'][0].value", Matchers.is("Public item 1")))
+                   .andExpect(jsonPath("$.metadata['dc.date.issued']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['dc.contributor.author']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['dc.subject']").doesNotExist())
                    .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
                    .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
                    .andExpect(jsonPath("$._links.self.href",
@@ -4295,6 +4306,70 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + item.getID() + "/owningCollection"))
                    .andExpect(status().isUnauthorized());
 
+    }
+
+    @Test
+    public void findWithdrawnItemWithConfiguredPublicMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .withMetadata("dspace", "withdrawn", "reason", "Migrated to another repository")
+                               .withMetadata("dcterms", "isReplacedBy", null, "https://example.com/handle/123/456")
+                               .withdrawn()
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("item.withdrawn.publicField",
+            new String[] { "dspace.withdrawn.reason", "dcterms.isReplacedBy" });
+
+        // anonymous users get only the configured subset of metadata
+        getClient().perform(get("/api/core/items/" + item.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                   .andExpect(jsonPath("$.metadata['dspace.withdrawn.reason'][0].value",
+                       Matchers.is("Migrated to another repository")))
+                   .andExpect(jsonPath("$.metadata['dcterms.isReplacedBy'][0].value",
+                       Matchers.is("https://example.com/handle/123/456")))
+                   .andExpect(jsonPath("$.metadata['dc.title']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['dc.date.issued']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['dc.subject']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['dc.contributor.author']").doesNotExist());
+
+        // logged in users which are not administrators get the same subset
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/items/" + item.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.metadata['dspace.withdrawn.reason'][0].value",
+                                   Matchers.is("Migrated to another repository")))
+                               .andExpect(jsonPath("$.metadata['dc.title']").doesNotExist());
+
+        // administrators still get the full metadata
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata['dc.title'][0].value", Matchers.is("Public item 1")))
+                             .andExpect(jsonPath("$.metadata['dspace.withdrawn.reason'][0].value",
+                                 Matchers.is("Migrated to another repository")));
+
+        // without any configured field no metadata is exposed at all, as it used to be
+        configurationService.setProperty("item.withdrawn.publicField", null);
+
+        getClient().perform(get("/api/core/items/" + item.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                   .andExpect(jsonPath("$.metadata").isEmpty());
     }
 
     @Test
