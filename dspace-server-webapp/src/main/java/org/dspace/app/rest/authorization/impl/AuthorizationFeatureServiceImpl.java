@@ -50,6 +50,10 @@ public class AuthorizationFeatureServiceImpl implements AuthorizationFeatureServ
             return false;
         }
 
+        if (feature.requiresAuthentication() && context.getCurrentUser() == null) {
+            return false;
+        }
+
         return feature.isAuthorized(context, object);
     }
 
