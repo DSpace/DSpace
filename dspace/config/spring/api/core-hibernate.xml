@@ -52,6 +52,10 @@
         <property name="maxConnLifetimeMillis" value="${db.maxconnlifetime}"/>
         <property name="removeAbandonedOnBorrow" value="${db.removeabandoned}"/>
         <property name="removeAbandonedTimeout" value="${db.removeabandonedtimeout}"/>
+        <!-- Register the pool as a JMX MBean, so that JMX monitoring tools (e.g. JConsole or VisualVM)
+             can report active, idle and waiting connections. Without a name DBCP2 registers nothing.
+             The MBean is unregistered when the pool is closed. -->
+        <property name="jmxName" value="org.dspace:type=DataSource,name=dspaceDataSource"/>
     </bean>
 
 </beans>
