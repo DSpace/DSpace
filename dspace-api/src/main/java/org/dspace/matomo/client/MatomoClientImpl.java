@@ -8,8 +8,8 @@
 package org.dspace.matomo.client;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.io.IOUtils;
@@ -53,12 +53,8 @@ public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, 
     @Override
     protected HttpPost createRequest(String requestBody, String cookies) {
         HttpPost httpPost = new HttpPost(baseUrl);
-        try {
-            httpPost.setHeader("Cookie", cookies);
-            httpPost.setEntity(new StringEntity(requestBody));
-        } catch (UnsupportedEncodingException e) {
-            throw new MatomoClientException("Error creating request", e);
-        }
+        httpPost.setHeader("Cookie", cookies);
+        httpPost.setEntity(new StringEntity(requestBody, StandardCharsets.UTF_8));
         return httpPost;
     }
 

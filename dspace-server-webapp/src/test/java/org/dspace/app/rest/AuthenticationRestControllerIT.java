@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
@@ -624,19 +625,29 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                           .build();
         context.restoreAuthSystemState();
 
-        //Tamper with the token, insert id of group we don't belong to
+        // Tamper with the JWT payload by injecting a group we do not belong to
         String[] jwtSplit = token.split("\\.");
 
-        //We try to inject a special group ID to spoof membership
-        String tampered = new String(Base64.getUrlEncoder().encode(
-            new String(Base64.getUrlDecoder().decode(
-                token.split("\\.")[1]))
-                .replaceAll("\\[]", "[\"" + internalGroup.getID() + "\"]")
-                .getBytes()));
+        String payload = new String(
+            Base64.getDecoder().decode(jwtSplit[1]),
+            StandardCharsets.UTF_8
+        );
 
-        String tamperedToken = jwtSplit[0] + "." + tampered + "." + jwtSplit[2];
+        String tamperedPayload = payload.replace(
+            "[]",
+            "[\"%s\"]".formatted(internalGroup.getID())
+        );
 
-        //Try to get authenticated with the tampered token
+        String encodedPayload = Base64.getUrlEncoder()
+            .encodeToString(tamperedPayload.getBytes(StandardCharsets.UTF_8));
+
+        String tamperedToken = "%s.%s.%s".formatted(
+          jwtSplit[0],
+          encodedPayload,
+          jwtSplit[2]
+        );
+
+        // Try to get authenticated with the tampered token
         getClient(tamperedToken).perform(get("/api/authn/status"))
                                 .andExpect(status().isOk())
 
@@ -644,7 +655,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                 .andExpect(jsonPath("$.authenticated", is(false)))
                                 .andExpect(jsonPath("$.type", is("status")));
 
-        // Logout, invalidating token
+        // Logout, invalidating the original token
         getClient(token).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
     }
