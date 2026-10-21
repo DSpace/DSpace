@@ -138,6 +138,7 @@ public class ManifestService extends AbstractResourceService {
                 sequenceService.getSequence(item));
         addRendering(item, context);
         addSeeAlso(item);
+        manifestGenerator.setAttribution(IIIF_ATTRIBUTION);
     }
 
     /**
@@ -220,9 +221,12 @@ public class ManifestService extends AbstractResourceService {
             manifestGenerator.addDescription(descrValue);
         }
 
-        String licenseUriValue = item.getItemService().getMetadataFirstValue(item, "dc", "rights", "uri", Item.ANY);
-        if (StringUtils.isNotBlank(licenseUriValue)) {
-            manifestGenerator.addLicense(licenseUriValue);
+        if (IIIF_LICENCE_URI != null) {
+            List<MetadataValue> licenseUriValues = item.getItemService()
+                    .getMetadataByMetadataString(item, IIIF_LICENCE_URI);
+            for (MetadataValue licenseUriValue : licenseUriValues) {
+                manifestGenerator.addLicense(licenseUriValue.getValue());
+            }
         }
     }
 
