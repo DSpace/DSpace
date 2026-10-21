@@ -340,6 +340,127 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
+    public void patchAddAndReplaceMetadataNormalizesBlankLanguagesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Publication")
+                                           .withSubmissionDefinition("modeA")
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title of item A")
+                                .withIssueDate("2015-06-25").build();
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> emptyLanguageValue = new HashMap<String, String>();
+        emptyLanguageValue.put("value", "Empty language");
+        emptyLanguageValue.put("language", "");
+        Map<String, String> whitespaceLanguageValue = new HashMap<String, String>();
+        whitespaceLanguageValue.put("value", "Whitespace language");
+        whitespaceLanguageValue.put("language", " \t\r\n ");
+        Map<String, String> anyLanguageValue = new HashMap<String, String>();
+        anyLanguageValue.put("value", "Any language");
+        anyLanguageValue.put("language", Item.ANY);
+        Map<String, String> nonBlankLanguageValue = new HashMap<String, String>();
+        nonBlankLanguageValue.put("value", "English language");
+        nonBlankLanguageValue.put("language", "en");
+        Map<String, String> otherNonBlankLanguageValue = new HashMap<String, String>();
+        otherNonBlankLanguageValue.put("value", "French language");
+        otherNonBlankLanguageValue.put("language", "fr");
+        values.add(emptyLanguageValue);
+        values.add(whitespaceLanguageValue);
+        values.add(anyLanguageValue);
+        values.add(nonBlankLanguageValue);
+        values.add(otherNonBlankLanguageValue);
+
+        operations.add(new AddOperation("/sections/titleAndIssuedDate/dc.subject", values));
+
+        String patchBody = getPatchContent(operations);
+        getClient(tokenAdmin).perform(patch("/api/core/edititems/" + editItem.getID() + ":FIRST")
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                     hasJsonPath("$['dc.subject'][0].value", is("Empty language")),
+                                     hasJsonPath("$['dc.subject'][1].value", is("Whitespace language")),
+                                     hasJsonPath("$['dc.subject'][2].value", is("Any language")),
+                                     hasJsonPath("$['dc.subject'][3].value", is("English language")),
+                                     hasJsonPath("$['dc.subject'][3].language", is("en")),
+                                     hasJsonPath("$['dc.subject'][4].value", is("French language")),
+                                     hasJsonPath("$['dc.subject'][4].language", is("fr"))
+                                     )))
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][0].language")
+                                     .doesNotExist())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][1].language")
+                                     .doesNotExist())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][2].language")
+                                     .doesNotExist());
+
+        // verify that the patch changes have been persisted
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][0].language")
+                                     .doesNotExist())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][1].language")
+                                     .doesNotExist())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][2].language")
+                                     .doesNotExist())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][3].language",
+                                     is("en")))
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][4].language",
+                                     is("fr")));
+
+        operations.clear();
+        Map<String, String> emptyLanguageReplacement = new HashMap<String, String>();
+        emptyLanguageReplacement.put("value", "English language replaced");
+        emptyLanguageReplacement.put("language", "");
+        Map<String, String> whitespaceLanguageReplacement = new HashMap<String, String>();
+        whitespaceLanguageReplacement.put("value", "French language replaced");
+        whitespaceLanguageReplacement.put("language", " \t\r\n ");
+
+        operations.add(new ReplaceOperation("/sections/titleAndIssuedDate/dc.subject/3", emptyLanguageReplacement));
+        operations.add(new ReplaceOperation("/sections/titleAndIssuedDate/dc.subject/4",
+                whitespaceLanguageReplacement));
+
+        patchBody = getPatchContent(operations);
+        getClient(tokenAdmin).perform(patch("/api/core/edititems/" + editItem.getID() + ":FIRST")
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                     hasJsonPath("$['dc.subject'][3].value", is("English language replaced")),
+                                     hasJsonPath("$['dc.subject'][4].value", is("French language replaced"))
+                                     )))
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][3].language")
+                                     .doesNotExist())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][4].language")
+                                     .doesNotExist());
+
+        // verify that replacing existing nonblank languages with blank languages has been persisted
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][3].value",
+                                     is("English language replaced")))
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][3].language")
+                                     .doesNotExist())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][4].value",
+                                     is("French language replaced")))
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.subject'][4].language")
+                                     .doesNotExist());
+    }
+
+    @Test
     public void notRepeatableFiledValidationErrorsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
