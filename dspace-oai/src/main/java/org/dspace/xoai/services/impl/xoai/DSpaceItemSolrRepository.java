@@ -24,11 +24,13 @@ import com.lyncode.xoai.dataprovider.exceptions.IdDoesNotExistException;
 import com.lyncode.xoai.dataprovider.filter.ScopedFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.lucene.search.TermRangeQuery;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.xoai.data.DSpaceSolrItem;
+import org.dspace.xoai.data.ResumptionCursor;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.HandleResolver;
 import org.dspace.xoai.services.api.solr.SolrQueryResolver;
@@ -43,12 +45,15 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
     private static final Logger log = LogManager.getLogger(DSpaceItemSolrRepository.class);
     private final SolrClient server;
     private final SolrQueryResolver solrQueryResolver;
+    private final ResumptionCursor cursor;
 
     public DSpaceItemSolrRepository(SolrClient server, CollectionsService collectionsService,
-                                    HandleResolver handleResolver, SolrQueryResolver solrQueryResolver) {
+                                    HandleResolver handleResolver, SolrQueryResolver solrQueryResolver,
+                                    ResumptionCursor cursor) {
         super(collectionsService, handleResolver);
         this.server = server;
         this.solrQueryResolver = solrQueryResolver;
+        this.cursor = cursor;
     }
 
     @Override
@@ -69,8 +74,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
     }
 
     @Override
-    public ListItemIdentifiersResult getItemIdentifiers(
-        List<ScopedFilter> filters, int offset, int length) {
+    public ListItemIdentifiersResult getItemIdentifiers(List<ScopedFilter> filters, int offset, int length) {
         try {
             QueryResult queryResult = retrieveItems(filters, offset, length);
             // transform results list from a list of Items to a list of ItemIdentifiers
@@ -89,8 +93,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
     }
 
     @Override
-    public ListItemsResults getItems(List<ScopedFilter> filters, int offset,
-                                     int length) {
+    public ListItemsResults getItems(List<ScopedFilter> filters, int offset, int length) {
         try {
             QueryResult queryResult = retrieveItems(filters, offset, length);
             return new ListItemsResults(queryResult.hasMore(), queryResult.getResults(), queryResult.getTotal());
@@ -103,15 +106,37 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
     private QueryResult retrieveItems(List<ScopedFilter> filters, int offset, int length)
             throws DSpaceSolrException, IOException {
         List<Item> list = new ArrayList<>();
-        SolrQuery params = new SolrQuery(solrQueryResolver.buildQuery(filters))
+        String query = solrQueryResolver.buildQuery(filters);
+        // Excluding the records already served from the query itself lets Solr seek to this page, instead of
+        // walking a priority queue of offset + length entries to throw away all but the last of them.
+        // The bound is only meaningful because DSpaceSolrSearch sorts on that very field, ascending.
+        // Without a cursor -- first page, or a token issued before they existed -- the offset is skipped as it was.
+        boolean seekable = !cursor.isEmpty();
+        if (seekable) {
+            // Generates: item.id:{cursorValue TO *]
+            TermRangeQuery rangeQuery = TermRangeQuery.newStringRange("item.id", cursor.valueOf(), null, false, true);
+            query += " AND " + rangeQuery.toString();
+        }
+        SolrQuery params = new SolrQuery(query)
             .setRows(length)
-            .setStart(offset);
+            .setStart(seekable ? 0 : offset);
         SolrDocumentList solrDocuments = DSpaceSolrSearch.query(server, params);
         for (SolrDocument doc : solrDocuments) {
             list.add(new DSpaceSolrItem(doc));
         }
-        return new QueryResult(list, (solrDocuments.getNumFound() > offset + length),
-                               (int) solrDocuments.getNumFound());
+        if (!solrDocuments.isEmpty()) {
+            // move the cursor to the last item from the Solr response
+            SolrDocument last = solrDocuments.get(solrDocuments.size() - 1);
+            cursor.moveTo((String) last.getFieldValue("item.id"));
+        }
+        // With the cursor bound in place, numFound is exactly what was left to serve, this page included:
+        //   * strictly more than a page means another page
+        //   * exactly a page means this one was the last.
+        //   * -1 makes the xoai library omit that optional attribute.
+        long numFound = solrDocuments.getNumFound();
+        return (seekable)
+            ? new QueryResult(list, numFound > length, -1)
+            : new QueryResult(list, numFound > offset + length, (int) numFound);
     }
 
     private class QueryResult {
