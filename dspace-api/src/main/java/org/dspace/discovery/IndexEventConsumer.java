@@ -76,7 +76,7 @@ public class IndexEventConsumer implements Consumer {
         int st = event.getSubjectType();
         if (!(st == Constants.ITEM || st == Constants.BUNDLE
             || st == Constants.COLLECTION || st == Constants.COMMUNITY || st == Constants.SITE
-            || st == Constants.LDN_MESSAGE)) {
+            || st == Constants.LDN_MESSAGE || st == Constants.PROCESS)) {
             log
                 .warn("IndexConsumer should not have been given this kind of Subject in an event, skipping: "
                           + event.toString());
@@ -117,7 +117,7 @@ public class IndexEventConsumer implements Consumer {
             case Event.MODIFY:
             case Event.MODIFY_METADATA:
                 if (subject == null) {
-                    if (st == Constants.SITE || st == Constants.LDN_MESSAGE) {
+                    if (st == Constants.SITE || st == Constants.LDN_MESSAGE || st == Constants.PROCESS) {
                         // Update the indexable objects of type in event.detail of objects with ids in event.identifiers
                         for (String id : event.getIdentifiers()) {
                             EventDetail detail = event.getDetail();
@@ -190,6 +190,15 @@ public class IndexEventConsumer implements Consumer {
             case Event.DELETE:
                 if (event.getSubjectType() == -1 || event.getSubjectID() == null) {
                     log.warn("got null subject type and/or ID on DELETE event, skipping it.");
+                } else if (st == Constants.PROCESS) {
+                    EventDetail eventDetail = event.getDetailList().get(0);
+                    IndexFactory<?, ?> indexableObjectService = IndexObjectFactoryFactory.getInstance()
+                        .getIndexFactoryByType((String) eventDetail.getDetailObject());
+                    for (String id : event.getIdentifiers()) {
+                        String detail = indexableObjectService.getType() + "-" + id;
+                        log.debug("consume() adding event to delete queue: " + event.toString());
+                        uniqueIdsToDelete.add(detail);
+                    }
                 } else {
                     IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance()
                                           .getIndexFactoryByType(Constants.typeText[event.getSubjectType()]);
