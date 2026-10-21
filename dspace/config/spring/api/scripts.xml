@@ -82,6 +82,16 @@
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
     </bean>
 
+    <bean id="dynamic-layout-tool" class="org.dspace.layout.script.DynamicLayoutToolScriptConfiguration">
+        <property name="description" value="Script to import Dynamic layout configuration from excel file"/>
+        <property name="dspaceRunnableClass" value="org.dspace.layout.script.DynamicLayoutToolScript"/>
+    </bean>
+
+    <bean id="export-dynamic-layout-tool" class="org.dspace.layout.script.ExportDynamicLayoutToolCliScriptConfiguration">
+        <property name="description" value="Script to export Dynamic layout configuration into excel file"/>
+        <property name="dspaceRunnableClass" value="org.dspace.layout.script.ExportDynamicLayoutToolScriptCli"/>
+    </bean>
+
     <bean id="solr-database-resync" class="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration">
         <property name="description" value="Update the database status of Items in solr"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
