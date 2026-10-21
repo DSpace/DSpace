@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <!--
-        Recursive function searching for a DDC in a string.
+        Recursive function searching for a DDC three-digits number in a string.
         Example string 1: '153 Kognitive Prozesse, Intelligenz'
         Example string 2: 'DDC::300 Sozialwissenschaften::330 Wirtschaft::336 Öffentliche Finanzen'
         In the last case, we want the last DDC.
