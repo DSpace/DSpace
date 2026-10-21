@@ -163,7 +163,6 @@ public class RequestItemEmailNotifierTest
         // Configure the help desk strategy.
         configurationService.setProperty("mail.helpdesk", HELPDESK_ADDRESS);
         configurationService.setProperty("mail.helpdesk.name", HELPDESK_NAME);
-        configurationService.setProperty("request.item.helpdesk.override", "true");
 
         // Ensure that mail is "sent".
         configurationService.setProperty("mail.server.disabled", "false");
@@ -236,7 +235,6 @@ public class RequestItemEmailNotifierTest
         // Configure the help desk strategy.
         configurationService.setProperty("mail.helpdesk", HELPDESK_ADDRESS);
         configurationService.setProperty("mail.helpdesk.name", HELPDESK_NAME);
-        configurationService.setProperty("request.item.helpdesk.override", "true");
 
         // Ensure that mail is "sent".
         configurationService.setProperty("mail.server.disabled", "false");

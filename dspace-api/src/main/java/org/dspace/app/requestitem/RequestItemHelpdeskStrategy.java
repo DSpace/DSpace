@@ -34,8 +34,6 @@ import org.springframework.lang.NonNull;
  */
 public class RequestItemHelpdeskStrategy
         extends RequestItemSubmitterStrategy {
-    static final String P_HELPDESK_OVERRIDE
-            = "request.item.helpdesk.override";
     static final String P_MAIL_HELPDESK = "mail.helpdesk";
 
     @Autowired(required = true)
@@ -51,16 +49,14 @@ public class RequestItemHelpdeskStrategy
     @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
             throws SQLException {
-        boolean helpdeskOverridesSubmitter = configurationService
-            .getBooleanProperty("request.item.helpdesk.override", false);
         String helpDeskEmail = configurationService.getProperty("mail.helpdesk");
 
-        if (helpdeskOverridesSubmitter && StringUtils.isNotBlank(helpDeskEmail)) {
+        if (StringUtils.isNotBlank(helpDeskEmail)) {
             List<RequestItemAuthor> authors = new ArrayList<>(1);
             authors.add(getHelpDeskPerson(context, helpDeskEmail));
             return authors;
         } else {
-            //Fallback to default logic (author of Item) if helpdesk isn't fully enabled or setup
+            //Fallback to default logic (author of Item) if helpdesk isn't setup
             return super.getRequestItemAuthor(context, item);
         }
     }
