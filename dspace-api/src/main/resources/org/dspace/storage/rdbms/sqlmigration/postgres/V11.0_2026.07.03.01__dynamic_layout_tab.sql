@@ -33,10 +33,19 @@ CREATE TABLE IF NOT EXISTS dynamic_layout_tab
     custom_filter VARCHAR(255),
     CONSTRAINT dynamic_layout_tab_pkey PRIMARY KEY (id),
     CONSTRAINT dynamic_layout_tab_entity_id_fkey FOREIGN KEY (entity_id)
-        REFERENCES entity_type (id),
-    CONSTRAINT dynamic_layout_tab_entity_shortname_custom_filter_unique
-        UNIQUE NULLS NOT DISTINCT (entity_id, shortname, custom_filter)
+        REFERENCES entity_type (id)
 );
+
+-- Uniqueness on (entity_id, shortname, custom_filter). Because custom_filter is
+-- nullable and a NULL filter must still collide with another NULL filter for the
+-- same entity/shortname, a plain UNIQUE would treat NULLs as distinct. This is
+-- expressed as two partial unique indexes.
+CREATE UNIQUE INDEX IF NOT EXISTS dynamic_layout_tab_entity_shortname_custom_filter_unique
+    ON dynamic_layout_tab (entity_id, shortname, custom_filter)
+    WHERE custom_filter IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS dynamic_layout_tab_entity_shortname_null_filter_unique
+    ON dynamic_layout_tab (entity_id, shortname)
+    WHERE custom_filter IS NULL;
 
 -- Step 2: migrate data from the legacy cris_layout_tab table when it exists.
 -- Ids are preserved because downstream layout tables reference them. The
