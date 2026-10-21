@@ -8,6 +8,10 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
@@ -18,6 +22,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -31,6 +36,7 @@ import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -248,6 +254,136 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
             assertEquals(0, tot);
             Collection<ImportRecord> importRecords  = dataCiteServiceImpl.getRecords("nocontent", 0 , -1);
             assertEquals(0, importRecords.size());
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
+
+    /**
+     * This method tests that when exactIdOnly = true and we search for a valid ID that does not exist
+     * -> we get no results
+     */
+    @Test
+    public void dataCiteExactIdOnlyEnabledDoesNotFallbackToQueryTest() throws Exception {
+        boolean originalExactIdOnly = dataCiteServiceImpl.isExactIdOnly();
+        dataCiteServiceImpl.setExactIdOnly(true);
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try {
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse notFound = mockResponse("", 404, "Not Found");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(notFound);
+
+            Collection<ImportRecord> records =
+                    dataCiteServiceImpl.getRecords("10.99999/does-not-exist", 0, 2);
+            assertEquals(0, records.size());
+
+            ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
+            verify(httpClient, times(1)).execute(captor.capture());
+            assertTrue(captor.getValue().getURI().getPath().endsWith("/10.99999/does-not-exist"));
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+            dataCiteServiceImpl.setExactIdOnly(originalExactIdOnly);
+        }
+    }
+
+
+    /**
+     * This method tests that when exactIdOnly = false, and we don't give an exact ID match
+     * -> The fallback query is used to retrieve non-exact values
+     */
+    @Test
+    public void dataCiteExactIdOnlyDisabledFallsBackToQueryTest() throws Exception {
+        boolean originalExactIdOnly = dataCiteServiceImpl.isExactIdOnly();
+        dataCiteServiceImpl.setExactIdOnly(false);
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-test2.json")) {
+            String queryResponse = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse notFound = mockResponse("", 404, "Not Found");
+            CloseableHttpResponse ok = mockResponse(queryResponse, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any()))
+                    .thenReturn(notFound)
+                    .thenReturn(ok);
+
+            Collection<ImportRecord> records =
+                    dataCiteServiceImpl.getRecords("10.99999/does-not-exist", 0, 2);
+            assertEquals(1, records.size());
+
+            ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
+            verify(httpClient, times(2)).execute(captor.capture());
+            assertTrue(captor.getAllValues().get(0).getURI().getPath().endsWith("/10.99999/does-not-exist"));
+            assertTrue(String.valueOf(captor.getAllValues().get(1).getURI().getQuery()).contains("query="));
+        } finally {
+            dataCiteServiceImpl.setExactIdOnly(originalExactIdOnly);
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
+
+    /**
+     * This method tests that if exactIdOnly = true and we didn't provide a valid DOI
+     * -> an empty list is returned
+     */
+    @Test
+    public void dataCiteExactIdOnlyEnabledNonDoiReturnsEmptyTest() throws Exception {
+        boolean originalExactIdOnly = dataCiteServiceImpl.isExactIdOnly();
+        dataCiteServiceImpl.setExactIdOnly(true);
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try {
+            liveImportClientImpl.setHttpClient(httpClient);
+
+            Collection<ImportRecord> records = dataCiteServiceImpl.getRecords("nocontent", 0, 2);
+            assertEquals(0, records.size());
+            verify(httpClient, never()).execute(ArgumentMatchers.any());
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+            dataCiteServiceImpl.setExactIdOnly(originalExactIdOnly);
+        }
+    }
+
+    /**
+     * resourceTypeGeneral=Project -> should be rejected
+     */
+    @Test
+    public void dataCitePublicationRejectsResourceTypeGeneralProjectTest() throws Exception {
+        assertEquals(0, getExactDoiImportSize("dataCite-pub-reject-rtg-project.json", "10.1234/pub-rtg-project"));
+    }
+
+    /**
+     * resourceTypeGeneral=Other, resourceType=Project -> should be rejected
+     */
+    @Test
+    public void dataCitePublicationRejectsOtherProjectTest() throws Exception {
+        assertEquals(0, getExactDoiImportSize("dataCite-pub-reject-other-project.json", "10.1234/pub-other-project"));
+    }
+
+    /**
+     * resourceTypeGeneral=Dataset -> should be accepted
+     */
+    @Test
+    public void dataCitePublicationAcceptsResourceTypeGeneralDatasetTest() throws Exception {
+        assertEquals(1, getExactDoiImportSize("dataCite-pub-accept-rtg-dataset.json", "10.1234/pub-rtg-dataset"));
+    }
+
+    /**
+     * resourceTypeGeneral=Text -> should be accepted
+     */
+    @Test
+    public void dataCitePublicationAcceptsResourceTypeGeneralTextTest() throws Exception {
+        assertEquals(1, getExactDoiImportSize("dataCite-pub-accept-rtg-text.json", "10.1234/pub-rtg-text"));
+    }
+
+    private int getExactDoiImportSize(String jsonResource, String doi) throws Exception {
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try (InputStream dataCiteResp = getClass().getResourceAsStream(jsonResource)) {
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse response =
+                    mockResponse(IOUtils.toString(dataCiteResp, Charset.defaultCharset()), 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+            return dataCiteServiceImpl.getRecords(doi, 0, -1).size();
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
