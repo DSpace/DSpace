@@ -143,7 +143,6 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
         configurationService.setProperty("mail.helpdesk", HELPDESK_EMAIL);
         configurationService.setProperty("mail.helpdesk.name", HELPDESK_NAME);
-        configurationService.setProperty("request.item.helpdesk.override", "true");
 
         // Test it.
         Item item = itemService.find(context, installItem.getID());
