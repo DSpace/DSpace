@@ -63,6 +63,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
     private Item itemWithDateRestriction;
     private Item itemWithGroupRestriction;
     private Item itemWithoutPolicy;
+    private Item itemWithLease;
+    private Item itemWithExpiredLease;
     private Item itemWithoutPrimaryBitstream;
     private Item itemWithPrimaryAndMultipleBitstreams;
     private Item itemWithoutPrimaryAndMultipleBitstreams;
@@ -119,6 +121,10 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                     workspaceItemService.create(context, collection, true));
             itemWithoutPolicy = installItemService.installItem(context,
                     workspaceItemService.create(context, collection, true));
+            itemWithLease = installItemService.installItem(context,
+                    workspaceItemService.create(context, collection, true));
+            itemWithExpiredLease = installItemService.installItem(context,
+                    workspaceItemService.create(context, collection, true));
             itemWithoutPrimaryBitstream = installItemService.installItem(context,
                     workspaceItemService.create(context, collection, true));
             itemWithPrimaryAndMultipleBitstreams = installItemService.installItem(context,
@@ -156,6 +162,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
             itemService.delete(context, itemWithDateRestriction);
             itemService.delete(context, itemWithGroupRestriction);
             itemService.delete(context, itemWithoutPolicy);
+            itemService.delete(context, itemWithLease);
+            itemService.delete(context, itemWithExpiredLease);
             itemService.delete(context, itemWithoutPrimaryBitstream);
             itemService.delete(context, itemWithPrimaryAndMultipleBitstreams);
             itemService.delete(context, itemWithoutPrimaryAndMultipleBitstreams);
@@ -180,6 +188,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         itemWithDateRestriction = null;
         itemWithGroupRestriction = null;
         itemWithoutPolicy = null;
+        itemWithLease = null;
+        itemWithExpiredLease = null;
         itemWithoutPrimaryBitstream = null;
         itemWithPrimaryAndMultipleBitstreams = null;
         itemWithoutPrimaryAndMultipleBitstreams = null;
@@ -430,6 +440,75 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         assertThat("testWithoutPolicy 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
         LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getAvailabilityDate();
         assertThat("testWithoutPolicy 4", bitstreamAvailabilityDate, equalTo(threshold));
+    }
+
+    /**
+     * Test for an item with an active lease (no startDate, future endDate)
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testWithLease() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Bundle bundle = bundleService.create(context, itemWithLease, Constants.CONTENT_BUNDLE_NAME);
+        Bitstream bitstream = bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+        bitstream.setName(context, "primary");
+        bundle.setPrimaryBitstreamID(bitstream);
+        List<ResourcePolicy> policies = new ArrayList<>();
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Lease");
+        policy.setAction(Constants.READ);
+        LocalDate endDate = LocalDate.of(9999, 12, 31);
+        policy.setEndDate(endDate);
+        policies.add(policy);
+        authorizeService.removeAllPolicies(context, bitstream);
+        authorizeService.addPolicies(context, policies, bitstream);
+        context.restoreAuthSystemState();
+        // getAccessStatusFromItem (anonymous — lease is an anonymous policy)
+        AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
+                itemWithLease, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        String status = accessStatus.getStatus();
+        assertThat("testWithLease 0", status, equalTo(DefaultAccessStatusHelper.LEASE));
+        LocalDate leaseDate = accessStatus.getLeaseDate();
+        assertThat("testWithLease 1", leaseDate, equalTo(endDate));
+        // getAccessStatusFromBitstream
+        AccessStatus accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
+                bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        String bitstreamStatus = accessStatusBitstream.getStatus();
+        assertThat("testWithLease 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.LEASE));
+        LocalDate bitstreamLeaseDate = accessStatusBitstream.getLeaseDate();
+        assertThat("testWithLease 3", bitstreamLeaseDate, equalTo(endDate));
+    }
+
+    /**
+     * Test for an item with an expired lease (endDate in the past)
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testWithExpiredLease() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Bundle bundle = bundleService.create(context, itemWithExpiredLease, Constants.CONTENT_BUNDLE_NAME);
+        Bitstream bitstream = bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+        bitstream.setName(context, "primary");
+        bundle.setPrimaryBitstreamID(bitstream);
+        List<ResourcePolicy> policies = new ArrayList<>();
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Lease");
+        policy.setAction(Constants.READ);
+        LocalDate endDate = LocalDate.of(2020, 1, 1);
+        policy.setEndDate(endDate);
+        policies.add(policy);
+        authorizeService.removeAllPolicies(context, bitstream);
+        authorizeService.addPolicies(context, policies, bitstream);
+        context.restoreAuthSystemState();
+        // An expired lease has no valid anonymous policy → restricted
+        AccessStatus accessStatus = helper.getAccessStatusFromItem(context,
+                itemWithExpiredLease, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        String status = accessStatus.getStatus();
+        assertThat("testWithExpiredLease 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
     }
 
     /**
