@@ -118,7 +118,9 @@ public class DynamicLayoutMetadataBoxConfigurator implements DynamicLayoutBoxCon
                     DynamicLayoutField fieldEntity = buildLayoutField(context, field);
                     fieldEntity.setLabel(field.getLabel());
                     fieldEntity.setLabelAsHeading(field.isLabelAsHeading());
-                    fieldEntity.setMetadataField(getMetadataField(context, field.getMetadata()));
+                    if (StringUtils.isNotBlank(field.getMetadata())) {
+                        fieldEntity.setMetadataField(getMetadataField(context, field.getMetadata()));
+                    }
                     fieldEntity.setPriority(priority++);
                     fieldEntity.setRendering(field.getRendering());
                     fieldEntity.setRow(rowIndex);

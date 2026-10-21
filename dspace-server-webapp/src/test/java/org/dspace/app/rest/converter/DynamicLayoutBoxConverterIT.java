@@ -324,6 +324,7 @@ public class DynamicLayoutBoxConverterIT extends AbstractControllerIntegrationTe
             new DynamicLayoutMetadataConfigurationRest.Bitstream();
         bitstreamData.setBundle("ORIGINAL");
         bitstreamData.setMetadataValue("dc.type");
+        bitstreamData.setMetadataField("dc.type");
 
         Field bitstreamField = new Field();
         bitstreamField.setLabel("Attachment");
@@ -363,5 +364,7 @@ public class DynamicLayoutBoxConverterIT extends AbstractControllerIntegrationTe
         DynamicLayoutFieldBitstream bitstream = (DynamicLayoutFieldBitstream) second;
         assertThat(bitstream.getBundle(), is("ORIGINAL"));
         assertThat(bitstream.getMetadataValue(), is("dc.type"));
+        assertThat(bitstream.getMetadataField(), notNullValue());
+        assertThat(bitstream.getMetadataField().toString('.'), is("dc.type"));
     }
 }
