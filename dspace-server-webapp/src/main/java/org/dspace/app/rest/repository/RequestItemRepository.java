@@ -119,6 +119,19 @@ public class RequestItemRepository
     @PreAuthorize("permitAll()")
     public RequestItemRest createAndReturn(Context ctx)
             throws AuthorizeException, SQLException {
+        // First, check request.item.type:
+        // "all" = anyone can request.
+        // "logged" = only authenticated user can request.
+        // "" or missing (null) = feature disabled.
+        String allowed = configurationService.getProperty("request.item.type");
+        if (StringUtils.isBlank(allowed)) {
+            throw new AuthorizeException("Request item feature is disabled.");
+        }
+        EPerson user = ctx.getCurrentUser();
+        if (user == null && "logged".equalsIgnoreCase(allowed)) {
+            throw new AuthorizeException("Anonymous requests are not permitted.");
+        }
+
         // Fill a RequestItemRest from the client's HTTP request.
         HttpServletRequest req = getRequestService()
                 .getCurrentRequest()
@@ -146,15 +159,6 @@ public class RequestItemRepository
             rir = mapper.readValue(req.getInputStream(), RequestItemRest.class);
         } catch (IOException ex) {
             throw new UnprocessableEntityException("error parsing the body", ex);
-        }
-
-        // Check request.item.type:
-        // "all" = anyone can request.
-        // "logged" = only authenticated user can request.
-        EPerson user = ctx.getCurrentUser();
-        String allowed = configurationService.getProperty("request.item.type", "logged");
-        if ("logged".equalsIgnoreCase(allowed) && null == user) {
-            throw new AuthorizeException("Anonymous requests are not permitted.");
         }
 
         /* Create the item request model object from the REST object. */
