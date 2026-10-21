@@ -302,6 +302,22 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
                                               Integer offset) throws SQLException;
 
     /**
+     * Keyset (seek) pagination over the relationships of a given type, ordered by ascending id.
+     * Returns up to {@code limit} relationships whose id is strictly greater than {@code lastId}.
+     * Stable and gap/duplicate-free across iterations (unlike offset paging), so it is the
+     * preferred way to iterate large numbers of relationships in batches.
+     *
+     * @param context           The relevant DSpace context
+     * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
+     * @param limit             maximum number of relationships to return
+     * @param lastId            return only relationships with id greater than this value (use 0 to start)
+     * @return  An id-ordered list of Relationship objects with the given type and id &gt; lastId
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByRelationshipTypeAfterId(Context context, RelationshipType relationshipType,
+                                                     int limit, int lastId) throws SQLException;
+
+    /**
      * This method is used to construct a Relationship object with all it's variables
      * @param c                   The relevant DSpace context
      * @param leftItem            The leftItem Item object for the relationship
