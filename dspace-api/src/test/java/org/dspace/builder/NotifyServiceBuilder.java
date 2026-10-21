@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 /**
  * Builder for {@link NotifyServiceEntity} entities.
@@ -50,7 +49,6 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
                 delete(notifyServiceEntity);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -68,8 +66,7 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
             notifyService.update(context, notifyServiceEntity);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException e) {
+        } catch (SQLException e) {
             log.error(e);
         }
         return notifyServiceEntity;
@@ -85,7 +82,6 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     public static NotifyServiceBuilder createNotifyServiceBuilder(Context context, String name) {
