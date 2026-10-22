@@ -136,6 +136,92 @@ public class DynamicLayoutSectionRestRepositoryIT extends AbstractControllerInte
     }
 
     @Test
+    public void testFindAllIsPaginated() throws Exception {
+
+        List<DynamicLayoutSection> originalSections = new LinkedList<>();
+        originalSections.addAll(dynamicLayoutSectionService.getComponents());
+
+        List<List<DynamicLayoutSectionComponent>> components = new ArrayList<>();
+        components.add(new ArrayList<>());
+        components.get(0).add(new org.dspace.layout.DynamicLayoutSearchComponent());
+
+        List<DynamicLayoutSection> sectionsForMock = new LinkedList<>();
+        sectionsForMock.add(new DynamicLayoutSection("CasualIdForTestingPurposes1", true, components));
+        sectionsForMock.add(new DynamicLayoutSection("CasualIdForTestingPurposes2", true, components));
+        sectionsForMock.add(new DynamicLayoutSection("CasualIdForTestingPurposes3", true, components));
+
+        dynamicLayoutSectionService.getComponents().clear();
+        dynamicLayoutSectionService.getComponents().addAll(sectionsForMock);
+
+        try {
+            getClient().perform(get("/api/layout/sections").param("size", "1").param("page", "0"))
+                .andExpect(status().isOk())
+                // Only the first page (one element) must be returned, not the whole list
+                .andExpect(jsonPath("$._embedded.sections", hasSize(1)))
+                .andExpect(jsonPath("$._embedded.sections[0].id", is("CasualIdForTestingPurposes1")))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(0)));
+
+            getClient().perform(get("/api/layout/sections").param("size", "1").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.sections", hasSize(1)))
+                .andExpect(jsonPath("$._embedded.sections[0].id", is("CasualIdForTestingPurposes2")))
+                .andExpect(jsonPath("$.page.number", is(1)));
+        } finally {
+            // Restoring situation previous to mock
+            dynamicLayoutSectionService.getComponents().clear();
+            dynamicLayoutSectionService.getComponents().addAll(originalSections);
+            // end restoring
+        }
+    }
+
+    @Test
+    public void testSearchVisibleTopBarSectionsIsPaginated() throws Exception {
+
+        List<DynamicLayoutSection> originalSections = new LinkedList<>();
+        originalSections.addAll(dynamicLayoutSectionService.getComponents());
+
+        List<List<DynamicLayoutSectionComponent>> components = new ArrayList<>();
+        components.add(new ArrayList<>());
+        components.get(0).add(new org.dspace.layout.DynamicLayoutSearchComponent());
+
+        // Three sections, two of them visible in the top bar
+        List<DynamicLayoutSection> sectionsForMock = new LinkedList<>();
+        sectionsForMock.add(new DynamicLayoutSection("CasualIdForTestingPurposes1", true, components));
+        sectionsForMock.add(new DynamicLayoutSection("CasualIdForTestingPurposes2", false, components));
+        sectionsForMock.add(new DynamicLayoutSection("CasualIdForTestingPurposes3", true, components));
+
+        dynamicLayoutSectionService.getComponents().clear();
+        dynamicLayoutSectionService.getComponents().addAll(sectionsForMock);
+
+        try {
+            getClient().perform(get("/api/layout/sections/search/visibleTopBarSections")
+                    .param("size", "1").param("page", "0"))
+                .andExpect(status().isOk())
+                // Only the first page (one element) must be returned, over 2 visible total
+                .andExpect(jsonPath("$._embedded.sections", hasSize(1)))
+                .andExpect(jsonPath("$._embedded.sections[0].id", is("CasualIdForTestingPurposes1")))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)));
+
+            getClient().perform(get("/api/layout/sections/search/visibleTopBarSections")
+                    .param("size", "1").param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.sections", hasSize(1)))
+                .andExpect(jsonPath("$._embedded.sections[0].id", is("CasualIdForTestingPurposes3")))
+                .andExpect(jsonPath("$.page.number", is(1)));
+        } finally {
+            // Restoring situation previous to mock
+            dynamicLayoutSectionService.getComponents().clear();
+            dynamicLayoutSectionService.getComponents().addAll(originalSections);
+            // end restoring
+        }
+    }
+
+    @Test
     public void testFindOne() throws Exception {
 
         String[] expectedBrowseNames = new String[] { "rodept", "author", "rsoTitle", "type", "dateissued", "subject" };
