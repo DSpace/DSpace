@@ -9,6 +9,7 @@ package org.dspace.layout.service.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.dspace.layout.DynamicLayoutSection;
@@ -65,19 +66,26 @@ public class DynamicLayoutSectionServiceImpl implements DynamicLayoutSectionServ
         return components.stream()
             .filter(DynamicLayoutSection::isVisible)
             .map(this::filterVisibleNestedSections)
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
     /**
      * Returns a representation of the given section that only exposes its
      * visible nested sections (applied recursively). Sections that hold
-     * components rather than nested sections are returned unchanged, since a
-     * {@link DynamicLayoutSection} can only hold either components or nested
-     * sections.
+     * components rather than nested sections (i.e. real leaf pages) are returned
+     * unchanged, since a {@link DynamicLayoutSection} can only hold either
+     * components or nested sections.
+     * <p>
+     * A nested-section menu whose children are all hidden (directly or after the
+     * recursive filtering) would become an empty shell that the frontend still
+     * renders as a dead navigation link. Such emptied menus are therefore
+     * discarded by returning {@code null}, which the caller filters out.
      *
      * @param section the (visible) section to process
-     * @return the section itself when it has no nested sections, otherwise a
-     *         copy retaining only its visible nested sections
+     * @return the section itself when it has no nested sections (leaf),
+     *         a copy retaining only its visible nested sections, or
+     *         {@code null} when it is a menu left without any visible child
      */
     private DynamicLayoutSection filterVisibleNestedSections(DynamicLayoutSection section) {
         List<DynamicLayoutSection> nestedSections = section.getNestedSections();
@@ -88,7 +96,12 @@ public class DynamicLayoutSectionServiceImpl implements DynamicLayoutSectionServ
         List<DynamicLayoutSection> visibleNestedSections = nestedSections.stream()
             .filter(DynamicLayoutSection::isVisible)
             .map(this::filterVisibleNestedSections)
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
+
+        if (visibleNestedSections.isEmpty()) {
+            return null;
+        }
 
         DynamicLayoutSection filteredSection = new DynamicLayoutSection(section.getId(), section.isVisible());
         filteredSection.setNestedSections(visibleNestedSections);
