@@ -158,6 +158,40 @@ public class DynamicLayoutSectionRestRepositoryIT extends AbstractControllerInte
     }
 
     @Test
+    public void testFindOneResolvesNestedChildAbsentFromTopLevel() throws Exception {
+
+        List<DynamicLayoutSection> originalSections = new LinkedList<>();
+        originalSections.addAll(dynamicLayoutSectionService.getComponents());
+
+        List<List<DynamicLayoutSectionComponent>> components = new ArrayList<>();
+        components.add(new ArrayList<>());
+        components.get(0).add(new org.dspace.layout.DynamicLayoutSearchComponent());
+
+        // A child that only exists inside its parent's nested sections: it appears
+        // in the navbar but must also be retrievable at /api/layout/sections/{childId}.
+        DynamicLayoutSection nestedChild = new DynamicLayoutSection("nestedOnlyChild", true, components);
+        DynamicLayoutSection parent = new DynamicLayoutSection("nestedParent", true, null);
+        parent.setNestedSections(List.of(nestedChild));
+
+        List<DynamicLayoutSection> sectionsForMock = new LinkedList<>();
+        sectionsForMock.add(parent);
+
+        dynamicLayoutSectionService.getComponents().clear();
+        dynamicLayoutSectionService.getComponents().addAll(sectionsForMock);
+
+        try {
+            getClient().perform(get("/api/layout/sections/{id}", "nestedOnlyChild"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is("nestedOnlyChild")));
+        } finally {
+            // Restoring situation previous to mock
+            dynamicLayoutSectionService.getComponents().clear();
+            dynamicLayoutSectionService.getComponents().addAll(originalSections);
+            // end restoring
+        }
+    }
+
+    @Test
     public void testFindAllWithExistingOfNestedSections() throws Exception {
 
         List<DynamicLayoutSection> originalSections = new LinkedList<>();
