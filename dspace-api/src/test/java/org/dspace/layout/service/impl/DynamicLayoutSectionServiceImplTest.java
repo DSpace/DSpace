@@ -100,6 +100,52 @@ public class DynamicLayoutSectionServiceImplTest {
     }
 
     @Test
+    public void visibleParentWithOnlyHiddenChildrenIsExcluded() {
+        DynamicLayoutSection hiddenChild = new DynamicLayoutSection("hiddenChild", false, emptyList());
+        DynamicLayoutSection emptiedParent = new DynamicLayoutSection("emptiedParent", true);
+        emptiedParent.setNestedSections(List.of(hiddenChild));
+
+        DynamicLayoutSectionServiceImpl service = buildService(List.of(emptiedParent));
+
+        assertThat(service.findAllVisibleSectionsInTopBar(), hasSize(0));
+    }
+
+    @Test
+    public void ancestorLeftWithoutVisibleDescendantsIsExcludedRecursively() {
+        DynamicLayoutSection hiddenLeaf = new DynamicLayoutSection("hiddenLeaf", false, emptyList());
+
+        DynamicLayoutSection intermediate = new DynamicLayoutSection("intermediate", true);
+        intermediate.setNestedSections(List.of(hiddenLeaf));
+
+        DynamicLayoutSection root = new DynamicLayoutSection("root", true);
+        root.setNestedSections(List.of(intermediate));
+
+        DynamicLayoutSectionServiceImpl service = buildService(List.of(root));
+
+        assertThat(service.findAllVisibleSectionsInTopBar(), hasSize(0));
+    }
+
+    @Test
+    public void visibleParentKeepsVisibleSiblingWhenAnotherBranchIsEmptied() {
+        DynamicLayoutSection hiddenGrandChild = new DynamicLayoutSection("hiddenGrandChild", false, emptyList());
+        DynamicLayoutSection emptiedBranch = new DynamicLayoutSection("emptiedBranch", true);
+        emptiedBranch.setNestedSections(List.of(hiddenGrandChild));
+
+        DynamicLayoutSection visibleChild = new DynamicLayoutSection("visibleChild", true, emptyList());
+
+        DynamicLayoutSection parent = new DynamicLayoutSection("parent", true);
+        parent.setNestedSections(List.of(emptiedBranch, visibleChild));
+
+        DynamicLayoutSectionServiceImpl service = buildService(List.of(parent));
+
+        List<DynamicLayoutSection> result = service.findAllVisibleSectionsInTopBar();
+
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0).getNestedSections(), contains(
+            org.hamcrest.Matchers.hasProperty("id", is("visibleChild"))));
+    }
+
+    @Test
     public void countVisibleSectionsInTopBarReflectsTopLevelVisibleSections() {
         DynamicLayoutSection visibleOne = new DynamicLayoutSection("visibleOne", true, emptyList());
         DynamicLayoutSection hidden = new DynamicLayoutSection("hidden", false, emptyList());
