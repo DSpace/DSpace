@@ -1,0 +1,86 @@
+{
+  "shortname": "secured-info",
+  "header": "Secured Publication HEADER",
+  "entityType": "Publication",
+  "priority": 1,
+  "security": 0,
+  "type": "tab",
+  "leading": "true",
+  "rows":
+  [{
+    "cells": [
+      {
+        "style": "col-md-6",
+        "boxes": [
+          {
+            "shortname": "admin-only-box",
+            "header": "Admin Only Information",
+            "entityType": "Publication",
+            "collapsed": false,
+            "container": false,
+            "minor": false,
+            "style": "col-md-6",
+            "security": 1,
+            "boxType": "METADATA",
+            "metadataSecurityFields": [],
+            "configuration": {
+              "type": "boxmetadataconfiguration",
+              "rows": [
+                {
+                  "style": "container row",
+                  "cells": [
+                    {
+                      "fields": [
+                        {
+                          "metadata": "dc.description.abstract",
+                          "label": "Abstract",
+                          "fieldType": "metadata"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "style": "col-md-6",
+        "boxes": [
+          {
+            "shortname": "public-box",
+            "header": "Public Information",
+            "entityType": "Publication",
+            "collapsed": false,
+            "container": false,
+            "minor": false,
+            "style": "col-md-6",
+            "security": 0,
+            "boxType": "METADATA",
+            "metadataSecurityFields": [],
+            "configuration": {
+              "type": "boxmetadataconfiguration",
+              "rows": [
+                {
+                  "style": "container row",
+                  "cells": [
+                    {
+                      "fields": [
+                        {
+                          "metadata": "dc.title",
+                          "label": "Name",
+                          "fieldType": "metadata"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }]
+}
