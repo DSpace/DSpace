@@ -2309,7 +2309,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     public void usageReportsSearch_ExcludePoints_ReturnsHeadersOnly() throws Exception {
         getClient(adminToken).perform(get("/api/statistics/usagereports/search/object")
                              .param("category", "collection-mainReports")
-                             .param("projection", "usageReportPoints")
+                             .param("projection", "excludeUsageReportPoints")
                              .param("uri", "http://localhost:8080/server/api/core/collections/" +
                                     collectionNotVisited.getID()))
                 .andExpect(status().isOk())

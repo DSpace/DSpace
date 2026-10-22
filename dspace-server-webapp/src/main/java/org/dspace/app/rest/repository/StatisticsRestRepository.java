@@ -20,7 +20,7 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.StatisticsSupportRest;
 import org.dspace.app.rest.model.UsageReportRest;
-import org.dspace.app.rest.projection.PreventPointsCalculationProjection;
+import org.dspace.app.rest.projection.ExcludeUsageReportPointsProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.UsageReportUtils;
@@ -84,7 +84,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
                 throw new IllegalArgumentException("The specified category doesn't exists: " + category);
             }
             Projection projection = utils.obtainProjection();
-            boolean includePoints = !(projection instanceof PreventPointsCalculationProjection);
+            boolean includePoints = !(projection instanceof ExcludeUsageReportPointsProjection);
             usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category, startDate, endDate,
                                                                        includePoints);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
