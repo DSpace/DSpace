@@ -20,6 +20,8 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.StatisticsSupportRest;
 import org.dspace.app.rest.model.UsageReportRest;
+import org.dspace.app.rest.projection.PreventPointsCalculationProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.content.DSpaceObject;
@@ -81,7 +83,10 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
             if (category != null && !usageReportUtils.categoryExists(dso, category)) {
                 throw new IllegalArgumentException("The specified category doesn't exists: " + category);
             }
-            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category, startDate, endDate);
+            Projection projection = utils.obtainProjection();
+            boolean includePoints = !(projection instanceof PreventPointsCalculationProjection);
+            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category, startDate, endDate,
+                                                                       includePoints);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

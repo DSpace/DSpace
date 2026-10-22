@@ -2306,6 +2306,35 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void usageReportsSearch_ExcludePoints_ReturnsHeadersOnly() throws Exception {
+        getClient(adminToken).perform(get("/api/statistics/usagereports/search/object")
+                             .param("category", "collection-mainReports")
+                             .param("projection", "usageReportPoints")
+                             .param("uri", "http://localhost:8080/server/api/core/collections/" +
+                                    collectionNotVisited.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.usagereports", not(empty())))
+                .andExpect(jsonPath("$._embedded.usagereports", Matchers.containsInAnyOrder(
+                        UsageReportMatcher.matchUsageReport(
+                                collectionNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                                TOTAL_VISITS_REPORT_ID),
+                        UsageReportMatcher.matchUsageReport(
+                                collectionNotVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                                TOTAL_VISITS_PER_MONTH_REPORT_ID),
+                        UsageReportMatcher.matchUsageReport(
+                                collectionNotVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
+                                TOP_CITIES_REPORT_ID),
+                        UsageReportMatcher.matchUsageReport(
+                                collectionNotVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
+                                TOP_COUNTRIES_REPORT_ID)
+                )))
+                .andExpect(jsonPath("$._embedded.usagereports[0].points", empty()))
+                .andExpect(jsonPath("$._embedded.usagereports[1].points", empty()))
+                .andExpect(jsonPath("$._embedded.usagereports[2].points", empty()))
+                .andExpect(jsonPath("$._embedded.usagereports[3].points", empty()));
+    }
+
+    @Test
     public void usageReportsSearch_Item_Visited_FileNotVisited() throws Exception {
         // ** WHEN **
         // We visit an item
