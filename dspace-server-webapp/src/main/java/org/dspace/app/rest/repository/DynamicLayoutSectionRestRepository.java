@@ -48,8 +48,7 @@ public class DynamicLayoutSectionRestRepository extends DSpaceRestRepository<Dyn
     @PreAuthorize("permitAll()")
     public Page<DynamicLayoutSectionRest> findAll(Context context, Pageable pageable) {
         List<DynamicLayoutSection> layoutSections = dynamicLayoutSectionService.findAll();
-        int total = dynamicLayoutSectionService.countTotal();
-        return converter.toRestPage(layoutSections, pageable, total, utils.obtainProjection());
+        return converter.toRestPage(layoutSections, pageable, utils.obtainProjection());
     }
 
     /**
@@ -65,8 +64,7 @@ public class DynamicLayoutSectionRestRepository extends DSpaceRestRepository<Dyn
     public Page<DynamicLayoutSectionRest> searchVisibleTopBarSections(@Parameter(value = "query") String q,
         Pageable pageable) throws SearchServiceException {
         List<DynamicLayoutSection> layoutSections = dynamicLayoutSectionService.findAllVisibleSectionsInTopBar();
-        int total = dynamicLayoutSectionService.countVisibleSectionsInTopBar();
-        return converter.toRestPage(layoutSections, pageable, total, utils.obtainProjection());
+        return converter.toRestPage(layoutSections, pageable, utils.obtainProjection());
     }
     @Override
     public Class<DynamicLayoutSectionRest> getDomainClass() {
