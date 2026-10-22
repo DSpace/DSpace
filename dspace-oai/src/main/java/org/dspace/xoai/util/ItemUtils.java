@@ -373,7 +373,7 @@ public class ItemUtils {
         ChoiceAuthority choiceAuthority = null;
         try {
             String authorityName = choiceAuthorityService.getChoiceAuthorityName(
-                field.getMetadataSchema().getName(), field.getElement(), field.getQualifier(), Constants.ITEM, null);
+                field.getMetadataSchema().getName(), field.getElement(), field.getQualifier(), null);
             if (authorityName != null) {
                 choiceAuthority = choiceAuthorityService.getChoiceAuthorityByAuthorityName(authorityName);
             }
