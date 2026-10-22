@@ -7,9 +7,11 @@
  */
 package org.dspace.layout.service.impl;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.dspace.layout.DynamicLayoutSection;
@@ -33,8 +35,36 @@ public class DynamicLayoutSectionServiceImpl implements DynamicLayoutSectionServ
 
     @Override
     public DynamicLayoutSection findOne(String id) {
-        return components.stream().filter(
-            component -> component.getId().equals(id)).findFirst().orElse(null);
+        return findOneByIdRecursively(components, id);
+    }
+
+    /**
+     * Resolves a section by id walking both the top-level sections and their
+     * nested sections recursively. A child declared only inside a parent's
+     * nested sections is therefore reachable (e.g. via
+     * {@code /api/layout/sections/{childId}}), not just the top-level entries.
+     *
+     * @param sections the sections to search (a level of the tree)
+     * @param id the section identifier to look up
+     * @return the matching section, or {@code null} if none matches
+     */
+    private DynamicLayoutSection findOneByIdRecursively(List<DynamicLayoutSection> sections, String id) {
+        if (id == null || sections == null || sections.isEmpty()) {
+            return null;
+        }
+
+        for (DynamicLayoutSection section : sections) {
+            if (id.equals(section.getId())) {
+                return section;
+            }
+
+            DynamicLayoutSection nestedMatch = findOneByIdRecursively(section.getNestedSections(), id);
+            if (nestedMatch != null) {
+                return nestedMatch;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -56,9 +86,39 @@ public class DynamicLayoutSectionServiceImpl implements DynamicLayoutSectionServ
 
     /**
      * @param components the list of components to set
+     * @throws IllegalArgumentException if any section id is not unique across
+     *         the whole tree (top-level and nested sections)
      */
     public void setComponents(List<DynamicLayoutSection> components) {
+        validateUniqueSectionIds(components);
         this.components = components;
+    }
+
+    /**
+     * Validates that every section id is unique across the whole configuration
+     * tree. Because {@link #findOne(String)} resolves ids recursively, a
+     * duplicate id (whether between a top-level section and a nested one, or
+     * between nested siblings) would make resolution ambiguous, so it is
+     * rejected at configuration load time.
+     *
+     * @param sections the top-level sections to validate
+     * @throws IllegalArgumentException on the first duplicate id found
+     */
+    private void validateUniqueSectionIds(List<DynamicLayoutSection> sections) {
+        collectSectionIds(sections, new HashSet<>());
+    }
+
+    private void collectSectionIds(List<DynamicLayoutSection> sections, Set<String> sectionIds) {
+        if (sections == null) {
+            return;
+        }
+        for (DynamicLayoutSection section : sections) {
+            if (!sectionIds.add(section.getId())) {
+                throw new IllegalArgumentException(
+                    "Duplicate dynamic layout section id found: " + section.getId());
+            }
+            collectSectionIds(section.getNestedSections(), sectionIds);
+        }
     }
 
     @Override

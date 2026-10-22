@@ -11,7 +11,10 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThrows;
 
 import java.util.List;
 
@@ -143,6 +146,83 @@ public class DynamicLayoutSectionServiceImplTest {
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getNestedSections(), contains(
             org.hamcrest.Matchers.hasProperty("id", is("visibleChild"))));
+    }
+
+    @Test
+    public void findOneResolvesTopLevelSection() {
+        DynamicLayoutSection topLevel = new DynamicLayoutSection("topLevel", true, emptyList());
+
+        DynamicLayoutSectionServiceImpl service = buildService(List.of(topLevel));
+
+        DynamicLayoutSection result = service.findOne("topLevel");
+
+        assertThat(result, is(notNullValue()));
+        assertThat(result.getId(), is("topLevel"));
+    }
+
+    @Test
+    public void findOneResolvesNestedChildById() {
+        DynamicLayoutSection nestedChild = new DynamicLayoutSection("nestedChild", true, emptyList());
+        DynamicLayoutSection parent = new DynamicLayoutSection("parent", true);
+        parent.setNestedSections(List.of(nestedChild));
+
+        DynamicLayoutSectionServiceImpl service = buildService(List.of(parent));
+
+        DynamicLayoutSection result = service.findOne("nestedChild");
+
+        assertThat(result, is(notNullValue()));
+        assertThat(result.getId(), is("nestedChild"));
+    }
+
+    @Test
+    public void findOneResolvesDeeplyNestedChildById() {
+        DynamicLayoutSection deepLeaf = new DynamicLayoutSection("deepLeaf", true, emptyList());
+        DynamicLayoutSection intermediate = new DynamicLayoutSection("intermediate", true);
+        intermediate.setNestedSections(List.of(deepLeaf));
+        DynamicLayoutSection root = new DynamicLayoutSection("root", true);
+        root.setNestedSections(List.of(intermediate));
+
+        DynamicLayoutSectionServiceImpl service = buildService(List.of(root));
+
+        DynamicLayoutSection result = service.findOne("deepLeaf");
+
+        assertThat(result, is(notNullValue()));
+        assertThat(result.getId(), is("deepLeaf"));
+    }
+
+    @Test
+    public void findOneReturnsNullForUnknownId() {
+        DynamicLayoutSection topLevel = new DynamicLayoutSection("topLevel", true, emptyList());
+
+        DynamicLayoutSectionServiceImpl service = buildService(List.of(topLevel));
+
+        assertThat(service.findOne("missing"), is(nullValue()));
+    }
+
+    @Test
+    public void setComponentsRejectsDuplicateIdsAcrossTree() {
+        DynamicLayoutSection nestedChild = new DynamicLayoutSection("dup", true, emptyList());
+        DynamicLayoutSection parent = new DynamicLayoutSection("parent", true);
+        parent.setNestedSections(List.of(nestedChild));
+        DynamicLayoutSection topLevel = new DynamicLayoutSection("dup", true, emptyList());
+
+        DynamicLayoutSectionServiceImpl service = new DynamicLayoutSectionServiceImpl();
+
+        assertThrows(IllegalArgumentException.class,
+            () -> service.setComponents(List.of(parent, topLevel)));
+    }
+
+    @Test
+    public void setComponentsRejectsDuplicateIdsAmongNestedSiblings() {
+        DynamicLayoutSection firstChild = new DynamicLayoutSection("dupChild", true, emptyList());
+        DynamicLayoutSection secondChild = new DynamicLayoutSection("dupChild", true, emptyList());
+        DynamicLayoutSection parent = new DynamicLayoutSection("parent", true);
+        parent.setNestedSections(List.of(firstChild, secondChild));
+
+        DynamicLayoutSectionServiceImpl service = new DynamicLayoutSectionServiceImpl();
+
+        assertThrows(IllegalArgumentException.class,
+            () -> service.setComponents(List.of(parent)));
     }
 
     @Test
