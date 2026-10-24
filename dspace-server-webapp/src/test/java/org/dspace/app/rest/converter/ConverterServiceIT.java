@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.dspace.app.rest.model.MockObject;
 import org.dspace.app.rest.model.MockObjectRest;
@@ -48,6 +47,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Tests functionality of {@link ConverterService}.

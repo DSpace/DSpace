@@ -17,8 +17,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.lang3.ArrayUtils;
@@ -38,8 +36,8 @@ import org.springframework.boot.web.servlet.support.ErrorPageFilter;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractJacksonHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -52,6 +50,8 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.web.context.WebApplicationContext;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Abstract integration test class that will take care of setting up the Spring Boot environment to run
@@ -114,7 +114,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     void setConverters(HttpMessageConverter<?>[] converters) {
 
         this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream().filter(
-            hmc -> hmc instanceof MappingJackson2HttpMessageConverter).findAny().get();
+            hmc -> hmc instanceof AbstractJacksonHttpMessageConverter).findAny().get();
 
         Assert.assertNotNull("the JSON message converter must not be null",
                              this.mappingJackson2HttpMessageConverter);
@@ -192,7 +192,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public String getPatchContent(List<Operation> ops) {
         try {
             return mapper.writeValueAsString(ops);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
         return null;

@@ -19,11 +19,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +43,10 @@ import org.dspace.core.exception.SQLRuntimeException;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 
 /**
@@ -85,7 +84,6 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             throws SolrServerException, IOException {
         if (force || !exist(suggestion)) {
             ObjectMapper jsonMapper = new JsonMapper();
-            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             SolrInputDocument document = new SolrInputDocument();
             document.addField(SOURCE, suggestion.getSource());
             // suggestion id is written as concatenation of
@@ -344,11 +342,10 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         }
         String evidencesJson = (String) solrDoc.getFieldValue(EVIDENCES);
         ObjectMapper jsonMapper = new JsonMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         List<SuggestionEvidence> evidences = new LinkedList<SuggestionEvidence>();
         try {
             evidences = jsonMapper.readValue(evidencesJson, new TypeReference<List<SuggestionEvidence>>() {});
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error(e);
         }
         suggestion.getEvidences().addAll(evidences);

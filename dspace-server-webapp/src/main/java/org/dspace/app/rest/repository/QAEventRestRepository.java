@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +40,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Rest repository that handle QA events.
@@ -187,7 +188,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         CorrectionTypeMessageDTO reason = null;
         try {
             reason = mapper.readValue(request.getInputStream(), CorrectionTypeMessageDTO.class);
-        } catch (IOException exIO) {
+        } catch (IOException | JacksonException exIO) {
             throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
         }
 

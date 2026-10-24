@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -35,6 +32,7 @@ import org.dspace.authenticate.oidc.model.OidcTokenResponseDTO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.ThrowingSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Implementation of {@link OidcClient}.
@@ -47,11 +45,6 @@ public class OidcClientImpl implements OidcClient {
     private ConfigurationService configurationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @PostConstruct
-    private void setup() {
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    }
 
     @Override
     public OidcTokenResponseDTO getAccessToken(String code) throws OidcClientException {
