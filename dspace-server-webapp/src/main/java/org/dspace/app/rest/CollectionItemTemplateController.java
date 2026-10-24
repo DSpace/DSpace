@@ -9,12 +9,9 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -42,6 +39,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This RestController takes care of the creation and retrieval of Collection's Item templates
@@ -119,7 +119,7 @@ public class CollectionItemTemplateController {
         TemplateItemRest inputTemplateItemRest;
         try {
             inputTemplateItemRest = mapper.readValue(itemBody.toString(), TemplateItemRest.class);
-        } catch (IOException e1) {
+        } catch (JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 

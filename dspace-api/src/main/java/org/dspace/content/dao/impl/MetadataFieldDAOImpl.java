@@ -99,7 +99,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
             Session session = getHibernateSession(context);
             MetadataField metadataField = null;
             try {
-                metadataField = session.load(MetadataField.class, cachedFields.get(key));
+                metadataField = session.getReference(MetadataField.class, cachedFields.get(key));
             } catch (Throwable e) {
                 log.error("Failed to load metadata field " + key + " using ID " + cachedFields.get(key));
             }

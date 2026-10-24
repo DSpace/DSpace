@@ -81,6 +81,8 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         Query query = createQuery(context, hqlQuery);
         query.setParameter("dSpaceObject", dSpaceObject);
         query.executeUpdate();
+        detachBulkDeleted(context, Subscription.class, subscription -> subscription.getDSpaceObject() != null
+            && dSpaceObject.getID().equals(subscription.getDSpaceObject().getID()));
     }
 
     @Override

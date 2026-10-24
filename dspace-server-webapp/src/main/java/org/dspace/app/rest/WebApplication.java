@@ -32,13 +32,16 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.LinkRelationProvider;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -254,6 +257,17 @@ public class WebApplication {
             @Override
             public void addArgumentResolvers(@NonNull List<HandlerMethodArgumentResolver> argumentResolvers) {
                 argumentResolvers.add(new SearchFilterResolver());
+            }
+
+            /**
+             * Keep "application/hal+json" as the response type when a client does not ask for a specific one.
+             * Spring Data REST 5 lists "application/vnd.hal+json" first for HAL responses, which would otherwise
+             * become the default. Any other type is still allowed for endpoints which do not produce HAL.
+             * @param configurer ContentNegotiationConfigurer
+             */
+            @Override
+            public void configureContentNegotiation(@NonNull ContentNegotiationConfigurer configurer) {
+                configurer.defaultContentType(MediaTypes.HAL_JSON, MediaType.ALL);
             }
         };
     }

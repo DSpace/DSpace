@@ -22,6 +22,8 @@ import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.Group;
 import org.dspace.supervision.service.SupervisionOrderService;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Database entity representation of the supervision_orders table
@@ -40,6 +42,8 @@ public class SupervisionOrder implements ReloadableEntity<Integer> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
+    // The database deletes these rows with their item (ON DELETE CASCADE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)

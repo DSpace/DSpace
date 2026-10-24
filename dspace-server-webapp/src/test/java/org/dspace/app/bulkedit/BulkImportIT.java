@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -54,6 +53,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for BulkImportScript run through the ScriptRestRepository

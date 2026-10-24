@@ -9,7 +9,6 @@ package org.dspace.app.ldn.action;
 
 import java.net.URI;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHeaders;
@@ -24,6 +23,7 @@ import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Action to send LDN Message

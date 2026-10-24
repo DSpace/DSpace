@@ -91,8 +91,11 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -104,6 +107,10 @@ import org.springframework.test.web.servlet.MvcResult;
  *
  */
 public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    // Spring Boot 4 no longer initializes plain Mockito @Mock/@Spy fields in Spring tests
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Autowired
     private ConfigurationService configurationService;

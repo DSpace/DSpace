@@ -20,8 +20,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.factory.NotifyServiceFactory;
@@ -52,6 +50,8 @@ import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.web.ContextUtil;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * class for creating a new LDN Messages of installed item
@@ -96,7 +96,7 @@ public class LDNMessageConsumer implements Consumer {
         createAutomaticLDNMessages(context, item);
     }
 
-    private void createManualLDNMessages(Context context, Item item) throws SQLException, JsonProcessingException {
+    private void createManualLDNMessages(Context context, Item item) throws SQLException, JacksonException {
         List<NotifyPatternToTrigger> patternsToTrigger =
             notifyPatternToTriggerService.findByItem(context, item);
         // Note that multiple patterns can be submitted and not all support resubmission
@@ -120,7 +120,7 @@ public class LDNMessageConsumer implements Consumer {
         }
     }
 
-    private void createAutomaticLDNMessages(Context context, Item item) throws SQLException, JsonProcessingException {
+    private void createAutomaticLDNMessages(Context context, Item item) throws SQLException, JacksonException {
 
         List<NotifyServiceInboundPattern> inboundPatterns = inboundPatternService.findAutomaticPatterns(context);
 
@@ -163,7 +163,7 @@ public class LDNMessageConsumer implements Consumer {
 
     private void createLDNMessage(Context context, Item item, NotifyServiceEntity service, String pattern,
                                   String resubmissionID)
-            throws SQLException, JsonProcessingException {
+            throws SQLException, JacksonException {
         // Amend current pattern name to trigger
         // Endorsement or Review offer resubmissions: append '-resubmission' to pattern name to choose the correct
         // LDN message template: e.g. request-endorsement-resubmission or request-review-resubmission

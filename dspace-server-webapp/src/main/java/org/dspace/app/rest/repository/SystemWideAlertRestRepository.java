@@ -13,9 +13,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
@@ -36,6 +33,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * The repository for the SystemWideAlert workload
@@ -114,7 +114,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
         SystemWideAlertRest systemWideAlertRest;
         try {
             systemWideAlertRest = mapper.readValue(jsonNode.toString(), SystemWideAlertRest.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
         }
 
@@ -160,7 +160,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
         try {
             ServletInputStream input = req.getInputStream();
             systemWideAlertRest = mapper.readValue(input, SystemWideAlertRest.class);
-        } catch (IOException e1) {
+        } catch (IOException | JacksonException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 

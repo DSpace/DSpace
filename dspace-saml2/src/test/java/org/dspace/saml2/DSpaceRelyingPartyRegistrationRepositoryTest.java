@@ -26,8 +26,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.saml2.core.Saml2X509Credential;
+import org.springframework.security.saml2.provider.service.registration.AssertingPartyMetadata;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
-import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration.AssertingPartyDetails;
 import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 
 public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpaceTest {
@@ -53,7 +53,7 @@ public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpace
 
         assertNotNull(registration);
 
-        AssertingPartyDetails assertingPartyDetails = registration.getAssertingPartyDetails();
+        AssertingPartyMetadata assertingPartyDetails = registration.getAssertingPartyMetadata();
 
         assertNotNull(assertingPartyDetails);
         assertEquals("urn:dev-vynkcnqhac3c0s10.us.auth0.com", assertingPartyDetails.getEntityId());
@@ -104,7 +104,7 @@ public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpace
 
         assertNotNull(registration);
 
-        AssertingPartyDetails assertingPartyDetails = registration.getAssertingPartyDetails();
+        AssertingPartyMetadata assertingPartyDetails = registration.getAssertingPartyMetadata();
 
         assertNotNull(assertingPartyDetails);
         assertEquals("my-entity-id", assertingPartyDetails.getEntityId());
@@ -149,7 +149,7 @@ public class DSpaceRelyingPartyRegistrationRepositoryTest extends AbstractDSpace
 
         assertNotNull(registration);
 
-        AssertingPartyDetails assertingPartyDetails = registration.getAssertingPartyDetails();
+        AssertingPartyMetadata assertingPartyDetails = registration.getAssertingPartyMetadata();
 
         assertNotNull(assertingPartyDetails);
         assertEquals("my-entity-id", assertingPartyDetails.getEntityId());

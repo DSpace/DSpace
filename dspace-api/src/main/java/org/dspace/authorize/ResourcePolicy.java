@@ -28,6 +28,8 @@ import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hibernate.Length;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Database entity representation of the ResourcePolicy table
@@ -57,6 +59,8 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dspace_object")
+    // The database deletes a DSpaceObject's policies with it (ON DELETE CASCADE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private DSpaceObject dSpaceObject;
 
     /*

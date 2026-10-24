@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -35,6 +34,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This is the repository responsible to manage Group Rest object
@@ -69,7 +70,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
 
         try {
             groupRest = mapper.readValue(req.getInputStream(), GroupRest.class);
-        } catch (IOException excIO) {
+        } catch (IOException | JacksonException excIO) {
             throw new UnprocessableEntityException("error parsing the body ..." + excIO.getMessage());
         }
 

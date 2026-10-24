@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -59,7 +58,7 @@ public class Community extends CacheableDSpaceObject implements DSpaceObjectLega
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
     private final Set<Community> parentCommunities = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities")
     private final Set<Collection> collections = new HashSet<>();
 
     @OneToOne

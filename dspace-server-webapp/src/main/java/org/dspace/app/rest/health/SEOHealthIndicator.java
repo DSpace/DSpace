@@ -12,12 +12,12 @@ import static org.dspace.app.rest.configuration.ActuatorConfiguration.UP_WITH_IS
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.Health;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Implementation of {@link org.springframework.boot.actuate.health.HealthIndicator} that verifies if the SEO of the
+ * Implementation of {@link org.springframework.boot.health.contributor.HealthIndicator} that verifies if the SEO of the
  * DSpace instance is configured correctly.
  *
  * This is only relevant in a production environment, where the DSpace instance is exposed to the public.

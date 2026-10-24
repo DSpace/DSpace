@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -71,7 +70,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "last_modified", columnDefinition = "timestamp with time zone")
     private Instant lastModified = Instant.now();
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owning_collection")
     private Collection owningCollection;
 
@@ -89,7 +88,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     /**
      * The bundles in this item - kept in sync with DB
      */
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "collection2item",
         joinColumns = {@JoinColumn(name = "item_id")},

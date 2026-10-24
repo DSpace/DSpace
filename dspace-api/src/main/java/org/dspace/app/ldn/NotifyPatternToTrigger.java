@@ -18,6 +18,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import org.dspace.content.Item;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Database object representing notify patterns to be triggered
@@ -38,6 +40,8 @@ public class NotifyPatternToTrigger implements ReloadableEntity<Integer> {
 
     @ManyToOne
     @JoinColumn(name = "item_id", referencedColumnName = "uuid")
+    // The database deletes these rows with their item (ON DELETE CASCADE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Item item;
 
     @ManyToOne

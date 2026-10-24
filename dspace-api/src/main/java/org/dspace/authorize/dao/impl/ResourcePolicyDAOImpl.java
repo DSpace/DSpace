@@ -234,6 +234,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         Query query = createQuery(context, queryString);
         query.setParameter("epersonGroup", group);
         query.executeUpdate();
+        detachBulkDeleted(context, ResourcePolicy.class,
+            policy -> isFor(policy, group));
     }
 
     @Override
@@ -243,6 +245,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         query.setParameter("dso", dso);
         query.setParameter("epersonGroup", group);
         query.executeUpdate();
+        detachBulkDeleted(context, ResourcePolicy.class,
+            policy -> isOf(policy, dso) && isFor(policy, group));
 
     }
 
@@ -253,6 +257,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         query.setParameter("dso", dso);
         query.setParameter("eperson", ePerson);
         query.executeUpdate();
+        detachBulkDeleted(context, ResourcePolicy.class,
+            policy -> isOf(policy, dso) && isFor(policy, ePerson));
 
     }
 
@@ -262,6 +268,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         Query query = createQuery(context, queryString);
         query.setParameter("eperson", ePerson);
         query.executeUpdate();
+        detachBulkDeleted(context, ResourcePolicy.class,
+            policy -> isFor(policy, ePerson));
 
     }
 
@@ -436,5 +444,26 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.id), id));
         return singleResult(context, criteriaQuery);
+    }
+
+    /**
+     * @return whether the policy is a policy of the given DSpaceObject (compared by ID, so proxies also match)
+     */
+    private static boolean isOf(ResourcePolicy policy, DSpaceObject dso) {
+        return policy.getdSpaceObject() != null && dso.getID().equals(policy.getdSpaceObject().getID());
+    }
+
+    /**
+     * @return whether the policy is granted to the given EPerson (compared by ID, so proxies also match)
+     */
+    private static boolean isFor(ResourcePolicy policy, EPerson ePerson) {
+        return policy.getEPerson() != null && ePerson.getID().equals(policy.getEPerson().getID());
+    }
+
+    /**
+     * @return whether the policy is granted to the given Group (compared by ID, so proxies also match)
+     */
+    private static boolean isFor(ResourcePolicy policy, Group group) {
+        return policy.getGroup() != null && group.getID().equals(policy.getGroup().getID());
     }
 }

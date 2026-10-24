@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -55,6 +54,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration Tests against {@link SendLDNMessageAction}

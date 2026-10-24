@@ -268,8 +268,15 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <artifactId>spring-boot-starter-tomcat-runtime</artifactId>
             <scope>provided</scope>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- External Tomcat provides the servlet container, but not Boot's WebServer API,
+             which is also referenced by the packaged Tomcat metrics integration. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-web-server</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
 
@@ -295,6 +302,38 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <version>${spring-security.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Spring Boot 4 test support modules, as in dspace-server-webapp -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-security-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-resttestclient</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- RestTemplateBuilder, required by TestRestTemplate -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Required by Spring Boot 4's TransactionAutoConfiguration (AspectJ mode) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

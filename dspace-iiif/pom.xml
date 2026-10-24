@@ -49,7 +49,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
             <version>${spring-boot.version}</version>
             <exclusions>
                 <!-- Later version provided by dspace-api -->
@@ -113,24 +113,12 @@
                     <artifactId>javassist</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.springframework.security</groupId>
                     <artifactId>spring-security-core</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.dmfs</groupId>
                     <artifactId>iterators</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                    <artifactId>jackson-module-parameter-names</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

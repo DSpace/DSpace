@@ -11,10 +11,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.annotation.PostConstruct;
 import org.dspace.app.rest.model.CorrectionTypeQAEventMessageRest;
 import org.dspace.app.rest.model.NotifyQAEventMessageRest;
@@ -30,6 +26,9 @@ import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Implementation of {@link DSpaceConverter} that converts {@link QAEvent} to
@@ -51,7 +50,6 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
     @PostConstruct
     public void setup() {
         jsonMapper = new JsonMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Override
@@ -61,7 +59,7 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
         try {
             rest.setMessage(convertMessage(jsonMapper.readValue(modelObject.getMessage(),
                                                                 modelObject.getMessageDtoClass())));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         rest.setSource(modelObject.getSource());

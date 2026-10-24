@@ -26,8 +26,11 @@ import org.dspace.rdf.storage.RDFStorageImpl;
 import org.dspace.services.ConfigurationService;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +52,10 @@ import org.springframework.test.context.TestPropertySource;
 // This annotation overrides default DSpace config settings loaded into Spring Context
 @TestPropertySource(properties = {"rdf.enabled = true"})
 public class RdfIT extends AbstractWebClientIntegrationTest {
+
+    // Spring Boot 4 no longer initializes plain Mockito @Mock/@Spy fields in Spring tests
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Autowired
     private ConfigurationService configurationService;
