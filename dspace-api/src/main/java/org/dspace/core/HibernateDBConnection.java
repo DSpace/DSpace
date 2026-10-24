@@ -29,7 +29,6 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.orm.hibernate5.SessionFactoryUtils;
 
 /**
  * Hibernate implementation of the DBConnection.
@@ -58,6 +57,9 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Autowired(required = true)
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
+
+    @Autowired
+    private DataSource dataSource;
 
     private boolean batchModeEnabled = false;
     private boolean readOnlyEnabled = false;
@@ -173,7 +175,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
 
     @Override
     public DataSource getDataSource() {
-        return SessionFactoryUtils.getDataSource(sessionFactory);
+        return dataSource;
     }
 
     @Override
