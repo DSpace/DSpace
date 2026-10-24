@@ -8,7 +8,6 @@
 package org.dspace.content;
 
 import jakarta.persistence.Cacheable;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -54,7 +53,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      * The leftType EntityType field for the relationshipType
      * This is stored as an ID and cannot be null
      */
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "left_type", nullable = false)
     private EntityType leftType;
 
@@ -62,7 +61,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      * The rightType EntityType field for the relationshipType
      * This is stored as an ID and cannot be null
      */
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "right_type", nullable = false)
     private EntityType rightType;
 

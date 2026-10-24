@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.google.common.collect.AbstractIterator;
@@ -24,6 +25,8 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Session;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.engine.spi.SessionImplementor;
 
 /**
  * Hibernate implementation for generic DAO interface.  Also includes additional
@@ -65,6 +68,28 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     */
     protected Session getHibernateSession(Context context) throws SQLException {
         return ((Session) context.getDBConnection().getSession());
+    }
+
+    /**
+     * Detach the entities of the given type which are still managed by the current session and match the
+     * given filter. Bulk (JPQL) deletes bypass the session: call this after such a delete for the entities it
+     * removed, so that Hibernate does not flush them later with references to other removed objects.
+     *
+     * @param context current DSpace context
+     * @param type    entity type removed by the bulk delete
+     * @param removed matches the entities removed by the bulk delete
+     * @param <E>     entity type
+     * @throws SQLException if a database error occurs
+     */
+    protected <E> void detachBulkDeleted(Context context, Class<E> type, Predicate<E> removed) throws SQLException {
+        Session session = getHibernateSession(context);
+        for (Map.Entry<Object, EntityEntry> entry
+                : ((SessionImplementor) session).getPersistenceContextInternal().reentrantSafeEntityEntries()) {
+            Object entity = entry.getKey();
+            if (type.isInstance(entity) && removed.test(type.cast(entity))) {
+                session.detach(entity);
+            }
+        }
     }
 
     @Override

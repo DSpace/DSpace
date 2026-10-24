@@ -36,6 +36,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.dao.LDNMessageDao;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
@@ -202,6 +204,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired
     private List<ItemSearcherByMetadata> itemSearcherByMetadata;
+    @Autowired
+    private LDNMessageDao ldnMessageDao;
 
     protected ItemServiceImpl() {
     }
@@ -916,6 +920,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<QAEventProcessed> qaEvents = qaEventsDao.findByItem(context, item);
         for (QAEventProcessed qaEvent : qaEvents) {
             qaEventsDao.delete(context, qaEvent);
+        }
+
+        // Clear LDN message references to this item. The database does the same (ON DELETE SET NULL), but
+        // messages loaded in this session would otherwise still reference the removed item when flushed.
+        for (LDNMessageEntity ldnMessage : ldnMessageDao.findByDSpaceObject(context, item)) {
+            if (item.equals(ldnMessage.getObject())) {
+                ldnMessage.setObject(null);
+            }
+            if (item.equals(ldnMessage.getContext())) {
+                ldnMessage.setContext(null);
+            }
         }
 
         //Only clear collections after we have removed everything else from the item

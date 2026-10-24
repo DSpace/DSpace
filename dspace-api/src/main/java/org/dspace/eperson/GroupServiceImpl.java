@@ -35,6 +35,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.MetadataField;
+import org.dspace.content.dao.ProcessDAO;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
@@ -47,6 +48,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.scripts.Process;
 import org.dspace.util.UUIDUtils;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -71,6 +73,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Autowired(required = true)
     protected GroupDAO groupDAO;
+    @Autowired(required = true)
+    protected ProcessDAO processDAO;
 
     @Autowired(required = true)
     protected Group2GroupCacheDAO group2GroupCacheDAO;
@@ -565,6 +569,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         authorizeService.removeGroupPolicies(context, group);
 
         group.getMemberGroups().clear();
+        // Parent groups own the association: a loaded parent still listing this group would reference a removed
+        // object when the session is flushed.
+        for (Group parentGroup : group.getParentGroups()) {
+            parentGroup.remove(group);
+        }
         group.getParentGroups().clear();
 
         //Remove all eperson references from this group
@@ -573,6 +582,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             EPerson ePerson = ePeople.next();
             ePeople.remove();
             ePerson.getGroups().remove(group);
+        }
+
+        // Remove this group from the special groups of processes. Process owns the association: a loaded process
+        // still listing the group would reference a removed object when the session is flushed.
+        for (Process process : processDAO.findByGroup(context, group)) {
+            process.getGroups().remove(group);
         }
 
         // empty out group2groupcache table (if we do it after we delete our object we get an issue with references)

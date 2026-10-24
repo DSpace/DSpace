@@ -103,6 +103,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     @Override
     public void deleteAll(Context context) throws SQLException {
         createQuery(context, "delete from Group2GroupCache").executeUpdate();
+        detachBulkDeleted(context, Group2GroupCache.class, cache -> true);
     }
 
     @Override

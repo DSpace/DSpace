@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -80,7 +79,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
     /** The default group of administrators */
     private Group admins;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "community2collection",
         joinColumns = {@JoinColumn(name = "collection_id")},

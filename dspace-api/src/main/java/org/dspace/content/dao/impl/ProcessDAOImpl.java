@@ -25,6 +25,7 @@ import org.dspace.content.dao.ProcessDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.Process_;
@@ -194,6 +195,16 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         criteriaQuery.select(criteriaBuilder.count(processRoot));
         criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
         return count(context, criteriaQuery, criteriaBuilder, processRoot);
+    }
+
+    @Override
+    public List<Process> findByGroup(Context context, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+        Root<Process> processRoot = criteriaQuery.from(Process.class);
+        criteriaQuery.select(processRoot);
+        criteriaQuery.where(criteriaBuilder.isMember(group, processRoot.get(Process_.GROUPS)));
+        return list(context, criteriaQuery, false, Process.class, -1, -1);
     }
 
 }

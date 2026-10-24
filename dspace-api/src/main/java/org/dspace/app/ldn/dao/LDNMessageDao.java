@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -73,4 +74,14 @@ public interface LDNMessageDao extends GenericDAO<LDNMessageEntity> {
      * @throws SQLException
      */
     public List<LDNMessageEntity> findMessagesToBeReprocessed(Context context) throws SQLException;
+
+    /**
+     * Find all LDN messages referencing the given DSpaceObject (via object or context field).
+     *
+     * @param context the DSpace context
+     * @param dso the DSpaceObject to search for
+     * @return all LDN messages referencing the given object
+     * @throws SQLException if a database error occurs
+     */
+    public List<LDNMessageEntity> findByDSpaceObject(Context context, DSpaceObject dso) throws SQLException;
 }
