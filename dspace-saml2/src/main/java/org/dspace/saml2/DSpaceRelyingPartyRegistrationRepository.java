@@ -131,7 +131,7 @@ public class DSpaceRelyingPartyRegistrationRepository implements RelyingPartyReg
 
             registrationBuilder.assertionConsumerServiceLocation("{baseUrl}/saml2/assertion-consumer/{registrationId}");
 
-            registrationBuilder.assertingPartyDetails(assertingParty -> {
+            registrationBuilder.assertingPartyMetadata(assertingParty -> {
                 String entityId = assertingPartyConfiguration.getString("entity-id");
 
                 if (entityId != null) {

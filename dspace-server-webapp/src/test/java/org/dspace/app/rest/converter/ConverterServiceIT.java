@@ -35,8 +35,11 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -50,6 +53,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * Tests functionality of {@link ConverterService}.
  */
 public class ConverterServiceIT extends AbstractControllerIntegrationTest {
+
+    // Spring Boot 4 no longer initializes plain Mockito @Mock/@Spy fields in Spring tests
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Autowired
     private ConverterService converter;

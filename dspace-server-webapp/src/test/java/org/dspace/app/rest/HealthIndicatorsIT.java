@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.Status;
 
 /**
  * Integration tests to verify the health indicators configuration.

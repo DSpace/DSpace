@@ -299,9 +299,15 @@
     <dependencies>
 
         <!-- Spring Boot dependencies -->
+        <!-- Boot 4 provides validation auto-configuration in a separate module. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
             <version>${spring-boot.version}</version>
             <exclusions>
                 <!-- Later version provided by dspace-api -->
@@ -325,9 +331,10 @@
             </exclusions>
         </dependency>
 
+        <!-- Boot 4 moved the DataSource health indicator (and other JDBC auto-configuration) into this module -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-jdbc</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
 
@@ -599,6 +606,39 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <version>${spring-security.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Spring Boot 4 moved MockMvc, security and TestRestTemplate test support into separate modules.
+             The plain modules are used instead of the starters, which would bring in JUnit Jupiter. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-security-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-resttestclient</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- RestTemplateBuilder, required by TestRestTemplate -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Required by Spring Boot 4's TransactionAutoConfiguration (AspectJ mode) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -33,13 +33,20 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RorOrgUnitAuthorityIT extends AbstractControllerIntegrationTest {
+
+    // Spring Boot 4 no longer initializes plain Mockito @Mock/@Spy fields in Spring tests
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     public static final String ROR_ORGUNIT_AUTHORITY =
         "org.dspace.content.authority.RorOrgUnitAuthority = OrgUnitAuthority";

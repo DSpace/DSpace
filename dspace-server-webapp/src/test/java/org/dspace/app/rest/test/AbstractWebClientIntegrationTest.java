@@ -15,8 +15,9 @@ import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpEntity;
@@ -52,6 +53,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
 // Load our src/test/resources/application-test.properties to override some settings in default application.properties
 @TestPropertySource(locations = "classpath:application-test.properties")
+// Enable auto-configuration of TestRestTemplate (moved to separate module in Spring Boot 4)
+@AutoConfigureTestRestTemplate
 public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWithDatabase {
     // (Random) port chosen for test web server
     @LocalServerPort
