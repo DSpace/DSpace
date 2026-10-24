@@ -259,8 +259,6 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
                 setOnlyReadPermission(bitstream, readerGroup, null);
             }
 
-            indexingService.commit();
-
         } catch (Exception e) {
             return null;
         }

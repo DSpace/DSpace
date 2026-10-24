@@ -570,7 +570,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             // Otherwise, dispatchEvents() may re-create default policies
             // that setOnlyReadPermission() just removed.
             context.dispatchEvents();
-            indexingService.commit();
 
             //Check if we need to make this item private. This has to be done after item install.
             if (readerGroup != null) {
