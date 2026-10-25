@@ -16,14 +16,17 @@
  <!-- specific stages of workflow. The taskset 'name' attribute should match -->
  <!-- the 'taskset' attribute in the task-set mapping above.                 -->
 
- <!-- Tasksets are organized into elements called 'flowsteps' which          -->
- <!-- correspond by name to DSpace workflow steps. Thus, to cause a task to  -->
- <!-- be performed in the workflow step 'edit', place a 'task' element in    -->
- <!-- the 'edit' flowstep.                                                   -->
+ <!-- Tasksets are organized into elements called 'flowsteps'. When an item  -->
+ <!-- enters workflow, the tasks of the first flowstep in the taskset are    -->
+ <!-- performed, whatever its name. When a user later performs an action on  -->
+ <!-- a claimed task, the tasks of the flowstep whose name matches the id of -->
+ <!-- that task's workflow step are performed before the action. The step    -->
+ <!-- ids are defined in config/spring/api/workflow.xml, for example         -->
+ <!-- 'reviewstep', 'editstep' and 'finaleditstep'. Thus, to cause a task to -->
+ <!-- be performed when an editor acts on an item, place a 'task' element in -->
+ <!-- an 'editstep' flowstep.                                                -->
  <!--                                                                        -->
- <!-- You may define a flowstep element in a taskset for each step in the    -->
- <!-- workflow, since the flowstep action occurs before its workflow step.   -->
- <!-- Use 'archive' for tasks to run just before the item is installed in    -->
+ <!-- There is no flowstep for the moment the item is installed in the       -->
  <!-- archive.                                                               -->
  <!--                                                                        -->
  <!-- Each flowstep also allows an optional 'queue' attribute, which         -->
@@ -60,6 +63,8 @@
  <!-- on every submitted item, reject infected submissions, notify the       -->
  <!-- reviewer's group and collection administrators of same, or the site    -->
  <!-- administrator if the task encounters an error in processing            -->
+ <!-- The sample flowstep 'step1' is not a workflow step id. It runs because -->
+ <!-- it is the first flowstep, when an item enters workflow.                -->
 
  <tasksets>
      
