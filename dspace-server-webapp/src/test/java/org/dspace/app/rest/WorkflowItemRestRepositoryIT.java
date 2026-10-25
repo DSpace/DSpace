@@ -55,6 +55,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -485,6 +486,41 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(hasJsonPath("$.id", is("traditional")))));
 
+    }
+
+    @Test
+    /**
+     * Retrieve the submitter of a workflowitem whose submitter is not set (e.g. deleted)
+     *
+     * @throws Exception
+     */
+    public void findOneWithoutSubmitterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withWorkflowGroup(1, admin).build();
+
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Workflow Item 1")
+                .build();
+        Item item = witem.getItem();
+        item.setSubmitter(null);
+        ContentServiceFactory.getInstance().getItemService().update(context, item);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())
+                .param("embed", "submitter"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.submitter", nullValue()));
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/submitter"))
+                .andExpect(status().isNoContent());
     }
 
     @Test
