@@ -18,6 +18,10 @@
                  taskset='test6'/>
         <mapping collection-handle='123456789/curation-test-7'
                  taskset='test7'/>
+        <mapping collection-handle='123456789/curation-test-8'
+                 taskset='test8'/>
+        <mapping collection-handle='123456789/curation-test-9'
+                 taskset='test9'/>
     </taskset-map>
 
     <tasksets>
@@ -88,6 +92,25 @@
         </taskset>
         <taskset name='test7'>
             <flowstep name='beforearchive'>
+                <task name='fail'>
+                    <workflow>reject</workflow>
+                </task>
+            </flowstep>
+        </taskset>
+
+        <!--
+            Tasksets attached to 'afterarchive', run just after the item is
+            archived: one marks the item only if it is archived, the other
+            always fails and is empowered to reject the item.
+            See config/modules/curate.cfg for 'archived' task.
+        -->
+        <taskset name='test8'>
+            <flowstep name='afterarchive'>
+                <task name='archived'/>
+            </flowstep>
+        </taskset>
+        <taskset name='test9'>
+            <flowstep name='afterarchive'>
                 <task name='fail'>
                     <workflow>reject</workflow>
                 </task>

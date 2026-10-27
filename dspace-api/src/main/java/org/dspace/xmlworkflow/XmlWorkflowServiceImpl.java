@@ -99,6 +99,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      */
     public static final String BEFORE_ARCHIVE_STEP = "beforearchive";
 
+    /**
+     * Pseudo-step of the workflow curation, run just after the item is archived.
+     */
+    public static final String AFTER_ARCHIVE_STEP = "afterarchive";
+
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
@@ -685,6 +690,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // Log the event
         log.info(LogHelper.getHeader(context, "install_item", "workflow_item_id="
             + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
+
+        // Check for curation tasks after archiving the item. The workflow item has already been
+        // deleted when installing the item, so its step is set but not persisted.
+        wfi.setStepID(AFTER_ARCHIVE_STEP);
+        xmlWorkflowCuratorService.doCuration(context, wfi);
 
         return item;
     }

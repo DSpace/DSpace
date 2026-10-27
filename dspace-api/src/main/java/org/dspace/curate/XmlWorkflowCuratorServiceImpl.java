@@ -35,6 +35,7 @@ import org.dspace.workflow.TaskSet;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.XmlWorkflowServiceImpl;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
@@ -150,7 +151,13 @@ public class XmlWorkflowCuratorServiceImpl
                         case Curator.CURATE_FAIL:
                             // task failed - notify any contacts the task has assigned
                             if (task.powers.contains("reject")) {
-                                action = "reject";
+                                if (XmlWorkflowServiceImpl.AFTER_ARCHIVE_STEP.equals(wfi.getStepID())) {
+                                    // the item is already archived, so it cannot be rejected
+                                    LOG.warn("Curation task {} cannot reject the archived item {}",
+                                            task.name, item.getID());
+                                } else {
+                                    action = "reject";
+                                }
                             }
                             notifyContacts(c, wfi, task, "fail", action, result);
                             // if task so empowered, reject submission and terminate

@@ -29,6 +29,12 @@
  <!-- workflow has no valid steps). The item may not have a handle yet       -->
  <!-- (unless identifiers are registered on submission), it does not have    -->
  <!-- its final metadata, and '$flowgroup' (see below) does not apply.       -->
+ <!-- Use 'afterarchive' for tasks to run just after the item is installed   -->
+ <!-- in the archive, e.g. to register the item or its handle in an external -->
+ <!-- service. The item already has its handle, final metadata and access    -->
+ <!-- policies. Its tasks cannot 'reject' the item, '$flowgroup' does not    -->
+ <!-- apply, and, unless they are queued, they are performed while the       -->
+ <!-- archiving request is processed.                                        -->
  <!--                                                                        -->
  <!-- Each flowstep also allows an optional 'queue' attribute, which         -->
  <!-- controls whether and where the tasks are placed on a queue for         -->

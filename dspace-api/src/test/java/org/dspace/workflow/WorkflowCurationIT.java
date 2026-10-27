@@ -30,6 +30,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.LegacyPluginServiceImpl;
+import org.dspace.ctask.testing.ArchivedTask;
 import org.dspace.ctask.testing.FailTask;
 import org.dspace.ctask.testing.MarkerTask;
 import org.dspace.eperson.EPerson;
@@ -465,14 +466,131 @@ public class WorkflowCurationIT
     }
 
     /**
+     * A curation task attached to 'afterarchive' must run once, just after the
+     * item is archived, when the item already has a handle.
+     * See {@link ArchivedTask}.
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void afterArchiveCurationRunsWhenArchived()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        legacyPluginService.clearNamedPluginClasses();
+        //** GIVEN **
+
+        // A submitter;
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .withLanguage("en")
+                .build();
+
+        // A containment hierarchy, using the default workflow without reviewers,
+        // so that the item is archived as soon as it enters the workflow;
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+        final String CURATION_COLLECTION_HANDLE = "123456789/curation-test-8";
+        Collection collection = CollectionBuilder
+                .createCollection(context, community, CURATION_COLLECTION_HANDLE)
+                .withName("Collection")
+                .build();
+
+        // A curation task attached to 'afterarchive', which marks archived items;
+        // See test/dspaceFolder/config/workflow-curation.xml for the attachment.
+
+        //** WHEN **
+
+        // The item enters the workflow;
+        context.setCurrentUser(submitter);
+        XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                .withTitle("Test of workflow curation")
+                .withIssueDate("2021-05-14")
+                .withSubject("Testing")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** THEN **
+
+        Item item = wfi.getItem();
+        assertThat("Item should have been archived", item.isArchived());
+        assertEquals("Item should have been curated once after being archived", 1,
+                countMarks(item, ArchivedTask.class));
+    }
+
+    /**
+     * A failed curation task empowered to reject, attached to 'afterarchive',
+     * must not send the already archived item back to the submitter.
+     * See {@link FailTask}.
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void afterArchiveCurationDoesNotRejectItem()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        legacyPluginService.clearNamedPluginClasses();
+        //** GIVEN **
+
+        // A submitter;
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .withLanguage("en")
+                .build();
+
+        // A containment hierarchy, using the default workflow without reviewers,
+        // so that the item is archived as soon as it enters the workflow;
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+        final String CURATION_COLLECTION_HANDLE = "123456789/curation-test-9";
+        Collection collection = CollectionBuilder
+                .createCollection(context, community, CURATION_COLLECTION_HANDLE)
+                .withName("Collection")
+                .build();
+
+        // A failing curation task, empowered to reject, attached to 'afterarchive';
+        // See test/dspaceFolder/config/workflow-curation.xml for the attachment.
+
+        //** WHEN **
+
+        // The item enters the workflow;
+        context.setCurrentUser(submitter);
+        XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                .withTitle("Test of workflow curation")
+                .withIssueDate("2021-05-14")
+                .withSubject("Testing")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** THEN **
+
+        assertThat("Item should have been archived", wfi.getItem().isArchived());
+        assertNull("Item should not be back in the workspace",
+                workspaceItemService.findByItem(context, wfi.getItem()));
+    }
+
+    /**
      * Count the Item's provenance records with MarkerTask's name.
      * @param item the item to search.
      * @return the number of times the item has been marked by MarkerTask.
      */
     private int countMarks(Item item) {
+        return countMarks(item, MarkerTask.class);
+    }
+
+    /**
+     * Count the Item's provenance records with the name of a marking task.
+     * @param item the item to search.
+     * @param task the class of the marking task.
+     * @return the number of times the item has been marked by the task.
+     */
+    private int countMarks(Item item, Class<?> task) {
         List<MetadataValue> provenance = itemService.getMetadata(item,
                 MarkerTask.SCHEMA, MarkerTask.ELEMENT, MarkerTask.QUALIFIER, MarkerTask.LANGUAGE);
-        Pattern markerPattern = Pattern.compile(MarkerTask.class.getCanonicalName());
+        Pattern markerPattern = Pattern.compile(task.getCanonicalName());
         int marks = 0;
         for (MetadataValue record : provenance) {
             if (markerPattern.matcher(record.getValue()).find()) {
