@@ -225,6 +225,17 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             grantSubmitterReadPolicies(context, myitem);
 
             context.turnOffAuthorisationSystem();
+
+            // remove the WorkspaceItem before activating any step, as the curation tasks run when
+            // entering a step may reject the item and send it back to a new WorkspaceItem
+            wsi = context.reloadEntity(wsi);
+            if (wsi != null) {
+                workspaceItemService.deleteWrapper(context, wsi);
+                context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
+                    itemService.getIdentifiers(context, wfi.getItem())));
+
+            }
+
             Step firstStep = wf.getFirstStep();
             if (firstStep.isValidStep(context, wfi)) {
                 activateFirstStep(context, wf, firstStep, wfi);
@@ -241,14 +252,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
             }
 
-            wsi = context.reloadEntity(wsi);
-            if (wsi != null) {
-                // remove the WorkspaceItem
-                workspaceItemService.deleteWrapper(context, wsi);
-                context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
-                    itemService.getIdentifiers(context, wfi.getItem())));
-
-            }
             context.restoreAuthSystemState();
             return wfi;
         } catch (WorkflowConfigurationException e) {

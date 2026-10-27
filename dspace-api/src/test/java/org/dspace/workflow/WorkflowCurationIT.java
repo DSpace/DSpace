@@ -232,6 +232,63 @@ public class WorkflowCurationIT
     }
 
     /**
+     * A failed curation task empowered to reject, attached to the first
+     * workflow step, must send the item back to the submitter when the item
+     * enters the workflow.
+     * See {@link FailTask}.
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void firstStepCurationRejectsItem()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        legacyPluginService.clearNamedPluginClasses();
+        //** GIVEN **
+
+        // A submitter and a reviewer;
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .withLanguage("en")
+                .build();
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .build();
+
+        // A containment hierarchy, using the default workflow;
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+        final String CURATION_COLLECTION_HANDLE = "123456789/curation-test-4";
+        Collection collection = CollectionBuilder
+                .createCollection(context, community, CURATION_COLLECTION_HANDLE)
+                .withName("Collection")
+                .withWorkflowGroup("reviewer", reviewer)
+                .build();
+
+        // A failing curation task, empowered to reject, attached to 'reviewstep';
+        // See test/dspaceFolder/config/workflow-curation.xml for the attachment.
+
+        //** WHEN **
+
+        // The item enters the workflow;
+        context.setCurrentUser(submitter);
+        XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                .withTitle("Test of workflow curation")
+                .withIssueDate("2021-05-14")
+                .withSubject("Testing")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** THEN **
+
+        assertNull("Item should not be in workflow", xmlWorkflowItemService.find(context, wfi.getID()));
+        assertNotNull("Item should be back in the workspace",
+                workspaceItemService.findByItem(context, wfi.getItem()));
+    }
+
+    /**
      * A failed curation task empowered to reject, attached to a later workflow
      * step, must send the item back to the submitter when the item enters
      * that step.
