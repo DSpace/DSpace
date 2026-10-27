@@ -60,6 +60,12 @@ public class XmlWorkflowItem implements WorkflowItem {
     @Column(name = "multiple_files")
     private boolean multipleFiles = false;
 
+    @Column(name = "workflow_id", columnDefinition = "text")
+    private String workflowId;
+
+    @Column(name = "step_id", columnDefinition = "text")
+    private String stepId;
+
     /**
      * Protected constructor, create object using:
      * {@link XmlWorkflowItemService#create(Context, Item, Collection)}
@@ -130,5 +136,21 @@ public class XmlWorkflowItem implements WorkflowItem {
     @Override
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
+    }
+
+    public void setWorkflowID(String workflowId) {
+        this.workflowId = workflowId;
+    }
+
+    public String getWorkflowID() {
+        return workflowId;
+    }
+
+    public void setStepID(String stepId) {
+        this.stepId = stepId;
+    }
+
+    public String getStepID() {
+        return stepId;
     }
 }

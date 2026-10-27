@@ -215,6 +215,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             wfi.setMultipleFiles(wsi.hasMultipleFiles());
             wfi.setMultipleTitles(wsi.hasMultipleTitles());
             wfi.setPublishedBefore(wsi.isPublishedBefore());
+            wfi.setWorkflowID(wf.getID());
             xmlWorkflowItemService.update(context, wfi);
             removeUserItemPolicies(context, myitem, myitem.getSubmitter());
             if (collectionService.isSharedWorkspace(context, collection)) {
@@ -337,6 +338,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected void activateFirstStep(Context context, Workflow wf, Step firstStep, XmlWorkflowItem wfi)
             throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig firstActionConfig = firstStep.getUserSelectionMethod();
+
+        wfi.setStepID(firstStep.getId());
+        xmlWorkflowItemService.update(context, wfi);
 
         // Check for curation tasks at the start of this step.
         //
@@ -600,6 +604,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         throws SQLException, IOException, AuthorizeException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig nextActionConfig;
         if (nextStep != null) {
+            wfi.setStepID(nextStep.getId());
+            xmlWorkflowItemService.update(c, wfi);
             nextActionConfig = nextStep.getUserSelectionMethod();
             nextActionConfig.getProcessingAction().activate(c, wfi);
 //                nextActionConfig.getProcessingAction().generateTasks();
