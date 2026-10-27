@@ -9,6 +9,7 @@ package org.dspace.workflow;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -345,6 +346,119 @@ public class WorkflowCurationIT
 
         //** THEN **
 
+        assertNull("Item should not be in workflow", xmlWorkflowItemService.find(context, wfi.getID()));
+        assertNotNull("Item should be back in the workspace",
+                workspaceItemService.findByItem(context, wfi.getItem()));
+    }
+
+    /**
+     * A curation task attached to 'beforearchive' must run once, just before
+     * the item is archived at the end of the workflow.
+     * See {@link MarkerTask}.
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void beforeArchiveCurationRunsWhenArchiving()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        legacyPluginService.clearNamedPluginClasses();
+        //** GIVEN **
+
+        // A reviewer;
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer@example.com")
+                .build();
+
+        // A containment hierarchy, using the default workflow with only a reviewer;
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+        final String CURATION_COLLECTION_HANDLE = "123456789/curation-test-6";
+        Collection collection = CollectionBuilder
+                .createCollection(context, community, CURATION_COLLECTION_HANDLE)
+                .withName("Collection")
+                .withWorkflowGroup("reviewer", reviewer)
+                .build();
+
+        // A curation task attached to 'beforearchive';
+        // See test/dspaceFolder/config/workflow-curation.xml for the attachment.
+
+        // A workflow item, claimed by the reviewer in 'reviewstep';
+        ClaimedTask task = ClaimedTaskBuilder.createClaimedTask(context, collection, reviewer)
+                .withTitle("Test of workflow curation")
+                .build();
+        XmlWorkflowItem wfi = task.getWorkflowItem();
+        Item item = wfi.getItem();
+
+        context.restoreAuthSystemState();
+
+        assertEquals("Item should not have been curated", 0, countMarks(item));
+
+        //** WHEN **
+
+        // The reviewer approves the item, the last step of the workflow;
+        Workflow workflow = workflowFactory.getWorkflowByName(wfi.getWorkflowID());
+        MockHttpServletRequest approveRequest = new MockHttpServletRequest();
+        approveRequest.setParameter("submit_approve", "submit_approve");
+        context.setCurrentUser(reviewer);
+        workflowService.doState(context, reviewer, approveRequest, wfi.getID(), workflow,
+                workflow.getStep(task.getStepID()).getActionConfig(task.getActionID()));
+
+        //** THEN **
+
+        assertThat("Item should have been archived", item.isArchived());
+        assertEquals("Item should have been curated once", 1, countMarks(item));
+    }
+
+    /**
+     * A failed curation task empowered to reject, attached to 'beforearchive',
+     * must send the item back to the submitter instead of archiving it.
+     * See {@link FailTask}.
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void beforeArchiveCurationRejectsItem()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        legacyPluginService.clearNamedPluginClasses();
+        //** GIVEN **
+
+        // A submitter;
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .withLanguage("en")
+                .build();
+
+        // A containment hierarchy, using the default workflow without reviewers,
+        // so that the item is archived as soon as it enters the workflow;
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+        final String CURATION_COLLECTION_HANDLE = "123456789/curation-test-7";
+        Collection collection = CollectionBuilder
+                .createCollection(context, community, CURATION_COLLECTION_HANDLE)
+                .withName("Collection")
+                .build();
+
+        // A failing curation task, empowered to reject, attached to 'beforearchive';
+        // See test/dspaceFolder/config/workflow-curation.xml for the attachment.
+
+        //** WHEN **
+
+        // The item enters the workflow;
+        context.setCurrentUser(submitter);
+        XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                .withTitle("Test of workflow curation")
+                .withIssueDate("2021-05-14")
+                .withSubject("Testing")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** THEN **
+
+        assertFalse("Item should not have been archived", wfi.getItem().isArchived());
         assertNull("Item should not be in workflow", xmlWorkflowItemService.find(context, wfi.getID()));
         assertNotNull("Item should be back in the workspace",
                 workspaceItemService.findByItem(context, wfi.getItem()));

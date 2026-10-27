@@ -14,6 +14,10 @@
                  taskset='test4'/>
         <mapping collection-handle='123456789/curation-test-5'
                  taskset='test5'/>
+        <mapping collection-handle='123456789/curation-test-6'
+                 taskset='test6'/>
+        <mapping collection-handle='123456789/curation-test-7'
+                 taskset='test7'/>
     </taskset-map>
 
     <tasksets>
@@ -66,6 +70,24 @@
         </taskset>
         <taskset name='test5'>
             <flowstep name='editstep'>
+                <task name='fail'>
+                    <workflow>reject</workflow>
+                </task>
+            </flowstep>
+        </taskset>
+
+        <!--
+            Tasksets attached to 'beforearchive', run just before the item is
+            archived: one marks the item, the other always fails and is
+            empowered to reject the item.
+        -->
+        <taskset name='test6'>
+            <flowstep name='beforearchive'>
+                <task name='marker'/>
+            </flowstep>
+        </taskset>
+        <taskset name='test7'>
+            <flowstep name='beforearchive'>
                 <task name='fail'>
                     <workflow>reject</workflow>
                 </task>

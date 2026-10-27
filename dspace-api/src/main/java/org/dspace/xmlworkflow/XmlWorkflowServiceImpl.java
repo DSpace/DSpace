@@ -94,6 +94,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
 
+    /**
+     * Pseudo-step of the workflow curation, run just before the item is archived.
+     */
+    public static final String BEFORE_ARCHIVE_STEP = "beforearchive";
+
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
@@ -635,7 +640,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      *
      * @param context The relevant DSpace Context.
      * @param wfi     workflow item
-     * @return the fully archived item.
+     * @return the fully archived item, or null if a curation task rejected it.
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
@@ -643,6 +648,19 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      */
     protected Item archive(Context context, XmlWorkflowItem wfi)
         throws SQLException, IOException, AuthorizeException {
+        // Check for curation tasks before archiving the item (see activateFirstStep).
+        wfi.setStepID(BEFORE_ARCHIVE_STEP);
+        xmlWorkflowItemService.update(context, wfi);
+        if (!xmlWorkflowCuratorService.doCuration(context, wfi)) {
+            // don't proceed - either curation tasks queued, or item rejected
+            log.info(LogHelper.getHeader(context, "archive_item",
+                    "workflow_item_id=" + wfi.getID()
+                            + ",item_id=" + wfi.getItem().getID()
+                            + ",collection_id=" + wfi.getCollection().getID()
+                            + ",doCuration=false"));
+            return null;
+        }
+
         // FIXME: Check auth
         Item item = wfi.getItem();
         Collection collection = wfi.getCollection();
