@@ -33,6 +33,7 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
     public void findAllTest() throws Exception {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
+        // Default cc.license.classfilter excludes "mark" and "certification"
         getClient(epersonToken).perform(get("/api/config/submissioncclicenses"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -40,7 +41,7 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
                         SubmissionCCLicenseMatcher.matchLicenseEntry(
                                 "license1",
                                 "Creative Commons License (3.0)",
-                                new int[]{2, 3, 44}
+                                new int[]{2, 3, 1}
                         ),
                         SubmissionCCLicenseMatcher.matchLicenseEntry(
                                 "license265",
@@ -50,16 +51,6 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
                         SubmissionCCLicenseMatcher.matchLicenseEntry(
                                 "license271",
                                 "CC0 1.0 Universal",
-                                new int[]{}
-                        ),
-                        SubmissionCCLicenseMatcher.matchLicenseEntry(
-                                "license272",
-                                "Public Domain Mark 1.0 Universal",
-                                new int[]{}
-                        ),
-                        SubmissionCCLicenseMatcher.matchLicenseEntry(
-                                "license273",
-                                "CERTIFICATION 1.0",
                                 new int[]{}
                         )
                 )));
@@ -92,6 +83,7 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
     public void findOneCC30Test() throws Exception {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
+        // cc.license.jurisdiction = us, so only that jurisdiction can be selected
         getClient(epersonToken).perform(get("/api/config/submissioncclicenses/license1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -101,8 +93,17 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
                 .andExpect(jsonPath("$.fields[0].id", Matchers.is("commercial")))
                 .andExpect(jsonPath("$.fields[1].id", Matchers.is("derivatives")))
                 .andExpect(jsonPath("$.fields[2].id", Matchers.is("jurisdiction")))
-                // jurisdiction always includes the generic/unported option first
-                .andExpect(jsonPath("$.fields[2].enums[0].id", Matchers.is("")));
+                .andExpect(jsonPath("$.fields[2].enums", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.fields[2].enums[0].id", Matchers.is("us")));
+    }
+
+    @Test
+    public void findOneExcludedLicenseTest() throws Exception {
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        // "mark" is excluded by the default cc.license.classfilter
+        getClient(epersonToken).perform(get("/api/config/submissioncclicenses/license272"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

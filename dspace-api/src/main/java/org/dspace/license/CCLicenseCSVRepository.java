@@ -8,6 +8,7 @@
 package org.dspace.license;
 
 import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +55,7 @@ public class CCLicenseCSVRepository implements InitializingBean {
 
         List<CCLicenseCSVRow> result = new ArrayList<>();
 
-        try (CSVReader reader = new CSVReader(new FileReader(csvPath))) {
+        try (CSVReader reader = new CSVReader(new FileReader(csvPath, StandardCharsets.UTF_8))) {
             String[] header = reader.readNext();
             Map<String, Integer> col = mapHeader(header);
 

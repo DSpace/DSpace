@@ -692,7 +692,11 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
         addLicenseField(context, item, uriField, null, licenseUri);
         if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
-            setLicenseRDF(context, item, fetchLicenseRDF(doc));
+            if (doc != null) {
+                setLicenseRDF(context, item, fetchLicenseRDF(doc));
+            } else {
+                log.warn("cc.submit.addbitstream is enabled, but no license RDF is available for: " + licenseUri);
+            }
         }
         if (configurationService.getBooleanProperty("cc.submit.setname")) {
             addLicenseField(context, item, nameField, "en", licenseName);

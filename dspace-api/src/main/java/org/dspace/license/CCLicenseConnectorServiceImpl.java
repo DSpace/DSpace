@@ -7,12 +7,14 @@
  */
 package org.dspace.license;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,34 +66,30 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
      */
     @Override
     public Map<String, CCLicense> retrieveLicenses(String language) {
-        List<String> excluded = Arrays.asList(configurationService.getArrayProperty("cc.license.classfilter "));
+        List<String> excluded = Arrays.asList(configurationService.getArrayProperty("cc.license.classfilter"));
         Map<String, CCLicense> licenses = new LinkedHashMap<>();
 
         for (CCLicenseCSVRow row : csvRepo.getEntryPoints()) {
 
             if ("CC_GROUP".equals(row.getEntryPoint())) {
-                if (excluded.contains("standard")) {
+                // "standard" excludes every CC version, "CC<version>" (e.g. CC3.0) excludes a single one
+                if (excluded.contains("standard") || excluded.contains("CC" + row.getVersion())) {
                     continue;
                 }
-                String id = "CC " + row.getVersion();
                 boolean includeJurisdiction = "3.0".equals(row.getVersion());
 
-                // We are storing url here because the ID is not unique and because the rest repository
-                // won't accept and id with a space in it
-                if (!licenses.containsKey(id)) {
-                    licenses.put(row.getId(),
-                            buildCCLicense(
-                                    row.getId(),
-                                    "Creative Commons License (" + row.getVersion() + ")",
-                                    includeJurisdiction
-                            )
-                    );
-                }
+                // The row ID is used as license ID because the IDENTIFIER column contains spaces,
+                // which the REST repository does not accept
+                licenses.put(row.getId(),
+                        buildCCLicense(
+                                row.getId(),
+                                "Creative Commons License (" + row.getVersion() + ")",
+                                includeJurisdiction
+                        )
+                );
             } else if ("DIRECT".equals(row.getEntryPoint())) {
-                if (excluded.contains("publicdomain") && "publicdomain".equalsIgnoreCase(row.getCategory())) {
-                    continue;
-                }
-                if (excluded.contains("mark") && "mark".equalsIgnoreCase(row.getUnit())) {
+                // Direct licenses are excluded individually by their unit (e.g. zero, mark, certification)
+                if (excluded.contains(row.getUnit())) {
                     continue;
                 }
                 licenses.put(
@@ -162,34 +160,35 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
     }
 
     /**
-     * Builds a list of valid JurisdictionsEnums for the given liceneses in configured csv.
+     * Builds the list of jurisdiction options for the CC 3.0 license, based on {@code cc.license.jurisdiction}.
+     *
+     * <p>The options are aligned with {@link CreativeCommonsServiceImpl#retrieveFullAnswerMap}, which replaces the
+     * submitted jurisdiction with the configured one unless it is set to {@code none}:</p>
+     * <ul>
+     *   <li>not set or blank — only the generic (unported) option</li>
+     *   <li>{@code none} — the generic option followed by all 3.0 jurisdictions from the CSV</li>
+     *   <li>any other value — only the configured jurisdiction</li>
+     * </ul>
      *
      * @return Valid CCLicenseFieldEnum's
      */
     private List<CCLicenseFieldEnum> buildJurisdictionEnums() {
+        String configured = StringUtils.trimToEmpty(configurationService.getProperty("cc.license.jurisdiction"));
+        CCLicenseFieldEnum unported = new CCLicenseFieldEnum("", "cc-license.jurisdiction.option.unported.label", "");
 
-        // 1. Check config override
-        String configured = configurationService.getProperty("dspace.cc-license.jurisdiction");
-
-        Map<String, CCLicenseFieldEnum> seen = new LinkedHashMap<>();
-
-        // Always include generic/unported first
-        seen.put("", new CCLicenseFieldEnum("", "Generic (Unported)", ""));
-
-        if (configured != null && !configured.isBlank()) {
-            String code = configured.trim();
-            seen.put(code, new CCLicenseFieldEnum(code, code.toUpperCase(), ""));
-            return List.copyOf(seen.values());
+        if (configured.isEmpty()) {
+            return List.of(unported);
+        }
+        if (!"none".equals(configured)) {
+            return List.of(new CCLicenseFieldEnum(configured, configured.toUpperCase(), ""));
         }
 
-        // 2. Otherwise derive from repository (NO CSV IO)
+        List<CCLicenseFieldEnum> enums = new ArrayList<>();
+        enums.add(unported);
         for (String code : csvRepo.getJurisdictionsByVersion("3.0")) {
-            if (!seen.containsKey(code)) {
-                seen.put(code, new CCLicenseFieldEnum(code, code.toUpperCase(), ""));
-            }
+            enums.add(new CCLicenseFieldEnum(code, code.toUpperCase(), ""));
         }
-
-        return List.copyOf(seen.values());
+        return enums;
     }
 
     /**
@@ -280,7 +279,12 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
 
     @Override
     public String retrieveLicenseName(final String licenseURI) {
-        return this.csvRepo.getByURI(licenseURI).getTitle();
+        CCLicenseCSVRow row = csvRepo.getByURI(licenseURI);
+        if (row == null) {
+            log.warn("Unknown license URI: {}", licenseURI);
+            return null;
+        }
+        return row.getTitle();
     }
 
     private boolean isDirectLicense(CCLicenseCSVRow row) {
