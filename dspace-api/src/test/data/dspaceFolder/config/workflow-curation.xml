@@ -18,7 +18,7 @@
             See config/modules/curate.cfg for 'marker' task.
         -->
         <taskset name='test1'>
-            <flowstep name='markingStep'>
+            <flowstep name='nullStep'>
                 <task name='marker'/>
             </flowstep>
         </taskset>
