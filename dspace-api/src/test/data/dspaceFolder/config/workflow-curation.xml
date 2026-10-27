@@ -6,6 +6,8 @@
                  taskset='none'/>
         <mapping collection-handle='123456789/curation-test-1'
                  taskset='test1'/>
+        <mapping collection-handle='123456789/curation-test-2'
+                 taskset='test2'/>
     </taskset-map>
 
     <tasksets>
@@ -19,6 +21,16 @@
         -->
         <taskset name='test1'>
             <flowstep name='nullStep'>
+                <task name='marker'/>
+            </flowstep>
+        </taskset>
+
+        <!--
+            A taskset whose only flowstep is attached to 'editstep', the second
+            step of the default workflow.
+        -->
+        <taskset name='test2'>
+            <flowstep name='editstep'>
                 <task name='marker'/>
             </flowstep>
         </taskset>
