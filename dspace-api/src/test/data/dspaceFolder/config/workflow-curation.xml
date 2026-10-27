@@ -8,6 +8,10 @@
                  taskset='test1'/>
         <mapping collection-handle='123456789/curation-test-2'
                  taskset='test2'/>
+        <mapping collection-handle='123456789/curation-test-3'
+                 taskset='test3'/>
+        <mapping collection-handle='123456789/curation-test-5'
+                 taskset='test5'/>
     </taskset-map>
 
     <tasksets>
@@ -32,6 +36,30 @@
         <taskset name='test2'>
             <flowstep name='editstep'>
                 <task name='marker'/>
+            </flowstep>
+        </taskset>
+
+        <!--
+            A taskset whose only flowstep is attached to 'reviewstep', the first
+            step of the default workflow.
+        -->
+        <taskset name='test3'>
+            <flowstep name='reviewstep'>
+                <task name='marker'/>
+            </flowstep>
+        </taskset>
+
+        <!--
+            A taskset that runs a curation task which always fails and is
+            empowered to reject the item, attached to 'editstep' of the
+            default workflow.
+            See config/modules/curate.cfg for 'fail' task.
+        -->
+        <taskset name='test5'>
+            <flowstep name='editstep'>
+                <task name='fail'>
+                    <workflow>reject</workflow>
+                </task>
             </flowstep>
         </taskset>
     </tasksets>

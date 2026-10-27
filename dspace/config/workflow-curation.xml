@@ -18,11 +18,12 @@
 
  <!-- Tasksets are organized into elements called 'flowsteps' which          -->
  <!-- correspond by name to DSpace workflow steps. Thus, to cause a task to  -->
- <!-- be performed in the workflow step 'edit', place a 'task' element in    -->
- <!-- the 'edit' flowstep.                                                   -->
+ <!-- be performed in the workflow step 'editstep', place a 'task' element   -->
+ <!-- in the 'editstep' flowstep.                                            -->
  <!--                                                                        -->
  <!-- You may define a flowstep element in a taskset for each step in the    -->
- <!-- workflow, since the flowstep action occurs before its workflow step.   -->
+ <!-- workflow. The tasks of a flowstep are performed once, when the item    -->
+ <!-- enters its workflow step and before the step is offered to anyone.     -->
  <!-- Use 'archive' for tasks to run just before the item is installed in    -->
  <!-- archive.                                                               -->
  <!--                                                                        -->
@@ -30,7 +31,8 @@
  <!-- controls whether and where the tasks are placed on a queue for         -->
  <!-- deferred performance. If the attribute is not present, the tasks are   -->
  <!-- all performed immediately. Otherwise, the tasks are placed on a queue  -->
- <!-- named by the attribute value.                                          -->
+ <!-- named by the attribute value, and the workflow continues without       -->
+ <!-- waiting for them: their 'workflow' powers (see below) are not applied. -->
  <!--                                                                        -->
  <!-- You may add any number of tasks to a flowstep.-->
 
@@ -42,9 +44,11 @@
  <!-- upon completion of the task. In the example below, the vscan (virus    -->
  <!-- scan) task has been given the power to 'reject': meaning that if the   -->
  <!-- task fails - viz. a virus is detected - the item will be rejected like -->
- <!-- a reviewer would reject it.                                            -->
+ <!-- a reviewer would reject it, i.e. sent back to the submitter's          -->
+ <!-- workspace. Otherwise, a failed task does not stop the workflow.        -->
  <!-- The other 'workflow' value is 'approve', which skips any further tasks -->
- <!-- and advances the item.                                                 -->
+ <!-- of the flowstep when the task succeeds. The item then continues in its -->
+ <!-- workflow step as usual.                                                -->
  <!--                                                                        -->
  <!-- The 'notify' element allows you use the workflow system of             -->
  <!-- notifications (email) whenever a task is performed and returns the     -->
@@ -64,7 +68,7 @@
  <tasksets>
      
    <taskset name="cautious">
-     <flowstep name="step1">
+     <flowstep name="reviewstep">
        <task name="vscan">
          <workflow>reject</workflow>
          <notify on="fail">$flowgroup</notify>

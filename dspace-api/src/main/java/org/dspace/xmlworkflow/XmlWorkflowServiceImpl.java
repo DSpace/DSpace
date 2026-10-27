@@ -391,26 +391,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             MessagingException, WorkflowException {
         XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
 
-        // Check for curation tasks.
-        //
-        // If doCuration returns true, either no curation tasks are mapped to
-        // this step, or they were run and succeeded.  In this scenario, we
-        // continue with the current step.
-        //
-        // If doCuration returns false, either curation tasks were queued, or
-        // they resulted in rejection of the item.  In this scenario, the
-        // current step cannot be completed and we must exit immediately.
-        if (!xmlWorkflowCuratorService.doCuration(c, wi)) {
-            // don't proceed - either curation tasks queued, or item rejected
-            log.info(LogHelper.getHeader(c, "advance_workflow",
-                    "workflow_item_id=" + wi.getID()
-                            + ",item_id=" + wi.getItem().getID()
-                            + ",collection_id=" + wi.getCollection().getID()
-                            + ",current_action=" + currentActionConfig.getId()
-                            + ",doCuration=false"));
-            return currentActionConfig;
-        }
-
         try {
             Step currentStep = currentActionConfig.getStep();
             if (currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)) {
@@ -607,6 +587,20 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             wfi.setStepID(nextStep.getId());
             xmlWorkflowItemService.update(c, wfi);
             nextActionConfig = nextStep.getUserSelectionMethod();
+
+            // Check for curation tasks at the start of this step (see activateFirstStep).
+            if (!xmlWorkflowCuratorService.doCuration(c, wfi)) {
+                // don't proceed - either curation tasks queued, or item rejected
+                log.info(LogHelper.getHeader(c, "advance_workflow",
+                        "workflow_item_id=" + wfi.getID()
+                                + ",item_id=" + wfi.getItem().getID()
+                                + ",collection_id=" + wfi.getCollection().getID()
+                                + ",current_action=" + nextActionConfig.getId()
+                                + ",doCuration=false"));
+                c.restoreAuthSystemState();
+                return null;
+            }
+
             nextActionConfig.getProcessingAction().activate(c, wfi);
 //                nextActionConfig.getProcessingAction().generateTasks();
 
