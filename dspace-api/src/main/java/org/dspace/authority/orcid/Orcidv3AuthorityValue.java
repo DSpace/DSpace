@@ -114,11 +114,13 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
             this.setOrcid_id(name.getPath());
         }
 
-        if (name.getFamilyName() != null && !StringUtils.equals(name.getFamilyName().getContent(), this.getLastName())) {
+        if (name.getFamilyName() != null &&
+                !StringUtils.equals(name.getFamilyName().getContent(), this.getLastName())) {
             this.setLastName(name.getFamilyName().getContent());
         }
 
-        if (name.getGivenNames() != null && !StringUtils.equals(name.getGivenNames().getContent(), this.getFirstName())) {
+        if (name.getGivenNames() != null &&
+                !StringUtils.equals(name.getGivenNames().getContent(), this.getFirstName())) {
             this.setFirstName(name.getGivenNames().getContent());
         }
 
