@@ -275,7 +275,7 @@ public class RequestItemEmailNotifier {
             }
         }
         LOG.info(LogHelper.getHeader(context,
-                "sent_attach_requestItem", "token={}"), ri.getToken());
+                "sent_attach_requestItem", "request_id={}"), ri.getID());
     }
 
     /**
