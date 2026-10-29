@@ -11,13 +11,13 @@ import java.util.Map;
 
 /**
  * Service interface class for the Creative commons license connector service.
- * The implementation of this class is responsible for all the calls to the CC license API and parsing the response
+ * The implementation of this class is responsible for providing the CC licenses from the configured CSV
  * The service is autowired by spring
  */
 public interface CCLicenseConnectorService {
 
     /**
-     * Retrieves the CC Licenses for the provided language from the CC License API
+     * Retrieves the CC Licenses for the provided language from the configured CSV
      *
      * @param language - the language to retrieve the licenses for
      * @return a map of licenses with the id and the license for the provided language
@@ -26,7 +26,7 @@ public interface CCLicenseConnectorService {
 
     /**
      * Retrieve the CC License URI based on the provided license id, language and answers to the field questions from
-     * the CC License API
+     * the configured CSV
      *
      * @param licenseId - the ID of the license
      * @param language  - the language for which to retrieve the full answerMap

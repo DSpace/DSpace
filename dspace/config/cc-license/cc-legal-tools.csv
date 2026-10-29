@@ -272,3 +272,6 @@
 "publicdomain","1.0","zero","","https://creativecommons.org/publicdomain/zero/1.0/","CC0 1.0","CC0-1.0","CC0 1.0 Universal","en","DIRECT"
 "publicdomain","1.0","mark","","https://creativecommons.org/publicdomain/mark/1.0/","PDM 1.0","CC-PDM-1.0","Public Domain Mark 1.0 Universal","en","DIRECT"
 "publicdomain","1.0","certification","us","https://creativecommons.org/publicdomain/certification/1.0/us/","CERTIFICATION 1.0 US","CC-PDDC","CERTIFICATION 1.0","en","DIRECT"
+"licenses","1.0","sampling","","https://creativecommons.org/licenses/sampling/1.0/","CC SAMPLING 1.0","","Sampling 1.0 Generic","en","RECOMBO_GROUP"
+"licenses","1.0","sampling+","","https://creativecommons.org/licenses/sampling+/1.0/","CC SAMPLING+ 1.0","","Sampling Plus 1.0 Generic","en",
+"licenses","1.0","nc-sampling+","","https://creativecommons.org/licenses/nc-sampling+/1.0/","CC NC-SAMPLING+ 1.0","","NonCommercial Sampling Plus 1.0 Generic","en",

@@ -34,6 +34,7 @@ public class CCLicenseConnectorServiceImplIT extends AbstractIntegrationTestWith
     private static final String CC_ZERO = "license271";
     private static final String MARK = "license272";
     private static final String CERTIFICATION = "license273";
+    private static final String SAMPLING = "license274";
 
     private CCLicenseConnectorService ccLicenseConnectorService;
     private ConfigurationService configurationService;
@@ -47,7 +48,7 @@ public class CCLicenseConnectorServiceImplIT extends AbstractIntegrationTestWith
 
     @Test
     public void retrieveLicensesDefaultClassFilterTest() {
-        // Default cc.license.classfilter = mark, certification
+        // Default cc.license.classfilter = recombo, mark, certification
         Map<String, CCLicense> licenses = ccLicenseConnectorService.retrieveLicenses("en");
 
         assertThat(licenses.keySet(), containsInAnyOrder(CC_30, CC_40, CC_ZERO));
@@ -59,7 +60,7 @@ public class CCLicenseConnectorServiceImplIT extends AbstractIntegrationTestWith
 
         Map<String, CCLicense> licenses = ccLicenseConnectorService.retrieveLicenses("en");
 
-        assertThat(licenses.keySet(), containsInAnyOrder(CC_30, CC_40, CC_ZERO, MARK, CERTIFICATION));
+        assertThat(licenses.keySet(), containsInAnyOrder(CC_30, CC_40, CC_ZERO, MARK, CERTIFICATION, SAMPLING));
     }
 
     @Test
@@ -68,7 +69,7 @@ public class CCLicenseConnectorServiceImplIT extends AbstractIntegrationTestWith
 
         Map<String, CCLicense> licenses = ccLicenseConnectorService.retrieveLicenses("en");
 
-        assertThat(licenses.keySet(), containsInAnyOrder(CC_40, MARK, CERTIFICATION));
+        assertThat(licenses.keySet(), containsInAnyOrder(CC_40, MARK, CERTIFICATION, SAMPLING));
     }
 
     @Test
@@ -77,7 +78,7 @@ public class CCLicenseConnectorServiceImplIT extends AbstractIntegrationTestWith
 
         Map<String, CCLicense> licenses = ccLicenseConnectorService.retrieveLicenses("en");
 
-        assertThat(licenses.keySet(), containsInAnyOrder(CC_ZERO, MARK, CERTIFICATION));
+        assertThat(licenses.keySet(), containsInAnyOrder(CC_ZERO, MARK, CERTIFICATION, SAMPLING));
     }
 
     @Test
@@ -120,6 +121,25 @@ public class CCLicenseConnectorServiceImplIT extends AbstractIntegrationTestWith
                 is("https://creativecommons.org/licenses/by-nd/3.0/us/"));
         assertThat(ccLicenseConnectorService.retrieveRightsByQuestion(CC_ZERO, "en", Map.of()),
                 is("https://creativecommons.org/publicdomain/zero/1.0/"));
+    }
+
+    @Test
+    public void retrieveSamplingLicenseTest() {
+        configurationService.setProperty("cc.license.classfilter", null);
+
+        CCLicense sampling = ccLicenseConnectorService.retrieveLicenses("en").get(SAMPLING);
+
+        assertThat(sampling.getCcLicenseFieldList(), hasSize(1));
+        assertThat(sampling.getCcLicenseFieldList().get(0).getFieldEnum().stream()
+                        .map(CCLicenseFieldEnum::getId).toList(),
+                contains("sampling", "samplingplus", "ncsamplingplus"));
+        assertThat(ccLicenseConnectorService.retrieveRightsByQuestion(SAMPLING, "en", Map.of("sampling", "sampling")),
+                is("https://creativecommons.org/licenses/sampling/1.0/"));
+        assertThat(ccLicenseConnectorService.retrieveRightsByQuestion(SAMPLING, "en",
+                        Map.of("sampling", "ncsamplingplus")),
+                is("https://creativecommons.org/licenses/nc-sampling+/1.0/"));
+        assertThat(ccLicenseConnectorService.retrieveLicenseName("https://creativecommons.org/licenses/sampling+/1.0/"),
+                is("Sampling Plus 1.0 Generic"));
     }
 
     @Test

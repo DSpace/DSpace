@@ -45,6 +45,15 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
     private static final String FIELD_COMMERCIAL  = "commercial";
     private static final String FIELD_DERIVATIVES = "derivatives";
     private static final String FIELD_JURISDICTION = "jurisdiction";
+    private static final String FIELD_SAMPLING = "sampling";
+
+    // Sampling (recombo) answers mapped to their CC unit. The answers don't contain a '+' as it would be
+    // decoded to a space in the query parameters of the REST API.
+    private static final Map<String, String> SAMPLING_UNITS = Map.of(
+            "sampling", "sampling",
+            "samplingplus", "sampling+",
+            "ncsamplingplus", "nc-sampling+"
+    );
 
     @Autowired
     private ConfigurationService configurationService;
@@ -55,6 +64,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
      * <p>Licenses are grouped based on the CSV {@code ENTRY_POINT} column:</p>
      * <ul>
      *   <li>{@code CC_GROUP} — grouped Creative Commons license families (e.g. CC 3.0, 4.0)</li>
+     *   <li>{@code RECOMBO_GROUP} — the retired Creative Commons Sampling licenses (version 1.0)</li>
      *   <li>{@code DIRECT} — standalone licenses (e.g. public domain tools)</li>
      * </ul>
      *
@@ -87,6 +97,12 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
                                 includeJurisdiction
                         )
                 );
+            } else if ("RECOMBO_GROUP".equals(row.getEntryPoint())) {
+                if (excluded.contains("recombo")) {
+                    continue;
+                }
+                licenses.put(row.getId(), buildSamplingLicense(row.getId(),
+                        "Creative Commons Sampling License (" + row.getVersion() + ")"));
             } else if ("DIRECT".equals(row.getEntryPoint())) {
                 // Direct licenses are excluded individually by their unit (e.g. zero, mark, certification)
                 if (excluded.contains(row.getUnit())) {
@@ -160,6 +176,31 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
     }
 
     /**
+     * Builds the CC Sampling (recombo) license, which has a single field to choose the sampling variant.
+     *
+     * @param id The ID of the CC License
+     * @param label The Label to use for the License
+     *
+     * @return Created CCLicense
+     */
+    private CCLicense buildSamplingLicense(String id, String label) {
+        CCLicenseField sampling = new CCLicenseField(
+                FIELD_SAMPLING,
+                "cc-license.sampling.label",
+                "cc-license.sampling.hint",
+                List.of(
+                    new CCLicenseFieldEnum("sampling", "cc-license.sampling.option.sampling.label",
+                            "cc-license.sampling.option.sampling.hint"),
+                    new CCLicenseFieldEnum("samplingplus", "cc-license.sampling.option.samplingplus.label",
+                            "cc-license.sampling.option.samplingplus.hint"),
+                    new CCLicenseFieldEnum("ncsamplingplus", "cc-license.sampling.option.ncsamplingplus.label",
+                            "cc-license.sampling.option.ncsamplingplus.hint")
+                )
+        );
+        return new CCLicense(id, label, List.of(sampling));
+    }
+
+    /**
      * Builds the list of jurisdiction options for the CC 3.0 license, based on {@code cc.license.jurisdiction}.
      *
      * <p>The options are aligned with {@link CreativeCommonsServiceImpl#retrieveFullAnswerMap}, which replaces the
@@ -220,6 +261,12 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService 
         // Direct lookup licenses (CC0, PDM, PDUS, etc.)
         if (isDirectLicense(entry)) {
             return entry.getUrl();
+        }
+
+        // CC Sampling licenses (recombo)
+        if ("RECOMBO_GROUP".equals(entry.getEntryPoint())) {
+            String unit = SAMPLING_UNITS.get(answerMap.get(FIELD_SAMPLING));
+            return unit == null ? null : csvRepo.findUri(entry.getVersion(), unit, "");
         }
 
         // CC licenses (3.0 / 4.0)
