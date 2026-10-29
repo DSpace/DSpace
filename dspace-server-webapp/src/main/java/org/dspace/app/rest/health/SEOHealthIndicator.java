@@ -43,7 +43,7 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
     @Autowired
     private ConfigurationService configurationService;
 
-    private final RestTemplate restTemplate = createRestTemplate();
+    private RestTemplate restTemplate = createRestTemplate();
 
     private static RestTemplate createRestTemplate() {
         RestTemplate template = new RestTemplate();
