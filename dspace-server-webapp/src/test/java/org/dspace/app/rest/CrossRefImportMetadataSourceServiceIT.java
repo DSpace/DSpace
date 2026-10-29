@@ -58,7 +58,9 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        boolean originalExactIdConfig = crossRefServiceImpl.isExactIdOnly();
         try {
+            crossRefServiceImpl.setExactIdOnly(false);
             liveImportClientImpl.setHttpClient(httpClient);
             CloseableHttpResponse response = mockResponse("" , 404, "Not Found");
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
@@ -68,6 +70,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             assertEquals(0, recordsImported.size());
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
+            crossRefServiceImpl.setExactIdOnly(originalExactIdConfig);
         }
     }
 
@@ -76,7 +79,9 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        boolean originalExactIdConfig = crossRefServiceImpl.isExactIdOnly();
         try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-test.json")) {
+            crossRefServiceImpl.setExactIdOnly(false);
 
             String crossRefRespXmlResp = IOUtils.toString(crossRefResp, Charset.defaultCharset());
 
@@ -91,6 +96,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
+            crossRefServiceImpl.setExactIdOnly(originalExactIdConfig);
         }
     }
 
@@ -99,7 +105,9 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        boolean originalExactIdConfig = crossRefServiceImpl.isExactIdOnly();
         try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-test.json")) {
+            crossRefServiceImpl.setExactIdOnly(false);
             String crossRefRespXmlResp = IOUtils.toString(crossRefResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -111,6 +119,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             assertEquals(10, tot);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
+            crossRefServiceImpl.setExactIdOnly(originalExactIdConfig);
         }
     }
 
@@ -119,9 +128,10 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        boolean originalExactIdConfig = crossRefServiceImpl.isExactIdOnly();
 
         try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-by-id.json")) {
-
+            crossRefServiceImpl.setExactIdOnly(false);
             String crossRefRespXmlResp = IOUtils.toString(crossRefResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -137,6 +147,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
+            crossRefServiceImpl.setExactIdOnly(originalExactIdConfig);
         }
     }
 
