@@ -64,7 +64,7 @@ public class CrossLinks {
 
     /**
      * Is there a link for the given browse name (eg 'author')
-     * @param browseIndexName
+     * @param browseIndexName the browse index name to check
      * @return true/false
      */
     public boolean hasBrowseName(String browseIndexName) {
@@ -83,7 +83,7 @@ public class CrossLinks {
 
     /**
      * Get full map of field->indexname link configurations
-     * @return
+     * @return map of metadata field to browse index name
      */
     public Map<String, String> getLinks() {
         return links;
@@ -93,8 +93,8 @@ public class CrossLinks {
      * Find and return the browse name for a given metadata field.
      * If the link key contains a wildcard eg dc.subject.*, it should
      * match dc.subject.other, etc.
-     * @param metadata
-     * @return
+     * @param metadata the metadata field to find the link type for
+     * @return the browse name for the given metadata, or null if not found
      */
     public String findLinkType(String metadata) {
         // Resolve wildcards properly, eg. dc.subject.other matches a configuration for dc.subject.*

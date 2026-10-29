@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -151,7 +152,7 @@ public class CrossRefClient {
         switch (statusCode) {
             case (200): {
                 try {
-                    SAXBuilder builder = new SAXBuilder();
+                    SAXBuilder builder = XMLUtils.getSAXBuilder();
                     Document doc = builder.build(new StringReader(content));
                     XPathExpression<Object> xpath = XPathFactory.instance().compile(
                             "/doi_batch_diagnostic/record_diagnostic[@status = 'Failure']", Filters.fpassthrough(),

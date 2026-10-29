@@ -8,7 +8,10 @@
 package org.dspace.app.rest.security.jwt;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.text.ParseException;
@@ -77,8 +80,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
     //temporary set a negative expiration time so the token is invalid immediately
     @Test
     public void testExpiredToken() throws Exception {
-        when(configurationService.getLongProperty("jwt.shortLived.token.expiration", 1800000))
-            .thenReturn(-99999999L);
+        when(shortLivedJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Instant previous = Instant.now().minus(10000000000L, ChronoUnit.MILLIS);
         String token = shortLivedJWTTokenHandler
@@ -86,6 +88,22 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
         EPerson parsed = shortLivedJWTTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
         assertEquals(null, parsed);
 
+    }
+
+    // Verify that if no session salt is set, one is generated and saved for the user.
+    // This is important as the session salt is used to sign the JWT, so it must be set for the token to be valid.
+    @Test
+    public void testBlankSessionSaltIsGenerated() throws Exception {
+        when(context.getCurrentUser()).thenReturn(ePerson);
+        when(ePerson.getSessionSalt()).thenReturn("");
+        doAnswer(invocation -> invocation.getArgument(1))
+            .when(ePersonService).update(any(Context.class), any(EPerson.class));
+
+        EPerson updated = shortLivedJWTTokenHandler.updateSessionSalt(context, Instant.now());
+
+        assertEquals(ePerson, updated);
+        assertNotNull(updated.getSessionSalt());
+        verify(ePersonService).update(any(Context.class), any(EPerson.class));
     }
 
     //Try if we can change the expiration date

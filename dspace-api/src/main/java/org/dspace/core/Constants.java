@@ -238,6 +238,11 @@ public class Constants {
     public static final String ENTITY_TYPE_NONE = "none";
 
     /**
+     * Default list of bundle names to restrict only to administrators
+     */
+    public static final String[] DEFAULT_RESTRICTED_BUNDLES = {"LICENSE", "TEXT", "SWORD"};
+
+    /**
      * Default constructor
      */
     private Constants() { }

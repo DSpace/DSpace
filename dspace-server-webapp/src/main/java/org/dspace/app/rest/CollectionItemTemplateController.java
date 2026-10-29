@@ -16,8 +16,8 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.BadRequestException;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.TemplateItemRest;
@@ -109,7 +109,8 @@ public class CollectionItemTemplateController {
             throws SQLException, AuthorizeException {
 
         if (itemBody == null) {
-            throw new BadRequestException("The new item should be included as json in the body of this request");
+            throw new DSpaceBadRequestException(
+                "The new item should be included as json in the body of this request");
         }
 
         Context context = ContextUtil.obtainContext(request);
@@ -145,7 +146,7 @@ public class CollectionItemTemplateController {
      * @return          The template item from the Collection in the request
      * @throws SQLException
      */
-    @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
+    @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'ADD')")
     @RequestMapping(method = RequestMethod.GET)
     public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
             throws SQLException {

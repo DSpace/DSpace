@@ -49,6 +49,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleaner"/>
     </bean>
 
+    <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportScriptConfiguration" primary="true">
+        <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImport"/>
+    </bean>
+
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration" primary="true">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
@@ -83,6 +88,11 @@
         <property name="description" value="Export and import complete SOLR cores with multithreading support"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solr.SolrCoreExportImport"/>
         <property name="isVisibleFromUI" value="false"/>
+    </bean>
+
+    <bean id="object-deletion" class="org.dspace.deletion.process.DSpaceObjectDeletionProcessScriptConfiguration" primary="true">
+        <property name="description" value="Permanently delete the given object along with all child objects. WARNING: This action cannot be undone." />
+        <property name="dspaceRunnableClass" value="org.dspace.deletion.process.DSpaceObjectDeletionProcess"/>
     </bean>
 
 </beans>

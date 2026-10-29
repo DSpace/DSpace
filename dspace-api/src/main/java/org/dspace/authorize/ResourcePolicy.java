@@ -10,7 +10,6 @@ package org.dspace.authorize;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -56,7 +55,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "resourcepolicy_seq", sequenceName = "resourcepolicy_seq", allocationSize = 1)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 

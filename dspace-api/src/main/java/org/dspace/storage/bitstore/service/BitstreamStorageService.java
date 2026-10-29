@@ -142,21 +142,6 @@ public interface BitstreamStorageService {
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException;
 
     /**
-     * Clone the given bitstream to a new bitstream with a new ID.
-     * Metadata of the given bitstream are also copied to the new bitstream.
-     * 
-     * @param context
-     *            DSpace context object
-     * @param bitstream
-     *            the bitstream to be cloned
-     * @return id of the clone bitstream.
-     * @throws SQLException if database error
-     * @throws IOException if IO error
-     * @throws AuthorizeException if authorization error
-     */
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException;
-
-    /**
      * Print out (log/out) a listing of the assetstores configured, and how many assets they contain
      *
      * @param context The relevant DSpace Context.

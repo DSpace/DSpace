@@ -79,8 +79,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
                 new String[] {
                         "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority",
-                        "org.dspace.content.authority.SHERPARoMEOPublisher = SRPublisher",
-                        "org.dspace.content.authority.SHERPARoMEOJournalTitle = SRJournalTitle"
+                        "org.dspace.content.authority.OpenPolicyFinderPublisherAuthority = SRPublisher",
+                        "org.dspace.content.authority.OpenPolicyFinderJournalTitle = SRJournalTitle"
                 });
 
         configurationService.setProperty("solr.authority.server",
@@ -169,11 +169,12 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                      VocabularyMatcher.matchProperties("SRPublisher", "SRPublisher", false , false),
                      VocabularyMatcher.matchProperties("SRJournalTitle", "SRJournalTitle", false , false),
                      VocabularyMatcher.matchProperties("funding_types", "funding_types", true, false),
-                     VocabularyMatcher.matchProperties("currency", "currency", true, false)
+                     VocabularyMatcher.matchProperties("currency", "currency", true, false),
+                     VocabularyMatcher.matchProperties("gender", "gender", true, false)
                  )))
         .andExpect(jsonPath("$._links.self.href",
             Matchers.containsString("api/submission/vocabularies")))
-        .andExpect(jsonPath("$.page.totalElements", is(8)));
+        .andExpect(jsonPath("$.page.totalElements", is(9)));
     }
 
     @Test
@@ -425,7 +426,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void sherpaJournalTest() throws Exception {
+    public void opfJournalTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/submission/vocabularies/SRJournalTitle/entries")
@@ -441,7 +442,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void sherpaPublisherTest() throws Exception {
+    public void opfPublisherTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/submission/vocabularies/SRPublisher/entries")

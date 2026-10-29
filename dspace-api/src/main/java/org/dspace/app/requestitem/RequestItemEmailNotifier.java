@@ -9,9 +9,11 @@
 package org.dspace.app.requestitem;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.annotation.ManagedBean;
@@ -203,6 +205,7 @@ public class RequestItemEmailNotifier {
         email.setSubject(subject);
         email.addRecipient(ri.getReqEmail());
         // Attach bitstreams.
+        List<InputStream> bitstreamInputStreams = new ArrayList<>();
         try {
             if (ri.isAccept_request()) {
                 if (ri.getAccess_token() != null) {
@@ -229,11 +232,13 @@ public class RequestItemEmailNotifier {
                                     // #8636 Anyone receiving the email can respond to the
                                     // request without authenticating into DSpace
                                     context.turnOffAuthorisationSystem();
+                                    InputStream is = bitstreamService.retrieve(context, bitstream);
                                     email.addAttachment(
-                                            bitstreamService.retrieve(context, bitstream),
+                                            is,
                                             bitstream.getName(),
                                             bitstream.getFormat(context).getMIMEType());
                                     context.restoreAuthSystemState();
+                                    bitstreamInputStreams.add(is);
                                 }
                             }
                         }
@@ -241,10 +246,13 @@ public class RequestItemEmailNotifier {
                         Bitstream bitstream = ri.getBitstream();
                         //#8636 Anyone receiving the email can respond to the request without authenticating into DSpace
                         context.turnOffAuthorisationSystem();
-                        email.addAttachment(bitstreamService.retrieve(context, bitstream),
+                        InputStream is = bitstreamService.retrieve(context, bitstream);
+                        email.addAttachment(
+                                is,
                                 bitstream.getName(),
                                 bitstream.getFormat(context).getMIMEType());
                         context.restoreAuthSystemState();
+                        bitstreamInputStreams.add(is);
                     }
                 }
                 email.send();
@@ -261,6 +269,10 @@ public class RequestItemEmailNotifier {
             LOG.warn(LogHelper.getHeader(context,
                     "error_mailing_requestItem", e.getMessage()));
             throw new IOException("Reply not sent:  " + e.getMessage());
+        } finally {
+            for (InputStream bitstreamInputStream : bitstreamInputStreams) {
+                bitstreamInputStream.close();
+            }
         }
         LOG.info(LogHelper.getHeader(context,
                 "sent_attach_requestItem", "token={}"), ri.getToken());

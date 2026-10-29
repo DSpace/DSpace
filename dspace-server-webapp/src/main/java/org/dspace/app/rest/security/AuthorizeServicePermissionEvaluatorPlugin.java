@@ -25,6 +25,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.profile.service.ResearcherProfileService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.util.UUIDUtils;
@@ -44,6 +45,9 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private ResearcherProfileService researcherProfileService;
 
     @Autowired
     private RequestService requestService;
@@ -125,6 +129,13 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                         if (!DSpaceRestPermission.READ.equals(restPermission) &&
                                    !item.isArchived() && !item.isWithdrawn()) {
                             return false;
+                        }
+
+                        if (DSpaceRestPermission.READ.equals(restPermission)
+                            && !item.isArchived()
+                            && !item.isWithdrawn()
+                            && researcherProfileService.isAuthorOf(context, ePerson, item)) {
+                            return true;
                         }
                     }
 

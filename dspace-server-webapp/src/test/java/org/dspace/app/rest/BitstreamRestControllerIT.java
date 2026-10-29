@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Period;
 import java.util.Map;
@@ -69,6 +70,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.model.RequestItemRest;
+import org.dspace.app.rest.repository.WorkflowItemItemLinkRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -100,6 +102,7 @@ import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -162,6 +165,8 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     private BitstreamFormat supportedFormat;
     private BitstreamFormat knownFormat;
     private BitstreamFormat unknownFormat;
+    @Autowired
+    private WorkflowItemItemLinkRepository item;
 
     @BeforeClass
     public static void clearStatistics() throws Exception {
@@ -1551,6 +1556,108 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         }
     }
 
+    /**
+     * Build a restricted Bitstream readable only by a group to which the test users do not belong.
+     *
+     * @return restricted Bitstream
+     * @throws Exception if the test object cannot be created
+     */
+    private Bitstream createRestrictedBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+        try {
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withName("Collection 1")
+                                               .build();
+            Group restrictedGroup = GroupBuilder.createGroup(context)
+                                                .withName("Restricted Group")
+                                                .build();
+
+            try (InputStream is = IOUtils.toInputStream("Secret file contents", StandardCharsets.UTF_8)) {
+                Item item = ItemBuilder.createItem(context, col1)
+                                       .withTitle("item 1")
+                                       .withIssueDate("2013-01-17")
+                                       .withAuthor("Doe, John")
+                                       .build();
+                return BitstreamBuilder.createBitstream(context, item, is)
+                                       .withName("secret.txt")
+                                       .withDescription("This bitstream is restricted")
+                                       .withMimeType("text/plain")
+                                       .withReaderGroup(restrictedGroup)
+                                       .build();
+            }
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
+     * A supplied access token must be validated before GET or HEAD can reach the Bitstream response handling.
+     */
+    @Test
+    public void restrictedBitstreamHeadWithUnvalidatedAccessTokenTest() throws Exception {
+        Bitstream restrictedBitstream = createRestrictedBitstream();
+        String contentUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
+
+        // Baseline: without an access token, anonymous is refused on both GET and HEAD.
+        getClient().perform(get(contentUrl)).andExpect(status().isUnauthorized());
+        getClient().perform(head(contentUrl)).andExpect(status().isUnauthorized());
+
+        // A bogus token must be rejected, not merely present.
+        getClient().perform(head(contentUrl).param("accessToken", "invalid_token"))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", "invalid_token"))
+                   .andExpect(status().isUnauthorized());
+
+        // A blank token must go through the normal Bitstream READ permission check.
+        getClient().perform(head(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    /**
+     * Access-token authorization must not be available when Request-a-Copy is disabled.
+     */
+    @Test
+    public void restrictedBitstreamHeadWithAccessTokenRequestACopyDisabledTest() throws Exception {
+        configurationService.setProperty("request.item.type", null);
+
+        Bitstream restrictedBitstream = createRestrictedBitstream();
+        String contentUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
+
+        getClient().perform(head(contentUrl)).andExpect(status().isUnauthorized());
+        getClient().perform(head(contentUrl).param("accessToken", "x"))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", "x"))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(head(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+        getClient().perform(get(contentUrl).param("accessToken", ""))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    /**
+     * Invalid token responses must not reveal whether a Bitstream UUID exists.
+     */
+    @Test
+    public void unknownBitstreamWithAccessTokenIsNotAnExistenceOracleTest() throws Exception {
+        Bitstream restrictedBitstream = createRestrictedBitstream();
+
+        String restrictedUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
+        String unknownUrl = "/api/core/bitstreams/" + UUID.randomUUID() + "/content";
+
+        int restrictedStatus = getClient().perform(head(restrictedUrl).param("accessToken", "invalid_token"))
+                                          .andReturn().getResponse().getStatus();
+        int unknownStatus = getClient().perform(head(unknownUrl).param("accessToken", "invalid_token"))
+                                       .andReturn().getResponse().getStatus();
+
+        assertEquals("An unauthorized caller must not be able to tell an existing restricted Bitstream apart "
+                         + "from a nonexistent one", restrictedStatus, unknownStatus);
+    }
+
     @Test
     public void restrictedBitstreamWithAccessTokenTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1662,6 +1769,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
         configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("core.authorization.bitstream.author.bypass-restrictions", "true");
         pluginService.clearNamedPluginClasses();
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
@@ -1749,5 +1857,267 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         // unauthorized request should not log statistics so we have only 2 successful visits
         checkNumberOfStatsRecords(bitstream, 2);
+    }
+
+    @Test
+    public void bitstreamInputStreamClosesWithGetRequestTest() throws Exception {
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream).build();
+        context.restoreAuthSystemState();
+
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isOk());
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1)
+                               .description("InputStream should have been closed after GET request"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
+    }
+
+    @Test
+    public void bitstreamInputStreamClosesWithHeadRequestTest() throws Exception {
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream).build();
+        context.restoreAuthSystemState();
+
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isOk());
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1)
+                               .description("InputStream should have been closed after HEAD request"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
+    }
+
+    @Test
+    public void bitstreamInputStreamClosesWithGetRequestAndAccessTokenTest() throws Exception {
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream).build();
+
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+        context.restoreAuthSystemState();
+
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content")
+                                        .param("accessToken", itemRequest.getAccess_token()))
+                       .andExpect(status().isOk());
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1)
+                               .description("InputStream should have been closed after GET request"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
+    }
+
+    @Test
+    public void bitstreamInputStreamClosesWithHeadRequestAndAccessTokenTest() throws Exception {
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream).build();
+
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+        context.restoreAuthSystemState();
+
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content")
+                                        .param("accessToken", itemRequest.getAccess_token()))
+                       .andExpect(status().isOk());
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1)
+                               .description("InputStream should have been closed after HEAD request"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
+    }
+
+    @Test
+    public void bitstreamInputStreamClosesWithGetRequestAndCitationPageEnabledTest() throws Exception {
+        configurationService.setProperty("citation-page.enable_globally", true);
+        citationDocumentService.afterPropertiesSet();
+
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream).build();
+        context.restoreAuthSystemState();
+
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isOk());
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1)
+                               .description("InputStream should have been closed after GET request"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
+    }
+
+    @Test
+    public void bitstreamInputStreamClosesWithHeadRequestAndCitationPageEnabledTest() throws Exception {
+        configurationService.setProperty("citation-page.enable_globally", true);
+        citationDocumentService.afterPropertiesSet();
+
+        InputStream realStream = new ByteArrayInputStream("abc".getBytes());
+        InputStream spyStream = Mockito.spy(realStream);
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, realStream).build();
+        context.restoreAuthSystemState();
+
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        doReturn(spyStream).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isOk());
+
+            boolean bitstreamRetrieved = Mockito.mockingDetails(spyService)
+                                                .getInvocations().stream()
+                                                .filter(i -> i.getMethod().getName().equals("retrieve"))
+                                                .mapToInt(i -> 1)
+                                                .sum() > 0;
+
+            if (bitstreamRetrieved) {
+                Mockito.verify(spyStream, times(1)
+                               .description("InputStream should have been closed after HEAD request"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
     }
 }

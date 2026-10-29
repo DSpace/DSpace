@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.DSpaceRunnable.StepResult;
 import org.dspace.scripts.configuration.ScriptConfiguration;
@@ -122,6 +123,24 @@ public class ScriptLauncher {
     public static int handleScript(String[] args, Document commandConfigs,
                                    DSpaceRunnableHandler dSpaceRunnableHandler,
                                    DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
+        return handleScript(args, commandConfigs, dSpaceRunnableHandler, kernelImpl, null);
+    }
+
+    /**
+     * This method will take the arguments from a commandline input and it'll find the script that the first argument
+     * refers to and it'll execute this script.
+     * It can return a 1 or a 0 depending on whether the script failed or passed respectively
+     * @param args                  The arguments for the script and the script as first one in the array
+     * @param commandConfigs        The Document
+     * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
+     * @param kernelImpl            The relevant DSpaceKernelImpl
+     * @param currentUser           The current user
+     * @return A 1 or 0 depending on whether the script failed or passed respectively
+     */
+    public static int handleScript(String[] args, Document commandConfigs,
+                                   DSpaceRunnableHandler dSpaceRunnableHandler,
+                                   DSpaceKernelImpl kernelImpl,
+                                   EPerson currentUser) throws InstantiationException, IllegalAccessException {
         int status;
         ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
         ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
@@ -130,7 +149,7 @@ public class ScriptLauncher {
             script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
-            status = executeScript(args, dSpaceRunnableHandler, script);
+            status = executeScript(args, dSpaceRunnableHandler, script, currentUser);
         } else {
             status = runOneCommand(commandConfigs, args, kernelImpl);
         }
@@ -142,12 +161,13 @@ public class ScriptLauncher {
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
      * @param script                The script to be executed
+     * @param currentUser           The current user
      * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
-    private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
-                                     DSpaceRunnable script) {
+    private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler, DSpaceRunnable script,
+        EPerson currentUser) {
         try {
-            StepResult result = script.initialize(args, dSpaceRunnableHandler, null);
+            StepResult result = script.initialize(args, dSpaceRunnableHandler, currentUser);
             // check the StepResult, only run the script if the result is Continue;
             // otherwise - for example the script is started with the help as argument, nothing is to do
             if (StepResult.Continue.equals(result)) {

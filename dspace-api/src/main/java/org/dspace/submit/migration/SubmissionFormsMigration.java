@@ -25,6 +25,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
@@ -95,7 +96,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         Result result = new StreamResult(new File(outputPath));
 
         // Create an instance of TransformerFactory
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = XMLUtils.getTransformerFactory();
 
         Transformer trans;
         try {

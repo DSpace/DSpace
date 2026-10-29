@@ -1064,7 +1064,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     private boolean isNonValidAuthority(boolean authorityControlled, List<String> authorities) {
-        return !authorityControlled && authorities != null && authorities.size() > 0 && authorities.get(0) != null;
+        return !authorityControlled && authorities != null && !authorities.isEmpty() &&
+            authorities.get(0) != null && !authorities.get(0).isBlank();
     }
 
     /**

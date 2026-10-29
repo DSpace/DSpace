@@ -1697,6 +1697,29 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void embedLogoAsAnonymousUserTest() throws Exception {
+        // An anonymous user requesting a Collection with its logo embedded must receive the logo.
+        // This covers the non-admin branch of the logo Bitstream's METADATA_READ evaluation
+        // (BitstreamMetadataReadPermissionEvaluatorPlugin falls through to a READ authorization
+        // check), which projectonLevelTest does not reach because it embeds the logo as an admin.
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection With Logo")
+                                          .withLogo("TestingContentForLogo")
+                                          .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/collections/" + col.getID()).param("embed", "logo"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.id", is(col.getID().toString())))
+                   .andExpect(jsonPath("$._embedded.logo", Matchers.not(Matchers.empty())))
+                   .andExpect(jsonPath("$._embedded.logo.type", is("bitstream")));
+    }
+
+    @Test
     public void projectonLevelEmbedLevelDepthHigherThanEmbedMaxBadRequestTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();

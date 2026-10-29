@@ -9,21 +9,27 @@ package org.dspace.app.rest.repository.handler;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * This class will handle ExternalSourceEntryUriList and it'll create Item objects based on them.
- * This will create Archived items and thus only Admin users can use it
+ * This class will handle ExternalSourceEntryUriList, and it'll create Item objects based on them.
+ * This will create Archived items and thus only Admin users can use it, unless the "submitter.allow.external.entities"
+ * is set to true, allowing submitters with submit permission to the given owning collection to import external items.
  */
 @Component
 public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourceEntryItemUriListHandler<Item> {
@@ -32,7 +38,13 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
     private AuthorizeService authorizeService;
 
     @Autowired
+    private CollectionService collectionService;
+
+    @Autowired
     private InstallItemService installItemService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(ExternalSourceEntryItemUriListHandler.class);
@@ -55,8 +67,20 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
             return false;
         }
         try {
-            if (!authorizeService.isAdmin(context)) {
-                throw new AuthorizeException("Only admins are allowed to create items using external data");
+            // TODO: This should be replaced by a solution, which doesn't bypass the submission workflow of the owning collection. See: https://github.com/DSpace/DSpace/issues/9114
+            if (this.configurationService.getBooleanProperty("submitter.allow.external.entities", false)) {
+                String owningCollectionUuid = request.getParameter("owningCollection");
+                Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
+                if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
+                        Constants.ADD)) {
+                    throw new AuthorizeException("Only admins or submitters with submit permission to the given " +
+                            "owning collection parameter, are allowed to create items using external data");
+                }
+            } else {
+                if (!authorizeService.isAdmin(context)) {
+                    throw new AuthorizeException("Only admins are allowed to create items using external data");
+
+                }
             }
         } catch (SQLException e) {
             log.error("context isAdmin check resulted in an error", e);
