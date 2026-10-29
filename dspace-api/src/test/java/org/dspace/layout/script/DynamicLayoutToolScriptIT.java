@@ -301,6 +301,66 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         }
     }
 
+    @Test
+    public void testExportImportSameShortnameTabsRetainOwnBoxes() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("box")
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("scopedTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Scoped Tab")
+            .withLeading(false)
+            .withCustomFilter("special")
+            .addBoxIntoNewRow(box)
+            .build();
+
+        DynamicLayoutBox defaultBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Default Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("defaultBox")
+            .build();
+        DynamicLayoutTabBuilder.createTab(context, personType, 1)
+            .withShortName("scopedTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Default Tab")
+            .withLeading(false)
+            .addBoxIntoNewRow(defaultBox)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            List<DynamicLayoutTab> scopedTabs = tabService.findByEntityType(context, "Person", "special");
+            assertThat(scopedTabs, hasSize(1));
+            assertThat(scopedTabs.get(0).getShortName(), is("scopedTab"));
+            assertThat("Scoped tab must retain only its original box", scopedTabs.get(0).getBoxes(), hasSize(1));
+            assertThat(scopedTabs.get(0).getBoxes().get(0).getShortname(), is("box"));
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
     private DynamicLayoutTab findTab(List<DynamicLayoutTab> tabs, String shortName) {
         return tabs.stream()
             .filter(tab -> shortName.equals(tab.getShortName()))

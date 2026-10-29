@@ -138,14 +138,14 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
      * Create a unique string key for a DynamicLayoutBox
      */
     private String createBoxKey(DynamicLayoutBox box) {
-        String entityLabel = box.getCell().getRow().getTab().getEntity().getLabel();
+        String entityColumn = toEntityColumn(box.getCell().getRow().getTab());
         String shortname = box.getShortname();
-        return entityLabel + ":" + shortname;
+        return entityColumn + ":" + shortname;
     }
 
     private void buildTab2boxRow(Sheet sheet, int cellIndex, DynamicLayoutCell cell) {
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, cell.getRow().getTab().getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(cell.getRow().getTab()));
         createCell(row, 1, cell.getRow().getTab().getShortName());
         createCell(row, 2, String.valueOf(cellIndex));
         createCell(row, 3, cell.getRow().getStyle());
@@ -277,7 +277,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
     private void buildTabPolicyMetadataSecurityFieldRow(Sheet sheet, DynamicLayoutTab tab,
             MetadataField metadataField) {
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, tab.getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(tab));
         createCell(row, 1, tab.getShortName());
         createCell(row, 2, metadataField.toString('.'));
         createCell(row, 3, "");
@@ -288,7 +288,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
                                                      DynamicLayoutTab2SecurityGroup tab2SecurityGroup) {
         DynamicLayoutTab alternativeTab = tab2SecurityGroup.getAlternativeTab();
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, tab.getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(tab));
         createCell(row, 1, tab.getShortName());
         createCell(row, 2, "");
         createCell(row, 3, tab2SecurityGroup.getGroup().getName());

@@ -117,7 +117,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
 
         tabs.forEach(tab -> {
             tab.setTab2SecurityGroups(buildTab2SecurityGroups(context,
-                workbook, TAB_POLICY_SHEET, tab.getEntity().getLabel(), tab.getShortName(), tab, tabs));
+                workbook, TAB_POLICY_SHEET, toEntityColumn(tab), tab.getShortName(), tab, tabs));
 
             tab.getBoxes().forEach(box ->
                 box.setBox2SecurityGroups(buildBox2SecurityGroups(context,
@@ -145,19 +145,19 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         tab.setLeading(toBoolean(getCellValue(tabRow, LEADING_COLUMN)));
         tab.setPriority(toInteger(getCellValue(tabRow, PRIORITY_COLUMN)));
         tab.setSecurity(toSecurity(getCellValue(tabRow, SECURITY_COLUMN)));
-        buildTabRows(context, workbook, entityType, name).forEach(tab::addRow);
+        buildTabRows(context, workbook, entityColumn, name).forEach(tab::addRow);
         tab.setMetadataSecurityFields(buildMetadataSecurityField(context, workbook,
-            TAB_POLICY_SHEET, entityType, name));
+            TAB_POLICY_SHEET, entityColumn, name, true));
 
         return tab;
     }
 
-    private List<DynamicLayoutRow> buildTabRows(Context context, Workbook workbook, String entityType,
+    private List<DynamicLayoutRow> buildTabRows(Context context, Workbook workbook, String entityColumn,
             String shortname) {
         Sheet tab2boxSheet = getSheetByName(workbook, TAB2BOX_SHEET);
 
         Map<Integer, List<Row>> groupSheetRowsByRowColumn =
-            getRowsByEntityAndColumnValue(tab2boxSheet, entityType, TAB_COLUMN, shortname)
+            getRowsByQualifiedEntityAndColumnValue(tab2boxSheet, entityColumn, TAB_COLUMN, shortname)
             .collect(Collectors.groupingBy(row -> toInteger(getCellValue(row, ROW_COLUMN))));
 
         return groupSheetRowsByRowColumn.keySet().stream().sorted()
@@ -228,7 +228,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         box.setShortname(boxName);
         box.setStyle(getCellValue(boxRow, STYLE_COLUMN));
         box.setMetadataSecurityFields(buildMetadataSecurityField(context, workbook,
-            BOX_POLICY_SHEET, entityType, boxName));
+            BOX_POLICY_SHEET, entityType, boxName, false));
 
         if (boxType.equals(DynamicLayoutBoxTypes.METADATA.name())) {
             buildDynamicLayoutFields(context, workbook, entityType, boxName).forEach(box::addLayoutField);
@@ -340,11 +340,15 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
     }
 
     private Set<MetadataField> buildMetadataSecurityField(Context context, Workbook workbook,
-        String sheetName, String entity, String name) {
+        String sheetName, String entity, String name, boolean qualified) {
 
         Sheet sheet = getSheetByName(workbook, sheetName);
 
-        return getRowsByEntityAndColumnValue(sheet, entity, SHORTNAME_COLUMN, name)
+        Stream<Row> rows = qualified
+            ? getRowsByQualifiedEntityAndColumnValue(sheet, entity, SHORTNAME_COLUMN, name)
+            : getRowsByEntityAndColumnValue(sheet, entity, SHORTNAME_COLUMN, name);
+
+        return rows
             .map(row -> getCellValue(row, METADATA_COLUMN))
             .filter(StringUtils::isNotBlank)
             .map(metadataField -> getMetadataField(context, metadataField))
@@ -421,7 +425,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         Sheet sheet = getSheetByName(workbook, sheetName);
         Set<DynamicLayoutTab2SecurityGroup> tab2SecurityGroups = new HashSet<>();
 
-        getRowsByEntityAndColumnValue(sheet, entity, SHORTNAME_COLUMN, name)
+        getRowsByQualifiedEntityAndColumnValue(sheet, entity, SHORTNAME_COLUMN, name)
             .forEach(row -> {
                 String groupName = getCellValue(row, GROUP_COLUMN);
                 String alternativeTab = getCellValue(row, ALTERNATIVE_TO_COLUMN);
@@ -430,7 +434,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
                     Group group = getGroupField(context, groupName);
                     if (group != null) {
                         tab2SecurityGroups.add(
-                            buildTab2SecurityGroup(group, dynamicLayoutTab, entity, alternativeTab, tabs)
+                            buildTab2SecurityGroup(group, dynamicLayoutTab, toEntityType(entity), alternativeTab, tabs)
                         );
                     }
                 }
@@ -468,6 +472,24 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         return WorkbookUtils.getNotEmptyRowsSkippingHeader(sheet).stream()
             .filter(row -> value.equals(getCellValue(row, columnName)))
             .filter(row -> entity.equals(getEntityValue(row, ENTITY_COLUMN)));
+    }
+
+    private Stream<Row> getRowsByQualifiedEntityAndColumnValue(Sheet sheet, String entityColumn, String columnName,
+            String value) {
+        return WorkbookUtils.getNotEmptyRowsSkippingHeader(sheet).stream()
+            .filter(row -> value.equals(getCellValue(row, columnName)))
+            .filter(row -> entityColumn.equals(getCellValue(row, ENTITY_COLUMN)));
+    }
+
+    private String toEntityType(String entityColumn) {
+        int index = entityColumn.indexOf(".");
+        return index > 0 ? entityColumn.substring(0, index) : entityColumn;
+    }
+
+    private String toEntityColumn(DynamicLayoutTab tab) {
+        String label = tab.getEntity().getLabel();
+        String customFilter = tab.getCustomFilter();
+        return customFilter == null || customFilter.isEmpty() ? label : label + "." + customFilter;
     }
 
     private boolean toBoolean(String value) {
