@@ -256,51 +256,11 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         }
     }
 
-    @Test
-    public void testExportImportCustomFilterRoundTrip() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-        EntityType personType = createEntityType("Person");
-
-        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
-            .withHeader("Box")
-            .withSecurity(LayoutSecurity.PUBLIC)
-            .withShortname("box")
-            .build();
-
-        DynamicLayoutTabBuilder.createTab(context, personType, 0)
-            .withShortName("scopedTab")
-            .withSecurity(LayoutSecurity.PUBLIC)
-            .withHeader("Scoped Tab")
-            .withLeading(false)
-            .withCustomFilter("special")
-            .addBoxIntoNewRow(box)
-            .build();
-
-        context.restoreAuthSystemState();
-
-        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
-        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
-        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
-        assertThat(exportHandler.getErrorMessages(), empty());
-
-        File exportedFile = new File("dynamic-layout-tool-exported.xls");
-        try {
-            assertThat("The export must produce a file", exportedFile.exists(), is(true));
-
-            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
-            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
-            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
-            assertThat(importHandler.getErrorMessages(), empty());
-
-            List<DynamicLayoutTab> scopedTabs = tabService.findByEntityType(context, "Person", "special");
-            assertThat(scopedTabs, hasSize(1));
-            assertThat(scopedTabs.get(0).getShortName(), is("scopedTab"));
-        } finally {
-            exportedFile.delete();
-        }
-    }
-
+    /**
+     * A default tab and a filtered tab sharing the same shortname must keep their own boxes across an
+     * export/import round-trip. This also covers the simpler scope-preservation case: the filtered tab
+     * is still resolved by its custom filter, so a dropped filter would fail here too.
+     */
     @Test
     public void testExportImportSameShortnameTabsRetainOwnBoxes() throws Exception {
 
