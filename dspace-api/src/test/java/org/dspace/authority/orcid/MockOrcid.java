@@ -60,6 +60,21 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
                         return this.getClass().getResourceAsStream("orcid-search.xml");
                     }
                 });
+        when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?q=family-name%3A%22Bollini%22"
+                            + "+AND+given-names%3A%22Andrea%22"), ArgumentMatchers.any()))
+                .thenAnswer(new Answer<InputStream>() {
+                    @Override
+                    public InputStream answer(InvocationOnMock invocation) {
+                        return this.getClass().getResourceAsStream("orcid-search.xml");
+                    }
+                });
+        when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?q=orcid%3A0000-0002-9029-1854"),
+            ArgumentMatchers.any())).thenAnswer(new Answer<InputStream>() {
+                @Override
+                public InputStream answer(InvocationOnMock invocation) {
+                    return this.getClass().getResourceAsStream("orcid-search.xml");
+                }
+            });
     }
     /**
      * Call this to set up mocking for any test classes that need it. We don't set it in init()

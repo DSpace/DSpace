@@ -177,7 +177,7 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
             }
         }
         // 3. Fallback: general name search
-        return escapeSolr(normalized);
+        return normalized;
     }
 
     private String escapeSolr(String value) {
