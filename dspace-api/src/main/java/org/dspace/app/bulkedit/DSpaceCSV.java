@@ -124,6 +124,12 @@ public class DSpaceCSV implements Serializable {
      */
     protected Map<String, String> ignore;
 
+    /**
+     * A list of metadata elements containing a wildcard to ignore
+     */
+    protected List<String> ignoreWildCard;
+
+
 
     /**
      * Create a new instance of a CSV line holder
@@ -323,6 +329,7 @@ public class DSpaceCSV implements Serializable {
 
         // Set the metadata fields to ignore
         ignore = new HashMap<>();
+        ignoreWildCard = new ArrayList<>();
 
         getConfiguredIgnoreFields();
     }
@@ -370,8 +377,13 @@ public class DSpaceCSV implements Serializable {
         }
 
         for (String toIgnoreString : toIgnoreArray) {
+            String toIgnoreStringTrimmed = toIgnoreString.trim();
             if (!"".equals(toIgnoreString.trim())) {
-                ignore.put(toIgnoreString.trim(), toIgnoreString.trim());
+                if (toIgnoreString.endsWith("*")) {
+                    ignoreWildCard.add(StringUtils.substringBefore(toIgnoreStringTrimmed, "*"));
+                } else {
+                    ignore.put(toIgnoreStringTrimmed, toIgnoreStringTrimmed);
+                }
             }
         }
     }
@@ -691,9 +703,19 @@ public class DSpaceCSV implements Serializable {
         if (md.getQualifier() != null) {
             key += "." + md.getQualifier();
         }
+        if (ignore.get(key) != null) {
+            return false;
+        }
+        for (String ignorePrefix : ignoreWildCard) {
+            if (key.startsWith(ignorePrefix)) {
+                return false;
+            }
+        }
+
         // Must be OK, so don't ignore
-        return ignore.get(key) == null;
+        return true;
     }
+
 
     /**
      * Get the headings used in this CSV file
