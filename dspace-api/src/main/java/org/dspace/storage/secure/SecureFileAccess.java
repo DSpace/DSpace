@@ -15,12 +15,16 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 /**
- * Decent I/O path validation - not perfect when symlinks are used and we are writing
- * as 'toRealPath' check on the resolved path fails for new files
+ * Decent I/O path validation
  *
  * @author Kim Shepherd <kim-at-shepherd-dot-nz>
  */
@@ -29,30 +33,52 @@ public final class SecureFileAccess {
     private SecureFileAccess() {}
 
     /**
-     * Validate a given path against an allowed base path. Does not attempt to calculate "real path"
-     * before validation, as this breaks for new files which don't yet exist. This can make the resulting
-     * validation still vulnerable to symlink traversal in some cases
-     * @param file the unvalidated file, usually derived from user input or configuration
+     * Normalizes the given Path, removing redundant elements, such as
+     * parent references (i.e., ".."). The existing segments of the path are
+     * converted to the "real path" (traversing symlinks). Non-existent
+     * segments of the path are appended to the real path in their original
+     * order. The final Path is validated against the allowed base paths and
+     * returned. An IOException is thrown if validation fails.
+     *
+     * <strong>Note:</strong> Due to path normalization and resolution of
+     * symbolic links, this method may return a Path that is lexically
+     * distinct from the given path.
+     *
+     * Callers MUST use the returned Path, as the validation only applies to
+     * that path.
+     *
+     * The validated path reflects the state of the filesystem when this
+     * method executes. It does not prevent another process from replacing a
+     * validated path component before the caller opens the file.
+     *
+     * @param filePath the unvalidated file path, usually derived from user input or configuration
      *             This MUST be an absolute path, and the caller is expected to calculate it based on best
      *             context (e.g. configured base path, CWD, dspace.dir, and so on)
      * @param allowedBasePaths list of allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
+     * @return a validated Path for as much of the given path as exists. Callers
+     *             MUST use this returned Path, as the validation only applies
+     *             to this path.
      * @throws IOException on validation failure
      */
-    public static Path validatePathForWrite(String file, List<String> allowedBasePaths, String purpose)
+    public static Path validatePathForWrite(String filePath, List<String> allowedBasePaths, String purpose)
             throws IOException {
-        Path filePath = Path.of(file);
-        if (!filePath.isAbsolute()) {
-            throw new IOException("Absolute path required for I/O (%s): %s".formatted(purpose, file));
+        Path unvalidatedPath = Path.of(filePath);
+        if (!unvalidatedPath.isAbsolute()) {
+            throw new IOException("Absolute path required for I/O (%s): %s".formatted(purpose, filePath));
         }
+
+        Path resolvedPath = resolvePathForWrite(unvalidatedPath);
+
         for (String allowedBasePath : allowedBasePaths) {
+            if (allowedBasePath == null) {
+                throw new IOException("Null base path cannot be provided for validation");
+            }
+
             Path basePath = Path.of(allowedBasePath)
                                 .toRealPath()
                                 .normalize();
-            if (basePath == null) {
-                throw new IOException("Null base path can not be provided for validation");
-            }
-            Path resolvedPath = basePath.resolve(file).normalize();
+
             if (resolvedPath.startsWith(basePath)) {
                 return resolvedPath;
             }
@@ -60,12 +86,70 @@ public final class SecureFileAccess {
 
         // If no valid path was resolved and returned by now
         // we raise an exception and treat this as illegal access
-        throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, file));
+        throw new IOException("Illegal file path attempted for I/O (%s): %s".formatted(purpose, filePath));
+    }
+
+    /**
+     * Resolves a Path intended for writing without requiring the complete path
+     * to exist.
+     *
+     * Normalizes the given Path, removing redundant elements, such as
+     * parent references (i.e., ".."). The existing segments of the path are
+     * then converted to the "real path" (traversing symlinks). Non-existent
+     * segments of the path are then appended to the real path in their original
+     * order.
+     *
+     * Note: The resolved path reflects the state of the filesystem when this
+     * method executes. It does not prevent another process from replacing a
+     * resolved path component before the caller opens the file.
+     *
+     * @param path the absolute path intended for writing
+     * @return the normalized path formed from the real path of the nearest
+     *         existing ancestor and any trailing nonexistent path elements
+     * @throws IOException if no existing ancestor can be resolved, if an
+     *         existing symbolic link is dangling, if filesystem access is
+     *         denied, or if another I/O error occurs
+     */
+    private static Path resolvePathForWrite(Path path) throws IOException {
+        Path normalizedPath = path.normalize();
+        Path existingAncestor = normalizedPath;
+        Deque<Path> nonexistentElements = new ArrayDeque<>();
+
+        // Determine the existing and non-existing path segments
+        while (true) {
+            try {
+                Files.readAttributes(
+                    existingAncestor,
+                    BasicFileAttributes.class,
+                    LinkOption.NOFOLLOW_LINKS
+                );
+                break;
+            } catch (NoSuchFileException e) {
+                Path fileName = existingAncestor.getFileName();
+                Path parent = existingAncestor.getParent();
+
+                if (fileName == null || parent == null) {
+                    throw e;
+                }
+
+                nonexistentElements.addFirst(fileName);
+                existingAncestor = parent;
+            }
+        }
+
+        // Determine "real path" for existing segments
+        Path resolvedPath = existingAncestor.toRealPath();
+
+        // Append non-existing segments to real path
+        for (Path element : nonexistentElements) {
+            resolvedPath = resolvedPath.resolve(element);
+        }
+
+        return resolvedPath;
     }
 
     /**
      * Validate a given path against an allowed base path.
-     * More secure than the 'write' variant because we can explicitly resolve links as well.
      *
      * @param file the unvalidated file, usually derived from user input or configuration
      *             This MUST be an absolute path, and the caller is expected to calculate it based on best
@@ -126,8 +210,10 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get an output stream after validating file path. New files can't use toRealPath() for link calculation so
-     * there is a bit of a trade-off in allowing some symlink traversal to occur
+     * Returns an output stream after validating the given file path using
+     * {@link #validatePathForWrite}, throwing an IOException if validation
+     * fails.
+     *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
@@ -140,9 +226,10 @@ public final class SecureFileAccess {
     }
 
     /**
-     * Get a buffered writer after validating file path. As with {@link #getOutputStream}, new files
-     * can't use toRealPath() for link calculation so there is a trade-off allowing some symlink
-     * traversal to occur.
+     * Returns a buffered writer after validating the given file path using
+     * {@link #validatePathForWrite}, throwing an IOException if validation
+     * fails.
+     *
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
