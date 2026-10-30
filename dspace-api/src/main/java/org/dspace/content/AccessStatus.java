@@ -24,6 +24,11 @@ public class AccessStatus {
     private LocalDate availabilityDate;
 
     /**
+     * the lease expiration date, if the object has an active lease
+     */
+    private LocalDate leaseDate;
+
+    /**
      * Construct a new access status
      *
      * @param status           the status value
@@ -32,6 +37,19 @@ public class AccessStatus {
     public AccessStatus(String status, LocalDate availabilityDate) {
         this.status = status;
         this.availabilityDate = availabilityDate;
+    }
+
+    /**
+     * Construct a new access status with a lease date
+     *
+     * @param status           the status value
+     * @param availabilityDate the availability date
+     * @param leaseDate        the lease expiration date
+     */
+    public AccessStatus(String status, LocalDate availabilityDate, LocalDate leaseDate) {
+        this.status = status;
+        this.availabilityDate = availabilityDate;
+        this.leaseDate = leaseDate;
     }
 
     /**
@@ -60,5 +78,19 @@ public class AccessStatus {
      */
     public void setAvailabilityDate(LocalDate availabilityDate) {
         this.availabilityDate = availabilityDate;
+    }
+
+    /**
+     * @return Returns the lease expiration date.
+     */
+    public LocalDate getLeaseDate() {
+        return leaseDate;
+    }
+
+    /**
+     * @param leaseDate The lease expiration date.
+     */
+    public void setLeaseDate(LocalDate leaseDate) {
+        this.leaseDate = leaseDate;
     }
 }
