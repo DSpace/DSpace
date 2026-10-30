@@ -153,7 +153,7 @@ public class BrowseIndex {
             this.defaultOrder = SortOption.ASCENDING;
             this.number = number;
 
-            String rx = "(\\w+):(\\w+):([\\w\\.\\*,]+):?(\\w*):?(\\w*):?(\\w*)";
+            String rx = "(\\w+):(\\w+):([\\w\\.\\*,\\-]+):?(\\w*):?(\\w*):?(\\w*)";
             Pattern pattern = Pattern.compile(rx);
             Matcher matcher = pattern.matcher(definition);
 
