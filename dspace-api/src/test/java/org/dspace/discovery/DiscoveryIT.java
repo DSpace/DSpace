@@ -19,9 +19,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -747,6 +750,87 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         for (Item item : itemsSubject2) {
             assertTrue(foundItems.contains(item));
         }
+    }
+
+    /**
+     * Regression test: iterating over several pages with a scoped iteratorSearch must not re-append the scope
+     * filter query ("location:...") on every page, and must neither lose nor duplicate items.
+     */
+    @Test
+    public void iteratorSearchScopedDoesNotAccumulateFilterQueriesTest() throws SearchServiceException {
+        String subject = "subject1";
+        int numberItems = 35;
+        int pageSize = 5;
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Collection otherCollection = CollectionBuilder.createCollection(context, community).build();
+        Set<UUID> expectedIds = new HashSet<>();
+        for (int i = 0; i < numberItems; i++) {
+            expectedIds.add(ItemBuilder.createItem(context, collection)
+                .withTitle("item number " + i)
+                .withSubject(subject)
+                .build().getID());
+        }
+        ItemBuilder.createItem(context, otherCollection)
+            .withTitle("item in other collection")
+            .withSubject(subject)
+            .build();
+        context.restoreAuthSystemState();
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject);
+        discoverQuery.setMaxResults(pageSize);
+
+        Iterator<Item> itemIterator =
+            searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
+        List<UUID> foundIds = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundIds.add(itemIterator.next().getID());
+        }
+
+        // no item lost, none duplicated, none from the other collection
+        assertEquals(numberItems, foundIds.size());
+        assertEquals(expectedIds, new HashSet<>(foundIds));
+        // 7 pages were read: only the original filter and a single location filter must be present
+        assertEquals(2, discoverQuery.getFilterQueries().size());
+    }
+
+    /**
+     * Regression test: iterating over multiple pages with a scoped iteratorSearch must not append the
+     * scope ("location:") filter query to the shared DiscoverQuery once per page.
+     */
+    @Test
+    public void iteratorSearchScopedDoesNotDuplicateFilterQueriesTest() throws SearchServiceException {
+        String subject = "subject1";
+        int numberItems = 25;
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItems; i++) {
+            ItemBuilder.createItem(context, collection)
+                .withTitle("item number " + i)
+                .withSubject(subject)
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject);
+        // small page size to force several pages
+        discoverQuery.setMaxResults(5);
+
+        Iterator<Item> itemIterator =
+            searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
+        List<Item> foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+        }
+
+        assertEquals(numberItems, foundItems.size());
+        assertEquals(numberItems, foundItems.stream().distinct().count());
+        // the original filter plus a single location filter, regardless of the number of pages
+        assertEquals(2, discoverQuery.getFilterQueries().size());
     }
 
     /**
