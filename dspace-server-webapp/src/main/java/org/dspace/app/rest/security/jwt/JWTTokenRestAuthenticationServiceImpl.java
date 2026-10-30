@@ -8,6 +8,7 @@
 package org.dspace.app.rest.security.jwt;
 
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -67,6 +69,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Lazy
     @Autowired
     private DSpaceCsrfAuthenticationStrategy dspaceCsrfAuthenticationStrategy;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -247,11 +252,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         // as the UI (or Hal Browser) obtains the Shibboleth login data, it makes a call to /login (addCookie=false)
         // which destroys this temporary auth cookie. So, the auth cookie only exists a few seconds.
         if (addCookie) {
+            String authnPath = getAuthenticationPath();
             ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)
                                                   .httpOnly(true)
                                                   .secure(true)
                                                   .sameSite("None")
-                                                  .path("/server/api/authn")
+                                                  .path(authnPath)
                                                   .build();
 
             // Write the cookie to the Set-Cookie header in order to send it
@@ -340,6 +346,33 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     private void resetCSRFToken(HttpServletRequest request, HttpServletResponse response) {
         // Use our custom CsrfAuthenticationStrategy class to force reset the CSRF token in Spring Security
         dspaceCsrfAuthenticationStrategy.resetCSRFToken(request, response);
+    }
+
+    /**
+     * Get the authentication path from the DSpace server configuration.
+     * This extracts the base path from dspace.server.url (e.g., /server from https://example.com/server)
+     * and appends /api/authn.
+     * @return the authentication path for the cookie
+     */
+    private String getAuthenticationPath() {
+        String serverUrl = configurationService.getProperty("dspace.server.url");
+        if (StringUtils.isNotBlank(serverUrl)) {
+            try {
+                URI uri = URI.create(serverUrl);
+                String path = uri.getPath();
+                if (StringUtils.isNotBlank(path)) {
+                    // Remove trailing slash if present
+                    if (path.endsWith("/")) {
+                        path = path.substring(0, path.length() - 1);
+                    }
+                    return path + "/api/authn";
+                }
+            } catch (Exception e) {
+                log.error("Error parsing dspace.server.url", e);
+            }
+        }
+        // Fallback to default path
+        return "/server/api/authn";
     }
 
 }
