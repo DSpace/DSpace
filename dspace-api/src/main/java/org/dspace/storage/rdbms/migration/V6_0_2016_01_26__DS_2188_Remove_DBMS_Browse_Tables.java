@@ -125,7 +125,7 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables extends BaseJava
         }
 
         // Drop all Item browse index tables
-        dropItemTables(connection, BrowseIndex.getItemBrowseIndex());
+        dropItemTables(connection, BrowseIndex.getItemBrowseIndex("item"));
         dropItemTables(connection, BrowseIndex.getWithdrawnBrowseIndex());
         dropItemTables(connection, BrowseIndex.getPrivateBrowseIndex());
 
