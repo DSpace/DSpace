@@ -85,16 +85,16 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         if (!choiceAuthorityService.isChoicesConfigured(fieldKey, Constants.ITEM, (Collection) null)) {
             return null;
         }
-        String targetType = choiceAuthorityService.getLinkedEntityType(fieldKey);
-        if (targetType == null || targetType.isBlank()) {
+        String[] targetTypes = choiceAuthorityService.getLinkedEntityTypes(fieldKey);
+        if (targetTypes == null || targetTypes.length == 0) {
             return null;
         }
         RelationshipTypeConfiguration configuration = new RelationshipTypeConfiguration();
         configuration.setId(AUTHORITY_PREFIX + field);
         configuration.setLeftMetadataField(field);
-        // This compatibility adapter mirrors the existing single entity-type lookup.
-        // Use an explicit Spring definition for multiple allowed types or inverse anchors.
-        configuration.setRightEntityTypes(List.of(targetType));
+        // Allow all entity types supported by the configured authority.
+        // Use an explicit Spring definition for custom relationship configurations or inverse anchors.
+        configuration.setRightEntityTypes(List.of(targetTypes));
         return configuration;
     }
 

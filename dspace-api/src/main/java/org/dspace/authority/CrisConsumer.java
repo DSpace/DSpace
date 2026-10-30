@@ -331,8 +331,8 @@ public class CrisConsumer implements Consumer {
         if (!choiceAuthorityService.isChoicesConfigured(fieldKey, Constants.ITEM, (Collection) null)) {
             return;
         }
-        String entityType = choiceAuthorityService.getLinkedEntityType(fieldKey);
-        if (entityType == null) {
+        String[] entityTypes = choiceAuthorityService.getLinkedEntityTypes(fieldKey);
+        if (entityTypes == null || entityTypes.length == 0) {
             return;
         }
 
