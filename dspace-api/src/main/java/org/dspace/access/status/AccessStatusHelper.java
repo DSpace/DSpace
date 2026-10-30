@@ -20,6 +20,27 @@ import org.dspace.core.Context;
  */
 public interface AccessStatusHelper {
     /**
+     * Defines the String value for an embargo state. Cannot be overwritten in plugins.
+     */
+    public static final String EMBARGO = "embargo";
+    /**
+     * Defines the String value for a metadata only state. Cannot be overwritten in plugins.
+     */
+    public static final String METADATA_ONLY = "metadata.only";
+    /**
+     * Defines the String value for an open access state. Cannot be overwritten in plugins.
+     */
+    public static final String OPEN_ACCESS = "open.access";
+    /**
+     * Defines the String value for a restricted state. Cannot be overwritten in plugins.
+     */
+    public static final String RESTRICTED = "restricted";
+    /**
+     * Defines the String value for an unknown state. Cannot be overwritten in plugins.
+     */
+    public static final String UNKNOWN = "unknown";
+
+    /**
      * Calculate the access status for the item.
      *
      * @param context the DSpace context

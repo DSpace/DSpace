@@ -48,6 +48,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.access.status.AccessStatusHelper;
+import org.dspace.access.status.factory.AccessStatusServiceFactory;
+import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -101,6 +104,8 @@ public class XOAI {
 
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
+    private final AccessStatusService accessStatusService;
+
 
     private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
             .getConfigurationService();
@@ -131,6 +136,7 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.accessStatusService = AccessStatusServiceFactory.getInstance().getAccessStatusService();
         this.extensionPlugins = new DSpace().getServiceManager()
                 .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
@@ -142,6 +148,7 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.accessStatusService = AccessStatusServiceFactory.getInstance().getAccessStatusService();
         this.extensionPlugins = new DSpace().getServiceManager()
                 .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
@@ -424,6 +431,9 @@ public class XOAI {
         boolean isPublic = isEmbargoed ? (isIndexed ? isCurrentlyVisible : false) : true;
         doc.addField("item.public", isPublic);
 
+        boolean isOpenAccess = this.isOpenAccess(item);
+        doc.addField("item.isOpenAccess", isOpenAccess);
+
         // if the visibility of the item will change in the future due to an
         // embargo, mark it as such.
 
@@ -528,6 +538,11 @@ public class XOAI {
             }
             context.uncacheEntity(policy);
         }
+        // check for bitstream access status
+        String accessStatus = accessStatusService.getAnonymousAccessStatus(context, item).getStatus();
+        if (accessStatus.equals(AccessStatusHelper.EMBARGO) || accessStatus.equals(AccessStatusHelper.RESTRICTED)) {
+            return true;
+        }
         return false;
     }
 
@@ -540,6 +555,16 @@ public class XOAI {
             log.error(ex.getMessage());
         }
         return pub;
+    }
+
+    private boolean isOpenAccess(Item item) {
+        try {
+            String accessStatus = accessStatusService.getAnonymousAccessStatus(context, item).getStatus();
+            return accessStatus.equals(AccessStatusHelper.OPEN_ACCESS);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+        }
+        return false;
     }
 
     private static boolean getKnownExplanation(Throwable t) {
