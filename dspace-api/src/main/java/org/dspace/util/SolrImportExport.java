@@ -28,6 +28,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -44,6 +45,7 @@ import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.luke.FieldFlag;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.FacetParams;
+import org.dspace.app.client.DSpaceHttpClientFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -250,7 +252,11 @@ public class SolrImportExport {
         }
 
         try {
-            HttpSolrClient adminSolr = new HttpSolrClient.Builder(baseSolrUrl).build();
+            CloseableHttpClient adminHttpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                    SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+            HttpSolrClient adminSolr = new HttpSolrClient.Builder(baseSolrUrl)
+                    .withHttpClient(adminHttpClient)
+                    .build();
 
             // try to find out size of core and compare with free space in export directory
             CoreAdminResponse status = CoreAdminRequest.getStatus(indexName, adminSolr);
@@ -317,7 +323,11 @@ public class SolrImportExport {
             }
 
             // commit changes
-            HttpSolrClient origSolr = new HttpSolrClient.Builder(origSolrUrl).build();
+            CloseableHttpClient origHttpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                    SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+            HttpSolrClient origSolr = new HttpSolrClient.Builder(origSolrUrl)
+                    .withHttpClient(origHttpClient)
+                    .build();
             origSolr.commit();
 
             // swap back (statistics now going to actual core name in actual data dir)
@@ -398,7 +408,11 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl)
+                .withHttpClient(httpClient)
+                .build();
 
         // must get multivalue fields before clearing
         List<String> multivaluedFields = getMultiValuedFields(solr);
@@ -471,7 +485,11 @@ public class SolrImportExport {
      * @throws SolrServerException if there is a problem in communicating with Solr.
      */
     public static void clearIndex(String solrUrl) throws IOException, SolrServerException {
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl)
+                .withHttpClient(httpClient)
+                .build();
         solr.deleteByQuery("*:*");
         solr.commit();
         solr.optimize();
@@ -510,7 +528,11 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
+        CloseableHttpClient httpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl)
+                .withHttpClient(httpClient)
+                .build();
 
         SolrQuery query = new SolrQuery("*:*");
         if (StringUtils.isNotBlank(fromWhen)) {
