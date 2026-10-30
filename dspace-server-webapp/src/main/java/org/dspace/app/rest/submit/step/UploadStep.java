@@ -38,6 +38,9 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.submit.model.UploadConfiguration;
+import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -123,6 +126,14 @@ public class UploadStep extends AbstractProcessingStep
         Bitstream source = null;
         BitstreamFormat bf = null;
 
+        Long maxSize = maxSize(stepConfig);
+        if (maxSize != null && maxSize > 0 && file.getSize() > maxSize) {
+            ErrorRest result = new ErrorRest();
+            result.setMessage("error.validation.filesize");
+            result.getPaths().add("/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + stepConfig.getId());
+            return Pair.of(null, result);
+        }
+
         Item item = wsi.getItem();
         List<Bundle> bundles = null;
         try {
@@ -164,5 +175,18 @@ public class UploadStep extends AbstractProcessingStep
             return Pair.of(source, result);
         }
         return Pair.of(source, null);
+    }
+
+    /**
+     * The size limit of the upload configuration that shares this step's id, if any.
+     * @param stepConfig the upload step
+     * @return the limit in bytes, or null when the step has no upload configuration
+     */
+    private Long maxSize(SubmissionStepConfig stepConfig) {
+        UploadConfigurationService uploadConfigurations = DSpaceServicesFactory.getInstance().getServiceManager()
+            .getServiceByName("uploadConfigurationService", UploadConfigurationService.class);
+        UploadConfiguration configuration = uploadConfigurations == null || uploadConfigurations.getMap() == null
+            ? null : uploadConfigurations.getMap().get(stepConfig.getId());
+        return configuration == null ? null : configuration.getMaxSize();
     }
 }
