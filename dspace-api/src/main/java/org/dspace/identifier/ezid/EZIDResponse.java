@@ -8,8 +8,8 @@
 package org.dspace.identifier.ezid;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,15 +73,11 @@ public class EZIDResponse {
             parts = lines[i].split(":", 2);
             String key = null;
             String value = null;
-            try {
-                key = URLDecoder.decode(parts[0], UTF_8).trim();
-                if (parts.length > 1) {
-                    value = URLDecoder.decode(parts[1], UTF_8).trim();
-                } else {
-                    value = null;
-                }
-            } catch (UnsupportedEncodingException e) {
-                // XXX SNH, we always use UTF-8 which is required by the Java spec.
+            key = URLDecoder.decode(parts[0], StandardCharsets.UTF_8).trim();
+            if (parts.length > 1) {
+                value = URLDecoder.decode(parts[1], StandardCharsets.UTF_8).trim();
+            } else {
+                value = null;
             }
             attributes.put(key, value);
         }
