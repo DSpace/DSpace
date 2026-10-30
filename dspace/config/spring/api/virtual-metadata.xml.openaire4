@@ -186,7 +186,7 @@
     <bean class="org.dspace.content.virtual.Collected" id="publicationProject_awardNumber">
         <property name="fields">
             <util:list>
-                <value>dc.identifier</value>
+                <value>oaire.awardNumber</value>
             </util:list>
         </property>
     </bean>
