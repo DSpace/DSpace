@@ -1965,7 +1965,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         // Update the MetadataValue object with the new place setting
-        rr.setPlace(place);
+        super.moveSingleMetadataValue(context, dso, place, rr);
     }
 
     @Override
