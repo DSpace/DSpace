@@ -117,6 +117,8 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Research Support, Non-U.S. Gov't");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "research-article");
         MetadatumDTO type3 = createMetadatumDTO("dc", "type", null, "Journal Article");
+        MetadatumDTO subject = createMetadatumDTO("dc", "subject", null, "Ostracoda");
+        MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null, "Paleontology");
 
         MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "0962-8452");
         MetadatumDTO pmid = createMetadatumDTO("dc", "identifier", "other", "21733903");
@@ -147,6 +149,8 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(type);
         metadatums.add(type2);
         metadatums.add(type3);
+        metadatums.add(subject);
+        metadatums.add(subject2);
         metadatums.add(description);
         metadatums.add(issn);
         metadatums.add(pmid);
