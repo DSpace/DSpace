@@ -7,8 +7,6 @@
  */
 package org.dspace.app.iiif.service;
 
-import java.util.UUID;
-
 import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.app.iiif.service.utils.ImageProfileUtil;
 import org.dspace.app.iiif.service.utils.ThumbProfileUtil;
@@ -79,15 +77,4 @@ public abstract class AbstractResourceService {
         DEFAULT_CANVAS_HEIGHT = this.configurationService.getIntProperty("iiif.canvas.default-height",
             defaultCanvasHeightFallback);
     }
-
-    /**
-     * Creates the manifest id from the provided uuid.
-     * @param uuid the item id
-     * @return the manifest identifier (url)
-     */
-    protected String getManifestId(UUID uuid) {
-        return IIIF_ENDPOINT + uuid + "/manifest";
-    }
-
-
 }
