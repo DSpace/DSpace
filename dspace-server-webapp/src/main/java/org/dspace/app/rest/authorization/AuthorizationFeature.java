@@ -37,6 +37,17 @@ public interface AuthorizationFeature {
     boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException, SearchServiceException;
 
     /**
+     * Whether this feature always requires an authenticated EPerson, for every supported resource type.
+     * A false value does not grant access: the feature must still be evaluated, including resource policies
+     * and configuration. Custom features retain their existing behavior unless they explicitly opt in.
+     *
+     * @return true only if anonymous users can never be authorized for this feature
+     */
+    default boolean requiresAuthentication() {
+        return false;
+    }
+
+    /**
      * Return the name of the feature
      * 
      * @return the name of the feature
