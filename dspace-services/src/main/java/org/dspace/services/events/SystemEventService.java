@@ -22,7 +22,6 @@ import org.dspace.services.model.Event;
 import org.dspace.services.model.Event.Scope;
 import org.dspace.services.model.EventListener;
 import org.dspace.services.model.RequestInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This is a placeholder until we get a real event service going.
@@ -43,7 +42,6 @@ public final class SystemEventService implements EventService {
     private final RequestService requestService;
     private EventRequestInterceptor requestInterceptor;
 
-    @Autowired(required = true)
     public SystemEventService(RequestService requestService) {
         if (requestService == null) {
             throw new IllegalArgumentException("requestService and all inputs must not be null");
