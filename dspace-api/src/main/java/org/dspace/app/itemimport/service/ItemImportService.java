@@ -9,6 +9,7 @@ package org.dspace.app.itemimport.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import jakarta.mail.MessagingException;
@@ -60,6 +61,20 @@ public interface ItemImportService {
      */
     public void addItems(Context c, List<Collection> mycollections,
                          String sourceDir, String mapFile, boolean template) throws Exception;
+
+    /**
+     * Import items directly from a ZIP file without extracting it to disk.
+     * Uses Java's NIO ZIP filesystem to read the SAF structure in-place.
+     *
+     * @param c             DSpace Context
+     * @param mycollections List of Collections to import into
+     * @param zipFile       Path to the ZIP file containing the SAF structure
+     * @param mapFile       path to the map file (will be written on disk)
+     * @param template      whether to use template item
+     * @throws Exception if error
+     */
+    public void addItemsFromZip(Context c, List<Collection> mycollections,
+                                Path zipFile, String mapFile, boolean template) throws Exception;
 
     /**
      * Unzip a file
