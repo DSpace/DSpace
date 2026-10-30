@@ -23,13 +23,23 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
+import org.dspace.builder.VersionBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.versioning.Version;
 import org.junit.Test;
 
 public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControllerIntegrationTest {
+
+    private final WorkspaceItemService workspaceItemService =
+        ContentServiceFactory.getInstance().getWorkspaceItemService();
+    private final InstallItemService installItemService =
+        ContentServiceFactory.getInstance().getInstallItemService();
 
     @Test
     public void moveItemTestByAnonymous() throws Exception {
@@ -104,6 +114,53 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                        is(CollectionMatcher
                                                   .matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                                        )));
+    }
+
+    @Test
+    public void moveItemWithVersionsTestByAuthorizedUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                              .withName("Parent Community")
+                              .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
+
+        //2. A public item that is readable by Anonymous
+        Item oldItem = ItemBuilder.createItem(context, col1)
+                           .withTitle("Public item 1")
+                           .withIssueDate("2017-10-17")
+                           .withAuthor("Smith, Donald")
+                           .build();
+        Version version = VersionBuilder.createVersion(context, oldItem, "Fixing some typos")
+                              .build();
+        Item newItem = version.getItem();
+        installItemService.installItem(context, workspaceItemService.findByItem(context, newItem));
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Move the item into a new collection
+        getClient(token)
+            .perform(put("/api/core/items/" + newItem.getID() + "/owningCollection")
+                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                         .content(
+                             "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
+                         ))
+            .andExpect(status().isOk());
+        // Both the item and its older version are moved
+        getClient().perform(get("/api/core/items/" + oldItem.getID() + "/owningCollection"))
+            .andExpect(jsonPath("$",
+                is(CollectionMatcher
+                       .matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
+                )));
+        getClient().perform(get("/api/core/items/" + newItem.getID() + "/owningCollection"))
+            .andExpect(jsonPath("$",
+                is(CollectionMatcher
+                       .matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
+                )));
     }
 
     /**
