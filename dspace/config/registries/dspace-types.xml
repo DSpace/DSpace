@@ -430,6 +430,49 @@
 
     <dc-type>
         <schema>dspace</schema>
+        <element>virtual</element>
+        <qualifier>journal-hierarchy</qualifier>
+        <scope_note>Virtual metadata field holding the flattened ancestor chain (Journal and above) derived from the linked Journal entity via dc.relation.journal</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>virtualsource</element>
+        <qualifier>journal-hierarchy</qualifier>
+        <scope_note>Reference to the source Journal entity UUID for virtual journal-hierarchy metadata</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>virtual</element>
+        <qualifier>journalvolume-hierarchy</qualifier>
+        <scope_note>Virtual metadata field holding the flattened ancestor chain (Journal and above) derived from the linked Journal entity via dc.relation.journal</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>virtualsource</element>
+        <qualifier>journalvolume-hierarchy</qualifier>
+        <scope_note>Reference to the source Journal entity UUID for virtual journal-hierarchy metadata</scope_note>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>virtual</element>
+        <qualifier>journalissue-hierarchy</qualifier>
+        <scope_note>Virtual metadata field holding the flattened ancestor chain (Journal and above) derived from the linked Journal entity via dc.relation.journal</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>virtualsource</element>
+        <qualifier>journalissue-hierarchy</qualifier>
+        <scope_note>Reference to the source Journal entity UUID for virtual journal-hierarchy metadata</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
         <element>curation</element>
         <qualifier>process</qualifier>
         <scope_note>Name of the curation task currently being processed on the item</scope_note>
