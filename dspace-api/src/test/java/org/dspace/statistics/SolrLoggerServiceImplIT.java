@@ -327,7 +327,7 @@ public class SolrLoggerServiceImplIT
                 .getServiceByName(SolrStatisticsCore.class.getName(), MockSolrStatisticsCore.class);
 
         solrStatisticsCore.getSolr().deleteByQuery("*:*");
-        solrStatisticsCore.getSolr().commit();
+        solrStatisticsCore.getSolr().commit(true, true, true);
 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder
@@ -352,7 +352,7 @@ public class SolrLoggerServiceImplIT
         solrLoggerService.postView(originalBitstream, null, eperson);
         solrLoggerService.postView(thumbnailBitstream, null, eperson);
 
-        solrStatisticsCore.getSolr().commit();
+        solrStatisticsCore.getSolr().commit(true, true, true);
 
         SolrQuery thumbnailQuery = new SolrQuery("id:" + thumbnailBitstream.getID().toString());
         QueryResponse thumbnailResponse = solrStatisticsCore.getSolr().query(thumbnailQuery);

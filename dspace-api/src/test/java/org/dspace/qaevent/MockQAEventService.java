@@ -33,7 +33,7 @@ public class MockQAEventService extends QAEventServiceImpl implements Initializi
     public void reset() {
         mockSolrServer.reset();
         try {
-            mockSolrServer.getSolrServer().commit();
+            mockSolrServer.getSolrServer().commit(true, true, true);
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
         }
