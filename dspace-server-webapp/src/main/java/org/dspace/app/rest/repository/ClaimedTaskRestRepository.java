@@ -201,7 +201,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
         Workflow workflow;
         try {
-            workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
+            workflow = factory.getWorkflowFactory().getWorkflowByName(task.getWorkflowItem().getWorkflowID());
 
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
@@ -269,7 +269,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                         "No PoolTask record found, the uri-list does not contait a resource");
             }
             XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
-            Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
+            Workflow workflow = factory.getWorkflowFactory().getWorkflowByName(task.getWorkflowItem().getWorkflowID());
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
             workflowService.doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(),

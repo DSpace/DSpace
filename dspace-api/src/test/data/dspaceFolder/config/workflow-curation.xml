@@ -6,6 +6,22 @@
                  taskset='none'/>
         <mapping collection-handle='123456789/curation-test-1'
                  taskset='test1'/>
+        <mapping collection-handle='123456789/curation-test-2'
+                 taskset='test2'/>
+        <mapping collection-handle='123456789/curation-test-3'
+                 taskset='test3'/>
+        <mapping collection-handle='123456789/curation-test-4'
+                 taskset='test4'/>
+        <mapping collection-handle='123456789/curation-test-5'
+                 taskset='test5'/>
+        <mapping collection-handle='123456789/curation-test-6'
+                 taskset='test6'/>
+        <mapping collection-handle='123456789/curation-test-7'
+                 taskset='test7'/>
+        <mapping collection-handle='123456789/curation-test-8'
+                 taskset='test8'/>
+        <mapping collection-handle='123456789/curation-test-9'
+                 taskset='test9'/>
     </taskset-map>
 
     <tasksets>
@@ -18,8 +34,86 @@
             See config/modules/curate.cfg for 'marker' task.
         -->
         <taskset name='test1'>
-            <flowstep name='markingStep'>
+            <flowstep name='nullStep'>
                 <task name='marker'/>
+            </flowstep>
+        </taskset>
+
+        <!--
+            A taskset whose only flowstep is attached to 'editstep', the second
+            step of the default workflow.
+        -->
+        <taskset name='test2'>
+            <flowstep name='editstep'>
+                <task name='marker'/>
+            </flowstep>
+        </taskset>
+
+        <!--
+            A taskset whose only flowstep is attached to 'reviewstep', the first
+            step of the default workflow.
+        -->
+        <taskset name='test3'>
+            <flowstep name='reviewstep'>
+                <task name='marker'/>
+            </flowstep>
+        </taskset>
+
+        <!--
+            Tasksets that run a curation task which always fails and is
+            empowered to reject the item, attached to 'reviewstep' and to
+            'editstep' of the default workflow.
+            See config/modules/curate.cfg for 'fail' task.
+        -->
+        <taskset name='test4'>
+            <flowstep name='reviewstep'>
+                <task name='fail'>
+                    <workflow>reject</workflow>
+                </task>
+            </flowstep>
+        </taskset>
+        <taskset name='test5'>
+            <flowstep name='editstep'>
+                <task name='fail'>
+                    <workflow>reject</workflow>
+                </task>
+            </flowstep>
+        </taskset>
+
+        <!--
+            Tasksets attached to 'beforearchive', run just before the item is
+            archived: one marks the item, the other always fails and is
+            empowered to reject the item.
+        -->
+        <taskset name='test6'>
+            <flowstep name='beforearchive'>
+                <task name='marker'/>
+            </flowstep>
+        </taskset>
+        <taskset name='test7'>
+            <flowstep name='beforearchive'>
+                <task name='fail'>
+                    <workflow>reject</workflow>
+                </task>
+            </flowstep>
+        </taskset>
+
+        <!--
+            Tasksets attached to 'afterarchive', run just after the item is
+            archived: one marks the item only if it is archived, the other
+            always fails and is empowered to reject the item.
+            See config/modules/curate.cfg for 'archived' task.
+        -->
+        <taskset name='test8'>
+            <flowstep name='afterarchive'>
+                <task name='archived'/>
+            </flowstep>
+        </taskset>
+        <taskset name='test9'>
+            <flowstep name='afterarchive'>
+                <task name='fail'>
+                    <workflow>reject</workflow>
+                </task>
             </flowstep>
         </taskset>
     </tasksets>
