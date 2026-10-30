@@ -326,30 +326,67 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void correctSolrQueryTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(
-                get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
-                        .param("filter", "Shirasaka")
-                        .param("size", "100"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
-                    VocabularyMatcher.matchVocabularyEntry("Shirasaka, Seiko", "Shirasaka, Seiko", "vocabularyEntry")
-                    )))
-                .andExpect(jsonPath("$._embedded.entries[0].authority").isNotEmpty())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+        String endpoint = "/api/submission/vocabularies/SolrAuthorAuthority/entries";
+        String orcidAuthority = AuthorityValueServiceImpl.GENERATE + "orcid"
+            + AuthorityValueServiceImpl.SPLIT + "0000-0002-9029-1854";
 
-        // test also an entry provided by ORCID
+        // 1. Search by surname without comma
         getClient(token).perform(
-                get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
-                        .param("filter", "Bollini")
-                        .param("size", "100"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
-                    VocabularyMatcher.matchVocabularyEntry("Bollini, Andrea", "Bollini, Andrea", "vocabularyEntry")
-                    )))
-                .andExpect(jsonPath("$._embedded.entries[0].authority",
-                            Matchers.is(AuthorityValueServiceImpl.GENERATE + "orcid"
-                                    + AuthorityValueServiceImpl.SPLIT + "0000-0002-9029-1854")))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                get(endpoint)
+                    .param("filter", "Shirasaka")
+                    .param("size", "100"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                VocabularyMatcher.matchVocabularyEntry("Shirasaka, Seiko", "Shirasaka, Seiko", "vocabularyEntry")
+            )))
+            .andExpect(jsonPath("$._embedded.entries[0].authority").isNotEmpty())
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+
+        // 2. Search by full name containing comma
+        getClient(token).perform(
+                get(endpoint)
+                    .param("filter", "Shirasaka, Seiko")
+                    .param("size", "100"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                VocabularyMatcher.matchVocabularyEntry("Shirasaka, Seiko", "Shirasaka, Seiko", "vocabularyEntry"))))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+
+        // 3. Search ORCID-provided entry by surname
+        getClient(token).perform(
+                get(endpoint)
+                    .param("filter", "Bollini")
+                    .param("size", "100"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                VocabularyMatcher.matchVocabularyEntry("Bollini, Andrea", "Bollini, Andrea", "vocabularyEntry")
+            )))
+            .andExpect(jsonPath("$._embedded.entries[0].authority", Matchers.is(orcidAuthority)))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+
+        // 4. Search ORCID-provided entry by full name
+        getClient(token).perform(
+                get(endpoint)
+                    .param("filter", "Bollini, Andrea")
+                    .param("size", "100"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                VocabularyMatcher.matchVocabularyEntry("Bollini, Andrea", "Bollini, Andrea", "vocabularyEntry")
+            )))
+            .andExpect(jsonPath("$._embedded.entries[0].authority", Matchers.is(orcidAuthority)))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+
+        // 5. Search directly by ORCID iD
+        getClient(token).perform(
+                get(endpoint)
+                    .param("filter", "0000-0002-9029-1854")
+                    .param("size", "100"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                VocabularyMatcher.matchVocabularyEntry("Bollini, Andrea", "Bollini, Andrea", "vocabularyEntry")
+            )))
+            .andExpect(jsonPath("$._embedded.entries[0].authority", Matchers.is(orcidAuthority)))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
 
     @Test
