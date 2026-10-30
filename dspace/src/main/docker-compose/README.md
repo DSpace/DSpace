@@ -52,6 +52,9 @@ Documentation for all Dockerfiles used by these compose scripts can be found in 
   - Docker compose file that will start a *test/demo* Matomo container required for track view events on DSpace.
   - You need to accept the Matomo cookie to see tracking events submitted on the container instance.
   - ONLY useful for testing/development. NOT production ready.
+- docker-compose-grobid.yml
+  - Docker compose file that will start a *test/demo* GROBID container required for metadata extraction from uploaded bitstreams.
+  - ONLY useful for testing/development. NOT production ready.
 
 Documentation for all Dockerfiles used by these compose scripts can be found in the ["docker" folder README](../docker/README.md)
 
@@ -214,6 +217,31 @@ Once started you can complete the Matomo configuration directly from the [Matomo
     ```
 3. Startup / Restart DSpace and try to download a bitstream that has been placed inside the ORIGINAL bundle ( default bundle configured for Matomo integration )
 4. You should see a mapped request inside your Matomo dashboard with the bitstream details - [Matomo-Docker-Dashboard](http://localhost:8081/index.php)
+
+## Run DSpace REST and GROBID from your branch
+
+_Only useful for testing metadata extraction in a development environment._
+
+This GROBID container uses the port 8070 to expose its API and User Interface.
+
+You can start both DSpace and GROBID with the following commnad:
+```shell
+docker compose -p d10 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-grobid.yml up -d
+```
+
+Once started you can test or directly use GROBID via its [web interface](http://localhost:8070/).
+
+1. You need to set these properties inside the `grobid.cfg` or `local.cfg` file, so that the service URL matches the container name or network alias of the GROBID docker service:
+    ```properties
+    grobid.service.url = http://dspace-grobid:8070/
+    ```
+2. You need to enable the `extractionstep` submission step in `item-submission.xml` for the submission process you will be testing:
+    ```xml
+            <!-- Uncomment this step to enabled metadata extraction from bitstreams, using configured sources such as GROBID -->
+            <step id="extractionstep"/>
+
+    ```
+3. Startup / Restart DSpace and start a submission in the submission process you enabled in step 2. Upload a well-formatted PDF, and observe the metadata that is populated in the submission form.
 
 ## Sample Test Data
 

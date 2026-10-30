@@ -27,11 +27,14 @@ import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.ProcessStatus;
+import org.dspace.eperson.EPerson;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -45,6 +48,21 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
+
+    private EPerson prevUser = null;
+
+    @Before
+    public void setUser() {
+        // buildProcess creates all processes with the 'admin' owner user so we should set that
+        // as the current context user in tests which expect to find created processes
+        prevUser = context.getCurrentUser();
+        context.setCurrentUser(admin);
+    }
+
+    @After
+    public void restoreUser() {
+       context.setCurrentUser(prevUser);
+    }
 
     @Test
     public void testWithoutProcessToDelete() throws Exception {
@@ -69,9 +87,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 0 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
+        EPerson prevUser = context.getCurrentUser();
+        context.setCurrentUser(admin);
+
         assertThat(processService.find(context, process_1.getID()), notNullValue());
         assertThat(processService.find(context, process_2.getID()), notNullValue());
         assertThat(processService.find(context, process_3.getID()), notNullValue());
+
+        context.setCurrentUser(prevUser);
 
     }
 
