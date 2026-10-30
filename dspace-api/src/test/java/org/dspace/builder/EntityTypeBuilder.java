@@ -15,7 +15,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeService> {
 
@@ -44,7 +43,6 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
                 delete(entityType);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -62,8 +60,7 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
             entityTypeService.update(context, entityType);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException | AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error(e);
         }
         return entityType;
@@ -79,7 +76,6 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     public static EntityTypeBuilder createEntityTypeBuilder(Context context, String entityType) {
