@@ -30,6 +30,11 @@ public class RelationshipMatcher {
                                                relationship.getRelationshipType());
     }
 
+    public static Matcher<? super Object> matchRelationship(
+        UUID leftId, UUID rightId, int leftPlace, int rightPlace, RelationshipType relationshipType) {
+        return matchRelationshipExplicitObjectValues(leftId, rightId, leftPlace, rightPlace, relationshipType);
+    }
+
     private static Matcher<? super Object> matchRelationshipExplicitValues(Item leftItem, Item rightItem, int leftPlace,
                                                                            int rightPlace,
                                                                            RelationshipType relationshipType) {

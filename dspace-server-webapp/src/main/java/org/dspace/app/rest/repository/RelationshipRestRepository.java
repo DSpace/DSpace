@@ -191,13 +191,17 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             if (isAllowedToModifyRelationship(context, relationship, newLeftItem, newRightItem)) {
                 try {
                     relationshipService.move(context, relationship, newLeftItem, newRightItem);
-                    context.commit();
-                    context.reloadEntity(relationship);
                 } catch (AuthorizeException e) {
                     throw new AccessDeniedException("You do not have write rights on this relationship's items");
                 }
 
-                return converter.toRest(relationship, utils.obtainProjection());
+                // Convert before committing to avoid accessing detached LAZY relationship associations.
+                RelationshipRest result = converter.toRest(relationship, utils.obtainProjection());
+
+                context.commit();
+
+                // No entity reload is needed because result was created before the commit.
+                return result;
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }
@@ -260,10 +264,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             }
 
             relationshipService.move(context, relationship, newLeftPlace, newRightPlace);
-            context.commit();
-            context.reloadEntity(relationship);
 
-            return converter.toRest(relationship, utils.obtainProjection());
+            // Convert before committing to avoid accessing detached LAZY relationship associations.
+            RelationshipRest result =  converter.toRest(relationship, utils.obtainProjection());
+
+            context.commit();
+
+            // No entity reload is needed because result was created before the commit.
+            return result;
         } catch (AuthorizeException e) {
             throw new AccessDeniedException("You do not have write rights on this relationship's metadata");
         }

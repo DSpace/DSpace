@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -202,6 +201,10 @@ public class VersioningConsumer implements Consumer {
      *   the side of the given item. This implies that on the page of the third-party item,
      *   the relationship with given item will no longer be listed. The old version of given item still lists
      *   the third-party item and the new version doesn't.
+     *
+     * Configuration-backed relationships are handled separately, with their latest-version statuses
+     * updated independently for the previous and new Item versions.
+     *
      * @param ctx the DSpace context.
      * @param latestItem the new version of the item.
      * @param previousItem the old version of the item.
@@ -218,9 +221,10 @@ public class VersioningConsumer implements Consumer {
             return;
         }
 
-        // get all relationship types that are linked to the given entity type
+        // get all relationship types that are linked to the given entity type.
+        // An empty list of legacy relationship types must not prevent processing configuration-backed relationships.
         List<RelationshipType> relationshipTypes = getRelationshipTypes(ctx, entityType);
-        if (CollectionUtils.isEmpty(relationshipTypes)) {
+        if (relationshipTypes == null) {
             return;
         }
 
@@ -286,6 +290,63 @@ public class VersioningConsumer implements Consumer {
                     reindexRelationship(ctx, changelog, latestItemRelationship);
                 }
             }
+        }
+        // Update the latest-version status of configuration-backed relationships separately from legacy relationships.
+        updateConfigBackedRelationships(ctx, latestItem, previousItem);
+    }
+
+    /**
+     * Updates the latest-version status of configuration-backed relationships when a new Item version is archived.
+     *
+     * For the previous Item version, the latest-version status is removed from the versioned Item's side,
+     * provided the other Item is still latest. For the new Item version, the versioned Item's side is marked as latest.
+     *
+     * Relationships are reindexed when their latest-version status changes.
+     *
+     * @param ctx          current DSpace context
+     * @param latestItem   newly archived Item version
+     * @param previousItem previous Item version
+     */
+    protected void updateConfigBackedRelationships(Context ctx, Item latestItem, Item previousItem) {
+        try {
+            // Retrieve configuration-backed relationships from both Item versions, including non-latest relationships.
+            List<Relationship> previousRelationships =
+                relationshipService.findByItem(ctx, previousItem, -1, -1, false, false)
+                                   .stream()
+                                   .filter(Relationship::isConfigurationBacked)
+                                   .toList();
+
+            List<Relationship> latestRelationships =
+                relationshipService.findByItem(ctx, latestItem, -1, -1, false, false)
+                                   .stream()
+                                   .filter(Relationship::isConfigurationBacked)
+                                   .toList();
+
+            // Mark relationships of the previous Item version as no longer latest on the versioned Item's side.
+            for (Relationship relationship : previousRelationships) {
+                // Determine which side contains the versioned Item.
+                boolean isLeft = previousItem.equals(relationship.getLeftItem());
+
+                // Only update relationships where the opposite endpoint is still latest.
+                if (relationshipVersioningUtils.otherSideIsLatest(
+                    isLeft, relationship.getLatestVersionStatus())) {
+
+                    LatestVersionStatusChangelog changelog =
+                        relationshipVersioningUtils.updateLatestVersionStatus(relationship, isLeft, false);
+                    reindexRelationship(ctx, changelog, relationship);
+                }
+            }
+
+            // Mark relationships of the new Item version as latest on the versioned Item's side.
+            for (Relationship relationship : latestRelationships) {
+                boolean isLeft = latestItem.equals(relationship.getLeftItem());
+
+                LatestVersionStatusChangelog changelog =
+                    relationshipVersioningUtils.updateLatestVersionStatus(relationship, isLeft, true);
+                reindexRelationship(ctx, changelog, relationship);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

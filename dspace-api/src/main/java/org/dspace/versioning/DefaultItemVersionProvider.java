@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.RelationshipService;
@@ -131,6 +132,8 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
 
     /**
      * Copy all relationships of the old item to the new item.
+     * Supports both legacy RelationshipType-backed and configuration-backed relationships.
+     * For configuration-backed relationships, the copied metadata values are linked to the new relationships.
      * At this point in the lifecycle of the item-version (before archival), only the opposite item receives
      * "latest" status. On item archival of the item-version, the "latest" status of the relevant relationships
      * will be updated.
@@ -143,31 +146,53 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     ) throws SQLException, AuthorizeException {
         List<Relationship> oldRelationships = relationshipService.findByItem(context, oldItem, -1, -1, false, true);
         for (Relationship oldRelationship : oldRelationships) {
-            if (oldRelationship.getLeftItem().equals(oldItem)) {
-                // current item is on left side of this relationship
-                relationshipService.create(
+            // Replace the old item on the corresponding side of the relationship.
+            boolean isLeft = oldRelationship.getLeftItem().equals(oldItem);
+
+            Item leftItem = isLeft ? newItem : oldRelationship.getLeftItem();
+            Item rightItem = isLeft ? oldRelationship.getRightItem() : newItem;
+
+            // Only the opposite side is considered latest until the new item version is archived.
+            Relationship.LatestVersionStatus latestVersionStatus = isLeft
+                ? Relationship.LatestVersionStatus.RIGHT_ONLY
+                : Relationship.LatestVersionStatus.LEFT_ONLY;
+
+            if (oldRelationship.isConfigurationBacked()) {
+                Relationship newRelationship = relationshipService.createConfigBackedRelationshipForVersion(
                     context,
-                    newItem,  // new item
-                    oldRelationship.getRightItem(),
-                    oldRelationship.getRelationshipType(),
-                    oldRelationship.getLeftPlace(),
-                    oldRelationship.getRightPlace(),
-                    oldRelationship.getLeftwardValue(),
-                    oldRelationship.getRightwardValue(),
-                    Relationship.LatestVersionStatus.RIGHT_ONLY // only mark the opposite side as "latest" for now
+                    leftItem,
+                    rightItem,
+                    oldRelationship.getRelationshipConfigKey(),
+                    latestVersionStatus
                 );
-            } else if (oldRelationship.getRightItem().equals(oldItem)) {
-                // current item is on right side of this relationship
+                // Associate copied metadata values with the new relationship instead of the old version's relationship.
+                for (MetadataValue oldMetadata : oldItem.getMetadata()) {
+                    if (oldMetadata.getRelationship() != null &&
+                        oldMetadata.getRelationship().getID().equals(oldRelationship.getID())) {
+
+                        for (MetadataValue newMetadata : newItem.getMetadata()) {
+                            if (newMetadata.getRelationship() == null
+                                && newMetadata.getMetadataField().equals(oldMetadata.getMetadataField())
+                                && newMetadata.getPlace() == oldMetadata.getPlace()
+                                && java.util.Objects.equals(newMetadata.getValue(), oldMetadata.getValue())
+                                && java.util.Objects.equals(newMetadata.getAuthority(), oldMetadata.getAuthority())) {
+                                newMetadata.setRelationship(newRelationship);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
                 relationshipService.create(
                     context,
-                    oldRelationship.getLeftItem(),
-                    newItem, // new item
+                    leftItem,
+                    rightItem,
                     oldRelationship.getRelationshipType(),
                     oldRelationship.getLeftPlace(),
                     oldRelationship.getRightPlace(),
                     oldRelationship.getLeftwardValue(),
                     oldRelationship.getRightwardValue(),
-                    Relationship.LatestVersionStatus.LEFT_ONLY // only mark the opposite side as "latest" for now
+                    latestVersionStatus
                 );
             }
         }
