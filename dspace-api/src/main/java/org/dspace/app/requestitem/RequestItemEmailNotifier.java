@@ -317,14 +317,8 @@ public class RequestItemEmailNotifier {
             message.addArgument(configurationService.getProperty("mail.admin")); // [4] Approver's address
         }
 
-        // Who gets this message?
-        String recipient;
-        EPerson submitter = item.getSubmitter();
-        if (submitter != null) {
-            recipient = submitter.getEmail();
-        } else {
-            recipient = configurationService.getProperty("mail.helpdesk");
-        }
+        // Who gets this message?  The repository staff, who can change the access rights.
+        String recipient = configurationService.getProperty("mail.helpdesk");
         if (null == recipient) {
             recipient = configurationService.getProperty("mail.admin");
         }
