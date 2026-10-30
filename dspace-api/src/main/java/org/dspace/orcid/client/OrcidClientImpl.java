@@ -56,6 +56,7 @@ import org.orcid.jaxb.model.v3.release.record.Keyword;
 import org.orcid.jaxb.model.v3.release.record.OtherName;
 import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
+import org.orcid.jaxb.model.v3.release.record.Record;
 import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkBulk;
@@ -119,6 +120,24 @@ public class OrcidClientImpl implements OrcidClient {
     public Person getPerson(String accessToken, String orcid) {
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/person");
         return executeAndUnmarshall(httpUriRequest, false, Person.class);
+    }
+
+    @Override
+    public Person getPerson(String orcid) {
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/person");
+        return executeAndUnmarshall(httpUriRequest, false, Person.class);
+    }
+
+    @Override
+    public Record getRecord(String accessToken, String orcid) {
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/record");
+        return executeAndUnmarshall(httpUriRequest, false, Record.class);
+    }
+
+    @Override
+    public Record getRecord(String orcid) {
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/record");
+        return executeAndUnmarshall(httpUriRequest, false, Record.class);
     }
 
     @Override
