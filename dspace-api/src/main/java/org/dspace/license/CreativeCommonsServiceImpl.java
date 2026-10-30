@@ -7,26 +7,18 @@
  */
 package org.dspace.license;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -41,8 +33,6 @@ import org.dspace.core.Utils;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom2.Document;
-import org.jdom2.transform.JDOMSource;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -76,8 +66,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     protected static final String BSN_LICENSE_RDF = "license_rdf";
 
-    protected Templates templates;
-
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
@@ -91,7 +79,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private String defaultLanguage;
+    // The license options are translated by the UI (i18n keys), so the language is no longer configurable
+    private static final String DEFAULT_LANGUAGE = "en";
     private String jurisdiction;
     private static final String JURISDICTION_KEY = "jurisdiction";
 
@@ -115,18 +104,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         }
 
         ccLicenses = new HashMap<>();
-        defaultLanguage = configurationService.getProperty("cc.license.locale", "en");
         jurisdiction = configurationService.getProperty("cc.license.jurisdiction", "");
-
-        try {
-            templates = XMLUtils.getTransformerFactory().newTemplates(
-                    new StreamSource(CreativeCommonsServiceImpl.class
-                                             .getResourceAsStream("CreativeCommons.xsl")));
-        } catch (TransformerConfigurationException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
-
     }
 
     // create the CC bundle if it doesn't exist
@@ -140,18 +118,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         }
         return bundleService.create(context, item, CC_BUNDLE_NAME);
     }
-
-    @Override
-    public void setLicenseRDF(Context context, Item item, String licenseRdf)
-            throws SQLException, IOException,
-            AuthorizeException {
-        Bundle bundle = getCcBundle(context, item);
-        // set the format
-        BitstreamFormat bs_rdf_format = bitstreamFormatService.findByShortDescription(context, "RDF XML");
-        // set the RDF bitstream
-        setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_RDF, bs_rdf_format, licenseRdf.getBytes());
-    }
-
 
     @Override
     public void setLicense(Context context, Item item,
@@ -258,54 +224,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             }
         }
         return null;
-    }
-
-    @Override
-    public String fetchLicenseRDF(Document license) {
-        StringWriter result = new StringWriter();
-
-        try {
-            templates.newTransformer().transform(
-                    new JDOMSource(license),
-                    new StreamResult(result)
-            );
-        } catch (TransformerException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
-
-        return result.getBuffer().toString();
-    }
-
-    /**
-     * This helper method takes some bytes and stores them as a bitstream for an
-     * item, under the CC bundle, with the given bitstream name
-     *
-     * Note: This helper method assumes that the CC
-     * bitstreams are short and easily expressed as byte arrays in RAM
-     *
-     * @param context        The relevant DSpace Context.
-     * @param item           parent item
-     * @param bundle         parent bundle
-     * @param bitstream_name bitstream name to set
-     * @param format         bitstream format
-     * @param bytes          bitstream data
-     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    protected void setBitstreamFromBytes(Context context, Item item, Bundle bundle,
-                                         String bitstream_name, BitstreamFormat format, byte[] bytes)
-            throws SQLException, IOException, AuthorizeException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        Bitstream bs = bitstreamService.create(context, bundle, bais);
-
-        bs.setName(context, bitstream_name);
-        bs.setSource(context, CC_BS_SOURCE);
-        bs.setFormat(context, format);
-
-        // commit everything
-        bitstreamService.update(context, bs);
     }
 
     /**
@@ -419,9 +337,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             if (configurationService.getBooleanProperty("cc.submit.setname")) {
                 removeLicenseField(context, item, nameField);
             }
-            if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
-                removeLicenseFile(context, item);
-            }
+            // License RDF bitstreams are no longer generated, but remove the ones of previously stored licenses
+            removeLicenseFile(context, item);
         }
     }
 
@@ -445,7 +362,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     @Override
     public List<CCLicense> findAllCCLicenses() {
-        return findAllCCLicenses(defaultLanguage);
+        return findAllCCLicenses(DEFAULT_LANGUAGE);
     }
 
     /**
@@ -471,7 +388,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     @Override
     public CCLicense findOne(String id) {
-        return findOne(id, defaultLanguage);
+        return findOne(id, DEFAULT_LANGUAGE);
     }
 
     /**
@@ -513,7 +430,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     @Override
     public String retrieveLicenseUri(String licenseId, Map<String, String> answerMap) {
-        return retrieveLicenseUri(licenseId, defaultLanguage, answerMap);
+        return retrieveLicenseUri(licenseId, DEFAULT_LANGUAGE, answerMap);
 
     }
 
@@ -541,7 +458,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     @Override
     public boolean verifyLicenseInformation(String licenseId, Map<String, String> fullAnswerMap) {
-        return verifyLicenseInformation(licenseId, defaultLanguage, fullAnswerMap);
+        return verifyLicenseInformation(licenseId, DEFAULT_LANGUAGE, fullAnswerMap);
     }
 
     /**
@@ -581,7 +498,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     @Override
     public Map<String, String> retrieveFullAnswerMap(String licenseId, Map<String, String> answerMap) {
-        return retrieveFullAnswerMap(licenseId, defaultLanguage, answerMap);
+        return retrieveFullAnswerMap(licenseId, DEFAULT_LANGUAGE, answerMap);
     }
 
     /**
@@ -655,17 +572,13 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     public boolean updateLicense(final Context context, final String licenseUri, final Item item)
             throws AuthorizeException, SQLException {
         try {
-            Document doc = ccLicenseConnectorService.retrieveLicenseRDFDoc(licenseUri);
-            if (doc == null) {
-                return false;
-            }
-            String licenseName = ccLicenseConnectorService.retrieveLicenseName(doc);
+            String licenseName = ccLicenseConnectorService.retrieveLicenseName(licenseUri);
             if (StringUtils.isBlank(licenseName)) {
                 return false;
             }
 
             removeLicense(context, item);
-            addLicense(context, item, licenseUri, licenseName, doc);
+            addLicense(context, item, licenseUri, licenseName);
 
             return true;
 
@@ -682,21 +595,17 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param item          - The item to which the license will be added
      * @param licenseUri    - The license URI to add
      * @param licenseName   - The license name to add
-     * @param doc           - The license to document to add
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
     @Override
-    public void addLicense(Context context, Item item, String licenseUri, String licenseName, Document doc)
+    public void addLicense(Context context, Item item, String licenseUri, String licenseName)
             throws SQLException, IOException, AuthorizeException {
         String uriField = getCCField("uri");
         String nameField = getCCField("name");
 
         addLicenseField(context, item, uriField, null, licenseUri);
-        if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
-            setLicenseRDF(context, item, fetchLicenseRDF(doc));
-        }
         if (configurationService.getBooleanProperty("cc.submit.setname")) {
             addLicenseField(context, item, nameField, "en", licenseName);
         }
