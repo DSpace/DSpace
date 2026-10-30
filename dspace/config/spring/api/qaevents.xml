@@ -132,7 +132,12 @@
     </bean>
 	-->
 
-    <bean id="WithdrawnRequestAction" class="org.dspace.qaevent.action.QAWithdrawnRequestAction" />
+    <bean id="WithdrawnRequestAction" class="org.dspace.qaevent.action.QAWithdrawnRequestAction">
+        <!-- metadata field where the reason provided with a withdrawal request is stored, so
+             that it can be shown on the tombstone page of the item.
+             Leave it unset to discard the reason, as in the previous behaviour. -->
+        <property name="reasonMetadataField" value="dspace.withdrawn.reason" />
+    </bean>
 
     <bean id="ReinstateRequestAction" class="org.dspace.qaevent.action.QAReinstateRequestAction" />
 
