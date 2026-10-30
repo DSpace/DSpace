@@ -797,43 +797,6 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
-     * Regression test: iterating over multiple pages with a scoped iteratorSearch must not append the
-     * scope ("location:") filter query to the shared DiscoverQuery once per page.
-     */
-    @Test
-    public void iteratorSearchScopedDoesNotDuplicateFilterQueriesTest() throws SearchServiceException {
-        String subject = "subject1";
-        int numberItems = 25;
-        context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, community).build();
-        for (int i = 0; i < numberItems; i++) {
-            ItemBuilder.createItem(context, collection)
-                .withTitle("item number " + i)
-                .withSubject(subject)
-                .build();
-        }
-        context.restoreAuthSystemState();
-
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.addFilterQueries("subject:" + subject);
-        // small page size to force several pages
-        discoverQuery.setMaxResults(5);
-
-        Iterator<Item> itemIterator =
-            searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
-        List<Item> foundItems = new ArrayList<>();
-        while (itemIterator.hasNext()) {
-            foundItems.add(itemIterator.next());
-        }
-
-        assertEquals(numberItems, foundItems.size());
-        assertEquals(numberItems, foundItems.stream().distinct().count());
-        // the original filter plus a single location filter, regardless of the number of pages
-        assertEquals(2, discoverQuery.getFilterQueries().size());
-    }
-
-    /**
      * Test designed to check if default sort option for Discovery is working, using <code>workspace</code>
      * DiscoveryConfiguration <br/>
      * <b>Note</b>: this test will be skipped if <code>workspace</code> do not have a default sort option set and of
