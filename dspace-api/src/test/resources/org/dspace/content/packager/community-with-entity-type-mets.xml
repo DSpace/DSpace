@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<mets ID="DSpace_COMMUNITY_123456789-66667" OBJID="hdl:123456789/66667" TYPE="DSpace COMMUNITY"
+      PROFILE="http://www.dspace.org/schema/aip/mets_aip_1_0.xsd" xmlns="http://www.loc.gov/METS/"
+      xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
+    <metsHdr>
+        <agent ROLE="CUSTODIAN" TYPE="OTHER" OTHERTYPE="DSpace Archive">
+            <name>123456789/1</name>
+        </agent>
+        <agent ROLE="CREATOR" TYPE="OTHER" OTHERTYPE="DSpace Software">
+            <name>DSpace</name>
+        </agent>
+    </metsHdr>
+    <dmdSec ID="dmdSec_1">
+        <mdWrap MDTYPE="MODS">
+            <xmlData xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink"
+                     xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-1.xsd">
+                <mods:mods xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                           xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-1.xsd">
+                    <mods:note/>
+                    <mods:abstract/>
+                    <mods:tableOfContents/>
+                    <mods:accessCondition type="useAndReproduction"/>
+                    <mods:titleInfo>
+                        <mods:title>Testcommunity: allow_dspace_metadata_for_collection_mets</mods:title>
+                    </mods:titleInfo>
+                </mods:mods>
+            </xmlData>
+        </mdWrap>
+    </dmdSec>
+    <dmdSec ID="dmdSec_2">
+        <mdWrap MDTYPE="OTHER" OTHERMDTYPE="DIM">
+            <xmlData xmlns:dim="http://www.dspace.org/xmlns/dspace/dim">
+                <dim:dim xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" dspaceType="COMMUNITY">
+                    <dim:field mdschema="dc" element="description"/>
+                    <dim:field mdschema="dc" element="description" qualifier="abstract"/>
+                    <dim:field mdschema="dc" element="description" qualifier="tableofcontents"/>
+                    <dim:field mdschema="dc" element="rights"/>
+                    <dim:field mdschema="dc" element="title">Testcommunity: allow_dspace_metadata_for_collection_mets</dim:field>
+                    <dim:field mdschema="dspace" element="entity" qualifier="type">OrgUnit</dim:field>
+                </dim:dim>
+            </xmlData>
+        </mdWrap>
+    </dmdSec>
+    <amdSec ID="amd_3">
+        <sourceMD ID="sourceMD_10">
+            <mdWrap MDTYPE="OTHER" OTHERMDTYPE="AIP-TECHMD">
+                <xmlData xmlns:dim="http://www.dspace.org/xmlns/dspace/dim">
+                    <dim:dim xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" dspaceType="COMMUNITY">
+                        <dim:field mdschema="dc" element="identifier" qualifier="uri">hdl:123456789/66667</dim:field>
+                        <dim:field mdschema="dc" element="relation" qualifier="isPartOf">hdl:123456789/1</dim:field>
+                    </dim:dim>
+                </xmlData>
+            </mdWrap>
+        </sourceMD>
+    </amdSec>
+    <structMap ID="struct_11" LABEL="DSpace Object" TYPE="LOGICAL">
+        <div ID="div_12" DMDID="dmdSec_1 dmdSec_2" ADMID="amd_3" TYPE="DSpace Object Contents"/>
+    </structMap>
+    <structMap ID="struct_16" LABEL="Parent" TYPE="LOGICAL">
+        <div ID="div_17" LABEL="Parent of this DSpace Object" TYPE="AIP Parent Link">
+            <mptr ID="mptr_18" LOCTYPE="HANDLE" xlink:type="simple" xlink:href="123456789/1"/>
+        </div>
+    </structMap>
+</mets>
