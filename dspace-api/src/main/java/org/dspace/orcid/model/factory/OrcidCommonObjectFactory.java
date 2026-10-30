@@ -90,4 +90,12 @@ public interface OrcidCommonObjectFactory {
     public Optional<Country> createCountry(Context context, MetadataValue metadataValue)
         throws OrcidValidationException;
 
+
+    /**
+     * Shorten the value aligned to orcid short-description data type and add some ellipses value
+     * @param metadataValue
+     * @return shortened value when to long or the original value
+     */
+    public String shortenDescription(String metadataValue);
+
 }
