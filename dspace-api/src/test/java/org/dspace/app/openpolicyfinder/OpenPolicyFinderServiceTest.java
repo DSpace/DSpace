@@ -10,6 +10,7 @@ package org.dspace.app.openpolicyfinder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -135,6 +136,120 @@ public class OpenPolicyFinderServiceTest extends AbstractDSpaceTest {
             openPolicyFinderService.constructHttpGet("publication", "issn", "equals", null)
                 .getURI().toASCIIString());
 
+    }
+
+    /**
+     * Test that {@link OpenPolicyFinderService#prepareQuery(String, String, String)} fails fast when the
+     * query is {@code null} instead of building a filter containing the literal "null".
+     */
+    @Test
+    public void testPrepareQueryFailsFastOnNullQuery() {
+        String endpoint = configurationService.getProperty("openpolicyfinder.url",
+            configurationService.getProperty("sherpa.romeo.url",
+                "https://api.openpolicyfinder.jisc.ac.uk/retrieve"));
+        try {
+            openPolicyFinderService.prepareQuery(null, endpoint, null);
+            fail("Expected a URISyntaxException when the query is null");
+        } catch (URISyntaxException e) {
+            // expected: no filter containing the literal "null" should be built
+            assertTrue("Unexpected reason: " + e.getReason(),
+                e.getReason().contains("No ISSN supplied"));
+        }
+    }
+
+    /**
+     * Test that {@link OpenPolicyFinderService#prepareQuery(String, String, String)} fails fast when the
+     * query is blank.
+     */
+    @Test
+    public void testPrepareQueryFailsFastOnBlankQuery() {
+        String endpoint = configurationService.getProperty("openpolicyfinder.url",
+            configurationService.getProperty("sherpa.romeo.url",
+                "https://api.openpolicyfinder.jisc.ac.uk/retrieve"));
+        try {
+            openPolicyFinderService.prepareQuery("   ", endpoint, null);
+            fail("Expected a URISyntaxException when the query is blank");
+        } catch (URISyntaxException e) {
+            assertTrue("Unexpected reason: " + e.getReason(),
+                e.getReason().contains("No ISSN supplied"));
+        }
+    }
+
+    /**
+     * Test that the grand total {@code totalHits} is parsed from the API response and that the items
+     * array is parsed alongside it (page 1 of the real "test" search).
+     */
+    @Test
+    public void testTotalHitsParsedFromResponse() {
+        OpenPolicyFinderResponse response = openPolicyFinderService.performRequest(
+            "publication", "title", "contains-word", "test_page1", 0, 3);
+
+        assertFalse("Response was flagged as 'isError'", response.isError());
+        assertEquals("totalHits was not parsed from the response", 4, response.getTotalHits());
+        assertTrue("Expected three parsed journals on page 1",
+            CollectionUtils.isNotEmpty(response.getJournals()) && response.getJournals().size() == 3);
+        assertEquals("First journal title did not match", "TEST",
+            response.getJournals().get(0).getTitles().get(0));
+        assertEquals("First journal ISSN did not match", "1133-0686",
+            response.getJournals().get(0).getIssns().get(0));
+    }
+
+    /**
+     * Test that {@code next_search_after} is parsed: present on page 1 (more pages) and null on the
+     * last page, while {@code totalHits} stays constant across pages.
+     */
+    @Test
+    public void testNextSearchAfterParsed() {
+        OpenPolicyFinderResponse page1 = openPolicyFinderService.performRequest(
+            "publication", "title", "contains-word", "test_page1", 0, 3);
+        assertEquals("next_search_after cursor did not match on page 1", "[37137]",
+            page1.getNextSearchAfter());
+
+        OpenPolicyFinderResponse page2 = openPolicyFinderService.performRequest(
+            "publication", "title", "contains-word", "test_page2", 0, 3);
+        assertTrue("next_search_after should be null on the last page",
+            page2.getNextSearchAfter() == null);
+        assertEquals("totalHits should be constant across pages", 4, page2.getTotalHits());
+        assertTrue("Expected a single journal on page 2",
+            CollectionUtils.isNotEmpty(page2.getJournals()) && page2.getJournals().size() == 1);
+        assertEquals("Page 2 journal title did not match", "Journal Test Record 1",
+            page2.getJournals().get(0).getTitles().get(0));
+    }
+
+    /**
+     * Test that {@code totalHits} defaults to the parsed item count when the API response does not
+     * include the field (protects legacy fixtures).
+     */
+    @Test
+    public void testTotalHitsDefaultsToItemCountWhenMissing() {
+        // thelancet.json now carries totalHits=1 which equals its item count; assert consistency
+        OpenPolicyFinderResponse response = openPolicyFinderService.searchByJournalISSN("0140-6736");
+        assertFalse("Response was flagged as 'isError'", response.isError());
+        assertEquals("totalHits should equal the parsed item count",
+            response.getJournals().size(), response.getTotalHits());
+    }
+
+    /**
+     * Test that the optional {@code search_after} cursor is appended to the constructed URI, and that
+     * the default (no-cursor) contract is unchanged.
+     * @throws URISyntaxException if the URL build fails
+     */
+    @Test
+    public void testSearchAfterAppendedToUri() throws URISyntaxException {
+        String cursorUri = openPolicyFinderService
+            .constructHttpGet("publication", "issn", "equals", "0140-6736", 0, 1, "[37137]")
+            .getURI().toASCIIString();
+        assertTrue("search_after cursor was not appended to the URI",
+            cursorUri.contains("search_after=%5B37137%5D"));
+
+        // Default path (blank cursor) must not add a search_after parameter
+        String defaultUri = openPolicyFinderService
+            .constructHttpGet("publication", "issn", "equals", "0140-6736", 0, 1)
+            .getURI().toASCIIString();
+        assertFalse("Default URI must not contain a search_after parameter",
+            defaultUri.contains("search_after"));
+        assertTrue("Default URI contract changed unexpectedly",
+            defaultUri.endsWith("&format=Json&offset=0&limit=1"));
     }
 
     /**

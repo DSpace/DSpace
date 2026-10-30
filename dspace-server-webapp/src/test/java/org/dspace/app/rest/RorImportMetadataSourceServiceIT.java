@@ -21,12 +21,14 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.ror.service.RorImportMetadataSourceServiceImpl;
 import org.hamcrest.Matcher;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +57,9 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
+            // The fixture holds one full ROR page (20 items); a window of count=2 must be sliced to 2
             Collection<ImportRecord> recordsImported = rorServiceImpl.getRecords("test query", 0, 2);
-            assertThat(recordsImported, hasSize(20));
+            assertThat(recordsImported, hasSize(2));
 
             ImportRecord record = recordsImported.iterator().next();
 
@@ -74,6 +77,61 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             assertThat(record.getSingleValue("organization.identifier.isni"), is("0000 0004 0446 4427"));
 
 
+        } finally {
+            liveImportClient.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void testGetRecordsFirstPageDoesNotSendPageParameter() throws Exception {
+        context.turnOffAuthorisationSystem();
+        CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+
+        try (InputStream file = getClass().getResourceAsStream("ror-records.json")) {
+            String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
+
+            liveImportClient.setHttpClient(httpClient);
+            CloseableHttpResponse response = mockResponse(jsonResponse, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+
+            context.restoreAuthSystemState();
+            rorServiceImpl.getRecords("test query", 0, 5);
+
+            ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
+            Mockito.verify(httpClient).execute(captor.capture());
+            String uri = captor.getValue().getURI().toASCIIString();
+            // The first ROR page must not carry an explicit "page" parameter
+            assertThat(uri.contains("page="), equalTo(false));
+        } finally {
+            liveImportClient.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void testGetRecordsSecondPageSendsPageParameterAndSlices() throws Exception {
+        context.turnOffAuthorisationSystem();
+        CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+
+        try (InputStream file = getClass().getResourceAsStream("ror-records.json")) {
+            String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
+
+            liveImportClient.setHttpClient(httpClient);
+            CloseableHttpResponse response = mockResponse(jsonResponse, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+
+            context.restoreAuthSystemState();
+            // A window starting at offset 20 falls entirely within ROR page 2 (20 results/page)
+            Collection<ImportRecord> records = rorServiceImpl.getRecords("test query", 20, 3);
+
+            ArgumentCaptor<HttpUriRequest> captor = ArgumentCaptor.forClass(HttpUriRequest.class);
+            Mockito.verify(httpClient).execute(captor.capture());
+            String uri = captor.getValue().getURI().toASCIIString();
+            // Offset 20 maps to the 1-based ROR page 2
+            assertThat(uri.contains("page=2"), equalTo(true));
+            // The single fetched page (20 items) must be sliced down to the requested count
+            assertThat(records, hasSize(3));
         } finally {
             liveImportClient.setHttpClient(originalHttpClient);
         }
