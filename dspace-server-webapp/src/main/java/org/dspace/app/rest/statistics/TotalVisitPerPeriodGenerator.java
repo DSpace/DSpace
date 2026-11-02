@@ -97,6 +97,7 @@ public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
         boolean hasValidRelation = false;
         StatisticsDatasetDisplay statisticsDatasetDisplay = new StatisticsDatasetDisplay();
         StringBuilder query = new StringBuilder();
+        List<String> filterQueries = new ArrayList<>();
 
         if (getRelation() != null) {
             DiscoveryConfiguration discoveryConfiguration = discoveryConfigurationService
@@ -106,9 +107,10 @@ public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
                 hasValidRelation = false;
             } else {
                 hasValidRelation = true;
-                query.append(
+                query.append(MATCH_ALL_QUERY);
+                filterQueries.add(
                     statisticsDatasetDisplay
-                        .composeQueryWithInverseRelation(
+                        .composeJoinFilterQuery(
                             dso,
                             discoveryConfiguration.getDefaultFilterQueries(),
                             getDsoType(dso)
@@ -144,10 +146,11 @@ public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
 
         String filterQuery = statisticsDatasetDisplay
             .composeFilterQuery(startDate, endDate, hasValidRelation, getDsoType(dso));
+        filterQueries.add(filterQuery);
 
         // execute query
         ObjectCount[] dateFacetResult = solrLoggerService.queryFacetDateField(context, "id", null, query.toString(),
-                                                                              filterQuery, periodType.toUpperCase(),
+                                                                              filterQueries, periodType.toUpperCase(),
                                                                               rangeStart, rangeEnd, false, 0,
                                                                               increment);
 
@@ -278,7 +281,7 @@ public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
 
         String query = "statistics_type:" + SolrLoggerServiceImpl.StatisticsType.VIEW.text();
 
-        QueryResponse queryResponse = solrLoggerService.query(query, null, null, 1, 1, null,
+        QueryResponse queryResponse = solrLoggerService.query(query, (String) null, null, 1, 1, null,
                                                               null, null, null, "time", true, -1);
 
         SolrDocumentList results = queryResponse.getResults();

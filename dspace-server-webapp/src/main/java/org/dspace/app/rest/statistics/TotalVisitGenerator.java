@@ -10,6 +10,8 @@ package org.dspace.app.rest.statistics;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -107,6 +109,7 @@ public class TotalVisitGenerator extends AbstractUsageReportGenerator {
         Dataset dataset;
         int type_of_dso = dsoType;
         String query = "";
+        List<String> filterQueries = new ArrayList<>();
         boolean hasValidRelation = false;
         if (getRelation() != null) {
             DiscoveryConfiguration discoveryConfiguration = discoveryConfigurationService
@@ -117,8 +120,9 @@ public class TotalVisitGenerator extends AbstractUsageReportGenerator {
 
             } else {
                 hasValidRelation = true;
-                query = statisticsDatasetDisplay.composeQueryWithInverseRelation(
-                    dso, discoveryConfiguration.getDefaultFilterQueries(), dso.getType());
+                query = MATCH_ALL_QUERY;
+                filterQueries.add(statisticsDatasetDisplay.composeJoinFilterQuery(
+                    dso, discoveryConfiguration.getDefaultFilterQueries(), dso.getType()));
                 type_of_dso = dso.getType();
             }
         }
@@ -129,9 +133,10 @@ public class TotalVisitGenerator extends AbstractUsageReportGenerator {
         }
         String filter_query = statisticsDatasetDisplay
                                   .composeFilterQuery(startDate, endDate, hasValidRelation, type_of_dso);
+        filterQueries.add(filter_query);
         //is used when generator has inverse relation property
         ObjectCount[] result = new ObjectCount[0];
-        ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filter_query, "id",
+        ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filterQueries, "id",
                 getMaxResults(), false, null, 1);
         // if dso.getType() != dsoType means that are are searching for downloads
         //this condition supports TotalDownloadsGenerator

@@ -11,6 +11,7 @@ package org.dspace.statistics.content;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,8 +278,20 @@ public class StatisticsDatasetDisplay {
         return filterQuery.toString();
     }
 
-    //Creates query for usage raport generator
-    public String composeQueryWithInverseRelation(DSpaceObject dSpaceObject, List<String> default_queries, int type) {
+    /**
+     * Creates the join between the statistics core and the search core used by the usage report generators: it
+     * selects the statistics documents of the items (or of the bitstreams of the items) that satisfy the default
+     * filter queries of a discovery configuration.
+     * <p>
+     * The join must be sent to Solr as a filter query (fq), not as the main query, so that it can be cached in the
+     * filterCache. The main query of the report is then {@code *:*}.
+     *
+     * @param dSpaceObject    the object that replaces the {0} placeholder in the default queries, may be null
+     * @param default_queries the default filter queries of the discovery configuration
+     * @param type            the type of statistics documents to select, a BITSTREAM is joined by its owning item
+     * @return the join filter query
+     */
+    public String composeJoinFilterQuery(DSpaceObject dSpaceObject, List<String> default_queries, int type) {
         StringBuilder query = new StringBuilder();
         if (type == Constants.BITSTREAM) {
             query.append("{!join from=search.resourceid to=owningItem fromIndex=");
@@ -295,7 +308,7 @@ public class StatisticsDatasetDisplay {
 
     /**
      * Creates the query, to be run on the search core, that selects the items joined by
-     * {@link #composeQueryWithInverseRelation(DSpaceObject, List, int)}. It is the part of the join query without the
+     * {@link #composeJoinFilterQuery(DSpaceObject, List, int)}. It is the part of the join query without the
      * {@code {!join ...}} prefix, so it can be run directly against the search core (e.g. to discover, with a single
      * query, which categories actually have items).
      *
@@ -305,23 +318,41 @@ public class StatisticsDatasetDisplay {
      */
     public String composeJoinedItemsQuery(DSpaceObject dSpaceObject, List<String> default_queries) {
         StringBuilder query = new StringBuilder();
+
+        // Build the filter queries
+        StringBuilder defaultQueries = new StringBuilder();
         boolean isFirstDefaultQuery = true;
         for (String default_query : default_queries) {
             if (!isFirstDefaultQuery) {
-                query.append(" AND ");
+                defaultQueries.append(" AND ");
             }
             if (dSpaceObject != null) {
-                query.append(replacePlaceholderIfPresent(default_query, dSpaceObject));
+                defaultQueries.append(replacePlaceholderIfPresent(default_query, dSpaceObject));
             } else {
-                query.append(default_query);
+                defaultQueries.append(default_query);
             }
             isFirstDefaultQuery = false;
         }
+        query.append(defaultQueries);
 
         // to consider only related items
-        query.append(" AND archived:true AND -withdrawn:true");
+        query.append(" AND archived:true");
+        if (!isWithdrawnAlreadyExcluded(defaultQueries.toString())) {
+            query.append(" AND -withdrawn:true");
+        }
 
         return query.toString();
+    }
+
+    /**
+     * Tell if the given query already excludes the withdrawn items at its top level: the clause must be a prohibited
+     * term of its own, in a query without sub-expressions and alternatives (an OR would make the clause optional).
+     */
+    private boolean isWithdrawnAlreadyExcluded(String query) {
+        if (query.contains("(") || query.contains(" OR ") || query.contains("||")) {
+            return false;
+        }
+        return Arrays.asList(query.split("\\s+")).contains("-withdrawn:true");
     }
 
     private String replacePlaceholderIfPresent(String defaultQuery, DSpaceObject dSpaceObject) {

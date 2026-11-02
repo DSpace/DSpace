@@ -10,8 +10,8 @@ package org.dspace.app.rest.statistics;
 import static org.dspace.core.Constants.ITEM;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +29,6 @@ import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrSearchCore;
-import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.content.StatisticsDatasetDisplay;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This report generator provides the TopCategories related to the site.
  * <p>
- * DURACOM-497: the entity types that make up the categories are discovered from the content of the search core
+ * The entity types that make up the categories are discovered from the content of the search core
  * (facet on {@code entityType_keyword}) instead of the {@code cris.entity-type} configuration property, so the
- * report self-configures to the entity types that actually have items in the repository. The views of each category
- * are counted on the statistics core through a cross-core join towards the search core, restricted to archived,
- * non-withdrawn items of the given entity type.
+ * report self-configures to the entity types that actually have items in the repository.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4Science)
  */
@@ -53,14 +50,13 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
 
     private static final String ENTITY_TYPE_FIELD = "entityType_keyword";
 
+    private static final List<String> JOIN_DEFAULT_FILTER_QUERIES = List.of("search.resourcetype:Item");
+
     @Autowired
     private SolrLoggerService solrLoggerService;
 
     @Autowired
     private SolrSearchCore solrSearchCore;
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     private Map<String, String> categoryQueries;
 
@@ -83,14 +79,15 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
     private Map<String, Integer> getCategoriesCount(DSpaceObject dso, String startDate, String endDate) {
 
         Map<String, Integer> categoriesCount = new HashMap<String, Integer>();
-        Set<String> categoryQueriesWithItems = getCategoryQueriesWithItems();
+        Set<String> categoryQueriesWithItems = getCategoryQueriesWithItems(dso);
 
         for (String category : getCategoryQueries().keySet()) {
             String categoryQuery = getCategoryQueries().get(category);
             // a category without items in the search core has no views: its join on the statistics core is skipped
             boolean hasItems = OTHER_CATEGORY.equals(categoryQuery) || categoryQueriesWithItems == null
                 || categoryQueriesWithItems.contains(categoryQuery);
-            Integer categoryCount = hasItems ? getCategoryCount(categoryQuery, startDate, endDate) : 0;
+            Integer categoryCount = hasItems
+                ? getCategoryCount(dso, categoryQuery, startDate, endDate) : 0;
             categoriesCount.put(category, categoryCount);
         }
 
@@ -99,10 +96,10 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
     }
 
     /**
-     * Find, with a single query on the search core, the category queries that match at least one archived,
-     * non-withdrawn item. Returns null if the search core can not be queried: all the categories are then computed.
+     * Find, with a single query on the search core, the category queries that match at least one of the items
+     * joined by the report. Returns null if the search core can not be queried: all the categories are then computed.
      */
-    private Set<String> getCategoryQueriesWithItems() {
+    private Set<String> getCategoryQueriesWithItems(DSpaceObject dso) {
 
         List<String> categoryQueries = getCategoryQueries().values().stream()
             .filter(categoryQuery -> !OTHER_CATEGORY.equals(categoryQuery))
@@ -110,7 +107,8 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
             .collect(Collectors.toList());
 
         SolrQuery solrQuery = new SolrQuery(MATCH_ALL_QUERY);
-        solrQuery.addFilterQuery("search.resourcetype:Item", "archived:true", "-withdrawn:true");
+        solrQuery.addFilterQuery(new StatisticsDatasetDisplay()
+            .composeJoinedItemsQuery(dso, JOIN_DEFAULT_FILTER_QUERIES));
         solrQuery.setRows(0);
         solrQuery.setFacet(true);
         categoryQueries.forEach(categoryQuery -> solrQuery.addFacetQuery(formatCategoryQuery(categoryQuery)));
@@ -126,40 +124,29 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
         }
     }
 
-    private int getCategoryCount(String categoryQuery, String startDate, String endDate) {
+    private int getCategoryCount(DSpaceObject dso, String categoryQuery, String startDate, String endDate) {
 
-        String joinQuery = composeCategoryQuery(categoryQuery);
+        String joinFilterQuery = composeCategoryQuery(dso, categoryQuery);
         String filterQuery = new StatisticsDatasetDisplay().composeFilterQuery(startDate, endDate, true, ITEM);
 
         try {
-            // the cross-core join is the main query ({!join ...} local params must start the query, not be nested
-            // inside a filter query); the statistics filters are applied as the (cacheable) filter query
-            return (int) solrLoggerService.queryTotal(joinQuery, filterQuery, 0).getCount();
+            return (int) solrLoggerService.queryTotal(MATCH_ALL_QUERY, List.of(joinFilterQuery, filterQuery), 0)
+                .getCount();
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Build the cross-core join filter query that selects, on the statistics core, the usage events of the items
-     * matching the given category. The join target is the search core, restricted to archived, non-withdrawn items.
-     * <p>
-     * The discovery default filter queries are intentionally NOT concatenated here: one of them is a purely negative
-     * clause ("-withdrawn:true AND -discoverable:false") that Solr resolves to zero matches once nested inside the
-     * joined query. The {@code entityType_keyword} field only exists on indexed items, so the archived/withdrawn
-     * filters are sufficient to select the valid items (DURACOM-497).
-     */
-    private String composeCategoryQuery(String categoryQuery) {
+    private String composeCategoryQuery(DSpaceObject dso, String categoryQuery) {
 
-        String joinPrefix = "{!join from=search.resourceid to=id fromIndex="
-            + configurationService.getProperty("solr.multicorePrefix") + "search}";
-        String itemsFilter = " AND archived:true AND -withdrawn:true";
+        String query = new StatisticsDatasetDisplay().composeJoinFilterQuery(dso,
+            JOIN_DEFAULT_FILTER_QUERIES, dso.getType());
 
         if (categoryQuery.equals(OTHER_CATEGORY)) {
-            return joinPrefix + getAllCategoryQueriesReverted() + itemsFilter;
+            return query + " AND " + getAllCategoryQueriesReverted();
         }
 
-        return joinPrefix + formatCategoryQuery(categoryQuery) + itemsFilter;
+        return query + " AND " + formatCategoryQuery(categoryQuery);
 
     }
 
@@ -191,23 +178,24 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
     }
 
     private Map<String, String> getDefaultCategoryQueries() {
-        return getDefaultEntityTypes().stream()
+        return Arrays.stream(getDefaultEntityTypes())
                      .collect(Collectors.toMap(
                          type -> type.toLowerCase(),
                          type -> ENTITY_TYPE_FIELD + ": '" + type + "'",
                          (existing, replacement) -> existing,
-                         LinkedHashMap::new
+                         java.util.LinkedHashMap::new
                      ));
     }
 
     /**
-     * Discover the entity types that actually have items, by faceting the {@code entityType_keyword} field on the
-     * search core. Only types with at least one archived, non-withdrawn item are returned, so the report categories
-     * always reflect the real content of the repository.
+     * The entity types are discovered from the content of the
+     * repository by faceting the {@code entityType_keyword} field on the search core, restricted to archived,
+     * non-withdrawn items, instead of reading the {@code cris.entity-type} configuration property. Only types with
+     * at least one matching item are returned, so the report categories always reflect the real content.
      *
      * @return the entity types present in the repository, possibly empty
      */
-    private List<String> getDefaultEntityTypes() {
+    private String[] getDefaultEntityTypes() {
         SolrQuery solrQuery = new SolrQuery(MATCH_ALL_QUERY);
         solrQuery.addFilterQuery("search.resourcetype:Item", "archived:true", "-withdrawn:true");
         solrQuery.setRows(0);
@@ -218,15 +206,15 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
         try {
             FacetField facetField = solrSearchCore.getSolr().query(solrQuery).getFacetField(ENTITY_TYPE_FIELD);
             if (facetField == null || facetField.getValues() == null) {
-                return List.of();
+                return new String[0];
             }
             return facetField.getValues().stream()
                 .map(FacetField.Count::getName)
                 .filter(StringUtils::isNotBlank)
-                .collect(Collectors.toList());
+                .toArray(String[]::new);
         } catch (SolrServerException | IOException | RuntimeException e) {
             log.warn("Unable to discover the entity types from the search core, no category is computed", e);
-            return List.of();
+            return new String[0];
         }
     }
 

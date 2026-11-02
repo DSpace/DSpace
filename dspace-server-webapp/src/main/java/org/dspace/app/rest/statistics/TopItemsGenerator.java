@@ -11,6 +11,7 @@ import static org.dspace.core.Constants.BITSTREAM;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -71,6 +72,7 @@ public class TopItemsGenerator extends AbstractUsageReportGenerator {
             StatisticsDatasetDisplay statisticsDatasetDisplay = new StatisticsDatasetDisplay();
             boolean hasValidRelation = false;
             String query = "";
+            List<String> filterQueries = new ArrayList<>();
             //if no relation property for generator
             if (getRelation() != null) {
                 DiscoveryConfiguration discoveryConfiguration  = discoveryConfigurationService
@@ -81,8 +83,9 @@ public class TopItemsGenerator extends AbstractUsageReportGenerator {
 
                 } else {
                     hasValidRelation = true;
-                    query = statisticsDatasetDisplay.composeQueryWithInverseRelation(root,
-                        discoveryConfiguration.getDefaultFilterQueries(), getDsoType());
+                    query = MATCH_ALL_QUERY;
+                    filterQueries.add(statisticsDatasetDisplay.composeJoinFilterQuery(root,
+                        discoveryConfiguration.getDefaultFilterQueries(), getDsoType()));
                 }
             }
             if (!hasValidRelation) {
@@ -96,8 +99,9 @@ public class TopItemsGenerator extends AbstractUsageReportGenerator {
             }
             String filter_query = statisticsDatasetDisplay.composeFilterQuery(startDate, endDate, hasValidRelation,
                 dsoType);
+            filterQueries.add(filter_query);
             String facetField = calculateFacetField(root);
-            ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filter_query, facetField,
+            ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filterQueries, facetField,
                     getMaxResults(), false, null, 1);
             UsageReportRest usageReportRest = new UsageReportRest();
             // if no data

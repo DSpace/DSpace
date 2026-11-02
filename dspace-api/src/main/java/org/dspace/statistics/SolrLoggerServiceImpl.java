@@ -37,6 +37,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -126,6 +128,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final Logger log = LogManager.getLogger();
 
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
+
+    /**
+     * Key of the logging context (ThreadContext) holding the name of the report generator that is running, used to
+     * identify the generator in the warning logged when the results of a query are partial.
+     */
+    public static final String GENERATOR_CONTEXT_KEY = "statisticsGenerator";
+
+    private static final String TIME_ALLOWED_PROPERTY = "solr-statistics.query.timeAllowed";
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -948,7 +958,24 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void query(String query, int max, int facetMinCount)
             throws SolrServerException, IOException {
-        query(query, null, null, 0, max, null, null, null, null, null, false, facetMinCount);
+        query(query, (String) null, null, 0, max, null, null, null, null, null, false, facetMinCount);
+    }
+
+    private Integer getTimeAllowed() {
+        String timeAllowed = configurationService.getProperty(TIME_ALLOWED_PROPERTY);
+        if (StringUtils.isBlank(timeAllowed)) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(timeAllowed.trim());
+        } catch (NumberFormatException e) {
+            log.warn("Ignoring the invalid {} value: {}", TIME_ALLOWED_PROPERTY, timeAllowed);
+            return null;
+        }
+    }
+
+    private List<String> singleFilterQuery(String filterQuery) {
+        return Collections.singletonList(filterQuery);
     }
 
     @Override
@@ -956,8 +983,17 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                                          String filterQuery, String facetField, int max, boolean showTotal,
                                          List<String> facetQueries, int facetMinCount)
             throws SolrServerException, IOException {
-        QueryResponse queryResponse = query(query, filterQuery, facetField,
-                                            0, max, null, null, null, facetQueries, null, false, facetMinCount);
+        return queryFacetField(query, singleFilterQuery(filterQuery), facetField, max, showTotal, facetQueries,
+                               facetMinCount);
+    }
+
+    @Override
+    public ObjectCount[] queryFacetField(String query,
+                                         List<String> filterQueries, String facetField, int max, boolean showTotal,
+                                         List<String> facetQueries, int facetMinCount)
+            throws SolrServerException, IOException {
+        QueryResponse queryResponse = reportQuery(query, filterQueries, facetField, 0, max, null, null, null, 1,
+                                                  facetQueries, null, false, facetMinCount, false, null, null);
         if (queryResponse == null) {
             return new ObjectCount[0];
         }
@@ -1017,10 +1053,28 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         int facetMinCount,
         int increment
     ) throws SolrServerException, IOException {
+        return queryFacetDateField(context, fieldList, facetField, query, singleFilterQuery(filterQuery), dateType,
+                                   dateStart, dateEnd, showTotal, facetMinCount, increment);
+    }
 
-        QueryResponse queryResponse = query(query, filterQuery, facetField, 0, -1, dateType, dateStart, dateEnd,
-                                            increment, null,
-                                            null, false, facetMinCount, false, null, fieldList);
+    @Override
+    public ObjectCount[] queryFacetDateField(
+        Context context,
+        String fieldList,
+        String facetField,
+        String query,
+        List<String> filterQueries,
+        String dateType,
+        String dateStart,
+        String dateEnd,
+        boolean showTotal,
+        int facetMinCount,
+        int increment
+    ) throws SolrServerException, IOException {
+
+        QueryResponse queryResponse = reportQuery(query, filterQueries, facetField, 0, -1, dateType, dateStart,
+                                                  dateEnd, increment, null, null, false, facetMinCount, false, null,
+                                                  fieldList);
 
         ObjectCount[] found = Optional.ofNullable(queryResponse)
                                       .map(QueryResponse::getFacetRanges)
@@ -1120,8 +1174,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public ObjectCount queryTotal(String query, String filterQuery, int facetMinCount)
         throws SolrServerException, IOException {
-        QueryResponse queryResponse = query(query, filterQuery, null, 0, -1, null,
-                                            null, null, null, null, false, facetMinCount);
+        return queryTotal(query, singleFilterQuery(filterQuery), facetMinCount);
+    }
+
+    @Override
+    public ObjectCount queryTotal(String query, List<String> filterQueries, int facetMinCount)
+        throws SolrServerException, IOException {
+        QueryResponse queryResponse = reportQuery(query, filterQueries, null, 0, -1, null, null, null, 1, null, null,
+                                                  false, facetMinCount, false, null, null);
         ObjectCount objCount = new ObjectCount();
         objCount.setCount(queryResponse.getResults().getNumFound());
 
@@ -1159,10 +1219,55 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     @Override
+    public QueryResponse query(String query, List<String> filterQueries, String facetField, int rows, int max,
+                               String dateType, String dateStart, String dateEnd, List<String> facetQueries,
+                               String sort, boolean ascending, int facetMinCount)
+        throws SolrServerException, IOException {
+        return query(query, filterQueries, facetField, rows, max, dateType, dateStart, dateEnd, 1, facetQueries,
+                     sort, ascending, facetMinCount, false, null, null);
+    }
+
+    @Override
     public QueryResponse query(String query, String filterQuery, String facetField, int rows,
                                int max, String dateType, String dateStart, String dateEnd, int increment,
                                List<String> facetQueries, String sort, boolean ascending, int facetMinCount,
                                boolean defaultFilterQueries, String pivotField, String fieldList)
+        throws SolrServerException, IOException {
+        return query(query, singleFilterQuery(filterQuery), facetField, rows, max, dateType, dateStart, dateEnd,
+                     increment, facetQueries, sort, ascending, facetMinCount, defaultFilterQueries, pivotField,
+                     fieldList);
+    }
+
+    @Override
+    public QueryResponse query(String query, List<String> filterQueries, String facetField, int rows,
+                               int max, String dateType, String dateStart, String dateEnd, int increment,
+                               List<String> facetQueries, String sort, boolean ascending, int facetMinCount,
+                               boolean defaultFilterQueries, String pivotField, String fieldList)
+        throws SolrServerException, IOException {
+        return executeQuery(false, query, filterQueries, facetField, rows, max, dateType, dateStart, dateEnd,
+                            increment, facetQueries, sort, ascending, facetMinCount, defaultFilterQueries,
+                            pivotField, fieldList);
+    }
+
+    /**
+     * Perform a query on behalf of a statistics report: the time allowed to Solr is limited by the
+     * {@code solr-statistics.query.timeAllowed} configuration, if any.
+     */
+    private QueryResponse reportQuery(String query, List<String> filterQueries, String facetField, int rows,
+                                      int max, String dateType, String dateStart, String dateEnd, int increment,
+                                      List<String> facetQueries, String sort, boolean ascending, int facetMinCount,
+                                      boolean defaultFilterQueries, String pivotField, String fieldList)
+        throws SolrServerException, IOException {
+        return executeQuery(true, query, filterQueries, facetField, rows, max, dateType, dateStart, dateEnd,
+                            increment, facetQueries, sort, ascending, facetMinCount, defaultFilterQueries,
+                            pivotField, fieldList);
+    }
+
+    private QueryResponse executeQuery(boolean report, String query, List<String> filterQueries, String facetField,
+                                       int rows, int max, String dateType, String dateStart, String dateEnd,
+                                       int increment, List<String> facetQueries, String sort, boolean ascending,
+                                       int facetMinCount, boolean defaultFilterQueries, String pivotField,
+                                       String fieldList)
         throws SolrServerException, IOException {
 
         if (solr == null) {
@@ -1251,12 +1356,23 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             solrQuery.addFilterQuery(bundleQuery.toString());
         }
 
-        if (filterQuery != null) {
-            solrQuery.addFilterQuery(filterQuery);
+        if (filterQueries != null) {
+            for (String filterQuery : filterQueries) {
+                if (filterQuery != null) {
+                    solrQuery.addFilterQuery(filterQuery);
+                }
+            }
         }
 
         if (StringUtils.isNotBlank(fieldList)) {
             solrQuery.add(CommonParams.FL, fieldList);
+        }
+
+        if (report) {
+            Integer timeAllowed = getTimeAllowed();
+            if (timeAllowed != null) {
+                solrQuery.setTimeAllowed(timeAllowed);
+            }
         }
 
         QueryResponse response;
@@ -1267,7 +1383,21 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             log.error("Error searching Solr usage events using query {}", query, e);
             throw e;
         }
+        if (report && isPartialResults(response)) {
+            log.warn("Partial results (timeAllowed={} ms expired) for the statistics report {}: q={} fq={}",
+                     solrQuery.getTimeAllowed(), getGeneratorName(), query, solrQuery.getFilterQueries());
+        }
         return response;
+    }
+
+    private boolean isPartialResults(QueryResponse response) {
+        return response != null && response.getHeader() != null
+            && Boolean.parseBoolean(String.valueOf(response.getHeader().get("partialResults")));
+    }
+
+    private String getGeneratorName() {
+        String generator = ThreadContext.get(GENERATOR_CONTEXT_KEY);
+        return generator != null ? generator : "(unknown generator)";
     }
 
     @Override

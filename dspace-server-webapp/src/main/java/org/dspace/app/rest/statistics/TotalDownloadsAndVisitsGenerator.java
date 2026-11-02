@@ -10,6 +10,8 @@ package org.dspace.app.rest.statistics;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -50,6 +52,7 @@ public class TotalDownloadsAndVisitsGenerator extends AbstractUsageReportGenerat
         boolean hasValidRelation = false;
         // query for item
         String query = "";
+        List<String> filterQueries = new ArrayList<>();
         if (getRelation() != null) {
             DiscoveryConfiguration discoveryConfiguration =
                 discoveryConfigurationService.getDiscoveryConfigurationByName(getRelation());
@@ -59,8 +62,9 @@ public class TotalDownloadsAndVisitsGenerator extends AbstractUsageReportGenerat
 
             } else {
                 hasValidRelation = true;
-                query = statisticsDatasetDisplay.composeQueryWithInverseRelation(dso,
-                    discoveryConfiguration.getDefaultFilterQueries(), dso.getType());
+                query = MATCH_ALL_QUERY;
+                filterQueries.add(statisticsDatasetDisplay.composeJoinFilterQuery(dso,
+                    discoveryConfiguration.getDefaultFilterQueries(), dso.getType()));
             }
         }
         if (!hasValidRelation) {
@@ -85,8 +89,9 @@ public class TotalDownloadsAndVisitsGenerator extends AbstractUsageReportGenerat
         UsageReportPointDsoTotalVisitsRest totalVisitPointBitstream = new UsageReportPointDsoTotalVisitsRest();
         totalVisitPointBitstream.setType("bitstream");
         totalVisitPointBitstream.setLabel("File visits");
+        filterQueries.add(filter_query);
         // first check item visits
-        ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filter_query, "id",
+        ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filterQueries, "id",
                 getMaxResults(), false, null, 1);
         //use accumulator in case the query returns more than one data
         int downloads = 0;

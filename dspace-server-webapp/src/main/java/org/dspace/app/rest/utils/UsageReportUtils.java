@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.model.UsageReportCategoryRest;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
@@ -33,6 +34,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.Dataset;
+import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
 import org.dspace.statistics.content.DatasetTimeGenerator;
 import org.dspace.statistics.content.DatasetTypeGenerator;
@@ -193,7 +195,7 @@ public class UsageReportUtils {
             throws ParseException, SolrServerException, IOException, SQLException {
         UsageReportGenerator generator = configuration.getReportGenerator(dso, reportId);
         if (generator != null) {
-            UsageReportRest usageReportRest = generator.createUsageReport(context, dso, null, null);
+            UsageReportRest usageReportRest = createUsageReport(generator, reportId, context, dso, null, null);
             usageReportRest.setId(dso.getID() + "_" + reportId);
             usageReportRest.setReportType(generator.getReportType());
             usageReportRest.setViewMode(generator.getViewMode());
@@ -250,7 +252,7 @@ public class UsageReportUtils {
             throws ParseException, SolrServerException, IOException, SQLException {
         UsageReportGenerator generator = configuration.getReportGenerator(dso, reportId);
         if (generator != null) {
-            UsageReportRest usageReportRest = generator.createUsageReport(context, dso, startDate, endDate);
+            UsageReportRest usageReportRest = createUsageReport(generator, reportId, context, dso, startDate, endDate);
             usageReportRest.setId(dso.getID() + "_" + reportId);
             usageReportRest.setReportType(generator.getReportType());
             usageReportRest.setViewMode(generator.getViewMode());
@@ -488,5 +490,21 @@ public class UsageReportUtils {
         typeAxis.setMax(typeAxisMax);
         statListing.addDatasetGenerator(typeAxis);
         return statListing.getDataset(context, facetMinCount);
+    }
+
+    /**
+     * Run the generator, publishing its name in the logging context so that a warning logged while the report query
+     * runs (e.g. partial results) can be traced back to the report being built.
+     */
+    private UsageReportRest createUsageReport(UsageReportGenerator generator, String reportId, Context context,
+                                              DSpaceObject dso, String startDate, String endDate)
+            throws ParseException, SolrServerException, IOException, SQLException {
+        ThreadContext.put(SolrLoggerServiceImpl.GENERATOR_CONTEXT_KEY,
+                          generator.getClass().getSimpleName() + " (" + reportId + ")");
+        try {
+            return generator.createUsageReport(context, dso, startDate, endDate);
+        } finally {
+            ThreadContext.remove(SolrLoggerServiceImpl.GENERATOR_CONTEXT_KEY);
+        }
     }
 }

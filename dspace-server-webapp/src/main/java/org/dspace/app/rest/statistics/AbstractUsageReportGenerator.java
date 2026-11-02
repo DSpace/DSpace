@@ -13,6 +13,7 @@ package org.dspace.app.rest.statistics;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public abstract class AbstractUsageReportGenerator implements UsageReportGenerator {
+    /** Main query of the reports whose selection is done by filter queries only. */
     protected static final String MATCH_ALL_QUERY = "*:*";
 
     private String viewMode = "table";

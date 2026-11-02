@@ -10,6 +10,8 @@ package org.dspace.app.rest.statistics;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.content.DSpaceObject;
@@ -56,6 +58,7 @@ public abstract class AbstractTopSolrStatsFieldGenerator extends AbstractUsageRe
         StatisticsDatasetDisplay statisticsDatasetDisplay = new StatisticsDatasetDisplay();
         Dataset dataset;
         String query = "";
+        List<String> filterQueries = new ArrayList<>();
         boolean hasValidRelation = false;
         if (getRelation() != null) {
             DiscoveryConfiguration discoveryConfiguration = discoveryConfigurationService
@@ -66,8 +69,9 @@ public abstract class AbstractTopSolrStatsFieldGenerator extends AbstractUsageRe
 
             } else {
                 hasValidRelation = true;
-                query = statisticsDatasetDisplay.composeQueryWithInverseRelation(
-                    dso, discoveryConfiguration.getDefaultFilterQueries(), getDsoType(dso));
+                query = MATCH_ALL_QUERY;
+                filterQueries.add(statisticsDatasetDisplay.composeJoinFilterQuery(
+                    dso, discoveryConfiguration.getDefaultFilterQueries(), getDsoType(dso)));
             }
         }
 
@@ -84,7 +88,8 @@ public abstract class AbstractTopSolrStatsFieldGenerator extends AbstractUsageRe
 
         String filter_query = statisticsDatasetDisplay
                                   .composeFilterQuery(startDate, endDate, hasValidRelation, getDsoType(dso));
-        ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filter_query, typeAxisString,
+        filterQueries.add(filter_query);
+        ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, filterQueries, typeAxisString,
                 getMaxResults(), false, null, 1);
         dataset = new Dataset(1, topCounts.length);
         for (int i = 0; i < topCounts.length; i++) {
