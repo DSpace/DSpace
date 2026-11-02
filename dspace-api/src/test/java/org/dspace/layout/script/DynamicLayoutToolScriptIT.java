@@ -521,6 +521,84 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
     }
 
     /**
+     * Verifies that two leading tabs declared for the <em>same</em> entity type but <em>different</em>
+     * custom-filter scopes (e.g. {@code Person.book} and {@code Person.article}) are accepted: the
+     * "only one leading tab" rule applies per qualified scope (entity type + custom filter), not per
+     * bare entity type. The leading-tab validation keys on the full ENTITY value, so these two
+     * distinct scopes each get their own leading tab and the import succeeds.
+     * <p>
+     * On the unpatched validator (which truncated the ENTITY value at the first {@code .} and grouped
+     * both rows under {@code Person}) this import is wrongly rejected as a duplicate leading tab.
+     */
+    @Test
+    public void testLeadingTabsForDifferentCustomFiltersAreAllowed() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+
+        DynamicLayoutBox bookBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Book Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("bookBox")
+            .build();
+        DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("bookTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Book Tab")
+            .withLeading(true)
+            .withCustomFilter("book")
+            .addBoxIntoNewRow(bookBox)
+            .build();
+
+        DynamicLayoutBox articleBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Article Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("articleBox")
+            .build();
+        DynamicLayoutTabBuilder.createTab(context, personType, 1)
+            .withShortName("articleTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Article Tab")
+            .withLeading(true)
+            .withCustomFilter("article")
+            .addBoxIntoNewRow(articleBox)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), hasSize(2));
+
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+
+            // The two leading tabs live on different scopes, so the import must not be rejected.
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            List<DynamicLayoutTab> bookTabs = tabService.findByEntityType(context, "Person", "book");
+            assertThat(bookTabs, hasSize(1));
+            assertThat(bookTabs.get(0).getShortName(), is("bookTab"));
+            assertThat(bookTabs.get(0).isLeading(), is(true));
+
+            List<DynamicLayoutTab> articleTabs = tabService.findByEntityType(context, "Person", "article");
+            assertThat(articleTabs, hasSize(1));
+            assertThat(articleTabs.get(0).getShortName(), is("articleTab"));
+            assertThat(articleTabs.get(0).isLeading(), is(true));
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
+    /**
      * Verifies that when a box shortname is referenced from multiple cells (i.e. multiple box
      * instances share the same entity + shortname), the export writes a single box row and keeps
      * a tab2box reference for each cell. This is the export-side de-duplication that prevents box

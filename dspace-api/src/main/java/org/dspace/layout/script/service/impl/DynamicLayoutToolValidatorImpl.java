@@ -135,9 +135,14 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
     }
 
     /**
-     * Validates that at most one leading tab is defined for each entity type in the tab sheet. If
-     * more than one row with a truthy {@link #LEADING_COLUMN} value is found for the same entity
-     * type, an error is added to the given result.
+     * Validates that at most one leading tab is defined for each tab scope in the tab sheet. A tab
+     * scope is the full ENTITY column value, i.e. either a bare entity type (e.g. {@code Publication})
+     * or an entity type qualified by a custom filter / {@code dc.type} subtype (e.g.
+     * {@code Publication.book}). A layout may legitimately declare a distinct leading tab for each
+     * qualified scope (e.g. one for {@code Publication.book} and one for {@code Publication.article}),
+     * so uniqueness is enforced on the full ENTITY value rather than on the truncated entity type.
+     * If more than one row with a truthy {@link #LEADING_COLUMN} value is found for the same scope,
+     * an error is added to the given result.
      *
      * @param tabSheet         the tab sheet to validate
      * @param result           the validation result to populate with errors
@@ -147,19 +152,19 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
     private void validateDuplicateLeadingTabs(Sheet tabSheet, DynamicLayoutToolValidationResult result,
         int entityTypeColumn, int leadingColumn) {
 
-        Map<String, List<Integer>> leadingRowsByEntityType = new HashMap<>();
+        Map<String, List<Integer>> leadingRowsByScope = new HashMap<>();
 
         for (Row row : getNotEmptyRowsSkippingHeader(tabSheet)) {
-            String entityType = getEntityTypeCellValue(row, entityTypeColumn);
+            String scope = getCellValue(row, entityTypeColumn);
             String leading = getCellValue(row, leadingColumn);
 
-            if (StringUtils.isNotBlank(entityType) && isTruthyBoolean(leading)) {
-                leadingRowsByEntityType.computeIfAbsent(entityType, k -> new ArrayList<>())
+            if (StringUtils.isNotBlank(scope) && isTruthyBoolean(leading)) {
+                leadingRowsByScope.computeIfAbsent(scope, k -> new ArrayList<>())
                     .add(row.getRowNum() + 1);
             }
         }
 
-        leadingRowsByEntityType.entrySet().stream()
+        leadingRowsByScope.entrySet().stream()
             .filter(entry -> entry.getValue().size() > 1)
             .forEach(entry -> result.addError("The sheet " + TAB_SHEET + " contains more than one leading tab for "
                 + "entity type '" + entry.getKey() + "' at rows " + entry.getValue()
