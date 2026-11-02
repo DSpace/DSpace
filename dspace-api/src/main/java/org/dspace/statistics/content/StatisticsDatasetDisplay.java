@@ -288,6 +288,23 @@ public class StatisticsDatasetDisplay {
 
         query.append(configurationService.getProperty("solr.multicorePrefix"));
         query.append("search} ");
+        query.append(composeJoinedItemsQuery(dSpaceObject, default_queries));
+
+        return query.toString();
+    }
+
+    /**
+     * Creates the query, to be run on the search core, that selects the items joined by
+     * {@link #composeQueryWithInverseRelation(DSpaceObject, List, int)}. It is the part of the join query without the
+     * {@code {!join ...}} prefix, so it can be run directly against the search core (e.g. to discover, with a single
+     * query, which categories actually have items).
+     *
+     * @param dSpaceObject    the object that replaces the {0} placeholder in the default queries, may be null
+     * @param default_queries the default filter queries of the discovery configuration
+     * @return the query on the search core
+     */
+    public String composeJoinedItemsQuery(DSpaceObject dSpaceObject, List<String> default_queries) {
+        StringBuilder query = new StringBuilder();
         boolean isFirstDefaultQuery = true;
         for (String default_query : default_queries) {
             if (!isFirstDefaultQuery) {
