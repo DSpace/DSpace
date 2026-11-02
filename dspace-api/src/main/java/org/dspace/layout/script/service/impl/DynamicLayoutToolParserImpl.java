@@ -10,6 +10,7 @@ package org.dspace.layout.script.service.impl;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.ALTERNATIVE_TO_COLUMN;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BITSTREAM_TYPE;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX2METADATA_SHEET;
+import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX2METRICS_SHEET;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOXES_COLUMN;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX_COLUMN;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX_POLICY_SHEET;
@@ -29,6 +30,7 @@ import static org.dspace.layout.script.service.DynamicLayoutToolValidator.METADA
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.METADATAGROUP_TYPE;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.METADATA_COLUMN;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.METADATA_TYPE;
+import static org.dspace.layout.script.service.DynamicLayoutToolValidator.METRIC_TYPE_COLUMN;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.MINOR_COLUMN;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.PARENT_COLUMN;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.PRIORITY_COLUMN;
@@ -49,6 +51,7 @@ import static org.dspace.layout.script.service.DynamicLayoutToolValidator.VALUES
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.VALUE_COLUMN;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -81,6 +84,7 @@ import org.dspace.layout.DynamicLayoutCell;
 import org.dspace.layout.DynamicLayoutField;
 import org.dspace.layout.DynamicLayoutFieldBitstream;
 import org.dspace.layout.DynamicLayoutFieldMetadata;
+import org.dspace.layout.DynamicLayoutMetric2Box;
 import org.dspace.layout.DynamicLayoutRow;
 import org.dspace.layout.DynamicLayoutTab;
 import org.dspace.layout.DynamicLayoutTab2SecurityGroup;
@@ -232,6 +236,8 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
 
         if (boxType.equals(DynamicLayoutBoxTypes.METADATA.name())) {
             buildDynamicLayoutFields(context, workbook, entityColumn, boxName).forEach(box::addLayoutField);
+        } else if (boxType.equals(DynamicLayoutBoxTypes.METRICS.name())) {
+            buildBoxMetrics(workbook, entityColumn, boxName).forEach(box::addMetric2box);
         }
 
         return box;
@@ -246,6 +252,27 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         return getRowsByQualifiedEntityAndColumnValue(box2metadataSheet, entityColumn, BOX_COLUMN, boxName)
             .map(row -> buildDynamicLayoutField(context, row, priority))
             .collect(Collectors.toList());
+    }
+
+    private List<DynamicLayoutMetric2Box> buildBoxMetrics(Workbook workbook, String entityColumn, String boxName) {
+        Sheet metricsSheet = getSheetByName(workbook, BOX2METRICS_SHEET);
+        return getRowsByQualifiedEntityAndColumnValue(metricsSheet, entityColumn, BOX_COLUMN, boxName)
+            .map(row -> getCellValue(row, METRIC_TYPE_COLUMN))
+            .filter(metrics -> StringUtils.isNotBlank(metrics))
+            .flatMap(metrics -> buildBoxMetrics(metrics.split(",")))
+            .collect(Collectors.toList());
+    }
+
+    private Stream<DynamicLayoutMetric2Box> buildBoxMetrics(String[] metrics) {
+        int position = 0;
+        List<DynamicLayoutMetric2Box> metricEntities = new ArrayList<>();
+        for (String metric : metrics) {
+            DynamicLayoutMetric2Box metricEntity = new DynamicLayoutMetric2Box();
+            metricEntity.setPosition(position++);
+            metricEntity.setType(metric.trim());
+            metricEntities.add(metricEntity);
+        }
+        return metricEntities.stream();
     }
 
     private DynamicLayoutField buildDynamicLayoutField(Context context, Row row, AtomicInteger priority) {

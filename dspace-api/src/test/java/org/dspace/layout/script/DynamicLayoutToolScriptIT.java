@@ -754,13 +754,14 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         assertThat(handler.getWarningMessages(), empty());
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat(errorMessages, hasSize(7));
+        assertThat(errorMessages, hasSize(8));
         assertThat(errorMessages, containsInAnyOrder(
             "The tab sheet is missing",
             "The box sheet is missing",
             "The tab2box sheet is missing",
             "The box2metadata sheet is missing",
             "The metadatagroups sheet is missing",
+            "The box2metrics sheet is missing",
             "The boxpolicy sheet is missing",
             "The tabpolicy sheet is missing"));
     }
@@ -777,7 +778,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         assertThat(handler.getWarningMessages(), empty());
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat(errorMessages, hasSize(41));
+        assertThat(errorMessages, hasSize(44));
         assertThat(errorMessages, containsInAnyOrder(
             "The sheet tab has no ENTITY column",
             "The sheet tab has no LEADING column",
@@ -819,7 +820,10 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             "The sheet tabpolicy has no GROUP column",
             "The sheet boxpolicy has no GROUP column",
             "The sheet box2metadata has no RENDERING column",
-            "The sheet metadatagroups has no RENDERING column"));
+            "The sheet metadatagroups has no RENDERING column",
+            "The sheet box2metrics has no ENTITY column",
+            "The sheet box2metrics has no BOX column",
+            "The sheet box2metrics has no METRIC_TYPE column"));
     }
 
     @Test
@@ -1053,6 +1057,12 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         assertThat(publicationTabSecondCell.getStyle(), is("cell-1-style"));
         assertThat(publicationTabSecondCell.getBoxes(), hasSize(1));
 
+        DynamicLayoutBox publicationMetricsBox = publicationTabSecondCell.getBoxes().get(0);
+        assertThatBoxHas(publicationMetricsBox, "metrics", "METRICS", "Publication", "Metrics", 0, 2,
+            false, true, true, null, LayoutSecurity.CUSTOM_DATA);
+        assertThat(publicationMetricsBox.getMetric2box(), containsInAnyOrder(
+            matches(metric -> metric.getType().equals("scopusCitation")),
+            matches(metric -> metric.getType().equals("wosCitation"))));
     }
 
     @Test

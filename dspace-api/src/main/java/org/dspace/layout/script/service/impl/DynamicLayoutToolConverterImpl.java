@@ -8,6 +8,7 @@
 package org.dspace.layout.script.service.impl;
 
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX2METADATA_SHEET;
+import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX2METRICS_SHEET;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX_POLICY_SHEET;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.BOX_SHEET;
 import static org.dspace.layout.script.service.DynamicLayoutToolValidator.METADATAGROUPS_SHEET;
@@ -38,6 +39,7 @@ import org.dspace.layout.DynamicLayoutBox2SecurityGroup;
 import org.dspace.layout.DynamicLayoutCell;
 import org.dspace.layout.DynamicLayoutField;
 import org.dspace.layout.DynamicLayoutFieldBitstream;
+import org.dspace.layout.DynamicLayoutMetric2Box;
 import org.dspace.layout.DynamicLayoutTab;
 import org.dspace.layout.DynamicLayoutTab2SecurityGroup;
 import org.dspace.layout.DynamicMetadataGroup;
@@ -164,7 +166,28 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
         boxes.forEach(box -> {
             buildBoxRow(sheet, box);
             buildBox2metadata(sheet.getWorkbook(), box.getLayoutFields());
+            buildBox2metrics(sheet.getWorkbook(), box);
         });
+    }
+
+    private void buildBox2metrics(Workbook workbook, DynamicLayoutBox box) {
+        Sheet sheet = workbook.getSheet(BOX2METRICS_SHEET);
+        buildBox2metricsRow(sheet, box);
+    }
+
+    private void buildBox2metricsRow(Sheet sheet, DynamicLayoutBox box) {
+        if (CollectionUtils.isNotEmpty(box.getMetric2box())) {
+            Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+            createCell(row, 0, box.getCell().getRow().getTab().getEntity().getLabel());
+            createCell(row, 1, box.getShortname());
+            createCell(row, 2, getMetric2BoxTypes(box.getMetric2box()));
+        }
+    }
+
+    private String getMetric2BoxTypes(List<DynamicLayoutMetric2Box> dynamicLayoutMetric2Boxes) {
+        return dynamicLayoutMetric2Boxes.stream()
+                                        .map(DynamicLayoutMetric2Box::getType)
+                                        .collect(Collectors.joining(", "));
     }
 
     private void buildBoxRow(Sheet sheet, DynamicLayoutBox box) {
@@ -348,6 +371,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
         autoSizeColumns(workbook.getSheet(BOX_SHEET));
         autoSizeColumns(workbook.getSheet(BOX2METADATA_SHEET));
         autoSizeColumns(workbook.getSheet(METADATAGROUPS_SHEET));
+        autoSizeColumns(workbook.getSheet(BOX2METRICS_SHEET));
         autoSizeColumns(workbook.getSheet(TAB_POLICY_SHEET));
         autoSizeColumns(workbook.getSheet(BOX_POLICY_SHEET));
     }

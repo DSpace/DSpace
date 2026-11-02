@@ -31,6 +31,8 @@ public interface DynamicLayoutToolValidator {
 
     String METADATAGROUPS_SHEET = "metadatagroups";
 
+    String BOX2METRICS_SHEET = "box2metrics";
+
     String TAB_POLICY_SHEET = "tabpolicy";
 
     String BOX_POLICY_SHEET = "boxpolicy";
@@ -95,6 +97,8 @@ public interface DynamicLayoutToolValidator {
     String FIELD_TYPE_COLUMN = "FIELDTYPE";
 
     String METADATA_COLUMN = "METADATA";
+
+    String METRIC_TYPE_COLUMN = "METRIC_TYPE";
 
     String VALUE_COLUMN = "VALUE";
 
