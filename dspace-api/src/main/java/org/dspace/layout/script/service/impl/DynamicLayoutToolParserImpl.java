@@ -121,7 +121,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
 
             tab.getBoxes().forEach(box ->
                 box.setBox2SecurityGroups(buildBox2SecurityGroups(context,
-                    workbook, BOX_POLICY_SHEET, box.getEntitytype().getLabel(), box.getShortname(), box, tabs)));
+                    workbook, BOX_POLICY_SHEET, toEntityColumn(tab), box.getShortname(), box, tabs)));
         });
 
         return  tabs;
@@ -188,7 +188,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
 
     private List<DynamicLayoutBox> buildBoxes(Context context, Row tab2boxRow) {
 
-        String entityType = getEntityValue(tab2boxRow, ENTITY_COLUMN);
+        String entityColumn = getCellValue(tab2boxRow, ENTITY_COLUMN);
 
         String boxes = getCellValue(tab2boxRow, BOXES_COLUMN);
         if (StringUtils.isBlank(boxes)) {
@@ -200,14 +200,14 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
 
         return Arrays.stream(boxes.split(","))
             .map(String::trim)
-            .map(box -> buildBox(context, boxSheet, entityType, box))
+            .map(box -> buildBox(context, boxSheet, entityColumn, box))
             .collect(Collectors.toList());
     }
 
-    private DynamicLayoutBox buildBox(Context context, Sheet boxSheet, String entityType, String boxName) {
+    private DynamicLayoutBox buildBox(Context context, Sheet boxSheet, String entityColumn, String boxName) {
 
         Workbook workbook = boxSheet.getWorkbook();
-        Row boxRow = getBowRowFromBoxSheet(boxSheet, entityType, boxName);
+        Row boxRow = getBowRowFromBoxSheet(boxSheet, entityColumn, boxName);
 
         DynamicLayoutBox box = new DynamicLayoutBox();
 
@@ -221,29 +221,29 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         box.setType(boxType);
         box.setCollapsed(toBoolean(getCellValue(boxRow, COLLAPSED_COLUMN)));
         box.setContainer(toBoolean(getCellValue(boxRow, CONTAINER_COLUMN)));
-        box.setEntitytype(getEntityType(context, entityType));
+        box.setEntitytype(getEntityType(context, toEntityType(entityColumn)));
         box.setHeader(getCellValue(boxRow, LABEL_COLUMN));
         box.setMinor(toBoolean(getCellValue(boxRow, MINOR_COLUMN)));
         box.setSecurity(toSecurity(getCellValue(boxRow, SECURITY_COLUMN)));
         box.setShortname(boxName);
         box.setStyle(getCellValue(boxRow, STYLE_COLUMN));
         box.setMetadataSecurityFields(buildMetadataSecurityField(context, workbook,
-            BOX_POLICY_SHEET, entityType, boxName, false));
+            BOX_POLICY_SHEET, entityColumn, boxName, true));
 
         if (boxType.equals(DynamicLayoutBoxTypes.METADATA.name())) {
-            buildDynamicLayoutFields(context, workbook, entityType, boxName).forEach(box::addLayoutField);
+            buildDynamicLayoutFields(context, workbook, entityColumn, boxName).forEach(box::addLayoutField);
         }
 
         return box;
     }
 
-    private List<DynamicLayoutField> buildDynamicLayoutFields(Context context, Workbook workbook, String entityType,
+    private List<DynamicLayoutField> buildDynamicLayoutFields(Context context, Workbook workbook, String entityColumn,
         String boxName) {
 
         Sheet box2metadataSheet = getSheetByName(workbook, BOX2METADATA_SHEET);
 
         AtomicInteger priority = new AtomicInteger(0);
-        return getRowsByEntityAndColumnValue(box2metadataSheet, entityType, BOX_COLUMN, boxName)
+        return getRowsByQualifiedEntityAndColumnValue(box2metadataSheet, entityColumn, BOX_COLUMN, boxName)
             .map(row -> buildDynamicLayoutField(context, row, priority))
             .collect(Collectors.toList());
     }
@@ -293,13 +293,13 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
 
     private List<DynamicMetadataGroup> buildDynamicMetadataGroups(Context context, Row row) {
         String metadataField = getCellValue(row, METADATA_COLUMN);
-        String entity = getEntityValue(row, ENTITY_COLUMN);
+        String entityColumn = getCellValue(row, ENTITY_COLUMN);
 
         Sheet metadatagroupsSheet = getSheetByName(row.getSheet().getWorkbook(), METADATAGROUPS_SHEET);
 
         AtomicInteger priority = new AtomicInteger(0);
-        return getRowsByEntityAndColumnValue(metadatagroupsSheet, entity, PARENT_COLUMN, metadataField)
-            .map(groupRow -> buildDynamicMetadataGroup(context, groupRow, entity, priority))
+        return getRowsByQualifiedEntityAndColumnValue(metadatagroupsSheet, entityColumn, PARENT_COLUMN, metadataField)
+            .map(groupRow -> buildDynamicMetadataGroup(context, groupRow, entityColumn, priority))
             .collect(Collectors.toList());
     }
 
@@ -325,11 +325,11 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         return field;
     }
 
-    private Row getBowRowFromBoxSheet(Sheet boxSheet, String entity, String boxName) {
-        return getRowsByEntityAndColumnValue(boxSheet, entity, SHORTNAME_COLUMN, boxName)
+    private Row getBowRowFromBoxSheet(Sheet boxSheet, String entityColumn, String boxName) {
+        return getRowsByQualifiedEntityAndColumnValue(boxSheet, entityColumn, SHORTNAME_COLUMN, boxName)
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No box found with entity "
-                + entity + " and name " + boxName));
+                + entityColumn + " and name " + boxName));
     }
 
     private Optional<String> getFirstNotEmptyRowStyle(List<Row> tab2boxRows) {
@@ -374,7 +374,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         Sheet sheet = getSheetByName(workbook, sheetName);
         Set<DynamicLayoutBox2SecurityGroup> box2SecurityGroups = new HashSet<>();
 
-        getRowsByEntityAndColumnValue(sheet, entity, SHORTNAME_COLUMN, name)
+        getRowsByQualifiedEntityAndColumnValue(sheet, entity, SHORTNAME_COLUMN, name)
             .forEach(row -> {
                 String groupName = getCellValue(row, GROUP_COLUMN);
                 String alternativeBox = getCellValue(row, ALTERNATIVE_TO_COLUMN);
@@ -403,7 +403,8 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
             findAlternativeBox(alternativeBox, entity, tabs));
     }
 
-    private DynamicLayoutBox findAlternativeBox(String alternativeBox, String entityType, List<DynamicLayoutTab> tabs) {
+    private DynamicLayoutBox findAlternativeBox(String alternativeBox, String entityColumn,
+            List<DynamicLayoutTab> tabs) {
 
         if (alternativeBox == null) {
             return null;
@@ -412,10 +413,10 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
         return tabs.stream()
                    .flatMap(tab -> tab.getBoxes().stream())
                    .filter(dynamicLayoutBox -> dynamicLayoutBox.getShortname().equals(alternativeBox) &&
-                       dynamicLayoutBox.getEntitytype().getLabel().equals(entityType))
+                       toEntityColumn(dynamicLayoutBox.getCell().getRow().getTab()).equals(entityColumn))
                    .findFirst()
                    .orElseThrow(() -> new RuntimeException("Alternative box not found for shortname: " +
-                       alternativeBox + ", entityType: " + entityType));
+                       alternativeBox + ", entityType: " + entityColumn));
     }
 
     private Set<DynamicLayoutTab2SecurityGroup> buildTab2SecurityGroups(Context context, Workbook workbook,
@@ -434,7 +435,7 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
                     Group group = getGroupField(context, groupName);
                     if (group != null) {
                         tab2SecurityGroups.add(
-                            buildTab2SecurityGroup(group, dynamicLayoutTab, toEntityType(entity), alternativeTab, tabs)
+                            buildTab2SecurityGroup(group, dynamicLayoutTab, entity, alternativeTab, tabs)
                         );
                     }
                 }
@@ -454,7 +455,8 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
             findAlternativeTab(alternativeTab, entity, tabs));
     }
 
-    private DynamicLayoutTab findAlternativeTab(String alternativeTab, String entityType, List<DynamicLayoutTab> tabs) {
+    private DynamicLayoutTab findAlternativeTab(String alternativeTab, String entityColumn,
+            List<DynamicLayoutTab> tabs) {
 
         if (alternativeTab == null) {
             return null;
@@ -462,10 +464,10 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
 
         return tabs.stream()
                    .filter(dynamicLayoutTab -> dynamicLayoutTab.getShortName().equals(alternativeTab) &&
-                       dynamicLayoutTab.getEntity().getLabel().equals(entityType))
+                       toEntityColumn(dynamicLayoutTab).equals(entityColumn))
                    .findFirst()
                    .orElseThrow(() -> new RuntimeException("Alternative tab not found for shortname: " +
-                       alternativeTab + ", entityType: " + entityType));
+                       alternativeTab + ", entityType: " + entityColumn));
     }
 
     private Stream<Row> getRowsByEntityAndColumnValue(Sheet sheet, String entity, String columnName, String value) {

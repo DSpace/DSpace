@@ -214,6 +214,19 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
 
     }
 
+    /**
+     * Validates that no two box rows in the box sheet share the same scope and shortname. A box scope
+     * is the full ENTITY column value, i.e. either a bare entity type (e.g. {@code Publication}) or an
+     * entity type qualified by a custom filter / {@code dc.type} subtype (e.g. {@code Publication.book}).
+     * Two tabs that share an entity type but differ by custom filter may legitimately own boxes with the
+     * same shortname (e.g. {@code Publication.book:main} and {@code Publication.article:main}), so
+     * uniqueness is enforced on the full ENTITY value rather than on the truncated entity type.
+     *
+     * @param boxSheet         the box sheet to validate
+     * @param result           the validation result to populate with errors
+     * @param entityTypeColumn the index of the ENTITY column
+     * @param shortnameColumn  the index of the shortname column
+     */
     private void validateDuplicateBoxes(Sheet boxSheet, DynamicLayoutToolValidationResult result,
                                         int entityTypeColumn, int shortnameColumn) {
 
@@ -221,7 +234,7 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
         Map<String, List<Integer>> originalToRows = new HashMap<>();
 
         for (Row row : getNotEmptyRowsSkippingHeader(boxSheet)) {
-            String entityType = getEntityTypeCellValue(row, entityTypeColumn);
+            String entityType = getCellValue(row, entityTypeColumn);
             String shortname = getCellValue(row, shortnameColumn);
 
             if (StringUtils.isNotBlank(entityType) && StringUtils.isNotBlank(shortname)) {

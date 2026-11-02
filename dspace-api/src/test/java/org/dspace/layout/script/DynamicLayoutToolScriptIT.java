@@ -1416,6 +1416,140 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         assertThat(context.reloadEntity(alternativeBox), notNullValue());
     }
 
+    @Test
+    public void testExportImportSharedBoxShortnameAcrossScopes() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("box")
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("scopedTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Scoped Tab")
+            .withLeading(false)
+            .withCustomFilter("special")
+            .addBoxIntoNewRow(box)
+            .build();
+
+        DynamicLayoutBox defaultBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Default Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("box")
+            .build();
+        DynamicLayoutTabBuilder.createTab(context, personType, 1)
+            .withShortName("defaultTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Default Tab")
+            .withLeading(false)
+            .addBoxIntoNewRow(defaultBox)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            List<DynamicLayoutTab> scopedTabs = tabService.findByEntityType(context, "Person", "special");
+            assertThat(scopedTabs, hasSize(1));
+            assertThat(scopedTabs.get(0).getShortName(), is("scopedTab"));
+            assertThat("Scoped tab must retain only its original box", scopedTabs.get(0).getBoxes(), hasSize(1));
+            assertThat(scopedTabs.get(0).getBoxes().get(0).getShortname(), is("box"));
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
+    @Test
+    public void testExportImportAlternativeTabRetainsScope() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("box")
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("scopedTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Scoped Tab")
+            .withLeading(false)
+            .withCustomFilter("special")
+            .addBoxIntoNewRow(box)
+            .build();
+
+        DynamicLayoutBox defaultBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Default Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("defaultBox")
+            .build();
+        DynamicLayoutTab defaultTab = DynamicLayoutTabBuilder.createTab(context, personType, 1)
+            .withShortName("scopedTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Default Tab")
+            .withLeading(false)
+            .addBoxIntoNewRow(defaultBox)
+            .build();
+
+        Group group = GroupBuilder.createGroup(context).withName("Researchers").build();
+        DynamicLayoutBox ownerBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Owner Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("ownerBox")
+            .build();
+        DynamicLayoutTabBuilder.createTab(context, personType, 2)
+            .withShortName("owner")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .withHeader("Owner")
+            .withLeading(false)
+            .addBoxIntoNewRow(ownerBox)
+            .addTab2SecurityGroups(group, defaultTab)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            DynamicLayoutTab owner = findTab(tabService.findByEntityType(context, "Person", null), "owner");
+            DynamicLayoutTab target = owner.getTab2SecurityGroups().iterator().next().getAlternativeTab();
+            assertThat("Alternative must remain the default tab", target.getCustomFilter(), nullValue());
+            assertThat(target.getShortName(), is("scopedTab"));
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
     private EntityType createEntityType(String entityType) {
         return EntityTypeBuilder.createEntityTypeBuilder(context, entityType).build();
     }

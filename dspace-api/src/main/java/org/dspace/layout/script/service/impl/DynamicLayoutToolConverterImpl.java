@@ -169,7 +169,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
 
     private void buildBoxRow(Sheet sheet, DynamicLayoutBox box) {
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, box.getCell().getRow().getTab().getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(box.getCell().getRow().getTab()));
         createCell(row, 1, convertToString(box.getCollapsed()));
         createCell(row, 2, box.getType());
         createCell(row, 3, box.getShortname());
@@ -190,7 +190,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
 
     private void buildBox2metadataRow(Sheet sheet, DynamicLayoutField layoutField) {
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, layoutField.getBox().getCell().getRow().getTab().getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(layoutField.getBox().getCell().getRow().getTab()));
         createCell(row, 1, layoutField.getBox().getShortname());
         createCell(row, 2, String.valueOf(layoutField.getRow()));
         createCell(row, 3, String.valueOf(layoutField.getCell()));
@@ -249,7 +249,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
         DynamicLayoutField dynamicLayoutField = dynamicMetadataGroup.getDynamicLayoutField();
 
-        createCell(row, 0, dynamicLayoutField.getBox().getCell().getRow().getTab().getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(dynamicLayoutField.getBox().getCell().getRow().getTab()));
         createCell(row, 1, dynamicLayoutField.getMetadataField().toString('.'));
         createCell(row, 2, dynamicLayoutField.getType());
         createCell(row, 3, dynamicMetadataGroup.getMetadataField().toString('.'));
@@ -313,7 +313,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
     private void buildBoxPolicyMetadataSecurityFieldRow(Sheet sheet, DynamicLayoutBox box,
             MetadataField metadataField) {
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, box.getCell().getRow().getTab().getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(box.getCell().getRow().getTab()));
         createCell(row, 1, box.getShortname());
         createCell(row, 2, metadataField.toString('.'));
         createCell(row, 3, "");
@@ -325,7 +325,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
 
         DynamicLayoutBox alternativeBox = box2SecurityGroup.getAlternativeBox();
         Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-        createCell(row, 0, box.getCell().getRow().getTab().getEntity().getLabel());
+        createCell(row, 0, toEntityColumn(box.getCell().getRow().getTab()));
         createCell(row, 1, box.getShortname());
         createCell(row, 2, "");
         createCell(row, 3, box2SecurityGroup.getGroup().getName());
