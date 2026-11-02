@@ -61,7 +61,8 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
             ccLicenseFields.add(new CCLicenseField(licenseFieldId,
                                                    licenseFieldLabel,
                                                    licenseFieldDescription,
-                                                   mockLicenseFields));
+                                                   mockLicenseFields,
+                                                   ""));
 
         }
 
@@ -75,7 +76,7 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
             String enumLabel = "License " + count + " - Field " + index + " - Enum " + i + " - Label";
             String enumDescription = "License " + count + " - Field " + index + " - Enum " + i + " - " +
                     "Description";
-            ccLicenseFieldEnumList.add(new CCLicenseFieldEnum(enumId, enumLabel, enumDescription));
+            ccLicenseFieldEnumList.add(new CCLicenseFieldEnum(enumId, enumLabel, enumDescription, false));
         }
         return ccLicenseFieldEnumList;
 

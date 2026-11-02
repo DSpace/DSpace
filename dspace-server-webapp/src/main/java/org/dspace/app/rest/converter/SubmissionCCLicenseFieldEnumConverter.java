@@ -34,6 +34,7 @@ public class SubmissionCCLicenseFieldEnumConverter
         submissionCCLicenseFieldEnumRest.setId(modelObject.getId());
         submissionCCLicenseFieldEnumRest.setLabel(modelObject.getLabel());
         submissionCCLicenseFieldEnumRest.setDescription(modelObject.getDescription());
+        submissionCCLicenseFieldEnumRest.setDefault(modelObject.getDefault());
 
         return submissionCCLicenseFieldEnumRest;
     }
