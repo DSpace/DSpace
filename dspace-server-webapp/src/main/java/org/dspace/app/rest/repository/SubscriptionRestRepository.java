@@ -9,8 +9,6 @@ package org.dspace.app.rest.repository;
 
 import static org.dspace.app.rest.model.SubscriptionRest.CATEGORY;
 import static org.dspace.app.rest.model.SubscriptionRest.NAME;
-import static org.dspace.core.Constants.COLLECTION;
-import static org.dspace.core.Constants.COMMUNITY;
 import static org.dspace.core.Constants.READ;
 
 import java.io.IOException;
@@ -180,24 +178,19 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 }
             }
 
-            if (dSpaceObject.getType() == COMMUNITY || dSpaceObject.getType() == COLLECTION) {
-                Subscription subscription = null;
-                ServletInputStream input = req.getInputStream();
-                SubscriptionRest subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
-                List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest
-                        .getSubscriptionParameterList();
-                if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
-                    List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
-                    validateParameters(subscriptionRest, subscriptionParameterList, subscriptionParameters);
-                    subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters,
-                                                              subscriptionRest.getSubscriptionType());
-                }
-                context.commit();
-                return converter.toRest(subscription, utils.obtainProjection());
-            } else {
-                throw new DSpaceBadRequestException(
-                        "Currently subscription is supported only for Community and Collection");
+            Subscription subscription = null;
+            ServletInputStream input = req.getInputStream();
+            SubscriptionRest subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
+            List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest
+                    .getSubscriptionParameterList();
+            if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
+                List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
+                validateParameters(subscriptionRest, subscriptionParameterList, subscriptionParameters);
+                subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters,
+                                                          subscriptionRest.getSubscriptionType());
             }
+            context.commit();
+            return converter.toRest(subscription, utils.obtainProjection());
         } catch (SQLException sqlException) {
             throw new SQLException(sqlException.getMessage(), sqlException);
         } catch (IOException ioException) {
