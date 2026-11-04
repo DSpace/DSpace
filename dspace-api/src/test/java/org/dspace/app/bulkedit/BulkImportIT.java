@@ -47,8 +47,10 @@ import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -60,6 +62,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.bulkimport.util.ImportFileUtil;
 import org.dspace.app.launcher.ScriptLauncher;
@@ -98,6 +104,7 @@ import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
@@ -2746,6 +2753,173 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         List<String> errorMessages = handler.getErrorMessages();
         assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("The user is not an admin of the given collection"));
+    }
+
+    /**
+     * Security regression test for cross-collection item deletion via bulk-import.
+     */
+    @Test
+    public void testDeleteItemInDifferentCollectionIsRejected() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        // Target collection the import runs against (caller is admin here).
+        Collection targetCollection = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+
+        // Foreign collection the caller has NO rights over.
+        Collection foreignCollection = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(admin)
+            .build();
+
+        // Victim item lives in the foreign collection.
+        Item victimItem = createItem(context, foreignCollection)
+            .withTitle("Victim Publication")
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = buildSingleActionWorkbook("cross-collection-delete.xlsx",
+            victimItem.getID().toString(), "DELETE", "");
+
+        String[] args = new String[] { "bulk-import", "-c", targetCollection.getID().toString(), "-f", fileLocation,
+            "-e", eperson.getEmail()};
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        // The DELETE must be rejected because the item belongs to a different collection.
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
+        assertThat(errorMessages.get(0), containsString("have a different collection"));
+
+        assertThat("No successful deletion expected", handler.getInfoMessages(),
+            not(hasItems(containsString("Item deleted successfully"))));
+
+        // The foreign item must still exist.
+        assertThat("Victim item must not be deleted",
+            itemService.find(context, victimItem.getID()), notNullValue());
+    }
+
+    /**
+     * Security regression test for cross-collection update item via bulk-import
+     */
+    @Test
+    public void testUpdateItemInDifferentCollectionIsRejected() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection targetCollection = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+
+        Collection foreignCollection = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(admin)
+            .build();
+
+        Item victimItem = createItem(context, foreignCollection)
+            .withTitle("Original Foreign Title")
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = buildSingleActionWorkbook("cross-collection-update.xlsx",
+            victimItem.getID().toString(), "UPDATE", "Hijacked Title");
+
+        String[] args = new String[] { "bulk-import", "-c", targetCollection.getID().toString(), "-f", fileLocation,
+            "-e", eperson.getEmail()};
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
+        assertThat(errorMessages.get(0), containsString("have a different collection"));
+
+        assertThat("No successful update expected", handler.getInfoMessages(),
+            not(hasItems(containsString("Item updated successfully"))));
+
+        victimItem = context.reloadEntity(victimItem);
+        assertThat(victimItem.getMetadata(), hasItems(with("dc.title", "Original Foreign Title")));
+        assertThat(victimItem.getMetadata(), not(hasItems(with("dc.title", "Hijacked Title"))));
+    }
+
+    /**
+     * "allowedToExecute" checks target collection
+     */
+    @Test
+    public void testIsAllowedToExecuteIsScopedToTargetCollection() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        // eperson administers collectionA only.
+        Collection collectionA = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+
+        // admin administers collectionB; eperson has no rights here.
+        Collection collectionB = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(admin)
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        ScriptConfiguration<?> configuration = scriptService.getScriptConfiguration("bulk-import");
+
+        context.setCurrentUser(eperson);
+
+        assertThat("Collection admin may run against their own collection",
+            configuration.isAllowedToExecute(context,
+                List.of(new DSpaceCommandLineParameter("-c", collectionA.getID().toString()))),
+            is(true));
+
+        assertThat("Collection admin must NOT run against a foreign collection",
+            configuration.isAllowedToExecute(context,
+                List.of(new DSpaceCommandLineParameter("-c", collectionB.getID().toString()))),
+            is(false));
+
+        context.setCurrentUser(admin);
+        assertThat("Repository admin may run against any collection",
+            configuration.isAllowedToExecute(context,
+                List.of(new DSpaceCommandLineParameter("-c", collectionB.getID().toString()))),
+            is(true));
+    }
+
+    /**
+     * Builds a minimal bulk import workbook with a single row (ID / ACTION / dc.title)
+     */
+    private String buildSingleActionWorkbook(String fileName, String targetId, String action, String title)
+        throws IOException {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("items");
+
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue(BulkImport.ID_HEADER);
+            header.createCell(1).setCellValue(BulkImport.ACTION_HEADER);
+            header.createCell(2).setCellValue("dc.title");
+
+            Row dataRow = sheet.createRow(1);
+            dataRow.createCell(0).setCellValue(targetId);
+            dataRow.createCell(1).setCellValue(action);
+            dataRow.createCell(2).setCellValue(title);
+
+            File file = new File(BASE_XLS_DIR_PATH, fileName);
+            file.getParentFile().mkdirs();
+            try (OutputStream out = new FileOutputStream(file)) {
+                workbook.write(out);
+            }
+            return file.getAbsolutePath();
+        }
     }
 
     private WorkspaceItem findWorkspaceItem(Item item) throws SQLException {
