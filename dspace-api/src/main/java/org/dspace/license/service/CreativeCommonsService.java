@@ -18,7 +18,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.license.CCLicense;
-import org.jdom2.Document;
 
 /**
  * Service interface class for the Creative commons licensing.
@@ -30,23 +29,6 @@ import org.jdom2.Document;
 public interface CreativeCommonsService {
 
     public static final String CC_BUNDLE_NAME = "CC-LICENSE";
-
-    /**
-     * setLicenseRDF
-     *
-     * CC Web Service method for setting the RDF bitstream
-     *
-     * @param context    The relevant DSpace Context.
-     * @param item       The item to set license on.
-     * @param licenseRdf license RDF string
-     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
-    public void setLicenseRDF(Context context, Item item, String licenseRdf)
-            throws SQLException, IOException, AuthorizeException;
-
 
     /**
      * Used by DSpaceMetsIngester
@@ -139,17 +121,6 @@ public interface CreativeCommonsService {
      * @return its value.
      */
     public String getCCField(String fieldId);
-
-    /**
-     * Apply same transformation on the document to retrieve only the most
-     * relevant part of the document passed as parameter. If no transformation
-     * is needed then take in consideration to empty the CreativeCommons.xml
-     *
-     * @param license - an element that could be contains as part of your content
-     *                the license rdf
-     * @return the document license in textual format after the transformation
-     */
-    public String fetchLicenseRDF(Document license);
 
     /**
      * Remove license information, delete also the bitstream
@@ -278,11 +249,10 @@ public interface CreativeCommonsService {
      * @param item          - The item to which the license will be added
      * @param licenseUri    - The license URI to add
      * @param licenseName   - The license name to add
-     * @param doc           - The license to document to add
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void addLicense(Context context, Item item, String licenseUri, String licenseName, Document doc)
+    public void addLicense(Context context, Item item, String licenseUri, String licenseName)
             throws SQLException, IOException, AuthorizeException;
 }
