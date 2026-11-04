@@ -7,20 +7,17 @@
  */
 package org.dspace.license;
 
-import java.io.IOException;
 import java.util.Map;
-
-import org.jdom2.Document;
 
 /**
  * Service interface class for the Creative commons license connector service.
- * The implementation of this class is responsible for all the calls to the CC license API and parsing the response
+ * The implementation of this class is responsible for providing the CC licenses from the configured CSV
  * The service is autowired by spring
  */
 public interface CCLicenseConnectorService {
 
     /**
-     * Retrieves the CC Licenses for the provided language from the CC License API
+     * Retrieves the CC Licenses for the provided language from the configured CSV
      *
      * @param language - the language to retrieve the licenses for
      * @return a map of licenses with the id and the license for the provided language
@@ -29,7 +26,7 @@ public interface CCLicenseConnectorService {
 
     /**
      * Retrieve the CC License URI based on the provided license id, language and answers to the field questions from
-     * the CC License API
+     * the configured CSV
      *
      * @param licenseId - the ID of the license
      * @param language  - the language for which to retrieve the full answerMap
@@ -41,20 +38,11 @@ public interface CCLicenseConnectorService {
                                            Map<String, String> answerMap);
 
     /**
-     * Retrieve the license RDF document based on the license URI
+     * Retrieves the CC License name of the given licenseURI from the CCLicenseCSVRow
      *
-     * @param licenseURI    - The license URI for which to retrieve the license RDF document
-     * @return the license RDF document
-     * @throws IOException
+     * @param licenseURI - The license URI
+     * @return  - The license name
      */
-    public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException;
-
-    /**
-     * Retrieve the license Name from the license document
-     *
-     * @param doc   - The license document from which to retrieve the license name
-     * @return the license name
-     */
-    public String retrieveLicenseName(final Document doc);
+    public String retrieveLicenseName(String licenseURI);
 
 }
