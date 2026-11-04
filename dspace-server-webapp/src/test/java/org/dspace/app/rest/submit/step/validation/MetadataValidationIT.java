@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class MetadataValidationTest extends AbstractIntegrationTestWithDatabase {
+public class MetadataValidationIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String RELATIONSHIP_TYPE = "isAuthorOfPublication";
     private static final String AUTHOR_FIELD = "dc.contributor.author";
