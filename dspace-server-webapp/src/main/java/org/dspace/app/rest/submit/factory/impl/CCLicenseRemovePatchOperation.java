@@ -47,7 +47,8 @@ public class CCLicenseRemovePatchOperation extends RemovePatchOperation<String> 
         Item item = source.getItem();
 
 
-        if (StringUtils.isNotBlank(creativeCommonsService.getLicenseName(item))) {
+        // Check the license uri, as the name is only stored when cc.submit.setname is enabled
+        if (StringUtils.isNotBlank(creativeCommonsService.getLicenseURI(item))) {
             creativeCommonsService.removeLicense(context, item);
         } else {
             throw new IllegalArgumentException("No CC license can be removed since none is present on submission: "
