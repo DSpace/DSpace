@@ -9,6 +9,7 @@ package org.dspace.subscriptions;
 
 import static org.dspace.core.Constants.COLLECTION;
 import static org.dspace.core.Constants.COMMUNITY;
+import static org.dspace.core.Constants.ITEM;
 import static org.dspace.core.Constants.READ;
 
 import java.sql.SQLException;
@@ -116,6 +117,16 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                                 .get(Collection.class.getSimpleName().toLowerCase())
                                 .findUpdates(context, dSpaceObject, frequency);
                         List<IndexableObject> filteredItems = getItems(context, ePerson, indexableCollectionItems);
+                        if (!filteredItems.isEmpty()) {
+                            collectionsItemsMap.put(dSpaceObject, filteredItems);
+                        }
+                    } else if (dSpaceObject.getType() == ITEM) {
+                        // A subscribed Item is treated as an entity: notify about its related items,
+                        // resolved through the entity's inverse-relation discovery configurations.
+                        List<IndexableObject> indexableItemItems = contentUpdates
+                                .get(Item.class.getSimpleName().toLowerCase())
+                                .findUpdates(context, dSpaceObject, frequency);
+                        List<IndexableObject> filteredItems = getItems(context, ePerson, indexableItemItems);
                         if (!filteredItems.isEmpty()) {
                             collectionsItemsMap.put(dSpaceObject, filteredItems);
                         }

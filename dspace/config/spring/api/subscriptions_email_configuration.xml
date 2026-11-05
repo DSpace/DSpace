@@ -18,10 +18,13 @@
 
     <bean class="org.dspace.subscriptions.SubscriptionEmailNotificationServiceImpl">
         <constructor-arg name="contentUpdates">
-            <!-- Currently we support subscriptions ONLY for Community & Collection -->
+            <!-- Content subscriptions are supported for Community, Collection and Item.
+                 An Item subscription is treated as an entity: the subscriber is notified
+                 about the entity's related items via its inverse-relation configurations. -->
             <map>
                 <entry key="community" value-ref="communityUpdates"/>
                 <entry key="collection" value-ref="collectionUpdates"/>
+                <entry key="item" value-ref="itemUpdates"/>
             </map>
         </constructor-arg>
         <constructor-arg name="subscriptionType2generators">
@@ -81,5 +84,7 @@
     <bean id="communityUpdates" class="org.dspace.subscriptions.objectupdates.CommunityUpdates" />
 
     <bean id="collectionUpdates" class="org.dspace.subscriptions.objectupdates.CollectionUpdates" />
+
+    <bean id="itemUpdates" class="org.dspace.subscriptions.objectupdates.ItemsUpdates" />
 
 </beans>
