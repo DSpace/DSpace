@@ -581,6 +581,113 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(relationshipService.findByItem(context, publication), hasSize(2));
     }
 
+
+    /**
+     * Verify that clearing relationship-backed Item metadata also deletes
+     * its configuration-backed Relationship.
+     */
+    @Test
+    public void testClearRelationshipBackedMetadata() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                      .build();
+
+        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
+        assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
+
+        itemService.clearMetadata(context, publication, "dc", "contributor", "author", Item.ANY);
+
+        assertThat(relationshipService.findByItem(context, publication), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "dc.contributor.author"), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "dc.title"), hasSize(1));
+
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * Verify that removing a relationship-backed MetadataValue through the
+     * Item service also deletes its Relationship.
+     */
+    @Test
+    public void testRemoveRelationshipBackedMetadataValues() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                      .build();
+
+        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
+
+        MetadataValue author = getSingleAuthor(publication);
+        assertThat(author.getRelationship(), notNullValue());
+
+        itemService.removeMetadataValues(context, publication, List.of(author));
+
+        assertThat(relationshipService.findByItem(context, publication), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "dc.contributor.author"), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "dc.title"), hasSize(1));
+
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * Verify that clearing a relationship-backed metadata field also removes
+     * other metadata values attached to the same relationship.
+     *
+     * This covers snapshot iteration when relationship removal indirectly
+     * modifies the Item's managed metadata collection.
+     */
+    @Test
+    public void testClearRelationshipBackedMetadataRemovesLinkedValues() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                      .build();
+
+        Relationship relationship = relationshipService.findByItem(context, publication).getFirst();
+
+        // Attach another metadata value to the same relationship.
+        MetadataValue orcid = itemService.addMetadata(
+            context, publication, "person", "identifier", "orcid",
+            null, "0000-0002-1825-0097");
+
+        authorityBackedRelationshipService.attachMetadataToRelationship(context, orcid, relationship);
+
+        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
+        assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
+        assertThat(orcid.getRelationship(), notNullValue());
+
+        // Clearing the author anchor removes the relationship and its linked metadata.
+        itemService.clearMetadata(context, publication, "dc", "contributor", "author", Item.ANY);
+
+        assertThat(relationshipService.findByItem(context, publication), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "dc.contributor.author"), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "person.identifier.orcid"), hasSize(0));
+
+        // Unrelated metadata must remain untouched.
+        assertThat(itemService.getMetadataByMetadataString(publication, "dc.title"), hasSize(1));
+
+        context.restoreAuthSystemState();
+    }
+
     private MetadataValue getSingleAuthor(Item item) {
         List<MetadataValue> values = itemService.getMetadataByMetadataString(item, "dc.contributor.author");
         assertThat(values, notNullValue());

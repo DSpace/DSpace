@@ -48,6 +48,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
@@ -106,6 +107,7 @@ import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Service implementation for the Item object.
@@ -170,6 +172,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
+
+    @Autowired
+    @Lazy
+    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
 
     @Autowired(required = true)
     private EntityTypeService entityTypeService;
@@ -2244,6 +2250,27 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         return item.equals(latestVersion.getItem());
 
+    }
+
+
+    /**
+     * Removes relationship-backed Item metadata through the relationship service,
+     * while ordinary Item metadata uses the generic removal implementation.
+     */
+    @Override
+    protected void removeMetadataValue(Context context, Item item, MetadataValue metadataValue)
+        throws SQLException {
+        if (metadataValue.isRelationshipBacked()) {
+            try {
+                // Snapshot iteration in the superclass allows the relationship service to remove
+                // other metadata values belonging to the same relationship from the managed collection.
+                authorityBackedRelationshipService.removeMetadataValue(context, metadataValue);
+            } catch (AuthorizeException e) {
+                throw new SQLException("Not authorized to remove relationship-bound metadata", e);
+            }
+        } else {
+            super.removeMetadataValue(context, item, metadataValue);
+        }
     }
 
 }
