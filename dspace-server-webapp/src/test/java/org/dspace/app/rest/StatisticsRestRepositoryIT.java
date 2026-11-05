@@ -54,12 +54,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -3125,6 +3128,113 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .content(mapper.writeValueAsBytes(viewEventRestSecondPublicationBitstream))
                                 .contentType(contentType))
                    .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void usagereportsSearchReport_noId_Exception() throws Exception {
+        getClient().perform(get("/api/statistics/usagereports/search/report"))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void usagereportsSearchReport_notProperUUIDAndReportId_Exception() throws Exception {
+        getClient(adminToken).perform(
+                get("/api/statistics/usagereports/search/report?id=notProperUUIDAndReportId"))
+            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void usagereportsSearchReport_nonValidUUIDpart_Exception() throws Exception {
+        getClient(adminToken).perform(
+                get("/api/statistics/usagereports/search/report?id=notAnUUID_" + TOTAL_VISITS_REPORT_ID))
+            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void usagereportsSearchReport_NonExistentUUID_Exception() throws Exception {
+        getClient(adminToken).perform(
+                get("/api/statistics/usagereports/search/report?id=" + UUID.randomUUID() +
+                    "_" + TOTAL_VISITS_REPORT_ID))
+            .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void usagereportsSearchReport_nonValidReportIDpart_Exception() throws Exception {
+        getClient(adminToken).perform(
+                get("/api/statistics/usagereports/search/report?id=" +
+                    itemNotVisitedWithBitstreams.getID() + "_NotValidReport"))
+            .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void usagereportSearchReport_onlyAdminReadRights() throws Exception {
+        // ** WHEN **
+        authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
+        // We request a dso's TotalVisits usage stat report as anon but dso has no read policy for anon
+        getClient().perform(
+                get("/api/statistics/usagereports/search/report?id=" +
+                    itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                // ** THEN **
+                .andExpect(status().isUnauthorized());
+        // We request a dso's TotalVisits usage stat report as admin
+        getClient(adminToken)
+                .perform(get("/api/statistics/usagereports/search/report?id=" +
+                        itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                // ** THEN **
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void usagereportSearchReport_appliesStartAndEndDateFilter() throws Exception {
+        this.statisticsEventListener.addConsumer(
+            throwingConsumerWrapper((event) -> {
+                // All of the last month's visit points (no date filter applied)
+                List<UsageReportPointRest> expectedPointsNoFilter = getLastMonthVisitPoints(1);
+
+                getClient(adminToken).perform(
+                        get("/api/statistics/usagereports/search/report?id=" +
+                            itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", Matchers.is(
+                        UsageReportMatcher.matchUsageReport(
+                            itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                            TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                            expectedPointsNoFilter
+                        )
+                    )));
+
+                // Applying a startDate/endDate range that excludes the current month must result in no points
+                DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                Calendar farPast = Calendar.getInstance();
+                farPast.add(Calendar.YEAR, -5);
+                String farPastStart = isoDateFormat.format(farPast.getTime());
+                farPast.add(Calendar.DATE, 1);
+                String farPastEnd = isoDateFormat.format(farPast.getTime());
+
+                getClient(adminToken).perform(
+                        get("/api/statistics/usagereports/search/report?id=" +
+                            itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID +
+                            "&startDate=" + farPastStart + "&endDate=" + farPastEnd))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", Matchers.is(
+                        UsageReportMatcher.matchUsageReport(
+                            itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                            TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                            List.of()
+                        )
+                    )));
+            }));
+
+        // ** WHEN **
+        // We visit an Item
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+                .content(mapper.writeValueAsBytes(viewEventRest))
+                .contentType(contentType))
+            .andExpect(status().isCreated());
     }
 
     private List<UsageReportPointRest> getLastMonthVisitPoints(int viewsLastMonth) {

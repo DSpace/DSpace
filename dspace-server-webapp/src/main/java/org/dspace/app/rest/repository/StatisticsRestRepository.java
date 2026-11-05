@@ -94,6 +94,28 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         return converter.toRestPage(usageReportsOfItem, pageable, usageReportsOfItem.size(), utils.obtainProjection());
     }
 
+    @PreAuthorize("hasPermission(#id, 'usagereport', 'READ')")
+    @SearchRestMethod(name = "report")
+    public UsageReportRest findReport(@Parameter(value = "id", required = true) String id,
+                                       @Parameter(value = "startDate") String startDate,
+                                       @Parameter(value = "endDate") String endDate) {
+        UUID uuidObject = UUID.fromString(StringUtils.substringBefore(id, "_"));
+        String reportId = StringUtils.substringAfter(id, "_");
+
+        UsageReportRest usageReportRest;
+        try {
+            Context context = obtainContext();
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
+            if (dso == null) {
+                throw new ResourceNotFoundException("No DSO found with uuid: " + uuidObject);
+            }
+            usageReportRest = usageReportUtils.createUsageReport(context, dso, reportId, startDate, endDate);
+        } catch (SQLException | ParseException | SolrServerException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return converter.toRest(usageReportRest, utils.obtainProjection());
+    }
+
     @Override
     public Page<UsageReportRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "findAll");
