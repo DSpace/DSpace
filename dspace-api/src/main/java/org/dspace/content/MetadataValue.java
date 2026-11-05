@@ -16,6 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -33,6 +35,8 @@ import org.hibernate.Length;
  * and a value.
  *
  * @author Martin Hald
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  * @see org.dspace.content.MetadataSchema
  * @see org.dspace.content.MetadataField
  */
@@ -95,6 +99,16 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dspace_object_id")
     protected DSpaceObject dSpaceObject;
+
+    /**
+     * Optional durable internal relationship described by this value. Multiple values
+     * can reference the same relationship. There is deliberately no cascade: deleting
+     * one projection must not implicitly delete the shared relationship or its items.
+     * TODO: we may want to make this EAGER, while making the relationship left and right item LAZY
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "relationship_id")
+    private Relationship relationship;
 
     /**
      * Protected constructor, create object using:
@@ -303,5 +317,41 @@ public class MetadataValue implements ReloadableEntity<Integer> {
 
     public void setSecurityLevel(Integer securityLevel) {
         this.securityLevel = securityLevel;
+    }
+
+    /**
+     * @return the durable internal relationship, or null for ordinary/authority metadata
+     */
+    @Nullable
+    public Relationship getRelationship() {
+        return relationship;
+    }
+
+    /**
+     * Persistence setter. Application changes should use the compound relationship service.
+     *
+     * @param relationship the relationship represented by this metadata value
+     */
+    public void setRelationship(Relationship relationship) {
+        this.relationship = relationship;
+    }
+
+    @Transient
+    public boolean isRelationshipBacked() {
+        return relationship != null;
+    }
+
+    /**
+     * Ensures relationship-backed metadata is owned by one of the Relationship endpoints.
+     */
+    @PrePersist
+    @PreUpdate
+    private void validateRelationshipOwner() {
+        if (relationship != null
+            && !dSpaceObject.getID().equals(relationship.getLeftItem().getID())
+            && !dSpaceObject.getID().equals(relationship.getRightItem().getID())) {
+            throw new IllegalArgumentException(
+                "Metadata owner must be an endpoint of its relationship");
+        }
     }
 }

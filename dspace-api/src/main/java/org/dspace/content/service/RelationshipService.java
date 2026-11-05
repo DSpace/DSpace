@@ -541,4 +541,33 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
             throws SQLException, AuthorizeException, BadVirtualMetadataTypeException;
 
+    /**
+     * Persist a configured internal link without legacy virtual metadata/place handling.
+     * Metadata association is the responsibility of the compound service.
+     */
+    Relationship createConfigBackedRelationship(Context context, Item leftItem, Item rightItem,
+                                               String relationshipConfigKey)
+        throws SQLException, AuthorizeException;
+
+    /**
+     * Creates a configuration-backed Relationship when copying Relationships to a newly created Item version.
+     *
+     * One endpoint may be the new Item version, which is not yet archived. Therefore, validation allows
+     * unarchived Items while still enforcing the configured endpoint requirements.
+     *
+     * The Relationship retains the original configuration key and the supplied latest-version status.
+     *
+     * @param context               current DSpace context
+     * @param leftItem              left endpoint of the Relationship
+     * @param rightItem             right endpoint of the Relationship
+     * @param relationshipConfigKey configuration key to preserve
+     * @param latestVersionStatus   latest-version status of the copied Relationship
+     * @return the newly created Relationship
+     * @throws SQLException       if a database error occurs
+     * @throws AuthorizeException if the user is not authorized to create the Relationship
+     */
+    Relationship createConfigBackedRelationshipForVersion(Context context, Item leftItem, Item rightItem,
+                                                          String relationshipConfigKey,
+                                                          LatestVersionStatus latestVersionStatus)
+        throws SQLException, AuthorizeException;
 }

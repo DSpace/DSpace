@@ -10,6 +10,7 @@ package org.dspace.content;
 import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
 import static org.dspace.content.Relationship.LatestVersionStatus.LEFT_ONLY;
 import static org.dspace.content.Relationship.LatestVersionStatus.RIGHT_ONLY;
+import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import static org.dspace.util.RelationshipVersioningTestUtils.isRel;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -50,6 +51,9 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.VersionBuilder;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -59,6 +63,8 @@ import org.dspace.content.virtual.Collected;
 import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.discovery.MockSolrSearchCore;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
@@ -248,6 +254,483 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
 
         // NOTE: this shouldn't be possible because of database constraints
         throw new IllegalStateException();
+    }
+
+    /**
+     * Tests that creating a new Item version copies a configuration-backed relationship
+     * and associates the copied metadata with the new relationship, leaving the original unchanged.
+     */
+    @Test
+    public void test_createNewVersionOfItemWithConfigBackedRelationship() throws Exception {
+        configureAuthorAuthority();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, publicationCollection)
+                                              .withTitle("Publication")
+                                              .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                              .build();
+
+        context.commit();
+
+        originalPublication = context.reloadEntity(originalPublication);
+        person = context.reloadEntity(person);
+
+        List<Relationship> oldRelationships = relationshipService.findByItem(context, originalPublication);
+        assertEquals(1, oldRelationships.size());
+
+        Relationship oldRelationship = oldRelationships.getFirst();
+        assertTrue(oldRelationship.isConfigurationBacked());
+        assertNull(oldRelationship.getRelationshipType());
+        assertEquals("authority:dc.contributor.author", oldRelationship.getRelationshipConfigKey());
+
+        MetadataValue oldAuthor =
+            itemService.getMetadataByMetadataString(originalPublication, "dc.contributor.author").getFirst();
+        assertEquals(oldRelationship.getID(), oldAuthor.getRelationship().getID());
+
+        Version newVersion = VersionBuilder.createVersion(context, originalPublication, "test").build();
+        Item newPublication = newVersion.getItem();
+
+        List<Relationship> newRelationships = relationshipService.findByItem(context, newPublication);
+        assertEquals(1, newRelationships.size());
+
+        Relationship newRelationship = newRelationships.getFirst();
+        assertTrue(newRelationship.isConfigurationBacked());
+        assertNull(newRelationship.getRelationshipType());
+        assertEquals(oldRelationship.getRelationshipConfigKey(), newRelationship.getRelationshipConfigKey());
+        assertNotEquals(oldRelationship.getID(), newRelationship.getID());
+        assertEquals(newPublication, newRelationship.getLeftItem());
+        assertEquals(person, newRelationship.getRightItem());
+
+        MetadataValue newAuthor =
+            itemService.getMetadataByMetadataString(newPublication, "dc.contributor.author").getFirst();
+        assertEquals(newRelationship.getID(), newAuthor.getRelationship().getID());
+
+        // Original version must remain unchanged.
+        assertEquals(oldRelationship.getID(), oldAuthor.getRelationship().getID());
+        assertEquals(originalPublication, oldRelationship.getLeftItem());
+        assertEquals(person, oldRelationship.getRightItem());
+    }
+
+    /**
+     * Tests that creating a new Item version copies multiple configuration-backed relationships
+     * and correctly associates each copied metadata value with its corresponding relationship.
+     */
+    @Test
+    public void test_createNewVersionWithMultipleConfigBackedRelationships() throws Exception {
+        configureAuthorAuthority();
+
+        Item person1 = ItemBuilder.createItem(context, personCollection)
+                                  .withTitle("Jane Doe")
+                                  .build();
+
+        Item person2 = ItemBuilder.createItem(context, personCollection)
+                                  .withTitle("Jane Doe")
+                                  .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, publicationCollection)
+                                              .withTitle("Publication")
+                                              .withAuthor("J. Doe", person1.getID().toString(), CF_ACCEPTED)
+                                              .withAuthor("J. Doe", person2.getID().toString(), CF_ACCEPTED)
+                                              .build();
+
+        context.commit();
+        originalPublication = context.reloadEntity(originalPublication);
+
+        List<Relationship> originalRelationships = relationshipService.findByItem(context, originalPublication);
+        assertEquals(2, originalRelationships.size());
+
+        Version version = VersionBuilder.createVersion(context, originalPublication, "test").build();
+        Item newPublication = version.getItem();
+
+        List<Relationship> newRelationships = relationshipService.findByItem(context, newPublication);
+        assertEquals(2, newRelationships.size());
+
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(newPublication, "dc.contributor.author");
+        assertEquals(2, authors.size());
+
+        for (MetadataValue author : authors) {
+            assertNotNull(author.getRelationship());
+            assertEquals(author.getAuthority(), author.getRelationship().getRightItem().getID().toString());
+            assertTrue(author.getRelationship().isConfigurationBacked());
+        }
+
+        assertNotEquals(authors.get(0).getRelationship().getID(),
+                        authors.get(1).getRelationship().getID());
+    }
+
+    /**
+     * Tests that installing a new Item version updates the latest-version status
+     * of its configuration-backed relationship and preserves the metadata association.
+     */
+    @Test
+    public void test_installNewVersionWithConfigBackedRelationship() throws Exception {
+        configureAuthorAuthority();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, publicationCollection)
+                                              .withTitle("Publication")
+                                              .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                              .build();
+
+        context.commit();
+        originalPublication = context.reloadEntity(originalPublication);
+
+        Version version = VersionBuilder.createVersion(context, originalPublication, "test").build();
+        Item newPublication = version.getItem();
+
+        Relationship newRelationship = relationshipService.findByItem(context, newPublication).getFirst();
+        assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, newRelationship.getLatestVersionStatus());
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newPublication);
+        assertNotNull(workspaceItem);
+
+        installItemService.installItem(context, workspaceItem);
+        context.dispatchEvents();
+
+        newPublication = context.reloadEntity(newPublication);
+        newRelationship = relationshipService.findByItem(context, newPublication).getFirst();
+
+        assertTrue(newPublication.isArchived());
+        assertTrue(newRelationship.isConfigurationBacked());
+        assertEquals(Relationship.LatestVersionStatus.BOTH, newRelationship.getLatestVersionStatus());
+
+        MetadataValue author =
+            itemService.getMetadataByMetadataString(newPublication, "dc.contributor.author").getFirst();
+
+        assertNotNull(author.getRelationship());
+        assertEquals(newRelationship.getID(), author.getRelationship().getID());
+    }
+
+    /**
+     * Tests that changing relationship-backed metadata before installing a new Item version
+     * does not prevent the relationships' latest-version statuses from being updated.
+     */
+    @Test
+    public void test_installNewVersionWithModifiedConfigBackedRelationshipMetadata() throws Exception {
+        configureAuthorAuthority();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, publicationCollection)
+                                              .withTitle("Publication")
+                                              .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                              .build();
+
+        context.commit();
+        originalPublication = context.reloadEntity(originalPublication);
+
+        Version version = VersionBuilder.createVersion(context, originalPublication, "test").build();
+        Item newPublication = version.getItem();
+
+        Relationship newRelationship = relationshipService.findByItem(context, newPublication).getFirst();
+        assertEquals(RIGHT_ONLY, newRelationship.getLatestVersionStatus());
+
+        // Change the metadata value without removing its relationship.
+        MetadataValue newAuthor =
+            itemService.getMetadataByMetadataString(newPublication, "dc.contributor.author").getFirst();
+
+        newAuthor.setValue("Jane Doe");
+        itemService.update(context, newPublication);
+
+        assertEquals(newRelationship.getID(), newAuthor.getRelationship().getID());
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newPublication);
+        installItemService.installItem(context, workspaceItem);
+        context.dispatchEvents();
+
+        context.commit();
+        context.clear();
+
+        originalPublication = itemService.find(context, originalPublication.getID());
+        newPublication = itemService.find(context, newPublication.getID());
+
+        Relationship originalRelationship = relationshipService.findByItem(context, originalPublication).getFirst();
+        newRelationship = relationshipService.findByItem(context, newPublication).getFirst();
+
+        assertEquals(RIGHT_ONLY, originalRelationship.getLatestVersionStatus());
+        assertEquals(BOTH, newRelationship.getLatestVersionStatus());
+
+        MetadataValue updatedAuthor =
+            itemService.getMetadataByMetadataString(newPublication, "dc.contributor.author").getFirst();
+
+        assertEquals("Jane Doe", updatedAuthor.getValue());
+        assertEquals(newRelationship.getID(), updatedAuthor.getRelationship().getID());
+    }
+
+    /**
+     * Tests that installing a new version of the right endpoint of a configuration-backed
+     * relationship updates the latest-version statuses on the right side.
+     */
+    @Test
+    public void test_installNewVersionOfRightItemWithConfigBackedRelationship() throws Exception {
+        configureAuthorAuthority();
+
+        Item originalPerson = ItemBuilder.createItem(context, personCollection)
+                                         .withTitle("Jane Doe")
+                                         .build();
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withAuthor("Jane Doe", originalPerson.getID().toString(), CF_ACCEPTED)
+                                      .build();
+
+        context.commit();
+        originalPerson = context.reloadEntity(originalPerson);
+        publication = context.reloadEntity(publication);
+
+        Relationship originalRelationship =
+            relationshipService.findByItem(context, originalPerson).getFirst();
+
+        assertTrue(originalRelationship.isConfigurationBacked());
+        assertEquals(publication, originalRelationship.getLeftItem());
+        assertEquals(originalPerson, originalRelationship.getRightItem());
+        assertEquals(BOTH, originalRelationship.getLatestVersionStatus());
+
+        Version version = VersionBuilder.createVersion(context, originalPerson, "test").build();
+        Item newPerson = version.getItem();
+
+        List<Relationship> newRelationships = relationshipService.findByItem(context, newPerson);
+        assertEquals(1, newRelationships.size());
+
+        Relationship newRelationship = newRelationships.getFirst();
+
+        assertTrue(newRelationship.isConfigurationBacked());
+        assertEquals(publication, newRelationship.getLeftItem());
+        assertEquals(newPerson, newRelationship.getRightItem());
+        assertNotEquals(originalRelationship.getID(), newRelationship.getID());
+        assertEquals(LEFT_ONLY, newRelationship.getLatestVersionStatus());
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newPerson);
+        installItemService.installItem(context, workspaceItem);
+        context.dispatchEvents();
+
+        context.commit();
+        context.clear();
+
+        originalPerson = itemService.find(context, originalPerson.getID());
+        newPerson = itemService.find(context, newPerson.getID());
+
+        originalRelationship = relationshipService.findByItem(context, originalPerson).getFirst();
+        newRelationship = relationshipService.findByItem(context, newPerson).getFirst();
+
+        assertEquals(LEFT_ONLY, originalRelationship.getLatestVersionStatus());
+        assertEquals(BOTH, newRelationship.getLatestVersionStatus());
+
+        assertEquals(originalPerson, originalRelationship.getRightItem());
+        assertEquals(newPerson, newRelationship.getRightItem());
+        assertEquals(publication.getID(), newRelationship.getLeftItem().getID());
+    }
+
+    /**
+     * Tests that installing a new Item version updates the latest-version status
+     * of multiple configuration-backed relationships and preserves their metadata associations.
+     */
+    @Test
+    public void test_installNewVersionWithMultipleConfigBackedRelationships() throws Exception {
+        configureAuthorAuthority();
+
+        Item person1 = ItemBuilder.createItem(context, personCollection)
+                                  .withTitle("Jane Doe")
+                                  .build();
+
+        Item person2 = ItemBuilder.createItem(context, personCollection)
+                                  .withTitle("John Doe")
+                                  .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, publicationCollection)
+                                              .withTitle("Publication")
+                                              .withAuthor("J. Doe", person1.getID().toString(), CF_ACCEPTED)
+                                              .withAuthor("J. Doe", person2.getID().toString(), CF_ACCEPTED)
+                                              .build();
+
+        context.commit();
+        originalPublication = context.reloadEntity(originalPublication);
+
+        List<Relationship> originalRelationships = relationshipService.findByItem(context, originalPublication);
+        assertEquals(2, originalRelationships.size());
+
+        Version version = VersionBuilder.createVersion(context, originalPublication, "test").build();
+        Item newPublication = version.getItem();
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newPublication);
+        installItemService.installItem(context, workspaceItem);
+        context.dispatchEvents();
+
+        // Verify that relationship associations persist after clearing the context.
+        context.commit();
+        context.clear();
+
+        newPublication = itemService.find(context, newPublication.getID());
+        assertNotNull(newPublication);
+
+        List<Relationship> newRelationships = relationshipService.findByItem(context, newPublication);
+        assertEquals(2, newRelationships.size());
+
+        for (Relationship relationship : newRelationships) {
+            assertTrue(relationship.isConfigurationBacked());
+            assertEquals(Relationship.LatestVersionStatus.BOTH, relationship.getLatestVersionStatus());
+        }
+
+        originalPublication = itemService.find(context, originalPublication.getID());
+        originalRelationships = relationshipService.findByItem(context, originalPublication);
+
+        assertEquals(2, originalRelationships.size());
+
+        for (Relationship relationship : originalRelationships) {
+            assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship.getLatestVersionStatus());
+        }
+
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(newPublication, "dc.contributor.author");
+        assertEquals(2, authors.size());
+
+        for (MetadataValue author : authors) {
+            assertNotNull(author.getRelationship());
+            assertEquals(author.getAuthority(), author.getRelationship().getRightItem().getID().toString());
+        }
+    }
+
+    /**
+     * Tests that multiple configuration-backed relationships sharing the same endpoints
+     * have their latest-version statuses updated independently without requiring Relationship matching.
+     */
+    @Test
+    public void test_installNewVersionWithDuplicateConfigBackedRelationshipEndpoints() throws Exception {
+        configureAuthorAuthority();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, publicationCollection)
+                                              .withTitle("Publication")
+                                              .withAuthor("Jane Doe", person.getID().toString(), CF_ACCEPTED)
+                                              .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                              .build();
+
+        context.commit();
+        originalPublication = context.reloadEntity(originalPublication);
+
+        List<Relationship> originalRelationships = relationshipService.findByItem(context, originalPublication);
+        assertEquals(2, originalRelationships.size());
+        assertNotEquals(originalRelationships.get(0).getID(), originalRelationships.get(1).getID());
+
+        Version version = VersionBuilder.createVersion(context, originalPublication, "test").build();
+        Item newPublication = version.getItem();
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newPublication);
+        installItemService.installItem(context, workspaceItem);
+        context.dispatchEvents();
+
+        context.commit();
+        context.clear();
+
+        newPublication = itemService.find(context, newPublication.getID());
+        originalPublication = itemService.find(context, originalPublication.getID());
+
+        List<Relationship> newRelationships = relationshipService.findByItem(context, newPublication);
+
+        originalRelationships = relationshipService.findByItem(context, originalPublication);
+
+        assertEquals(2, newRelationships.size());
+        assertEquals(2, originalRelationships.size());
+
+        for (Relationship relationship : newRelationships) {
+            assertTrue(relationship.isConfigurationBacked());
+            assertEquals(Relationship.LatestVersionStatus.BOTH, relationship.getLatestVersionStatus());
+            assertEquals(person.getID(), relationship.getRightItem().getID());
+        }
+
+        for (Relationship relationship : originalRelationships) {
+            assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship.getLatestVersionStatus());
+        }
+
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(newPublication, "dc.contributor.author");
+        assertEquals(2, authors.size());
+        assertNotNull(authors.get(0).getRelationship());
+        assertNotNull(authors.get(1).getRelationship());
+
+        assertNotEquals(authors.get(0).getRelationship().getID(), authors.get(1).getRelationship().getID());
+
+        assertTrue(authors.stream().anyMatch(author -> "Jane Doe".equals(author.getValue())));
+        assertTrue(authors.stream().anyMatch(author -> "J. Doe".equals(author.getValue())));
+    }
+
+    /**
+     * Tests that installing a new Item version correctly updates a configuration-backed relationship
+     * without associated metadata, matching it by configuration key and endpoints.
+     */
+    @Test
+    public void test_installNewVersionWithConfigBackedRelationshipWithoutMetadata() throws Exception {
+        configureAuthorAuthority();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, publicationCollection)
+                                              .withTitle("Publication")
+                                              .build();
+
+        Relationship originalRelationship = relationshipService.createConfigBackedRelationship(
+            context, originalPublication, person, "authority:dc.contributor.author");
+
+        context.commit();
+        originalPublication = context.reloadEntity(originalPublication);
+
+        assertTrue(originalRelationship.isConfigurationBacked());
+        assertEquals("authority:dc.contributor.author", originalRelationship.getRelationshipConfigKey());
+        assertTrue(itemService.getMetadataByMetadataString(
+            originalPublication, "dc.contributor.author").isEmpty());
+
+        Version version = VersionBuilder.createVersion(context, originalPublication, "test").build();
+        Item newPublication = version.getItem();
+
+        List<Relationship> newRelationships = relationshipService.findByItem(context, newPublication);
+        assertEquals(1, newRelationships.size());
+
+        Relationship newRelationship = newRelationships.getFirst();
+        assertTrue(newRelationship.isConfigurationBacked());
+        assertEquals(originalRelationship.getRelationshipConfigKey(), newRelationship.getRelationshipConfigKey());
+        assertNotEquals(originalRelationship.getID(), newRelationship.getID());
+        assertEquals(RIGHT_ONLY, newRelationship.getLatestVersionStatus());
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newPublication);
+        installItemService.installItem(context, workspaceItem);
+        context.dispatchEvents();
+
+        // Verify the relationship statuses after persistence.
+        context.commit();
+        context.clear();
+
+        originalPublication = itemService.find(context, originalPublication.getID());
+        newPublication = itemService.find(context, newPublication.getID());
+
+        List<Relationship> originalRelationships = relationshipService.findByItem(context, originalPublication);
+        newRelationships = relationshipService.findByItem(context, newPublication);
+
+        assertEquals(1, originalRelationships.size());
+        assertEquals(1, newRelationships.size());
+
+        originalRelationship = originalRelationships.getFirst();
+        newRelationship = newRelationships.getFirst();
+
+        assertEquals(RIGHT_ONLY, originalRelationship.getLatestVersionStatus());
+        assertEquals(BOTH, newRelationship.getLatestVersionStatus());
+
+        assertEquals(originalPublication, originalRelationship.getLeftItem());
+        assertEquals(newPublication, newRelationship.getLeftItem());
+        assertEquals(person.getID(), newRelationship.getRightItem().getID());
+
+        assertTrue(itemService.getMetadataByMetadataString(
+            newPublication, "dc.contributor.author").isEmpty());
     }
 
     @Test
@@ -4188,6 +4671,27 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
             person1V1.getID().toString(), person1V2.getID().toString(),
             person2V1.getID().toString(), person2V2.getID().toString()
         ));
+    }
+
+    private void configureAuthorAuthority() throws Exception {
+        ChoiceAuthorityService choiceAuthorityService =
+            ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+        MetadataAuthorityService metadataAuthorityService =
+            ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+        PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+
+        configurationService.setProperty(
+            "plugin.named.org.dspace.content.authority.ChoiceAuthority",
+            new String[] {"org.dspace.content.authority.ItemAuthority = AuthorAuthority"});
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.getChoiceAuthoritiesNames();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
     }
 
 }
