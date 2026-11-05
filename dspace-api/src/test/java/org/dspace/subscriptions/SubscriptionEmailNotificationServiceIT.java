@@ -608,6 +608,97 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
                      receivedMessages[0].getRecipients(Message.RecipientType.TO)[0].toString());
     }
 
+    @Test
+    public void testSubscriptionToItemEntityWithNewRelatedItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // A subscribed Item is treated as an entity: the subscriber is notified about the
+        // entity's related items, resolved through its inverse-relation discovery configs.
+        // For a Person, RELATION.Person.researchoutputs matches author_authority:{personUUID}.
+        Item person = ItemBuilder.createItem(context, col)
+                                 .withTitle("Jane Doe")
+                                 .withEntityType("Person")
+                                 .build();
+
+        Item publication = ItemBuilder.createItem(context, col)
+                                      .withTitle("Related Publication")
+                                      .withEntityType("Publication")
+                                      .withAuthor("Jane Doe")
+                                      .withDateAccessioned(yesterdayString)
+                                      .withLastModified(yesterday.toInstant())
+                                      .build();
+
+        // Link the publication to the Person via the author authority on the Solr document,
+        // so RELATION.Person.researchoutputs (author_authority:{personUUID}) resolves it.
+        setAuthorAuthorityOnItemSolrDocument(context, publication.getID(), person.getID(), yesterday);
+        subscribeTo(person);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "content", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+
+        MimeMessage message = receivedMessages[0];
+        assertEquals(eperson.getEmail(), message.getRecipients(Message.RecipientType.TO)[0].toString());
+        String body = GreenMailUtil.getBody(message);
+        assertTrue(body.contains("Title: Related Publication"));
+    }
+
+    @Test
+    public void testSubscriptionToItemEntityWithoutRelatedUpdatesSendsNoEmail() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Person entity with a publication that is NOT related to it (no author authority):
+        // the inverse-relation query matches nothing -> no email.
+        Item person = ItemBuilder.createItem(context, col)
+                                 .withTitle("John Roe")
+                                 .withEntityType("Person")
+                                 .build();
+
+        ItemBuilder.createItem(context, col)
+                   .withTitle("Unrelated Publication")
+                   .withEntityType("Publication")
+                   .withAuthor("John Roe")
+                   .withDateAccessioned(yesterdayString)
+                   .withLastModified(yesterday.toInstant())
+                   .build();
+
+        subscribeTo(person);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "content", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(0, receivedMessages.length);
+    }
+
+    private void setAuthorAuthorityOnItemSolrDocument(Context c, UUID itemId, UUID authority,
+                                                      ZonedDateTime lastModified)
+            throws SolrServerException, IOException {
+        SolrDocument d = searchService.getSolr()
+                                      .query(new SolrQuery("search.resourceid:" + itemId.toString()))
+                                      .getResults()
+                                      .get(0);
+        SolrInputDocument inputdoc = new SolrInputDocument();
+        for (String name : d.getFieldNames()) {
+            inputdoc.setField(name, d.getFieldValue(name));
+        }
+        inputdoc.setField("author_authority", authority.toString());
+        inputdoc.setField("lastModified", lastModified.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        // remove, as it will be added again with the new value
+        inputdoc.removeField("lastModified_dt");
+        searchService.getSolr().add(inputdoc);
+        searchService.getSolr().commit();
+    }
+
+    private void subscribeTo(Item item) throws Exception {
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        subscribeService.subscribe(context, eperson, item, subscriptionParameterList, "content");
+    }
+
     private void subscribeTo(Collection collection) throws Exception {
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
