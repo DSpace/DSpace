@@ -15,8 +15,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +45,17 @@ public class ImportFileUtil {
     private static final String FTP_PREFIX = "ftp:";
 
     private static final String UNKNOWN = "UNKNOWN";
+
+    /**
+     * Wildcard value that can be used in {@code allowed.ips.import} to explicitly allow
+     * remote retrieval from any host.
+     */
+    private static final String ALLOW_ALL = "*";
+
+    private static final int CONNECT_TIMEOUT_MS = 30_000;
+
+    private static final int READ_TIMEOUT_MS = 30_000;
+
     protected DSpaceRunnableHandler handler;
 
     public ImportFileUtil() {
@@ -158,32 +171,41 @@ public class ImportFileUtil {
 
     private Optional<InputStream> getInputStreamOfRemoteFile(String path) throws IOException {
         URL url = getUrl(path);
-        if (!isHostAllowed(url, path)) {
+        if (!isHttpScheme(url)) {
+            logWarning(String.format(
+                "Scheme '%s' is not allowed for remote retrieval. Path: %s", url.getProtocol(), path));
+            return Optional.empty();
+        }
+        if (!isHostAllowed(url.getHost(), path)) {
             return Optional.empty();
         }
         return Optional.ofNullable(openStream(url));
     }
 
     /**
-     * Checks whether the host of the given URL is allowed to be contacted by the bulk
-     * import, according to the {@code allowed.ips.import} configuration property.
+     * Checks whether the given host is allowed to be contacted by the bulk import, according
+     * to the {@code allowed.ips.import} configuration property.
      * <p>
-     * The same validation is applied to every URL-based retrieval (both HTTP/HTTPS and
-     * FTP) to mitigate server-side request forgery: when an allow-list is configured only
-     * the listed hosts can be reached. When the property is not set or empty no
-     * restriction is applied and any host is allowed.
+     * The same validation is applied to every URL-based retrieval (both HTTP/HTTPS and FTP)
+     * to mitigate server-side request forgery. The validation is fail-closed: when the
+     * property is not set or empty no remote host can be reached, unless the wildcard
+     * {@code *} is explicitly configured.
      * </p>
      *
-     * @param url  the URL whose host has to be validated
+     * @param host the host that has to be validated
      * @param path the original file path, used only for logging a rejected request
-     * @return {@code true} if the host is allowed or no allow-list is configured,
-     *         {@code false} otherwise
+     * @return {@code true} if the host is allowed, {@code false} otherwise
      */
-    private boolean isHostAllowed(URL url, String path) {
-        Set<String> allowedIps = Set.of(getAllowedIps());
-        String host = url.getHost();
+    private boolean isHostAllowed(String host, String path) {
+        Set<String> allowedHosts = getAllowedHosts();
 
-        if (allowedIps.isEmpty() || allowedIps.contains(host)) {
+        if (allowedHosts.isEmpty()) {
+            logWarning(String.format(
+                "Remote retrieval is disabled: 'allowed.ips.import' is empty. Rejected path: %s", path));
+            return false;
+        }
+
+        if (allowedHosts.contains(ALLOW_ALL) || allowedHosts.contains(host)) {
             return true;
         }
 
@@ -193,9 +215,34 @@ public class ImportFileUtil {
         return false;
     }
 
+    /**
+     * Normalises the {@code allowed.ips.import} configuration value into a set of allowed
+     * hosts, ignoring blank entries and tolerating both a missing (null) value and null
+     * elements inside the configured array.
+     *
+     * @return the set of allowed hosts, empty when the configuration is missing or empty
+     */
+    private Set<String> getAllowedHosts() {
+        String[] allowedIps = getAllowedIps();
+        if (allowedIps == null) {
+            return Set.of();
+        }
+        return Arrays.stream(allowedIps)
+                     .filter(StringUtils::isNotBlank)
+                     .map(String::trim)
+                     .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private static boolean isHttpScheme(URL url) {
+        return "http".equalsIgnoreCase(url.getProtocol()) || "https".equalsIgnoreCase(url.getProtocol());
+    }
+
     protected InputStream openStream(URL url) {
         try {
-            return url.openStream();
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            connection.setReadTimeout(READ_TIMEOUT_MS);
+            return connection.getInputStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -207,10 +254,12 @@ public class ImportFileUtil {
 
     private Optional<InputStream> getInputStreamOfFtpFile(String url) throws IOException {
         URL urlObject = getUrl(url);
-        if (!isHostAllowed(urlObject, url)) {
+        if (!isHostAllowed(urlObject.getHost(), url)) {
             return Optional.empty();
         }
         URLConnection urlConnection = urlObject.openConnection();
+        urlConnection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+        urlConnection.setReadTimeout(READ_TIMEOUT_MS);
         InputStream inputStream = urlConnection.getInputStream();
         if (inputStream == null) {
             logError(
