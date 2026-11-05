@@ -407,5 +407,125 @@
         <scope_note>Contains all uuids of DATASETS which link to the current PUBLICATION via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from any DATASET, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfFunding</element>
+        <scope_note>Contains all uuids of the "latest" PROJECTS that the current FUNDING links to via a relationship. In other words, this stores all relationships pointing from the current FUNDING to any PROJECT where the PROJECT is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfFunding</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PROJECTS which link to the current FUNDING via a "latest" relationship. In other words, this stores all relationships pointing to the current FUNDING from any PROJECT, implying that the FUNDING is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfProject</element>
+        <scope_note>Contains all uuids of the "latest" FUNDINGS that the current PROJECT links to via a relationship. In other words, this stores all relationships pointing from the current PROJECT to any FUNDING where the FUNDING is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfProject</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of FUNDINGS which link to the current PROJECT via a "latest" relationship. In other words, this stores all relationships pointing to the current PROJECT from any FUNDING, implying that the PROJECT is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfFunding</element>
+        <scope_note>Contains all uuids of the "latest" ORGUNITS that the current FUNDING links to via a relationship. In other words, this stores all relationships pointing from the current FUNDING to any ORGUNIT where the ORGUNIT is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfFunding</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of ORGUNITS which link to the current FUNDING via a "latest" relationship. In other words, this stores all relationships pointing to the current FUNDING from any ORGUNIT, implying that the FUNDING is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfOrgUnit</element>
+        <scope_note>Contains all uuids of the "latest" FUNDINGS that the current ORGUNIT links to via a relationship. In other words, this stores all relationships pointing from the current ORGUNIT to any FUNDING where the FUNDING is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfOrgUnit</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of FUNDINGS which link to the current ORGUNIT via a "latest" relationship. In other words, this stores all relationships pointing to the current ORGUNIT from any FUNDING, implying that the ORGUNIT is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfFunding</element>
+        <scope_note>Contains all uuids of the "latest" PUBLICATIONS that the current FUNDING links to via a relationship. In other words, this stores all relationships pointing from the current FUNDING to any PUBLICATION where the PUBLICATION is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfFunding</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PUBLICATIONS which link to the current FUNDING via a "latest" relationship. In other words, this stores all relationships pointing to the current FUNDING from any PUBLICATION, implying that the FUNDING is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfPublication</element>
+        <scope_note>Contains all uuids of the "latest" FUNDINGS that the current PUBLICATION links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any FUNDING where the FUNDING is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of FUNDINGS which link to the current PUBLICATION via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from any FUNDING, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isInvestigatorOfFunding</element>
+        <scope_note>Contains all uuids of the "latest" PERSONS that the current FUNDING links to via a relationship. In other words, this stores all relationships pointing from the current FUNDING to any PERSON where the PERSON is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isInvestigatorOfFunding</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of PERSONS which link to the current FUNDING via a "latest" relationship. In other words, this stores all relationships pointing to the current FUNDING from any PERSON, implying that the FUNDING is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfInvestigator</element>
+        <scope_note>Contains all uuids of the "latest" FUNDINGS that the current PERSON links to via a relationship. In other words, this stores all relationships pointing from the current PERSON to any FUNDING where the FUNDING is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfInvestigator</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of FUNDINGS which link to the current PERSON via a "latest" relationship. In other words, this stores all relationships pointing to the current PERSON from any FUNDING, implying that the PERSON is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfFunding</element>
+        <scope_note>Contains all uuids of the "latest" child FUNDINGS that the current parent-programme FUNDING links to via a self-referential relationship. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingOfFunding</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of child FUNDINGS which link to the current parent-programme FUNDING via a "latest" self-referential relationship. Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingProgrammeOf</element>
+        <scope_note>Contains all uuids of the "latest" parent-programme FUNDINGS that the current child FUNDING links to via a self-referential relationship. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingProgrammeOf</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of parent-programme FUNDINGS which link to the current child FUNDING via a "latest" self-referential relationship. Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
 
 </dspace-dc-types>

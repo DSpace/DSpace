@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -44,8 +43,6 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
     @Autowired
     private RequestService requestService;
     @Autowired
-    private DSpaceObjectUtils dspaceObjectUtil;
-    @Autowired
     AuthorizeService authorizeService;
     @Autowired
     protected BitstreamService bitstreamService;
@@ -61,9 +58,12 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
 
             try {
                 UUID dsoUuid = UUID.fromString(targetId.toString());
-                DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
-                if (dso instanceof Bitstream) {
-                    return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
+                // Resolve the target as a Bitstream directly: this plugin only handles Bitstreams, and the
+                // untyped DSpaceObjectUtils#findDSpaceObject sweep logs a spurious Hibernate
+                // ObjectNotFoundException here (see #12839).
+                Bitstream bitstream = bitstreamService.find(context, dsoUuid);
+                if (bitstream != null) {
+                    return this.metadataReadPermissionOnBitstream(context, bitstream);
                 }
             } catch (SQLException e) {
                 log.error(e::getMessage, e);

@@ -123,33 +123,33 @@
 <!--                entities configuration and created the corresponding submission definition.-->
 <!--                The INVESTIGATOR mode uses CUSTOM security with the 'crisfund.investigators'-->
 <!--                metadata field to grant edit access to users listed as investigators.-->
-<!--                <entry key="funding">-->
-<!--                    <list>-->
-<!--                        <bean class="org.dspace.content.edit.EditItemMode">-->
-<!--                            <property name="name" value="FULL" />-->
-<!--                            <property name="security">-->
-<!--                                <value type="org.dspace.content.security.CrisSecurity">-->
-<!--                                    ITEM_ADMIN-->
-<!--                                </value>-->
-<!--                            </property>-->
-<!--                            <property name="submissionDefinition" value="funding-edit" />-->
-<!--                        </bean>-->
-<!--                        <bean class="org.dspace.content.edit.EditItemMode">-->
-<!--                            <property name="name" value="INVESTIGATOR" />-->
-<!--                            <property name="security">-->
-<!--                              <value type="org.dspace.content.security.CrisSecurity">-->
-<!--                                CUSTOM-->
-<!--                              </value>-->
-<!--                            </property>-->
-<!--                            <property name="submissionDefinition" value="funding-edit" />-->
-<!--                            <property name="items">-->
-<!--                            	<list>-->
-<!--                            		<value>crisfund.investigators</value>-->
-<!--                            	</list>-->
-<!--                            </property>-->
-<!--                        </bean>-->
-<!--                    </list>-->
-<!--                </entry>-->
+                <entry key="funding">
+                    <list>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="FULL" />
+                            <property name="security">
+                                <value type="org.dspace.content.security.CrisSecurity">
+                                    ITEM_ADMIN
+                                </value>
+                            </property>
+                            <property name="submissionDefinition" value="funding-edit" />
+                        </bean>
+                        <bean class="org.dspace.content.edit.EditItemMode">
+                            <property name="name" value="INVESTIGATOR" />
+                            <property name="security">
+                              <value type="org.dspace.content.security.CrisSecurity">
+                                CUSTOM
+                              </value>
+                            </property>
+                            <property name="submissionDefinition" value="funding-edit" />
+                            <property name="items">
+                            	<list>
+                            		<value>crisfund.investigators</value>
+                            	</list>
+                            </property>
+                        </bean>
+                    </list>
+                </entry>
                 <entry key="orgunit">
                     <list>
                         <bean class="org.dspace.content.edit.EditItemMode">

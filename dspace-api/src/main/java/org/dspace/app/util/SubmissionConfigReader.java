@@ -188,7 +188,7 @@ public class SubmissionConfigReader {
         entityTypeToSubmissionConfig = new HashMap<String, String>();
         submitDefns = new LinkedHashMap<String, List<Map<String, String>>>();
 
-        String uri = "file:" + new File(fileName).getAbsolutePath();
+        String uri = new File(fileName).toURI().toString();
 
         try {
             // This document builder factory will *not* disable external

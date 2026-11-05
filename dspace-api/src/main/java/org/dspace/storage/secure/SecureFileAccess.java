@@ -8,6 +8,7 @@
 package org.dspace.storage.secure;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -98,6 +99,7 @@ public final class SecureFileAccess {
      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
+     * @param charset the charset to use, or UTF-8 if null
      * @throws IOException on validation failure
      */
     public static BufferedReader getBufferedReader(String unvalidatedFile, List<String> allowedBasePaths,
@@ -135,6 +137,25 @@ public final class SecureFileAccess {
             throws IOException {
         Path validatedFile = validatePathForWrite(unvalidatedFile, allowedBasePaths, purpose);
         return Files.newOutputStream(validatedFile);
+    }
+
+    /**
+     * Get a buffered writer after validating file path. As with {@link #getOutputStream}, new files
+     * can't use toRealPath() for link calculation so there is a trade-off allowing some symlink
+     * traversal to occur.
+     * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
+     * @param allowedBasePaths the allowed base paths for this use case as per system configuration
+     * @param purpose the name of the calling component / use case for logging and inspection
+     * @param charset the charset to use, or UTF-8 if null
+     * @throws IOException on validation failure
+     */
+    public static BufferedWriter getBufferedWriter(String unvalidatedFile, List<String> allowedBasePaths,
+            String purpose, Charset charset) throws IOException {
+        if (charset == null) {
+            charset = StandardCharsets.UTF_8;
+        }
+        Path validatedFile = validatePathForWrite(unvalidatedFile, allowedBasePaths, purpose);
+        return Files.newBufferedWriter(validatedFile, charset);
     }
 
     /**

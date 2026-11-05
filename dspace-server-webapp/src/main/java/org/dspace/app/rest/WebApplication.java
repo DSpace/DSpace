@@ -56,6 +56,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebApplication {
 
+    private static final String[] CORS_ALLOWED_HEADERS = {
+        "Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+        "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
+        "x-captcha-payload"
+    };
+
+    private static final String[] CORS_EXPOSED_HEADERS = {
+        "Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate"
+    };
+
     @Autowired
     private ApplicationConfig configuration;
 
@@ -174,6 +184,7 @@ public class WebApplication {
                 boolean corsAllowCredentials = configuration.getCorsAllowCredentials();
                 boolean iiifAllowCredentials = configuration.getIiifAllowCredentials();
                 boolean signpostingAllowCredentials = configuration.getSignpostingAllowCredentials();
+                int corsMaxAge = configuration.getCorsMaxAge();
                 if (corsAllowedOrigins != null) {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
                             // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
@@ -181,11 +192,10 @@ public class WebApplication {
                             // for our Access-Control-Allow-Origin header
                             .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
                             // Allow list of request preflight headers allowed to be sent to us from the client
-                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                "x-captcha-payload")
+                            .allowedHeaders(CORS_ALLOWED_HEADERS)
                             // Allow list of response headers allowed to be sent by us (the server) to the client
-                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
+                            .exposedHeaders(CORS_EXPOSED_HEADERS)
+                            .maxAge(corsMaxAge);
                 }
                 if (iiifAllowedOrigins != null) {
                     registry.addMapping("/iiif/**").allowedMethods(CorsConfiguration.ALL)
@@ -193,11 +203,10 @@ public class WebApplication {
                             // for our Access-Control-Allow-Origin header
                             .allowCredentials(iiifAllowCredentials).allowedOrigins(iiifAllowedOrigins)
                             // Allow list of request preflight headers allowed to be sent to us from the client
-                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                "x-captcha-payload")
+                            .allowedHeaders(CORS_ALLOWED_HEADERS)
                             // Allow list of response headers allowed to be sent by us (the server) to the client
-                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
+                            .exposedHeaders(CORS_EXPOSED_HEADERS)
+                            .maxAge(corsMaxAge);
                 }
                 if (signpostingAllowedOrigins != null) {
                     registry.addMapping("/signposting/**").allowedMethods(CorsConfiguration.ALL)
@@ -205,11 +214,10 @@ public class WebApplication {
                             // for our Access-Control-Allow-Origin header
                             .allowCredentials(signpostingAllowCredentials).allowedOrigins(signpostingAllowedOrigins)
                             // Allow list of request preflight headers allowed to be sent to us from the client
-                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                    "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                    "x-captcha-payload", "access-control-allow-headers")
+                            .allowedHeaders(CORS_ALLOWED_HEADERS)
                             // Allow list of response headers allowed to be sent by us (the server) to the client
-                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
+                            .exposedHeaders(CORS_EXPOSED_HEADERS)
+                            .maxAge(corsMaxAge);
                 }
             }
 

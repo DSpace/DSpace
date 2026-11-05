@@ -143,7 +143,7 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void start(Context context, Process process) throws SQLException {
+    public void start(Context context, Process process) throws SQLException, AuthorizeException {
         process.setProcessStatus(ProcessStatus.RUNNING);
         process.setStartTime(Instant.now());
         update(context, process);
@@ -153,7 +153,7 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void fail(Context context, Process process) throws SQLException {
+    public void fail(Context context, Process process) throws SQLException, AuthorizeException {
         process.setProcessStatus(ProcessStatus.FAILED);
         process.setFinishedTime(Instant.now());
         update(context, process);
@@ -163,7 +163,7 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void complete(Context context, Process process) throws SQLException {
+    public void complete(Context context, Process process) throws SQLException, AuthorizeException {
         process.setProcessStatus(ProcessStatus.COMPLETED);
         process.setFinishedTime(Instant.now());
         update(context, process);
@@ -175,6 +175,9 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
         throws IOException, SQLException, AuthorizeException {
+        if (!authorizeActionBoolean(context, process)) {
+            throw new AuthorizeException("Cannot append file to process " + process.getID());
+        }
         Bitstream bitstream = bitstreamService.create(context, is);
         if (getBitstream(context, process, type) != null) {
             throw new IllegalArgumentException("Cannot create another file of type: " + type + " for this process" +
@@ -195,7 +198,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public void delete(Context context, Process process) throws SQLException, IOException, AuthorizeException {
-
+        if (!authorizeActionBoolean(context, process)) {
+            throw new AuthorizeException("Cannot delete process " + process.getID());
+        }
         for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
             bitstreamService.delete(context, bitstream);
         }
@@ -205,7 +210,10 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void update(Context context, Process process) throws SQLException {
+    public void update(Context context, Process process) throws SQLException, AuthorizeException {
+        if (!authorizeActionBoolean(context, process)) {
+            throw new AuthorizeException("Cannot update process " + process.getID());
+        }
         processDAO.save(context, process);
     }
 
@@ -332,20 +340,52 @@ public class ProcessServiceImpl implements ProcessService {
         return processDAO.countByUser(context, user);
     }
 
+    /**
+     * Authorize any action, to ensure only a process creator/owner or a repository administrator
+     * may read, update or delete an existing process.
+     * @param context DSpace context containing the current user
+     * @param process the process to check
+     * @return true if the current user may perform the action, or false
+     */
+    @Override
+    public boolean authorizeActionBoolean(Context context, Process process) {
+        try {
+            if (process == null) {
+                return false;
+            }
+            // Only the process owner or an administrator may perform any action
+            EPerson currentUser = context.getCurrentUser();
+            EPerson processOwner = process.getEPerson();
+            boolean isOwner = currentUser != null && processOwner != null
+                    && currentUser.getID().equals(processOwner.getID());
+            if (isOwner || authorizeService.isAdmin(context)) {
+                return true;
+            }
+        } catch (SQLException e) {
+            log.error(e::getMessage, e);
+        }
+        return false;
+    }
+
     @Override
     public void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException {
         List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
                 context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), Instant.now());
         for (Process process : processesToBeFailed) {
-            context.setCurrentUser(process.getEPerson());
-            // Fail the process.
-            log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
-            fail(context, process);
-            // But still attach its log to the process.
-            appendLog(process.getID(), process.getName(),
-                      "Process did not complete before tomcat shutdown.",
-                      ProcessLogLevel.ERROR);
-            createLogBitstream(context, process);
+            context.turnOffAuthorisationSystem();
+            try {
+                // Fail the process.
+                log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.",
+                        process.getID());
+                fail(context, process);
+                // But still attach its log to the process.
+                appendLog(process.getID(), process.getName(),
+                        "Process did not complete before tomcat shutdown.",
+                        ProcessLogLevel.ERROR);
+                createLogBitstream(context, process);
+            } finally {
+                context.restoreAuthSystemState();
+            }
         }
     }
 

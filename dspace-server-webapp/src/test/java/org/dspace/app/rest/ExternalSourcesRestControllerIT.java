@@ -60,7 +60,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void findAllExternalSources() throws Exception {
-        getClient(token).perform(get("/api/integration/externalsources").param("size", "21"))
+        getClient(token).perform(get("/api/integration/externalsources").param("size", "22"))
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
@@ -96,12 +96,12 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "authorAuthority", "authorAuthority", false)
                                 )))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(21)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(22)));
     }
 
     @Test
     public void findAllExternalSourcesAnonymous() throws Exception {
-        getClient().perform(get("/api/integration/externalsources").param("size", "21"))
+        getClient().perform(get("/api/integration/externalsources").param("size", "22"))
                         .andExpect(status().isUnauthorized());
     }
 

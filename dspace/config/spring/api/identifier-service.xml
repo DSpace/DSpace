@@ -22,10 +22,6 @@
     </bean>
     -->
 
-    <!--
-        <context:component-scan base-package="org.dspace.identifier.doi.crossref" />
-    -->
-
     <!-- If you enabled versioning, you should use one of the versioned
          handle identifier provider instead of the default one.
          The VersionedHandleIdentifierProvider creates a new versioned
@@ -83,6 +79,7 @@
     on the filters defined in item-filters.xml, eg.
     Of course, you can use a filter on the VersionedDOIIdentifierProvider as well.
     -->
+    <!--
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.DOIIdentifierProvider"
         scope="singleton">
@@ -92,9 +89,7 @@
             ref="org.dspace.identifier.doi.DOIConnector" />
         <property name="filter" ref="doi-filter" />
     </bean>
-
-    <bean id="org.dspace.identifier.doi.DOIConnector"
-	    class="org.dspace.identifier.doi.crossref.CrossRefConnector"/>
+    -->
 
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency
@@ -104,7 +99,7 @@
          e.g. EZID is part of DataCite but provides their own APIs. The following
          DataCiteConnector won't work if EZID is your registration agency.
     -->
-    <!-- Uncomment this to use the DataCite API directly as DOIConnector.
+    <!--
     <bean id="org.dspace.identifier.doi.DOIConnector"
         class="org.dspace.identifier.doi.DataCiteConnector"
         scope="singleton">
@@ -114,6 +109,16 @@
         <property name='DATACITE_METADATA_PATH' value='/metadata/' />
         <property name='disseminationCrosswalkName' value="DataCite" />
     </bean>
+    -->
+
+    <!--
+	 If you want to use Crossref, activate the CrossRefConnector and change
+	 the configuration values of identifier.doi.* and identifier.doi.crossref.*
+	 in your dspace.cfg or local.cfg.
+    -->
+    <!-- 
+    <bean id="org.dspace.identifier.doi.DOIConnector"
+	    class="org.dspace.identifier.doi.crossref.CrossRefConnector"/>
     -->
 
     <!-- Provider to mint and register DOIs using EZID as the registrar.

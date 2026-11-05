@@ -71,6 +71,9 @@ public class ApplicationConfig {
     @Value("${signposting.cors.allow-credentials:true}")
     private boolean signpostingCorsAllowCredentials;
 
+    @Value("${rest.cors.max-age:86400}")
+    private int corsMaxAge;
+
     // Configured User Interface URL (default: http://localhost:4000)
     @Value("${dspace.ui.url:http://localhost:4000}")
     private String uiURL;
@@ -161,5 +164,14 @@ public class ApplicationConfig {
      */
     public boolean getSignpostingAllowCredentials() {
         return signpostingCorsAllowCredentials;
+    }
+
+    /**
+     * Return the CORS max age value, defined in the DSpace configuration. This is used to set the
+     * CORS "Access-Control-Max-Age" header in Application class. Defaults to 86400 seconds.
+     * @return cors max age
+     */
+    public int getCorsMaxAge() {
+        return corsMaxAge;
     }
 }
