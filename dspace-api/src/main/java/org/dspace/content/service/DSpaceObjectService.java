@@ -726,4 +726,23 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     }
 
+    /**
+     * Lightweight existence check that determines whether a DSpaceObject of this
+     * service's type exists with the given UUID, without loading and hydrating the
+     * full entity.
+     * <p>
+     * Unlike {@link #find(Context, UUID)}, which loads the complete Hibernate entity
+     * (along with any cascaded or lazily-fetched state that gets touched), this method
+     * performs an ID-only query that never hydrates the object, making it suitable for
+     * cheap yes/no checks. It is used, for example, to validate arbitrary,
+     * client-supplied target UUIDs at the REST API boundary before scheduling any
+     * downstream work.
+     *
+     * @param context the relevant DSpace Context
+     * @param id      the UUID to look up; a {@code null} id yields {@code false}
+     * @return {@code true} if a DSpaceObject of this type with the given UUID exists,
+     *         {@code false} otherwise (including when {@code id} is {@code null})
+     * @throws SQLException if a database error occurs
+     */
+    boolean exists(Context context, UUID id) throws SQLException;
 }

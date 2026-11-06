@@ -31,6 +31,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.profile.OrcidEntitySyncPreference;
@@ -112,6 +113,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
     }
 
+    public ItemBuilder withAuthorAffiliation(String affiliation) {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation", affiliation);
+    }
+
+    public ItemBuilder withAuthorAffiliationPlaceholder() {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation",
+                                CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
+    //adds an affiliattion to the author
     public ItemBuilder withAffiliation(String affiliation, String authority) {
         return addMetadataValue(item, "person", "affiliation", "name", null, affiliation, authority, 600);
     }
@@ -289,6 +300,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "crispj", "investigator", null, null, investigator, authority, 600);
     }
 
+    public ItemBuilder withProjectCoinvestigators(String coinvestigators, String authority) {
+        return addMetadataValue(item, "crispj", "coinvestigators", null, null, coinvestigators, authority, 600);
+    }
+
     public ItemBuilder withType(String type) {
         return addMetadataValue(item, "dc", "type", null, type);
     }
@@ -307,6 +322,19 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withDspaceObjectOwner(EPerson ePerson) {
         return withDspaceObjectOwner(ePerson.getFullName(), ePerson.getID().toString());
+    }
+
+
+    public ItemBuilder withPersonEducation(String education) {
+        return addMetadataValue(item, "crisrp", "education", null, education);
+    }
+
+    public ItemBuilder withPersonEducationStartDate(String startDate) {
+        return addMetadataValue(item, "crisrp", "education", "start", startDate);
+    }
+
+    public ItemBuilder withPersonEducationEndDate(String endDate) {
+        return addMetadataValue(item, "crisrp", "education", "end", endDate);
     }
 
     public ItemBuilder withDspaceObjectOwner(String value, String authority) {

@@ -9,12 +9,14 @@ package org.dspace.subscriptions;
 
 import static org.dspace.core.Constants.COLLECTION;
 import static org.dspace.core.Constants.COMMUNITY;
+import static org.dspace.core.Constants.ITEM;
 import static org.dspace.core.Constants.READ;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.metrics.CrisMetrics;
+import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -49,24 +53,51 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
 
     private static final Logger log = LogManager.getLogger(SubscriptionEmailNotificationServiceImpl.class);
 
+    private static final String STATISTICS_SUBSCRIPTION_TYPE = "statistics";
+
     private Map<String, DSpaceObjectUpdates> contentUpdates = new HashMap<>();
     @SuppressWarnings("rawtypes")
     private Map<String, SubscriptionGenerator> subscriptionType2generators = new HashMap<>();
+    private final StatisticsGenerator statisticsGenerator;
 
     @Autowired
     private AuthorizeService authorizeService;
     @Autowired
     private SubscribeService subscribeService;
+    @Autowired
+    private CrisMetricsService crisMetricsService;
 
+    /**
+     * Creates a new subscription email notification service.
+     *
+     * @param contentUpdates              the map of {@link DSpaceObjectUpdates} handlers keyed by object type
+     * @param subscriptionType2generators the map of {@link SubscriptionGenerator} keyed by subscription type
+     * @param statisticsGenerator         the generator used to build and send statistics reports
+     */
     @SuppressWarnings("rawtypes")
     public SubscriptionEmailNotificationServiceImpl(Map<String, DSpaceObjectUpdates> contentUpdates,
-                                                    Map<String, SubscriptionGenerator> subscriptionType2generators) {
+                                                    Map<String, SubscriptionGenerator> subscriptionType2generators,
+                                                    StatisticsGenerator statisticsGenerator) {
         this.contentUpdates = contentUpdates;
         this.subscriptionType2generators = subscriptionType2generators;
+        this.statisticsGenerator = statisticsGenerator;
     }
 
+    /**
+     * Finds the subscribed objects matching the given subscription type and frequency and sends the
+     * corresponding notification emails to the subscribers.
+     *
+     * @param context          the current DSpace context
+     * @param handler          the runnable handler used to report exceptions
+     * @param subscriptionType the subscription type to process (e.g. "content" or "statistics")
+     * @param frequency        the frequency to process ("D" day, "W" week or "M" month)
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
+        if (STATISTICS_SUBSCRIPTION_TYPE.equals(subscriptionType)) {
+            performForStatistics(context, subscriptionType, frequency);
+            return;
+        }
         Map<DSpaceObject, List<IndexableObject>> communityItemsMap = new HashMap<>();
         Map<DSpaceObject, List<IndexableObject>> collectionsItemsMap = new HashMap<>();
         EPerson currentEperson = context.getCurrentUser();
@@ -102,6 +133,16 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                                 .get(Collection.class.getSimpleName().toLowerCase())
                                 .findUpdates(context, dSpaceObject, frequency);
                         List<IndexableObject> filteredItems = getItems(context, ePerson, indexableCollectionItems);
+                        if (!filteredItems.isEmpty()) {
+                            collectionsItemsMap.put(dSpaceObject, filteredItems);
+                        }
+                    } else if (dSpaceObject.getType() == ITEM) {
+                        // A subscribed Item is treated as an entity: notify about its related items,
+                        // resolved through the entity's inverse-relation discovery configurations.
+                        List<IndexableObject> indexableItemItems = contentUpdates
+                                .get(Item.class.getSimpleName().toLowerCase())
+                                .findUpdates(context, dSpaceObject, frequency);
+                        List<IndexableObject> filteredItems = getItems(context, ePerson, indexableItemItems);
                         if (!filteredItems.isEmpty()) {
                             collectionsItemsMap.put(dSpaceObject, filteredItems);
                         }
@@ -178,9 +219,60 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
         return new ArrayList<Subscription>();
     }
 
+    /**
+     * Send statistics reports to subscribers. For each statistics subscription the
+     * {@link CrisMetrics} of the subscribed object are accumulated and, at every
+     * eperson boundary (subscriptions are ordered by eperson), the accumulated
+     * metrics are handed to the {@link StatisticsGenerator} which emails a
+     * spreadsheet report. Subscribers whose objects have no metrics receive no email.
+     *
+     * @param context           DSpace context
+     * @param subscriptionType  the "statistics" subscription type
+     * @param frequency         Could be "D" (Day), "W" (Week) or "M" (Month)
+     */
+    private void performForStatistics(Context context, String subscriptionType, String frequency) {
+        EPerson currentEperson = context.getCurrentUser();
+        List<Subscription> subscriptions =
+            findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType, frequency);
+        List<CrisMetrics> crisMetricsList = new ArrayList<>();
+        int iterator = 0;
+
+        for (Subscription subscription : subscriptions) {
+            EPerson ePerson = subscription.getEPerson();
+            DSpaceObject dSpaceObject = subscription.getDSpaceObject();
+            // Set the current user to the subscribed eperson because the Solr query checks
+            // the permissions of the current user in the ANONYMOUS group.
+            // If there is no user (i.e., `current user = null`), it will send an email with no new items.
+            context.setCurrentUser(ePerson);
+            try {
+                crisMetricsList.addAll(crisMetricsService.findAllByDSO(context, dSpaceObject));
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+            if (iterator < subscriptions.size() - 1) {
+                if (ePerson.equals(subscriptions.get(iterator + 1).getEPerson())) {
+                    iterator++;
+                    continue;
+                } else {
+                    statisticsGenerator.notifyForSubscriptions(context, ePerson, crisMetricsList);
+                    crisMetricsList.clear();
+                }
+            } else {
+                //in the end of the iteration
+                statisticsGenerator.notifyForSubscriptions(context, ePerson, crisMetricsList);
+            }
+            iterator++;
+        }
+
+        // Reset the current user because it was changed to subscriber eperson
+        context.setCurrentUser(currentEperson);
+    }
+
     @Override
     public Set<String> getSupportedSubscriptionTypes() {
-        return subscriptionType2generators.keySet();
+        Set<String> supportedTypes = new LinkedHashSet<>(subscriptionType2generators.keySet());
+        supportedTypes.add(STATISTICS_SUBSCRIPTION_TYPE);
+        return supportedTypes;
     }
 
 }

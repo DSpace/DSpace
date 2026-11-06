@@ -20,6 +20,8 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.StatisticsSupportRest;
 import org.dspace.app.rest.model.UsageReportRest;
+import org.dspace.app.rest.projection.ExcludeUsageReportPointsProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.content.DSpaceObject;
@@ -45,10 +47,10 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
     }
 
     @Override
-    @PreAuthorize("hasPermission(#uuidObjectReportId, 'usagereport', 'READ')")
-    public UsageReportRest findOne(Context context, String uuidObjectReportId) {
-        UUID uuidObject = UUID.fromString(StringUtils.substringBefore(uuidObjectReportId, "_"));
-        String reportId = StringUtils.substringAfter(uuidObjectReportId, "_");
+    @PreAuthorize("hasPermission(#id, 'usagereport', 'READ')")
+    public UsageReportRest findOne(Context context, String id) {
+        UUID uuidObject = UUID.fromString(StringUtils.substringBefore(id, "_"));
+        String reportId = StringUtils.substringAfter(id, "_");
 
         UsageReportRest usageReportRest = null;
         try {
@@ -64,10 +66,25 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         return converter.toRest(usageReportRest, utils.obtainProjection());
     }
 
-    @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
+    /**
+     * Returns the page of usage reports available for the DSpace object identified by the given URI, optionally
+     * restricted to a single report category and bounded by an optional date range.
+     *
+     * @param uri       the URI of the DSpace object, whose UUID is its last path segment
+     * @param category  the report category to filter by, may be null for all categories
+     * @param pageable  the pagination information
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the reports, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the reports, may be null
+     * @return a page of usage reports for the resolved DSpace object
+     * @throws ResourceNotFoundException if no DSpace object is found for the URI's UUID
+     * @throws IllegalArgumentException  if the given category does not exist for the DSO
+     */
+    @PreAuthorize("permitAll()")
     @SearchRestMethod(name = "object")
     public Page<UsageReportRest> findByObject(@Parameter(value = "uri", required = true) String uri,
-                                              Pageable pageable) {
+            @Parameter(value = "category") String category, Pageable pageable,
+                                              @Parameter(value = "startDate") String startDate,
+                                              @Parameter(value = "endDate") String endDate) {
         UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
         List<UsageReportRest> usageReportsOfItem = null;
         try {
@@ -76,12 +93,50 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
             if (dso == null) {
                 throw new ResourceNotFoundException("No DSO found with uuid: " + uuid);
             }
-            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso);
+            if (category != null && !usageReportUtils.categoryExists(dso, category)) {
+                throw new IllegalArgumentException("The specified category doesn't exists: " + category);
+            }
+            Projection projection = utils.obtainProjection();
+            boolean includePoints = !(projection instanceof ExcludeUsageReportPointsProjection);
+            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso, category, startDate, endDate,
+                                                                       includePoints);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
 
         return converter.toRestPage(usageReportsOfItem, pageable, usageReportsOfItem.size(), utils.obtainProjection());
+    }
+
+    /**
+     * Returns a single usage report identified by the given composite id (of the form
+     * {@code <dsoUuid>_<reportId>}), bounded by an optional date range.
+     *
+     * @param id        the composite report id, combining the DSO UUID and the report id
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report, may be null
+     * @return the requested usage report
+     * @throws ResourceNotFoundException if no DSpace object is found for the id's UUID
+     */
+    @PreAuthorize("hasPermission(#id, 'usagereport', 'READ')")
+    @SearchRestMethod(name = "report")
+    public UsageReportRest findReport(@Parameter(value = "id", required = true) String id,
+                                       @Parameter(value = "startDate") String startDate,
+                                       @Parameter(value = "endDate") String endDate) {
+        UUID uuidObject = UUID.fromString(StringUtils.substringBefore(id, "_"));
+        String reportId = StringUtils.substringAfter(id, "_");
+
+        UsageReportRest usageReportRest;
+        try {
+            Context context = obtainContext();
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
+            if (dso == null) {
+                throw new ResourceNotFoundException("No DSO found with uuid: " + uuidObject);
+            }
+            usageReportRest = usageReportUtils.createUsageReport(context, dso, reportId, startDate, endDate);
+        } catch (SQLException | ParseException | SolrServerException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return converter.toRest(usageReportRest, utils.obtainProjection());
     }
 
     @Override

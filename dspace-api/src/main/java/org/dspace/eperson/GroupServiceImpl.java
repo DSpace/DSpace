@@ -590,6 +590,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         return Constants.GROUP;
     }
 
+    @Override
+    public boolean exists(Context context, UUID id) throws SQLException {
+        return this.groupDAO.exists(context, Group.class, id);
+    }
+
     /**
      * Return true if group has no direct or indirect members
      */

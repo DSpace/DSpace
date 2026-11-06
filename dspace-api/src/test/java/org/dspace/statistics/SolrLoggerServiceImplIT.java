@@ -295,7 +295,7 @@ public class SolrLoggerServiceImplIT
         instance.deleteRobots();
 
         // Check that the correct documents (and only those) are gone.
-        QueryResponse response = instance.query(Q_ALL, null, null,
+        QueryResponse response = instance.query(Q_ALL, (String) null, null,
                 Integer.MAX_VALUE, -1,
                 null, null, null, null, null, true, 0);
         long nDocs = 0;
