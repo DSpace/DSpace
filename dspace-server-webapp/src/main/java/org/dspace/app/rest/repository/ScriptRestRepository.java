@@ -8,12 +8,14 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.IntConsumer;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -100,6 +102,23 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     public ProcessRest startProcess(Context context, String scriptName, List<MultipartFile> files) throws SQLException,
         IOException, AuthorizeException, IllegalAccessException, InstantiationException {
         String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
+        return startProcess(context, scriptName, files, properties, id -> { });
+    }
+
+    /**
+     * Start a script with explicit properties, recording its process ID before file attachment and scheduling.
+     * The recorder allows a staged upload to retain the handoff identity across HTTP retries.
+     * @param context request context
+     * @param scriptName script to execute
+     * @param files staged input files
+     * @param properties serialized command line parameters
+     * @param recorder called once after process creation, before execution
+     * @return created process
+     * @throws Exception if process creation or scheduling fails
+     */
+    public ProcessRest startProcess(Context context, String scriptName, List<MultipartFile> files,
+                                    String properties, IntConsumer recorder) throws SQLException, IOException,
+        AuthorizeException, IllegalAccessException, InstantiationException {
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
         ScriptConfiguration scriptToExecute = scriptService.getScriptConfiguration(scriptName);
@@ -118,6 +137,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
             context.getCurrentUser(), scriptToExecute.getName(), dSpaceCommandLineParameters,
             new HashSet<>(context.getSpecialGroups()));
+        recorder.accept(restDSpaceRunnableHandler.getProcess(context).getID());
         List<String> args = constructArgs(dSpaceCommandLineParameters);
         runDSpaceScript(files, context, scriptToExecute, restDSpaceRunnableHandler, args);
         return converter.toRest(restDSpaceRunnableHandler.getProcess(context), utils.obtainProjection());
@@ -129,11 +149,19 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         if (StringUtils.isNotBlank(propertiesJson)) {
             parameterValueRestList = Arrays.asList(mapper.readValue(propertiesJson, ParameterValueRest[].class));
         }
+        return toCommandLineParameters(parameterValueRestList);
+    }
 
+    /**
+     * Convert REST parameter values to the command line parameters a script configuration understands.
+     * @param parameters the parameter values
+     * @return the command line parameters, in order
+     */
+    public List<DSpaceCommandLineParameter> toCommandLineParameters(List<ParameterValueRest> parameters) {
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = new LinkedList<>();
         dSpaceCommandLineParameters.addAll(
-            parameterValueRestList.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
-                                  .collect(Collectors.toList()));
+            parameters.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
+                      .collect(Collectors.toList()));
         return dSpaceCommandLineParameters;
     }
 
@@ -176,8 +204,9 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
                               List<MultipartFile> files)
         throws IOException, SQLException, AuthorizeException {
         for (MultipartFile file : files) {
-            restDSpaceRunnableHandler
-                .writeFilestream(context, file.getOriginalFilename(), file.getInputStream(), "inputfile");
+            try (InputStream input = file.getInputStream()) {
+                restDSpaceRunnableHandler.writeFilestream(context, file.getOriginalFilename(), input, "inputfile");
+            }
         }
     }
 
