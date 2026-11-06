@@ -130,4 +130,55 @@ public class FeedbackRestRepositoryIT extends AbstractControllerIntegrationTest 
         }
     }
 
+    @Test
+    public void sendFeedbackUnauthenticatedByDefaultTest() throws Exception {
+        configurationService.setProperty("feedback.recipient", "recipient.email@test.com");
+        // feedback.allow-anonymous defaults to false, so anonymous users cannot submit feedback
+        FeedbackService originFeedbackService = feedbackRestRepository.getFeedbackService();
+        try {
+            FeedbackService feedbackServiceMock = mock(FeedbackServiceImpl.class);
+            feedbackRestRepository.setFeedbackService(feedbackServiceMock);
+
+            FeedbackRest feedbackRest = new FeedbackRest();
+            feedbackRest.setEmail("misha.boychuk@test.com");
+            feedbackRest.setMessage("My feedback!");
+
+            getClient().perform(post("/api/tools/feedbacks")
+                       .content(mapper.writeValueAsBytes(feedbackRest))
+                       .contentType(contentType))
+                       .andExpect(status().isUnauthorized());
+
+            verifyNoMoreInteractions(feedbackServiceMock);
+        } finally {
+            feedbackRestRepository.setFeedbackService(originFeedbackService);
+        }
+    }
+
+    @Test
+    public void sendFeedbackAnonymousAllowedTest() throws Exception {
+        configurationService.setProperty("feedback.recipient", "recipient.email@test.com");
+        configurationService.setProperty("feedback.allow-anonymous", true);
+        FeedbackService originFeedbackService = feedbackRestRepository.getFeedbackService();
+        try {
+            FeedbackService feedbackServiceMock = mock(FeedbackServiceImpl.class);
+            feedbackRestRepository.setFeedbackService(feedbackServiceMock);
+
+            FeedbackRest feedbackRest = new FeedbackRest();
+            feedbackRest.setEmail("misha.boychuk@test.com");
+            feedbackRest.setMessage("My feedback!");
+
+            getClient().perform(post("/api/tools/feedbacks")
+                       .content(mapper.writeValueAsBytes(feedbackRest))
+                       .contentType(contentType))
+                       .andExpect(status().isCreated());
+
+            verify(feedbackServiceMock).sendEmail(isNotNull(), isNotNull(), eq("recipient.email@test.com"),
+                    eq("misha.boychuk@test.com"), eq("My feedback!"), isNull());
+            verifyNoMoreInteractions(feedbackServiceMock);
+        } finally {
+            feedbackRestRepository.setFeedbackService(originFeedbackService);
+            configurationService.setProperty("feedback.allow-anonymous", false);
+        }
+    }
+
 }
