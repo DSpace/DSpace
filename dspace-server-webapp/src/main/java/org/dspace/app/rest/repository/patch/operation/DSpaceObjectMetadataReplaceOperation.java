@@ -10,11 +10,12 @@ package org.dspace.app.rest.repository.patch.operation;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.app.audit.MetadataEvent;
+import jakarta.annotation.Nullable;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.utils.MetadataReplaceUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -45,7 +46,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
-        DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
+        DSpaceObjectService<R> dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(resource);
         MetadataField metadataField = metadataPatchUtils.getMetadataField(context, operation);
         String[] partsOfPath = operation.getPath().split("/");
         // Index of md being patched
@@ -54,20 +55,25 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
         // Property of md being altered
         String propertyOfMd = metadataPatchUtils.extractPropertyOfMdFromPath(partsOfPath);
         String newValueMdAttribute = metadataPatchUtils.extractNewValueOfMd(operation);
-
-        replace(context, resource, dsoService, metadataField, metadataValueToReplace, indexInPath, propertyOfMd,
-                newValueMdAttribute);
+        replace(
+            context, resource, dsoService, metadataField, metadataValueToReplace, indexInPath,
+            propertyOfMd, newValueMdAttribute
+        );
         return resource;
     }
 
     /**
      * Replaces metadata in the dso; 4 cases:
-     *      * - If we replace everything: clears all metadata
-     *      * - If we replace for a single field: clearMetadata on the field & add the new ones
-     *      * - A single existing metadata value:
-     *      * Retrieve the metadatavalue object & make alterations directly on this object
-     *      * - A single existing metadata property:
-     *      * Retrieve the metadatavalue object & make alterations directly on this object
+     * <ol>
+     *     <li> - If we replace everything: clears all metadata </li>
+     *     <li> - If we replace for a single field: clearMetadata on the field & add the new ones </li>
+     *     <li> - A single existing metadata value:
+     *     Retrieve the metadatavalue object & make alterations directly on this object
+     *     </li>
+     *     <li> - A single existing metadata property:
+     *     Retrieve the metadatavalue object & make alterations directly on this object
+     *     </li>
+     * </ol>
      * @param context           context patch is being performed in
      * @param dso               dso being patched
      * @param dsoService        service doing the patch in db
@@ -75,28 +81,28 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param metadataValue     value of md element
      * @param index             possible index of md being replaced
      * @param propertyOfMd      possible property of md being replaced
-     * @param valueMdProperty   possible new value of property of md being replaced
+     * @param newPropertyValue  value for the possible property of md being replaced (when propertyOfMd != null)
      */
-    private void replace(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
-                         MetadataValueRest metadataValue, String index, String propertyOfMd, String valueMdProperty) {
-        // replace entire set of metadata
+    private void replace(Context context,
+                         R dso, DSpaceObjectService<R> dsoService,
+                         MetadataField metadataField,
+                         MetadataValueRest metadataValue,
+                         String index,
+                         String propertyOfMd,
+                         String newPropertyValue
+    ) {
         if (metadataField == null) {
+            // Case 1 - replace entire set of metadata
             this.replaceAllMetadata(context, dso, dsoService);
-            return;
-        }
-
-        // replace all metadata for existing key
-        if (index == null) {
+        } else if (index == null) {
+            // Case 2 - replace all metadata for existing key
             this.replaceMetadataFieldMetadata(context, dso, dsoService, metadataField, metadataValue);
-            return;
+        } else {
+            // Case 3 and 4 - replace single existing metadata
+            this.replaceMetadataValue(
+                context, dso, dsoService, metadataField, metadataValue, index, propertyOfMd, newPropertyValue
+            );
         }
-        // replace single existing metadata value
-        if (propertyOfMd == null) {
-            this.replaceSingleMetadataValue(dso, dsoService, metadataField, metadataValue, index);
-            return;
-        }
-        // replace single property of exiting metadata value
-        this.replaceSinglePropertyOfMdValue(dso, dsoService, metadataField, index, propertyOfMd, valueMdProperty);
     }
 
     /**
@@ -105,7 +111,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param dso               dso being patched
      * @param dsoService        service doing the patch in db
      */
-    private void replaceAllMetadata(Context context, DSpaceObject dso, DSpaceObjectService dsoService) {
+    private void replaceAllMetadata(Context context, R dso, DSpaceObjectService<R> dsoService) {
         try {
             dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         } catch (SQLException e) {
@@ -122,8 +128,12 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param metadataField     md field being patched
      * @param metadataValue     value of md element
      */
-    private void replaceMetadataFieldMetadata(Context context, DSpaceObject dso, DSpaceObjectService dsoService,
-                                              MetadataField metadataField, MetadataValueRest metadataValue) {
+    private void replaceMetadataFieldMetadata(Context context,
+                                              R dso,
+                                              DSpaceObjectService<R> dsoService,
+                                              MetadataField metadataField,
+                                              MetadataValueRest metadataValue
+    ) {
         try {
             dsoService.clearMetadata(context, dso, metadataField.getMetadataSchema().getName(),
                     metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
@@ -137,88 +147,60 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
     }
 
     /**
-     * Replaces metadata value of a single metadataValue object
-     *      Retrieve the metadatavalue object & make alerations directly on this object
+     * Replaces metadata value of a single metadataValue object or a single property of the object.
+     * Retrieve the metadatavalue object & make alerations directly on this object
      * @param dso               dso being patched
      * @param dsoService        service doing the patch in db
      * @param metadataField     md field being patched
      * @param metadataValue     new value of md element
      * @param index             index of md being replaced
+     * @param propertyOfMd      property of md being replaced
+     * @param newPropertyValue  new value for the property being replaced
      */
-    // replace single existing metadata value
-    private void replaceSingleMetadataValue(DSpaceObject dso, DSpaceObjectService dsoService,
-                                            MetadataField metadataField, MetadataValueRest metadataValue,
-                                            String index) {
+    private void replaceMetadataValue(Context context,
+                                      R dso,
+                                      DSpaceObjectService<R> dsoService,
+                                      MetadataField metadataField,
+                                      MetadataValueRest metadataValue,
+                                      String index,
+                                      @Nullable String propertyOfMd,
+                                      @Nullable String newPropertyValue
+    ) {
         try {
-            List<MetadataValue> metadataValues = dsoService.getMetadata(dso,
-                    metadataField.getMetadataSchema().getName(), metadataField.getElement(),
-                    metadataField.getQualifier(), Item.ANY);
+            List<MetadataValue> metadataValues = dsoService.getMetadata(
+                dso,
+                metadataField.getMetadataSchema().getName(),
+                metadataField.getElement(),
+                metadataField.getQualifier(),
+                Item.ANY
+            );
             int indexInt = Integer.parseInt(index);
-            if (indexInt >= 0 && metadataValues.size() > indexInt
-                    && metadataValues.get(indexInt) != null) {
-                // Alter this existing md
+            if (indexInt >= 0 && metadataValues.size() > indexInt && metadataValues.get(indexInt) != null) {
                 MetadataValue existingMdv = metadataValues.get(indexInt);
-                existingMdv.setAuthority(metadataValue.getAuthority());
-                existingMdv.setConfidence(metadataValue.getConfidence());
-                existingMdv.setLanguage(metadataValue.getLanguage());
-                existingMdv.setValue(metadataValue.getValue());
-                dso.addMetadataEventDetails(new MetadataEvent(existingMdv, MetadataEvent.MODIFY));
-                dsoService.setMetadataModified(dso);
-                existingMdv.setSecurityLevel(metadataValue.getSecurityLevel());
+                MetadataReplaceUtils.replaceValue(
+                    context,
+                    dsoService,
+                    dso,
+                    metadataField.toString(),
+                    existingMdv,
+                    metadataValue,
+                    indexInt,
+                    propertyOfMd,
+                    newPropertyValue
+                );
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("This index (" + index + ") is not valid number.", e);
-        }
-    }
-
-    /**
-     * Replaces single property of a specific mdValue object
-     * @param dso               dso being patched
-     * @param dsoService        service doing the patch in db
-     * @param metadataField     md field being patched
-     * @param index             index of md being replaced
-     * @param propertyOfMd      property of md being replaced
-     * @param valueMdProperty   new value of property of md being replaced
-     */
-    private void replaceSinglePropertyOfMdValue(DSpaceObject dso, DSpaceObjectService dsoService,
-                                                MetadataField metadataField,
-                                                String index, String propertyOfMd, String valueMdProperty) {
-        try {
-            List<MetadataValue> metadataValues = dsoService.getMetadata(dso,
-                    metadataField.getMetadataSchema().getName(), metadataField.getElement(),
-                    metadataField.getQualifier(), Item.ANY);
-            int indexInt = Integer.parseInt(index);
-            if (indexInt >= 0 && metadataValues.size() > indexInt && metadataValues.get(indexInt) != null) {
-                // Alter only asked propertyOfMd
-                MetadataValue existingMdv = metadataValues.get(indexInt);
-                if (propertyOfMd.equals("authority")) {
-                    existingMdv.setAuthority(valueMdProperty);
-                }
-                if (propertyOfMd.equals("confidence")) {
-                    existingMdv.setConfidence(Integer.valueOf(valueMdProperty));
-                }
-                if (propertyOfMd.equals("language")) {
-                    existingMdv.setLanguage(valueMdProperty);
-                }
-                if (propertyOfMd.equals("value")) {
-                    existingMdv.setValue(valueMdProperty);
-                }
-                dso.addMetadataEventDetails(new MetadataEvent(existingMdv, MetadataEvent.MODIFY));
-                dsoService.setMetadataModified(dso);
-            } else {
-                throw new UnprocessableEntityException("There is no metadata of this type at that index");
-            }
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Not all numbers are valid numbers. " +
-                    "(Index and confidence should be nr)", e);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQL error trying to replace metadata", e);
         }
     }
 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        return (operation.getPath().startsWith(metadataPatchUtils.OPERATION_METADATA_PATH)
+        return (operation.getPath().startsWith(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)
                 && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
                 && objectToMatch instanceof DSpaceObject);
     }
