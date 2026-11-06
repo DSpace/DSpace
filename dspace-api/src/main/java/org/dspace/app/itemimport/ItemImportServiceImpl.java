@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -2020,8 +2021,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 File outFile = validatedOutPath.toFile();
 
                 if (entry.isDirectory()) {
-                    if (!outFile.mkdirs()) {
-                        logError("Unable to create contents directory: " + zipDir + entry.getName());
+                    try {
+                        Files.createDirectories(validatedOutPath);
+                    } catch (IOException ioe) {
+                        logError("Unable to create contents directory: " + validatedOutPath, ioe);
                     }
                 } else {
                     logInfo("Extracting file: " + entryName);
@@ -2032,9 +2035,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         index = entryName.lastIndexOf('\\');
                     }
                     if (index > 0) {
-                        File dir = new File(zipDir + entryName.substring(0, index));
-                        if (!dir.exists() && !dir.mkdirs()) {
-                            logError("Unable to create directory: " + dir.getAbsolutePath());
+                        Path validatedParent = validatedOutPath.getParent();
+                        try {
+                            Files.createDirectories(validatedParent);
+                        } catch (IOException ioe) {
+                            logError("Unable to create directory: " + validatedParent, ioe);
                         }
 
                         //Entries could have too many directories, and we need to adjust the sourcedir
