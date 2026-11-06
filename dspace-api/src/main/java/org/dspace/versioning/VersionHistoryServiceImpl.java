@@ -233,4 +233,9 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         return false;
     }
 
+    @Override
+    public void lockVersionCreation(Context context, Item item) throws SQLException {
+        versionHistoryDAO.lockVersionCreation(context, item);
+    }
+
 }
