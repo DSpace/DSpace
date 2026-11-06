@@ -45,12 +45,6 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     public static final String STATUS_FOR_CURRENT_USER  = "current";
     public static final String STATUS_FOR_ANONYMOUS  = "anonymous";
 
-    public static final String EMBARGO = "embargo";
-    public static final String METADATA_ONLY = "metadata.only";
-    public static final String OPEN_ACCESS = "open.access";
-    public static final String RESTRICTED = "restricted";
-    public static final String UNKNOWN = "unknown";
-
     protected ItemService itemService =
             ContentServiceFactory.getInstance().getItemService();
     protected ResourcePolicyService resourcePolicyService =
