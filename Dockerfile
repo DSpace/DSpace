@@ -28,7 +28,7 @@ COPY --chown=dspace . /app/
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 # Maven flags here ensure that we skip building test environment and skip all code verification checks.
 # These flags speed up this compilation as much as reasonably possible.
-ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
+ENV MAVEN_FLAGS="-P-test-environment -pl '!dspace-shell' -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
 RUN mvn --no-transfer-progress package ${MAVEN_FLAGS} && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
