@@ -139,6 +139,79 @@
       }
     },
     {
+      "name": "replace titles by adding two with one list",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title",
+          "value": [
+            { "value": "title 1 (from list)" },
+            { "value": "title 2 (from list)" }
+          ]
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 1 (from list)", "language": null, "authority": null, "confidence": -1, "place": 0},
+          { "value": "title 2 (from list)", "language": null, "authority": null, "confidence": -1, "place": 1}
+        ]
+      }
+    },
+    {
+      "name": "insert title in between existing ones",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title/1",
+          "value": [
+            { "value": "appended title" }
+          ]
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 1 (from list)", "language": null, "authority": null, "confidence": -1, "place": 0},
+          { "value": "appended title", "language": null, "authority": null, "confidence": -1, "place": 1},
+          { "value": "title 2 (from list)", "language": null, "authority": null, "confidence": -1, "place": 2}
+        ]
+      }
+    },
+    {
+      "name": "insert title to the end of list with explicit index",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title/3",
+          "value": [
+            { "value": "title at the end" }
+          ]
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 1 (from list)", "language": null, "authority": null, "confidence": -1, "place": 0},
+          { "value": "appended title", "language": null, "authority": null, "confidence": -1, "place": 1},
+          { "value": "title 2 (from list)", "language": null, "authority": null, "confidence": -1, "place": 2},
+          { "value": "title at the end", "language": null, "authority": null, "confidence": -1, "place": 3}
+        ]
+      }
+    },
+    {
+      "name": "replace titles by adding just one value",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title",
+          "value": { "value": "new singular title" }
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "new singular title", "language": null, "authority": null, "confidence": -1, "place": 0}
+        ]
+      }
+    },
+    {
       "name": "remove all titles",
       "patch": [
         {
