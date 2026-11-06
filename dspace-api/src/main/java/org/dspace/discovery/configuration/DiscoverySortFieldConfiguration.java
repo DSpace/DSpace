@@ -26,6 +26,12 @@ public class DiscoverySortFieldConfiguration {
 
     private SORT_ORDER defaultSortOrder;
 
+    /** Ignores special chars in front of the title when indexing into Solr. */
+    private boolean ignoreLeadingNonAlphaNum = false;
+
+    /** Ignores digits in front of the title when indexing into Solr. */
+    private boolean ignoreLeadingDigits = false;
+
     public String getMetadataField() {
         return metadataField;
     }
@@ -49,6 +55,24 @@ public class DiscoverySortFieldConfiguration {
     @Autowired(required = true)
     public void setDefaultSortOrder(SORT_ORDER defaultSortOrder) {
         this.defaultSortOrder = defaultSortOrder;
+    }
+
+    public boolean isIgnoreLeadingNonAlphaNum() {
+        return ignoreLeadingNonAlphaNum;
+    }
+
+    @Autowired(required = false)
+    public void setIgnoreLeadingNonAlphaNum(boolean ignoreLeadingNonAlphaNum) {
+        this.ignoreLeadingNonAlphaNum = ignoreLeadingNonAlphaNum;
+    }
+
+    public boolean isIgnoreLeadingDigits() {
+        return ignoreLeadingDigits;
+    }
+
+    @Autowired(required = false)
+    public void setIgnoreLeadingDigits(boolean ignoreLeadingDigits) {
+        this.ignoreLeadingDigits = ignoreLeadingDigits;
     }
 
     @Override
