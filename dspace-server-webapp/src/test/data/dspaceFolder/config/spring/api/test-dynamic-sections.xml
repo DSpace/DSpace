@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!--
+    Test override for config/spring/api/dynamic-sections.xml.
+
+    The default dynamic-sections.xml ships with the CRIS entity-scoped browse
+    indexes (rodept, rsoTitle, pjtitle, rpname, rpdept) commented out, because a
+    plain DSpace installation has no such entities and the matching browse
+    indexes are disabled in dspace.cfg.
+
+    The integration tests (e.g. DynamicLayoutSectionRestRepositoryIT), however,
+    run against the full CRIS test environment where those entities and browse
+    indexes DO exist. This file re-declares the four explore-page section beans
+    (by bean id) with the entity-scoped browse components enabled, so the tests
+    keep exercising the complete layout. Because the DSpace Spring context loads
+    every *.xml under config/spring/api/ with bean-definition overriding enabled,
+    and this file sorts after "dynamic-sections.xml", these definitions override
+    the defaults. The DynamicLayoutSectionServiceImpl bean (defined without an id
+    in the default file) resolves its <ref> entries to the beans below.
+
+    Mirrors the pattern used by test-discovery.xml overriding discovery.xml.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+
+    <bean class="org.dspace.layout.DynamicLayoutSection" id="sectionresearchoutputs">
+        <constructor-arg name="id" value="researchoutputs"/>
+        <constructor-arg name="visible" value="true"/>
+        <constructor-arg name="sectionComponents">
+            <list>
+                <list>
+                    <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">
+                        <property name="browseNames">
+                            <list>
+                                <value>rodept</value>
+                                <value>author</value>
+                                <value>rsoTitle</value>
+                                <value>type</value>
+                                <value>dateissued</value>
+                                <value>subject</value>
+                            </list>
+                        </property>
+                        <property name="style" value="col-md-4"/>
+                    </bean>
+                    <bean class="org.dspace.layout.DynamicLayoutSearchComponent">
+                        <property name="discoveryConfigurationName" value="researchoutputs" />
+                        <property name="style" value="col-md-8"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.DynamicLayoutTopComponent">
+                        <property name="discoveryConfigurationName" value="researchoutputs" />
+                        <property name="sortField" value="dc.date.accessioned" />
+                        <property name="order" value="desc" />
+                        <property name="style" value="col-12"/>
+                        <property name="numberOfItems" value="5"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.DynamicLayoutFacetComponent">
+                        <property name="discoveryConfigurationName" value="researchoutputs" />
+                        <property name="style" value="col-md-12"/>
+                    </bean>
+                </list>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean class="org.dspace.layout.DynamicLayoutSection" id="sectionfundings_and_projects">
+        <constructor-arg name="id" value="fundings_and_projects"/>
+        <constructor-arg name="visible" value="true"/>
+        <constructor-arg name="sectionComponents">
+            <list>
+                <list>
+                    <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">
+                        <property name="browseNames">
+                            <list>
+                                <value>pjtitle</value>
+                            </list>
+                        </property>
+                        <property name="style" value="col-md-4"/>
+                    </bean>
+                    <bean class="org.dspace.layout.DynamicLayoutSearchComponent">
+                        <property name="discoveryConfigurationName" value="project_funding" />
+                        <property name="style" value="col-md-8"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.DynamicLayoutFacetComponent">
+                        <property name="discoveryConfigurationName" value="project_funding" />
+                        <property name="style" value="col-md-12"/>
+                    </bean>
+                </list>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean class="org.dspace.layout.DynamicLayoutSection" id="sectionresearcherprofiles">
+        <constructor-arg name="id" value="researcherprofiles"/>
+        <constructor-arg name="visible" value="true"/>
+        <constructor-arg name="sectionComponents">
+            <list>
+                <list>
+                    <bean class="org.dspace.layout.DynamicLayoutBrowseComponent">
+                        <property name="browseNames">
+                            <list>
+                                <value>rpname</value>
+                                <value>rpdept</value>
+                            </list>
+                        </property>
+                        <property name="style" value="col-md-4"/>
+                    </bean>
+                    <bean class="org.dspace.layout.DynamicLayoutSearchComponent">
+                        <property name="discoveryConfigurationName" value="person" />
+                        <property name="style" value="col-md-8"/>
+                    </bean>
+                </list>
+                <list>
+                    <bean class="org.dspace.layout.DynamicLayoutFacetComponent">
+                        <property name="discoveryConfigurationName" value="person" />
+                        <property name="style" value="col-md-12"/>
+                    </bean>
+                </list>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean class="org.dspace.layout.DynamicLayoutSection" id="sectionsite">
+        <constructor-arg name="id" value="site"/>
+        <constructor-arg name="visible" value="false"/>
+        <constructor-arg name="sectionComponents">
+          <list>
+            <list>
+                <bean class="org.dspace.layout.DynamicLayoutSearchComponent">
+                    <property name="style" value="col-md-12"/>
+                    <property name="searchType" value="basic"/>
+                    <property name="displayTitle" value="false"/>
+                </bean>
+            </list>
+            <list>
+                <bean class="org.dspace.layout.DynamicLayoutCountersComponent">
+                    <property name="style" value="col-md-12 py-4"/>
+                    <property name="counterSettingsList">
+                        <list>
+                            <bean class="org.dspace.layout.DynamicLayoutCountersComponent.CounterSettings">
+                                <property name="discoveryConfigurationName" value="researchoutputs"/>
+                                <property name="label" value="publications"/>
+                                <property name="icon" value="fas fa-file-alt fa-3x"/>
+                                <property name="link" value="/explore/researchoutputs"/>
+                            </bean>
+                            <bean class="org.dspace.layout.DynamicLayoutCountersComponent.CounterSettings">
+                                <property name="discoveryConfigurationName" value="project_funding"/>
+                                <property name="label" value="project_funding"/>
+                                <property name="icon" value="fas fa-cogs fa-3x"/>
+                                <property name="link" value="/explore/fundings_and_projects"/>
+                            </bean>
+                            <bean class="org.dspace.layout.DynamicLayoutCountersComponent.CounterSettings">
+                                <property name="discoveryConfigurationName" value="person"/>
+                                <property name="label" value="rprofiles"/>
+                                <property name="icon" value="fas fa-users fa-3x"/>
+                                <property name="link" value="/explore/researcherprofiles"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+            <list>
+                <bean class="org.dspace.layout.DynamicLayoutTopComponent">
+                    <property name="discoveryConfigurationName" value="homePageTopItems" />
+                    <property name="sortField" value="dc.date.accessioned" />
+                    <property name="order" value="desc" />
+                    <property name="style" value="col-12"/>
+                    <property name="numberOfItems" value="5"/>
+                </bean>
+            </list>
+          </list>
+        </constructor-arg>
+    </bean>
+
+</beans>
