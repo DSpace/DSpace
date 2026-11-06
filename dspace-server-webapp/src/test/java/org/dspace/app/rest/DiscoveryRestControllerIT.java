@@ -1260,6 +1260,33 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void discoverSearchSelfLinkKeepsScopeAndConfigurationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        context.restoreAuthSystemState();
+
+        //The self link has to describe the request it answers
+        getClient().perform(get("/api/discover/search")
+                   .param("scope", parentCommunity.getID().toString())
+                   .param("configuration", "personOrOrgunit"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._links.self.href",
+                                       containsString("scope=" + parentCommunity.getID())))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       containsString("configuration=personOrOrgunit")));
+
+        //And it may not add parameters the request did not have
+        getClient().perform(get("/api/discover/search"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._links.self.href", not(containsString("scope="))))
+                   .andExpect(jsonPath("$._links.self.href", not(containsString("configuration="))));
+    }
+
+    @Test
     public void checkSortOrderInPersonOrOrgunitConfigurationTest() throws Exception {
         getClient().perform(get("/api/discover/search")
                    .param("configuration", "personOrOrgunit"))
