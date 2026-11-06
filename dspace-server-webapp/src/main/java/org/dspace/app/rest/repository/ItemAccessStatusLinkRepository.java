@@ -60,6 +60,9 @@ public class ItemAccessStatusLinkRepository extends AbstractDSpaceRestRepository
                 LocalDate availabilityDate = accessStatus.getAvailabilityDate();
                 String embargoDate = availabilityDate.toString();
                 accessStatusRest.setEmbargoDate(embargoDate);
+            } else if (status == DefaultAccessStatusHelper.LEASE) {
+                LocalDate leaseDate = accessStatus.getLeaseDate();
+                accessStatusRest.setLeaseDate(leaseDate.toString());
             }
             accessStatusRest.setStatus(status);
             return accessStatusRest;
