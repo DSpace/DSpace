@@ -31,6 +31,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -1260,6 +1261,81 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     private InProgressSubmission<Integer> findInProgressSubmission(Context context, Item item) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
         return workspaceItem != null ? workspaceItem : workflowItemService.findByItem(context, item);
+    }
+
+    @Override
+    public List<Collection> findCollectionsAdministeredByEntityType(String query, String entityType,
+                                                                    Context context, int offset, int limit)
+        throws SQLException, SearchServiceException {
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setStart(offset);
+        discoverQuery.setMaxResults(limit);
+        discoverQuery.setSortField(SOLR_SORT_FIELD, SORT_ORDER.asc);
+
+        return retrieveCollectionsAdministeredByEntityType(context, discoverQuery,
+                query, entityType).getIndexableObjects().stream()
+                .map(indexableObject -> ((IndexableCollection) indexableObject).getIndexedObject())
+                .collect(Collectors.toList());
+    }
+
+    private DiscoverResult retrieveCollectionsAdministered(Context context, DiscoverQuery discoverQuery, String query)
+        throws SQLException, SearchServiceException {
+
+        if (!authorizeService.isAdmin(context)) {
+
+            String filterQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
+                .map(group -> "g" + group.getID())
+                .collect(Collectors.joining(" OR ", "admin:(", ")"));
+
+            discoverQuery.addFilterQueries(filterQuery);
+        }
+
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(query);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+
+        return searchService.search(context, discoverQuery);
+    }
+
+    private DiscoverResult retrieveCollectionsAdministeredByEntityType(Context context,
+                                                                       DiscoverQuery discoverQuery,
+                                                                       String query, String entityType)
+            throws SQLException, SearchServiceException {
+        String filterQuery = "";
+        if (!authorizeService.isAdmin(context)) {
+            filterQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
+                    .map(group -> "g" + group.getID())
+                    .collect(Collectors.joining(" OR ", "admin:(", ")"));
+            discoverQuery.addFilterQueries(filterQuery);
+        }
+        if (StringUtils.isNoneBlank(entityType)) {
+            if (filterQuery.length() > 0) {
+                filterQuery += " AND ";
+            }
+            filterQuery += "search.entitytype: " + entityType;
+            discoverQuery.addFilterQueries(filterQuery);
+        }
+        if (StringUtils.isNotBlank(query)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(query);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+        return searchService.search(context, discoverQuery);
+    }
+    @Override
+    public int countCollectionsAdministeredByEntityType(String query, String entityType, Context context)
+            throws SQLException, SearchServiceException {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        return (int) retrieveCollectionsAdministeredByEntityType(context,
+                discoverQuery, query, entityType).getTotalSearchResults();
     }
 
     @Override

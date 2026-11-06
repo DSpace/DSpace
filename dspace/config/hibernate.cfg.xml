@@ -96,6 +96,18 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
+        <!-- Configurable Layout -->
+        <mapping class="org.dspace.layout.DynamicLayoutTab" />
+        <mapping class="org.dspace.layout.DynamicLayoutBox" />
+        <mapping class="org.dspace.layout.DynamicLayoutField" />
+        <mapping class="org.dspace.layout.DynamicLayoutFieldMetadata" />
+        <mapping class="org.dspace.layout.DynamicLayoutFieldBitstream" />
+        <mapping class="org.dspace.layout.DynamicLayoutRow" />
+        <mapping class="org.dspace.layout.DynamicLayoutCell" />
+        <mapping class="org.dspace.layout.DynamicMetadataGroup" />
+        <mapping class="org.dspace.layout.DynamicLayoutBox2SecurityGroup" />
+        <mapping class="org.dspace.layout.DynamicLayoutTab2SecurityGroup" />
+
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
         
         <mapping class="org.dspace.orcid.OrcidQueue" />
