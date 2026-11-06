@@ -7,6 +7,7 @@
  */
 package org.dspace.app.bulkedit;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -61,10 +62,10 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
         } catch (SQLException e) {
             handler.handleException(e);
         }
-        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService
-            .handleExport(context, exportAllItems, exportAllMetadata, identifier,
-                          handler);
-        handler.writeFilestream(context, filename, dSpaceCSV.getInputStream(), EXPORT_CSV);
+        InputStream csvStream = metadataDSpaceCsvExportService
+            .handleExportStreaming(context, exportAllItems, exportAllMetadata, identifier,
+                                  handler);
+        handler.writeFilestream(context, filename, csvStream, EXPORT_CSV);
         context.restoreAuthSystemState();
         context.complete();
     }
