@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * SpiderDetectorServiceImpl is used to find IP's that are spiders...
@@ -58,7 +57,6 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
      */
     private IPTable table = null;
 
-    @Autowired(required = true)
     public SpiderDetectorServiceImpl(ConfigurationService configurationService, ClientInfoService clientInfoService) {
         this.configurationService = configurationService;
         this.clientInfoService = clientInfoService;

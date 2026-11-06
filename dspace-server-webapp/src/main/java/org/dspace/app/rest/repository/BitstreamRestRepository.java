@@ -83,7 +83,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Autowired
     private ObjectMapper mapper;
 
-    @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
         super(dsoService);
         this.bs = dsoService;
