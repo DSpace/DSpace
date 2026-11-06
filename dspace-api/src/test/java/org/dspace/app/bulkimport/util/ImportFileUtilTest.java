@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -85,6 +86,109 @@ public class ImportFileUtilTest {
     }
 
     /**
+     * An empty {@code allowed.ips.import} is the fail-closed default: the remote retrieval is
+     * disabled, so the request is rejected with an explicit warning and the stream is never
+     * opened.
+     */
+    @Test
+    public void remoteFileWithEmptyAllowlistIsRejected() {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        TestableImportFileUtil importFileUtil = new TestableImportFileUtil(handler, new String[] {});
+
+        Optional<InputStream> result = importFileUtil.getInputStream("https://allowed.example.com/file.pdf");
+
+        assertThat(result.isPresent(), is(false));
+        assertThat(handler.getWarningMessages(), hasItem(containsString(
+            "Remote retrieval is disabled: 'allowed.ips.import' is empty. "
+                + "Rejected path: https://allowed.example.com/file.pdf")));
+        assertThat(importFileUtil.getOpenStreamInvocations(), is(0));
+    }
+
+    /**
+     * A missing (null) {@code allowed.ips.import} must be treated as an empty allow-list, so
+     * the retrieval is rejected instead of throwing a {@link NullPointerException}.
+     */
+    @Test
+    public void remoteFileWithNullAllowlistIsRejected() {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        ImportFileUtil importFileUtil = new TestableImportFileUtil(handler, null);
+
+        Optional<InputStream> result = importFileUtil.getInputStream("https://allowed.example.com/file.pdf");
+
+        assertThat(result.isPresent(), is(false));
+        assertThat(handler.getWarningMessages(), hasItem(containsString(
+            "Remote retrieval is disabled: 'allowed.ips.import' is empty. "
+                + "Rejected path: https://allowed.example.com/file.pdf")));
+    }
+
+    /**
+     * The wildcard {@code *} explicitly re-enables remote retrieval from any host.
+     */
+    @Test
+    public void remoteFileWithWildcardAllowlistIsAccepted() throws Exception {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        ImportFileUtil importFileUtil = new TestableImportFileUtil(handler, new String[] { "*" });
+
+        Optional<InputStream> result = importFileUtil.getInputStream("https://any.example.com/file.pdf");
+
+        assertThat(result.isPresent(), is(true));
+        assertThat(IOUtils.toString(result.get(), StandardCharsets.UTF_8), is(REMOTE_CONTENT));
+    }
+
+    /**
+     * Blank or null entries in the configured allow-list must be ignored: they must not cause a
+     * {@link NullPointerException}, nor prevent the remaining configured hosts from matching.
+     */
+    @Test
+    public void remoteFileWithBlankEntriesInAllowlistIsAccepted() {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        ImportFileUtil importFileUtil = new TestableImportFileUtil(
+            handler, new String[] { "allowed.example.com", null, "  " });
+
+        Optional<InputStream> allowed = importFileUtil.getInputStream("https://allowed.example.com/file.pdf");
+        Optional<InputStream> notAllowed = importFileUtil.getInputStream("https://not-allowed.example.com/file.pdf");
+
+        assertThat(allowed.isPresent(), is(true));
+        assertThat(notAllowed.isPresent(), is(false));
+    }
+
+    /**
+     * The remote retrieval must only accept HTTP/HTTPS URLs: a different scheme must be
+     * rejected before the allow-list is even consulted, without opening the stream.
+     */
+    @Test
+    public void remoteFileWithNonHttpSchemeIsRejected() throws Exception {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        URL ftpUrl = new URL("ftp://allowed.example.com/file.pdf");
+        TestableImportFileUtil importFileUtil =
+            new TestableImportFileUtil(handler, new String[] { "allowed.example.com" }).withUrl(ftpUrl);
+
+        Optional<InputStream> result = importFileUtil.getInputStream("http://allowed.example.com/file.pdf");
+
+        assertThat(result.isPresent(), is(false));
+        assertThat(handler.getWarningMessages(), hasItem(containsString(
+            "Scheme 'ftp' is not allowed for remote retrieval. Path: http://allowed.example.com/file.pdf")));
+        assertThat(importFileUtil.getOpenStreamInvocations(), is(0));
+    }
+
+    /**
+     * An empty {@code allowed.ips.import} disables FTP retrieval as well: the request is
+     * rejected with an explicit warning without opening any connection.
+     */
+    @Test
+    public void ftpFileWithEmptyAllowlistIsRejected() {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        ImportFileUtil importFileUtil = new TestableImportFileUtil(handler, new String[] {});
+
+        Optional<InputStream> result = importFileUtil.getInputStream("ftp://allowed.example.com/file.pdf");
+
+        assertThat(result.isPresent(), is(false));
+        assertThat(handler.getWarningMessages(), hasItem(containsString(
+            "Remote retrieval is disabled: 'allowed.ips.import' is empty. "
+                + "Rejected path: ftp://allowed.example.com/file.pdf")));
+    }
+
+    /**
      * Test double that supplies the allowed-host list directly and returns canned content for
      * allowed URLs, so both the validation and the allowed (positive) path can be exercised
      * without a running DSpace kernel / configuration service or any outbound network access.
@@ -93,9 +197,22 @@ public class ImportFileUtilTest {
 
         private final String[] allowedHosts;
 
+        private URL urlOverride;
+
+        private int openStreamInvocations;
+
         private TestableImportFileUtil(DSpaceRunnableHandler handler, String[] allowedHosts) {
             super(handler);
             this.allowedHosts = allowedHosts;
+        }
+
+        private TestableImportFileUtil withUrl(URL url) {
+            this.urlOverride = url;
+            return this;
+        }
+
+        private int getOpenStreamInvocations() {
+            return openStreamInvocations;
         }
 
         @Override
@@ -104,9 +221,15 @@ public class ImportFileUtilTest {
         }
 
         @Override
+        protected URL getUrl(String path) throws IOException {
+            return urlOverride != null ? urlOverride : super.getUrl(path);
+        }
+
+        @Override
         protected InputStream openStream(URL url) {
             // Return canned content instead of performing a real network request, so the
             // allowed-host (positive) path can be unit-tested without outbound access.
+            openStreamInvocations++;
             return new ByteArrayInputStream(REMOTE_CONTENT.getBytes(StandardCharsets.UTF_8));
         }
     }
