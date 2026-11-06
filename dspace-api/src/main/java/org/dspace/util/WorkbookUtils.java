@@ -13,6 +13,7 @@ import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_B
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,30 +40,51 @@ public final class WorkbookUtils {
 
     }
 
+    /**
+     * Returns whether sheet empty.
+     */
     public static boolean isSheetEmpty(Sheet sheet) {
         return getRows(sheet).allMatch(WorkbookUtils::isRowEmpty);
     }
 
+    /**
+     * Returns whether row empty.
+     */
     public static boolean isRowEmpty(Row row) {
         return getCells(row).allMatch(cell -> StringUtils.isBlank(getCellValue(cell)));
     }
 
+    /**
+     * Returns whether not empty row.
+     */
     public static boolean isNotEmptyRow(Row row) {
         return !isRowEmpty(row);
     }
 
+    /**
+     * Returns whether not first row.
+     */
     public static boolean isNotFirstRow(Row row) {
         return row.getRowNum() != 0;
     }
 
+    /**
+     * Returns whether cell empty.
+     */
     public static boolean isCellEmpty(Cell cell) {
         return StringUtils.isBlank(getCellValue(cell));
     }
 
+    /**
+     * Returns whether cell not empty.
+     */
     public static boolean isCellNotEmpty(Cell cell) {
         return !isCellEmpty(cell);
     }
 
+    /**
+     * Returns the cells.
+     */
     public static Stream<Cell> getCells(Row row) {
         int lastNotEmptyColumnIndex = stream(spliteratorUnknownSize(row.cellIterator(), 0), false)
             .filter(WorkbookUtils::isCellNotEmpty)
@@ -77,20 +99,61 @@ public final class WorkbookUtils {
         return cells.stream();
     }
 
+    /**
+     * Returns the rows.
+     */
     public static Stream<Row> getRows(Sheet sheet) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(sheet.rowIterator(), 0), false);
     }
 
+    /**
+     * Returns the not empty rows skipping header.
+     */
+    public static List<Row> getNotEmptyRowsSkippingHeader(Sheet sheet) {
+        return getRows(sheet)
+            .filter(WorkbookUtils::isNotFirstRow)
+            .filter(WorkbookUtils::isNotEmptyRow)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the row values.
+     */
+    public static List<String> getRowValues(Row row, int size) {
+        List<String> values = new ArrayList<String>();
+        for (int i = 0; i < size; i++) {
+            values.add(getCellValue(row, i));
+        }
+        return values;
+    }
+
+    /**
+     * Returns the entity type cell value.
+     */
+    public static String getEntityTypeCellValue(Row row, int index) {
+        Cell cell = row.getCell(index);
+        return getEntityTypeValue(cell);
+    }
+
+    /**
+     * Returns the cell value.
+     */
     public static String getCellValue(Row row, int index) {
         Cell cell = row.getCell(index);
         return getCellValue(cell);
     }
 
+    /**
+     * Returns the cell value.
+     */
     public static String getCellValue(Row row, String headerName) {
         int headerIndex = getCellIndexFromHeaderName(row.getSheet(), headerName);
         return headerIndex != -1 ? getCellValue(row.getCell(headerIndex)) : null;
     }
 
+    /**
+     * Returns the cell value.
+     */
     public static String getCellValue(Cell cell) {
         if (cell == null) {
             return "";
@@ -99,12 +162,35 @@ public final class WorkbookUtils {
         return formatter.formatCellValue(cell).trim();
     }
 
+    /**
+     * Returns the entity type value.
+     */
+    public static String getEntityTypeValue(Cell cell) {
+        String cellValue = getCellValue(cell);
+        return Optional.ofNullable(cellValue)
+                    .filter(value -> StringUtils.isNotBlank(value))
+                    .filter(value -> value.contains("."))
+                    .map(value -> value.split("\\.")[0])
+                    .orElse(cellValue);
+    }
+
+    /**
+     * Creates a cell in the given row at the given column with the given value.
+     *
+     * @param row the row in which to create the cell
+     * @param column the column index
+     * @param value the string value of the cell
+     * @return the created cell
+     */
     public static Cell createCell(Row row, int column, String value) {
         Cell cell = row.createCell(column);
         cell.setCellValue(value);
         return cell;
     }
 
+    /**
+     * Returns the all headers.
+     */
     public static List<HeaderPair> getAllHeaders(Sheet sheet) {
         return getCells(sheet.getRow(0))
             .map(WorkbookUtils::getCellValue)
@@ -112,6 +198,9 @@ public final class WorkbookUtils {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the column without header.
+     */
     public static List<Cell> getColumnWithoutHeader(Sheet sheet, int column) {
         return WorkbookUtils.getRows(sheet)
             .filter(WorkbookUtils::isNotFirstRow)
@@ -120,6 +209,9 @@ public final class WorkbookUtils {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the cell index from header name.
+     */
     public static int getCellIndexFromHeaderName(Sheet sheet, String headerName) {
         Row row = sheet.getRow(0);
         if (row == null) {
