@@ -368,8 +368,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         // First, delete any existing logo
-        if (collection.getLogo() != null) {
-            bitstreamService.delete(context, collection.getLogo());
+        Bitstream oldLogo = collection.getLogo();
+        if (oldLogo != null) {
+            context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, collection.getID(),
+                Constants.BITSTREAM, oldLogo.getID(),
+                oldLogo.getChecksum(), DetailType.BITSTREAM_CHECKSUM,
+                getIdentifiers(context, collection)));
+            bitstreamService.delete(context, oldLogo);
         }
 
         if (is == null) {
@@ -379,6 +384,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         } else {
             Bitstream newLogo = bitstreamService.create(context, is);
             collection.setLogo(newLogo);
+            context.addEvent(new Event(Event.ADD, Constants.COLLECTION, collection.getID(),
+                Constants.BITSTREAM, newLogo.getID(),
+                newLogo.getChecksum(), DetailType.BITSTREAM_CHECKSUM,
+                getIdentifiers(context, collection)));
 
             // now create policy for logo bitstream
             // to match our READ policy

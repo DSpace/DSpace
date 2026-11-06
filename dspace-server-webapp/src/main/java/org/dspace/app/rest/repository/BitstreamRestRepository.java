@@ -143,10 +143,12 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             Community community = bit.getCommunity();
             if (community != null) {
                 communityService.setLogo(context, community, null);
+                return;
             }
             Collection collection = bit.getCollection();
             if (collection != null) {
                 collectionService.setLogo(context, collection, null);
+                return;
             }
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
