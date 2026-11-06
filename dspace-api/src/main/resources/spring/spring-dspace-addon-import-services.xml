@@ -54,6 +54,19 @@
           class="org.dspace.importer.external.datacite.DataCiteImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="DataCiteMetadataFieldMapping"/>
         <property name="entityFilterQuery" value="${datacite.publicationimport.entityfilterquery}" />
+        <!-- When true, only exact DOI lookups are used; when false, falls back to a query search. -->
+        <property name="exactIdOnly" value="false"/>
+        <property name="excludeExactDoiRules">
+            <list>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Project"/>
+                </map>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Other"/>
+                    <entry key="types.resourceType" value="Project"/>
+                </map>
+            </list>
+        </property>
     </bean>
     <bean id="DataCiteMetadataFieldMapping"
           class="org.dspace.importer.external.datacite.DataCiteFieldMapping">
@@ -63,6 +76,19 @@
           class="org.dspace.importer.external.datacite.DataCiteProjectImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="DataCiteProjectMetadataFieldMapping"/>
         <property name="entityFilterQuery" value="${datacite.projectimport.entityfilterquery}" />
+        <!-- When true, only exact DOI lookups are used; when false, falls back to a query search. -->
+        <property name="exactIdOnly" value="false"/>
+        <property name="allowExactDoiRules">
+            <list>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Project"/>
+                </map>
+                <map>
+                    <entry key="types.resourceTypeGeneral" value="Other"/>
+                    <entry key="types.resourceType" value="Project"/>
+                </map>
+            </list>
+        </property>
     </bean>
     <bean id="DataCiteProjectMetadataFieldMapping"
           class="org.dspace.importer.external.datacite.DataCiteProjectFieldMapping">
@@ -72,6 +98,8 @@
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
         <property name="baseAddress" value="https://export.arxiv.org/api/query"/>
+        <!-- When true, only exact arXiv id lookups are used; when false, falls back to a query search. -->
+        <property name="exactIdOnly" value="false"/>
     </bean>
     <bean id="ArXivMetadataFieldMapping"
           class="org.dspace.importer.external.arxiv.metadatamapping.ArXivFieldMapping">
@@ -167,6 +195,8 @@
     <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
         <property name="url" value="${crossref.url}"/>
+        <!-- When true, only exact DOI lookups are used; when false, falls back to a query search. -->
+        <property name="exactIdOnly" value="false"/>
     </bean>
     <bean id="CrossRefMetadataFieldMapping" class="org.dspace.importer.external.crossref.CrossRefFieldMapping"/>
 
