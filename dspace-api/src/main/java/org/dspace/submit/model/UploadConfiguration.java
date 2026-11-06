@@ -69,12 +69,13 @@ public class UploadConfiguration {
     }
 
     /**
-     * Limit on the maximum size of an uploaded Bitstream.
-     * @return maximum upload size in bytes.
+     * Limit on the maximum size of an uploaded Bitstream: the configured {@code maxSize} of this
+     * configuration, or otherwise the current value of {@code upload.max}.
+     * @return maximum upload size in bytes; zero or negative when no limit is configured.
      */
     public Long getMaxSize() {
         if (maxSize == null) {
-            maxSize = configurationService.getLongProperty("upload.max");
+            return configurationService.getLongProperty("upload.max");
         }
         return maxSize;
     }
