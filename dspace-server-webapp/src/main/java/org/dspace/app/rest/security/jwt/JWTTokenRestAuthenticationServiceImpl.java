@@ -8,6 +8,8 @@
 package org.dspace.app.rest.security.jwt;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -30,6 +32,7 @@ import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -63,6 +66,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Lazy
     @Autowired
@@ -242,6 +248,20 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
      */
     private void addTokenToResponse(final HttpServletRequest request, final HttpServletResponse response,
                                     final String token, final Boolean addCookie) {
+
+        String cookiePath = "";
+
+        try {
+            String serverUrl = configurationService.getProperty("dspace.server.url");
+
+            URL url = new URL(serverUrl);
+            String contextPath = url.getPath();
+
+            cookiePath = contextPath + "/api/authn";
+
+        } catch (MalformedURLException e) {
+            log.error("Failed to parse the dspace.server.url property.", e);
+        }
         // If addCookie=true, create a temporary authentication cookie. This is primarily used for the initial
         // Shibboleth response (which requires a number of redirects), as headers cannot be sent via a redirect. As soon
         // as the UI (or Hal Browser) obtains the Shibboleth login data, it makes a call to /login (addCookie=false)
@@ -251,7 +271,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
                                                   .httpOnly(true)
                                                   .secure(true)
                                                   .sameSite("None")
-                                                  .path("/server/api/authn")
+                                                  .path(cookiePath)
                                                   .build();
 
             // Write the cookie to the Set-Cookie header in order to send it
