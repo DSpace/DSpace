@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
 import org.dspace.core.Context;
 
 /**
@@ -30,6 +31,20 @@ public interface VirtualMetadataConfiguration {
      * @throws SQLException If something goes wrong
      */
     List<String> getValues(Context context, Item item) throws SQLException;
+
+    /**
+     * This method will return a list filled with String values which will be determine by the bean that's responsible
+     * of handling the metadata fields when fully traversed through all the {@link Related} beans
+     * @param context      The relevant DSpace context
+     * @param item         The item that will be used to either retrieve metadata values from or to find
+     *                     the related item through its relationships
+     * @param relationship The concrete relationship that was identified
+     * @return The list of String values of all the metadata values as constructed by the responsible bean
+     * @throws SQLException If something goes wrong
+     */
+    default List<String> getValues(Context context, Item item, Relationship relationship) throws SQLException {
+        return getValues(context, item);
+    }
 
     /**
      * Generic setter for the useForPlace property
