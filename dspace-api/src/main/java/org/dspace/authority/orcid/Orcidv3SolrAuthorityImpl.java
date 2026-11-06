@@ -155,7 +155,34 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
         }
     }
 
+    private String buildSearchQuery(String text) {
+        if (StringUtils.isBlank(text)) {
+            return "";
+        }
+        String normalized = text.trim().replaceFirst("(?i)^https?://orcid\\.org/", "");
 
+        // 1. ORCID iD
+        if (isValid(normalized)) {
+            return "orcid:" + normalized;
+        }
+
+        // 2. Lastname, Firstname
+        String[] names = normalized.split(",", 2);
+
+        if (names.length == 2) {
+            String lastName = names[0].trim();
+            String firstName = names[1].trim();
+            if (!lastName.isEmpty() && !firstName.isEmpty()) {
+                return "family-name:" + escapeSolr(lastName) + " AND given-names:" + escapeSolr(firstName);
+            }
+        }
+        // 3. Fallback: general name search
+        return normalized;
+    }
+
+    private String escapeSolr(String value) {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+    }
     /**
      * Retrieve a list of Person objects.
      * @param text search string
@@ -175,8 +202,8 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
         // Check / init access token
         initializeAccessToken();
 
-        String searchPath = "search?q=" + URLEncoder.encode(text, StandardCharsets.UTF_8) + "&start=" + start +
-                                                                                            "&rows=" + rows;
+        String searchPath = "search?q=" + URLEncoder.encode(buildSearchQuery(text), StandardCharsets.UTF_8)
+            + "&start=" + start + "&rows=" + rows;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         try {
             InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
