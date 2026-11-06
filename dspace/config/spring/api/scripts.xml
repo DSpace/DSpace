@@ -133,4 +133,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.content.enhancer.script.ItemEnhancerScript"/>
     </bean>
 
+    <bean id="xoai-script" class="org.dspace.xoai.script.XOAIScriptConfiguration">
+        <property name="description" value=""/>
+        <property name="dspaceRunnableClass" value="org.dspace.xoai.script.XOAIScript"/>
+    </bean>
+
 </beans>
