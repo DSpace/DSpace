@@ -531,6 +531,145 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findOneWithRepeatedTocLabels() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withIIIFCanvasHeight(3000)
+                .withIIIFCanvasWidth(2000)
+                .withIIIFCanvasNaming("Global")
+                .enableIIIF()
+                .enableIIIFSearch()
+                .build();
+
+        String bitstreamContent = "ThisIsSomeText";
+        // The same label is used twice, separated by other sections: Cover, Appendix,
+        // Chapter 1, chapter 2, Appendix, Cover.
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, IIIFBundle)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFToC("Cover")
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, IIIFBundle)
+                    .withName("Bitstream2.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFToC("Appendix")
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, IIIFBundle)
+                    .withName("Bitstream3.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFToC("Chapter 1")
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, IIIFBundle)
+                    .withName("Bitstream4.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFToC("chapter 2")
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, IIIFBundle)
+                    .withName("Bitstream5.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFToC("Appendix")
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, IIIFBundle)
+                    .withName("Bitstream6.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFToC("Cover")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+        // Expect six distinct ranges, not four: the repeated Appendix and Cover labels are
+        // not contiguous with the section of the same name, so each is its own section.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(6)))
+                .andExpect(jsonPath("$.structures[0].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
+                .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                .andExpect(jsonPath("$.structures[0].viewingHint", is("top")))
+                .andExpect(jsonPath("$.structures[0].ranges", Matchers.hasSize(6)))
+                // The six sub-range references are distinct.
+                .andExpect(jsonPath("$.structures[0].ranges[0]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
+                .andExpect(jsonPath("$.structures[0].ranges[1]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
+                .andExpect(jsonPath("$.structures[0].ranges[2]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-2")))
+                .andExpect(jsonPath("$.structures[0].ranges[3]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-3")))
+                .andExpect(jsonPath("$.structures[0].ranges[4]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-4")))
+                .andExpect(jsonPath("$.structures[0].ranges[5]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-5")))
+                .andExpect(jsonPath("$.structures[0].canvases").doesNotExist())
+                // Each of the six sections holds exactly its own canvas.
+                .andExpect(jsonPath("$.structures[1].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
+                .andExpect(jsonPath("$.structures[1].label", is("Cover")))
+                .andExpect(jsonPath("$.structures[1].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.structures[1].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                .andExpect(jsonPath("$.structures[2].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
+                .andExpect(jsonPath("$.structures[2].label", is("Appendix")))
+                .andExpect(jsonPath("$.structures[2].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.structures[2].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c1")))
+                .andExpect(jsonPath("$.structures[3].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-2")))
+                .andExpect(jsonPath("$.structures[3].label", is("Chapter 1")))
+                .andExpect(jsonPath("$.structures[3].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.structures[3].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c2")))
+                .andExpect(jsonPath("$.structures[4].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-3")))
+                .andExpect(jsonPath("$.structures[4].label", is("chapter 2")))
+                .andExpect(jsonPath("$.structures[4].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.structures[4].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c3")))
+                .andExpect(jsonPath("$.structures[5].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-4")))
+                .andExpect(jsonPath("$.structures[5].label", is("Appendix")))
+                .andExpect(jsonPath("$.structures[5].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.structures[5].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c4")))
+                .andExpect(jsonPath("$.structures[6].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-5")))
+                .andExpect(jsonPath("$.structures[6].label", is("Cover")))
+                .andExpect(jsonPath("$.structures[6].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.structures[6].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c5")))
+                .andExpect(jsonPath("$.structures[7]").doesNotExist());
+    }
+
+    @Test
     public void findOneWithBundleStructures() throws Exception {
 
         context.turnOffAuthorisationSystem();
