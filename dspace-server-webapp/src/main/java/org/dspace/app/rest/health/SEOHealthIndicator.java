@@ -43,7 +43,16 @@ public class SEOHealthIndicator extends AbstractHealthIndicator {
     @Autowired
     private ConfigurationService configurationService;
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate = createRestTemplate();
+
+    private static RestTemplate createRestTemplate() {
+        RestTemplate template = new RestTemplate();
+        template.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().set("User-Agent", "DSpace Backend SEO Health Check");
+            return execution.execute(request, body);
+        });
+        return template;
+    }
 
     @Override
     protected void doHealthCheck(Health.Builder builder) {
