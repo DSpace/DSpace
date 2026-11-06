@@ -49,6 +49,8 @@ public class TotalVisitGenerator extends AbstractUsageReportGenerator {
      *
      * @param context DSpace context
      * @param dso     DSO we want usage report with TotalVisits on the DSO
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report period, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report period, may be null
      * @return Rest object containing the TotalVisits usage report of the given DSO
      */
 
@@ -168,6 +170,16 @@ public class TotalVisitGenerator extends AbstractUsageReportGenerator {
         return dataset;
     }
 
+    /**
+     * Builds the Solr query used to count visits for the given DSO. When the requested statistics type matches the
+     * DSO type the query filters directly on the DSO id, otherwise it filters on the appropriate owning field
+     * (owningItem, owningColl or owningComm) so that child object views are attributed to the DSO.
+     *
+     * @param dso_id  the UUID of the DSpace object
+     * @param type    the Constants type of the given DSO
+     * @param dsoType the statistics type being queried
+     * @return the Solr query string
+     */
     public String createQuery(UUID dso_id, int type, int dsoType) {
         String query = "type: " + dsoType;
         if (dsoType == type) {
@@ -195,6 +207,14 @@ public class TotalVisitGenerator extends AbstractUsageReportGenerator {
         return query;
     }
 
+    /**
+     * Builds the Solr query used to retrieve bitstream views for objects related to the given owner via an inverse
+     * relation. The query targets bitstreams owned by the object (item, collection or community) and excludes the
+     * LICENSE, THUMBNAIL, SWORD and TEXT bundles.
+     *
+     * @param uuid the UUID of the owning object
+     * @return the Solr query string
+     */
     public String createQueryForInverseRelation(String uuid) {
         //as type of the objects in inverse relation is unknown, query all types with OR
         String query = "type: " + Constants.BITSTREAM;

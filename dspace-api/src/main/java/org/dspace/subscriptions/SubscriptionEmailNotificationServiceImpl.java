@@ -67,6 +67,13 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     @Autowired
     private CrisMetricsService crisMetricsService;
 
+    /**
+     * Creates a new subscription email notification service.
+     *
+     * @param contentUpdates              the map of {@link DSpaceObjectUpdates} handlers keyed by object type
+     * @param subscriptionType2generators the map of {@link SubscriptionGenerator} keyed by subscription type
+     * @param statisticsGenerator         the generator used to build and send statistics reports
+     */
     @SuppressWarnings("rawtypes")
     public SubscriptionEmailNotificationServiceImpl(Map<String, DSpaceObjectUpdates> contentUpdates,
                                                     Map<String, SubscriptionGenerator> subscriptionType2generators,
@@ -76,6 +83,15 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
         this.statisticsGenerator = statisticsGenerator;
     }
 
+    /**
+     * Finds the subscribed objects matching the given subscription type and frequency and sends the
+     * corresponding notification emails to the subscribers.
+     *
+     * @param context          the current DSpace context
+     * @param handler          the runnable handler used to report exceptions
+     * @param subscriptionType the subscription type to process (e.g. "content" or "statistics")
+     * @param frequency        the frequency to process ("D" day, "W" week or "M" month)
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
         if (STATISTICS_SUBSCRIPTION_TYPE.equals(subscriptionType)) {

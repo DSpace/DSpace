@@ -53,26 +53,56 @@ public class UsageWorkflowEvent extends UsageEvent {
         return oldState;
     }
 
+    /**
+     * Returns the current workflow action of this event.
+     *
+     * @return the current workflow action
+     */
     public String getCurrentWorkflowAction() {
         return currentWorkflowAction;
     }
 
+    /**
+     * Sets the current workflow action of this event.
+     *
+     * @param currentWorkflowAction the current workflow action
+     */
     public void setCurrentWorkflowAction(String currentWorkflowAction) {
         this.currentWorkflowAction = currentWorkflowAction;
     }
 
+    /**
+     * Returns the previous workflow action of this event.
+     *
+     * @return the previous workflow action
+     */
     public String getPreviousWorkflowAction() {
         return previousWorkflowAction;
     }
 
+    /**
+     * Sets the previous workflow action of this event.
+     *
+     * @param previousWorkflowAction the previous workflow action
+     */
     public void setPreviousWorkflowAction(String previousWorkflowAction) {
         this.previousWorkflowAction = previousWorkflowAction;
     }
 
+    /**
+     * Returns whether the previous workflow action required user interaction.
+     *
+     * @return {@code true} if the previous action required user interaction
+     */
     public boolean isPreviousActionRequiresUI() {
         return previousActionRequiresUI;
     }
 
+    /**
+     * Sets whether the previous workflow action required user interaction.
+     *
+     * @param previousActionRequiresUI {@code true} if the previous action required user interaction
+     */
     public void setPreviousActionRequiresUI(boolean previousActionRequiresUI) {
         this.previousActionRequiresUI = previousActionRequiresUI;
     }

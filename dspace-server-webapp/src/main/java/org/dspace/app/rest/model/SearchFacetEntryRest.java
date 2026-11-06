@@ -175,42 +175,92 @@ public class SearchFacetEntryRest extends RestAddressableModel {
         this.maxValue = maxValue;
     }
 
+    /**
+     * Sets the number of documents missing a value for this facet.
+     *
+     * @param missing the missing count
+     */
     public void setMissing(String missing) {
         this.missing = missing;
     }
 
+    /**
+     * Returns the number of documents missing a value for this facet.
+     *
+     * @return the missing count
+     */
     public String getMissing() {
         return missing;
     }
 
+    /**
+     * Sets the number of facet values beyond those returned in this entry.
+     *
+     * @param more the "more" count
+     */
     public void setMore(String more) {
         this.more = more;
     }
 
+    /**
+     * Returns the number of facet values beyond those returned in this entry.
+     *
+     * @return the "more" count
+     */
     public String getMore() {
         return more;
     }
 
+    /**
+     * Sets the total number of values available for this facet.
+     *
+     * @param totalElements the total number of facet values
+     */
     public void setTotalElements(String totalElements) {
         this.totalElements = totalElements;
     }
 
+    /**
+     * Returns the total number of values available for this facet.
+     *
+     * @return the total number of facet values
+     */
     public String getTotalElements() {
         return totalElements;
     }
 
+    /**
+     * Returns whether the "more" indicator should be exposed for this facet.
+     *
+     * @return true if the "more" indicator is exposed
+     */
     public boolean exposeMore() {
         return exposeMore;
     }
 
+    /**
+     * Sets whether the "more" indicator should be exposed for this facet.
+     *
+     * @param exposeMore true to expose the "more" indicator
+     */
     public void setExposeMore(boolean exposeMore) {
         this.exposeMore = exposeMore;
     }
 
+    /**
+     * Returns whether the "missing" count should be exposed for this facet.
+     *
+     * @return true if the "missing" count is exposed
+     */
     public boolean exposeMissing() {
         return exposeMissing;
     }
 
+    /**
+     * Sets whether the "missing" count should be exposed for this facet.
+     *
+     * @param exposeMissing true to expose the "missing" count
+     */
     public void setExposeMissing(boolean exposeMissing) {
         this.exposeMissing = exposeMissing;
     }

@@ -62,10 +62,10 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     }
 
     /**
-     * This method returns whether or not the DiscoverySearchFilterFacet should return a
+     * This method returns whether the DiscoverySearchFilterFacet should return a
      * min and max value.
      *
-     * @return  A boolean indicating whether or not this DiscoverySearchFilterFacet should expose
+     * @return  A boolean indicating whether this DiscoverySearchFilterFacet should expose
      *          a min and max value
      */
     public boolean exposeMinAndMaxValue() {
@@ -80,42 +80,92 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
         this.exposeMinMax = exposeMinMax;
     }
 
+    /**
+     * This method returns whether the count of documents missing the facet value should be exposed.
+     *
+     * @return  A boolean indicating whether this DiscoverySearchFilterFacet should expose
+     *          the missing count
+     */
     public boolean exposeMissing() {
         return exposeMissing;
     }
 
+    /**
+     * This method sets the boolean for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet#exposeMissing}
+     * @param exposeMissing A boolean value that will be set to return in the above mentioned link
+     */
     public void setExposeMissing(boolean exposeMissing) {
         this.exposeMissing = exposeMissing;
     }
 
+    /**
+     * This method returns whether the information about additional available facet values should be exposed.
+     *
+     * @return  A boolean indicating whether this DiscoverySearchFilterFacet should expose
+     *          the "more" information
+     */
     public boolean exposeMore() {
         return exposeMore;
     }
 
+    /**
+     * This method sets the boolean for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet#exposeMore}
+     * @param exposeMore A boolean value that will be set to return in the above mentioned link
+     */
     public void setExposeMore(boolean exposeMore) {
         this.exposeMore = exposeMore;
     }
 
+    /**
+     * This method returns whether the total number of distinct facet values should be exposed.
+     *
+     * @return  A boolean indicating whether this DiscoverySearchFilterFacet should expose
+     *          the total elements count
+     */
     public boolean exposeTotalElements() {
         return exposeTotalElements;
     }
 
+    /**
+     * This method sets the boolean for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet#exposeTotalElements}
+     * @param exposeTotalElements A boolean value that will be set to return in the above mentioned link
+     */
     public void setExposeTotalElements(boolean exposeTotalElements) {
         this.exposeTotalElements = exposeTotalElements;
     }
 
+    /**
+     * This method returns whether the gaps between date facet values should be filled.
+     *
+     * @return  A boolean indicating whether this DiscoverySearchFilterFacet should fill
+     *          date gaps
+     */
     public boolean fillDateGaps() {
         return fillDateGaps;
     }
 
+    /**
+     * This method sets the boolean for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet#fillDateGaps}
+     * @param fillDateGaps A boolean value that will be set to return in the above mentioned link
+     */
     public void setFillDateGaps(boolean fillDateGaps) {
         this.fillDateGaps = fillDateGaps;
     }
 
+    /**
+     * This method returns whether the facet direction should be inverted.
+     *
+     * @return  A boolean indicating whether this DiscoverySearchFilterFacet should invert
+     *          the direction
+     */
     public boolean inverseDirection() {
         return inverseDirection;
     }
 
+    /**
+     * This method sets the boolean for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet#inverseDirection}
+     * @param inverseDirection A boolean value that will be set to return in the above mentioned link
+     */
     public void setInverseDirection(boolean inverseDirection) {
         this.inverseDirection = inverseDirection;
     }

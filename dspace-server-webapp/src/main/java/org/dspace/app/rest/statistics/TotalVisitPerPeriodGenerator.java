@@ -294,6 +294,12 @@ public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
 
     }
 
+    /**
+     * Sets the default start date to use when no explicit start date is supplied to the report. The given value is
+     * parsed with the multi-format date parser and stored in yyyy-MM-dd format.
+     *
+     * @param date the default start date, in any format supported by {@link MultiFormatDateParser}
+     */
     public void setDefaultStartDate(String date) {
         LocalDate parsedDate = MultiFormatDateParser.parse(date).toLocalDate();
         if (parsedDate == null) {
@@ -346,26 +352,58 @@ public class TotalVisitPerPeriodGenerator extends AbstractUsageReportGenerator {
         return dsoType != null ? dsoType : dso.getType();
     }
 
+    /**
+     * Overrides the Constants DSpace object type used when querying Solr statistics, instead of deriving it from
+     * the DSO.
+     *
+     * @param dsoType the DSO type to use
+     */
     public void setDsoType(Integer dsoType) {
         this.dsoType = dsoType;
     }
 
+    /**
+     * Sets the time period granularity used to group the report points (e.g. month, year).
+     *
+     * @param periodType the period type
+     */
     public void setPeriodType(String periodType) {
         this.periodType = periodType;
     }
 
+    /**
+     * Sets the increment, i.e. the number of periods back from the current date that the report should cover.
+     *
+     * @param increment the number of periods to include
+     */
     public void setIncrement(int increment) {
         this.increment = increment;
     }
 
+    /**
+     * Sets the Solr logger service used to query the statistics core.
+     *
+     * @param solrLoggerService the Solr logger service
+     */
     public void setSolrLoggerService(SolrLoggerService solrLoggerService) {
         this.solrLoggerService = solrLoggerService;
     }
 
+    /**
+     * Sets the discovery configuration service used to resolve relation configurations.
+     *
+     * @param discoveryConfigurationService the discovery configuration service
+     */
     public void setDiscoveryConfigurationService(DiscoveryConfigurationService discoveryConfigurationService) {
         this.discoveryConfigurationService = discoveryConfigurationService;
     }
 
+    /**
+     * Not supported by this generator: the number of points is derived from the configured period and increment.
+     *
+     * @param maxResults ignored
+     * @throws IllegalStateException always, as max results can not be configured for this generator
+     */
     public void setMaxResults(int maxResults) {
         throw new IllegalStateException("Max results not supported by TotalVisitPerPeriodGenerator");
     }

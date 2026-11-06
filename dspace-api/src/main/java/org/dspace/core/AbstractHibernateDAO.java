@@ -136,6 +136,13 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         return result;
     }
 
+    /**
+     * Collects all the declared fields of the given type and its superclasses into the provided list.
+     *
+     * @param fields the list the fields are accumulated into
+     * @param type   the type whose fields (including inherited ones) are collected
+     * @return the list of collected fields
+     */
     public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
         fields.addAll(Arrays.asList(type.getDeclaredFields()));
 

@@ -47,6 +47,17 @@ public class StatisticsDatasetDisplay {
     protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
+    /**
+     * Builds the map of display attributes (such as name, url and type) for the given statistics value.
+     *
+     * @param value   the raw statistics value, typically a DSpace object identifier
+     * @param dso     the DSpace object the value refers to, may be {@code null}
+     * @param dsoType the type of the DSpace object
+     * @param context the current DSpace context
+     * @return the map of display attributes
+     * @throws SQLException if a database error occurs
+     */
     public Map<String, String> getAttributes(String value, DSpaceObject dso, int dsoType,
                                              Context context) throws SQLException {
         HashMap<String, String> attrs = new HashMap<>();
@@ -149,6 +160,18 @@ public class StatisticsDatasetDisplay {
         return attrs;
     }
 
+    /**
+     * Resolves the human readable name to display for the given statistics result value.
+     *
+     * @param queryName the name of the query/facet the value belongs to
+     * @param value     the raw statistics value
+     * @param dso       the DSpace object the value refers to, may be {@code null}
+     * @param dsoType   the type of the DSpace object
+     * @param dsoLength the maximum length allowed for the resulting name
+     * @param context   the current DSpace context
+     * @return the resolved display name
+     * @throws SQLException if a database error occurs
+     */
     public String getResultName(String queryName, String value, DSpaceObject dso,
                                 int dsoType, int dsoLength, Context context) throws SQLException {
         if ("continent".equals(queryName)) {
@@ -246,7 +269,15 @@ public class StatisticsDatasetDisplay {
         return value;
     }
 
-    //create filter query for usage raport generator
+    /**
+     * Creates the Solr filter query used by the usage report generator.
+     *
+     * @param startDate the lower bound date of the report, may be {@code null}
+     * @param endDate   the upper bound date of the report, may be {@code null}
+     * @param relation  whether the generator uses an inverse relation
+     * @param type      the DSpace object type the report is restricted to
+     * @return the composed filter query
+     */
     public String composeFilterQuery(String startDate, String endDate, boolean relation, int type) {
         StringBuilder filterQuery = new StringBuilder();
         //when generator has not inverse relation
@@ -359,7 +390,13 @@ public class StatisticsDatasetDisplay {
         return new MessageFormat(defaultQuery).format(new String[] { dSpaceObject.getID().toString() });
     }
 
-    // create filter in string format for start date and end date
+    /**
+     * Builds the Solr time range filter query for the given start and end dates.
+     *
+     * @param startDate the lower bound date, may be {@code null} or the literal {@code "null"}
+     * @param endDate   the upper bound date, may be {@code null} or the literal {@code "null"}
+     * @return the time range filter query, or an empty string if no bounds are provided
+     */
     public String setStartDateEndDateFilterQuery(String startDate, String endDate) {
         if ((startDate != null && !startDate.equals("null")) || (endDate != null && !endDate.equals("null"))) {
             StringBuilder stringBuilder = new StringBuilder();

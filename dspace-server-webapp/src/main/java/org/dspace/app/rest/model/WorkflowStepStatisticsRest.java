@@ -33,18 +33,22 @@ public class WorkflowStepStatisticsRest extends BaseObjectRest<String> {
     @JsonInclude(value = Include.NON_EMPTY)
     private Map<String, Long> actionCounts;
 
+    /** @return the name of the workflow step */
     public String getName() {
         return name;
     }
 
+    /** @param name the workflow step name to set */
     public void setName(String name) {
         this.name = name;
     }
 
+    /** @return the total number of workflow actions performed in this step */
     public long getCount() {
         return count;
     }
 
+    /** @param count the total number of workflow actions to set */
     public void setCount(long count) {
         this.count = count;
     }
@@ -69,10 +73,12 @@ public class WorkflowStepStatisticsRest extends BaseObjectRest<String> {
         return RestResourceController.class;
     }
 
+    /** @return the number of workflow actions performed in this step, keyed by action name */
     public Map<String, Long> getActionCounts() {
         return actionCounts;
     }
 
+    /** @param actionCounts the per-action counts to set, keyed by action name */
     public void setActionCounts(Map<String, Long> actionCounts) {
         this.actionCounts = actionCounts;
     }

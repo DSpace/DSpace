@@ -66,6 +66,19 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         return converter.toRest(usageReportRest, utils.obtainProjection());
     }
 
+    /**
+     * Returns the page of usage reports available for the DSpace object identified by the given URI, optionally
+     * restricted to a single report category and bounded by an optional date range.
+     *
+     * @param uri       the URI of the DSpace object, whose UUID is its last path segment
+     * @param category  the report category to filter by, may be null for all categories
+     * @param pageable  the pagination information
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the reports, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the reports, may be null
+     * @return a page of usage reports for the resolved DSpace object
+     * @throws ResourceNotFoundException if no DSpace object is found for the URI's UUID
+     * @throws IllegalArgumentException  if the given category does not exist for the DSO
+     */
     @PreAuthorize("permitAll()")
     @SearchRestMethod(name = "object")
     public Page<UsageReportRest> findByObject(@Parameter(value = "uri", required = true) String uri,
@@ -94,6 +107,16 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         return converter.toRestPage(usageReportsOfItem, pageable, usageReportsOfItem.size(), utils.obtainProjection());
     }
 
+    /**
+     * Returns a single usage report identified by the given composite id (of the form
+     * {@code <dsoUuid>_<reportId>}), bounded by an optional date range.
+     *
+     * @param id        the composite report id, combining the DSO UUID and the report id
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report, may be null
+     * @return the requested usage report
+     * @throws ResourceNotFoundException if no DSpace object is found for the id's UUID
+     */
     @PreAuthorize("hasPermission(#id, 'usagereport', 'READ')")
     @SearchRestMethod(name = "report")
     public UsageReportRest findReport(@Parameter(value = "id", required = true) String id,

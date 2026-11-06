@@ -33,6 +33,13 @@ public class UsageReportPointCountryRest extends UsageReportPointRest {
         super.label = LocationUtils.getCountryName(id, Locale.getDefault());
     }
 
+    /**
+     * Sets both the id and the label of this point explicitly, bypassing the automatic country-name resolution done
+     * by {@link #setId(String)}.
+     *
+     * @param id    the point id (country ISO code)
+     * @param label the human readable label for the point
+     */
     public void setIdAndLabel(String id, String label) {
         this.id = id;
         this.label = label;

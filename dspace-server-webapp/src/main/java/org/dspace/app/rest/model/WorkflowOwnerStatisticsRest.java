@@ -32,26 +32,32 @@ public class WorkflowOwnerStatisticsRest extends BaseObjectRest<String> {
 
     private Map<String, Long> actionCounts;
 
+    /** @return the email of the owner */
     public String getEmail() {
         return email;
     }
 
+    /** @param email the owner email to set */
     public void setEmail(String email) {
         this.email = email;
     }
 
+    /** @return the name of the owner (user or group) */
     public String getName() {
         return name;
     }
 
+    /** @param name the owner name to set */
     public void setName(String name) {
         this.name = name;
     }
 
+    /** @return the total number of workflow actions performed by the owner */
     public long getCount() {
         return count;
     }
 
+    /** @param count the total number of workflow actions to set */
     public void setCount(long count) {
         this.count = count;
     }
@@ -76,10 +82,12 @@ public class WorkflowOwnerStatisticsRest extends BaseObjectRest<String> {
         return RestResourceController.class;
     }
 
+    /** @return the number of workflow actions performed by the owner, keyed by action name */
     public Map<String, Long> getActionCounts() {
         return actionCounts;
     }
 
+    /** @param actionCounts the per-action counts to set, keyed by action name */
     public void setActionCounts(Map<String, Long> actionCounts) {
         this.actionCounts = actionCounts;
     }

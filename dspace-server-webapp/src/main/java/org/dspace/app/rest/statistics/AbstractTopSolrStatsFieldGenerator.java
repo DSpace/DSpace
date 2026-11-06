@@ -113,6 +113,11 @@ public abstract class AbstractTopSolrStatsFieldGenerator extends AbstractUsageRe
         return dsoType != null ? dsoType : dso.getType();
     }
 
+    /**
+     * Overrides the DSpace object type used when querying Solr statistics, instead of deriving it from the DSO.
+     *
+     * @param dsoType the Constants DSO type to use
+     */
     public void setDsoType(Integer dsoType) {
         this.dsoType = dsoType;
     }

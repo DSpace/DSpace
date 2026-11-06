@@ -62,6 +62,17 @@ public class WorkflowOwnerStatisticsRestRepository extends DSpaceRestRepository<
             .orElse(null);
     }
 
+    /**
+     * Returns a page of workflow owner statistics for workflow actions performed within the given date range,
+     * optionally restricted to a single collection. Restricted to administrators.
+     *
+     * @param pageable     the pagination information
+     * @param startDate    the start date of the range (format yyyy-MM-dd), may be null
+     * @param endDate      the end date of the range (format yyyy-MM-dd), may be null
+     * @param collectionId the id of the collection to filter by, may be null or blank for all collections
+     * @return a page of workflow owner statistics
+     * @throws IllegalArgumentException if a collection id is provided but no matching collection is found
+     */
     @SearchRestMethod(name = "byDateRange")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowOwnerStatisticsRest> findByDateRange(Pageable pageable,

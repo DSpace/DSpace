@@ -43,6 +43,17 @@ public class ItemMetricsLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private ItemService itemService;
 
+    /**
+     * Returns the paged CRIS metrics associated with the item identified by the given UUID.
+     *
+     * @param request          the current servlet request, may be null
+     * @param itemUuid         the UUID of the item whose metrics are requested
+     * @param optionalPageable the optional pagination information
+     * @param projection       the projection to apply to the returned resources
+     * @return a page of CRIS metrics for the item
+     * @throws BadRequestException       if the item UUID is null
+     * @throws ResourceNotFoundException if no item exists for the given UUID
+     */
     @PreAuthorize("hasPermission(#itemUuid, 'ITEM', 'READ')")
     public Page<CrisMetrics> getMetrics(@Nullable HttpServletRequest request, UUID itemUuid,
             @Nullable Pageable optionalPageable, Projection projection) {

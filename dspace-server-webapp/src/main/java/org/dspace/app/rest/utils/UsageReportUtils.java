@@ -247,6 +247,21 @@ public class UsageReportUtils {
         return usageReportRest;
     }
 
+    /**
+     * Creates the stat usage report identified by the given report id for the DSO, bounded by an optional date
+     * range. If the report id can not be resolved for the given DSO, a {@link ResourceNotFoundException} is thrown.
+     *
+     * @param context   DSpace context
+     * @param dso       DSpace object we want a stat usage report on
+     * @param reportId  Type of usage report requested
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report period, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report period, may be null
+     * @return Rest object containing the stat usage report, see {@link UsageReportRest}
+     * @throws ParseException      if the date range can not be parsed
+     * @throws SolrServerException if a Solr error occurs while gathering statistics
+     * @throws IOException         if an I/O error occurs while querying Solr
+     * @throws SQLException        if a database error occurs
+     */
     public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String reportId,
                                              String startDate, String endDate)
             throws ParseException, SolrServerException, IOException, SQLException {
@@ -286,6 +301,13 @@ public class UsageReportUtils {
         }
     }
 
+    /**
+     * Checks whether a usage report category with the given id is configured for the given DSpace object.
+     *
+     * @param dso      the DSpace object to check
+     * @param category the id of the category to look for
+     * @return true if the category exists for the DSO, false otherwise
+     */
     public boolean categoryExists(DSpaceObject dso, String category) {
         List<UsageReportCategoryRest> categories = configuration.getCategories(dso);
         if (categories != null) {

@@ -43,6 +43,11 @@ public class StatisticsCategoryRestRepository extends DSpaceRestRepository<Usage
     @Autowired
     private StatisticsReportsConfiguration statsConfiguration;
 
+    /**
+     * Returns the statistics support REST object, the entry point describing the statistics endpoints.
+     *
+     * @return a new {@link StatisticsSupportRest} instance
+     */
     public StatisticsSupportRest getStatisticsSupport() {
         return new StatisticsSupportRest();
     }
@@ -58,6 +63,14 @@ public class StatisticsCategoryRestRepository extends DSpaceRestRepository<Usage
         }
     }
 
+    /**
+     * Returns the page of usage report categories available for the DSpace object identified by the given URI.
+     *
+     * @param uri      the URI of the DSpace object, whose UUID is its last path segment
+     * @param pageable the pagination information
+     * @return a page of usage report categories for the resolved DSpace object
+     * @throws IllegalArgumentException if no DSpace object is found for the URI's UUID
+     */
     @PreAuthorize("permitAll()")
     @SearchRestMethod(name = "object")
     public Page<UsageReportCategoryRest> findByObject(@Parameter(value = "uri", required = true) String uri,

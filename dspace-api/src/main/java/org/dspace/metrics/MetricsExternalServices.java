@@ -98,6 +98,12 @@ public abstract class MetricsExternalServices {
         }
     }
 
+    /**
+     * Returns the list of Discovery filter queries used to select the items this
+     * service should process. The default implementation returns no filters.
+     *
+     * @return the filter queries, or an empty list when none are configured
+     */
     public List<String> getFilters() {
         return Collections.emptyList();
     }
@@ -119,6 +125,12 @@ public abstract class MetricsExternalServices {
         this.fetchSize = fetchSize;
     }
 
+    /**
+     * Returns the log messages collected during the metrics update, if the
+     * service tracks them. The default implementation returns {@code null}.
+     *
+     * @return the collected log messages, or {@code null} when not tracked
+     */
     public List<String> getLogs() {
         return null;
     }

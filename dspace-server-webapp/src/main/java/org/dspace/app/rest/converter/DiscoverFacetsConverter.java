@@ -108,6 +108,13 @@ public class DiscoverFacetsConverter {
         }
     }
 
+    /**
+     * Copies the total number of facet values into the given facet entry when the facet is configured to expose it.
+     *
+     * @param field        the discovery facet configuration
+     * @param facetEntry   the REST facet entry being populated
+     * @param searchResult the discovery search result holding the facet totals
+     */
     public void handleExposeTotalValues(DiscoverySearchFilterFacet field,
             SearchFacetEntryRest facetEntry, DiscoverResult searchResult) {
         if (field.exposeTotalElements()) {
@@ -118,6 +125,14 @@ public class DiscoverFacetsConverter {
         }
     }
 
+    /**
+     * Flags on the facet entry whether the "missing" count should be exposed and, when so, copies the number of
+     * documents missing a value for the facet field into the entry.
+     *
+     * @param field        the discovery facet configuration
+     * @param facetEntry   the REST facet entry being populated
+     * @param searchResult the discovery search result holding the facet missing count
+     */
     public void handleExposeMissing(DiscoverySearchFilterFacet field, SearchFacetEntryRest facetEntry,
             DiscoverResult searchResult) {
         facetEntry.setExposeMissing(field.exposeMissing());
@@ -129,6 +144,14 @@ public class DiscoverFacetsConverter {
         }
     }
 
+    /**
+     * Flags on the facet entry whether the "more" indicator should be exposed and, when so, copies the number of
+     * additional facet values beyond those returned into the entry.
+     *
+     * @param field        the discovery facet configuration
+     * @param facetEntry   the REST facet entry being populated
+     * @param searchResult the discovery search result holding the facet "more" count
+     */
     public void handleExposeMore(DiscoverySearchFilterFacet field, SearchFacetEntryRest facetEntry,
             DiscoverResult searchResult) {
         facetEntry.setExposeMore(field.exposeMore());

@@ -73,6 +73,14 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
         return crisMetricsDAO.countRows(context);
     }
 
+    /**
+     * Create a new CrisMetrics attached to the given DSpaceObject, with the
+     * acquisition date set to the current time.
+     *
+     * @param context      the DSpace context
+     * @param dSpaceObject the object the metric refers to
+     * @return             the newly created CrisMetrics
+     */
     public CrisMetrics create(Context context, DSpaceObject dSpaceObject) throws SQLException, AuthorizeException {
         CrisMetrics cm = new CrisMetrics();
         cm.setResource(dSpaceObject);
@@ -82,10 +90,22 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
         return metric;
     }
 
+    /**
+     * Delete the given CrisMetrics.
+     *
+     * @param context     the DSpace context
+     * @param crisMetrics the metric to delete
+     */
     public void delete(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException {
         this.crisMetricsDAO.delete(context, crisMetrics);
     }
 
+    /**
+     * Delete all CrisMetrics associated with the given DSpaceObject.
+     *
+     * @param context      the DSpace context
+     * @param dSpaceObject the object whose metrics should be removed
+     */
     public void deleteByResourceID(Context context, DSpaceObject dSpaceObject) throws SQLException, AuthorizeException {
         this.crisMetricsDAO.deleteByDSO(context, dSpaceObject);
     }
@@ -120,6 +140,13 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
         }
     }
 
+    /**
+     * Find a CrisMetrics by its database identifier.
+     *
+     * @param context the DSpace context
+     * @param id      the metric identifier
+     * @return        the matching CrisMetrics, or {@code null} if not found
+     */
     public CrisMetrics find(Context context, int id) throws SQLException {
         return crisMetricsDAO.findByID(context, CrisMetrics.class, id);
     }

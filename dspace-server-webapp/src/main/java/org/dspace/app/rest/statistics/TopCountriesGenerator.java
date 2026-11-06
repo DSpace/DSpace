@@ -35,6 +35,8 @@ public class TopCountriesGenerator extends AbstractTopSolrStatsFieldGenerator {
      *
      * @param context DSpace context
      * @param dso     DSO we want usage report of the TopCountries on the given DSO
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report period, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report period, may be null
      * @return Rest object containing the TopCountries usage report on the given DSO
      */
     public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String startDate, String endDate) {

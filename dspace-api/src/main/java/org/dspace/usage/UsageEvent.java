@@ -21,6 +21,17 @@ import org.dspace.services.model.Event;
  */
 public class UsageEvent extends Event {
 
+    /**
+     * Creates a VIEW usage event for the object identified by the given id, resolving it through the
+     * provided service.
+     *
+     * @param context             the current DSpace context
+     * @param req                 the HTTP request that triggered the event
+     * @param dSpaceObjectService the service used to resolve the target object
+     * @param targetId            the id of the object the event refers to
+     * @param referrer            the referrer of the request
+     * @return the created usage event
+     */
     public static final UsageEvent createUsageEvent(
         final Context context, final HttpServletRequest req,
         final DSpaceObjectService<?> dSpaceObjectService, final UUID targetId,

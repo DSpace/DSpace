@@ -41,6 +41,12 @@ public class ScopusRestConnector {
     private CloseableHttpClient httpClient;
 
 
+    /**
+     * Query the Scopus service for the given identifier.
+     *
+     * @param id the identifier to append to the configured Scopus URL
+     * @return   the raw response body, or {@code null} if the request failed
+     */
     public String get(String id) {
         try {
             return sendRequestToScopus(id);

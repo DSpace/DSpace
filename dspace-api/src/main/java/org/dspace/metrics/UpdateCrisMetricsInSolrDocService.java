@@ -36,10 +36,26 @@ public class UpdateCrisMetricsInSolrDocService {
     private IndexingService crisIndexingService = new DSpace().getServiceManager().getServiceByName(
             IndexingService.class.getName(), IndexingService.class);
 
+    /**
+     * Reindex the latest CrisMetrics of all resources into their Solr documents.
+     *
+     * @param context  the DSpace context
+     * @param handler  the runnable handler used to report progress
+     * @param optimize whether to run a Solr optimization after the update
+     */
     public void performUpdate(Context context, DSpaceRunnableHandler handler, boolean optimize) {
         performUpdate(context, handler, optimize, null);
     }
 
+    /**
+     * Reindex the latest CrisMetrics into their Solr documents, optionally
+     * restricting the update to a single resource.
+     *
+     * @param context      the DSpace context
+     * @param handler      the runnable handler used to report progress
+     * @param optimize     whether to run a Solr optimization after the update
+     * @param resourceUuid the resource to update, or {@code null} for all resources
+     */
     public void performUpdate(Context context, DSpaceRunnableHandler handler, boolean optimize, UUID resourceUuid) {
         try {
             List<CrisMetrics> metrics = resourceUuid == null

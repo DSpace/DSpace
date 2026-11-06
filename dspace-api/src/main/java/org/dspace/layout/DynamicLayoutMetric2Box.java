@@ -50,8 +50,18 @@ public class DynamicLayoutMetric2Box {
     @Column(name = "position")
     private Integer position;
 
+    /**
+     * Default constructor required by the persistence layer.
+     */
     public DynamicLayoutMetric2Box() {}
 
+    /**
+     * Creates a new metric-to-box association and registers it on the given box.
+     *
+     * @param box      the box the metric is associated to
+     * @param type     the metric type
+     * @param position the position of the metric within the box
+     */
     public DynamicLayoutMetric2Box(DynamicLayoutBox box, String type, int position) {
         this.box = box;
         this.position = position;
@@ -59,26 +69,56 @@ public class DynamicLayoutMetric2Box {
         this.box.addMetric2box(this);
     }
 
+    /**
+     * Returns the identifier of this association.
+     *
+     * @return the id
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * Sets the identifier of this association.
+     *
+     * @param id the id
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
+    /**
+     * Returns the box this metric is associated to.
+     *
+     * @return the box
+     */
     public DynamicLayoutBox getBox() {
         return box;
     }
 
+    /**
+     * Sets the box this metric is associated to.
+     *
+     * @param box the box
+     */
     public void setBox(DynamicLayoutBox box) {
         this.box = box;
     }
 
+    /**
+     * Returns the position of the metric within the box.
+     *
+     * @return the position
+     */
     public Integer getPosition() {
         return position;
     }
 
+    /**
+     * Sets the position of the metric within the box.
+     *
+     * @param position the position
+     */
     public void setPosition(Integer position) {
         this.position = position;
     }
@@ -113,10 +153,20 @@ public class DynamicLayoutMetric2Box {
         return true;
     }
 
+    /**
+     * Returns the metric type of this association.
+     *
+     * @return the metric type
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Sets the metric type of this association.
+     *
+     * @param type the metric type
+     */
     public void setType(String type) {
         this.type = type;
     }

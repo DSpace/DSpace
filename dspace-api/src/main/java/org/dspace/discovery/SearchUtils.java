@@ -257,6 +257,13 @@ public class SearchUtils {
         result.add(configurationExtra);
     }
 
+    /**
+     * Adds the fields of the given CRIS metric to the provided Solr input document.
+     *
+     * @param metric    the CRIS metric whose fields should be added
+     * @param solrInDoc the Solr input document to enrich
+     * @return the enriched Solr input document
+     */
     public static SolrInputDocument addMetricFieldsInSolrDoc(CrisMetrics metric, SolrInputDocument solrInDoc) {
         String type = "metric." + metric.getMetricType();
         String typeSort = type + "_sort";

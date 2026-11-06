@@ -37,6 +37,8 @@ public class TotalDownloadsGenerator extends TotalVisitGenerator {
      * @param context DSpace context
      * @param dso     Item/Bitstream we want usage report on with TotalDownloads of the Item's bitstreams or of the
      *                bitstream itself
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report period, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report period, may be null
      * @return Rest object containing the TotalDownloads usage report on the given Item/Bitstream
      */
     public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String startDate, String endDate) {

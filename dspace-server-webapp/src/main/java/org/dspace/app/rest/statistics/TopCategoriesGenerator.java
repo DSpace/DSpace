@@ -60,6 +60,16 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
 
     private Map<String, String> categoryQueries;
 
+    /**
+     * Creates a TopCategories usage report counting, for each configured category, the views of the items joined to
+     * the given DSO within the optional date range. Each report point carries the category id and its view count.
+     *
+     * @param context   DSpace context
+     * @param dso       the DSpace object the report is computed for
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report period, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report period, may be null
+     * @return Rest object containing the TopCategories usage report
+     */
     public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String startDate, String endDate) {
 
         Map<String, Integer> categoriesCount = getCategoriesCount(dso, startDate, endDate);
@@ -166,6 +176,12 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
         return UsageReportUtils.TOP_CATEGORIES_REPORT_ID;
     }
 
+    /**
+     * Returns the configured category queries keyed by category name. When no queries have been explicitly set, the
+     * defaults derived from the entity types present in the repository are returned.
+     *
+     * @return the category queries to use for the report
+     */
     public Map<String, String> getCategoryQueries() {
         if (categoryQueries == null) {
             return getDefaultCategoryQueries();
@@ -173,6 +189,11 @@ public class TopCategoriesGenerator extends AbstractUsageReportGenerator {
         return categoryQueries;
     }
 
+    /**
+     * Sets the category queries keyed by category name, overriding the defaults discovered from the repository.
+     *
+     * @param categoryQueries the category queries to use
+     */
     public void setCategoryQueries(Map<String, String> categoryQueries) {
         this.categoryQueries = categoryQueries;
     }

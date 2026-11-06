@@ -21,15 +21,31 @@ public final class LoginStatistics {
 
     private final long count;
 
+    /**
+     * Creates a new login statistic entry.
+     *
+     * @param user  the user the statistic refers to
+     * @param count the number of logins performed by the user
+     */
     public LoginStatistics(EPerson user, long count) {
         this.user = user;
         this.count = count;
     }
 
+    /**
+     * Returns the user related to this statistic entry.
+     *
+     * @return the user
+     */
     public EPerson getUser() {
         return user;
     }
 
+    /**
+     * Returns the number of logins performed by the user.
+     *
+     * @return the login count
+     */
     public long getCount() {
         return count;
     }

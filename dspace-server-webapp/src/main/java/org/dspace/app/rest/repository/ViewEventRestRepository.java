@@ -49,6 +49,15 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
 
     private final List<String> typeList = Arrays.asList(Constants.typeText);
 
+    /**
+     * Reads a view event from the body of the current request, validates its target type and target id, and
+     * schedules an asynchronous event to record the view on the resolved DSpace object.
+     *
+     * @return the parsed and validated view event
+     * @throws SQLException                 if a database error occurs while resolving the target
+     * @throws UnprocessableEntityException if the body can not be parsed or the target id does not resolve
+     * @throws DSpaceBadRequestException    if the view event is missing or has invalid properties
+     */
     public ViewEventRest createViewEvent() throws SQLException {
 
         Context context = obtainContext();

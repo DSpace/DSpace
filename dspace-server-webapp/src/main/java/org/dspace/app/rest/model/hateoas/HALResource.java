@@ -44,6 +44,11 @@ public abstract class HALResource<T> extends EntityModel<T> {
         embedded.put(rel, object);
     }
 
+    /**
+     * Sets the embedded page header for this resource and registers all of the header's links on the resource.
+     *
+     * @param page the page header to attach
+     */
     public void setPageHeader(EmbeddedPageHeader page) {
         this.pageHeader = page;
         for (Map.Entry<String, Object> entry : page.getLinks().entrySet()) {

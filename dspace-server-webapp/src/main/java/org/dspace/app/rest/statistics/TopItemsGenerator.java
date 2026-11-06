@@ -166,10 +166,20 @@ public class TopItemsGenerator extends AbstractUsageReportGenerator {
         throw new IllegalStateException("Not supported dspace object type: " + getDsoType());
     }
 
+    /**
+     * Returns the Constants DSpace object type this generator reports on (e.g. ITEM or BITSTREAM).
+     *
+     * @return the configured DSO type
+     */
     public int getDsoType() {
         return dsoType;
     }
 
+    /**
+     * Sets the Constants DSpace object type this generator reports on (e.g. ITEM or BITSTREAM).
+     *
+     * @param dsoType the DSO type to use
+     */
     public void setDsoType(int dsoType) {
         this.dsoType = dsoType;
     }

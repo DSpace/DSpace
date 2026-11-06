@@ -61,6 +61,17 @@ public class WorkflowStepStatisticsRestRepository extends DSpaceRestRepository<W
             .orElse(null);
     }
 
+    /**
+     * Returns a page of workflow step statistics for workflow actions performed within the given date range,
+     * optionally restricted to a single collection. Restricted to administrators.
+     *
+     * @param pageable     the pagination information
+     * @param startDate    the start date of the range (format yyyy-MM-dd), may be null
+     * @param endDate      the end date of the range (format yyyy-MM-dd), may be null
+     * @param collectionId the id of the collection to filter by, may be null or blank for all collections
+     * @return a page of workflow step statistics
+     * @throws IllegalArgumentException if a collection id is provided but no matching collection is found
+     */
     @SearchRestMethod(name = "byDateRange")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowStepStatisticsRest> findByDateRange(Pageable pageable,
@@ -81,6 +92,13 @@ public class WorkflowStepStatisticsRestRepository extends DSpaceRestRepository<W
         return converter.toRestPage(statistics, pageable, statistics.size(), utils.obtainProjection());
     }
 
+    /**
+     * Returns a page of workflow step statistics for the workflow items currently in progress, grouped by step.
+     * Restricted to administrators.
+     *
+     * @param pageable the pagination information
+     * @return a page of workflow step statistics for the current workflows
+     */
     @SearchRestMethod(name = "current")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<WorkflowStepStatisticsRest> findCurrentWorkflows(Pageable pageable) {

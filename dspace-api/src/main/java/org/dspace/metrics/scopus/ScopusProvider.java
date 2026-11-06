@@ -77,6 +77,12 @@ public class ScopusProvider {
         return List.of();
     }
 
+    /**
+     * Fetch a single Scopus citation metric for the given identifier.
+     *
+     * @param id Appender to the URL defined in the props
+     * @return   the mapped CrisMetricDTO, or {@code null} if the query failed
+     */
     public CrisMetricDTO getScopusObject(String id) {
         String scopusResponse = getRecords(id);
         if (StringUtils.isNotBlank(scopusResponse)) {

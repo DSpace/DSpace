@@ -28,26 +28,32 @@ public class LoginStatisticsRest extends BaseObjectRest<String> {
 
     private long count;
 
+    /** @return the name of the EPerson */
     public String getName() {
         return name;
     }
 
+    /** @param name the EPerson name to set */
     public void setName(String name) {
         this.name = name;
     }
 
+    /** @return the email of the EPerson */
     public String getEmail() {
         return email;
     }
 
+    /** @param email the EPerson email to set */
     public void setEmail(String email) {
         this.email = email;
     }
 
+    /** @return the number of logins recorded for the EPerson */
     public long getCount() {
         return count;
     }
 
+    /** @param count the number of logins to set */
     public void setCount(long count) {
         this.count = count;
     }

@@ -119,6 +119,12 @@ public class DiscoverResult {
         this.facetResults.put(facetField, facetValues);
     }
 
+    /**
+     * Adds one or more pivot facet results for the given facet pivot field.
+     *
+     * @param facetPivot   the facet pivot field name
+     * @param pivotResults the pivot results to add
+     */
     public void addFacetPivotResult(String facetPivot, FacetPivotResult... pivotResults) {
         List<FacetPivotResult> facetValues = this.facetPivotResults.get(facetPivot);
         if (facetValues == null) {
@@ -128,26 +134,62 @@ public class DiscoverResult {
         this.facetPivotResults.put(facetPivot, facetValues);
     }
 
+    /**
+     * Stores the count of documents missing a value for the given facet field.
+     *
+     * @param facetField   the facet field name
+     * @param missingCount the count of documents missing the facet value
+     */
     public void setFacetResultMissing(String facetField, long missingCount) {
         facetResultsMissing.put(facetField, missingCount);
     }
 
+    /**
+     * Returns the count of documents missing a value for the given facet field.
+     *
+     * @param facetField the facet field name
+     * @return the missing count, or {@code null} if not available
+     */
     public Long getFacetResultMissing(String facetField) {
         return facetResultsMissing.get(facetField);
     }
 
+    /**
+     * Stores the count of additional facet values available for the given facet field.
+     *
+     * @param field the facet field name
+     * @param l     the count of additional facet values
+     */
     public void setFacetResultMore(String field, long l) {
         facetResultMore.put(field, l);
     }
 
+    /**
+     * Returns the count of additional facet values available for the given facet field.
+     *
+     * @param facetField the facet field name
+     * @return the additional values count, or {@code null} if not available
+     */
     public Long getFacetResultMore(String facetField) {
         return facetResultMore.get(facetField);
     }
 
+    /**
+     * Stores the total number of distinct facet values for the given facet field.
+     *
+     * @param field         the facet field name
+     * @param countDistinct the total number of distinct facet values
+     */
     public void setFacetResultTotalElements(String field, Long countDistinct) {
         facetResultTotalElements.put(field, countDistinct);
     }
 
+    /**
+     * Returns the total number of distinct facet values for the given facet field.
+     *
+     * @param facetField the facet field name
+     * @return the total number of distinct facet values, or {@code null} if not available
+     */
     public Long getFacetResultTotalElements(String facetField) {
         return facetResultTotalElements.get(facetField);
     }
@@ -156,14 +198,31 @@ public class DiscoverResult {
         return facetResults;
     }
 
+    /**
+     * Returns the facet results for the given facet field.
+     *
+     * @param facet the facet field name
+     * @return the facet results, or an empty list if none are available
+     */
     public List<FacetResult> getFacetResult(String facet) {
         return ListUtils.emptyIfNull(facetResults.get(facet));
     }
 
+    /**
+     * Returns all the pivot facet results grouped by facet pivot field.
+     *
+     * @return the map of pivot facet results
+     */
     public Map<String, List<FacetPivotResult>> getFacetPivotResults() {
         return facetPivotResults;
     }
 
+    /**
+     * Returns the pivot facet results for the given facet pivot field.
+     *
+     * @param facetPivot the facet pivot field name
+     * @return the pivot facet results, or an empty list if none are available
+     */
     public List<FacetPivotResult> getFacetPivotResult(String facetPivot) {
         return ListUtils.emptyIfNull(facetPivotResults.get(facetPivot));
     }
@@ -216,6 +275,19 @@ public class DiscoverResult {
             this.totalElements = -1;
         }
 
+        /**
+         * Creates a facet result including the missing, more and total elements counts.
+         *
+         * @param asFilterQuery the filter query representation of this facet value
+         * @param displayedValue the value to display for this facet
+         * @param authorityKey the authority key of this facet value, may be {@code null}
+         * @param sortValue the value used to sort this facet
+         * @param count the number of documents matching this facet value
+         * @param fieldType the type of the facet field
+         * @param missing the count of documents missing a value for the facet
+         * @param more the count of additional facet values available
+         * @param totalElements the total number of distinct facet values
+         */
         public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue,
                 long count, String fieldType, int missing, int more, int totalElements) {
             this.asFilterQuery = asFilterQuery;
@@ -261,14 +333,29 @@ public class DiscoverResult {
             return fieldType;
         }
 
+        /**
+         * Returns the count of documents missing a value for this facet.
+         *
+         * @return the missing count, or -1 if not set
+         */
         public int getMissing() {
             return missing;
         }
 
+        /**
+         * Returns the count of additional facet values available.
+         *
+         * @return the additional values count, or -1 if not set
+         */
         public int getMore() {
             return more;
         }
 
+        /**
+         * Returns the total number of distinct facet values.
+         *
+         * @return the total number of distinct facet values, or -1 if not set
+         */
         public int getTotalElements() {
             return totalElements;
         }
@@ -282,18 +369,38 @@ public class DiscoverResult {
 
         private FacetPivotResult[] pivot;
 
+        /**
+         * Creates a new pivot facet result.
+         *
+         * @param count the number of documents matching this pivot value
+         * @param value the value of this pivot
+         * @param pivot the nested pivot results
+         */
         public FacetPivotResult(long count, String value, FacetPivotResult[] pivot) {
             this.count = count;
             this.value = value;
             this.pivot = pivot;
         }
 
+        /**
+         * Converts a list of Solr {@link PivotField} into an array of {@link FacetPivotResult}.
+         *
+         * @param pivotFields the Solr pivot fields to convert
+         * @return the converted pivot facet results
+         */
         public static FacetPivotResult[] fromPivotFields(List<PivotField> pivotFields) {
             return ListUtils.emptyIfNull(pivotFields).stream()
                 .map(FacetPivotResult::fromPivotField)
                 .toArray(FacetPivotResult[]::new);
         }
 
+        /**
+         * Converts a single Solr {@link PivotField} into a {@link FacetPivotResult}, recursively converting
+         * its nested pivots.
+         *
+         * @param pivotField the Solr pivot field to convert
+         * @return the converted pivot facet result
+         */
         public static FacetPivotResult fromPivotField(PivotField pivotField) {
             int count = pivotField.getCount();
             String value = String.valueOf(pivotField.getValue());
@@ -301,26 +408,56 @@ public class DiscoverResult {
             return new FacetPivotResult(count, value, pivot);
         }
 
+        /**
+         * Returns the number of documents matching this pivot value.
+         *
+         * @return the count
+         */
         public long getCount() {
             return count;
         }
 
+        /**
+         * Sets the number of documents matching this pivot value.
+         *
+         * @param count the count
+         */
         public void setCount(long count) {
             this.count = count;
         }
 
+        /**
+         * Returns the value of this pivot.
+         *
+         * @return the pivot value
+         */
         public String getValue() {
             return value;
         }
 
+        /**
+         * Sets the value of this pivot.
+         *
+         * @param value the pivot value
+         */
         public void setValue(String value) {
             this.value = value;
         }
 
+        /**
+         * Returns the nested pivot results.
+         *
+         * @return the nested pivots
+         */
         public FacetPivotResult[] getPivot() {
             return pivot;
         }
 
+        /**
+         * Sets the nested pivot results.
+         *
+         * @param pivot the nested pivots
+         */
         public void setPivot(FacetPivotResult[] pivot) {
             this.pivot = pivot;
         }

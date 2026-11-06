@@ -42,6 +42,17 @@ public class BoxMetricsLayoutConfigurationService {
         this.authorizeService = authorizeService;
     }
 
+    /**
+     * Check whether the current user is allowed to see the given metric for the
+     * item, based on the access configuration of the metric layout boxes.
+     * Administrators always have access, and items without metric boxes are
+     * considered visible.
+     *
+     * @param context    the DSpace context
+     * @param item       the item owning the metric
+     * @param crisMetric the metric to check
+     * @return           true if the metric can be exposed, false otherwise
+     */
     public boolean checkPermissionOfMetricByBox(Context context, Item item, CrisMetrics crisMetric) {
         try {
             if (authorizeService.isAdmin(context)) {

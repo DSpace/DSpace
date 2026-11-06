@@ -45,6 +45,15 @@ public class WOSPersonRestConnector {
     private CloseableHttpClient httpClient;
 
 
+    /**
+     * Query Web of Science for all records of the given author and sum their
+     * citation counts into a single metric, paging through the results.
+     *
+     * @param orcidId the ORCID of the author
+     * @return        a CrisMetricDTO with the total citation count, or
+     *                {@code null} if no records were found
+     * @throws IOException if the request to Web of Science fails
+     */
     public CrisMetricDTO sendRequestToWOS(String orcidId) throws IOException {
         double total = 0;
         int record = 0;

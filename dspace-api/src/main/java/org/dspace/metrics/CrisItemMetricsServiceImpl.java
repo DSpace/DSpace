@@ -203,6 +203,13 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         return metricsField;
     }
 
+    /**
+     * Build an embedded-view {@link EmbeddableCrisMetrics} for the given item uuid.
+     *
+     * @param remark the remark to store on the metric
+     * @param uuid   the uuid of the item, used to derive the embeddable id
+     * @return       the assembled EmbeddableCrisMetrics
+     */
     public EmbeddableCrisMetrics createEmbeddableCrisMetrics(String remark, String uuid) {
         EmbeddableCrisMetrics embeddableCrisMetrics = new EmbeddableCrisMetrics();
         embeddableCrisMetrics.setMetricType("embedded-view");
@@ -211,10 +218,27 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         return embeddableCrisMetrics;
     }
 
+    /**
+     * Check whether the given metric is allowed to be shown for the item,
+     * according to the metric box layout configuration.
+     *
+     * @param context    the DSpace context
+     * @param item       the item owning the metric
+     * @param crisMetric the metric to check
+     * @return           true if the metric can be exposed, false otherwise
+     */
     public boolean checkPermissionsOfMetricsByBox(Context context, Item item, CrisMetrics crisMetric) {
         return boxMetricsLayoutConfigurationService.checkPermissionOfMetricByBox(context, item, crisMetric);
     }
 
+    /**
+     * Resolve the {@link Item} referenced by a metric id, whether it is an
+     * embeddable metric id or a stored metric id.
+     *
+     * @param context the DSpace context
+     * @param target  the metric id
+     * @return        the owning item, or {@code null} if it cannot be resolved
+     */
     public Item itemFromMetricId(Context context, String target) throws SQLException {
         if (isEmbeddableMetricId(target.toString())) {
             int indexOf = target.indexOf(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR);

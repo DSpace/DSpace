@@ -332,10 +332,20 @@ public class DynamicLayoutBox implements ReloadableEntity<Integer> {
     }
 
 
+    /**
+     * Returns the metric-to-box associations configured for this box.
+     *
+     * @return the list of metric-to-box associations
+     */
     public List<DynamicLayoutMetric2Box> getMetric2box() {
         return metric2box;
     }
 
+    /**
+     * Adds a metric-to-box association to this box, linking it back to this box.
+     *
+     * @param box2metric the metric-to-box association to add
+     */
     public void addMetric2box(DynamicLayoutMetric2Box box2metric) {
         box2metric.setBox(this);
         this.metric2box.add(box2metric);

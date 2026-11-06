@@ -28,10 +28,10 @@ public class TotalDownloadsAndVisitsGenerator {
      * Create stat points of the items over views and downloads
      * specific community, collection
      *
-     * @param uuid      Uuid of item for which to find views and downloads
+     * @param uuid      Uuid of the object for which to find views and downloads
+     * @param type      the object type (e.g. item, collection, community)
      * @return  Map<String, Integer> with views and downloads
      */
-
     public  Map<String, Integer> createUsageReport(UUID uuid, int type)
             throws SolrServerException, IOException, SQLException {
         // query for item

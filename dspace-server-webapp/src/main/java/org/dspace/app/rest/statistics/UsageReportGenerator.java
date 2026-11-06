@@ -27,7 +27,12 @@ public interface UsageReportGenerator {
      *
      * @param context  DSpace context
      * @param dso     DSpace object we want a stat usage report on
+     * @param startDate optional start date (format yyyy-MM-dd) bounding the report period, may be null
+     * @param endDate   optional end date (format yyyy-MM-dd) bounding the report period, may be null
      * @return Rest object containing the stat usage report, see {@link UsageReportRest}
+     * @throws SolrServerException if a Solr error occurs while gathering statistics
+     * @throws IOException         if an I/O error occurs while querying Solr
+     * @throws SQLException        if a database error occurs
      */
     public UsageReportRest createUsageReport(Context context,
                                              DSpaceObject dso, String startDate, String endDate)

@@ -54,6 +54,15 @@ public class LoginStatisticsRestRepository extends DSpaceRestRepository<LoginSta
             .orElse(null);
     }
 
+    /**
+     * Returns a page of login statistics for logins that occurred within the given date range. Restricted to
+     * administrators.
+     *
+     * @param pageable  the pagination information
+     * @param startDate the start date of the range (format yyyy-MM-dd), may be null
+     * @param endDate   the end date of the range (format yyyy-MM-dd), may be null
+     * @return a page of login statistics within the given range
+     */
     @SearchRestMethod(name = "byDateRange")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<LoginStatisticsRest> findByDateRange(Pageable pageable,

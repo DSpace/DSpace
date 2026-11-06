@@ -125,7 +125,13 @@ public class TotalDownloadsAndVisitsGenerator extends AbstractUsageReportGenerat
         return UsageReportUtils.TOTAL_VISITS_TOTAL_DOWNLOADS;
     }
 
-    // to support different types of dso
+    /**
+     * Returns the Solr "owning" field name matching the given DSpace object type (owningItem, owningColl or
+     * owningComm), defaulting to owningItem for unsupported types.
+     *
+     * @param dsoType the Constants DSpace object type
+     * @return the name of the owning field to use in the Solr query
+     */
     public String createQueryKeyword(int dsoType) {
         String owningStr = "";
         switch (dsoType) {

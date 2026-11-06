@@ -27,6 +27,12 @@ public class WOSProvider {
     @Autowired
     private WOSRestConnector wosRestConnector;
 
+    /**
+     * Fetch the Web of Science citation metric for the given identifier.
+     *
+     * @param id the DOI used to query Web of Science
+     * @return   the mapped CrisMetricDTO, or {@code null} if the query failed
+     */
     public CrisMetricDTO getWOSObject(String id) {
         String wosResponse = wosRestConnector.get(id);
         if (StringUtils.isNotBlank(wosResponse)) {

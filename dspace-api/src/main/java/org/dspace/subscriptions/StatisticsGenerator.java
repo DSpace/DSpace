@@ -41,6 +41,13 @@ import org.dspace.eperson.EPerson;
 public class StatisticsGenerator {
     private static final Logger log = LogManager.getLogger(StatisticsGenerator.class);
 
+    /**
+     * Builds an Excel report from the given metrics and emails it to the subscriber as an attachment.
+     *
+     * @param c               the current DSpace context
+     * @param ePerson         the subscriber to notify
+     * @param crisMetricsList the metrics to include in the report
+     */
     public void notifyForSubscriptions(Context c, EPerson ePerson, List<CrisMetrics> crisMetricsList) {
         try {
             // send the notification to the user

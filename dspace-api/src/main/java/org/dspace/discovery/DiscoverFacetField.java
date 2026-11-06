@@ -53,6 +53,20 @@ public class DiscoverFacetField {
         this.field = field;
     }
 
+    /**
+     * Creates a facet field query exposing the additional facet metadata options.
+     *
+     * @param field               the facet field name
+     * @param type                the facet type
+     * @param limit               the maximum number of facet values to return
+     * @param sortOrder           the sort order to apply to the facet values
+     * @param prefix              the prefix all returned facet values must start with
+     * @param exposeMore          whether to expose the information about additional available values
+     * @param exposeMissing       whether to expose the count of documents missing the facet value
+     * @param exposeTotalElements whether to expose the total number of distinct facet values
+     * @param fillGaps            whether to fill the gaps between date facet values
+     * @param inverseDirection    whether to invert the facet direction
+     */
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
                               String prefix, boolean exposeMore, boolean exposeMissing, boolean exposeTotalElements,
                               boolean fillGaps, boolean inverseDirection) {
@@ -106,22 +120,47 @@ public class DiscoverFacetField {
         this.offset = offset;
     }
 
+    /**
+     * Returns whether the count of documents missing the facet value should be exposed.
+     *
+     * @return {@code true} if the missing count should be exposed
+     */
     public boolean exposeMissing() {
         return exposeMissing;
     }
 
+    /**
+     * Returns whether the information about additional available facet values should be exposed.
+     *
+     * @return {@code true} if the "more" information should be exposed
+     */
     public boolean exposeMore() {
         return exposeMore;
     }
 
+    /**
+     * Returns whether the total number of distinct facet values should be exposed.
+     *
+     * @return {@code true} if the total elements count should be exposed
+     */
     public boolean exposeTotalElements() {
         return exposeTotalElements;
     }
 
+    /**
+     * Returns whether the gaps between date facet values should be filled.
+     *
+     * @return {@code true} if date gaps should be filled
+     */
     public boolean fillGaps() {
         return fillGaps;
     }
 
+    /**
+     * Returns whether the facet direction should be inverted.
+     *
+     * @return {@code true} if the direction should be inverted
+     */
     public boolean inverseDirection() {
         return inverseDirection;
     }

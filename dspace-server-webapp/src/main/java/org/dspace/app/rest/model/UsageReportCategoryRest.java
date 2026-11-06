@@ -84,10 +84,20 @@ public class UsageReportCategoryRest extends BaseObjectRest<String> implements B
         this.categoryType = categoryType;
     }
 
+    /**
+     * Sets the report generators belonging to this category, keyed by report id.
+     *
+     * @param reports the report generators keyed by report id
+     */
     public void setReports(Map<String, UsageReportGenerator> reports) {
         this.reports = reports;
     }
 
+    /**
+     * Returns the report generators belonging to this category, keyed by report id.
+     *
+     * @return the report generators keyed by report id
+     */
     public Map<String, UsageReportGenerator> getReports() {
         return reports;
     }

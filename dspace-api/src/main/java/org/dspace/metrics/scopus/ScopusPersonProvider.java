@@ -51,6 +51,14 @@ public class ScopusPersonProvider {
     @Autowired
     private ScopusPersonRestConnector hindexRestConnector;
 
+    /**
+     * Fetch the Scopus author metrics for the given author id and convert them
+     * into {@link CrisMetricDTO}s.
+     *
+     * @param id    the Scopus author identifier
+     * @param param the specific metric to retrieve, or blank for all metrics
+     * @return      the collected metric DTOs, or {@code null} if no records found
+     */
     public List<CrisMetricDTO> getCrisMetricDTOs(String id, String param) {
         String records = getRecords(id);
         if (StringUtils.isNotBlank(records)) {

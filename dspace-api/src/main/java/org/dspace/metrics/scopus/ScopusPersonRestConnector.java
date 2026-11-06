@@ -41,6 +41,12 @@ public class ScopusPersonRestConnector {
     private CloseableHttpClient httpClient;
 
 
+    /**
+     * Query the Scopus author service for the given author identifier.
+     *
+     * @param id the Scopus author identifier
+     * @return   the raw JSON response body, or {@code null} if the request failed
+     */
     public String get(String id) {
         try {
             return sendRequest(id);

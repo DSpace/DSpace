@@ -37,6 +37,12 @@ public class WOSRestConnector {
     private CloseableHttpClient httpClient;
 
 
+    /**
+     * Query the Web of Science service for the given identifier.
+     *
+     * @param id the DOI used to build the Web of Science query
+     * @return   the raw response body, or {@code null} if the request failed
+     */
     public String get(String id) {
         try {
             return sendRequestToWOS(id);

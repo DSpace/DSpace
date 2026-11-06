@@ -30,10 +30,24 @@ public class StatisticsReportsConfiguration {
 
     private Map<String, List<UsageReportCategoryRest>> mapping;
 
+    /**
+     * Sets the mapping between DSO category keys (e.g. "site", "community", "item-&lt;entityType&gt;") and the list of
+     * report categories available for each of them.
+     *
+     * @param mapping the category mapping keyed by DSO category
+     */
     public void setMapping(Map<String, List<UsageReportCategoryRest>> mapping) {
         this.mapping = mapping;
     }
 
+    /**
+     * Returns the list of report categories configured for the given DSpace object, resolving the most specific
+     * mapping available (including entity-type specific mappings for collections and items) and falling back to the
+     * generic mapping for the object kind.
+     *
+     * @param dso the DSpace object the report categories are requested for
+     * @return the matching list of report categories, or null if none is configured
+     */
     public List<UsageReportCategoryRest> getCategories(DSpaceObject dso) {
         if (dso instanceof Site) {
             return mapping.get("site");
@@ -76,6 +90,13 @@ public class StatisticsReportsConfiguration {
                   .orElse("");
     }
 
+    /**
+     * Returns the report generator matching the given report id among the categories configured for the given DSO.
+     *
+     * @param dso      the DSpace object the report is requested for
+     * @param reportId the id of the report whose generator is requested
+     * @return the matching report generator, or null if none is found
+     */
     public UsageReportGenerator getReportGenerator(DSpaceObject dso, String reportId) {
         return getCategories(dso).stream()
                                  .filter(x -> x.getReports().containsKey(reportId))
@@ -84,6 +105,12 @@ public class StatisticsReportsConfiguration {
                                  .orElse(null);
     }
 
+    /**
+     * Looks up a report category by its configured bean name in the service manager.
+     *
+     * @param categoryId the bean name of the report category
+     * @return the resolved report category, or null if no such bean exists
+     */
     public UsageReportCategoryRest getCategory(String categoryId) {
         return new DSpace().getServiceManager().getServiceByName(categoryId, UsageReportCategoryRest.class);
     }

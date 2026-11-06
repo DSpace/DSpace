@@ -37,12 +37,23 @@ public class CrisMetricDTO {
         this.metricCount = metricCount;
     }
 
+    /**
+     * Serialize the temporary remark map into its JSON representation.
+     *
+     * @return the remark map as a JSON string
+     */
     @Transient
     public String buildMetricsRemark() {
         Gson gson = new Gson();
         return gson.toJson(this.tmpRemark);
     }
 
+    /**
+     * Return the external identifier stored in the remark, deserializing the
+     * remark JSON into the temporary map if needed.
+     *
+     * @return the identifier value, or {@code null} if not present
+     */
     @Transient
     public String getIdentifier() {
         if (this.remark != null) {
