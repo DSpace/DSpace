@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceAPIRequestLoggingFilter;
+import org.dspace.app.rest.utils.PaginationParameterInterceptor;
 import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli;
 import org.dspace.app.util.DSpaceContextListener;
@@ -40,6 +41,7 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -254,6 +256,15 @@ public class WebApplication {
             @Override
             public void addArgumentResolvers(@NonNull List<HandlerMethodArgumentResolver> argumentResolvers) {
                 argumentResolvers.add(new SearchFilterResolver());
+            }
+
+            /**
+             * Reject invalid "page" and "size" parameters with a 400 error, as required by the REST contract
+             * @param registry InterceptorRegistry
+             */
+            @Override
+            public void addInterceptors(@NonNull InterceptorRegistry registry) {
+                registry.addInterceptor(new PaginationParameterInterceptor());
             }
         };
     }
