@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,11 +16,7 @@ import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
-import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
-import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -36,12 +31,6 @@ public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository
 
     @Autowired
     private XmlWorkflowItemService xmlWorkflowItemService;
-
-    @Autowired
-    private PoolTaskService poolTaskService;
-
-    @Autowired
-    private ClaimedTaskService claimedTaskService;
 
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
@@ -67,13 +56,8 @@ public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository
             if (xmlWorkflowItem == null) {
                 throw new ResourceNotFoundException("XmlWorkflowItem with id: " + workflowItemId + " wasn't found");
             }
-            List<PoolTask> poolTasks = poolTaskService.find(context, xmlWorkflowItem);
-            List<ClaimedTask> claimedTasks = claimedTaskService.find(context, xmlWorkflowItem);
-            for (PoolTask poolTask : poolTasks) {
-                return converter.toRest(xmlWorkflowFactory.getStepByName(poolTask.getStepID()), projection);
-            }
-            for (ClaimedTask claimedTask : claimedTasks) {
-                return converter.toRest(xmlWorkflowFactory.getStepByName(claimedTask.getStepID()), projection);
+            if (xmlWorkflowItem.getStepID() != null) {
+                return converter.toRest(xmlWorkflowFactory.getStepByName(xmlWorkflowItem.getStepID()), projection);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
