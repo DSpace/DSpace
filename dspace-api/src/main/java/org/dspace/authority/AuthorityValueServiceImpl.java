@@ -18,6 +18,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.authority.SolrAuthority;
@@ -130,7 +131,8 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
 
     @Override
     public List<AuthorityValue> findByValue(String field, String value) {
-        String queryString = "value:" + value + " AND field:" + field;
+        String escapedValue = ClientUtils.escapeQueryChars(value).replaceAll("\\\\ ", " ");
+        String queryString = "value:" + escapedValue + " AND field:" + field;
         return find(queryString);
     }
 
@@ -143,7 +145,8 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
 
     @Override
     public List<AuthorityValue> findByExactValue(String field, String value) {
-        String queryString = "value:\"" + value + "\" AND field:" + field;
+        String escapedValue = ClientUtils.escapeQueryChars(value);
+        String queryString = "value:\"" + escapedValue + "\" AND field:" + field;
         return find(queryString);
     }
 
@@ -158,8 +161,9 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     public List<AuthorityValue> findByName(String schema, String element, String qualifier,
                                            String name) {
         String field = fieldParameter(schema, element, qualifier);
-        String queryString = "first_name:" + name + " OR last_name:" + name + " OR name_variant:" + name + " AND " +
-            "field:" + field;
+        String escapedName = ClientUtils.escapeQueryChars(name).replaceAll("\\\\ ", " ");
+        String queryString = "first_name:" + escapedName + " OR last_name:" + escapedName
+            + " OR name_variant:" + escapedName + " AND field:" + field;
         return find(queryString);
     }
 
@@ -167,7 +171,8 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     public List<AuthorityValue> findByAuthorityMetadata(String schema, String element,
                                                         String qualifier, String value) {
         String field = fieldParameter(schema, element, qualifier);
-        String queryString = "all_Labels:" + value + " AND field:" + field;
+        String escapedValue = ClientUtils.escapeQueryChars(value).replaceAll("\\\\ ", " ");
+        String queryString = "all_Labels:" + escapedValue + " AND field:" + field;
         return find(queryString);
     }
 
