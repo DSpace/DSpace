@@ -107,7 +107,7 @@ public class TotalDownloadsAndVisitsGenerator extends AbstractUsageReportGenerat
             //it can have more than one
             for (ObjectCount objectCountBitStream : topCounts1) {
                 //calculate downloads for item count bitstream values
-                downloads += objectCountBitStream.getCount();
+                downloads += (int) objectCountBitStream.getCount();
             }
         }
         // add views to report
