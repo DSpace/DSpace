@@ -296,6 +296,25 @@ public class ImportService implements Destroyable {
         return importSources.keySet();
     }
 
+    /**
+     * Check whether any registered {@link FileSource} can handle a file with the given name, based on
+     * its supported extensions.
+     *
+     * @param originalName the file name (or full path) of the file to check
+     * @return true if at least one registered FileSource declares the file as a valid source
+     */
+    public boolean isValidSourceForFile(String originalName) {
+        for (MetadataSource metadataSource : importSources.values()) {
+            if (metadataSource instanceof FileSource) {
+                FileSource fileSource = (FileSource) metadataSource;
+                if (fileSource.isValidSourceForFile(originalName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /*
      * Get a collection of record from File,
      * The first match will be return.
