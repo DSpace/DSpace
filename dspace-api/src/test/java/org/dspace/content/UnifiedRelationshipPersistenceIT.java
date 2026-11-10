@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.util.Set;
+
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -63,9 +65,9 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
 
         RelationshipTypeConfiguration definition = new RelationshipTypeConfiguration();
         definition.setId("poc-publication-author");
-        definition.setLeftMetadataField("dc.contributor.author");
-        definition.setLeftEntityTypes(java.util.List.of("Publication"));
-        definition.setRightEntityTypes(java.util.List.of("Person", "OrgUnit"));
+        definition.setLeftPrimaryMetadataField("dc.contributor.author");
+        definition.setLeftEntityTypes(Set.of("Publication"));
+        definition.setRightEntityTypes(Set.of("Person", "OrgUnit"));
         RelationshipConfigurationServiceImpl configurations =
                 dspace.getServiceManager().getServiceByName(
                         RelationshipConfigurationServiceImpl.class.getCanonicalName(),

@@ -78,7 +78,8 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
             validateAuthority(value, existing);
             return existing;
         }
-        RelationshipTypeConfiguration configuration = relationshipConfigurationService.findForMetadataValue(value);
+        RelationshipTypeConfiguration configuration =
+            relationshipConfigurationService.findForMetadataValue(context, value);
         if (configuration == null) {
             return null;
         }
@@ -128,7 +129,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         authorizeRelationshipMetadataValues(context, values);
         boolean ownerOnLeft = owner.getID().equals(relationship.getLeftItem().getID());
         RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(
-            relationship.getRelationshipConfigKey());
+            context, relationship.getRelationshipConfigKey());
         relationshipConfigurationService.validate(context, configuration,
             ownerOnLeft ? owner : newTarget, ownerOnLeft ? newTarget : owner);
 
@@ -141,7 +142,10 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
                 throw new IllegalArgumentException(
                         "Relinking a two-sided relationship metadata requires an explicit transfer policy");
             }
-            String anchor = ownerOnLeft ? configuration.getLeftMetadataField() : configuration.getRightMetadataField();
+            String anchor = (ownerOnLeft
+                ? configuration.getLeftPrimaryMetadataField()
+                : configuration.getRightPrimaryMetadataField())
+                .orElse(null);
             if (!RelationshipConfigurationServiceImpl.fieldName(value).equals(anchor)) {
                 throw new IllegalArgumentException(
                     "Relinking dependent relationship metadata requires a refresh policy");
@@ -268,8 +272,12 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
             // depend on the authority configuration still being available.
             anchor = ownerOnLeft ? configurationKey.substring(AUTHORITY_PREFIX.length()) : null;
         } else {
-            RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(configurationKey);
-            anchor = ownerOnLeft ? configuration.getLeftMetadataField() : configuration.getRightMetadataField();
+            RelationshipTypeConfiguration configuration =
+                relationshipConfigurationService.getByKey(context, configurationKey);
+            anchor = (ownerOnLeft
+                ? configuration.getLeftPrimaryMetadataField()
+                : configuration.getRightPrimaryMetadataField())
+                .orElse(null);
         }
 
         List<MetadataValue> values = metadataValueService.findByRelationship(context, relationship);
