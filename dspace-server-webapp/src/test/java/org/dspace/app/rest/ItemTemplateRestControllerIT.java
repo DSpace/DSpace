@@ -235,6 +235,62 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void getTemplateItemFromItemIdNotLoggedIn() throws Exception {
+        setupTestTemplate();
+        String itemUuidString = installTestTemplate();
+
+        getClient().perform(get(getTemplateItemUrlTemplate(itemUuidString)))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getTemplateItemFromItemIdNoRights() throws Exception {
+        setupTestTemplate();
+        String itemUuidString = installTestTemplate();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get(getTemplateItemUrlTemplate(itemUuidString)))
+                               .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getTemplateItemFromItemIdAsSubmitter() throws Exception {
+        setupTestTemplate();
+        String itemUuidString = installTestTemplate();
+
+        GroupBuilder.createCollectionSubmitterGroup(context, childCollection)
+                    .addMember(eperson)
+                    .build();
+        String submitterToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(submitterToken).perform(get(getTemplateItemUrlTemplate(itemUuidString)))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.id", is(itemUuidString)));
+    }
+
+    @Test
+    public void getTemplateItemFromItemIdAsCollectionAdmin() throws Exception {
+        setupTestTemplate();
+        String itemUuidString = installTestTemplate();
+
+        GroupBuilder.createCollectionAdminGroup(context, childCollection)
+                    .addMember(eperson)
+                    .build();
+        String collectionAdminToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(collectionAdminToken).perform(get(getTemplateItemUrlTemplate(itemUuidString)))
+                                       .andExpect(status().isOk())
+                                       .andExpect(jsonPath("$.id", is(itemUuidString)));
+    }
+
+    @Test
+    public void getTemplateItemFromItemIdNonexisting() throws Exception {
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get(getTemplateItemUrlTemplate("16a4b65b-3b3f-4ef5-8058-ef6f5a653ef9")))
+                               .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void patchTemplateItemNotLoggedIn() throws Exception {
         setupTestTemplate();
 
