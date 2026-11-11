@@ -9,6 +9,7 @@
 package org.dspace.app.oai;
 
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -19,8 +20,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
+import java.io.StringReader;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import com.lyncode.xoai.dataprovider.core.XOAIManager;
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
@@ -29,6 +38,7 @@ import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.ContextConfiguration;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Community;
@@ -44,6 +54,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
 
 /**
  * Integration test to verify the /oai endpoint is responding as a valid OAI-PMH endpoint.
@@ -277,5 +293,74 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
      */
     private XOAIManager createMockXOAIManager(Configuration xoaiConfig) throws ConfigurationException {
         return new XOAIManager(filterResolver, resourceResolver, xoaiConfig);
+    }
+
+    /**
+     * Calls ListSets repeatedly, following the resumptionToken across every page, and returns
+     * every setSpec returned (in the order received). Used to verify pagination correctness
+     * when many Sets share the same title (see DSpace/DSpace#11201).
+     */
+    private List<String> listAllSetSpecsAcrossPages(Configuration xoaiConfig) throws Exception {
+        doReturn(createMockXOAIManager(xoaiConfig)).when(xoaiManagerResolver).getManager();
+
+        List<String> allSetSpecs = new ArrayList<>();
+        String resumptionToken = null;
+
+        DocumentBuilderFactory factory = XMLUtils.getDocumentBuilderFactory();
+        factory.setNamespaceAware(true);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+
+        do {
+            MockHttpServletRequestBuilder request = get(DEFAULT_CONTEXT).param("verb", "ListSets");
+            if (resumptionToken != null && !resumptionToken.isEmpty()) {
+                request = get(DEFAULT_CONTEXT).param("verb", "ListSets")
+                                            .param("resumptionToken", resumptionToken);
+            }
+
+            String xml = getClient().perform(request)
+                                    .andExpect(status().isOk())
+                                    .andReturn().getResponse().getContentAsString();
+
+            Document doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+
+            NodeList setSpecNodes = (NodeList) xpath.evaluate(
+                "//*[local-name()='set']/*[local-name()='setSpec']", doc, XPathConstants.NODESET);
+            for (int i = 0; i < setSpecNodes.getLength(); i++) {
+                allSetSpecs.add(setSpecNodes.item(i).getTextContent());
+            }
+
+            Node tokenNode = (Node) xpath.evaluate(
+                "//*[local-name()='resumptionToken']", doc, XPathConstants.NODE);
+            resumptionToken = (tokenNode != null) ? tokenNode.getTextContent() : null;
+        } while (resumptionToken != null && !resumptionToken.isEmpty());
+
+        return allSetSpecs;
+    }
+
+    @Test
+    public void listSetsWithDuplicateTitlesShouldNotDuplicateOrOmitSets() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community parentCommunity = CommunityBuilder.createCommunity(context)
+                                                    .withName("Parent Community")
+                                                    .build();
+
+        int totalCollections = 8;
+        for (int i = 0; i < totalCollections; i++) {
+            CollectionBuilder.createCollection(context, parentCommunity)
+                            .withName("Duplicate Title Collection")
+                            .build();
+        }
+        context.restoreAuthSystemState();
+        int totalSets = totalCollections + 1;
+        Configuration xoaiConfig =
+            new Configuration().withMaxListSetsSize(3)
+                            .withContextConfigurations(new ContextConfiguration(DEFAULT_CONTEXT_PATH));
+
+        List<String> allSetSpecs = listAllSetSpecsAcrossPages(xoaiConfig);
+
+        assertEquals("ListSets returned the wrong number of set entries across all resumptionToken pages",
+            totalSets, allSetSpecs.size());
+        assertEquals("ListSets returned duplicate and/or omitted sets across pages",
+            totalSets, new HashSet<>(allSetSpecs).size());
     }
 }
