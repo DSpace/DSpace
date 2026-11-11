@@ -137,7 +137,8 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                        String relationshipConfigKey)
         throws SQLException, AuthorizeException {
 
-        RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(relationshipConfigKey);
+        RelationshipTypeConfiguration configuration =
+            relationshipConfigurationService.getByKey(context, relationshipConfigKey);
         relationshipConfigurationService.validate(context, configuration, leftItem, rightItem);
 
         authorizeRelationshipCreation(context, leftItem, rightItem);
@@ -160,7 +161,8 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                                  LatestVersionStatus latestVersionStatus)
         throws SQLException, AuthorizeException {
 
-        RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(relationshipConfigKey);
+        RelationshipTypeConfiguration configuration =
+            relationshipConfigurationService.getByKey(context, relationshipConfigKey);
 
         // Allow the new Item version to be unarchived while still validating the configured relationship semantics.
         relationshipConfigurationService.validate(context, configuration, leftItem, rightItem, true);
@@ -627,7 +629,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         RelationshipType relationshipType = relationship.getRelationshipType();
         if (relationship.isConfigurationBacked()) {
             relationshipConfigurationService.validate(context,
-                relationshipConfigurationService.getByKey(relationship.getRelationshipConfigKey()),
+                relationshipConfigurationService.getByKey(
+                    context, relationship.getRelationshipConfigKey()),
                 relationship.getLeftItem(), relationship.getRightItem());
             for (MetadataValue value : metadataValueDAO.findByRelationship(context, relationship)) {
                 UUID owner = value.getDSpaceObject().getID();

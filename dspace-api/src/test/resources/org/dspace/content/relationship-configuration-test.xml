@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="authorOrcidMetadataGenerator" class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
+        <property name="authorityName" value="AuthorAuthority"/>
+        <property name="keyId" value="person_identifier_orcid"/>
+        <property name="schema" value="person"/>
+        <property name="element" value="identifier"/>
+        <property name="qualifier" value="orcid"/>
+    </bean>
+
+    <bean id="publicationAuthorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
+        <property name="id" value="publication-author"/>
+        <property name="leftEntityTypes">
+            <set>
+                <value>Publication</value>
+            </set>
+        </property>
+        <property name="rightEntityTypes">
+            <set>
+                <value>Person</value>
+            </set>
+        </property>
+        <property name="leftPrimaryMetadataField" value="dc.contributor.author"/>
+        <property name="leftMetadataGenerators">
+            <map>
+                <entry key="person.identifier.orcid" value-ref="authorOrcidMetadataGenerator"/>
+            </map>
+        </property>
+        <property name="rightMetadataGenerators">
+            <map>
+                <entry key="person.identifier.orcid" value-ref="authorOrcidMetadataGenerator"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

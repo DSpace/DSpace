@@ -304,7 +304,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         metadataAuthorityService.clearCache();
 
         assertThrows(IllegalArgumentException.class,
-                     () -> relationshipConfigurationService.getByKey("authority:dc.contributor.author"));
+                     () -> relationshipConfigurationService.getByKey(context, "authority:dc.contributor.author"));
 
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<>();
@@ -353,7 +353,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         metadataAuthorityService.clearCache();
 
         assertThrows(IllegalArgumentException.class,
-                     () -> relationshipConfigurationService.getByKey("authority:dc.contributor.author"));
+                     () -> relationshipConfigurationService.getByKey(context, "authority:dc.contributor.author"));
 
         String token = getAuthToken(admin.getEmail(), password);
 
