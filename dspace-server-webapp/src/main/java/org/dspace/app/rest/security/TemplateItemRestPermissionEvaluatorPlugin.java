@@ -18,7 +18,9 @@ import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
@@ -28,7 +30,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link RestObjectPermissionEvaluatorPlugin} class that evaluate WRITE and DELETE permission over a TemplateItem
+ * {@link RestObjectPermissionEvaluatorPlugin} class that evaluate READ, WRITE and DELETE permission over a
+ * TemplateItem. READ follows the nested collection endpoint and requires ADD on the owning collection.
  *
  * @author Bui Thai Hai (thaihai.bui@dlcorp.com.vn)
  */
@@ -51,7 +54,8 @@ public class TemplateItemRestPermissionEvaluatorPlugin extends RestObjectPermiss
             DSpaceRestPermission permission) {
 
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
-        if (!DSpaceRestPermission.WRITE.equals(restPermission) &&
+        if (!DSpaceRestPermission.READ.equals(restPermission) &&
+                !DSpaceRestPermission.WRITE.equals(restPermission) &&
                 !DSpaceRestPermission.DELETE.equals(restPermission)) {
             return false;
         }
@@ -63,18 +67,40 @@ public class TemplateItemRestPermissionEvaluatorPlugin extends RestObjectPermiss
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
 
         EPerson ePerson = context.getCurrentUser();
+        UUID dsoId = UUID.fromString(targetId.toString());
+        if (DSpaceRestPermission.READ.equals(restPermission)) {
+            return hasReadPermission(context, ePerson, dsoId);
+        }
         if (ePerson == null) {
             return false;
         }
         // Allow collection's admin to edit/delete the template
 
-        UUID dsoId = UUID.fromString(targetId.toString());
         requestService.getCurrentRequest().getHttpServletRequest().getRequestURL();
         try {
             Collection coll = its.find(context, dsoId).getTemplateItemOf();
             if (authorizeService.isAdmin(context, coll)) {
                 return true;
             }
+        } catch (SQLException e) {
+            log.error(e::getMessage, e);
+        }
+        return false;
+    }
+
+    /**
+     * Reading a template item requires ADD on its collection, the same as
+     * GET /api/core/collections/{uuid}/itemtemplate. A missing item or an item that is not a template is allowed
+     * through, so that the endpoint can answer with 404.
+     */
+    private boolean hasReadPermission(Context context, EPerson ePerson, UUID itemId) {
+        try {
+            Item item = its.find(context, itemId);
+            if (item == null || item.getTemplateItemOf() == null) {
+                return true;
+            }
+            return authorizeService.authorizeActionBoolean(context, ePerson, item.getTemplateItemOf(),
+                                                           Constants.ADD, true);
         } catch (SQLException e) {
             log.error(e::getMessage, e);
         }
