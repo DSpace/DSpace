@@ -56,11 +56,6 @@ public class Choices {
     public static final int CF_REJECTED = 100;
 
     /**
-     * The relationship associated with this authority value was explicitly rejected.
-     */
-    public static final int CF_RELATIONSHIP_REJECTED = 50;
-
-    /**
      * No reasonable confidence value is available
      */
     public static final int CF_NOVALUE = 0;
@@ -82,7 +77,6 @@ public class Choices {
         CF_AMBIGUOUS,
         CF_UNCERTAIN,
         CF_ACCEPTED,
-        CF_RELATIONSHIP_REJECTED,
     };
     private static final String[] confidenceText = {
         "UNSET",
@@ -93,7 +87,6 @@ public class Choices {
         "AMBIGUOUS",
         "UNCERTAIN",
         "ACCEPTED",
-        "RELATIONSHIP_REJECTED",
     };
 
     /** -------------- Instance fields ----------------- **/

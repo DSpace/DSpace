@@ -85,7 +85,8 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
             legacy.setRelationshipConfigKey(definition.getId());
             // Keep the old type table available, but this row has migrated off it.
             legacy.setRelationshipType(null);
-            service.attachMetadataToRelationship(context, value, legacy);
+            value.setRelationship(legacy);
+            metadata.update(context, value);
             relationships.update(context, legacy);
             context.commit();
 
@@ -98,7 +99,8 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
             assertThat(legacy.getRelationshipConfigKey(), equalTo(definition.getId()));
             assertThat(value.getRelationship().getID(), equalTo(legacyId));
             assertThat(value.getValue(), equalTo("Smith, Jane"));
-            assertThat(value.getPlace(), equalTo(0));
+            // The metadata value keeps the ordering of the legacy relationship it was migrated from.
+            assertThat(value.getPlace(), equalTo(legacy.getLeftPlace()));
             assertThat(metadata.findByRelationship(context, legacy), hasSize(1));
             assertThat(relationships.findByItem(context, person), hasSize(1));
             assertThat(ContentServiceFactory.getInstance().getRelationshipTypeService()

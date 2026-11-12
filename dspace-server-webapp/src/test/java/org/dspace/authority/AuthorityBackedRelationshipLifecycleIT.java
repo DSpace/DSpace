@@ -40,12 +40,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
-import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.service.PluginService;
@@ -95,12 +93,6 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
     @Autowired
     private RelationshipConfigurationService relationshipConfigurationService;
-
-    @Autowired
-    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
-
-    @Autowired
-    private MetadataValueService metadataValueService;
 
     @Before
     @Override
@@ -388,104 +380,6 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(itemService.getMetadataByMetadataString(publication, "ds11rel.contributor.author"), hasSize(1));
         assertThat(getSingleAuthor(publication).getValue(), equalTo("Updated Author"));
         assertThat(getSingleAuthor(publication).getRelationship(), nullValue());
-    }
-
-    /**
-     * Tests removing non-anchor metadata while preserving a relationship that still has linked metadata.
-     */
-    @Test
-    public void testRemoveNonAnchorWithMissingConfigurationKeepsRelationship() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Item person = ItemBuilder.createItem(context, personCollection)
-                                 .withTitle("Jane Doe").build();
-        Item publication = ItemBuilder.createItem(context, publicationCollection)
-                                      .withTitle("Publication")
-                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "J. Doe",
-                                                    person.getID().toString(), CF_ACCEPTED)
-                                      .build();
-
-        Relationship relationship = relationshipService.findByItem(context, publication).get(0);
-
-        itemService.addMetadata(context, publication, "person", "identifier", "orcid",
-                                null, "0000-0002-1825-0097");
-        MetadataValue orcid = itemService.getMetadataByMetadataString(
-            publication, "person.identifier.orcid").get(0);
-
-        authorityBackedRelationshipService.attachMetadataToRelationship(context, orcid, relationship);
-
-        context.restoreAuthSystemState();
-        context.commit();
-
-        configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "");
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(patch("/api/core/items/" + publication.getID())
-                                     .content(getPatchContent(List.of(
-                                         new RemoveOperation("/metadata/person.identifier.orcid/0"))))
-                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
-
-        publication = context.reloadEntity(publication);
-
-        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
-        assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
-        assertThat(itemService.getMetadataByMetadataString(publication, "person.identifier.orcid"), hasSize(0));
-    }
-
-    /**
-     * Tests removing the last linked metadata value from a relationship whose anchor is already missing.
-     */
-    @Test
-    public void testRemoveLastNonAnchorWithMissingConfigurationDeletesRelationship() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Item person = ItemBuilder.createItem(context, personCollection)
-                                 .withTitle("Jane Doe").build();
-        Item publication = ItemBuilder.createItem(context, publicationCollection)
-                                      .withTitle("Publication")
-                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "J. Doe",
-                                                    person.getID().toString(), CF_ACCEPTED)
-                                      .build();
-
-        Relationship relationship = relationshipService.findByItem(context, publication).get(0);
-
-        itemService.addMetadata(context, publication, "person", "identifier", "orcid",
-                                null, "0000-0002-1825-0097");
-        MetadataValue orcid = itemService.getMetadataByMetadataString(
-            publication, "person.identifier.orcid").get(0);
-
-        authorityBackedRelationshipService.attachMetadataToRelationship(context, orcid, relationship);
-
-        // Simulate stale persisted state: the anchor is gone, but the relationship remains.
-        MetadataValue author = getSingleAuthor(publication);
-        author.setRelationship(null);
-        publication.getMetadata().remove(author);
-        metadataValueService.delete(context, author);
-        itemService.update(context, publication);
-
-        context.restoreAuthSystemState();
-        context.commit();
-
-        configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "");
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(patch("/api/core/items/" + publication.getID())
-                                     .content(getPatchContent(List.of(
-                                         new RemoveOperation("/metadata/person.identifier.orcid/0"))))
-                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
-
-        publication = context.reloadEntity(publication);
-
-        assertThat(relationshipService.findByItem(context, publication), hasSize(0));
-        assertThat(itemService.getMetadataByMetadataString(publication, "person.identifier.orcid"), hasSize(0));
     }
 
     /**
