@@ -219,12 +219,6 @@ public class CrisConsumer implements Consumer {
         addEntityTypeIfNotExist(context, item);
 
         for (MetadataValue metadata : item.getMetadata()) {
-            // Check if this metadata value was explicitly detached from its relationship,
-            // if so, skip it to prevent the consumer from recreating that relationship.
-            if (metadata.getConfidence() == Choices.CF_RELATIONSHIP_REJECTED) {
-                continue;
-            }
-
             String fieldKey = getFieldKey(metadata);
             String authority = metadata.getAuthority();
 
@@ -278,18 +272,15 @@ public class CrisConsumer implements Consumer {
     }
 
     /**
-     * Mint an authority-backed relationship for a metadata value on the system
-     * (reference) path, provided the resolved target item is archived. The
-     * authority stamp has already been applied by the caller via
-     * {@code setReferenceWithAuthority}; this only creates the durable
-     * relationship. Minting is idempotent (guarded by the owning metadata
-     * value's {@code relationship_id}) and never touches the value text.
+     * Creates the relationship for a metadata value whose target item is archived.
+     * The authority has already been set by the caller; this only creates the relationship,
+     * and does nothing if it already exists.
      *
      * @param context     the DSpace context
      * @param item        the owning item
      * @param metadata    the owning metadata value
      * @param relatedItem the resolved target item (may be freshly built and not
-     *                    yet archived, in which case nothing is minted)
+     *                    yet archived, in which case nothing is created)
      * @throws SQLException       if a database error occurs
      * @throws AuthorizeException if the current user cannot create the relationship
      */
@@ -302,15 +293,10 @@ public class CrisConsumer implements Consumer {
     }
 
     /**
-     * Mint an authority-backed relationship for a metadata value carrying a
-     * user-selected plain UUID authority (confidence {@code CF_ACCEPTED}), which
-     * the main resolution loop skips because the authority is already set. The
-     * target item is resolved <b>directly</b> from the authority UUID via
-     * {@code itemService.find} (not through {@code generateCrisSourceId}, which
-     * would md5-hash and discard the UUID). No authority stamp is applied here,
-     * so the user's typed display text is preserved. A relationship is minted
-     * only when the field is a mapped entity field and the target is archived;
-     * minting is idempotent via the owning value's {@code relationship_id}.
+     * Creates the relationship for a metadata value whose authority is a plain UUID chosen by the user
+     * (confidence {@code CF_ACCEPTED}). The target item is looked up by that UUID, so the user's display
+     * text is kept; {@code generateCrisSourceId} would hash the UUID and lose it. The relationship is
+     * only created when the field is an entity field and the target item is archived, and only once.
      *
      * @param context  the DSpace context
      * @param item     the owning item

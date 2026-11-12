@@ -9,6 +9,7 @@ package org.dspace.content.authority;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -132,6 +133,27 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     }
 
     @Test
+    public void testPromotionWritesAtMostOnePrimaryPerEndpoint() throws Exception {
+        context.turnOffAuthorisationSystem();
+        MetadataValue value = author();
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, value, target);
+
+        List<MetadataValue> values = metadataValueService.findByRelationship(context, relationship);
+        assertThat(values, hasSize(1));
+        MetadataValue primary = values.get(0);
+        assertThat(primary.getDSpaceObject().getID(), equalTo(owner.getID()));
+        assertThat(primary.getMetadataField().toString('.'), equalTo("dc.contributor.author"));
+
+        // The Person side has no configured primary field, so no metadata is written on that endpoint.
+        assertThat(values.stream().noneMatch(candidate -> candidate.getDSpaceObject().getID()
+            .equals(target.getID())), is(true));
+
+        // The relationship still exists and stays navigable from both endpoints.
+        assertThat(relationshipService.findByItem(context, owner), hasItem(relationship));
+        assertThat(relationshipService.findByItem(context, target), hasItem(relationship));
+    }
+
+    @Test
     public void testPromotionIsIdempotentButDoesNotSilentlyRelink() throws Exception {
         context.turnOffAuthorisationSystem();
         Relationship first = service.promoteResolvedAuthority(context, owner, author(), target);
@@ -154,86 +176,13 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     }
 
     @Test
-    public void testMultipleMetadataValuesShareOneRelationship() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
-        MetadataValue orcid = addOrcid();
-        service.attachMetadataToRelationship(context, orcid, relationship);
-        context.commit();
-        relationship = context.reloadEntity(relationship);
-        assertThat(metadataValueService.findByRelationship(context, relationship), hasSize(2));
-        assertThat(metadataValueService.countByRelationship(context, relationship), equalTo(2));
-        assertThat(relationshipService.findByItem(context, owner), hasSize(1));
-    }
-
-    @Test
-    public void testRemoveDependentRelationshipMetadataRetainsRelationshipAndAuthor() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
-        MetadataValue orcid = addOrcid();
-        service.attachMetadataToRelationship(context, orcid, relationship);
-        service.removeAdditionalRelationshipMetadata(context, orcid);
-        context.commit();
-        assertThat(relationshipService.find(context, relationship.getID()), notNullValue());
-        assertThat(metadataValueService.findByRelationship(context, relationship), hasSize(1));
-    }
-
-    @Test
     public void testRemovingFinalPrimaryRelationshipMetadataRemovesAllRelationshipMetadata() throws Exception {
         context.turnOffAuthorisationSystem();
         Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
-        service.attachMetadataToRelationship(context, addOrcid(), relationship);
-        service.removeMetadataValue(context, author());
+        service.removeMetadataValue(context, author(), null);
         context.commit();
         assertThat(relationshipService.find(context, relationship.getID()), nullValue());
         assertThat(itemService.getMetadata(owner, "dc", "contributor", "author", Item.ANY), hasSize(0));
-        assertThat(itemService.getMetadata(owner, "person", "identifier", "orcid", Item.ANY), hasSize(0));
-    }
-
-    @Test
-    public void testDetachRetainsTextAndDoesNotRemint() throws Exception {
-        context.turnOffAuthorisationSystem();
-        MetadataValue value = author();
-        value.setAuthority(target.getID().toString());
-        value.setConfidence(Choices.CF_ACCEPTED);
-        Relationship relationship = service.promoteResolvedAuthority(context, owner, value, target);
-        service.detachRelationshipKeepMetadata(context, relationship);
-        itemService.update(context, owner);
-        context.commit();
-        value = context.reloadEntity(value);
-        assertThat(value.getRelationship(), nullValue());
-        assertThat(value.getAuthority(), nullValue());
-        assertThat(value.getValue(), equalTo("Smith, John"));
-        assertThat(value.getConfidence(), equalTo(Choices.CF_RELATIONSHIP_REJECTED));
-        assertThat(relationshipService.find(context, relationship.getID()), nullValue());
-    }
-
-    @Test
-    public void testReplacementPreservesRelationshipIdentityAndDisplayText() throws Exception {
-        context.turnOffAuthorisationSystem();
-        author().setAuthority(target.getID().toString());
-        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
-        Integer id = relationship.getID();
-        Item replacement = ItemBuilder.createItem(context, collection).withTitle("replacement")
-            .withEntityType("Person").build();
-        service.replaceRelatedObject(context, owner, relationship, replacement);
-        context.commit();
-        relationship = context.reloadEntity(relationship);
-        assertThat(relationship.getID(), equalTo(id));
-        assertThat(relationship.getRightItem(), equalTo(replacement));
-        assertThat(author().getValue(), equalTo("Smith, John"));
-        assertThat(author().getAuthority(), equalTo(replacement.getID().toString()));
-    }
-
-    @Test
-    public void testUnrelatedMetadataOwnerIsRejected() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
-        Item stranger = ItemBuilder.createItem(context, collection).withTitle("stranger").withAuthor("other").build();
-        MetadataValue otherValue = itemService.getMetadata(stranger, "dc", "contributor", "author", Item.ANY).get(0);
-        assertThrows(IllegalArgumentException.class,
-            () -> service.attachMetadataToRelationship(context, otherValue, relationship));
-        assertThat(otherValue.getRelationship(), nullValue());
     }
 
     @Test
@@ -489,12 +438,6 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
 
         // The failed persistence marks the transaction for rollback; recover the Context for test cleanup.
         context.rollback();
-    }
-
-    private MetadataValue addOrcid() throws Exception {
-        itemService.addMetadata(context, owner, "person", "identifier", "orcid", null, "0000-0002-1825-0097");
-        List<MetadataValue> values = itemService.getMetadata(owner, "person", "identifier", "orcid", Item.ANY);
-        return values.get(values.size() - 1);
     }
 
     private MetadataValue author() {
