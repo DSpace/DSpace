@@ -41,7 +41,9 @@ import static org.hamcrest.core.CombinableMatcher.both;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1707,57 +1709,66 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testUploadBitstreamWithRemoteFilePathAndEmptyAllowedIps() throws Exception {
 
-        InputStream mockInputStream = new ByteArrayInputStream("mocked content".getBytes());
+        try {
+            context.turnOffAuthorisationSystem();
+            Collection publication = createCollection(context, community)
+                    .withSubmissionDefinition("publication-bulkimport")
+                    .withAdminGroup(eperson)
+                    .build();
+            context.commit();
+            context.restoreAuthSystemState();
 
-        context.turnOffAuthorisationSystem();
-        Collection publication = createCollection(context, community)
-            .withSubmissionDefinition("publication-bulkimport")
-            .withAdminGroup(eperson)
-            .build();
-        context.commit();
-        context.restoreAuthSystemState();
+            // An empty allowlist is the fail-closed default: no remote fetch may be attempted.
+            configurationService.setProperty("allowed.ips.import", new String[] {});
 
-        String fileLocation = getXlsFilePath("add-bitstream-with-http-url-to-item.xls");
+            String fileLocation = getXlsFilePath("add-bitstream-with-http-url-to-item.xls");
 
-        String[] args = new String[] { "bulk-import", "-c", publication.getID().toString(), "-f", fileLocation,
-            "-e", eperson.getEmail()};
-        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+            String[] args = new String[] { "bulk-import", "-c", publication.getID().toString(), "-f", fileLocation,
+                    "-e", eperson.getEmail()};
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
-        ImportFileUtilMockClass importFileUtilSpy = spy(new ImportFileUtilMockClass(handler));
-        doReturn(mockInputStream).when(importFileUtilSpy).openStream(any(URL.class));
+            ImportFileUtilMockClass importFileUtilSpy = spy(new ImportFileUtilMockClass(handler));
 
-        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+            ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+            ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
 
-        BulkImport script = null;
-        if (scriptConfiguration != null) {
-            script = (BulkImport) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
-            script.setImportFileUtil(importFileUtilSpy);
-        }
-        if (script != null) {
-            if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, handler, eperson))) {
-                script.run();
+            BulkImport script = null;
+            if (scriptConfiguration != null) {
+                script = (BulkImport) scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+                script.setImportFileUtil(importFileUtilSpy);
             }
+            if (script != null) {
+                if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, handler, eperson))) {
+                    script.run();
+                }
+            }
+
+            assertThat(handler.getErrorMessages(), contains(
+                    "Cannot create bitstream from file at path http://127.0.1.1"));
+            assertThat(handler.getWarningMessages(), contains(
+                    containsString("Remote retrieval is disabled: 'allowed.ips.import' is empty. "
+                        + "Rejected path: http://127.0.1.1"),
+                    containsString("Row 2 - Invalid item left in workspace"),
+                    containsString("Row 3 - Invalid item left in workspace")));
+            assertThat(handler.getInfoMessages(), contains(
+                    is("Start reading all the metadata group rows"),
+                    is("Found 4 metadata groups to process"),
+                    is("Start reading all the bitstream rows"),
+                    is("Found 1 bitstreams to process"),
+                    is("Found 2 items to process")));
+
+            Item item = getItemFromMessage(handler.getWarningMessages().get(1));
+            Item item2 = getItemFromMessage(handler.getWarningMessages().get(2));
+
+            assertThat(getItemBitstreamsByBundle(item, "TEST-BUNDLE"), empty());
+            assertThat(getItemBitstreamsByBundle(item, "TEST-BUNDLE2"), empty());
+            assertThat(getItemBitstreamsByBundle(item2, "SECOND-BUNDLE"), empty());
+
+            verify(importFileUtilSpy, never()).openStream(any(URL.class));
+
+        } finally {
+            configurationService.setProperty("allowed.ips.import", new String[]{});
         }
-
-        assertThat(handler.getErrorMessages(), empty());
-        assertThat(handler.getWarningMessages(), contains(
-            containsString("Row 2 - Invalid item left in workspace"),
-            containsString("Row 3 - Invalid item left in workspace")));
-        assertThat(handler.getInfoMessages(), contains(
-            is("Start reading all the metadata group rows"),
-            is("Found 4 metadata groups to process"),
-            is("Start reading all the bitstream rows"),
-            is("Found 1 bitstreams to process"),
-            is("Found 2 items to process"),
-            containsString("Sheet 'bitstream-metadata' - Row 2 - Bitstream created successfully")));
-
-        Item item = getItemFromMessage(handler.getWarningMessages().get(0));
-
-        assertThat(getItemBitstreamsByBundle(item, "TEST-BUNDLE"), contains(
-            bitstreamWith("Test title", "test file description",
-                          "mocked content")));
-
     }
 
     @Test
