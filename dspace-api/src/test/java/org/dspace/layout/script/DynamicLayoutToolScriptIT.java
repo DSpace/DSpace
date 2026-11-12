@@ -169,8 +169,8 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
 
     /**
      * Verifies that exporting a layout containing alternative tab/box associations writes the
-     * alternative shortnames into the {@code tabpolicy}/{@code boxpolicy} {@code ALTERNATIVE_TO}
-     * column, and that a full export/import round-trip preserves those associations.
+     * alternative's qualified reference (scope + shortname) into the {@code tabpolicy}/{@code boxpolicy}
+     * {@code ALTERNATIVE_TO} column, and that a full export/import round-trip preserves those associations.
      */
     @Test
     public void testExportImportAlternativeRoundTrip() throws Exception {
@@ -226,10 +226,10 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
 
             try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
                 Sheet tabPolicy = workbook.getSheet(DynamicLayoutToolValidator.TAB_POLICY_SHEET);
-                assertThat(getAlternativeTo(tabPolicy, "tabTwo"), is("tabOne"));
+                assertThat(getAlternativeTo(tabPolicy, "tabTwo"), is("Person:tabOne"));
 
                 Sheet boxPolicy = workbook.getSheet(DynamicLayoutToolValidator.BOX_POLICY_SHEET);
-                assertThat(getAlternativeTo(boxPolicy, "boxTwo"), is("boxOne"));
+                assertThat(getAlternativeTo(boxPolicy, "boxTwo"), is("Person:boxOne"));
             }
 
             // Re-import the exported workbook and confirm the alternatives survive the round-trip.
@@ -1521,6 +1521,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             .withSecurity(LayoutSecurity.CUSTOM_DATA)
             .withHeader("Owner")
             .withLeading(false)
+            .withCustomFilter("special")
             .addBoxIntoNewRow(ownerBox)
             .addTab2SecurityGroups(group, defaultTab)
             .build();
@@ -1536,15 +1537,168 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         try {
             assertThat("The export must produce a file", exportedFile.exists(), is(true));
 
+            try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
+                Sheet tabPolicy = workbook.getSheet(DynamicLayoutToolValidator.TAB_POLICY_SHEET);
+                assertThat("The exported alternative must preserve the target scope",
+                    getAlternativeTo(tabPolicy, "owner"), is("Person:scopedTab"));
+            }
+
             String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
 
-            DynamicLayoutTab owner = findTab(tabService.findByEntityType(context, "Person", null), "owner");
+            DynamicLayoutTab owner = findTab(tabService.findByEntityType(context, "Person", "special"), "owner");
             DynamicLayoutTab target = owner.getTab2SecurityGroups().iterator().next().getAlternativeTab();
             assertThat("Alternative must remain the default tab", target.getCustomFilter(), nullValue());
             assertThat(target.getShortName(), is("scopedTab"));
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
+    @Test
+    public void testExportImportAlternativeBoxRetainsScope() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+
+        DynamicLayoutBox scopedBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Scoped Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("scopedBox")
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("specialTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Special Tab")
+            .withLeading(false)
+            .withCustomFilter("special")
+            .addBoxIntoNewRow(scopedBox)
+            .build();
+
+        DynamicLayoutBox defaultBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Default Box")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withShortname("scopedBox")
+            .build();
+        DynamicLayoutTabBuilder.createTab(context, personType, 1)
+            .withShortName("defaultTab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("Default Tab")
+            .withLeading(false)
+            .addBoxIntoNewRow(defaultBox)
+            .build();
+
+        Group group = GroupBuilder.createGroup(context).withName("Researchers").build();
+        DynamicLayoutBox ownerBox = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Owner Box")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .withShortname("ownerBox")
+            .addBox2SecurityGroups(group, defaultBox)
+            .build();
+        DynamicLayoutTabBuilder.createTab(context, personType, 2)
+            .withShortName("owner")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .withHeader("Owner")
+            .withLeading(false)
+            .withCustomFilter("special")
+            .addBoxIntoNewRow(ownerBox)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
+                Sheet boxPolicy = workbook.getSheet(DynamicLayoutToolValidator.BOX_POLICY_SHEET);
+                assertThat("The exported alternative must preserve the target scope",
+                    getAlternativeTo(boxPolicy, "ownerBox"), is("Person:scopedBox"));
+            }
+
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            DynamicLayoutTab owner = findTab(tabService.findByEntityType(context, "Person", "special"), "owner");
+            DynamicLayoutBox reimportedOwnerBox = findBox(owner.getBoxes(), "ownerBox");
+            DynamicLayoutBox alternative =
+                reimportedOwnerBox.getBox2SecurityGroups().iterator().next().getAlternativeBox();
+            assertThat("Alternative must remain the default box",
+                alternative.getCell().getRow().getTab().getCustomFilter(), nullValue());
+            assertThat(alternative.getShortname(), is("scopedBox"));
+        } finally {
+            exportedFile.delete();
+        }
+    }
+
+    @Test
+    public void testExportImportSecurityGroupWithoutAlternative() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        EntityType personType = createEntityType("Person");
+        Group group = GroupBuilder.createGroup(context).withName("Researchers").build();
+
+        DynamicLayoutBox box = DynamicLayoutBoxBuilder.createBuilder(context, personType, false, false)
+            .withHeader("Box Without Alternative")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .withShortname("plainBox")
+            .addBox2SecurityGroups(group, null)
+            .build();
+
+        DynamicLayoutTabBuilder.createTab(context, personType, 0)
+            .withShortName("plainTab")
+            .withSecurity(LayoutSecurity.CUSTOM_DATA)
+            .withHeader("Tab Without Alternative")
+            .withLeading(false)
+            .addBoxIntoNewRow(box)
+            .addTab2SecurityGroups(group, null)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String[] exportArgs = new String[] { "export-dynamic-layout-tool" };
+        TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
+        handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
+        assertThat(exportHandler.getErrorMessages(), empty());
+
+        File exportedFile = new File("dynamic-layout-tool-exported.xls");
+        try {
+            assertThat("The export must produce a file", exportedFile.exists(), is(true));
+
+            try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
+                Sheet tabPolicy = workbook.getSheet(DynamicLayoutToolValidator.TAB_POLICY_SHEET);
+                assertThat("A tab group without an alternative must export an empty value",
+                    getAlternativeTo(tabPolicy, "plainTab"), is(""));
+
+                Sheet boxPolicy = workbook.getSheet(DynamicLayoutToolValidator.BOX_POLICY_SHEET);
+                assertThat("A box group without an alternative must export an empty value",
+                    getAlternativeTo(boxPolicy, "plainBox"), is(""));
+            }
+
+            String[] importArgs = new String[] { "dynamic-layout-tool", "-f", exportedFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
+            handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
+            assertThat(importHandler.getErrorMessages(), empty());
+
+            DynamicLayoutTab reimportedTab = findTab(tabService.findByEntityType(context, "Person", null), "plainTab");
+            DynamicLayoutTab2SecurityGroup tab2SecurityGroup =
+                reimportedTab.getTab2SecurityGroups().iterator().next();
+            assertThat(tab2SecurityGroup.getAlternativeTab(), nullValue());
+
+            DynamicLayoutBox reimportedBox = findBox(reimportedTab.getBoxes(), "plainBox");
+            DynamicLayoutBox2SecurityGroup box2SecurityGroup =
+                reimportedBox.getBox2SecurityGroups().iterator().next();
+            assertThat(box2SecurityGroup.getAlternativeBox(), nullValue());
         } finally {
             exportedFile.delete();
         }

@@ -406,17 +406,19 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
     private DynamicLayoutBox findAlternativeBox(String alternativeBox, String entityColumn,
             List<DynamicLayoutTab> tabs) {
 
-        if (alternativeBox == null) {
+        if (StringUtils.isBlank(alternativeBox)) {
             return null;
         }
 
+        AlternativeReference target = parseAlternativeReference(alternativeBox, entityColumn);
+
         return tabs.stream()
                    .flatMap(tab -> tab.getBoxes().stream())
-                   .filter(dynamicLayoutBox -> dynamicLayoutBox.getShortname().equals(alternativeBox) &&
-                       toEntityColumn(dynamicLayoutBox.getCell().getRow().getTab()).equals(entityColumn))
+                   .filter(dynamicLayoutBox -> dynamicLayoutBox.getShortname().equals(target.shortName()) &&
+                       toEntityColumn(dynamicLayoutBox.getCell().getRow().getTab()).equals(target.entityColumn()))
                    .findFirst()
                    .orElseThrow(() -> new RuntimeException("Alternative box not found for shortname: " +
-                       alternativeBox + ", entityType: " + entityColumn));
+                       target.shortName() + ", entityType: " + target.entityColumn()));
     }
 
     private Set<DynamicLayoutTab2SecurityGroup> buildTab2SecurityGroups(Context context, Workbook workbook,
@@ -458,16 +460,34 @@ public class DynamicLayoutToolParserImpl implements DynamicLayoutToolParser {
     private DynamicLayoutTab findAlternativeTab(String alternativeTab, String entityColumn,
             List<DynamicLayoutTab> tabs) {
 
-        if (alternativeTab == null) {
+        if (StringUtils.isBlank(alternativeTab)) {
             return null;
         }
 
+        AlternativeReference target = parseAlternativeReference(alternativeTab, entityColumn);
+
         return tabs.stream()
-                   .filter(dynamicLayoutTab -> dynamicLayoutTab.getShortName().equals(alternativeTab) &&
-                       toEntityColumn(dynamicLayoutTab).equals(entityColumn))
+                   .filter(dynamicLayoutTab -> dynamicLayoutTab.getShortName().equals(target.shortName()) &&
+                       toEntityColumn(dynamicLayoutTab).equals(target.entityColumn()))
                    .findFirst()
                    .orElseThrow(() -> new RuntimeException("Alternative tab not found for shortname: " +
-                       alternativeTab + ", entityType: " + entityColumn));
+                       target.shortName() + ", entityType: " + target.entityColumn()));
+    }
+
+    /**
+     * Parse an alternative reference. Exported workbooks carry the alternative's qualified identity
+     * (scope + shortname); legacy workbooks only carry the bare shortname, which belongs to the owner's scope.
+     */
+    private AlternativeReference parseAlternativeReference(String alternative, String ownerEntityColumn) {
+        int separatorIndex = alternative.lastIndexOf(':');
+        if (separatorIndex < 0) {
+            return new AlternativeReference(ownerEntityColumn, alternative);
+        }
+        return new AlternativeReference(alternative.substring(0, separatorIndex),
+            alternative.substring(separatorIndex + 1));
+    }
+
+    private record AlternativeReference(String entityColumn, String shortName) {
     }
 
     private Stream<Row> getRowsByEntityAndColumnValue(Sheet sheet, String entity, String columnName, String value) {

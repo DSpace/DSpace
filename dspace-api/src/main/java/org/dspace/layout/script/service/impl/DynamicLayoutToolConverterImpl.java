@@ -86,6 +86,22 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
         return customFilter == null || customFilter.isEmpty() ? label : label + "." + customFilter;
     }
 
+    /**
+     * Build the qualified reference (scope + shortname) of the given tab, so that an alternative
+     * keeps its own scope instead of being resolved against the owner's scope.
+     */
+    private String toQualifiedReference(DynamicLayoutTab tab) {
+        return toEntityColumn(tab) + ":" + tab.getShortName();
+    }
+
+    /**
+     * Build the qualified reference (scope + shortname) of the given box, so that an alternative
+     * keeps its own scope instead of being resolved against the owner's scope.
+     */
+    private String toQualifiedReference(DynamicLayoutBox box) {
+        return toEntityColumn(box.getCell().getRow().getTab()) + ":" + box.getShortname();
+    }
+
     private void buildTab(Workbook workbook, List<DynamicLayoutTab> tabs) {
         Sheet sheet = workbook.getSheet(TAB_SHEET);
         Map<String, DynamicLayoutBox> allUniqueBoxes = new HashMap<>();
@@ -292,7 +308,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
         createCell(row, 1, tab.getShortName());
         createCell(row, 2, "");
         createCell(row, 3, tab2SecurityGroup.getGroup().getName());
-        createCell(row, 4, alternativeTab == null ? "" : alternativeTab.getShortName());
+        createCell(row, 4, alternativeTab == null ? "" : toQualifiedReference(alternativeTab));
     }
 
     private void buildBoxPolicy(Workbook workbook, List<DynamicLayoutBox> boxes) {
@@ -329,7 +345,7 @@ public class DynamicLayoutToolConverterImpl implements DynamicLayoutToolConverte
         createCell(row, 1, box.getShortname());
         createCell(row, 2, "");
         createCell(row, 3, box2SecurityGroup.getGroup().getName());
-        createCell(row, 4, alternativeBox == null ? "" : alternativeBox.getShortname());
+        createCell(row, 4, alternativeBox == null ? "" : toQualifiedReference(alternativeBox));
     }
 
     private String convertToString(boolean value) {
