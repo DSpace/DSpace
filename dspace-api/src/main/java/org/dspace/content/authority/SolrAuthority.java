@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CommonParams;
@@ -202,8 +203,8 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\\\:") + "*) OR " + searchField + ":(" + text
-            .toLowerCase().replaceAll(":", "\\\\:") + ")";
+        String escapedText = ClientUtils.escapeQueryChars(text.toLowerCase()).replaceAll("\\\\ ", " ");
+        return searchField + ":(" + escapedText + "*) OR " + searchField + ":(" + escapedText + ")";
     }
 
     @Override
@@ -227,7 +228,7 @@ public class SolrAuthority implements ChoiceAuthority {
                 log.debug("requesting label for key " + key + " using locale " + locale);
             }
             SolrQuery queryArgs = new SolrQuery();
-            queryArgs.setQuery("id:" + key.replaceAll(":", "\\\\:"));
+            queryArgs.setQuery("id:" + ClientUtils.escapeQueryChars(key));
             queryArgs.setRows(1);
             QueryResponse searchResponse = getSearchService().search(queryArgs);
             SolrDocumentList docs = searchResponse.getResults();
