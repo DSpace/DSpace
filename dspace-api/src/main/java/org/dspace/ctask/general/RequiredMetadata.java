@@ -33,9 +33,13 @@ import org.dspace.curate.Suspendable;
  * required fields are present in the item metadata, otherwise it fails.
  * Primarily a curation task demonstrator.
  *
+ * <p>
+ * Only an error suspends the task. A failure (missing required metadata)
+ * must not, so that a run over a container reports every incomplete item.
+ *
  * @author richardrodgers
  */
-@Suspendable
+@Suspendable(statusCodes = {Curator.CURATE_ERROR})
 public class RequiredMetadata extends AbstractCurationTask {
     // map of DCInputSets
     protected DCInputsReader reader = null;
