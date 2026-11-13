@@ -189,5 +189,7 @@
 
     <bean class="org.dspace.content.BitstreamLinkingServiceImpl"/>
 
+    <bean class="org.dspace.mfa.service.impl.MfaServiceImpl"/>
+
 </beans>
 
