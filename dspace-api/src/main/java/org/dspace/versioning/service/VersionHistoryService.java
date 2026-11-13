@@ -79,4 +79,16 @@ public interface VersionHistoryService extends DSpaceCRUDService<VersionHistory>
      */
     public boolean canSeeDraftVersion(Context context, VersionHistory versionHistory) throws SQLException;
 
+    /**
+     * Acquire a pessimistic DB lock that serializes new-version creation for this item
+     * (or its version history, when one already exists). Callers must hold this lock
+     * before checking for an in-progress workspace/workflow version and before creating
+     * a new version, so concurrent requests cannot race.
+     *
+     * @param context           The relevant DSpace context
+     * @param item              The item for which to lock version creation
+     * @throws SQLException     If database error
+     */
+    public void lockVersionCreation(Context context, Item item) throws SQLException;
+
 }

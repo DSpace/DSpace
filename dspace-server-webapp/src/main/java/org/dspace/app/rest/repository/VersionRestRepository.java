@@ -118,6 +118,7 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
             throw new AuthorizeException("The logged user doesn't have the rights to create a new version.");
         }
 
+        versionHistoryService.lockVersionCreation(context, item);
         WorkflowItem workflowItem = null;
         WorkspaceItem workspaceItem = null;
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);

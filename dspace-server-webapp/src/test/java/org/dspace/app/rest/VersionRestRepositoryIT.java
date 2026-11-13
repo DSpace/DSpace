@@ -26,6 +26,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
@@ -65,6 +70,8 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
@@ -74,6 +81,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration test class for the version endpoint.
@@ -92,6 +101,9 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private VersioningService versioningService;
+
+    @Autowired
+    private VersionHistoryService versionHistoryService;
 
     @Autowired
     private VersionConverter versionConverter;
@@ -1724,6 +1736,145 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                     hasJsonPath("$.value", is("Publication"))
                 ))
             )));
+    }
+
+    /**
+     * Two concurrent POSTs creating the first version of the same item must serialize:
+     * exactly one succeeds (201), the other sees the in-progress draft and gets 422.
+     */
+    @Test
+    public void createFirstVersionConcurrentRequestsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Concurrent first version item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        ConcurrentLinkedQueue<Integer> createdVersionIds = new ConcurrentLinkedQueue<>();
+        try {
+            List<Integer> statuses = performConcurrentCreateVersionRequests(adminToken, item.getID(), 2,
+                                                                            createdVersionIds);
+
+            long created = statuses.stream().filter(status -> status == 201).count();
+            long unprocessable = statuses.stream().filter(status -> status == 422).count();
+            Assert.assertEquals("Expected exactly one success among statuses " + statuses, 1, created);
+            Assert.assertEquals("Expected exactly one conflict among statuses " + statuses, 1, unprocessable);
+            Assert.assertEquals(1, createdVersionIds.size());
+
+            // A single version history must exist (v1 for original + v2 for the new draft)
+            Item reloaded = itemService.find(context, item.getID());
+            VersionHistory history = versionHistoryService.findByItem(context, reloaded);
+            Assert.assertNotNull(history);
+            Assert.assertEquals(2, versioningService.getVersionsByHistory(context, history).size());
+        } finally {
+            for (Integer versionId : createdVersionIds) {
+                VersionBuilder.delete(versionId);
+            }
+        }
+    }
+
+    /**
+     * Two concurrent POSTs creating a further version of an already-versioned item must serialize
+     * on the shared version history lock: one 201 and one 422.
+     */
+    @Test
+    public void createFurtherVersionConcurrentRequestsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .withSubmitterGroup(admin)
+                                          .build();
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Concurrent further version item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .grantLicense()
+                               .build();
+
+        // Create and archive version 2 so a VersionHistory already exists
+        Item archivedV2 = createNewVersion(item, "archived version 2");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        ConcurrentLinkedQueue<Integer> createdVersionIds = new ConcurrentLinkedQueue<>();
+        try {
+            List<Integer> statuses = performConcurrentCreateVersionRequests(adminToken, archivedV2.getID(), 2,
+                                                                            createdVersionIds);
+
+            long created = statuses.stream().filter(status -> status == 201).count();
+            long unprocessable = statuses.stream().filter(status -> status == 422).count();
+            Assert.assertEquals("Expected exactly one success among statuses " + statuses, 1, created);
+            Assert.assertEquals("Expected exactly one conflict among statuses " + statuses, 1, unprocessable);
+            Assert.assertEquals(1, createdVersionIds.size());
+
+            Item reloaded = itemService.find(context, archivedV2.getID());
+            VersionHistory history = versionHistoryService.findByItem(context, reloaded);
+            Assert.assertNotNull(history);
+            // v1 (original) + v2 (archived) + v3 (new draft)
+            Assert.assertEquals(3, versioningService.getVersionsByHistory(context, history).size());
+        } finally {
+            for (Integer versionId : createdVersionIds) {
+                VersionBuilder.delete(versionId);
+            }
+        }
+    }
+
+    /**
+     * Fire {@code threadCount} simultaneous POSTs to create a new version of the given item.
+     * Returns the HTTP status codes received (order not guaranteed).
+     */
+    private List<Integer> performConcurrentCreateVersionRequests(String authToken, UUID itemId, int threadCount,
+                                                                 ConcurrentLinkedQueue<Integer> createdVersionIds)
+        throws Exception {
+        // Build MockMvc once on this thread — getClient() touches the shared test Context.
+        MockMvc mvc = getClient(authToken);
+
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch ready = new CountDownLatch(threadCount);
+        CountDownLatch start = new CountDownLatch(1);
+        ConcurrentLinkedQueue<Integer> statuses = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<Throwable> errors = new ConcurrentLinkedQueue<>();
+
+        for (int i = 0; i < threadCount; i++) {
+            executor.submit(() -> {
+                try {
+                    ready.countDown();
+                    Assert.assertTrue(start.await(30, TimeUnit.SECONDS));
+                    MvcResult result = mvc.perform(post("/api/versioning/versions")
+                                                       .param("summary", "concurrent create")
+                                                       .contentType(MediaType.parseMediaType(
+                                                           RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                                       .content("/api/core/items/" + itemId))
+                                          .andReturn();
+                    int status = result.getResponse().getStatus();
+                    statuses.add(status);
+                    if (status == 201) {
+                        createdVersionIds.add(read(result.getResponse().getContentAsString(), "$.id"));
+                    }
+                } catch (Throwable t) {
+                    errors.add(t);
+                }
+            });
+        }
+
+        Assert.assertTrue("Workers did not become ready in time", ready.await(30, TimeUnit.SECONDS));
+        start.countDown();
+        executor.shutdown();
+        Assert.assertTrue("Workers did not finish in time", executor.awaitTermination(120, TimeUnit.SECONDS));
+        Assert.assertTrue("Unexpected errors from concurrent requests: " + errors, errors.isEmpty());
+        Assert.assertEquals(threadCount, statuses.size());
+        return new ArrayList<>(statuses);
     }
 
     protected Item createNewVersion(Item oldItem, String newTitle) throws Exception {

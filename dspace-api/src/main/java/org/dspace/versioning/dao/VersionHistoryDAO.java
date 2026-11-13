@@ -25,4 +25,6 @@ import org.dspace.versioning.VersionHistory;
 public interface VersionHistoryDAO extends GenericDAO<VersionHistory> {
 
     public VersionHistory findByItem(Context context, Item item) throws SQLException;
+
+    public void lockVersionCreation(Context context, Item item) throws SQLException;
 }
