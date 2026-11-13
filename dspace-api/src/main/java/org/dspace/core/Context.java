@@ -1064,8 +1064,11 @@ public class Context implements AutoCloseable {
      * This is done to improve performance, as this method is called quite often.
      */
     public Group getAdminGroup() throws SQLException {
-        return (adminGroup == null) ? EPersonServiceFactory.getInstance()
-                                                           .getGroupService()
-                                                           .findByName(this, Group.ADMIN) : adminGroup;
+        if (adminGroup == null) {
+            adminGroup = EPersonServiceFactory.getInstance()
+                .getGroupService()
+                .findByName(this, Group.ADMIN);
+        }
+        return adminGroup;
     }
 }
