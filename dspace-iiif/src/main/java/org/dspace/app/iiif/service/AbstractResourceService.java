@@ -31,6 +31,8 @@ public abstract class AbstractResourceService {
     protected String CLIENT_URL;
     protected String IIIF_LOGO_IMAGE;
     protected String BITSTREAM_PATH_PREFIX;
+    protected String IIIF_ATTRIBUTION;
+    protected String IIIF_LICENCE_URI;
     protected int DEFAULT_CANVAS_WIDTH;
     protected int DEFAULT_CANVAS_HEIGHT;
     /**
@@ -68,6 +70,8 @@ public abstract class AbstractResourceService {
         IMAGE_SERVICE = configurationService.getProperty("iiif.image.server");
         SEARCH_URL = configurationService.getProperty("iiif.search.url");
         BITSTREAM_PATH_PREFIX = configurationService.getProperty("dspace.server.url") + "/api/core/bitstreams";
+        IIIF_ATTRIBUTION = configurationService.getProperty("iiif.attribution");
+        IIIF_LICENCE_URI = configurationService.getProperty("iiif.license.uri");
         DOCUMENT_VIEWING_HINT = configurationService.getProperty("iiif.document.viewing.hint");
         CLIENT_URL = configurationService.getProperty("dspace.ui.url");
         IIIF_LOGO_IMAGE = configurationService.getProperty("iiif.logo.image");

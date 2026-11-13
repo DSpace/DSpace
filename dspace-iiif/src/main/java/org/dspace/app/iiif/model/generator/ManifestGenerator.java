@@ -49,6 +49,7 @@ public class ManifestGenerator implements IIIFResource {
 
     private String identifier;
     private String label;
+    private String attribution;
     private PropertyValue description;
     private ImageContent logo;
     private ViewingHint viewingHint;
@@ -80,6 +81,14 @@ public class ManifestGenerator implements IIIFResource {
      */
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    /**
+     * Sets the manifest attribution
+     * @param attribution manifest attribution
+     */
+    public void setAttribution(String attribution) {
+        this.attribution = attribution;
     }
 
     public void addLogo(ImageContentGenerator logo) {
@@ -193,6 +202,9 @@ public class ManifestGenerator implements IIIFResource {
         }
         if (renderings.size() > 0) {
             manifest.setRenderings(renderings);
+        }
+        if (attribution != null) {
+            manifest.addAttribution(attribution);
         }
         if (logo != null) {
             List<ImageContent> logos = new ArrayList<>();
