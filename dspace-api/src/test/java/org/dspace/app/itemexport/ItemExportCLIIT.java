@@ -357,6 +357,61 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void exportZipItemWithPathTraversalBitstreamName() throws Exception {
+        String traversalName = "../../evil.txt";
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .build();
+        String bitstreamContent = "some arbitrary content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder.createBitstream(context, item, is)
+                    .withName(traversalName)
+                    .withMimeType("text/plain")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-z", zipFileName, "-n", "1" };
+
+        // The entry must be rejected rather than written into the archive
+        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args));
+        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
+
+        // Neither the archive nor its partial temporary file should remain
+        assertFalse(Files.list(tempDir).findAny().isPresent());
+    }
+
+    @Test
+    public void exportZipRejectedWhenDestDirOutsideAllowedBase() throws Exception {
+        configurationService.setProperty(
+                "org.dspace.app.itemexport.allowed.dir", workDir.toString());
+
+        Path notAllowed = Files.createTempDirectory("notSafExportDir");
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .build();
+        context.restoreAuthSystemState();
+
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", notAllowed.toString(), "-z", zipFileName, "-n", "1" };
+
+        // Exception should be thrown at validation
+        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args));
+        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
+
+        // File should never have been written
+        assertFalse(Files.list(notAllowed).findAny().isPresent());
+        PathUtils.deleteOnExit(notAllowed);
+    }
+
+    @Test
     public void exportRejectedWhenDestDirOutsideAllowedBase() throws Exception {
         configurationService.setProperty(
                 "org.dspace.app.itemexport.allowed.dir", workDir.toString());
