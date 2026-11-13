@@ -251,7 +251,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
                                                   .httpOnly(true)
                                                   .secure(true)
                                                   .sameSite("None")
-                                                  .path("/server/api/authn")
                                                   .build();
 
             // Write the cookie to the Set-Cookie header in order to send it
