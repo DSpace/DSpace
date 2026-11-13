@@ -8,8 +8,11 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -31,6 +34,9 @@ import org.dspace.core.Context;
  * @author kevinvandevelde at atmire.com
  */
 public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> implements MetadataValueDAO {
+
+    private static final int MAX_IN_CLAUSE_SIZE = 1000;
+
     protected MetadataValueDAOImpl() {
         super();
     }
@@ -94,6 +100,101 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM MetadataValue"));
+    }
+
+    @Override
+    public long countByField(Context context, MetadataField metadataField) throws SQLException {
+        Query query = createQuery(context,
+            "SELECT count(mv) FROM MetadataValue mv WHERE mv.metadataField = :field");
+        query.setParameter("field", metadataField);
+        return (Long) query.getSingleResult();
+    }
+
+    @Override
+    public List<UUID> findObjectIdsByField(Context context, MetadataField metadataField, UUID afterUuid, int limit)
+        throws SQLException {
+        StringBuilder hql = new StringBuilder(
+            "SELECT DISTINCT mv.dSpaceObject.id FROM MetadataValue mv WHERE mv.metadataField = :field");
+        if (afterUuid != null) {
+            hql.append(" AND mv.dSpaceObject.id > :after");
+        }
+        hql.append(" ORDER BY mv.dSpaceObject.id");
+
+        Query query = createQuery(context, hql.toString());
+        query.setParameter("field", metadataField);
+        if (afterUuid != null) {
+            query.setParameter("after", afterUuid);
+        }
+        if (limit > 0) {
+            query.setMaxResults(limit);
+        }
+
+        @SuppressWarnings("unchecked")
+        List<UUID> result = query.getResultList();
+        return result;
+    }
+
+    @Override
+    public List<MetadataValue> findByFieldAndObjects(Context context, MetadataField metadataField,
+                                                     List<UUID> objectIds) throws SQLException {
+        if (objectIds == null || objectIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        if (objectIds.size() <= MAX_IN_CLAUSE_SIZE) {
+            Query query = createQuery(context,
+                "SELECT mv FROM MetadataValue mv WHERE mv.metadataField = :field "
+                    + "AND mv.dSpaceObject.id IN (:ids) ORDER BY mv.dSpaceObject.id, mv.place");
+            query.setParameter("field", metadataField);
+            query.setParameter("ids", objectIds);
+
+            @SuppressWarnings("unchecked")
+            List<MetadataValue> result = query.getResultList();
+            return result;
+        }
+
+        // Chunk into sublists to avoid exceeding database IN-clause limits
+        List<MetadataValue> combined = new ArrayList<>();
+        for (int start = 0; start < objectIds.size(); start += MAX_IN_CLAUSE_SIZE) {
+            int end = Math.min(start + MAX_IN_CLAUSE_SIZE, objectIds.size());
+            List<UUID> chunk = objectIds.subList(start, end);
+
+            Query query = createQuery(context,
+                "SELECT mv FROM MetadataValue mv WHERE mv.metadataField = :field "
+                    + "AND mv.dSpaceObject.id IN (:ids) ORDER BY mv.dSpaceObject.id, mv.place");
+            query.setParameter("field", metadataField);
+            query.setParameter("ids", chunk);
+
+            @SuppressWarnings("unchecked")
+            List<MetadataValue> chunkResult = query.getResultList();
+            combined.addAll(chunkResult);
+        }
+        return combined;
+    }
+
+    @Override
+    public int deleteByIds(Context context, List<Integer> ids) throws SQLException {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        // N.B. Bulk HQL DELETE bypasses the persistence context — callers must
+        // evict affected entities from the session to avoid stale references.
+        if (ids.size() <= MAX_IN_CLAUSE_SIZE) {
+            Query query = createQuery(context, "DELETE FROM MetadataValue mv WHERE mv.id IN (:ids)");
+            query.setParameter("ids", ids);
+            return query.executeUpdate();
+        }
+
+        // Chunk into sublists to avoid exceeding database IN-clause limits
+        int totalDeleted = 0;
+        for (int start = 0; start < ids.size(); start += MAX_IN_CLAUSE_SIZE) {
+            int end = Math.min(start + MAX_IN_CLAUSE_SIZE, ids.size());
+            List<Integer> chunk = ids.subList(start, end);
+
+            Query query = createQuery(context, "DELETE FROM MetadataValue mv WHERE mv.id IN (:ids)");
+            query.setParameter("ids", chunk);
+            totalDeleted += query.executeUpdate();
+        }
+        return totalDeleted;
     }
 
 }

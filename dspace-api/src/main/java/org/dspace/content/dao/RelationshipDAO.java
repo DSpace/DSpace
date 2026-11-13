@@ -90,6 +90,23 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
                                               Integer limit, Integer offset) throws SQLException;
 
     /**
+     * Keyset (seek) pagination over the relationships of a given type, ordered by ascending id.
+     * Returns up to {@code limit} relationships whose id is strictly greater than {@code lastId}.
+     * Unlike offset paging, this is stable and gap/duplicate-free across iterations even while rows
+     * are being added/removed, which makes it suitable for large batch processing.
+     *
+     * @param context           The relevant DSpace context
+     * @param relationshipType  The RelationshipType object to be checked on
+     * @param limit             maximum number of relationships to return
+     * @param lastId            return only relationships with id greater than this value
+     *                          (use 0 to start from the beginning)
+     * @return  An id-ordered list of Relationship objects with the given RelationshipType and id &gt; lastId
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByRelationshipTypeAfterId(Context context, RelationshipType relationshipType,
+                                                     int limit, int lastId) throws SQLException;
+
+    /**
      * This method returns a list of Relationship objects for the given RelationshipType object.
      * It will construct a list of all Relationship objects that have the given RelationshipType object
      * as the relationshipType property
