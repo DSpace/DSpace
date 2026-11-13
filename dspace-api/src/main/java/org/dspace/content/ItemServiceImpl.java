@@ -80,6 +80,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.DetailType;
 import org.dspace.event.Event;
+import org.dspace.event.EventDetail;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.DOI;
@@ -865,8 +866,22 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
-        context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
-            item.getHandle(), DetailType.HANDLE, getIdentifiers(context, item)));
+        ArrayList<EventDetail> detailList = new ArrayList<>();
+        // Add the item handle to the EventDetails.
+        detailList.add(new EventDetail(DetailType.HANDLE, item.getHandle()));
+        UUID collectionID = item.getOwningCollection() == null ? null : item.getOwningCollection().getID();;
+        if (collectionID != null) {
+            try {
+                // If it's available, add the parent collection handle to the EventDetails
+                Collection collection = collectionService.find(context, collectionID);
+                if (collection != null) {
+                    detailList.add(new EventDetail(DetailType.PARENT_HANDLE, collection.getHandle()));
+                }
+            } catch (SQLException e) {
+                log.error("Could not find collection with ID " + collectionID, e);
+            }
+        }
+        context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(), detailList));
 
         log.info(LogHelper.getHeader(context, "delete_item", "item_id="
             + item.getID()));
