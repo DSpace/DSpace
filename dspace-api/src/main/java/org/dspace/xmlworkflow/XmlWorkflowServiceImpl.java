@@ -1256,8 +1256,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             provmessage.append("\n");
         }
 
-        // add sizes and checksums of bitstreams
-        provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
+        // add sizes and checksums of bitstreams if enabled
+        if (configurationService.getBooleanProperty("provenance.bitstream.enabled", true)) {
+            provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
+        }
 
         // Add message to the DC
         itemService
