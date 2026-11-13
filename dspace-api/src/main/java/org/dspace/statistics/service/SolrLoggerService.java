@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverResult.FacetPivotResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.ObjectCount;
 import org.dspace.usage.UsageWorkflowEvent;
@@ -75,6 +76,15 @@ public interface SolrLoggerService {
 
     public void postSearch(DSpaceObject resultObject, HttpServletRequest request, EPerson currentUser,
                            List<String> queries, int rpp, String sortBy, String order, int page, DSpaceObject scope);
+
+    /**
+     * Store a login usage event into Solr.
+     *
+     * @param dspaceObject the object used.
+     * @param request      the current request context.
+     * @param currentUser  the current session's user.
+     */
+    public void postLogin(DSpaceObject dspaceObject, HttpServletRequest request, EPerson currentUser);
 
     public void postWorkflow(UsageWorkflowEvent usageWorkflowEvent) throws SQLException;
 
@@ -177,6 +187,49 @@ public interface SolrLoggerService {
         throws SolrServerException, IOException;
 
     /**
+     * Query used to get values grouped by the given facet field, applying all the given filter queries.
+     *
+     * @param query         the query to be used
+     * @param filterQueries filter queries, each one is sent to Solr as a separate fq (may be null or empty)
+     * @param facetField    the facet field on which to group our values
+     * @param max           the max number of values given back (in case of 10 the top 10
+     *                      will be given)
+     * @param showTotal     a boolean determining whether the total amount should be given
+     *                      back as the last element of the array
+     * @param facetQueries  list of facet queries
+     * @param facetMinCount Minimum count of results facet must have to return a result
+     * @return an array containing our results
+     * @throws SolrServerException Exception from the Solr server to the solrj Java client.
+     * @throws java.io.IOException passed through.
+     */
+    public ObjectCount[] queryFacetField(String query,
+                                         List<String> filterQueries, String facetField, int max, boolean showTotal,
+                                         List<String> facetQueries, int facetMinCount)
+        throws SolrServerException, IOException;
+
+    /**
+     * Query used to get the values grouped by the given facet pivot field.
+     *
+     * @param  query               the query to be used
+     * @param  filterQuery         filter query
+     * @param  pivotField          the facet pivot field (comma separated list of fields)
+     * @param  max                 the max number of values given back (in case of 10 the
+     *                             top 10 will be given)
+     * @param  showTotal           a boolean determining whether the total amount should be
+     *                             given back as the last element of the array
+     * @param  facetQueries        list of facet queries
+     * @param  facetMinCount       Minimum count of results facet must have to
+     *                             return a result
+     * @return                     an array containing our results
+     * @throws SolrServerException Exception from the Solr server to the solrj Java
+     *                             client.
+     * @throws                     java.io.IOException passed through.
+     */
+    public FacetPivotResult[] queryFacetPivotField(String query, String filterQuery, String pivotField,
+        int max, boolean showTotal, List<String> facetQueries, int facetMinCount)
+        throws SolrServerException, IOException;
+
+    /**
      * Query used to get values grouped by the date.
      *
      * @param query       the query to be used
@@ -205,7 +258,52 @@ public interface SolrLoggerService {
                                                 int facetMinCount)
         throws SolrServerException, IOException;
 
+    /**
+     * This method generates a faceting solr query that uses ranges between date
+     *
+     * @param context           dspace Context
+     * @param fieldList         list of field (fl param)
+     * @param facetField        facet field (facet.field param)
+     * @param query             query of solr (q param)
+     * @param filterQuery       filter query used in solr (fq param)
+     * @param dateType          formatted string date type (YEAR, MONTH, DATE) used as range
+     * @param dateStart         formatted string date
+     * @param dateEnd           formatted string date
+     * @param showTotal         boolean to use total
+     * @param facetMinCount     min count of the results
+     * @param increment         the gap increment
+     * @return
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    ObjectCount[] queryFacetDateField(Context context, String fieldList, String facetField, String query,
+            String filterQuery, String dateType, String dateStart, String dateEnd, boolean showTotal, int facetMinCount,
+            int increment) throws SolrServerException, IOException;
+
+    /**
+     * Same as {@link #queryFacetDateField(Context, String, String, String, String, String, String, String, boolean,
+     * int, int)} but applying all the given filter queries.
+     *
+     * @param filterQueries filter queries, each one is sent to Solr as a separate fq (may be null or empty)
+     */
+    ObjectCount[] queryFacetDateField(Context context, String fieldList, String facetField, String query,
+            List<String> filterQueries, String dateType, String dateStart, String dateEnd, boolean showTotal,
+            int facetMinCount, int increment) throws SolrServerException, IOException;
+
     public ObjectCount queryTotal(String query, String filterQuery, int facetMinCount)
+        throws SolrServerException, IOException;
+
+    /**
+     * Count the documents matching the query, applying all the given filter queries.
+     *
+     * @param query         the query to be used
+     * @param filterQueries filter queries, each one is sent to Solr as a separate fq (may be null or empty)
+     * @param facetMinCount Minimum count of results facet must have to return a result
+     * @return the number of matching documents
+     * @throws SolrServerException Exception from the Solr server to the solrj Java client.
+     * @throws java.io.IOException passed through.
+     */
+    public ObjectCount queryTotal(String query, List<String> filterQueries, int facetMinCount)
         throws SolrServerException, IOException;
 
     /**
@@ -229,6 +327,32 @@ public interface SolrLoggerService {
      * @throws java.io.IOException passed through.
      */
     public QueryResponse query(String query, String filterQuery,
+                               String facetField, int rows, int max, String dateType, String dateStart,
+                               String dateEnd, List<String> facetQueries, String sort, boolean ascending,
+                               int facetMinCount)
+        throws SolrServerException, IOException;
+
+    /**
+     * Perform a solr query, applying all the given filter queries.
+     *
+     * @param query         the query to be used
+     * @param filterQueries filter queries, each one is sent to Solr as a separate fq (may be null or empty)
+     * @param facetField    field to facet the results by
+     * @param rows          the max number of results to return
+     * @param max           the max number of facets to return
+     * @param dateType      the type to be used (example: DAY, MONTH, YEAR)
+     * @param dateStart     the start date Format:(-3, -2, ..) the date is calculated
+     *                      relatively on today
+     * @param dateEnd       the end date stop Format (-2, +1, ..) the date is calculated
+     *                      relatively on today
+     * @param facetQueries  list of facet queries
+     * @param sort          the sort field
+     * @param ascending     the sort direction (true: ascending)
+     * @param facetMinCount Minimum count of results facet must have to return a result
+     * @throws SolrServerException Exception from the Solr server to the solrj Java client.
+     * @throws java.io.IOException passed through.
+     */
+    public QueryResponse query(String query, List<String> filterQueries,
                                String facetField, int rows, int max, String dateType, String dateStart,
                                String dateEnd, List<String> facetQueries, String sort, boolean ascending,
                                int facetMinCount)
@@ -261,6 +385,68 @@ public interface SolrLoggerService {
                                String dateEnd, List<String> facetQueries, String sort, boolean ascending,
                                int facetMinCount, boolean defaultFilterQueries)
             throws SolrServerException, IOException;
+
+    /**
+     * Perform a solr query.
+     *
+     * @param  query                the query to be used
+     * @param  filterQuery          filter query
+     * @param  facetField           field to facet the results by
+     * @param  rows                 the max number of results to return
+     * @param  max                  the max number of facets to return
+     * @param  dateType             the type to be used (example: DAY, MONTH, YEAR)
+     * @param  increment            the gap increment
+     * @param  dateStart            the start date Format:(-3, -2, ..) the date is
+     *                              calculated relatively on today
+     * @param  dateEnd              the end date stop Format (-2, +1, ..) the date
+     *                              is calculated relatively on today
+     * @param  facetQueries         list of facet queries
+     * @param  sort                 the sort field
+     * @param  ascending            the sort direction (true: ascending)
+     * @param  facetMinCount        Minimum count of results facet must have to
+     *                              return a result
+     * @param  defaultFilterQueries use the default filter queries
+     * @param  pivotField           the pivot field to apply
+     * @param  fieldList            the field list to use (fl)
+     * @throws SolrServerException  Exception from the Solr server to the solrj Java
+     *                              client.
+     * @throws                      java.io.IOException passed through.
+     */
+    public QueryResponse query(String query, String filterQuery, String facetField, int rows,
+        int max, String dateType, String dateStart, String dateEnd, int increment, List<String> facetQueries,
+        String sort, boolean ascending, int facetMinCount, boolean defaultFilterQueries,
+        String pivotField, String fieldList) throws SolrServerException, IOException;
+
+    /**
+     * Perform a solr query, applying all the given filter queries.
+     *
+     * @param  query                the query to be used
+     * @param  filterQueries        filter queries, each one is sent to Solr as a separate fq (may be null or empty)
+     * @param  facetField           field to facet the results by
+     * @param  rows                 the max number of results to return
+     * @param  max                  the max number of facets to return
+     * @param  dateType             the type to be used (example: DAY, MONTH, YEAR)
+     * @param  increment            the gap increment
+     * @param  dateStart            the start date Format:(-3, -2, ..) the date is
+     *                              calculated relatively on today
+     * @param  dateEnd              the end date stop Format (-2, +1, ..) the date
+     *                              is calculated relatively on today
+     * @param  facetQueries         list of facet queries
+     * @param  sort                 the sort field
+     * @param  ascending            the sort direction (true: ascending)
+     * @param  facetMinCount        Minimum count of results facet must have to
+     *                              return a result
+     * @param  defaultFilterQueries use the default filter queries
+     * @param  pivotField           the pivot field to apply
+     * @param  fieldList            the field list to use (fl)
+     * @throws SolrServerException  Exception from the Solr server to the solrj Java
+     *                              client.
+     * @throws                      java.io.IOException passed through.
+     */
+    public QueryResponse query(String query, List<String> filterQueries, String facetField, int rows,
+        int max, String dateType, String dateStart, String dateEnd, int increment, List<String> facetQueries,
+        String sort, boolean ascending, int facetMinCount, boolean defaultFilterQueries,
+        String pivotField, String fieldList) throws SolrServerException, IOException;
 
     public void shardSolrIndex() throws IOException, SolrServerException;
 

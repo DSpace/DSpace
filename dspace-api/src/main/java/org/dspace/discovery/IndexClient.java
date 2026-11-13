@@ -36,6 +36,7 @@ import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.metrics.UpdateCrisMetricsInSolrDocService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
@@ -50,6 +51,8 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             .getServiceByName(IndexingService.class.getName(), IndexingService.class);
 
     private IndexClientOptions indexClientOptions;
+
+    private UpdateCrisMetricsInSolrDocService updateCrisMetricsInSolrDocService;
 
     @Override
     public void internalRun() throws Exception {
@@ -80,6 +83,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             }
         }
 
+        boolean metricUpdate = !commandLine.hasOption("m");
         switch (indexClientOptions) {
             case REMOVE:
                 handler.logInfo("Removing " + commandLine.getOptionValue("r") + " from Index");
@@ -146,6 +150,25 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         }
 
         handler.logInfo("Done with indexing");
+        if (metricUpdate) {
+            if (indexableObject.isPresent()) {
+                final String param = indexClientOptions == IndexClientOptions.REMOVE ?
+                    commandLine.getOptionValue('r') :
+                    commandLine.getOptionValue('i');
+                UUID uuid = null;
+                try {
+                    uuid = UUID.fromString(param);
+                } catch (Exception e) {
+                    uuid = HandleServiceFactory.getInstance()
+                                               .getHandleService().resolveToObject(context, param).getID();
+                }
+
+                updateCrisMetricsInSolrDocService.performUpdate(context, handler, true, uuid);
+
+            } else {
+                updateCrisMetricsInSolrDocService.performUpdate(context, handler, true);
+            }
+        }
     }
 
     @Override
@@ -162,6 +185,8 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
         }
         indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
+        updateCrisMetricsInSolrDocService = new DSpace().getServiceManager().getServiceByName(
+            UpdateCrisMetricsInSolrDocService.class.getName(), UpdateCrisMetricsInSolrDocService.class);
     }
 
     /**

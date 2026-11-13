@@ -26,6 +26,9 @@ public class SubscriptionEmailNotificationConfiguration<T
     public Options getOptions() {
         if (Objects.isNull(options)) {
             Options options = new Options();
+            options.addOption("t", "type", true,
+                              "Subscription type. Valid values are \"content\" or \"statistics\"");
+            options.getOption("t").setRequired(true);
             options.addOption("f", "frequency", true,
                               "Subscription frequency. Valid values include: D (Day), W (Week) and M (Month)");
             options.getOption("f").setRequired(true);

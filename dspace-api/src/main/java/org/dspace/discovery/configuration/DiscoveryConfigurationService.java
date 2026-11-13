@@ -193,6 +193,13 @@ public class DiscoveryConfigurationService {
     }
 
     /**
+     * Returns the discovery configuration by name.
+     */
+    public DiscoveryConfiguration getDiscoveryConfigurationByName(String name) {
+        return this.getDiscoveryConfiguration(name, false);
+    }
+
+    /**
      * Retrieves a list of all DiscoveryConfiguration objects where
      * {@link org.dspace.discovery.configuration.DiscoveryConfiguration#isIndexAlways()} is true
      * These configurations should always be included when indexing

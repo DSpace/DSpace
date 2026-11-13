@@ -7,6 +7,8 @@
  */
 package org.dspace.statistics;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,12 +37,14 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import com.maxmind.geoip2.DatabaseReader;
@@ -57,6 +61,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -98,6 +103,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverResult.FacetPivotResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.service.ClientInfoService;
@@ -122,6 +128,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final Logger log = LogManager.getLogger();
 
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
+
+    /**
+     * Key of the logging context (ThreadContext) holding the name of the report generator that is running, used to
+     * identify the generator in the warning logged when the results of a query are partial.
+     */
+    public static final String GENERATOR_CONTEXT_KEY = "statisticsGenerator";
+
+    private static final String TIME_ALLOWED_PROPERTY = "solr-statistics.query.timeAllowed";
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -162,7 +176,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         VIEW("view"),
         SEARCH("search"),
         SEARCH_RESULT("search_result"),
-        WORKFLOW("workflow");
+        WORKFLOW("workflow"),
+        LOGIN("login");
 
         private final String text;
 
@@ -321,6 +336,42 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             log.error("Error saving VIEW event to Solr for DSpaceObject {} by EPerson {}",
                       dspaceObject.getID(), currentUser.getEmail(), e);
         }
+    }
+
+    @Override
+    public void postLogin(DSpaceObject dspaceObject, HttpServletRequest request, EPerson currentUser) {
+
+        if (solr == null) {
+            return;
+        }
+
+        initSolrYearCores();
+
+        try {
+
+            SolrInputDocument document = getCommonSolrDoc(dspaceObject, request, currentUser, null);
+
+            if (document == null) {
+                return;
+            }
+
+            document.addField("statistics_type", StatisticsType.LOGIN.text());
+
+            solr.add(document);
+
+            // commits are executed automatically using the solr autocommit
+            boolean useAutoCommit = configurationService.getBooleanProperty("solr-statistics.autoCommit", true);
+            if (!useAutoCommit) {
+                solr.commit(false, false);
+            }
+
+        } catch (RuntimeException re) {
+            throw re;
+        } catch (Exception e) {
+            String email = null == currentUser ? "[anonymous]" : currentUser.getEmail();
+            log.error("Error saving LOGIN event to Solr by EPerson {}", email, e);
+        }
+
     }
 
     /**
@@ -602,6 +653,13 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if (usageWorkflowEvent.getOldState() != null) {
                 solrDoc.addField("previousWorkflowStep", usageWorkflowEvent.getOldState());
             }
+            if (usageWorkflowEvent.getCurrentWorkflowAction() != null) {
+                solrDoc.addField("workflowAction", usageWorkflowEvent.getCurrentWorkflowAction());
+            }
+            if (usageWorkflowEvent.getPreviousWorkflowAction() != null) {
+                solrDoc.addField("previousWorkflowAction", usageWorkflowEvent.getPreviousWorkflowAction());
+            }
+            solrDoc.addField("previousActionRequiresUI", usageWorkflowEvent.isPreviousActionRequiresUI());
             if (usageWorkflowEvent.getGroupOwners() != null) {
                 for (int i = 0; i < usageWorkflowEvent.getGroupOwners().length; i++) {
                     Group group = usageWorkflowEvent.getGroupOwners()[i];
@@ -627,6 +685,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
 
             solr.add(solrDoc);
+            // commits are executed automatically using the solr autocommit
+            boolean useAutoCommit = configurationService.getBooleanProperty("solr-statistics.autoCommit", true);
+            if (!useAutoCommit) {
+                solr.commit(false, false);
+            }
         } catch (Exception e) {
             //Log the exception, no need to send it through, the workflow shouldn't crash because of this !
             log.error("Error saving WORKFLOW event to Solr", e);
@@ -895,7 +958,24 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void query(String query, int max, int facetMinCount)
             throws SolrServerException, IOException {
-        query(query, null, null, 0, max, null, null, null, null, null, false, facetMinCount);
+        query(query, (String) null, null, 0, max, null, null, null, null, null, false, facetMinCount);
+    }
+
+    private Integer getTimeAllowed() {
+        String timeAllowed = configurationService.getProperty(TIME_ALLOWED_PROPERTY);
+        if (StringUtils.isBlank(timeAllowed)) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(timeAllowed.trim());
+        } catch (NumberFormatException e) {
+            log.warn("Ignoring the invalid {} value: {}", TIME_ALLOWED_PROPERTY, timeAllowed);
+            return null;
+        }
+    }
+
+    private List<String> singleFilterQuery(String filterQuery) {
+        return Collections.singletonList(filterQuery);
     }
 
     @Override
@@ -903,8 +983,17 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                                          String filterQuery, String facetField, int max, boolean showTotal,
                                          List<String> facetQueries, int facetMinCount)
             throws SolrServerException, IOException {
-        QueryResponse queryResponse = query(query, filterQuery, facetField,
-                                            0, max, null, null, null, facetQueries, null, false, facetMinCount);
+        return queryFacetField(query, singleFilterQuery(filterQuery), facetField, max, showTotal, facetQueries,
+                               facetMinCount);
+    }
+
+    @Override
+    public ObjectCount[] queryFacetField(String query,
+                                         List<String> filterQueries, String facetField, int max, boolean showTotal,
+                                         List<String> facetQueries, int facetMinCount)
+            throws SolrServerException, IOException {
+        QueryResponse queryResponse = reportQuery(query, filterQueries, facetField, 0, max, null, null, null, 1,
+                                                  facetQueries, null, false, facetMinCount, false, null, null);
         if (queryResponse == null) {
             return new ObjectCount[0];
         }
@@ -933,6 +1022,106 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             // Return an empty array cause we got no data
             return new ObjectCount[0];
         }
+    }
+
+    @Override
+    public FacetPivotResult[] queryFacetPivotField(String query, String filterQuery, String pivotField, int max,
+        boolean showTotal, List<String> facetQueries, int facetMinCount) throws SolrServerException, IOException {
+
+        QueryResponse queryResponse = query(query, filterQuery, null,
+            0, max, null, null, null, 1, facetQueries, null, false, facetMinCount, true, pivotField, null);
+
+        if (queryResponse == null) {
+            return new FacetPivotResult[0];
+        }
+
+        return FacetPivotResult.fromPivotFields(queryResponse.getFacetPivot().get(pivotField));
+
+    }
+
+    @Override
+    public ObjectCount[] queryFacetDateField(
+        Context context,
+        String fieldList,
+        String facetField,
+        String query,
+        String filterQuery,
+        String dateType,
+        String dateStart,
+        String dateEnd,
+        boolean showTotal,
+        int facetMinCount,
+        int increment
+    ) throws SolrServerException, IOException {
+        return queryFacetDateField(context, fieldList, facetField, query, singleFilterQuery(filterQuery), dateType,
+                                   dateStart, dateEnd, showTotal, facetMinCount, increment);
+    }
+
+    @Override
+    public ObjectCount[] queryFacetDateField(
+        Context context,
+        String fieldList,
+        String facetField,
+        String query,
+        List<String> filterQueries,
+        String dateType,
+        String dateStart,
+        String dateEnd,
+        boolean showTotal,
+        int facetMinCount,
+        int increment
+    ) throws SolrServerException, IOException {
+
+        QueryResponse queryResponse = reportQuery(query, filterQueries, facetField, 0, -1, dateType, dateStart,
+                                                  dateEnd, increment, null, null, false, facetMinCount, false, null,
+                                                  fieldList);
+
+        ObjectCount[] found = Optional.ofNullable(queryResponse)
+                                      .map(QueryResponse::getFacetRanges)
+                                      .filter(list -> !list.isEmpty())
+                                      .flatMap(
+                                          list ->
+                                              list
+                                                  .stream()
+                                                  .filter(
+                                                      rangeFacet ->
+                                                          "time".equalsIgnoreCase(rangeFacet.getName())
+                                                  )
+                                                  .findFirst()
+                                      )
+                                      .map(timeFacet -> this.mapTimeFacet(context, dateType, showTotal, queryResponse,
+                                                                          timeFacet))
+                                      .orElse(new ObjectCount[0]);
+
+        return found;
+    }
+
+
+    protected ObjectCount[] mapTimeFacet(
+        Context context,
+        String dateType,
+        boolean showTotal,
+        QueryResponse queryResponse,
+        RangeFacet<?, ?> timeFacet
+    ) {
+        // Create an array for our result
+        int resultSize = timeFacet.getCounts().size() + (showTotal ? 1 : 0);
+        ObjectCount[] result = new ObjectCount[resultSize];
+        // Run over our datefacet & store all the values
+        for (int i = 0; i < timeFacet.getCounts().size(); i++) {
+            RangeFacet.Count dateCount = timeFacet.getCounts().get(i);
+            result[i] = new ObjectCount();
+            result[i].setCount(dateCount.getCount());
+            result[i].setValue(getDateView(dateCount.getValue(), dateType));
+        }
+        if (showTotal) {
+            result[result.length - 1] = new ObjectCount();
+            result[result.length - 1].setCount(queryResponse.getResults()
+                                                            .getNumFound());
+            // TODO: Make sure that this total is gotten out of the msgs.xml
+            result[result.length - 1].setValue("total");
+        }
+        return result;
     }
 
     @Override
@@ -985,8 +1174,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public ObjectCount queryTotal(String query, String filterQuery, int facetMinCount)
         throws SolrServerException, IOException {
-        QueryResponse queryResponse = query(query, filterQuery, null, 0, -1, null,
-                                            null, null, null, null, false, facetMinCount);
+        return queryTotal(query, singleFilterQuery(filterQuery), facetMinCount);
+    }
+
+    @Override
+    public ObjectCount queryTotal(String query, List<String> filterQueries, int facetMinCount)
+        throws SolrServerException, IOException {
+        QueryResponse queryResponse = reportQuery(query, filterQueries, null, 0, -1, null, null, null, 1, null, null,
+                                                  false, facetMinCount, false, null, null);
         ObjectCount objCount = new ObjectCount();
         objCount.setCount(queryResponse.getResults().getNumFound());
 
@@ -1021,6 +1216,188 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         }
         return name;
+    }
+
+    @Override
+    public QueryResponse query(String query, List<String> filterQueries, String facetField, int rows, int max,
+                               String dateType, String dateStart, String dateEnd, List<String> facetQueries,
+                               String sort, boolean ascending, int facetMinCount)
+        throws SolrServerException, IOException {
+        return query(query, filterQueries, facetField, rows, max, dateType, dateStart, dateEnd, 1, facetQueries,
+                     sort, ascending, facetMinCount, false, null, null);
+    }
+
+    @Override
+    public QueryResponse query(String query, String filterQuery, String facetField, int rows,
+                               int max, String dateType, String dateStart, String dateEnd, int increment,
+                               List<String> facetQueries, String sort, boolean ascending, int facetMinCount,
+                               boolean defaultFilterQueries, String pivotField, String fieldList)
+        throws SolrServerException, IOException {
+        return query(query, singleFilterQuery(filterQuery), facetField, rows, max, dateType, dateStart, dateEnd,
+                     increment, facetQueries, sort, ascending, facetMinCount, defaultFilterQueries, pivotField,
+                     fieldList);
+    }
+
+    @Override
+    public QueryResponse query(String query, List<String> filterQueries, String facetField, int rows,
+                               int max, String dateType, String dateStart, String dateEnd, int increment,
+                               List<String> facetQueries, String sort, boolean ascending, int facetMinCount,
+                               boolean defaultFilterQueries, String pivotField, String fieldList)
+        throws SolrServerException, IOException {
+        return executeQuery(false, query, filterQueries, facetField, rows, max, dateType, dateStart, dateEnd,
+                            increment, facetQueries, sort, ascending, facetMinCount, defaultFilterQueries,
+                            pivotField, fieldList);
+    }
+
+    /**
+     * Perform a query on behalf of a statistics report: the time allowed to Solr is limited by the
+     * {@code solr-statistics.query.timeAllowed} configuration, if any.
+     */
+    private QueryResponse reportQuery(String query, List<String> filterQueries, String facetField, int rows,
+                                      int max, String dateType, String dateStart, String dateEnd, int increment,
+                                      List<String> facetQueries, String sort, boolean ascending, int facetMinCount,
+                                      boolean defaultFilterQueries, String pivotField, String fieldList)
+        throws SolrServerException, IOException {
+        return executeQuery(true, query, filterQueries, facetField, rows, max, dateType, dateStart, dateEnd,
+                            increment, facetQueries, sort, ascending, facetMinCount, defaultFilterQueries,
+                            pivotField, fieldList);
+    }
+
+    private QueryResponse executeQuery(boolean report, String query, List<String> filterQueries, String facetField,
+                                       int rows, int max, String dateType, String dateStart, String dateEnd,
+                                       int increment, List<String> facetQueries, String sort, boolean ascending,
+                                       int facetMinCount, boolean defaultFilterQueries, String pivotField,
+                                       String fieldList)
+        throws SolrServerException, IOException {
+
+        if (solr == null) {
+            return null;
+        }
+
+        SolrQuery solrQuery = new SolrQuery().setRows(rows).setQuery(query)
+                                             .setFacetMinCount(facetMinCount);
+        addAdditionalSolrYearCores(solrQuery);
+
+        // Set the date facet if present
+        if (dateType != null) {
+
+            String start = isNotBlank(dateStart) ? dateStart + dateType : "";
+            String end = isNotBlank(dateEnd) ? dateEnd + dateType : "";
+
+            solrQuery.setParam("facet.range", "time")
+                     .setParam("f.time.facet.range.start", "NOW/" + dateType + start) // EXAMPLE: NOW/MONTH-2MONTHS
+                     .setParam("f.time.facet.range.end", "NOW/" + dateType + end) // EXAMPLE: NOW/MONTH+1MONTH
+                     .setParam("f.time.facet.range.gap", "+" + increment + dateType)
+                     .setFacet(true);
+
+        }
+        if (facetQueries != null) {
+            for (int i = 0; i < facetQueries.size(); i++) {
+                String facetQuery = facetQueries.get(i);
+                solrQuery.addFacetQuery(facetQuery);
+            }
+            if (!facetQueries.isEmpty()) {
+                solrQuery.setFacet(true);
+            }
+        }
+
+        if (facetField != null) {
+            solrQuery.addFacetField(facetField);
+        }
+
+        if (pivotField != null) {
+            solrQuery.addFacetPivotField(pivotField);
+        }
+
+        // Set the top x of if present
+        if (max != -1) {
+            if (pivotField == null) {
+                solrQuery.setFacetLimit(max);
+            } else {
+                solrQuery.set("f." + pivotField.split(",")[0].trim() + "." + FacetParams.FACET_LIMIT, max);
+            }
+        }
+
+        // A filter is used instead of a regular query to improve
+        // performance and ensure the search result ordering will
+        // not be influenced
+
+        // Choose to filter by isBot field, may be overridden in future
+        // to allow views on stats based on bots.
+        if (defaultFilterQueries && configurationService.getBooleanProperty(
+            "solr-statistics.query.filter.isBot", true)) {
+            solrQuery.addFilterQuery("-isBot:true");
+        }
+
+        if (sort != null) {
+            solrQuery.addSort(sort, (ascending ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc));
+        }
+
+        String[] bundles = configurationService.getArrayProperty("solr-statistics.query.filter.bundles");
+        if (defaultFilterQueries && bundles != null && bundles.length > 0) {
+
+            /**
+             * The code below creates a query that will allow only records which do not have a bundle name
+             * (items, collections, ...) or bitstreams that have a configured bundle name
+             */
+            StringBuilder bundleQuery = new StringBuilder();
+            //Also add the possibility that if no bundle name is there these results will also be returned !
+            bundleQuery.append("-(bundleName:[* TO *]");
+            for (int i = 0; i < bundles.length; i++) {
+                String bundle = bundles[i].trim();
+                bundleQuery.append("-bundleName:").append(bundle);
+                if (i != bundles.length - 1) {
+                    bundleQuery.append(" AND ");
+                }
+            }
+            bundleQuery.append(")");
+
+
+            solrQuery.addFilterQuery(bundleQuery.toString());
+        }
+
+        if (filterQueries != null) {
+            for (String filterQuery : filterQueries) {
+                if (filterQuery != null) {
+                    solrQuery.addFilterQuery(filterQuery);
+                }
+            }
+        }
+
+        if (StringUtils.isNotBlank(fieldList)) {
+            solrQuery.add(CommonParams.FL, fieldList);
+        }
+
+        if (report) {
+            Integer timeAllowed = getTimeAllowed();
+            if (timeAllowed != null) {
+                solrQuery.setTimeAllowed(timeAllowed);
+            }
+        }
+
+        QueryResponse response;
+        try {
+            // solr.set
+            response = solr.query(solrQuery);
+        } catch (SolrServerException | IOException e) {
+            log.error("Error searching Solr usage events using query {}", query, e);
+            throw e;
+        }
+        if (report && isPartialResults(response)) {
+            log.warn("Partial results (timeAllowed={} ms expired) for the statistics report {}: q={} fq={}",
+                     solrQuery.getTimeAllowed(), getGeneratorName(), query, solrQuery.getFilterQueries());
+        }
+        return response;
+    }
+
+    private boolean isPartialResults(QueryResponse response) {
+        return response != null && response.getHeader() != null
+            && Boolean.parseBoolean(String.valueOf(response.getHeader().get("partialResults")));
+    }
+
+    private String getGeneratorName() {
+        String generator = ThreadContext.get(GENERATOR_CONTEXT_KEY);
+        return generator != null ? generator : "(unknown generator)";
     }
 
     @Override

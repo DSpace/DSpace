@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search-results xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <opensearch:totalResults>5</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>
+  <opensearch:Query role="request" searchTerms="DOI(10.1016/j.procs.2014.06.046) OR DOI(10.1211/0022357011778250) OR DOI(10.1590/1519-6984.254973) OR DOI(10.1590/1519-6984.252426) OR DOI(10.1590/1519-6984.257516)" startPage="0"/>
+  <link ref="self" href="https://api.elsevier.com/content/search/scopus?start=0&amp;count=25&amp;query=DOI%2810.1016%2Fj.procs.2014.06.046%29+OR+DOI%2810.1211%2F0022357011778250%29+OR+DOI%2810.1590%2F1519-6984.254973%29+OR+DOI%2810.1590%2F1519-6984.252426%29+OR+DOI%2810.1590%2F1519-6984.257516%29&amp;apiKey=c05176b6c359b1bc5102e2a0c320bd1d" type="application/xml"/>
+  <link ref="first" href="https://api.elsevier.com/content/search/scopus?start=0&amp;count=25&amp;query=DOI%2810.1016%2Fj.procs.2014.06.046%29+OR+DOI%2810.1211%2F0022357011778250%29+OR+DOI%2810.1590%2F1519-6984.254973%29+OR+DOI%2810.1590%2F1519-6984.252426%29+OR+DOI%2810.1590%2F1519-6984.257516%29&amp;apiKey=c05176b6c359b1bc5102e2a0c320bd1d" type="application/xml"/>
+  <entry>
+    <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/85130298365"/>
+    <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/85130298365?field=author,affiliation"/>
+    <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&amp;scp=85130298365&amp;origin=inward"/>
+    <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&amp;scp=85130298365&amp;origin=inward"/>
+    <prism:url>https://api.elsevier.com/content/abstract/scopus_id/85130298365</prism:url>
+    <dc:identifier>SCOPUS_ID:85130298365</dc:identifier>
+    <eid>2-s2.0-85130298365</eid>
+    <dc:title>Transformation of Rhodococcus Pigment Production Hydroxylase (PPH) gene into Camelina sativa: an alternative marker for the detection of transgenic plants</dc:title>
+    <dc:creator>Abbas M.A.</dc:creator>
+    <prism:publicationName>Brazilian Journal of Biology</prism:publicationName>
+    <prism:issn>15196984</prism:issn>
+    <prism:eIssn>16784375</prism:eIssn>
+    <prism:volume>84</prism:volume>
+    <prism:pageRange/>
+    <prism:coverDate>2024-01-01</prism:coverDate>
+    <prism:coverDisplayDate>2024</prism:coverDisplayDate>
+    <prism:doi>10.1590/1519-6984.254973</prism:doi>
+    <citedby-count>0</citedby-count>
+    <affiliation>
+      <affilname>University of the Punjab</affilname>
+      <affiliation-city>Lahore</affiliation-city>
+      <affiliation-country>Pakistan</affiliation-country>
+    </affiliation>
+    <affiliation>
+      <affilname>Government College University Lahore</affilname>
+      <affiliation-city>Lahore</affiliation-city>
+      <affiliation-country>Pakistan</affiliation-country>
+    </affiliation>
+    <pubmed-id>35588515</pubmed-id>
+    <prism:aggregationType>Journal</prism:aggregationType>
+    <subtype>ar</subtype>
+    <subtypeDescription>Article</subtypeDescription>
+    <article-number>e254973</article-number>
+    <source-id>13841</source-id>
+    <openaccess>1</openaccess>
+    <openaccessFlag>true</openaccessFlag>
+  </entry>
+  <entry>
+    <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/85130257610"/>
+    <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/85130257610?field=author,affiliation"/>
+    <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&amp;scp=85130257610&amp;origin=inward"/>
+    <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&amp;scp=85130257610&amp;origin=inward"/>
+    <prism:url>https://api.elsevier.com/content/abstract/scopus_id/85130257610</prism:url>
+    <dc:identifier>SCOPUS_ID:85130257610</dc:identifier>
+    <eid>2-s2.0-85130257610</eid>
+    <dc:title>Evolution of pigments and their relationship with skin color and sensory profile in date fruits (Phoenix dactylifera L.)</dc:title>
+    <dc:creator>Alahyane A.</dc:creator>
+    <prism:publicationName>Brazilian Journal of Biology</prism:publicationName>
+    <prism:issn>15196984</prism:issn>
+    <prism:eIssn>16784375</prism:eIssn>
+    <prism:volume>84</prism:volume>
+    <prism:pageRange/>
+    <prism:coverDate>2024-01-01</prism:coverDate>
+    <prism:coverDisplayDate>2024</prism:coverDisplayDate>
+    <prism:doi>10.1590/1519-6984.252426</prism:doi>
+    <citedby-count>0</citedby-count>
+    <affiliation>
+      <affilname>Faculté des Sciences Semlalia</affilname>
+      <affiliation-city>Marakech</affiliation-city>
+      <affiliation-country>Morocco</affiliation-country>
+    </affiliation>
+    <pubmed-id>35588514</pubmed-id>
+    <prism:aggregationType>Journal</prism:aggregationType>
+    <subtype>ar</subtype>
+    <subtypeDescription>Article</subtypeDescription>
+    <article-number>e252426</article-number>
+    <source-id>13841</source-id>
+    <openaccess>1</openaccess>
+    <openaccessFlag>true</openaccessFlag>
+  </entry>
+  <entry>
+    <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/85129779662"/>
+    <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/85129779662?field=author,affiliation"/>
+    <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&amp;scp=85129779662&amp;origin=inward"/>
+    <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&amp;scp=85129779662&amp;origin=inward"/>
+    <prism:url>https://api.elsevier.com/content/abstract/scopus_id/85129779662</prism:url>
+    <dc:identifier>SCOPUS_ID:85129779662</dc:identifier>
+    <eid>2-s2.0-85129779662</eid>
+    <dc:title>Characterization of Bacillus cereus isolated from contaminated foods with sequencing of virulence genes in Egypt</dc:title>
+    <dc:creator>Mostafa N.F.</dc:creator>
+    <prism:publicationName>Brazilian Journal of Biology</prism:publicationName>
+    <prism:issn>15196984</prism:issn>
+    <prism:eIssn>16784375</prism:eIssn>
+    <prism:volume>84</prism:volume>
+    <prism:pageRange/>
+    <prism:coverDate>2024-01-01</prism:coverDate>
+    <prism:coverDisplayDate>2024</prism:coverDisplayDate>
+    <prism:doi>10.1590/1519-6984.257516</prism:doi>
+    <citedby-count>0</citedby-count>
+    <affiliation>
+      <affilname>Gastrointestinal Surgery Center</affilname>
+      <affiliation-city>Mansoura</affiliation-city>
+      <affiliation-country>Egypt</affiliation-country>
+    </affiliation>
+    <pubmed-id>35475993</pubmed-id>
+    <prism:aggregationType>Journal</prism:aggregationType>
+    <subtype>ar</subtype>
+    <subtypeDescription>Article</subtypeDescription>
+    <article-number>e257516</article-number>
+    <source-id>13841</source-id>
+    <openaccess>1</openaccess>
+    <openaccessFlag>true</openaccessFlag>
+    <freetoread>
+      <value>all</value>
+      <value>publisherfullgold</value>
+    </freetoread>
+    <freetoreadLabel>
+      <value>All Open Access</value>
+      <value>Gold</value>
+    </freetoreadLabel>
+  </entry>
+  <entry>
+    <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/84904515851"/>
+    <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/84904515851?field=author,affiliation"/>
+    <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&amp;scp=84904515851&amp;origin=inward"/>
+    <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&amp;scp=84904515851&amp;origin=inward"/>
+    <link ref="full-text" href="https://api.elsevier.com/content/article/eid/1-s2.0-S1877050914008369"/>
+    <prism:url>https://api.elsevier.com/content/abstract/scopus_id/84904515851</prism:url>
+    <dc:identifier>SCOPUS_ID:84904515851</dc:identifier>
+    <eid>2-s2.0-84904515851</eid>
+    <dc:title>Developing a documentation system for evaluating the societal impact of science</dc:title>
+    <dc:creator>Wolf B.</dc:creator>
+    <prism:publicationName>Procedia Computer Science</prism:publicationName>
+    <prism:issn>18770509</prism:issn>
+    <prism:volume>33</prism:volume>
+    <prism:pageRange>289-296</prism:pageRange>
+    <prism:coverDate>2014-01-01</prism:coverDate>
+    <prism:coverDisplayDate>2014</prism:coverDisplayDate>
+    <prism:doi>10.1016/j.procs.2014.06.046</prism:doi>
+    <pii>S1877050914008369</pii>
+    <citedby-count>5</citedby-count>
+    <affiliation>
+      <affilname>Universität Kassel</affilname>
+      <affiliation-city>Kassel</affiliation-city>
+      <affiliation-country>Germany</affiliation-country>
+    </affiliation>
+    <prism:aggregationType>Conference Proceeding</prism:aggregationType>
+    <subtype>cp</subtype>
+    <subtypeDescription>Conference Paper</subtypeDescription>
+    <source-id>19700182801</source-id>
+    <openaccess>1</openaccess>
+    <openaccessFlag>true</openaccessFlag>
+    <freetoread>
+      <value>all</value>
+      <value>publisherfree2read</value>
+      <value>repository</value>
+      <value>repositoryvor</value>
+    </freetoread>
+    <freetoreadLabel>
+      <value>All Open Access</value>
+      <value>Bronze</value>
+      <value>Green</value>
+    </freetoreadLabel>
+  </entry>
+  <entry>
+    <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/0035674063"/>
+    <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/0035674063?field=author,affiliation"/>
+    <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&amp;scp=0035674063&amp;origin=inward"/>
+    <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&amp;scp=0035674063&amp;origin=inward"/>
+    <prism:url>https://api.elsevier.com/content/abstract/scopus_id/0035674063</prism:url>
+    <dc:identifier>SCOPUS_ID:0035674063</dc:identifier>
+    <eid>2-s2.0-0035674063</eid>
+    <dc:title>Topical anti-inflammatory activity of Thymus willdenowii</dc:title>
+    <dc:creator>Ilidrissi A.</dc:creator>
+    <prism:publicationName>Journal of Pharmacy and Pharmacology</prism:publicationName>
+    <prism:issn>00223573</prism:issn>
+    <prism:volume>53</prism:volume>
+    <prism:issueIdentifier>12</prism:issueIdentifier>
+    <prism:pageRange>1645-1652</prism:pageRange>
+    <prism:coverDate>2001-01-01</prism:coverDate>
+    <prism:coverDisplayDate>2001</prism:coverDisplayDate>
+    <prism:doi>10.1211/0022357011778250</prism:doi>
+    <citedby-count>43</citedby-count>
+    <affiliation>
+      <affilname>Faculté de Médecine et Pharmacie</affilname>
+      <affiliation-city/>
+      <affiliation-country>Morocco</affiliation-country>
+    </affiliation>
+    <pubmed-id>11804395</pubmed-id>
+    <prism:aggregationType>Journal</prism:aggregationType>
+    <subtype>ar</subtype>
+    <subtypeDescription>Article</subtypeDescription>
+    <source-id>23102</source-id>
+    <openaccess>0</openaccess>
+    <openaccessFlag>false</openaccessFlag>
+  </entry>
+</search-results>

@@ -25,6 +25,7 @@
 
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
+    <bean id="solrServiceMetricsIndexPlugin" class="org.dspace.discovery.SolrServiceMetricsIndexPlugin"/>
     <bean id="solrServiceCrisValuePairsIndexPlugin" class="org.dspace.discovery.SolrServiceValuePairsIndexPlugin"/>
     <bean id="itemAuthorityLookupIndexPlugin" class="org.dspace.discovery.ItemAuthorityLookupIndexPlugin">
         <property name="additionalFields">
@@ -77,6 +78,11 @@
                 <entry key="supervision" value-ref="supervisionConfiguration" />
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="administrativeView" value-ref="administrativeView" />
+
+                <!-- Item-only configuration exposing the graph (chart) facets -->
+                <entry key="graphConfiguration" value-ref="graphConfiguration" />
+                <!-- Discovery configuration backing the research outputs explore section -->
+                <entry key="researchoutputs" value-ref="researchoutputs"/>
 
                 <entry key="publication" value-ref="publication"/>
                 <!-- Same as the "publication" configuration, but does NOT filter out older versions of items -->
@@ -148,6 +154,11 @@
                 <!-- Maps to: OrgUnit.isProjectOfOrgUnit (from Project → OrgUnit relationship) -->
                 <!-- Shows Projects participated by this OrgUnit -->
                 <entry key="RELATION.OrgUnit.projects" value-ref="relationOrgunitProjectsConfiguration"/>
+
+                <!-- Collection items -->
+                <entry key="RELATION.Collection.items" value-ref="relationCollectionItemsConfiguration"/>
+                <!-- Community items -->
+                <entry key="RELATION.Community.items" value-ref="relationCommunityItemsConfiguration"/>
 
                 <!-- COAR NOTIFY LDN MESSAGES configuration -->
                 <entry key="NOTIFY.incoming" value-ref="NOTIFY.incoming"/>
@@ -1296,6 +1307,46 @@
             <list>
                 <value>dc.contributor.other_authority:{0}</value>
                 <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- items of a collection -->
+    <bean id="relationCollectionItemsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="indexAlways" value="true"/>
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortTitleAsc" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--find collection items. The placeholder {0} will be replaced with scope (UUID of collection)-->
+                <value>location.coll:{0}</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- items of a community -->
+    <bean id="relationCommunityItemsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="indexAlways" value="true"/>
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortTitleAsc" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--find community items. The placeholder {0} will be replaced with scope (UUID of community)-->
+                <value>location.comm:{0}</value>
             </list>
         </property>
     </bean>

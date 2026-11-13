@@ -573,13 +573,25 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEPerson).perform(post("/api/core/subscriptions")
-                               .param("resource", item1.getID().toString())
-                               .param("eperson_id", eperson.getID().toString())
-                               .content(mapper.writeValueAsString(map))
-                               .contentType(MediaType.APPLICATION_JSON_VALUE))
-                               .andExpect(status().isBadRequest());
+
+        try {
+            getClient(tokenEPerson).perform(post("/api/core/subscriptions")
+                                   .param("resource", item1.getID().toString())
+                                   .param("eperson_id", eperson.getID().toString())
+                                   .content(mapper.writeValueAsString(map))
+                                   .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                   .andExpect(status().isCreated())
+                                   .andExpect(jsonPath("$.subscriptionType", is("content")))
+                                   .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
+                                   .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("W")))
+                                   .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("eperson")))
+                                   .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("resource")))
+                                   .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            SubscribeBuilder.deleteSubscription(idRef.get());
+        }
     }
 
     @Test
@@ -601,13 +613,25 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/core/subscriptions")
-                             .param("resource", item1.getID().toString())
-                             .param("eperson_id", eperson.getID().toString())
-                             .content(mapper.writeValueAsString(map))
-                             .contentType(MediaType.APPLICATION_JSON_VALUE))
-                             .andExpect(status().isBadRequest());
+
+        try {
+            getClient(tokenAdmin).perform(post("/api/core/subscriptions")
+                                 .param("resource", item1.getID().toString())
+                                 .param("eperson_id", eperson.getID().toString())
+                                 .content(mapper.writeValueAsString(map))
+                                 .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                 .andExpect(status().isCreated())
+                                 .andExpect(jsonPath("$.subscriptionType", is("content")))
+                                 .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
+                                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("W")))
+                                 .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("eperson")))
+                                 .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("resource")))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            SubscribeBuilder.deleteSubscription(idRef.get());
+        }
     }
 
     @Test
