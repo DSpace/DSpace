@@ -37,6 +37,10 @@ public abstract class AbstractDSpaceRestRepository {
         return ContextUtil.obtainCurrentRequestContext();
     }
 
+    protected Context obtainReadOnlyContext() {
+        return ContextUtil.obtainCurrentRequestContextAsReadOnly();
+    }
+
     public RequestService getRequestService() {
         return requestService;
     }

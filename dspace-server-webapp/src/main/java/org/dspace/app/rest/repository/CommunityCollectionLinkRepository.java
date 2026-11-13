@@ -56,7 +56,7 @@ public class CommunityCollectionLinkRepository extends AbstractDSpaceRestReposit
                                                @Nullable Pageable optionalPageable,
                                                Projection projection) {
         try {
-            Context context = obtainContext();
+            Context context = obtainReadOnlyContext();
             Community community = communityService.find(context, communityId);
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + communityId);
