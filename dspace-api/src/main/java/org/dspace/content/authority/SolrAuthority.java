@@ -59,6 +59,11 @@ public class SolrAuthority implements ChoiceAuthority {
     protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private String getQueryFields() {
+        String key = "authority.search.qf." + field.replace('_', '.');
+        return configurationService.getProperty(key, configurationService.getProperty("authority.search.qf", "value"));
+    }
+
     public Choices getMatches(String text, int start, int limit, String locale,
                               boolean bestMatch) {
         if (limit == 0) {
@@ -69,7 +74,6 @@ public class SolrAuthority implements ChoiceAuthority {
         if (text == null || text.trim().equals("")) {
             queryArgs.setQuery("*:*");
         } else {
-            String searchField = "value";
             String localSearchField = "";
             try {
                 //A downside of the authors is that the locale is sometimes a number, make sure that this isn't one
@@ -78,15 +82,15 @@ public class SolrAuthority implements ChoiceAuthority {
             } catch (NumberFormatException e) {
                 //Everything is alright
             }
-            if (locale != null && !"".equals(locale)) {
-                localSearchField = searchField + "_" + locale;
+            String queryFields = getQueryFields();
+            // Add localized value field
+            if (locale != null && locale.matches("[a-zA-Z]{2,8}")) {
+                queryFields += " value_" + locale + "^3";
             }
 
-            String query = "(" + toQuery(searchField, text) + ") ";
-            if (!localSearchField.equals("")) {
-                query += " or (" + toQuery(localSearchField, text) + ")";
-            }
-            queryArgs.setQuery(query);
+            queryArgs.set("defType", "edismax");
+            queryArgs.set("qf", queryFields);
+            queryArgs.setQuery(text.trim());
         }
 
         queryArgs.addFilterQuery("field:" + field);
@@ -94,15 +98,6 @@ public class SolrAuthority implements ChoiceAuthority {
         //We add one to our facet limit so that we know if there are more matches
         int maxNumberOfSolrResults = limit + 1;
         queryArgs.set(CommonParams.ROWS, maxNumberOfSolrResults);
-
-        String sortField = "value";
-        String localSortField = "";
-        if (StringUtils.isNotBlank(locale)) {
-            localSortField = sortField + "_" + locale;
-            queryArgs.addSort(localSortField, SolrQuery.ORDER.asc);
-        } else {
-            queryArgs.addSort(sortField, SolrQuery.ORDER.asc);
-        }
 
         Choices result;
         try {
