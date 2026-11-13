@@ -94,6 +94,16 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
 
+    /**
+     * Pseudo-step of the workflow curation, run just before the item is archived.
+     */
+    public static final String BEFORE_ARCHIVE_STEP = "beforearchive";
+
+    /**
+     * Pseudo-step of the workflow curation, run just after the item is archived.
+     */
+    public static final String AFTER_ARCHIVE_STEP = "afterarchive";
+
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
@@ -215,6 +225,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             wfi.setMultipleFiles(wsi.hasMultipleFiles());
             wfi.setMultipleTitles(wsi.hasMultipleTitles());
             wfi.setPublishedBefore(wsi.isPublishedBefore());
+            wfi.setWorkflowID(wf.getID());
             xmlWorkflowItemService.update(context, wfi);
             removeUserItemPolicies(context, myitem, myitem.getSubmitter());
             if (collectionService.isSharedWorkspace(context, collection)) {
@@ -224,6 +235,17 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             grantSubmitterReadPolicies(context, myitem);
 
             context.turnOffAuthorisationSystem();
+
+            // remove the WorkspaceItem before activating any step, as the curation tasks run when
+            // entering a step may reject the item and send it back to a new WorkspaceItem
+            wsi = context.reloadEntity(wsi);
+            if (wsi != null) {
+                workspaceItemService.deleteWrapper(context, wsi);
+                context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
+                    itemService.getIdentifiers(context, wfi.getItem())));
+
+            }
+
             Step firstStep = wf.getFirstStep();
             if (firstStep.isValidStep(context, wfi)) {
                 activateFirstStep(context, wf, firstStep, wfi);
@@ -240,14 +262,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
             }
 
-            wsi = context.reloadEntity(wsi);
-            if (wsi != null) {
-                // remove the WorkspaceItem
-                workspaceItemService.deleteWrapper(context, wsi);
-                context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wfi.getItem().getID(), null,
-                    itemService.getIdentifiers(context, wfi.getItem())));
-
-            }
             context.restoreAuthSystemState();
             return wfi;
         } catch (WorkflowConfigurationException e) {
@@ -338,6 +352,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig firstActionConfig = firstStep.getUserSelectionMethod();
 
+        wfi.setStepID(firstStep.getId());
+        xmlWorkflowItemService.update(context, wfi);
+
         // Check for curation tasks at the start of this step.
         //
         // If doCuration returns true, either no curation tasks are mapped to
@@ -386,26 +403,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             throws SQLException, AuthorizeException, IOException,
             MessagingException, WorkflowException {
         XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
-
-        // Check for curation tasks.
-        //
-        // If doCuration returns true, either no curation tasks are mapped to
-        // this step, or they were run and succeeded.  In this scenario, we
-        // continue with the current step.
-        //
-        // If doCuration returns false, either curation tasks were queued, or
-        // they resulted in rejection of the item.  In this scenario, the
-        // current step cannot be completed and we must exit immediately.
-        if (!xmlWorkflowCuratorService.doCuration(c, wi)) {
-            // don't proceed - either curation tasks queued, or item rejected
-            log.info(LogHelper.getHeader(c, "advance_workflow",
-                    "workflow_item_id=" + wi.getID()
-                            + ",item_id=" + wi.getItem().getID()
-                            + ",collection_id=" + wi.getCollection().getID()
-                            + ",current_action=" + currentActionConfig.getId()
-                            + ",doCuration=false"));
-            return currentActionConfig;
-        }
 
         try {
             Step currentStep = currentActionConfig.getStep();
@@ -600,7 +597,23 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         throws SQLException, IOException, AuthorizeException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig nextActionConfig;
         if (nextStep != null) {
+            wfi.setStepID(nextStep.getId());
+            xmlWorkflowItemService.update(c, wfi);
             nextActionConfig = nextStep.getUserSelectionMethod();
+
+            // Check for curation tasks at the start of this step (see activateFirstStep).
+            if (!xmlWorkflowCuratorService.doCuration(c, wfi)) {
+                // don't proceed - either curation tasks queued, or item rejected
+                log.info(LogHelper.getHeader(c, "advance_workflow",
+                        "workflow_item_id=" + wfi.getID()
+                                + ",item_id=" + wfi.getItem().getID()
+                                + ",collection_id=" + wfi.getCollection().getID()
+                                + ",current_action=" + nextActionConfig.getId()
+                                + ",doCuration=false"));
+                c.restoreAuthSystemState();
+                return null;
+            }
+
             nextActionConfig.getProcessingAction().activate(c, wfi);
 //                nextActionConfig.getProcessingAction().generateTasks();
 
@@ -632,7 +645,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      *
      * @param context The relevant DSpace Context.
      * @param wfi     workflow item
-     * @return the fully archived item.
+     * @return the fully archived item, or null if a curation task rejected it.
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
@@ -640,6 +653,19 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      */
     protected Item archive(Context context, XmlWorkflowItem wfi)
         throws SQLException, IOException, AuthorizeException {
+        // Check for curation tasks before archiving the item (see activateFirstStep).
+        wfi.setStepID(BEFORE_ARCHIVE_STEP);
+        xmlWorkflowItemService.update(context, wfi);
+        if (!xmlWorkflowCuratorService.doCuration(context, wfi)) {
+            // don't proceed - either curation tasks queued, or item rejected
+            log.info(LogHelper.getHeader(context, "archive_item",
+                    "workflow_item_id=" + wfi.getID()
+                            + ",item_id=" + wfi.getItem().getID()
+                            + ",collection_id=" + wfi.getCollection().getID()
+                            + ",doCuration=false"));
+            return null;
+        }
+
         // FIXME: Check auth
         Item item = wfi.getItem();
         Collection collection = wfi.getCollection();
@@ -664,6 +690,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // Log the event
         log.info(LogHelper.getHeader(context, "install_item", "workflow_item_id="
             + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
+
+        // Check for curation tasks after archiving the item. The workflow item has already been
+        // deleted when installing the item, so its step is set but not persisted.
+        wfi.setStepID(AFTER_ARCHIVE_STEP);
+        xmlWorkflowCuratorService.doCuration(context, wfi);
 
         return item;
     }
