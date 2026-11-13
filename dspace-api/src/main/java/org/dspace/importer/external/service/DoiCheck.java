@@ -7,6 +7,8 @@
  */
 package org.dspace.importer.external.service;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,6 +30,7 @@ public class DoiCheck {
             "https://doi.org/",
             "www.dx.doi.org/",
             "dx.doi.org/",
+            "doi.org/",
             "doi:");
 
     /**
@@ -49,19 +52,53 @@ public class DoiCheck {
                                                                "|10.1207/[\\w\\d]+\\&\\d+_\\d+",
                                                            Pattern.CASE_INSENSITIVE);
 
+
     private DoiCheck() {}
 
+    // then run isDoi() against that normalized value
     public static boolean isDoi(final String value) {
         Matcher m = PATTERN.matcher(purgeDoiValue(value));
         return m.matches();
     }
 
     public static String purgeDoiValue(final String query) {
-        String value = query.replaceAll(",", "");
-        for (final String prefix : DOI_PREFIXES) {
-            value = value.replaceAll(prefix, "");
+        // trim leading/trailing whitespace
+        String value = query.trim();
+
+        // URL-decode the DOI where needed, e.g. %2F → /
+        value = urlDecode(value);
+
+        // remove query-string fragments after the DOI, e.g. ?pdf=1, ?download=true
+        int queryIdx = value.indexOf('?');
+        if (queryIdx >= 0) {
+            value = value.substring(0, queryIdx);
         }
+        int fragmentIdx = value.indexOf('#');
+        if (fragmentIdx >= 0) {
+            value = value.substring(0, fragmentIdx);
+        }
+
+        // remove supported DOI resolver prefixes
+        for (final String prefix : DOI_PREFIXES) {
+            value = value.replaceAll("(?i)" + Pattern.quote(prefix), "");
+        }
+
+        // extract the DOI when it appears after a known URL/path prefix
+        Matcher matcher = PATTERN.matcher(value);
+        if (matcher.find()) {
+            value = matcher.group();
+        }
+
+        // return only the normalized DOI, e.g. 10.1038/s41561-018-0221-6
         return value.trim();
+    }
+
+    private static String urlDecode(String value) {
+        try {
+            return URLDecoder.decode(value.replace("+", "%2B"), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            return value;
+        }
     }
 
 }
