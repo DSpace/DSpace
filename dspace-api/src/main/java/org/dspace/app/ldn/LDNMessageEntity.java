@@ -12,6 +12,7 @@ import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -20,6 +21,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * Class representing ldnMessages stored in the DSpace system and, when locally resolvable,
@@ -84,7 +87,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @Id
     private String id;
 
+    // DSpaceObject relations are loaded with a separate select rather than joined into every message query
+    // (joining all DSpaceObject subclass tables made each query very large). They are not LAZY: a lazy
+    // DSpaceObject is a proxy that cannot be cast to its subclass, e.g. Item, also when loaded elsewhere.
     @ManyToOne
+    @Fetch(FetchMode.SELECT)
     @JoinColumn(name = "object", referencedColumnName = "uuid")
     private DSpaceObject object;
 
@@ -106,19 +113,20 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @Column(name = "queue_timeout")
     private Instant queueTimeout = null;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "origin", referencedColumnName = "id")
     private NotifyServiceEntity origin;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target", referencedColumnName = "id")
     private NotifyServiceEntity target;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inReplyTo", referencedColumnName = "id")
     private LDNMessageEntity inReplyTo;
 
     @ManyToOne
+    @Fetch(FetchMode.SELECT)
     @JoinColumn(name = "context", referencedColumnName = "uuid")
     private DSpaceObject context;
 

@@ -6658,6 +6658,15 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$._embedded.searchResult.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
+            // The related objects of the message must be resolvable from the search result
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects[0]._embedded.indexableObject.object",
+                is(item.getID().toString())))
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects[0]._embedded.indexableObject.context",
+                is(item.getID().toString())))
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects[0]._embedded.indexableObject.origin",
+                is(notifyService.getID())))
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects[0]._embedded.indexableObject"
+                + ".notificationType", is("Incoming")))
             .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(notifyIncomingFacetMatchers)))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
