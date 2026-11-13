@@ -26,10 +26,12 @@ import org.dspace.submit.model.UploadConfigurationService;
 import org.dspace.util.DateMathParser;
 import org.dspace.util.TimeHelpers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.util.unit.DataSize;
 
 /**
  * This is the repository responsible to manage Configuration Upload section
@@ -48,6 +50,9 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 
     @Autowired
     private UploadConfigurationService uploadConfigurationService;
+
+    @Autowired
+    private MultipartProperties multipartProperties;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
@@ -116,9 +121,26 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
             result.getAccessConditionOptions().add(optionRest);
         }
         result.setMetadata(submissionFormRestRepository.findOne(context, config.getMetadata()));
-        result.setMaxSize(config.getMaxSize());
+        result.setMaxSize(effectiveMaxSize(config));
         result.setRequired(config.isRequired());
         result.setName(config.getName());
         return result;
+    }
+
+    /**
+     * The largest file the upload step accepts: the configured limit, capped by the servlet container's
+     * multipart file-size limit when that limit is finite. Clients can check a file against it before
+     * sending any data.
+     * @param config the upload configuration
+     * @return the effective limit in bytes, or null when neither limit applies
+     */
+    private Long effectiveMaxSize(UploadConfiguration config) {
+        Long configured = config.getMaxSize();
+        boolean limited = configured != null && configured > 0;
+        DataSize multipart = multipartProperties.getMaxFileSize();
+        if (multipart == null || multipart.toBytes() < 0) {
+            return limited ? configured : null;
+        }
+        return limited ? Math.min(configured, multipart.toBytes()) : multipart.toBytes();
     }
 }
