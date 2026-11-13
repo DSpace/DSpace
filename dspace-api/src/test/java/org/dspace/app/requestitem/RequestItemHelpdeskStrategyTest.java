@@ -98,13 +98,12 @@ public class RequestItemHelpdeskStrategyTest
         instance.ePersonService = epersonService;
 
         // Check with help desk enabled.
-        configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "true");
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_MAIL_HELPDESK, HELPDESK_ADDRESS);
         List<RequestItemAuthor> authors = instance.getRequestItemAuthor(context, item);
         assertEquals("Wrong author address", HELPDESK_ADDRESS, authors.get(0).getEmail());
 
         // Check with help desk disabled.
-        configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "false");
+        configurationService.setProperty(RequestItemHelpdeskStrategy.P_MAIL_HELPDESK, "");
         authors = instance.getRequestItemAuthor(context, item);
         assertEquals("Wrong author address", AUTHOR_ADDRESS, authors.get(0).getEmail());
     }
