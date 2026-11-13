@@ -36,6 +36,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.DefaultTlsDirContextAuthenticationStrategy;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.ldap.filter.PresentFilter;
@@ -417,6 +418,50 @@ public class LDAPAuthentication implements AuthenticationMethod {
     }
 
     /**
+     * Create the Spring LDAP context source used for the user lookup and the password check.
+     * <p>
+     * When "authentication-ldap.starttls" is enabled, every connection negotiates StartTLS
+     * before it binds, so that neither the search account's password nor the user's password
+     * is sent in cleartext. JNDI connection pooling is turned off in that case, because a
+     * pooled connection cannot be upgraded to TLS. Without a search account, the user lookup
+     * binds anonymously after StartTLS, so the user id and the returned attributes are not
+     * sent in cleartext either.
+     *
+     * @param url       the LDAP provider URL
+     * @param adminUser the DN of the search account, possibly blank
+     * @param adminPass the password of the search account, possibly blank
+     * @param useTLS    whether to negotiate StartTLS
+     * @return the initialised context source
+     */
+    static LdapContextSource createContextSource(String url, String adminUser, String adminPass, boolean useTLS) {
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl(url);
+
+        boolean hasSearchAccount = StringUtils.isNotBlank(adminUser) && StringUtils.isNotBlank(adminPass);
+        if (hasSearchAccount) {
+            contextSource.setUserDn(adminUser);
+            contextSource.setPassword(adminPass);
+        } else {
+            contextSource.setAnonymousReadOnly(true);
+        }
+
+        if (useTLS) {
+            contextSource.setAuthenticationStrategy(new DefaultTlsDirContextAuthenticationStrategy());
+            contextSource.setPooled(false);
+        } else {
+            contextSource.setPooled(true);
+        }
+        contextSource.afterPropertiesSet();
+        if (useTLS && !hasSearchAccount) {
+            // afterPropertiesSet() switches to an anonymous read-only context when no user DN is set,
+            // and that context is created without StartTLS. Turn it off again so that the lookup
+            // binds with an empty DN and password (an anonymous bind) after StartTLS.
+            contextSource.setAnonymousReadOnly(false);
+        }
+        return contextSource;
+    }
+
+    /**
      * Translate the value of "authentication-ldap.search_scope" (0 = object, 1 = one level,
      * 2 = subtree, the same numbers as javax.naming.directory.SearchControls) into the
      * Spring LDAP search scope used when looking up the DN of a user.
@@ -498,26 +543,14 @@ public class LDAPAuthentication implements AuthenticationMethod {
         }
 
         private void setupSpringLdap(ConfigurationService cfg) {
-            LdapContextSource contextSource = new LdapContextSource();
             if (StringUtils.isBlank(ldap_provider_url)) {
                 throw new IllegalStateException(
                     "LDAP provider URL is empty! Please check 'authentication-ldap.provider_url' in your configuration."
                 );
             }
-            contextSource.setUrl(ldap_provider_url);
-
-            String adminUser = cfg.getProperty("authentication-ldap.search.user");
-            String adminPass = cfg.getProperty("authentication-ldap.search.password");
-
-            if (StringUtils.isNotBlank(adminUser) && StringUtils.isNotBlank(adminPass)) {
-                contextSource.setUserDn(adminUser);
-                contextSource.setPassword(adminPass);
-            } else {
-                contextSource.setAnonymousReadOnly(true);
-            }
-
-            contextSource.setPooled(true);
-            contextSource.afterPropertiesSet();
+            LdapContextSource contextSource = createContextSource(ldap_provider_url,
+                cfg.getProperty("authentication-ldap.search.user"),
+                cfg.getProperty("authentication-ldap.search.password"), useTLS);
             this.ldapTemplate = new LdapTemplate(contextSource);
             this.ldapTemplate.setIgnorePartialResultException(true);
         }
