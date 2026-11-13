@@ -23,6 +23,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,9 @@ import org.springframework.stereotype.Component;
 public class CanSynchronizeWithORCID implements AuthorizationFeature {
 
     public static final String NAME = "canSynchronizeWithORCID";
+
+    @Autowired
+    private EPersonService ePersonService;
 
     @Autowired
     private ItemService itemService;
@@ -63,7 +67,7 @@ public class CanSynchronizeWithORCID implements AuthorizationFeature {
         String id = ((ItemRest) object).getId();
         Item item = itemService.find(context, UUID.fromString(id));
 
-        return isOrcidSynchronizationEnabled() && isDspaceObjectOwner(ePerson, item);
+        return isOrcidSynchronizationEnabled() && ePersonService.isOwnerOfItem(ePerson, item);
     }
 
     @Override

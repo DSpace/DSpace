@@ -531,6 +531,20 @@
   <dc-type>
     <schema>dc</schema>
     <element>relation</element>
+    <qualifier>journalvolume</qualifier>
+    <scope_note>References journal volume for related item.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>relation</element>
+    <qualifier>journalissue</qualifier>
+    <scope_note>References journal issue for related item.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>relation</element>
     <qualifier>orgunit</qualifier>
     <scope_note>References orgunit for related item.</scope_note>
   </dc-type>
@@ -730,6 +744,13 @@
     <element>identifier</element>
     <qualifier>patentno</qualifier>
     <scope_note>The Patent Number</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>applicationnumber</qualifier>
+    <scope_note></scope_note>
   </dc-type>
 
   <dc-type>
