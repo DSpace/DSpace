@@ -810,6 +810,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 pagesize = 10;
             }
             discoverQuery.setMaxResults(pagesize);
+            // Resolve the scope only on the first search: the scoped search(context, dso, query)
+            // overload mutates the shared DiscoverQuery by appending a "location:" filter query.
+            // Because this iterator reuses the same DiscoverQuery for every page, calling the scoped
+            // overload on each page re-appended that filter once per page, so after ~1000 pages the
+            // Solr request accumulated ~1000 identical filter queries and was rejected
+            // ("Form with too many parts [1001 > 1000]"), aborting the iteration. We apply the scope
+            // once here and page with the unscoped search(context, query) from then on.
             this.discoverResult = search(context, dso, discoverQuery);
         }
 
@@ -828,7 +835,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 relativeCursor = 0;
                 discoverQuery.setStart(offset);
                 try {
-                    discoverResult = search(context, dso, discoverQuery);
+                    // Use the unscoped search: the scope filter was already applied in initialise(),
+                    // and the DiscoverQuery already carries it. Calling the scoped overload again
+                    // would re-append the "location:" filter on every page.
+                    discoverResult = search(context, discoverQuery);
                 } catch (SearchServiceException e) {
                     log.error("error while getting search results", e);
                 }
