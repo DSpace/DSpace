@@ -1461,8 +1461,8 @@
                 <version>${asm.version}</version>
             </dependency>
 
-            <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
-                 and OpenAIRE Broker-Client -->
+            <!-- Several dependencies disagree on version of GSON including Jena and
+                 OpenAIRE Broker-Client -->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
