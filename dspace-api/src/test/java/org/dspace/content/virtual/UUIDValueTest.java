@@ -36,11 +36,11 @@ public class UUIDValueTest {
     @Test
     public void testGetValues() throws Exception {
         // Setup objects utilized in unit test
-        List<String> list = new ArrayList<>();
+        List<VirtualMetadataConfiguration.ValueResult> list = new ArrayList<>();
         Item item = mock(Item.class);
         UUID uuid = UUID.randomUUID();
         when(item.getID()).thenReturn(uuid);
-        list.add(String.valueOf(uuid));
+        list.add(new VirtualMetadataConfiguration.ValueResult(String.valueOf(uuid)));
 
         // The reported value(s) should match our defined list
         assertEquals("TestGetValues 0", list, uuidValue.getValues(context, item));
