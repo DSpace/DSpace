@@ -38,7 +38,6 @@ public abstract class AbstractCRUDBuilder<T extends ReloadableEntity> extends Ab
             c.complete();
         }
 
-        indexingService.commit();
     }
 
 }

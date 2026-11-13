@@ -15,7 +15,6 @@ import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 /**
  * Builder for {@link LDNMessageEntity} entities.
@@ -50,7 +49,6 @@ public class LDNMessageBuilder extends AbstractBuilder<LDNMessageEntity, LDNMess
                 delete(ldnMessageEntity);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -68,8 +66,7 @@ public class LDNMessageBuilder extends AbstractBuilder<LDNMessageEntity, LDNMess
             ldnMessageService.update(context, ldnMessageEntity);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException e) {
+        } catch (SQLException e) {
             log.error(e);
         }
         return ldnMessageEntity;
@@ -85,7 +82,6 @@ public class LDNMessageBuilder extends AbstractBuilder<LDNMessageEntity, LDNMess
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     public static LDNMessageBuilder createNotifyServiceBuilder(Context context, String id) {

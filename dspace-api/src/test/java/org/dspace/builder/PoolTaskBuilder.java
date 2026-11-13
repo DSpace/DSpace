@@ -77,7 +77,6 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
             workspaceItem = null;
             poolTask = getService().findByWorkflowIdAndEPerson(context, workflowItem, user);
             context.dispatchEvents();
-            indexingService.commit();
             return poolTask;
         } catch (Exception e) {
             return handleException(e);
@@ -117,7 +116,6 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
             WorkflowItemBuilder.deleteWorkflowItem(workflowItem.getID());
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
