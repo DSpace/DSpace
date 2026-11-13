@@ -240,12 +240,20 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             log.info(LogHelper.getHeader(context, "remove_logo",
                                           "community_id=" + community.getID()));
             community.setLogo(null);
+            context.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, community.getID(),
+                Constants.BITSTREAM, oldLogo.getID(),
+                oldLogo.getChecksum(), DetailType.BITSTREAM_CHECKSUM,
+                getIdentifiers(context, community)));
             bitstreamService.delete(context, oldLogo);
         }
 
         if (is != null) {
             Bitstream newLogo = bitstreamService.create(context, is);
             community.setLogo(newLogo);
+            context.addEvent(new Event(Event.ADD, Constants.COMMUNITY, community.getID(),
+                Constants.BITSTREAM, newLogo.getID(),
+                newLogo.getChecksum(), DetailType.BITSTREAM_CHECKSUM,
+                getIdentifiers(context, community)));
 
             // now create policy for logo bitstream
             // to match our READ policy
