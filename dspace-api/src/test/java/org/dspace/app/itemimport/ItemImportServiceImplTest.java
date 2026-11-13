@@ -95,8 +95,8 @@ public class ItemImportServiceImplTest {
     @Test
     public void unzipReturnsImportRoot() throws Exception {
         // Imported Zip files may contain an optional outer "wrapper" directory,
-        // such as "SimpleArchiveFormat", that the directories of the items
-        // being imported. The ItemImportServiceImpl.unzip method handles
+        // such as "SimpleArchiveFormat", that contains the directories of the
+        // items being imported. The ItemImportServiceImpl.unzip method handles
         // this optional directory internally, and returns an "import root"
         // that enables callers to assume that the directory contains the
         // items to be imported as immediate child subdirectories.

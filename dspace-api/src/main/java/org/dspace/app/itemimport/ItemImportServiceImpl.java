@@ -1996,7 +1996,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
 
         // 3
-        // extractionRoot is the directory were the Zip file will be uncompressed
+        // extractionRoot is the directory where the Zip file will be uncompressed
         Path extractionRoot = sourcedirFile.toPath().toRealPath();
         // sourceDirForZip is returned from this method. It is initially set to
         // extractionRoot, but may be modified to a subdirectory of the

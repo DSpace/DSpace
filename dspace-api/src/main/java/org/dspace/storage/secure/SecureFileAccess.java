@@ -24,7 +24,7 @@ import java.util.Deque;
 import java.util.List;
 
 /**
- * Decent I/O path validation
+ * Validates a given path against allowed base paths.
  *
  * @author Kim Shepherd <kim-at-shepherd-dot-nz>
  */
@@ -42,7 +42,8 @@ public final class SecureFileAccess {
      *
      * <strong>Note:</strong> Due to path normalization and resolution of
      * symbolic links, this method may return a Path that is lexically
-     * distinct from the given path.
+     * distinct from the given path, and may be different from direct traversal
+     * of the original path.
      *
      * Callers MUST use the returned Path, as the validation only applies to
      * that path.
@@ -56,7 +57,7 @@ public final class SecureFileAccess {
      *             context (e.g. configured base path, CWD, dspace.dir, and so on)
      * @param allowedBasePaths list of allowed base paths for this use case as per system configuration
      * @param purpose the name of the calling component / use case for logging and inspection
-     * @return a validated Path for as much of the given path as exists. Callers
+     * @return the complete validated Path, including nonexistent trailing elements. Callers
      *             MUST use this returned Path, as the validation only applies
      *             to this path.
      * @throws IOException on validation failure
