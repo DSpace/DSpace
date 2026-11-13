@@ -23,8 +23,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
- * I18nUtil.java
- *
  * Some Utilities for i18n Support.
  * - getting the default Locale for this DSpace Instance
  * - getting all supported Locales for this DSpace Instance
@@ -49,8 +47,7 @@ public class I18nUtil {
      * Gets the default locale as defined in dspace.cfg If no default locale is
      * defined, the Locale of the JVM is used
      *
-     * @return defaultLocale
-     * the default Locale for this DSpace instance
+     * @return defaultLocale the default Locale for this DSpace instance
      */
     public static Locale getDefaultLocale() {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -134,8 +131,7 @@ public class I18nUtil {
      * no appropriate supported locale is found, the DEFAULTLOCALE is used
      *
      * @param locale Locale to find the corresponding Locale
-     * @return supportedLocale
-     * Locale for session according to locales supported by this DSpace instance as set in dspace.cfg
+     * @return supportedLocale Locale for session according to supported locales set in dspace.cfg
      */
 
     public static Locale getSupportedLocale(Locale locale) {
@@ -196,8 +192,7 @@ public class I18nUtil {
      * no appropriate supported locale is found, the DEFAULTLOCALE is used
      *
      * @param locale String to find the corresponding Locale
-     * @return supportedLocale
-     * Locale for session according to locales supported by this DSpace instance as set in dspace.cfg
+     * @return supportedLocale Locale for session according to supported locales set in dspace.cfg
      */
     public static Locale getSupportedLocale(String locale) {
         Locale currentLocale = null;
@@ -229,8 +224,7 @@ public class I18nUtil {
      * Get the i18n message string for a given key and use the default Locale.
      *
      * @param key String - name of the key to get the message for
-     * @return message
-     * String of the message
+     * @return message String of the message
      */
     public static String getMessage(String key) {
         return getMessage(key.trim(), getDefaultLocale());
@@ -241,8 +235,7 @@ public class I18nUtil {
      *
      * @param key    String - name of the key to get the message for
      * @param locale Locale, to get the message for
-     * @return message
-     * String of the message
+     * @return message String of the message
      */
     public static String getMessage(String key, Locale locale) {
         if (locale == null) {
@@ -268,8 +261,7 @@ public class I18nUtil {
      *
      * @param key String - name of the key to get the message for
      * @param c   Context having the desired Locale
-     * @return message
-     * String of the message
+     * @return message String of the message
      */
     public static String getMessage(String key, Context c) {
         return getMessage(key.trim(), c.getCurrentLocale());
@@ -280,8 +272,7 @@ public class I18nUtil {
      * Get the appropriate localized version of the default.license according to language settings
      *
      * @param context the current DSpace context
-     * @return fileName
-     * String - localized filename for default.license
+     * @return fileName String - localized filename for default.license
      */
     public static String getDefaultLicense(Context context) {
         Locale locale = context.getCurrentLocale();
@@ -298,13 +289,11 @@ public class I18nUtil {
 
     /**
      * Get the appropriate localized version of a file according to language settings
-     * e. g. help files in jsp/help/
      *
      * @param locale   Locale to get the file for
      * @param fileName String fileName, to get the localized file for
      * @param fileType String file extension
-     * @return localizedFileName
-     * String - localized filename
+     * @return localizedFileName String - localized filename
      */
     private static String getFilename(Locale locale, String fileName, String fileType) {
         String localizedFileName = null;
@@ -365,8 +354,7 @@ public class I18nUtil {
      *
      * @param locale Locale for this request
      * @param name   String - base name of the email template
-     * @return templateName
-     * String - localized filename of an email template
+     * @return templateName String - localized filename of an email template
      */
     public static String getEmailFilename(Locale locale, String name) {
         String templateFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
@@ -382,8 +370,7 @@ public class I18nUtil {
      *
      * @param locale Locale for this request
      * @param name   String - base name of the ldn template
-     * @return templateName
-     * String - localized filename of a ldn template
+     * @return templateName String - localized filename of a ldn template
      */
     public static String getLDNFilename(Locale locale, String name) {
         String templateFile =
