@@ -484,4 +484,18 @@
         <scope_note>Text alternative for associated image/video content.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>withdrawn</element>
+        <qualifier>reason</qualifier>
+        <scope_note>Human readable explanation of why the item has been withdrawn, shown on its tombstone page.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>withdrawn</element>
+        <qualifier>redirect</qualifier>
+        <scope_note>Stores a boolean text value (true or false). When true, and a replacement record is available in dcterms.isReplacedBy, the tombstone page of the withdrawn item is skipped and the visitor is redirected to the replacement.</scope_note>
+    </dc-type>
+
 </dspace-dc-types>
