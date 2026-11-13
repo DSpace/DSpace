@@ -23,11 +23,11 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.dspace.disseminate.factory.DisseminateServiceFactory;
 import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.util.DigestUtils;
@@ -53,8 +53,7 @@ public class BitstreamResource extends AbstractResource {
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected final CitationDocumentService citationDocumentService =
-            new DSpace().getServiceManager()
-                    .getServicesByType(CitationDocumentService.class).get(0);
+                                                DisseminateServiceFactory.getInstance().getCitationDocumentService();
 
     protected BitstreamDocument document;
 
