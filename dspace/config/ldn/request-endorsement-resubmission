@@ -28,7 +28,10 @@
   "object": {
     "id": "${params[5]}",
     "ietf:cite-as": "${params[6]}",
-    "type": "sorg:AboutPage",
+    "type": [
+      "Page",
+      "sorg:AboutPage"
+    ],
     "ietf:item": {
       "id": "${params[7]}",
       "mediaType": "${params[8]}",
