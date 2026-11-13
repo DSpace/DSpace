@@ -50,7 +50,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);
         criteriaQuery.select(ePersonRoot);
         criteriaQuery.where(criteriaBuilder.equal(ePersonRoot.get(EPerson_.email), email.toLowerCase()));
-        return uniqueResult(context, criteriaQuery, true, EPerson.class);
+        return uniqueResult(context, criteriaQuery, false, EPerson.class);
     }
 
 
@@ -61,7 +61,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);
         criteriaQuery.select(ePersonRoot);
         criteriaQuery.where((criteriaBuilder.equal(ePersonRoot.get(EPerson_.netid), netid)));
-        return uniqueResult(context, criteriaQuery, true, EPerson.class);
+        return uniqueResult(context, criteriaQuery, false, EPerson.class);
     }
 
     @Override
