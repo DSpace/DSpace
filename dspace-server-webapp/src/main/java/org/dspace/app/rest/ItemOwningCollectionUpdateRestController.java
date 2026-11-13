@@ -32,6 +32,10 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -58,6 +62,12 @@ public class ItemOwningCollectionUpdateRestController {
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    VersionHistoryService versionHistoryService;
+
+    @Autowired
+    VersioningService versioningService;
 
     @Autowired
     ConverterService converter;
@@ -163,8 +173,29 @@ public class ItemOwningCollectionUpdateRestController {
         Collection currentCollection = item.getOwningCollection();
 
         if (authorizeService.authorizeActionBoolean(context, currentCollection, Constants.ADMIN)) {
-
-            return moveItem(context, item, currentCollection, targetCollection, inheritPolicies);
+            Collection latestTargetCollection = targetCollection;
+            latestTargetCollection =
+                moveItem(context, item, currentCollection, latestTargetCollection, inheritPolicies);
+            if (latestTargetCollection != null) {
+                // Move older versions of the item as well
+                item = context.reloadEntity(item);
+                VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+                if (versionHistory != null) {
+                    List<Version> versions =
+                        versioningService.getVersionsByHistoryWithItems(context, versionHistory, 0, -1);
+                    List<Item> versionItems = versions.stream()
+                                              .map(Version::getItem)
+                                              .toList();
+                    for (Item versionItem : versionItems) {
+                        if (versionItem == item) {
+                            continue;
+                        }
+                        latestTargetCollection =
+                            moveItem(context, versionItem, currentCollection, latestTargetCollection, inheritPolicies);
+                    }
+                }
+            }
+            return latestTargetCollection;
         }
 
         return null;
