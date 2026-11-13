@@ -100,6 +100,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             VisibilityEnum.fromString(dcinput.isReadOnly("submission") ? "read-only" : null),
             VisibilityEnum.fromString(dcinput.isReadOnly("workflow") ? "read-only" : null)));
         inputField.setRepeatable(dcinput.isRepeatable());
+        if (dcinput.getMaxOccurrences() > 0) {
+            inputField.setMaxOccurrences(dcinput.getMaxOccurrences());
+        }
         if (dcinput.getLanguage()) {
             int idx = 1;
             //list contains: at even position the code, at odd position the label
