@@ -23,7 +23,7 @@
     </bean>
 
     <bean id="publicationAuthorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
-        <property name="id" value="publication-author"/>
+        <property name="id" value="authority:dc.contributor.author"/>
         <property name="leftEntityTypes">
             <set>
                 <value>Publication</value>

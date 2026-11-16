@@ -34,12 +34,12 @@ public class RelationshipTypeConfigurationTest {
     @Before
     public void setUp() {
         configuration = new RelationshipTypeConfiguration();
-        configuration.setId("publication-author");
+        configuration.setId("authority:dc.contributor.author");
     }
 
     @Test
     public void testSetId() {
-        assertEquals("publication-author", configuration.getId());
+        assertEquals("authority:dc.contributor.author", configuration.getId());
     }
 
     @Test
@@ -237,7 +237,7 @@ public class RelationshipTypeConfigurationTest {
             ItemAuthorityExtraMetadataGenerator generator =
                 context.getBean("authorOrcidMetadataGenerator", ItemAuthorityExtraMetadataGenerator.class);
 
-            assertEquals("publication-author", configuration.getId());
+            assertEquals("authority:dc.contributor.author", configuration.getId());
             assertSame(generator, configuration.getLeftMetadataGenerators().get("additional.identifier.orcid"));
             assertTrue(configuration.getRightMetadataGenerators().isEmpty());
         }

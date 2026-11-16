@@ -97,9 +97,9 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
                                            0, 10, 0, 10).build();
 
         relationship = RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem, type).build();
-        relationship.setRelationshipConfigKey("publication-author");
+        relationship.setRelationshipConfigKey("authority:dc.contributor.author");
 
-        configuration = configuration("publication-author", "dc.contributor.author",
+        configuration = configuration("authority:dc.contributor.author", "dc.contributor.author",
                                       "dc.relation.isAuthorOfPublication");
         setConfigurations(configuration);
 
@@ -171,7 +171,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testDuplicateIdsRejectedAtStartup() {
-        setConfigurations(configuration, configuration("publication-author", "dc.title", null));
+        setConfigurations(configuration, configuration("authority:dc.contributor.author", "dc.title", null));
         assertThrows(IllegalArgumentException.class, () -> service.validateConfigurations());
     }
 
@@ -205,7 +205,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
             assertThrows(RelationshipConfigurationException.class,
                          () -> service.validateConfigurations());
 
-        assertTrue(exception.getMessage().contains("publication-author"));
+        assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
         assertTrue(exception.getMessage().contains("dc..author"));
     }
 
@@ -225,7 +225,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
     @Test
     public void testGetByKeyResolvesExplicitConfiguration() throws SQLException {
         registerMetadataFields();
-        assertSame(configuration, service.getByKey(context, "publication-author"));
+        assertSame(configuration, service.getByKey(context, "authority:dc.contributor.author"));
     }
 
     /**
@@ -283,9 +283,9 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
     public void testGetByKeyRejectsNonexistentPrimaryMetadataField() {
         RelationshipConfigurationException exception =
             assertThrows(RelationshipConfigurationException.class,
-                         () -> service.getByKey(context, "publication-author"));
+                         () -> service.getByKey(context, "authority:dc.contributor.author"));
 
-        assertTrue(exception.getMessage().contains("publication-author"));
+        assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
         assertTrue(exception.getMessage().contains("primary metadata field"));
     }
 
@@ -305,7 +305,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
                 return "person".equals(schema) ? null : mock(MetadataField.class);
             });
 
-        RelationshipTypeConfiguration resolved = service.getByKey(context, "publication-author");
+        RelationshipTypeConfiguration resolved = service.getByKey(context, "authority:dc.contributor.author");
 
         assertTrue(resolved.getLeftAdditionalMetadataFields().isEmpty());
         assertTrue(resolved.getLeftMetadataGenerators().isEmpty());
@@ -326,7 +326,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
             assertThrows(RelationshipConfigurationException.class,
                          () -> service.validateConfigurations());
 
-        assertTrue(exception.getMessage().contains("publication-author"));
+        assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
         assertTrue(exception.getMessage().contains("dc..author"));
     }
 
@@ -521,7 +521,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
                 return "person".equals(schema) ? null : mock(MetadataField.class);
             });
 
-        RelationshipTypeConfiguration resolved = service.getByKey(context, "publication-author");
+        RelationshipTypeConfiguration resolved = service.getByKey(context, "authority:dc.contributor.author");
 
         assertEquals(Set.of("dc.description"), resolved.getLeftAdditionalMetadataFields());
         assertSame(validGenerator, resolved.getLeftMetadataGenerators().get("dc.description"));
@@ -538,7 +538,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
                          () -> service.findForMetadataValue(
                              context, metadataValue("dc", "contributor", "author", leftItem)));
 
-        assertTrue(exception.getMessage().contains("publication-author"));
+        assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
         assertTrue(exception.getMessage().contains("dc.contributor.author"));
     }
 }
