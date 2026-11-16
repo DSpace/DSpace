@@ -15,7 +15,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipTypeConfiguration;
-import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
 import org.dspace.core.Context;
 
 /**
@@ -25,8 +25,8 @@ import org.dspace.core.Context;
  * {@link org.dspace.content.RelationshipType} database entity. A persisted {@link org.dspace.content.Relationship}
  * may store a configuration key identifying which configured semantics apply to that relationship.
  *
- * Implementations may also provide compatibility mappings from existing authority configuration, for example while
- * migrating existing CRIS authority-backed relationships to the configuration-backed relationship model.
+ * Implementations may also resolve relationships created from the authority configuration while a repository moves
+ * to configuration-backed relationships.
  */
 public interface RelationshipConfigurationService {
 
@@ -194,7 +194,7 @@ public interface RelationshipConfigurationService {
      *                                  is not an endpoint of the relationship
      * @throws SQLException             if an error occurs while accessing the metadata registry
      */
-    Optional<ItemAuthorityExtraMetadataGenerator> getMetadataGenerator(Context context, Relationship relationship,
-                                                                       Item endpoint, String metadataField)
+    Optional<RelationshipMetadataGenerator> getMetadataGenerator(Context context, Relationship relationship,
+                                                                 Item endpoint, String metadataField)
         throws SQLException;
 }

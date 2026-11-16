@@ -30,12 +30,8 @@
         <property name="leftMetadataGenerators">
             <map>
                 <entry key="additional.test.orcid">
-                    <bean class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
-                        <property name="authorityName" value="AuthorAuthority"/>
-                        <property name="keyId" value="additional_test_orcid"/>
-                        <property name="schema" value="additional"/>
-                        <property name="element" value="test"/>
-                        <property name="qualifier" value="orcid"/>
+                    <bean class="org.dspace.content.enhancer.generator.impl.SourceFieldMetadataGenerator">
+                        <property name="sourceField" value="person.identifier.orcid"/>
                     </bean>
                 </entry>
             </map>

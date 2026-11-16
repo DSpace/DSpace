@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.annotation.PostConstruct;
-import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.RelationshipConfigurationService;
@@ -166,12 +166,12 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         String configurationId,
         String side,
         Optional<String> primaryField,
-        Map<String, ItemAuthorityExtraMetadataGenerator> generators) {
+        Map<String, RelationshipMetadataGenerator> generators) {
 
         // Validate the primary metadata field, if configured.
         primaryField.ifPresent(field -> validateMetadataField(configurationId, side, field, true));
 
-        for (Map.Entry<String, ItemAuthorityExtraMetadataGenerator> entry : generators.entrySet()) {
+        for (Map.Entry<String, RelationshipMetadataGenerator> entry : generators.entrySet()) {
             String field = entry.getKey();
 
             // Validate each additional metadata field.
@@ -183,6 +183,9 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
                     "Primary metadata field cannot also be additional metadata in relationship configuration "
                         + configurationId + " on the " + side + " endpoint: " + field);
             }
+
+            // Validate the source field declared by the generator.
+            validateMetadataField(configurationId, side, entry.getValue().getSourceField(), "source");
         }
     }
 
@@ -197,9 +200,22 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
      * @throws RelationshipConfigurationException if a primary or additional metadata field has invalid syntax
      */
     private void validateMetadataField(String configurationId, String side, String field, boolean isPrimary) {
+        validateMetadataField(configurationId, side, field, isPrimary ? "primary" : "additional");
+    }
+
+    /**
+     * Validates the syntax of a configured metadata field, without checking its existence in the metadata registry.
+     *
+     * @param configurationId stable identifier of the relationship configuration
+     * @param side            endpoint containing the field
+     * @param field           metadata field name to validate
+     * @param role            role of the field in the configuration (primary, additional or source)
+     * @throws RelationshipConfigurationException if the metadata field has invalid syntax
+     */
+    private void validateMetadataField(String configurationId, String side, String field, String role) {
         if (field == null || !field.matches("[^.\\s]+\\.[^.\\s]+(\\.[^.\\s]+)?")) {
             throw new RelationshipConfigurationException(
-                "Invalid " + (isPrimary ? "primary" : "additional") + " metadata field '" + field +
+                "Invalid " + role + " metadata field '" + field +
                     "' in relationship configuration " + configurationId + " on the " + side + " endpoint");
         }
     }
@@ -208,14 +224,14 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
      * Validates that primary metadata fields exist in the metadata registry and filters out
      * additional metadata fields that are not registered.
      *
-     * Missing primary metadata fields invalidate the relationship configuration.
+     * Missing primary metadata fields and missing generator source fields invalidate the relationship configuration.
      * Missing additional metadata fields are logged and excluded from the resolved configuration.
      *
      * @param context       current DSpace context
      * @param configuration relationship configuration to validate
      * @return the original configuration if all fields are valid, or a filtered configuration
      *         containing only registered additional metadata fields
-     * @throws RelationshipConfigurationException if a configured primary metadata field does not exist
+     * @throws RelationshipConfigurationException if a configured primary or source metadata field does not exist
      * @throws SQLException if an error occurs while accessing the metadata registry
      */
     private RelationshipTypeConfiguration validateMetadataFields(Context context,
@@ -232,11 +248,12 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
                                          configuration.getRightPrimaryMetadataField().get());
         }
 
-        Map<String, ItemAuthorityExtraMetadataGenerator> leftGenerators =
-            filterMetadataGenerators(context, configuration.getId(), configuration.getLeftMetadataGenerators());
+        Map<String, RelationshipMetadataGenerator> leftGenerators =
+            filterMetadataGenerators(context, configuration.getId(), "left", configuration.getLeftMetadataGenerators());
 
-        Map<String, ItemAuthorityExtraMetadataGenerator> rightGenerators =
-            filterMetadataGenerators(context, configuration.getId(), configuration.getRightMetadataGenerators());
+        Map<String, RelationshipMetadataGenerator> rightGenerators =
+            filterMetadataGenerators(context, configuration.getId(), "right",
+                                     configuration.getRightMetadataGenerators());
 
         // Return the original configuration if no additional fields were removed.
         if (leftGenerators.size() == configuration.getLeftMetadataGenerators().size()
@@ -274,28 +291,50 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     }
 
     /**
-     * Filters out metadata generators referencing unregistered additional metadata fields.
-     * Missing fields are logged as errors without invalidating the relationship configuration.
+     * Filters out metadata generators referencing unregistered additional metadata fields and validates the
+     * source field declared by each remaining generator.
      *
+     * Missing additional metadata fields are logged as errors without invalidating the relationship configuration.
+     * Because every generator backs an additional field, a generator whose source field is missing is logged and
+     * dropped as well, following the same severity rule.
+     *
+     * @param context         current DSpace context
+     * @param configurationId stable identifier of the relationship configuration
+     * @param side            endpoint owning the generators
+     * @param generators      additional metadata generators keyed by target metadata field
      * @return a map containing only generators for registered metadata fields
+     * @throws RelationshipConfigurationException if a generator source metadata field does not exist
      * @throws SQLException if an error occurs while accessing the metadata registry
      */
-    private Map<String, ItemAuthorityExtraMetadataGenerator> filterMetadataGenerators(
+    private Map<String, RelationshipMetadataGenerator> filterMetadataGenerators(
         Context context,
         String configurationId,
-        Map<String, ItemAuthorityExtraMetadataGenerator> generators) throws SQLException {
+        String side,
+        Map<String, RelationshipMetadataGenerator> generators) throws SQLException {
 
-        Map<String, ItemAuthorityExtraMetadataGenerator> validGenerators = new HashMap<>();
+        Map<String, RelationshipMetadataGenerator> validGenerators = new HashMap<>();
 
-        for (Map.Entry<String, ItemAuthorityExtraMetadataGenerator> entry : generators.entrySet()) {
+        for (Map.Entry<String, RelationshipMetadataGenerator> entry : generators.entrySet()) {
             String field = entry.getKey();
 
-            if (metadataFieldExists(context, field)) {
-                validGenerators.put(field, entry.getValue());
-            } else {
+            if (!metadataFieldExists(context, field)) {
                 log.error("Relationship configuration {} references a nonexistent additional metadata field: {}",
                           configurationId, field);
+                continue;
             }
+
+            // Validate the source field declared by the generator, which is read on the related item.
+            // A generator backs an additional field, so a missing source field follows the additional
+            // severity rule: log it and drop this generator instead of invalidating the configuration.
+            String sourceField = entry.getValue().getSourceField();
+            if (sourceField == null || !metadataFieldExists(context, sourceField)) {
+                log.error("Relationship configuration {} references a generator for {} with a nonexistent " +
+                              "source metadata field: {} on the {} endpoint",
+                          configurationId, field, sourceField, side);
+                continue;
+            }
+
+            validGenerators.put(field, entry.getValue());
         }
 
         return validGenerators;
@@ -548,14 +587,14 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     }
 
     @Override
-    public Optional<ItemAuthorityExtraMetadataGenerator> getMetadataGenerator(Context context,
-                                                                              Relationship relationship, Item endpoint,
-                                                                              String metadataField)
+    public Optional<RelationshipMetadataGenerator> getMetadataGenerator(Context context,
+                                                                        Relationship relationship, Item endpoint,
+                                                                        String metadataField)
         throws SQLException {
 
         RelationshipTypeConfiguration configuration = getRelationshipConfig(context, relationship);
 
-        Map<String, ItemAuthorityExtraMetadataGenerator> generators =
+        Map<String, RelationshipMetadataGenerator> generators =
             isLeftEndpoint(relationship, endpoint)
                 ? configuration.getLeftMetadataGenerators()
                 : configuration.getRightMetadataGenerators();
