@@ -15,7 +15,7 @@
            https://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="testPublicationAuthorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
-        <property name="id" value="authority:test.contributor.author"/>
+        <property name="id" value="authority:ds11rel.contributor.author"/>
         <property name="leftEntityTypes">
             <set>
                 <value>Publication</value>
@@ -26,7 +26,7 @@
                 <value>Person</value>
             </set>
         </property>
-        <property name="leftPrimaryMetadataField" value="test.contributor.author"/>
+        <property name="leftPrimaryMetadataField" value="ds11rel.contributor.author"/>
         <property name="leftMetadataGenerators">
             <map>
                 <entry key="additional.test.orcid">

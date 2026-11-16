@@ -5,12 +5,12 @@
     </dspace-header>
 
     <dc-schema>
-        <name>test</name>
-        <namespace>http://test/schema/</namespace>
+        <name>ds11rel</name>
+        <namespace>http://www.dspace.org/ns/ds11rel</namespace>
     </dc-schema>
 
     <dc-type>
-        <schema>test</schema>
+        <schema>ds11rel</schema>
         <element>contributor</element>
         <qualifier>author</qualifier>
         <scope_note></scope_note>
