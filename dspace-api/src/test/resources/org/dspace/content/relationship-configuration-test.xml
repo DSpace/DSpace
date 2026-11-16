@@ -16,8 +16,8 @@
 
     <bean id="authorOrcidMetadataGenerator" class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
         <property name="authorityName" value="AuthorAuthority"/>
-        <property name="keyId" value="person_identifier_orcid"/>
-        <property name="schema" value="person"/>
+        <property name="keyId" value="additional_identifier_orcid"/>
+        <property name="schema" value="additional"/>
         <property name="element" value="identifier"/>
         <property name="qualifier" value="orcid"/>
     </bean>
@@ -37,12 +37,7 @@
         <property name="leftPrimaryMetadataField" value="dc.contributor.author"/>
         <property name="leftMetadataGenerators">
             <map>
-                <entry key="person.identifier.orcid" value-ref="authorOrcidMetadataGenerator"/>
-            </map>
-        </property>
-        <property name="rightMetadataGenerators">
-            <map>
-                <entry key="person.identifier.orcid" value-ref="authorOrcidMetadataGenerator"/>
+                <entry key="additional.identifier.orcid" value-ref="authorOrcidMetadataGenerator"/>
             </map>
         </property>
     </bean>

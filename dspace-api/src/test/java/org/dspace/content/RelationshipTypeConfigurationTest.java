@@ -238,8 +238,8 @@ public class RelationshipTypeConfigurationTest {
                 context.getBean("authorOrcidMetadataGenerator", ItemAuthorityExtraMetadataGenerator.class);
 
             assertEquals("publication-author", configuration.getId());
-            assertSame(generator, configuration.getLeftMetadataGenerators().get("person.identifier.orcid"));
-            assertSame(generator, configuration.getRightMetadataGenerators().get("person.identifier.orcid"));
+            assertSame(generator, configuration.getLeftMetadataGenerators().get("additional.identifier.orcid"));
+            assertTrue(configuration.getRightMetadataGenerators().isEmpty());
         }
     }
 }
