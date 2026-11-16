@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
+import org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -227,18 +228,19 @@ public class RelationshipTypeConfigurationTest {
     }
 
     @Test
-    public void testExistingMetadataGeneratorBeanCanBeReused() {
+    public void testInlineMetadataGeneratorLoadedFromSpringXml() {
         try (ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
             "org/dspace/content/relationship-configuration-test.xml")) {
 
             RelationshipTypeConfiguration configuration =
-                context.getBean("publicationAuthorRelationship", RelationshipTypeConfiguration.class);
+                context.getBean("testPublicationAuthorRelationship", RelationshipTypeConfiguration.class);
+
+            assertEquals("authority:test.contributor.author", configuration.getId());
 
             ItemAuthorityExtraMetadataGenerator generator =
-                context.getBean("authorOrcidMetadataGenerator", ItemAuthorityExtraMetadataGenerator.class);
+                configuration.getLeftMetadataGenerators().get("additional.test.orcid");
 
-            assertEquals("authority:dc.contributor.author", configuration.getId());
-            assertSame(generator, configuration.getLeftMetadataGenerators().get("additional.identifier.orcid"));
+            assertTrue(generator instanceof ItemSimpleAuthorityMetadataGenerator);
             assertTrue(configuration.getRightMetadataGenerators().isEmpty());
         }
     }

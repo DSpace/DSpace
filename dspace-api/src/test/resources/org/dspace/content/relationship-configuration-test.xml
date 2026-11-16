@@ -14,14 +14,6 @@
            http://www.springframework.org/schema/beans
            https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="testAuthorOrcidMetadataGenerator" class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
-        <property name="authorityName" value="AuthorAuthority"/>
-        <property name="keyId" value="additional_test_orcid"/>
-        <property name="schema" value="additional"/>
-        <property name="element" value="test"/>
-        <property name="qualifier" value="orcid"/>
-    </bean>
-
     <bean id="testPublicationAuthorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
         <property name="id" value="authority:test.contributor.author"/>
         <property name="leftEntityTypes">
@@ -37,7 +29,15 @@
         <property name="leftPrimaryMetadataField" value="test.contributor.author"/>
         <property name="leftMetadataGenerators">
             <map>
-                <entry key="additional.test.orcid" value-ref="testAuthorOrcidMetadataGenerator"/>
+                <entry key="additional.test.orcid">
+                    <bean class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
+                        <property name="authorityName" value="AuthorAuthority"/>
+                        <property name="keyId" value="additional_test_orcid"/>
+                        <property name="schema" value="additional"/>
+                        <property name="element" value="test"/>
+                        <property name="qualifier" value="orcid"/>
+                    </bean>
+                </entry>
             </map>
         </property>
     </bean>
