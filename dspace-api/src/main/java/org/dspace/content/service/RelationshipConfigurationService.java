@@ -15,7 +15,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipTypeConfiguration;
-import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
 import org.dspace.core.Context;
 
 /**
@@ -194,7 +194,7 @@ public interface RelationshipConfigurationService {
      *                                  is not an endpoint of the relationship
      * @throws SQLException             if an error occurs while accessing the metadata registry
      */
-    Optional<ItemAuthorityExtraMetadataGenerator> getMetadataGenerator(Context context, Relationship relationship,
-                                                                       Item endpoint, String metadataField)
+    Optional<RelationshipMetadataGenerator> getMetadataGenerator(Context context, Relationship relationship,
+                                                                 Item endpoint, String metadataField)
         throws SQLException;
 }

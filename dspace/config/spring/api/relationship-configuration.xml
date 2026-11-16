@@ -14,6 +14,11 @@
            http://www.springframework.org/schema/beans
            https://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="authorOrcidMetadataGenerator"
+          class="org.dspace.content.enhancer.generator.impl.SourceFieldMetadataGenerator">
+        <property name="sourceField" value="person.identifier.orcid"/>
+    </bean>
+
     <bean id="publicationAuthorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
         <property name="id" value="authority:dc.contributor.author"/>
         <property name="leftEntityTypes">
@@ -29,15 +34,7 @@
         <property name="leftPrimaryMetadataField" value="dc.contributor.author"/>
         <property name="leftMetadataGenerators">
             <map>
-                <entry key="additional.identifier.orcid">
-                    <bean class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
-                        <property name="authorityName" value="AuthorAuthority"/>
-                        <property name="keyId" value="additional_identifier_orcid"/>
-                        <property name="schema" value="additional"/>
-                        <property name="element" value="identifier"/>
-                        <property name="qualifier" value="orcid"/>
-                    </bean>
-                </entry>
+                <entry key="additional.identifier.orcid" value-ref="authorOrcidMetadataGenerator"/>
             </map>
         </property>
     </bean>

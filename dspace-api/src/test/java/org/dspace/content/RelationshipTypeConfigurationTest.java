@@ -13,14 +13,15 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
-import org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
+import org.dspace.content.enhancer.generator.impl.SourceFieldMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -115,10 +116,10 @@ public class RelationshipTypeConfigurationTest {
 
     @Test
     public void testMetadataGenerators() {
-        ItemAuthorityExtraMetadataGenerator leftGenerator =
-            mock(ItemAuthorityExtraMetadataGenerator.class);
-        ItemAuthorityExtraMetadataGenerator rightGenerator =
-            mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator leftGenerator =
+            mock(RelationshipMetadataGenerator.class);
+        RelationshipMetadataGenerator rightGenerator =
+            mock(RelationshipMetadataGenerator.class);
 
         configuration.setLeftMetadataGenerators(
             Map.of("person.identifier.orcid", leftGenerator));
@@ -133,8 +134,8 @@ public class RelationshipTypeConfigurationTest {
 
     @Test
     public void testAdditionalMetadataFieldsAreDerivedFromGenerators() {
-        ItemAuthorityExtraMetadataGenerator generator =
-            mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator generator =
+            mock(RelationshipMetadataGenerator.class);
 
         configuration.setLeftMetadataGenerators(Map.of(
             "person.identifier.orcid", generator,
@@ -148,10 +149,10 @@ public class RelationshipTypeConfigurationTest {
 
     @Test
     public void testMetadataGeneratorsAreDefensivelyCopied() {
-        ItemAuthorityExtraMetadataGenerator generator =
-            mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator generator =
+            mock(RelationshipMetadataGenerator.class);
 
-        Map<String, ItemAuthorityExtraMetadataGenerator> generators = new HashMap<>();
+        Map<String, RelationshipMetadataGenerator> generators = new HashMap<>();
         generators.put("person.identifier.orcid", generator);
 
         configuration.setLeftMetadataGenerators(generators);
@@ -169,13 +170,42 @@ public class RelationshipTypeConfigurationTest {
 
     @Test
     public void testNullMetadataGeneratorsAreRejected() {
-        Map<String, ItemAuthorityExtraMetadataGenerator> generators = new HashMap<>();
+        Map<String, RelationshipMetadataGenerator> generators = new HashMap<>();
         generators.put("person.identifier.orcid", null);
 
         assertThrows(IllegalArgumentException.class,
                      () -> configuration.setLeftMetadataGenerators(generators));
         assertThrows(IllegalArgumentException.class,
                      () -> configuration.setRightMetadataGenerators(generators));
+    }
+
+    @Test
+    public void testNullMetadataGeneratorMessagesIdentifyEndpoint() {
+        Map<String, RelationshipMetadataGenerator> generators = new HashMap<>();
+        generators.put("person.identifier.orcid", null);
+
+        IllegalArgumentException left = assertThrows(IllegalArgumentException.class,
+                                                    () -> configuration.setLeftMetadataGenerators(generators));
+        IllegalArgumentException right = assertThrows(IllegalArgumentException.class,
+                                                     () -> configuration.setRightMetadataGenerators(generators));
+
+        assertEquals("Metadata generators cannot be null on the left endpoint", left.getMessage());
+        assertEquals("Metadata generators cannot be null on the right endpoint", right.getMessage());
+    }
+
+    @Test
+    public void testMetadataGeneratorSourceFieldIsAvailableThroughConfiguration() {
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
+        when(generator.getSourceField()).thenReturn("person.identifier.orcid");
+
+        configuration.setLeftMetadataGenerators(Map.of("additional.identifier.orcid", generator));
+
+        RelationshipMetadataGenerator configured =
+            configuration.getLeftMetadataGenerators().get("additional.identifier.orcid");
+
+        assertSame(generator, configured);
+        assertEquals("person.identifier.orcid", configured.getSourceField());
+        assertEquals(Set.of("additional.identifier.orcid"), configuration.getLeftAdditionalMetadataFields());
     }
 
     @Test
@@ -206,8 +236,8 @@ public class RelationshipTypeConfigurationTest {
 
     @Test
     public void testMapsFieldMatchesPrimaryMetadataOnly() {
-        ItemAuthorityExtraMetadataGenerator generator =
-            mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator generator =
+            mock(RelationshipMetadataGenerator.class);
 
         configuration.setLeftPrimaryMetadataField("dc.contributor.author");
         configuration.setRightPrimaryMetadataField("dc.relation.isAuthorOfPublication");
@@ -237,10 +267,11 @@ public class RelationshipTypeConfigurationTest {
 
             assertEquals("authority:ds11rel.contributor.author", configuration.getId());
 
-            ItemAuthorityExtraMetadataGenerator generator =
+            RelationshipMetadataGenerator generator =
                 configuration.getLeftMetadataGenerators().get("additional.test.orcid");
 
-            assertTrue(generator instanceof ItemSimpleAuthorityMetadataGenerator);
+            assertTrue(generator instanceof SourceFieldMetadataGenerator);
+            assertEquals("person.identifier.orcid", generator.getSourceField());
             assertTrue(configuration.getRightMetadataGenerators().isEmpty());
         }
     }
