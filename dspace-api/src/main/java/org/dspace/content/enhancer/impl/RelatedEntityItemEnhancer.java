@@ -138,7 +138,7 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
             Item relatedItem = getRelatedItem(relationship, owner);
             MetadataSource source = relatedItem == null
                     ? null
-                    : new ItemMetadataSource(context, relatedItem, itemService);
+                    : new ItemMetadataSource(relatedItem, itemService);
 
             for (String targetField : targetFields) {
                 Optional<RelationshipMetadataGenerator> generator = relationshipConfigurationService

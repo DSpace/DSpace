@@ -83,7 +83,7 @@ public class ItemMetadataSourceIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void getValuesReturnsAllMatchingValues() {
-        ItemMetadataSource source = new ItemMetadataSource(context, item, itemService);
+        ItemMetadataSource source = new ItemMetadataSource(item, itemService);
 
         List<RawMetadataValue> values = source.getValues(AUTHOR_FIELD);
 
@@ -94,14 +94,14 @@ public class ItemMetadataSourceIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void getValuesReturnsEmptyListWhenFieldHasNoValues() {
-        ItemMetadataSource source = new ItemMetadataSource(context, item, itemService);
+        ItemMetadataSource source = new ItemMetadataSource(item, itemService);
 
         assertTrue(source.getValues("dc.description.abstract").isEmpty());
     }
 
     @Test
     public void getValuesReturnsEmptyListWhenFieldIsNull() {
-        ItemMetadataSource source = new ItemMetadataSource(context, item, itemService);
+        ItemMetadataSource source = new ItemMetadataSource(item, itemService);
 
         assertTrue(source.getValues(null).isEmpty());
     }
