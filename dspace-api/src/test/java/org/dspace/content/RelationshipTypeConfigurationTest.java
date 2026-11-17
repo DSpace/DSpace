@@ -183,8 +183,8 @@ public class RelationshipTypeConfigurationTest {
         configuration.setLeftPrimaryMetadataField("dc.contributor.author");
         configuration.setRightPrimaryMetadataField("person.identifier.orcid");
 
-        assertTrue(configuration.isOwnerOnLeft("dc.contributor.author"));
-        assertFalse(configuration.isOwnerOnLeft("person.identifier.orcid"));
+        assertTrue(configuration.isOwnerOnLeft("dc.contributor.author", "Publication"));
+        assertFalse(configuration.isOwnerOnLeft("person.identifier.orcid", "Person"));
     }
 
     @Test
@@ -192,7 +192,7 @@ public class RelationshipTypeConfigurationTest {
         configuration.setLeftPrimaryMetadataField("dc.contributor.author");
 
         assertThrows(IllegalArgumentException.class,
-                     () -> configuration.isOwnerOnLeft("dc.title"));
+                     () -> configuration.isOwnerOnLeft("dc.title", "Publication"));
     }
 
     @Test
@@ -201,7 +201,7 @@ public class RelationshipTypeConfigurationTest {
         configuration.setRightPrimaryMetadataField("dc.contributor.author");
 
         assertThrows(IllegalArgumentException.class,
-                     () -> configuration.isOwnerOnLeft("dc.contributor.author"));
+                     () -> configuration.isOwnerOnLeft("dc.contributor.author", "Publication"));
     }
 
     @Test
@@ -214,17 +214,17 @@ public class RelationshipTypeConfigurationTest {
         configuration.setLeftMetadataGenerators(
             Map.of("person.identifier.orcid", generator));
 
-        assertTrue(configuration.mapsField("dc.contributor.author"));
-        assertTrue(configuration.mapsField("dc.relation.isAuthorOfPublication"));
+        assertTrue(configuration.mapsField("dc.contributor.author", "Publication"));
+        assertTrue(configuration.mapsField("dc.relation.isAuthorOfPublication", "Person"));
 
         // Additional metadata must not be treated as a primary relationship field.
-        assertFalse(configuration.mapsField("person.identifier.orcid"));
-        assertFalse(configuration.mapsField("dc.title"));
+        assertFalse(configuration.mapsField("person.identifier.orcid", "Person"));
+        assertFalse(configuration.mapsField("dc.title", "Publication"));
     }
 
     @Test
     public void testMapsFieldWithNoPrimaryMetadata() {
-        assertFalse(configuration.mapsField("dc.contributor.author"));
+        assertFalse(configuration.mapsField("dc.contributor.author", "Publication"));
     }
 
     @Test
@@ -243,5 +243,30 @@ public class RelationshipTypeConfigurationTest {
             assertTrue(generator instanceof ItemSimpleAuthorityMetadataGenerator);
             assertTrue(configuration.getRightMetadataGenerators().isEmpty());
         }
+    }
+
+    @Test
+    public void testIsOwnerOnLeftWithSameFieldAndDifferentEntityTypes() {
+        configuration.setLeftEntityTypes(Set.of("Publication"));
+        configuration.setRightEntityTypes(Set.of("DataSet"));
+        configuration.setLeftPrimaryMetadataField("dc.title");
+        configuration.setRightPrimaryMetadataField("dc.title");
+
+        assertTrue(configuration.isOwnerOnLeft("dc.title", "Publication"));
+        assertFalse(configuration.isOwnerOnLeft("dc.title", "DataSet"));
+
+        assertTrue(configuration.mapsField("dc.title", "Publication"));
+        assertTrue(configuration.mapsField("dc.title", "DataSet"));
+        assertFalse(configuration.mapsField("dc.title", "Person"));
+    }
+
+    @Test
+    public void testIsOwnerOnLeftRejectsUnsupportedEntityType() {
+        configuration.setLeftEntityTypes(Set.of("Publication"));
+        configuration.setRightEntityTypes(Set.of("Person"));
+        configuration.setLeftPrimaryMetadataField("dc.title");
+
+        assertThrows(IllegalArgumentException.class,
+                     () -> configuration.isOwnerOnLeft("dc.title", "DataSet"));
     }
 }

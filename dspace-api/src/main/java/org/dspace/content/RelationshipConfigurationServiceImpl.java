@@ -54,6 +54,14 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @Autowired(required = false)
     private List<RelationshipTypeConfiguration> configurations = new ArrayList<>();
 
+    private record PrimaryMetadataMapping(
+        String field,
+        String configurationId,
+        String side,
+        Set<String> entityTypes
+    ) {
+    }
+
     /**
      * Validates all explicitly configured relationship definitions at startup.
      *
@@ -63,6 +71,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @PostConstruct
     public void validateConfigurations() {
         Set<String> ids = new HashSet<>();
+        List<PrimaryMetadataMapping> mappings = new ArrayList<>();
 
         for (RelationshipTypeConfiguration configuration : configurations) {
             // Reject null relationship configurations.
@@ -83,7 +92,39 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
 
             // Validate endpoint entity types, metadata fields, and generator mappings.
             validateConfiguration(configuration);
+
+            // Reject primary metadata mappings with overlapping endpoint entity types.
+            configuration.getLeftPrimaryMetadataField().ifPresent(field -> validatePrimaryMapping(
+                mappings, new PrimaryMetadataMapping(field, id, "left", configuration.getLeftEntityTypes())));
+
+            configuration.getRightPrimaryMetadataField().ifPresent(field -> validatePrimaryMapping(
+                mappings, new PrimaryMetadataMapping(field, id, "right", configuration.getRightEntityTypes())));
         }
+    }
+
+    /**
+     * Rejects primary metadata mappings that share a field and at least one owning entity type.
+     * The check applies across configurations and across relationship endpoints.
+     */
+    private void validatePrimaryMapping(List<PrimaryMetadataMapping> mappings, PrimaryMetadataMapping candidate) {
+        for (PrimaryMetadataMapping existing : mappings) {
+            if (!existing.field().equals(candidate.field())) {
+                continue;
+            }
+
+            Set<String> overlappingTypes = new HashSet<>(existing.entityTypes());
+            overlappingTypes.retainAll(candidate.entityTypes());
+
+            if (!overlappingTypes.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Ambiguous primary metadata field " + candidate.field()
+                        + " between relationship configurations " + existing.configurationId()
+                        + " (" + existing.side() + ") and " + candidate.configurationId()
+                        + " (" + candidate.side() + ") for entity types " + overlappingTypes);
+            }
+        }
+
+        mappings.add(candidate);
     }
 
     /**
@@ -272,12 +313,18 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @Override
     public RelationshipTypeConfiguration findForMetadataValue(Context context, MetadataValue value)
         throws SQLException {
+
         String field = fieldName(value);
+        String ownerEntityType = itemService.getEntityTypeLabel((Item) value.getDSpaceObject());
+
         RelationshipTypeConfiguration match = null;
+
         for (RelationshipTypeConfiguration candidate : configurations) {
-            if (candidate.mapsField(field)) {
+            if (candidate.mapsField(field, ownerEntityType)) {
                 if (match != null) {
-                    throw new IllegalArgumentException("Ambiguous relationship configuration for field " + field);
+                    throw new IllegalArgumentException(
+                        "Ambiguous relationship configuration for field " + field + " and entity type " +
+                            ownerEntityType);
                 }
                 match = candidate;
             }

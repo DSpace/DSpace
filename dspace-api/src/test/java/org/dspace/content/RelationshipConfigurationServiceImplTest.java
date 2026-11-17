@@ -106,6 +106,11 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         context.restoreAuthSystemState();
     }
 
+    private void mockOwnerEntityTypes() {
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
+        when(itemService.getEntityTypeLabel(rightItem)).thenReturn("Person");
+    }
+
     /**
      * Creates a relationship configuration between Publication and Person entities.
      */
@@ -233,6 +238,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
     @Test
     public void testFindForMetadataValueMatchesEitherPrimaryField() throws SQLException {
         registerMetadataFields();
+        mockOwnerEntityTypes();
         assertSame(configuration,
                    service.findForMetadataValue(context, metadataValue("dc", "contributor", "author", leftItem)));
         assertSame(configuration,
@@ -247,6 +253,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
     public void testOneSidedPrimaryMetadataConfiguration() throws SQLException {
         configuration.setRightPrimaryMetadataField(null);
         registerMetadataFields();
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
 
         assertSame(configuration,
                    service.findForMetadataValue(context, metadataValue("dc", "contributor", "author", leftItem)));
@@ -259,6 +266,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testFindForMetadataValueDoesNotMatchAdditionalFields() throws SQLException {
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
         ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
         configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
         assertNull(service.findForMetadataValue(context, metadataValue("person", "identifier", "orcid", leftItem)));
@@ -269,6 +277,8 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testFindForMetadataValueRejectsAmbiguousPrimaryField() {
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
+
         setConfigurations(configuration, configuration("another", "dc.contributor.author", null));
         assertThrows(IllegalArgumentException.class,
                      () -> service.findForMetadataValue(context,
@@ -492,6 +502,12 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         MetadataValue leftMetadata = metadataValue("dc", "title", null, leftItem);
         MetadataValue rightMetadata = metadataValue("dc", "title", null, rightItem);
 
+        mockOwnerEntityTypes();
+        service.validateConfigurations();
+
+        assertSame(configuration, service.findForMetadataValue(context, leftMetadata));
+        assertSame(configuration, service.findForMetadataValue(context, rightMetadata));
+
         assertEquals("dc.title",
                      service.getPrimaryMetadataField(context, relationship, leftItem).orElse(null));
         assertEquals("dc.title",
@@ -529,6 +545,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testFindForMetadataValueRejectsNonexistentPrimaryMetadataField() {
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
         RelationshipConfigurationException exception =
             assertThrows(RelationshipConfigurationException.class,
                          () -> service.findForMetadataValue(
@@ -536,5 +553,122 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
 
         assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
         assertTrue(exception.getMessage().contains("dc.contributor.author"));
+    }
+
+    @Test
+    public void testOverlappingPrimaryMetadataMappingsRejectedAtStartup() {
+        RelationshipTypeConfiguration another = configuration("another", "dc.contributor.author", null);
+        another.setLeftEntityTypes(Set.of("Publication", "Book"));
+
+        setConfigurations(configuration, another);
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class, () -> service.validateConfigurations());
+
+        assertTrue(exception.getMessage().contains("dc.contributor.author"));
+        assertTrue(exception.getMessage().contains(configuration.getId()));
+        assertTrue(exception.getMessage().contains("another"));
+        assertTrue(exception.getMessage().contains("Publication"));
+    }
+
+    @Test
+    public void testDisjointPrimaryMetadataMappingsAllowedAtStartup() {
+        RelationshipTypeConfiguration another = configuration("dataset-person", "dc.contributor.author", null);
+        another.setLeftEntityTypes(Set.of("DataSet"));
+
+        setConfigurations(configuration, another);
+
+        service.validateConfigurations();
+    }
+
+    @Test
+    public void testCrossSidePrimaryMetadataConflictRejectedAtStartup() {
+        RelationshipTypeConfiguration another = configuration("another", null, "dc.contributor.author");
+        another.setRightEntityTypes(Set.of("Publication", "Person"));
+
+        setConfigurations(configuration, another);
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class, () -> service.validateConfigurations());
+
+        assertTrue(exception.getMessage().contains("dc.contributor.author"));
+        assertTrue(exception.getMessage().contains("Publication"));
+        assertTrue(exception.getMessage().contains("left"));
+        assertTrue(exception.getMessage().contains("right"));
+    }
+
+    @Test
+    public void testSamePrimaryFieldOnDisjointEndpointsAllowedAtStartup() {
+        configuration.setLeftPrimaryMetadataField("dc.title");
+        configuration.setRightPrimaryMetadataField("dc.title");
+
+        service.validateConfigurations();
+    }
+
+    @Test
+    public void testSamePrimaryFieldOnOverlappingEndpointsRejectedAtStartup() {
+        configuration.setLeftPrimaryMetadataField("dc.title");
+        configuration.setRightPrimaryMetadataField("dc.title");
+        configuration.setRightEntityTypes(Set.of("Publication", "Person"));
+
+        assertThrows(IllegalArgumentException.class, () -> service.validateConfigurations());
+    }
+
+    @Test
+    public void testFindForMetadataValueSelectsConfigurationByOwnerEntityType() throws SQLException {
+        RelationshipTypeConfiguration datasetConfiguration =
+            configuration("dataset-person", "dc.contributor.author", null);
+        datasetConfiguration.setLeftEntityTypes(Set.of("DataSet"));
+
+        setConfigurations(configuration, datasetConfiguration);
+        registerMetadataFields();
+
+        Item dataset = mock(Item.class);
+
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
+        when(itemService.getEntityTypeLabel(dataset)).thenReturn("DataSet");
+
+        assertSame(configuration,
+                   service.findForMetadataValue(context,
+                                                metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertSame(datasetConfiguration,
+                   service.findForMetadataValue(context,
+                                                metadataValue("dc", "contributor", "author", dataset)));
+    }
+
+    @Test
+    public void testGetRelationshipConfigResolvesAuthorityDerivedConfiguration() throws SQLException {
+        setConfigurations();
+        enableAuthority("dc.contributor.author", "Person");
+        registerMetadataFields();
+
+        RelationshipTypeConfiguration result = service.getRelationshipConfig(context, relationship);
+
+        assertEquals("authority:dc.contributor.author", result.getId());
+        assertEquals("dc.contributor.author", result.getLeftPrimaryMetadataField().orElse(null));
+        assertEquals(Set.of("Person"), result.getRightEntityTypes());
+    }
+
+    @Test
+    public void testGetRelationshipConfigRejectsMissingConfigurationKey() {
+        relationship.setRelationshipConfigKey(null);
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> service.getRelationshipConfig(context, relationship));
+
+        assertTrue(exception.getMessage().contains("Missing relationship configuration key"));
+    }
+
+    @Test
+    public void testGetRelationshipConfigRejectsUnknownConfigurationKey() {
+        relationship.setRelationshipConfigKey("unknown");
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> service.getRelationshipConfig(context, relationship));
+
+        assertTrue(exception.getMessage().contains("Unknown relationship configuration"));
     }
 }

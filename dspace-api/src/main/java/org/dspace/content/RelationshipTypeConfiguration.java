@@ -82,19 +82,35 @@ public class RelationshipTypeConfiguration {
     }
 
     /**
-     * Resolve the orientation of an anchor field. Ambiguous mappings fail explicitly.
+     * Resolves the owning endpoint using the primary metadata field and the owner's entity type.
+     * Empty entity-type sets are treated as unrestricted for authority-derived configurations.
+     *
+     * @throws IllegalArgumentException if neither endpoint or both endpoints match
      */
-    public boolean isOwnerOnLeft(String field) {
-        boolean left = field.equals(leftPrimaryMetadataField);
-        boolean right = field.equals(rightPrimaryMetadataField);
+    public boolean isOwnerOnLeft(String field, String ownerEntityType) {
+        boolean left = field.equals(leftPrimaryMetadataField)
+            && (leftEntityTypes.isEmpty() || leftEntityTypes.contains(ownerEntityType));
+
+        boolean right = field.equals(rightPrimaryMetadataField)
+            && (rightEntityTypes.isEmpty() || rightEntityTypes.contains(ownerEntityType));
+
         if (left == right) {
-            throw new IllegalArgumentException("Field must match exactly one side of relationship configuration " + id);
+            throw new IllegalArgumentException(
+                "Field " + field + " and entity type " + ownerEntityType
+                    + " must match exactly one side of relationship configuration " + id);
         }
+
         return left;
     }
 
-    public boolean mapsField(String field) {
-        return field.equals(leftPrimaryMetadataField) || field.equals(rightPrimaryMetadataField);
+    /**
+     * Checks whether the field is configured as primary metadata for the given owner entity type.
+     */
+    public boolean mapsField(String field, String ownerEntityType) {
+        return (field.equals(leftPrimaryMetadataField)
+            && (leftEntityTypes.isEmpty() || leftEntityTypes.contains(ownerEntityType)))
+            || (field.equals(rightPrimaryMetadataField)
+            && (rightEntityTypes.isEmpty() || rightEntityTypes.contains(ownerEntityType)));
     }
 
     public Map<String, ItemAuthorityExtraMetadataGenerator> getLeftMetadataGenerators() {

@@ -83,7 +83,8 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         if (configuration == null) {
             return null;
         }
-        boolean ownerOnLeft = configuration.isOwnerOnLeft(RelationshipConfigurationServiceImpl.fieldName(value));
+        boolean ownerOnLeft = configuration.isOwnerOnLeft(RelationshipConfigurationServiceImpl.fieldName(value),
+                                                          itemService.getEntityTypeLabel(owner));
         Item left = ownerOnLeft ? owner : target;
         Item right = ownerOnLeft ? target : owner;
         // Validate before persistence, so invalid input does not leave a half-created link.
