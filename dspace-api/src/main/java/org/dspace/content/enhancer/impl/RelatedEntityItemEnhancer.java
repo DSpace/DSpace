@@ -389,6 +389,12 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
             byOwner.computeIfAbsent((Item) value.getDSpaceObject(), owner -> new ArrayList<>()).add(value);
         }
         for (Map.Entry<Item, List<MetadataValue>> entry : byOwner.entrySet()) {
+            for (MetadataValue value : entry.getValue()) {
+                // Additional values are projections of the relationship, not its primary value.
+                // Detach them before removal so the 1:1 rule does not delete the relationship itself.
+                value.setRelationship(null);
+                metadataValueService.update(context, value);
+            }
             itemService.removeMetadataValues(context, entry.getKey(), entry.getValue());
         }
         return true;
