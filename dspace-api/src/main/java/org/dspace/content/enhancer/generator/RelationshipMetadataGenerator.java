@@ -7,13 +7,10 @@
  */
 package org.dspace.content.enhancer.generator;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.enhancer.source.MetadataSource;
-import org.dspace.content.enhancer.source.RawMetadataValue;
 
 /**
  * Generates the additional metadata values of a relationship from the related entity.
@@ -35,22 +32,9 @@ public interface RelationshipMetadataGenerator {
     /**
      * Extract the additional metadata values for this generator from the given source.
      *
-     * <p>The default implementation copies the values of {@link #getSourceField()} 1:1, preserving
-     * the value, language, authority and confidence of each raw value. The returned DTOs carry the
-     * field derived from {@link #getSourceField()}.</p>
-     *
      * @param source the source to read the values from
      * @return the extracted values, never {@code null}, possibly empty
      */
-    default List<MetadataValueDTO> extract(MetadataSource source) {
-        MetadataFieldName fieldName = new MetadataFieldName(getSourceField());
-        List<RawMetadataValue> values = source.getValues(getSourceField());
-        List<MetadataValueDTO> result = new ArrayList<>(values.size());
-        for (RawMetadataValue value : values) {
-            result.add(new MetadataValueDTO(fieldName.schema, fieldName.element, fieldName.qualifier,
-                value.language(), value.value(), value.authority(), value.confidence()));
-        }
-        return result;
-    }
+    List<MetadataValueDTO> extract(MetadataSource source);
 
 }
