@@ -137,7 +137,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                                        RelationshipTypeConfiguration configuration)
         throws SQLException, AuthorizeException {
 
-        relationshipConfigurationService.validate(context, configuration, leftItem, rightItem);
+        relationshipConfigurationService.validateForCreation(context, configuration, leftItem, rightItem, false);
 
         authorizeRelationshipCreation(context, leftItem, rightItem);
 
@@ -160,7 +160,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         throws SQLException, AuthorizeException {
 
         // Allow the new Item version to be unarchived while still validating the configured relationship semantics.
-        relationshipConfigurationService.validate(context, configuration, leftItem, rightItem, true);
+        relationshipConfigurationService.validateForCreation(context, configuration, leftItem, rightItem, true);
 
         authorizeRelationshipCreation(context, leftItem, rightItem);
 

@@ -638,6 +638,92 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
     }
 
     @Test
+    public void testAuthorityFallbackWithSharedKeyUsesEndpointTypes() throws SQLException {
+        enableAuthority("dc.contributor.author", "Person");
+        registerMetadataFields();
+        Item dataset = mock(Item.class);
+        when(itemService.getEntityTypeLabel(dataset)).thenReturn("DataSet");
+        when(itemService.getEntityTypeLabel(rightItem)).thenReturn("Person");
+
+        // A Publication-specific explicit bean may share its key with a generic authority fallback.
+        // A DataSet must select the fallback, and the persisted Relationship must resolve to that fallback.
+        RelationshipTypeConfiguration fallback = service.findForMetadataValue(context,
+            metadataValue("dc", "contributor", "author", dataset));
+        assertEquals("authority:dc.contributor.author", fallback.getId());
+        assertTrue(fallback.getLeftEntityTypes().isEmpty());
+        assertEquals(Set.of("Person"), fallback.getRightEntityTypes());
+
+        service.validateForCreation(context, fallback, dataset, rightItem, true);
+        Relationship datasetRelationship = mock(Relationship.class);
+        when(datasetRelationship.getRelationshipConfigKey()).thenReturn("authority:dc.contributor.author");
+        when(datasetRelationship.getLeftItem()).thenReturn(dataset);
+        when(datasetRelationship.getRightItem()).thenReturn(rightItem);
+        when(dataset.getID()).thenReturn(UUID.randomUUID());
+        assertEquals(fallback.getLeftEntityTypes(),
+                     service.getRelationshipConfig(context, datasetRelationship).getLeftEntityTypes());
+        assertTrue(service.isPrimaryMetadata(context, datasetRelationship,
+            metadataValue("dc", "contributor", "author", dataset)));
+    }
+
+    @Test
+    public void testExplicitAuthorityConfigurationStillWinsForMatchingEndpointTypes() throws SQLException {
+        enableAuthority("dc.contributor.author", "Person");
+        registerMetadataFields();
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
+        when(itemService.getEntityTypeLabel(rightItem)).thenReturn("Person");
+
+        assertSame(configuration, service.findForMetadataValue(context,
+            metadataValue("dc", "contributor", "author", leftItem)));
+        assertSame(configuration, service.getRelationshipConfig(context, relationship));
+
+        RelationshipTypeConfiguration fallback = new RelationshipTypeConfiguration();
+        fallback.setId("authority:dc.contributor.author");
+        fallback.setLeftPrimaryMetadataField("dc.contributor.author");
+        fallback.setRightEntityTypes(Set.of("Person"));
+        assertThrows(IllegalArgumentException.class,
+            () -> service.validateForCreation(context, fallback, leftItem, rightItem, true));
+    }
+
+    @Test
+    public void testValidateForCreationSupportsAuthorityWithoutSpringConfiguration() throws SQLException {
+        setConfigurations();
+        enableAuthority("dc.contributor.author", "Person");
+        registerMetadataFields();
+        when(itemService.getEntityTypeLabel(rightItem)).thenReturn("Person");
+
+        RelationshipTypeConfiguration authorityOnly = service.findForMetadataValue(context,
+            metadataValue("dc", "contributor", "author", leftItem));
+        assertEquals("authority:dc.contributor.author", authorityOnly.getId());
+        service.validateForCreation(context, authorityOnly, leftItem, rightItem, true);
+        assertEquals(authorityOnly.getLeftPrimaryMetadataField(),
+                     service.getRelationshipConfig(context, relationship).getLeftPrimaryMetadataField());
+    }
+
+    @Test
+    public void testValidateForCreationRejectsUnknownKey() {
+        RelationshipTypeConfiguration unknown = configuration("unknown-key", "dc.contributor.author", null);
+        assertThrows(IllegalArgumentException.class,
+            () -> service.validateForCreation(context, unknown, leftItem, rightItem, false));
+    }
+
+    @Test
+    public void testValidateForCreationRejectsMismatchedSemantics() throws SQLException {
+        registerMetadataFields();
+        RelationshipTypeConfiguration incompatible =
+            configuration("authority:dc.contributor.author", "dc.contributor.author", null);
+        incompatible.setLeftEntityTypes(Set.of("DataSet"));
+        assertThrows(IllegalArgumentException.class,
+            () -> service.validateForCreation(context, incompatible, leftItem, rightItem, false));
+    }
+
+    @Test
+    public void testValidateForCreationChecksRegisteredPrimaryFields() {
+        // The supplied configuration is known, but its primary metadata field is not in the registry.
+        assertThrows(RelationshipConfigurationException.class,
+            () -> service.validateForCreation(context, configuration, leftItem, rightItem, false));
+    }
+
+    @Test
     public void testGetRelationshipConfigResolvesAuthorityDerivedConfiguration() throws SQLException {
         setConfigurations();
         enableAuthority("dc.contributor.author", "Person");

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -330,6 +331,9 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
             }
         }
 
+        // Use the explicit mapping when it applies to this owner. Otherwise, retain the legacy linked-entity
+        // authority fallback, even if a more specific Spring mapping uses the same authority:* key. Resolution
+        // of persisted Relationships must also consider their endpoint types (see resolveConfiguration below).
         RelationshipTypeConfiguration configuration = match != null ? match : fromLinkedEntityAuthority(field);
 
         // Validate metadata fields against the registry before returning an explicit or authority-derived
@@ -341,23 +345,25 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         return configuration;
     }
 
-    private RelationshipTypeConfiguration resolveConfiguration(Context context, String key) throws SQLException {
-        return resolveConfiguration(context, key, true);
-    }
-
     /**
-     * Resolves a relationship configuration by its key, optionally validating
-     * configured metadata fields against the metadata registry.
+     * Resolves a configuration for a persisted Relationship or a proposed pair of endpoints.
+     *
+     * An explicit Spring configuration takes precedence when its entity-type constraints fit the endpoints.
+     * For authority:* keys, a different owner entity type can still use the linked-entity authority fallback
+     * under the same persisted key. Resolving by key AND endpoints prevents that fallback from later being
+     * interpreted as the unrelated explicit Spring definition.
      *
      * @param context  current DSpace context
      * @param key      relationship configuration key
-     * @param validate whether to validate metadata fields against the registry
-     * @return the resolved relationship configuration
-     * @throws IllegalArgumentException if the configuration key is missing, unknown, or ambiguous
+     * @param left     left endpoint, or null when endpoint types are not available
+     * @param right    right endpoint, or null when endpoint types are not available
+     * @param validate whether to validate fields against the metadata registry
+     * @return the applicable relationship configuration
+     * @throws IllegalArgumentException if the configuration key is missing or not resolvable
      * @throws SQLException if an error occurs while accessing the metadata registry
      */
-    private RelationshipTypeConfiguration resolveConfiguration(Context context, String key, boolean validate)
-        throws SQLException {
+    private RelationshipTypeConfiguration resolveConfiguration(Context context, String key, Item left, Item right,
+                                                              boolean validate) throws SQLException {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Missing relationship configuration key");
         }
@@ -370,22 +376,48 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
                 match = candidate;
             }
         }
-        if (match == null && key.startsWith(AUTHORITY_PREFIX)) {
-            match = fromLinkedEntityAuthority(key.substring(AUTHORITY_PREFIX.length()));
+
+        if (key.startsWith(AUTHORITY_PREFIX)
+            && (match == null || !matchesEndpointTypes(match, left, right))) {
+            RelationshipTypeConfiguration fallback =
+                fromLinkedEntityAuthority(key.substring(AUTHORITY_PREFIX.length()));
+            if (fallback != null && matchesEndpointTypes(fallback, left, right)) {
+                match = fallback;
+            } else if (match != null) {
+                throw new IllegalArgumentException(
+                    "Relationship configuration " + key + " does not support the relationship endpoints");
+            }
         }
         if (match == null) {
             throw new IllegalArgumentException("Unknown relationship configuration " + key);
         }
 
-        // Validate metadata fields against the registry only when requested.
+        // Only normal resolution checks the registry. Primary/additional classification remains lightweight.
         return validate ? validateMetadataFields(context, match) : match;
+    }
+
+    /**
+     * Returns whether the configured entity types permit the supplied endpoints.
+     * Missing endpoints or unknown entity types do not disambiguate a key; validation of concrete endpoints
+     * is still performed separately by validate().
+     */
+    private boolean matchesEndpointTypes(RelationshipTypeConfiguration configuration, Item left, Item right) {
+        if (left == null || right == null) {
+            return true;
+        }
+        String leftType = itemService.getEntityTypeLabel(left);
+        String rightType = itemService.getEntityTypeLabel(right);
+        return (leftType == null || configuration.getLeftEntityTypes().isEmpty()
+                || configuration.getLeftEntityTypes().contains(leftType))
+            && (rightType == null || configuration.getRightEntityTypes().isEmpty()
+                || configuration.getRightEntityTypes().contains(rightType));
     }
 
     @Override
     public RelationshipTypeConfiguration getRelationshipConfig(Context context, Relationship relationship)
         throws SQLException {
-        String key = relationship.getRelationshipConfigKey();
-        return resolveConfiguration(context, key);
+        return resolveConfiguration(context, relationship.getRelationshipConfigKey(),
+                                    relationship.getLeftItem(), relationship.getRightItem(), true);
     }
 
     /**
@@ -437,6 +469,33 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     }
 
     @Override
+    public void validateForCreation(Context context, RelationshipTypeConfiguration configuration, Item left, Item right,
+                                    boolean allowUnarchivedItems) throws SQLException {
+        if (configuration == null || configuration.getId() == null) {
+            throw new IllegalArgumentException("A registered relationship configuration is required for creation");
+        }
+
+        // Creation may receive a configuration resolved earlier from a MetadataValue, but the persisted key
+        // must resolve to the same endpoint and primary-field semantics. This is particularly important for
+        // authority:* keys, where an explicit bean can override a legacy authority-derived configuration.
+        RelationshipTypeConfiguration registered = resolveConfiguration(context, configuration.getId(),
+                                                                       left, right, true);
+        if (!configuration.getLeftEntityTypes().equals(registered.getLeftEntityTypes())
+            || !configuration.getRightEntityTypes().equals(registered.getRightEntityTypes())
+            || !Objects.equals(configuration.getLeftPrimaryMetadataField(),
+                               registered.getLeftPrimaryMetadataField())
+            || !Objects.equals(configuration.getRightPrimaryMetadataField(),
+                               registered.getRightPrimaryMetadataField())) {
+            throw new IllegalArgumentException(
+                "Relationship configuration " + configuration.getId()
+                    + " does not match the registered configuration for its persisted key");
+        }
+
+        // Use the registered definition for endpoint validation, not an arbitrary caller-provided object.
+        validate(context, registered, left, right, allowUnarchivedItems);
+    }
+
+    @Override
     public Optional<String> getPrimaryMetadataField(Context context, Relationship relationship, Item endpoint)
         throws SQLException {
         RelationshipTypeConfiguration configuration = getRelationshipConfig(context, relationship);
@@ -450,7 +509,8 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         throws SQLException {
 
         RelationshipTypeConfiguration configuration =
-            resolveConfiguration(context, relationship.getRelationshipConfigKey(), false);
+            resolveConfiguration(context, relationship.getRelationshipConfigKey(),
+                                 relationship.getLeftItem(), relationship.getRightItem(), false);
 
         Item endpoint = (Item) metadataValue.getDSpaceObject();
 
@@ -466,7 +526,8 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         throws SQLException {
 
         RelationshipTypeConfiguration configuration =
-            resolveConfiguration(context, relationship.getRelationshipConfigKey(), false);
+            resolveConfiguration(context, relationship.getRelationshipConfigKey(),
+                                 relationship.getLeftItem(), relationship.getRightItem(), false);
 
         Item endpoint = (Item) metadataValue.getDSpaceObject();
 

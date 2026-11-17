@@ -96,6 +96,23 @@ public interface RelationshipConfigurationService {
                   boolean allowUnarchivedItems) throws SQLException;
 
     /**
+     * Validates a configuration-backed relationship before persistence, including the configuration key.
+     * The supplied configuration must resolve to registered semantics with the same endpoint entity types
+     * and primary metadata fields. This prevents persisting a key that would later resolve differently.
+     * Registry validation is retained for primary fields, and missing additional fields are filtered as usual.
+     *
+     * @param context              current DSpace context
+     * @param configuration        previously resolved relationship configuration
+     * @param left                 left relationship endpoint
+     * @param right                right relationship endpoint
+     * @param allowUnarchivedItems whether unarchived endpoints are allowed when copying a version
+     * @throws IllegalArgumentException if the key is unknown or its registered semantics differ
+     * @throws SQLException             if a metadata registry lookup fails
+     */
+    void validateForCreation(Context context, RelationshipTypeConfiguration configuration, Item left, Item right,
+                             boolean allowUnarchivedItems) throws SQLException;
+
+    /**
      * Checks whether the supplied metadata value belongs to the primary metadata field
      * configured for its endpoint in the relationship.
      *
