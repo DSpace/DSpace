@@ -43,14 +43,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implementation of {@link ItemEnhancer} that derives the additional metadata declared by the
  * relationship configuration.
  *
- * <p>For each relationship-backed primary value the enhancer resolves the configured
- * {@link RelationshipMetadataGenerator}, reads the related entity through the
- * {@link ItemMetadataSource} adapter and persists the extracted values on the owning item,
- * stamped with the relationship id.</p>
- *
- * <p>The enhancer acts as a thin use case: it builds the database adapter at the boundary and
- * asks the generator to extract the values. The generator never sees the related {@link Item}
- * or the {@link ItemService}; it only sees the abstract {@link MetadataSource}.</p>
+ * <p>For each relationship-backed primary value, the enhancer resolves the configured
+ * {@link RelationshipMetadataGenerator}, reads the metadata of the related entity through an
+ * {@link ItemMetadataSource} and saves the extracted values on the owning item, with the
+ * relationship id.</p>
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  * @see ItemEnhancer
@@ -389,6 +385,13 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
             byOwner.computeIfAbsent((Item) value.getDSpaceObject(), owner -> new ArrayList<>()).add(value);
         }
         for (Map.Entry<Item, List<MetadataValue>> entry : byOwner.entrySet()) {
+            for (MetadataValue value : entry.getValue()) {
+                // Additional values point at the relationship but are not its primary value.
+                // Clear the link before removing them, otherwise the removal would delete the
+                // relationship itself.
+                value.setRelationship(null);
+                metadataValueService.update(context, value);
+            }
             itemService.removeMetadataValues(context, entry.getKey(), entry.getValue());
         }
         return true;
