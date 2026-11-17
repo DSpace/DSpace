@@ -7,12 +7,9 @@
  */
 package org.dspace.app.rest.enhancer;
 
-import static org.dspace.app.matcher.MetadataValueMatcher.with;
-import static org.dspace.app.matcher.MetadataValueMatcher.withNoPlace;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -24,6 +21,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.matcher.CustomItemMatcher;
@@ -31,15 +29,24 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.MetadataFieldBuilder;
+import org.dspace.builder.MetadataSchemaBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.AuthorityBackedRelationshipServiceImpl;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.enhancer.service.ItemEnhancerService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
@@ -51,9 +58,14 @@ import org.mockito.Mockito;
 
 public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithDatabase {
 
+    private static final String ADDITIONAL_ORCID_FIELD = "additional.identifier.orcid";
+
+    private static final String ADDITIONAL_AFFILIATION_FIELD = "additional.affiliation.name";
+
     private ItemService itemService;
     private ItemEnhancerService itemEnhancerService;
     private ItemEnhancerService spyItemEnhancerService;
+    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
     private RelatedItemEnhancerUpdatePoller poller = new RelatedItemEnhancerUpdatePoller();
     private Collection collection;
 
@@ -61,9 +73,11 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
     public void setup() throws Exception {
         final DSpace dspace = new DSpace();
         ConfigurationService configurationService = dspace.getConfigurationService();
-        configurationService.setProperty("relationship.enable-virtual-metadata", false);
         itemService = ContentServiceFactory.getInstance().getItemService();
         itemEnhancerService = dspace.getSingletonService(ItemEnhancerService.class);
+        authorityBackedRelationshipService = dspace.getServiceManager().getServiceByName(
+            AuthorityBackedRelationshipServiceImpl.class.getCanonicalName(),
+            AuthorityBackedRelationshipService.class);
         spyItemEnhancerService = spy(itemEnhancerService);
         poller.setItemEnhancerService(spyItemEnhancerService);
         poller.setItemService(itemService);
@@ -91,18 +105,18 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
         collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
             .build();
+        registerAdditionalFields();
         context.restoreAuthSystemState();
     }
 
     @Test
     public void testUpdateRelatedItemAreProcessed() throws Exception {
 
-
-
         context.turnOffAuthorisationSystem();
 
         Item person = ItemBuilder.createItem(context, collection)
             .withTitle("Walter White")
+            .withEntityType("Person")
             .withPersonMainAffiliation("4Science")
             .build();
 
@@ -110,12 +124,14 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
 
         Item person2 = ItemBuilder.createItem(context, collection)
                 .withTitle("John Red")
+                .withEntityType("Person")
                 .build();
 
         String person2Id = person2.getID().toString();
 
         Item person3 = ItemBuilder.createItem(context, collection)
                 .withTitle("Marc Green")
+                .withEntityType("Person")
                 .withOrcidIdentifier("orcid-person3")
                 .withPersonMainAffiliation("Affiliation 1")
                 .withPersonMainAffiliation("Affiliation 2")
@@ -144,55 +160,45 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
                 .withAuthor("Marc Green", person3Id)
                 .build();
 
+        promote(publication, person);
+        promote(publication2, person);
+        promote(publication2, person2);
+        promote(publication3, person2);
+        promote(publication3, person3);
+
         context.restoreAuthSystemState();
+        context.commit();
         publication = context.reloadEntity(publication);
         publication2 = context.reloadEntity(publication2);
         publication3 = context.reloadEntity(publication3);
 
         List<MetadataValue> metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(10));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.department", "4Science")));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.department", personId)));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.orcid", personId)));
+        assertThat(metadataValues, hasSize(8));
+        assertThat(getValues(publication, ADDITIONAL_ORCID_FIELD),
+                containsInAnyOrder(PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(getValues(publication, ADDITIONAL_AFFILIATION_FIELD),
+                containsInAnyOrder("4Science"));
         List<MetadataValue> metadataValues2 = publication2.getMetadata();
-        assertThat(metadataValues2, hasSize(16));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtual.department"),
+        assertThat(metadataValues2, hasSize(12));
+        assertThat(getValues(publication2, ADDITIONAL_ORCID_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", "4Science"),
-                    withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtualsource.department"),
+                    PLACEHOLDER_PARENT_METADATA_VALUE,
+                    PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(getValues(publication2, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", personId),
-                    withNoPlace("dspace.virtualsource.department", person2Id)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtual.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtualsource.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.orcid", personId),
-                    withNoPlace("dspace.virtualsource.orcid", person2Id)));
+                    "4Science",
+                    PLACEHOLDER_PARENT_METADATA_VALUE));
         List<MetadataValue> metadataValues3 = publication3.getMetadata();
-        assertThat(metadataValues3, hasSize(17));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtual.department"),
+        assertThat(metadataValues3, hasSize(12));
+        assertThat(getValues(publication3, ADDITIONAL_ORCID_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.department", "Affiliation 1"),
-                    withNoPlace("dspace.virtual.department", "Affiliation 2")));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtualsource.department"),
+                    PLACEHOLDER_PARENT_METADATA_VALUE,
+                    "orcid-person3"));
+        assertThat(getValues(publication3, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", person2Id),
-                    withNoPlace("dspace.virtualsource.department", person3Id),
-                    withNoPlace("dspace.virtualsource.department", person3Id)));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtual.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.orcid", "orcid-person3")));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtualsource.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.orcid", person2Id),
-                    withNoPlace("dspace.virtualsource.orcid", person3Id)));
+                    PLACEHOLDER_PARENT_METADATA_VALUE,
+                    "Affiliation 1",
+                    "Affiliation 2"));
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, person, "person", "identifier", "orcid", null, "1234-5678-9101");
@@ -217,61 +223,32 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
         publication3 = context.reloadEntity(publication3);
 
         metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(12));
-        assertThat(itemService.getMetadataByMetadataString(publication, "dspace.virtual.department"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", "4Science"),
-                    withNoPlace("dspace.virtual.department", "Company")));
-        assertThat(itemService.getMetadataByMetadataString(publication, "dspace.virtualsource.department"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", personId),
-                    withNoPlace("dspace.virtualsource.department", personId)));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.orcid", "1234-5678-9101")));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.orcid", personId)));
+        assertThat(metadataValues, hasSize(9));
+        assertThat(getValues(publication, ADDITIONAL_ORCID_FIELD),
+                containsInAnyOrder("1234-5678-9101"));
+        assertThat(getValues(publication, ADDITIONAL_AFFILIATION_FIELD),
+                containsInAnyOrder("4Science", "Company"));
         metadataValues2 = publication2.getMetadata();
-        assertThat(metadataValues2, hasSize(18));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtual.department"),
+        assertThat(metadataValues2, hasSize(13));
+        assertThat(getValues(publication2, ADDITIONAL_ORCID_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", "4Science"),
-                    withNoPlace("dspace.virtual.department", "Company"),
-                    withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtualsource.department"),
+                    "1234-5678-9101",
+                    PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(getValues(publication2, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", personId),
-                    withNoPlace("dspace.virtualsource.department", personId),
-                    withNoPlace("dspace.virtualsource.department", person2Id)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtual.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.orcid", "1234-5678-9101"),
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtualsource.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.orcid", personId),
-                    withNoPlace("dspace.virtualsource.orcid", person2Id)));
+                    "4Science",
+                    "Company",
+                    PLACEHOLDER_PARENT_METADATA_VALUE));
         metadataValues3 = publication3.getMetadata();
-        assertThat(metadataValues3, hasSize(17));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtual.department"),
+        assertThat(metadataValues3, hasSize(12));
+        assertThat(getValues(publication3, ADDITIONAL_ORCID_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.department", "Affiliation 1"),
-                    withNoPlace("dspace.virtual.department", "Affiliation 2")));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtualsource.department"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", person2Id),
-                    withNoPlace("dspace.virtualsource.department", person3Id),
-                    withNoPlace("dspace.virtualsource.department", person3Id)));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtual.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.orcid", "orcid-person3")));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtualsource.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.orcid", person2Id),
-                    withNoPlace("dspace.virtualsource.orcid", person3Id)));
+                    PLACEHOLDER_PARENT_METADATA_VALUE,
+                    "orcid-person3"));
+
         context.turnOffAuthorisationSystem();
         itemService.clearMetadata(context, person3, "person", "identifier", "orcid", Item.ANY);
-        itemService.removeMetadataValues(context, person3,
-                List.of(itemService.getMetadataByMetadataString(person3, "person.affiliation.name").get(0)));
+        removeAffiliation(context, person3, "Affiliation 1");
         itemService.update(context, person3);
         context.restoreAuthSystemState();
         person3 = commitAndReload(person3);
@@ -290,60 +267,100 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
         publication3 = context.reloadEntity(publication3);
 
         metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(12));
-        assertThat(itemService.getMetadataByMetadataString(publication, "dspace.virtual.department"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", "4Science"),
-                    withNoPlace("dspace.virtual.department", "Company")));
-        assertThat(itemService.getMetadataByMetadataString(publication, "dspace.virtualsource.department"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", personId),
-                    withNoPlace("dspace.virtualsource.department", personId)));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.orcid", "1234-5678-9101")));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.orcid", personId)));
+        assertThat(metadataValues, hasSize(9));
+        assertThat(getValues(publication, ADDITIONAL_ORCID_FIELD),
+                containsInAnyOrder("1234-5678-9101"));
+        assertThat(getValues(publication, ADDITIONAL_AFFILIATION_FIELD),
+                containsInAnyOrder("4Science", "Company"));
         metadataValues2 = publication2.getMetadata();
-        assertThat(metadataValues2, hasSize(18));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtual.department"),
+        assertThat(metadataValues2, hasSize(13));
+        assertThat(getValues(publication2, ADDITIONAL_ORCID_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", "4Science"),
-                    withNoPlace("dspace.virtual.department", "Company"),
-                    withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtualsource.department"),
+                    "1234-5678-9101",
+                    PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(getValues(publication2, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", personId),
-                    withNoPlace("dspace.virtualsource.department", personId),
-                    withNoPlace("dspace.virtualsource.department", person2Id)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtual.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.orcid", "1234-5678-9101"),
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(itemService.getMetadataByMetadataString(publication2, "dspace.virtualsource.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.orcid", personId),
-                    withNoPlace("dspace.virtualsource.orcid", person2Id)));
+                    "4Science",
+                    "Company",
+                    PLACEHOLDER_PARENT_METADATA_VALUE));
         metadataValues3 = publication3.getMetadata();
-        assertThat(metadataValues3, hasSize(15));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtual.department"),
+        assertThat(metadataValues3, hasSize(11));
+        assertThat(getValues(publication3, ADDITIONAL_ORCID_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.department", "Affiliation 2")));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtualsource.department"),
+                    PLACEHOLDER_PARENT_METADATA_VALUE,
+                    PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(getValues(publication3, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", person2Id),
-                    withNoPlace("dspace.virtualsource.department", person3Id)));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtual.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(itemService.getMetadataByMetadataString(publication3, "dspace.virtualsource.orcid"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.orcid", person2Id),
-                    withNoPlace("dspace.virtualsource.orcid", person3Id)));
+                    PLACEHOLDER_PARENT_METADATA_VALUE,
+                    "Affiliation 2"));
 
     }
 
-    private List<MetadataValue> getMetadataValues(Item item, String metadataField) {
-        return itemService.getMetadataByMetadataString(item, metadataField);
+    /**
+     * Remove the affiliation with the given value from the given person.
+     *
+     * @param context the DSpace context
+     * @param person  the person item
+     * @param value   the affiliation value to remove
+     * @throws SQLException if the metadata values cannot be removed
+     */
+    private void removeAffiliation(Context context, Item person, String value) throws SQLException {
+        List<MetadataValue> affiliations = itemService
+            .getMetadata(person, "person", "affiliation", "name", Item.ANY)
+            .stream()
+            .filter(metadata -> value.equals(metadata.getValue()))
+            .collect(Collectors.toList());
+        itemService.removeMetadataValues(context, person, affiliations);
+    }
+
+    /**
+     * Register the target metadata fields used by the production relationship configuration.
+     *
+     * @throws SQLException       if the metadata fields cannot be looked up
+     * @throws AuthorizeException if the metadata schema or fields cannot be created
+     */
+    private void registerAdditionalFields() throws SQLException, AuthorizeException {
+        registerAdditionalField("identifier", "orcid");
+        registerAdditionalField("affiliation", "name");
+    }
+
+    /**
+     * Register a single field of the {@code additional} metadata schema.
+     *
+     * @param element   the metadata field element
+     * @param qualifier the metadata field qualifier
+     * @throws SQLException       if the metadata field cannot be looked up
+     * @throws AuthorizeException if the metadata schema or field cannot be created
+     */
+    private void registerAdditionalField(String element, String qualifier) throws SQLException, AuthorizeException {
+        MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        MetadataField existing = metadataFieldService.findByElement(context, "additional", element, qualifier);
+        if (existing != null) {
+            return;
+        }
+        MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+        MetadataSchema schema = metadataSchemaService.find(context, "additional");
+        if (schema == null) {
+            schema = MetadataSchemaBuilder.createMetadataSchema(context, "additional", "http://dspace.org/additional")
+                .build();
+        }
+        MetadataFieldBuilder.createMetadataField(context, schema, element, qualifier, null).build();
+    }
+
+    private void promote(Item publication, Item person) throws SQLException, AuthorizeException {
+        MetadataValue author = itemService
+            .getMetadata(publication, "dc", "contributor", "author", Item.ANY)
+            .stream()
+            .filter(value -> person.getID().toString().equals(value.getAuthority()))
+            .findFirst()
+            .orElseThrow();
+        authorityBackedRelationshipService.promoteResolvedAuthority(context, publication, author, person);
+    }
+
+    private List<String> getValues(Item item, String metadataField) {
+        return itemService.getMetadataByMetadataString(item, metadataField).stream()
+            .map(MetadataValue::getValue)
+            .collect(Collectors.toList());
     }
 
     @SuppressWarnings("rawtypes")

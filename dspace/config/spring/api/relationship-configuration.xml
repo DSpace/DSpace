@@ -19,6 +19,11 @@
         <property name="sourceField" value="person.identifier.orcid"/>
     </bean>
 
+    <bean id="authorAffiliationMetadataGenerator"
+          class="org.dspace.content.enhancer.generator.impl.SourceFieldMetadataGenerator">
+        <property name="sourceField" value="person.affiliation.name"/>
+    </bean>
+
     <bean id="publicationAuthorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
         <property name="id" value="authority:dc.contributor.author"/>
         <property name="leftEntityTypes">
@@ -35,6 +40,7 @@
         <property name="leftMetadataGenerators">
             <map>
                 <entry key="additional.identifier.orcid" value-ref="authorOrcidMetadataGenerator"/>
+                <entry key="additional.affiliation.name" value-ref="authorAffiliationMetadataGenerator"/>
             </map>
         </property>
     </bean>
