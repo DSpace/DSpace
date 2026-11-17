@@ -298,6 +298,22 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     }
 
     private RelationshipTypeConfiguration resolveConfiguration(Context context, String key) throws SQLException {
+        return resolveConfiguration(context, key, true);
+    }
+
+    /**
+     * Resolves a relationship configuration by its key, optionally validating
+     * configured metadata fields against the metadata registry.
+     *
+     * @param context  current DSpace context
+     * @param key      relationship configuration key
+     * @param validate whether to validate metadata fields against the registry
+     * @return the resolved relationship configuration
+     * @throws IllegalArgumentException if the configuration key is missing, unknown, or ambiguous
+     * @throws SQLException if an error occurs while accessing the metadata registry
+     */
+    private RelationshipTypeConfiguration resolveConfiguration(Context context, String key, boolean validate)
+        throws SQLException {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Missing relationship configuration key");
         }
@@ -317,8 +333,8 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
             throw new IllegalArgumentException("Unknown relationship configuration " + key);
         }
 
-        // Validate metadata fields against the registry before returning the resolved configuration.
-        return validateMetadataFields(context, match);
+        // Validate metadata fields against the registry only when requested.
+        return validate ? validateMetadataFields(context, match) : match;
     }
 
     @Override
@@ -388,16 +404,33 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @Override
     public boolean isPrimaryMetadata(Context context, Relationship relationship, MetadataValue metadataValue)
         throws SQLException {
-        return getPrimaryMetadataField(context, relationship, (Item) metadataValue.getDSpaceObject())
-            .filter(fieldName(metadataValue)::equals)
-            .isPresent();
+
+        RelationshipTypeConfiguration configuration =
+            resolveConfiguration(context, relationship.getRelationshipConfigKey(), false);
+
+        Item endpoint = (Item) metadataValue.getDSpaceObject();
+
+        Optional<String> primaryField = isLeftEndpoint(relationship, endpoint)
+            ? configuration.getLeftPrimaryMetadataField()
+            : configuration.getRightPrimaryMetadataField();
+
+        return primaryField.filter(fieldName(metadataValue)::equals).isPresent();
     }
 
     @Override
     public boolean isAdditionalMetadata(Context context, Relationship relationship, MetadataValue metadataValue)
         throws SQLException {
-        return getAdditionalMetadataFields(context, relationship, (Item) metadataValue.getDSpaceObject())
-            .contains(fieldName(metadataValue));
+
+        RelationshipTypeConfiguration configuration =
+            resolveConfiguration(context, relationship.getRelationshipConfigKey(), false);
+
+        Item endpoint = (Item) metadataValue.getDSpaceObject();
+
+        Set<String> additionalFields = isLeftEndpoint(relationship, endpoint)
+            ? configuration.getLeftAdditionalMetadataFields()
+            : configuration.getRightAdditionalMetadataFields();
+
+        return additionalFields.contains(fieldName(metadataValue));
     }
 
     @Override
