@@ -186,6 +186,20 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
      </form>
 
+     <form name="test-author-relationship">
+         <row>
+             <field>
+                 <dc-schema>ds11rel</dc-schema>
+                 <dc-element>contributor</dc-element>
+                 <dc-qualifier>author</dc-qualifier>
+                 <repeatable>true</repeatable>
+                 <label>Author</label>
+                 <input-type>onebox</input-type>
+                 <hint>Enter an author</hint>
+                 <required></required>
+             </field>
+         </row>
+     </form>
 
     <form name="publication">
      <row>

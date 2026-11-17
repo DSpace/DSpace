@@ -15,8 +15,12 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
@@ -32,12 +36,15 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipConfigurationServiceImpl;
+import org.dspace.content.RelationshipTypeConfiguration;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -47,6 +54,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Persistence and lifecycle regression tests for the metadata-to-relationship FK.
@@ -229,10 +237,97 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     }
 
     @Test
+    public void testAuthorityFallbackWithExplicitKeyOnDifferentEntityType() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item dataset = ItemBuilder.createItem(context, collection).withTitle("dataset")
+            .withEntityType("DataSet").withAuthor("Someone").build();
+        MetadataValue author = itemService.getMetadata(dataset, "dc", "contributor", "author", Item.ANY).get(0);
+
+        // The explicit bean only covers Publication -> Person. A DataSet can still use the linked-entity
+        // authority fallback with the same key, provided persisted resolution uses its endpoint types.
+        Relationship relationship = service.promoteResolvedAuthority(context, dataset, author, target);
+        assertThat(relationship, notNullValue());
+        assertThat(relationship.getRelationshipConfigKey(), equalTo("authority:dc.contributor.author"));
+        assertThat(author.getRelationship().getID(), equalTo(relationship.getID()));
+        RelationshipConfigurationServiceImpl configurations = new DSpace().getServiceManager().getServiceByName(
+            RelationshipConfigurationServiceImpl.class.getCanonicalName(), RelationshipConfigurationServiceImpl.class);
+        RelationshipTypeConfiguration resolved = configurations.getRelationshipConfig(context, relationship);
+        assertThat(resolved.getLeftEntityTypes().isEmpty(), is(true));
+        assertThat(resolved.getRightEntityTypes(), equalTo(Set.of("Person")));
+    }
+
+    @Test
+    public void testAuthorityOnlyEditorRelationshipWithoutSpringConfiguration() throws Exception {
+        context.turnOffAuthorisationSystem();
+        itemService.addMetadata(context, owner, "dc", "contributor", "editor", null, "Smith, John");
+        MetadataValue editor = itemService.getMetadata(owner, "dc", "contributor", "editor", Item.ANY).get(0);
+
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, editor, target);
+        assertThat(relationship, notNullValue());
+        assertThat(relationship.getRelationshipConfigKey(), equalTo("authority:dc.contributor.editor"));
+        RelationshipConfigurationServiceImpl configurations = new DSpace().getServiceManager().getServiceByName(
+            RelationshipConfigurationServiceImpl.class.getCanonicalName(), RelationshipConfigurationServiceImpl.class);
+        assertThat(configurations.getRelationshipConfig(context, relationship).getLeftPrimaryMetadataField()
+            .orElse(null), equalTo("dc.contributor.editor"));
+    }
+
+    @Test
+    public void testCreationRejectsUnresolvableConfigurationKey() throws Exception {
+        context.turnOffAuthorisationSystem();
+        RelationshipTypeConfiguration unknown = new RelationshipTypeConfiguration();
+        unknown.setId("nonexistent-config");
+        unknown.setLeftEntityTypes(Set.of("Publication"));
+        unknown.setRightEntityTypes(Set.of("Person"));
+        unknown.setLeftPrimaryMetadataField("dc.contributor.author");
+
+        assertThrows(IllegalArgumentException.class,
+            () -> relationshipService.createConfigBackedRelationship(context, owner, target, unknown));
+        assertThat(relationshipService.findByItem(context, owner), hasSize(0));
+    }
+
+    @Test
+    public void testPromotesRightEndpointWithMatchingPrimaryFieldOnBothSides() throws Exception {
+        context.turnOffAuthorisationSystem();
+        RelationshipConfigurationServiceImpl configurations = new DSpace().getServiceManager().getServiceByName(
+            RelationshipConfigurationServiceImpl.class.getCanonicalName(), RelationshipConfigurationServiceImpl.class);
+        Object original = ReflectionTestUtils.getField(configurations, "configurations");
+
+        RelationshipTypeConfiguration twoSided = new RelationshipTypeConfiguration();
+        twoSided.setId("test:two-sided-title");
+        twoSided.setLeftEntityTypes(Set.of("Publication"));
+        twoSided.setRightEntityTypes(Set.of("Person"));
+        twoSided.setLeftPrimaryMetadataField("dc.title");
+        twoSided.setRightPrimaryMetadataField("dc.title");
+        Relationship created = null;
+        ReflectionTestUtils.setField(configurations, "configurations", List.of(twoSided));
+        try {
+            MetadataValue personTitle = itemService.getMetadata(target, "dc", "title", null, Item.ANY).get(0);
+            created = service.promoteResolvedAuthority(context, target, personTitle, owner);
+
+            assertThat(created, notNullValue());
+            assertThat(created.getLeftItem(), equalTo(owner));
+            assertThat(created.getRightItem(), equalTo(target));
+            assertThat(created.getRelationshipConfigKey(), equalTo(twoSided.getId()));
+            assertThat(personTitle.getRelationship().getID(), equalTo(created.getID()));
+            assertThat(configurations.getRelationshipConfig(context, created).getId(),
+                equalTo(twoSided.getId()));
+        } finally {
+            try {
+                if (created != null) {
+                    // Clean up the temporary relationship before restoring the singleton's configuration.
+                    service.detachRelationshipKeepMetadata(context, created);
+                }
+            } finally {
+                ReflectionTestUtils.setField(configurations, "configurations", original);
+            }
+        }
+    }
+
+    @Test
     public void testForeignKeyDirectionDoesNotRequireMetadataToExist() throws Exception {
         context.turnOffAuthorisationSystem();
-        Relationship relationship = relationshipService.createConfigBackedRelationship(context, owner, target,
-            "authority:dc.contributor.author");
+        Relationship relationship = relationshipService
+            .createConfigBackedRelationship(context, owner, target, authorRelationshipConfiguration());
         context.commit();
         relationship = context.reloadEntity(relationship);
         assertThat(relationship, notNullValue());
@@ -260,8 +355,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.setCurrentUser(user);
         context.restoreAuthSystemState();
 
-        Relationship relationship = relationshipService.createConfigBackedRelationship(
-            context, owner, target, "authority:dc.contributor.author");
+        Relationship relationship = relationshipService
+            .createConfigBackedRelationship(context, owner, target, authorRelationshipConfiguration());
 
         assertThat(relationship, notNullValue());
         assertThat(relationship.getLeftItem(), equalTo(owner));
@@ -287,8 +382,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.setCurrentUser(user);
         context.restoreAuthSystemState();
 
-        Relationship relationship = relationshipService.createConfigBackedRelationship(
-            context, owner, target, "authority:dc.contributor.author");
+        Relationship relationship = relationshipService
+            .createConfigBackedRelationship(context, owner, target, authorRelationshipConfiguration());
 
         assertThat(relationship, notNullValue());
         assertThat(relationship.getLeftItem(), equalTo(owner));
@@ -314,8 +409,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.restoreAuthSystemState();
 
         assertThrows(AuthorizeException.class,
-                     () -> relationshipService.createConfigBackedRelationship(
-                         context, owner, target, "authority:dc.contributor.author"));
+                     () -> relationshipService.createConfigBackedRelationship(context, owner, target,
+                                                                              authorRelationshipConfiguration()));
     }
 
     @Test
@@ -337,8 +432,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.restoreAuthSystemState();
 
         assertThrows(AuthorizeException.class,
-                     () -> relationshipService.createConfigBackedRelationship(
-                         context, owner, target, "authority:dc.contributor.author"));
+                     () -> relationshipService.createConfigBackedRelationship(context, owner, target,
+                                                                              authorRelationshipConfiguration()));
     }
 
     /**
@@ -592,6 +687,17 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
                             .count();
 
         assertThat(count, is(expectedCount));
+    }
+
+    /**
+     * Creates the relationship configuration used by the configuration-backed creation tests.
+     */
+    private RelationshipTypeConfiguration authorRelationshipConfiguration() throws SQLException {
+        Relationship lookup = mock(Relationship.class);
+        when(lookup.getRelationshipConfigKey()).thenReturn("authority:dc.contributor.author");
+        RelationshipConfigurationService configurations = new DSpace().getServiceManager().getServiceByName(
+            RelationshipConfigurationServiceImpl.class.getCanonicalName(), RelationshipConfigurationService.class);
+        return configurations.getRelationshipConfig(context, lookup);
     }
 
 }

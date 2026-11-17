@@ -57,6 +57,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.content.virtual.Collected;
@@ -679,8 +680,15 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                                               .withTitle("Publication")
                                               .build();
 
-        Relationship originalRelationship = relationshipService.createConfigBackedRelationship(
-            context, originalPublication, person, "authority:dc.contributor.author");
+        Relationship lookup = new Relationship();
+        lookup.setRelationshipConfigKey("authority:dc.contributor.author");
+        RelationshipConfigurationService configurations =
+            DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                RelationshipConfigurationServiceImpl.class.getCanonicalName(), RelationshipConfigurationService.class);
+        RelationshipTypeConfiguration configuration = configurations.getRelationshipConfig(context, lookup);
+
+        Relationship originalRelationship =
+            relationshipService.createConfigBackedRelationship(context, originalPublication, person, configuration);
 
         context.commit();
         originalPublication = context.reloadEntity(originalPublication);
