@@ -16,25 +16,26 @@ import org.dspace.core.Context;
  * Data Access Object interface for managing the metadata enhancement update queue.
  * 
  * <p><strong>Purpose:</strong></p>
- * <p>This DAO provides a contract for managing items that need their virtual metadata
- * refreshed when related entities change. It maintains a queue system to ensure
+ * <p>This DAO provides a contract for managing items that need their relationship-derived
+ * metadata refreshed when related entities change. It maintains a queue system to ensure
  * data consistency across entity relationships in a performant, asynchronous manner.</p>
  * 
  * <p><strong>How it is used:</strong></p>
  * <ul>
  *   <li><strong>Dependency Tracking:</strong> When an entity is modified, this DAO identifies
- *       and queues all dependent items that reference the entity through virtual metadata</li>
+ *       and queues all dependent items that reference the entity through relationship-backed
+ *       metadata</li>
  *   <li><strong>Queue Management:</strong> Provides operations to add items to the update queue,
  *       retrieve the next item for processing, and remove completed items</li>
- *   <li><strong>Virtual Metadata Synchronization:</strong> Supports the virtual metadata system
- *       where derived metadata fields need to stay synchronized with their source entities</li>
+ *   <li><strong>Derived Metadata Synchronization:</strong> Supports the enhancer system where
+ *       derived metadata fields need to stay synchronized with their related entities</li>
  * </ul>
  * 
  * <p><strong>Workflow:</strong></p>
  * <ol>
  *   <li>When an entity is updated, queue all dependent items for enhancement</li>
  *   <li>Background processes poll for the next item to process</li>
- *   <li>Update the item's virtual metadata fields with current entity data</li>
+ *   <li>Update the item's derived metadata fields with current entity data</li>
  *   <li>Remove the processed item from the queue</li>
  * </ol>
  * 
@@ -46,8 +47,8 @@ public interface ItemForMetadataEnhancementUpdateDAO {
 
     /**
      * Queues all items that are potentially affected by the update of an entity
-     * with the specified UUID. Affected items are those that reference the entity
-     * through virtual metadata source fields.
+     * with the specified UUID. Affected items are those that own relationship-backed
+     * metadata whose relationship has the entity as one of its endpoints.
      * 
      * @param context the DSpace Context object
      * @param uuid    the UUID of the updated entity

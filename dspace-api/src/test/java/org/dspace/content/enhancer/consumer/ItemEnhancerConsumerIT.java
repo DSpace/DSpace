@@ -8,55 +8,68 @@
 package org.dspace.content.enhancer.consumer;
 
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
-import static org.dspace.app.matcher.MetadataValueMatcher.withNoPlace;
 import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.app.matcher.MetadataValueMatcher;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.MetadataFieldBuilder;
+import org.dspace.builder.MetadataSchemaBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.AuthorityBackedRelationshipServiceImpl;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.ReloadableEntity;
-import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Integration tests for the {@link ItemEnhancerConsumer}.
+ *
+ * <p>The consumer forces the enhancement of the archived items touched by the dispatched events.
+ * The legacy virtual metadata was replaced by the relationship additional metadata derived by the
+ * related entity enhancer, so the tests assert on the {@code additional.identifier.orcid} values
+ * produced for the relationship-backed authors.</p>
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ */
 public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase {
+
+    private static final String ADDITIONAL_FIELD = "additional.identifier.orcid";
+    private static final String AUTHOR_FIELD = "dc.contributor.author";
 
     private ItemService itemService;
 
     private Collection collection;
 
-    private PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
-
-    private ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory
-        .getInstance().getChoiceAuthorityService();
+    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
 
     private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
         .getInstance().getMetadataAuthorityService();
@@ -68,15 +81,17 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
     public void setup() throws Exception {
 
         itemService = ContentServiceFactory.getInstance().getItemService();
+        authorityBackedRelationshipService = new DSpace().getServiceManager().getServiceByName(
+            AuthorityBackedRelationshipServiceImpl.class.getCanonicalName(),
+            AuthorityBackedRelationshipService.class);
 
-        // Common authority configuration for most tests
-        choiceAuthorityService.getChoiceAuthoritiesNames();
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
+        configurationService.setProperty("authority.controlled.additional.identifier.orcid", "true");
         metadataAuthorityService.clearCache();
 
         context.turnOffAuthorisationSystem();
+        registerAdditionalOrcidField();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
@@ -93,32 +108,23 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
 
         context.turnOffAuthorisationSystem();
 
-        Item person = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
-
-        String personId = person.getID().toString();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication")
-            .withEntityType("Publication")
-            .withAuthor("Walter White", personId)
-            .build();
+        Item person = createPerson("Walter White", "0000-0001-0000-0001");
+        Item publication = createPublication("Test publication", person);
+        promoteAuthors(publication, person);
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        List<MetadataValue> metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(10));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.department", "4Science")));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.department", personId)));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.orcid", personId)));
+        List<MetadataValue> metadataValues = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(metadataValues, hasSize(1));
 
+        MetadataValue additional = metadataValues.get(0);
+        assertThat(additional.getValue(), equalTo("0000-0001-0000-0001"));
+        assertThat(additional.getRelationship(), notNullValue());
+        assertThat(additional.getRelationship().getID(), equalTo(primaryRelationship(publication).getID()));
+        assertThat(additional.getAuthority(), equalTo(person.getID().toString()));
 
-        MetadataValue virtualField = getFirstMetadataValue(publication, "dspace.virtual.department");
-        MetadataValue virtualSourceField = getFirstMetadataValue(publication, "dspace.virtualsource.department");
+        Integer additionalId = additional.getID();
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, publication, "dc", "subject", null, null, "Test");
@@ -126,79 +132,38 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(11));
-        assertThat(metadataValues, hasItem(with("dc.contributor.author", "Walter White", personId, 600)));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.department", "4Science")));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.department", personId)));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.orcid", personId)));
-
-        assertThat(virtualField, equalTo(getFirstMetadataValue(publication, "dspace.virtual.department")));
-        assertThat(virtualSourceField, equalTo(getFirstMetadataValue(publication, "dspace.virtualsource.department")));
+        metadataValues = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(metadataValues, hasSize(1));
+        assertThat(metadataValues.get(0).getID(), equalTo(additionalId));
+        assertThat(metadataValues.get(0).getValue(), equalTo("0000-0001-0000-0001"));
 
     }
 
     @Test
     public void testManyMetadataValuesEnhancement() throws Exception {
-        // This test needs additional editor authority control
-        configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
 
         context.turnOffAuthorisationSystem();
 
-        Item person1 = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
+        Item person1 = createPerson("Walter White", "0000-0001-0000-0001");
+        Item person2 = createPerson("John Smith", null);
+        Item person3 = createPerson("Jesse Pinkman", "0000-0001-0000-0003");
 
-        Item person2 = ItemBuilder.createItem(context, collection)
-            .withTitle("John Smith")
-            .build();
-
-        Item person3 = ItemBuilder.createItem(context, collection)
-            .withTitle("Jesse Pinkman")
-            .withPersonMainAffiliation("University of Rome")
-            .build();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication")
-            .withEntityType("Publication")
-            .withAuthor("Red Smith")
-            .withAuthor("Walter White", person1.getID().toString())
-            .withAuthor("John Smith", person2.getID().toString())
-            .withEditor("Jesse Pinkman", person3.getID().toString())
-            .build();
+        Item publication = createPublication("Test publication", person1, person2, person3);
+        promoteAuthors(publication, person1, person2, person3);
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
         List<MetadataValue> values = publication.getMetadata();
-        assertThat(values, hasSize(21));
-        assertThat(values, hasItem(with("dc.contributor.author", "Red Smith")));
-        assertThat(values, hasItem(with("dc.contributor.author", "Walter White", person1.getID().toString(), 1, 600)));
-        assertThat(values, hasItem(with("dc.contributor.author", "John Smith", person2.getID().toString(), 2, 600)));
-        assertThat(values, hasItem(with("dc.contributor.editor", "Jesse Pinkman", person3.getID().toString(), 0, 600)));
-        // virtual source and virtual metadata are not required to respect the order of the source metadata
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person1.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person2.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person3.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", "4Science")));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", "University of Rome")));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid", person1.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid", person2.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid", person3.getID().toString())));
-        // we can check with the position as all the values are expected to be placeholder
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 0)));
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 1)));
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 2)));
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(3));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(3));
-        assertThat(getMetadataValues(publication, "dspace.virtual.orcid"), hasSize(3));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.orcid"), hasSize(3));
+        assertThat(values, hasItem(with(AUTHOR_FIELD, "Walter White", person1.getID().toString(), 0, 600)));
+        assertThat(values, hasItem(with(AUTHOR_FIELD, "John Smith", person2.getID().toString(), 1, 600)));
+        assertThat(values, hasItem(with(AUTHOR_FIELD, "Jesse Pinkman", person3.getID().toString(), 2, 600)));
+
+        // additional metadata is not required to respect the order of the source metadata
+        assertThat(values, hasItem(additionalValue("0000-0001-0000-0001", person1)));
+        assertThat(values, hasItem(additionalValue("0000-0001-0000-0003", person3)));
+        assertThat(values, hasItem(additionalValue(PLACEHOLDER_PARENT_METADATA_VALUE, person2)));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(3));
 
     }
 
@@ -207,107 +172,49 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
 
         context.turnOffAuthorisationSystem();
 
-        Item person = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
+        Item person = createPerson("Walter White", "0000-0001-0000-0001");
 
-        String personId = person.getID().toString();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication")
-            .withEntityType("Publication")
-            .build();
+        Item publication = createPublication("Test publication");
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        List<MetadataValue> metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(5));
-
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, publication, "dc", "contributor", "author",
-            null, "Walter White", personId, 600);
+            null, titleOf(person), person.getID().toString(), 600);
         itemService.update(context, publication);
+        MetadataValue author = getMetadataValues(publication, AUTHOR_FIELD).get(0);
+        authorityBackedRelationshipService.promoteResolvedAuthority(context, publication, author, person);
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(10));
-        assertThat(metadataValues, hasItem(with("dc.contributor.author", "Walter White", personId, 600)));
-        assertThat(metadataValues, hasItem(with("dspace.virtual.department", "4Science")));
-        assertThat(metadataValues, hasItem(with("dspace.virtualsource.department", personId)));
+        List<MetadataValue> metadataValues = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(metadataValues, hasSize(1));
+        assertThat(metadataValues.get(0).getValue(), equalTo("0000-0001-0000-0001"));
+        assertThat(metadataValues.get(0).getRelationship(), notNullValue());
 
     }
 
     @Test
     public void testEnhancementWithMetadataRemoval() throws Exception {
 
-        choiceAuthorityService.getChoiceAuthoritiesNames();
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
         context.turnOffAuthorisationSystem();
 
-        Item person1 = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
+        Item person1 = createPerson("Walter White", "0000-0001-0000-0001");
+        Item person2 = createPerson("John Smith", "0000-0001-0000-0002");
+        Item person3 = createPerson("Jesse Pinkman", "0000-0001-0000-0003");
 
-        Item person2 = ItemBuilder.createItem(context, collection)
-            .withTitle("John Smith")
-            .withPersonMainAffiliation("Company")
-            .build();
-
-        Item person3 = ItemBuilder.createItem(context, collection)
-            .withTitle("Jesse Pinkman")
-            .withPersonMainAffiliation("University of Rome")
-            .build();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication")
-            .withEntityType("Publication")
-            .withAuthor("Walter White", person1.getID().toString())
-            .withAuthor("John Smith", person2.getID().toString())
-            .withAuthor("Jesse Pinkman", person3.getID().toString())
-            .build();
+        Item publication = createPublication("Test publication", person1, person2, person3);
+        promoteAuthors(publication, person1, person2, person3);
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        List<MetadataValue> values = publication.getMetadata();
-        assertThat(values, hasSize(20));
-        assertThat(values, hasItem(with("dc.contributor.author", "Walter White", person1.getID().toString(), 0, 600)));
-        assertThat(values, hasItem(with("dc.contributor.author", "John Smith", person2.getID().toString(), 1, 600)));
-        assertThat(values, hasItem(with("dc.contributor.author", "Jesse Pinkman", person3.getID().toString(), 2, 600)));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(3));
 
-        // virtual source and virtual metadata are not required to respect the order of the source metadata
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person1.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person2.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person3.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", "4Science")));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", "Company")));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", "University of Rome")));
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(3));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(3));
-
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid",  person1.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid", person2.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid", person3.getID().toString())));
-        // we can check with the position as all the values are expected to be placeholder
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 0)));
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 1)));
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 2)));
-        assertThat(getMetadataValues(publication, "dspace.virtual.orcid"), hasSize(3));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.orcid"), hasSize(3));
-
-
-        MetadataValue authorToRemove = getMetadataValues(publication, "dc.contributor.author").get(1);
+        MetadataValue authorToRemove = getMetadataValues(publication, AUTHOR_FIELD).get(1);
 
         context.turnOffAuthorisationSystem();
         itemService.removeMetadataValues(context, publication, List.of(authorToRemove));
@@ -315,103 +222,52 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        values = publication.getMetadata();
-        assertThat(values, hasSize(15));
-        assertThat(values, hasItem(with("dc.contributor.author", "Walter White", person1.getID().toString(), 0, 600)));
-        assertThat(values, hasItem(with("dc.contributor.author", "Jesse Pinkman", person3.getID().toString(), 1, 600)));
-        // virtual source and virtual metadata are not required to respect the order of the source metadata
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person1.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.department", person3.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", "4Science")));
-        assertThat(values, hasItem(withNoPlace("dspace.virtual.department", "University of Rome")));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid",  person1.getID().toString())));
-        assertThat(values, hasItem(withNoPlace("dspace.virtualsource.orcid", person3.getID().toString())));
-        // we can check with the position as all the values are expected to be placeholder
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 0)));
-        assertThat(values, hasItem(with("dspace.virtual.orcid", PLACEHOLDER_PARENT_METADATA_VALUE, 1)));
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(2));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(2));
-        assertThat(getMetadataValues(publication, "dspace.virtual.orcid"), hasSize(2));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.orcid"), hasSize(2));
+        List<MetadataValue> values = publication.getMetadata();
+        assertThat(values, hasItem(with(AUTHOR_FIELD, "Walter White", person1.getID().toString(), 0, 600)));
+        assertThat(values, hasItem(with(AUTHOR_FIELD, "Jesse Pinkman", person3.getID().toString(), 1, 600)));
+
+        List<MetadataValue> additionals = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(additionals, hasSize(2));
+        assertThat(values, hasItem(additionalValue("0000-0001-0000-0001", person1)));
+        assertThat(values, hasItem(additionalValue("0000-0001-0000-0003", person3)));
 
     }
 
     @Test
     public void testWithWorkspaceItem() throws Exception {
-        // Configure authority settings for this specific test
-        choiceAuthorityService.getChoiceAuthoritiesNames();
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
 
         context.turnOffAuthorisationSystem();
 
-        Item person = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
-
-        String personId = person.getID().toString();
+        Item person = createPerson("Walter White", "0000-0001-0000-0001");
 
         WorkspaceItem publication = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
             .withTitle("Test publication")
             .withEntityType("Publication")
-            .withAuthor("Walter White", personId)
+            .withAuthor("Walter White", person.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        List<MetadataValue> metadataValues = publication.getItem().getMetadata();
-        assertThat(metadataValues, hasSize(3));
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
 
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testEnhancementAfterItemUpdate() throws Exception {
-
-        choiceAuthorityService.getChoiceAuthoritiesNames();
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
 
         context.turnOffAuthorisationSystem();
 
-        Item person = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withOrcidIdentifier("0000-0000-1111-2222")
-            .build();
+        Item person = createPerson("Walter White", "0000-0000-1111-2222");
 
-        String personId = person.getID().toString();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication")
-            .withEntityType("Publication")
-            .withAuthor("Jesse Pinkman")
-            .withAuthor("Saul Goodman")
-            .withAuthor("Walter White", person.getID().toString())
-            .withAuthor("Gus Fring")
-            .build();
+        Item publication = createPublication("Test publication", person);
+        promoteAuthors(publication, person);
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        assertThat(getMetadataValues(publication, "dc.contributor.author"), contains(
-            with("dc.contributor.author", "Jesse Pinkman"),
-            with("dc.contributor.author", "Saul Goodman", 1),
-            with("dc.contributor.author", "Walter White", personId, 2, 600),
-            with("dc.contributor.author", "Gus Fring", 3)));
-
-        assertThat(getMetadataValues(publication, "dspace.virtual.orcid"), contains(
-            with("dspace.virtual.orcid", "0000-0000-1111-2222")));
-
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.orcid"), contains(
-            with("dspace.virtualsource.orcid", personId)));
+        Integer additionalId = getMetadataValues(publication, ADDITIONAL_FIELD).get(0).getID();
+        Integer relationshipId = primaryRelationship(publication).getID();
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, publication, "dc", "title", "alternative", null, "Other name");
@@ -419,106 +275,96 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
 
-        assertThat(getMetadataValues(publication, "dc.contributor.author"), contains(
-            with("dc.contributor.author", "Jesse Pinkman"),
-            with("dc.contributor.author", "Saul Goodman", 1),
-            with("dc.contributor.author", "Walter White", personId, 2, 600),
-            with("dc.contributor.author", "Gus Fring", 3)));
-
-        assertThat(getMetadataValues(publication, "dspace.virtual.orcid"), contains(
-                with("dspace.virtual.orcid", "0000-0000-1111-2222")));
-
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.orcid"), contains(
-            with("dspace.virtualsource.orcid", personId)));
+        List<MetadataValue> additionals = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(additionals, hasSize(1));
+        assertThat(additionals.get(0).getID(), equalTo(additionalId));
+        assertThat(additionals.get(0).getValue(), equalTo("0000-0000-1111-2222"));
+        assertThat(additionals.get(0).getRelationship().getID(), equalTo(relationshipId));
 
     }
 
     @Test
     public void testMultipleRelatedItemValuesEnhancement() throws Exception {
 
-        choiceAuthorityService.getChoiceAuthoritiesNames();
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
-        configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
         context.turnOffAuthorisationSystem();
-        MetadataSchema schema = ContentServiceFactory.getInstance()
-                .getMetadataSchemaService().find(context, "dspace");
-        MetadataFieldBuilder.createMetadataField(context, schema, "virtual", "testmultival", null);
-        MetadataFieldBuilder.createMetadataField(context, schema, "virtualsource", "testmultival", null);
 
-        Item person1 = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .withPersonMainAffiliation("DSpace")
-            .withOrcidIdentifier("orcid1")
-            .build();
+        Item person = createPerson("Walter White", "0000-0001-0000-0001");
+        itemService.addMetadata(context, person, "person", "identifier", "orcid", null, "0000-0001-0000-0002");
+        itemService.update(context, person);
 
-        Item person2 = ItemBuilder.createItem(context, collection)
-            .withTitle("John Smith")
-            .build();
-
-        Item person3 = ItemBuilder.createItem(context, collection)
-            .withTitle("Jesse Pinkman")
-            .withPersonMainAffiliation("University of Rome")
-            .build();
-
-        Item testEntity = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication")
-            // let's use our custom entity for test purpose, see extra-metadata-enhancers-for-test.xml
-            .withEntityType("TestEntity")
-            .withAuthor("Red Smith")
-            .withAuthor("Walter White", person1.getID().toString())
-            .withAuthor("John Smith", person2.getID().toString())
-            .withEditor("Jesse Pinkman", person3.getID().toString())
-            .build();
+        Item publication = createPublication("Test publication", person);
+        promoteAuthors(publication, person);
 
         context.restoreAuthSystemState();
-        testEntity = commitAndReload(testEntity);
+        publication = commitAndReload(publication);
 
-        List<MetadataValue> values = testEntity.getMetadata();
-        assertThat(values, hasItem(with("dc.contributor.author", "Red Smith")));
-        assertThat(values, hasItem(with("dc.contributor.author", "Walter White", person1.getID().toString(), 1, 600)));
-        assertThat(values, hasItem(with("dc.contributor.author", "John Smith", person2.getID().toString(), 2, 600)));
-        assertThat(values, hasItem(with("dc.contributor.editor", "Jesse Pinkman", person3.getID().toString(), 0, 600)));
-        // virtual source and virtual metadata are not required to respect the order of the source metadata
-        List<Integer> posPerson1 = getPlacesAsVirtualSource(person1, testEntity, "dspace.virtualsource.testmultival");
-        List<Integer> posPerson2 = getPlacesAsVirtualSource(person2, testEntity, "dspace.virtualsource.testmultival");
-        List<Integer> posPerson3 = getPlacesAsVirtualSource(person3, testEntity, "dspace.virtualsource.testmultival");
-        assertThat(values,
-                hasItem(with("dspace.virtualsource.testmultival", person1.getID().toString(), posPerson1.get(0))));
-        assertThat(values, hasItem(with("dspace.virtual.testmultival", "4Science", posPerson1.get(0))));
-        assertThat(values,
-                hasItem(with("dspace.virtualsource.testmultival", person1.getID().toString(), posPerson1.get(1))));
-        assertThat(values, hasItem(with("dspace.virtual.testmultival", "DSpace", posPerson1.get(1))));
-        assertThat(values,
-                hasItem(with("dspace.virtualsource.testmultival", person1.getID().toString(), posPerson1.get(2))));
-        assertThat(values, hasItem(with("dspace.virtual.testmultival", "orcid1", posPerson1.get(2))));
-
-        assertThat(values,
-                hasItem(with("dspace.virtualsource.testmultival", person2.getID().toString(), posPerson2.get(0))));
-        assertThat(values,
-                hasItem(with("dspace.virtual.testmultival", PLACEHOLDER_PARENT_METADATA_VALUE, posPerson2.get(0))));
-
-        assertThat(values,
-                hasItem(with("dspace.virtualsource.testmultival", person3.getID().toString(), posPerson3.get(0))));
-        assertThat(values, hasItem(with("dspace.virtual.testmultival", "University of Rome", posPerson3.get(0))));
-
-        assertThat(getMetadataValues(testEntity, "dspace.virtualsource.testmultival"), hasSize(5));
-        assertThat(getMetadataValues(testEntity, "dspace.virtual.testmultival"), hasSize(5));
+        List<MetadataValue> values = publication.getMetadata();
+        assertThat(values, hasItem(additionalValue("0000-0001-0000-0001", person)));
+        assertThat(values, hasItem(additionalValue("0000-0001-0000-0002", person)));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(2));
 
     }
 
-    private List<Integer> getPlacesAsVirtualSource(Item person1, Item publication, String metadata) {
-        return getMetadataValues(publication, metadata).stream()
-                .filter(mv -> StringUtils.equals(mv.getValue(), person1.getID().toString())).map(mv -> mv.getPlace())
-                .collect(Collectors.toList());
+    /**
+     * Register the target metadata field used by the production relationship configuration.
+     */
+    private void registerAdditionalOrcidField() throws Exception {
+        MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        MetadataField existing = metadataFieldService.findByElement(context, "additional", "identifier", "orcid");
+        if (existing != null) {
+            return;
+        }
+
+        MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+        MetadataSchema schema = metadataSchemaService.find(context, "additional");
+        if (schema == null) {
+            schema = MetadataSchemaBuilder
+                .createMetadataSchema(context, "additional", "http://dspace.org/additional")
+                .build();
+        }
+        MetadataFieldBuilder.createMetadataField(context, schema, "identifier", "orcid", null).build();
     }
 
-    private MetadataValue getFirstMetadataValue(Item item, String metadataField) {
-        return getMetadataValues(item, metadataField).get(0);
+    private Item createPerson(String title, String orcid) throws Exception {
+        ItemBuilder builder = ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withEntityType("Person");
+        if (orcid != null) {
+            builder.withOrcidIdentifier(orcid);
+        }
+        return builder.build();
+    }
+
+    private Item createPublication(String title, Item... persons) throws Exception {
+        ItemBuilder builder = ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withEntityType("Publication");
+        for (Item person : persons) {
+            builder.withAuthor(titleOf(person), person.getID().toString());
+        }
+        return builder.build();
+    }
+
+    private void promoteAuthors(Item publication, Item... persons) throws Exception {
+        List<MetadataValue> authors = getMetadataValues(publication, AUTHOR_FIELD);
+        assertThat(authors, hasSize(persons.length));
+        for (int i = 0; i < persons.length; i++) {
+            Relationship relationship = authorityBackedRelationshipService
+                .promoteResolvedAuthority(context, publication, authors.get(i), persons[i]);
+            assertThat(relationship, notNullValue());
+        }
+    }
+
+    private Relationship primaryRelationship(Item publication) {
+        return getMetadataValues(publication, AUTHOR_FIELD).get(0).getRelationship();
+    }
+
+    private MetadataValueMatcher additionalValue(String value, Item person) {
+        return with(ADDITIONAL_FIELD, value, null, person.getID().toString(), null, -1);
+    }
+
+    private String titleOf(Item item) {
+        return itemService.getMetadata(item, "dc", "title", null, Item.ANY).get(0).getValue();
     }
 
     private List<MetadataValue> getMetadataValues(Item item, String metadataField) {

@@ -10,10 +10,7 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.dao.ItemForMetadataEnhancementUpdateDAO;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.dspace.core.DBConnection;
 import org.dspace.services.ConfigurationService;
@@ -90,18 +87,16 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
 
     /**
      * {@inheritDoc}
-     * 
-     * <p><strong>Query Logic:</strong> Searches for all items containing {@code dspace.virtualsource.*}
-     * metadata fields where the first 36 characters (UUID portion) match the updated entity's UUID.
-     * This covers both direct references and qualified references like "uuid::qualifier".</p>
+     *
+     * <p><strong>Query Logic:</strong> Searches for all items owning relationship-backed metadata
+     * whose relationship has the updated entity as one of its endpoints. Derived metadata is
+     * re-keyed on {@code relationship_id}, so the fan-out follows the indexed relationship join
+     * instead of the removed {@code dspace.virtualsource.*} back-pointer.</p>
      */
     @Override
     public int saveAffectedItemsForUpdate(Context context, UUID uuid) {
         try {
             Session session = getHibernateSession();
-            MetadataSchemaService schemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-            MetadataSchema schema = schemaService.find(context, "dspace");
-            String sqlInsertOrUpdate;
             if ("org.h2.Driver".equals(configurationService.getProperty("db.driver"))) {
                 // H2 doesn't support the INSERT OR UPDATE statement so let's do in two steps
                 // update queued date for records already in the queue
@@ -110,43 +105,37 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
                     "WHERE EXISTS ( " +
                     "    SELECT 1 " +
                     "    FROM metadatavalue mv " +
-                    "    JOIN metadatafieldregistry mfr ON mv.metadata_field_id = mfr.metadata_field_id " +
+                    "    JOIN relationship r ON mv.relationship_id = r.id " +
                     "    WHERE mv.dspace_object_id = iue.uuid " +
-                    "    AND mfr.metadata_schema_id = :schema " +
-                    "    AND mfr.element = 'virtualsource' " +
-                    "    AND SUBSTRING(mv.text_value,1,36) = :uuid " +
+                    "    AND (r.left_id = :uuid OR r.right_id = :uuid) " +
+                    "    AND mv.dspace_object_id <> :uuid " +
                     ")";
                 String sqlInsert =
                         "INSERT INTO itemupdate_metadata_enhancement (uuid, date_queued) " +
                             "SELECT DISTINCT mv.dspace_object_id, CURRENT_TIMESTAMP " +
                             "FROM metadatavalue mv " +
-                            "JOIN metadatafieldregistry mfr ON mv.metadata_field_id = mfr.metadata_field_id " +
+                            "JOIN relationship r ON mv.relationship_id = r.id " +
                             "LEFT JOIN itemupdate_metadata_enhancement iue ON mv.dspace_object_id = iue.uuid " +
-                            "WHERE mfr.metadata_schema_id = :schema " +
-                            "AND mfr.element = 'virtualsource' " +
-                            "AND SUBSTRING(mv.text_value,1,36) = :uuid " +
+                            "WHERE (r.left_id = :uuid OR r.right_id = :uuid) " +
+                            "AND mv.dspace_object_id <> :uuid " +
                             "AND iue.uuid IS NULL";
                 NativeQuery<?> queryUpdate = session.createNativeQuery(sqlUpdate);
-                queryUpdate.setParameter("uuid", uuid.toString());
-                queryUpdate.setParameter("schema", schema.getID());
+                queryUpdate.setParameter("uuid", uuid);
                 queryUpdate.executeUpdate();
                 NativeQuery<?> queryInsert = session.createNativeQuery(sqlInsert);
-                queryInsert.setParameter("uuid", uuid.toString());
-                queryInsert.setParameter("schema", schema.getID());
+                queryInsert.setParameter("uuid", uuid);
                 return queryInsert.executeUpdate();
             } else {
-                sqlInsertOrUpdate = "INSERT INTO itemupdate_metadata_enhancement (uuid, date_queued)" +
+                String sqlInsertOrUpdate = "INSERT INTO itemupdate_metadata_enhancement (uuid, date_queued) " +
                     "SELECT DISTINCT mv.dspace_object_id, CURRENT_TIMESTAMP " +
                     "FROM metadatavalue mv " +
-                    "JOIN metadatafieldregistry mfr ON mv.metadata_field_id = mfr.metadata_field_id " +
-                    "WHERE mfr.metadata_schema_id = :schema " +
-                    "AND mfr.element = 'virtualsource' " +
-                    "AND SUBSTRING(mv.text_value,1,36) = :uuid " +
+                    "JOIN relationship r ON mv.relationship_id = r.id " +
+                    "WHERE (r.left_id = :uuid OR r.right_id = :uuid) " +
+                    "AND mv.dspace_object_id <> :uuid " +
                     "ON CONFLICT (uuid) DO UPDATE " +
                     "SET date_queued = EXCLUDED.date_queued";
                 NativeQuery<?> queryInsertOrUpdate = session.createNativeQuery(sqlInsertOrUpdate);
-                queryInsertOrUpdate.setParameter("uuid", uuid.toString());
-                queryInsertOrUpdate.setParameter("schema", schema.getID());
+                queryInsertOrUpdate.setParameter("uuid", uuid);
                 return queryInsertOrUpdate.executeUpdate();
             }
         } catch (Exception e) {

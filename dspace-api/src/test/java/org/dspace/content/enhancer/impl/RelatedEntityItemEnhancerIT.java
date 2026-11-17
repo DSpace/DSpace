@@ -78,6 +78,7 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
 
         ConfigurationService configurationService = dspace.getSingletonService(ConfigurationService.class);
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("authority.controlled.additional.identifier.orcid", "true");
         MetadataAuthorityService metadataAuthorityService =
             ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
         metadataAuthorityService.clearCache();
