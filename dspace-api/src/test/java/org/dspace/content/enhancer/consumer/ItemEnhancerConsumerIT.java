@@ -8,7 +8,6 @@
 package org.dspace.content.enhancer.consumer;
 
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
-import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -158,11 +157,11 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         assertThat(values, hasItem(with(AUTHOR_FIELD, "John Smith", person2.getID().toString(), 1, 600)));
         assertThat(values, hasItem(with(AUTHOR_FIELD, "Jesse Pinkman", person3.getID().toString(), 2, 600)));
 
-        // additional metadata is not required to respect the order of the source metadata
+        // additional metadata is not required to respect the order of the source metadata;
+        // a person without an ORCID (person2) yields no additional value at all
         assertThat(values, hasItem(additionalValue("0000-0001-0000-0001", person1)));
         assertThat(values, hasItem(additionalValue("0000-0001-0000-0003", person3)));
-        assertThat(values, hasItem(additionalValue(PLACEHOLDER_PARENT_METADATA_VALUE, person2)));
-        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(3));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(2));
 
     }
 

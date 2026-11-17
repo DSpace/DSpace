@@ -7,9 +7,9 @@
  */
 package org.dspace.app.rest.enhancer;
 
-import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -173,30 +173,21 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
         publication3 = context.reloadEntity(publication3);
 
         List<MetadataValue> metadataValues = publication.getMetadata();
-        assertThat(metadataValues, hasSize(8));
-        assertThat(getValues(publication, ADDITIONAL_ORCID_FIELD),
-                containsInAnyOrder(PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(metadataValues, hasSize(7));
+        assertThat(getValues(publication, ADDITIONAL_ORCID_FIELD), empty());
         assertThat(getValues(publication, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder("4Science"));
         List<MetadataValue> metadataValues2 = publication2.getMetadata();
-        assertThat(metadataValues2, hasSize(12));
-        assertThat(getValues(publication2, ADDITIONAL_ORCID_FIELD),
-                containsInAnyOrder(
-                    PLACEHOLDER_PARENT_METADATA_VALUE,
-                    PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(metadataValues2, hasSize(9));
+        assertThat(getValues(publication2, ADDITIONAL_ORCID_FIELD), empty());
         assertThat(getValues(publication2, ADDITIONAL_AFFILIATION_FIELD),
-                containsInAnyOrder(
-                    "4Science",
-                    PLACEHOLDER_PARENT_METADATA_VALUE));
+                containsInAnyOrder("4Science"));
         List<MetadataValue> metadataValues3 = publication3.getMetadata();
-        assertThat(metadataValues3, hasSize(12));
+        assertThat(metadataValues3, hasSize(10));
         assertThat(getValues(publication3, ADDITIONAL_ORCID_FIELD),
-                containsInAnyOrder(
-                    PLACEHOLDER_PARENT_METADATA_VALUE,
-                    "orcid-person3"));
+                containsInAnyOrder("orcid-person3"));
         assertThat(getValues(publication3, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
-                    PLACEHOLDER_PARENT_METADATA_VALUE,
                     "Affiliation 1",
                     "Affiliation 2"));
 
@@ -229,22 +220,17 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
         assertThat(getValues(publication, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder("4Science", "Company"));
         metadataValues2 = publication2.getMetadata();
-        assertThat(metadataValues2, hasSize(13));
+        assertThat(metadataValues2, hasSize(11));
         assertThat(getValues(publication2, ADDITIONAL_ORCID_FIELD),
-                containsInAnyOrder(
-                    "1234-5678-9101",
-                    PLACEHOLDER_PARENT_METADATA_VALUE));
+                containsInAnyOrder("1234-5678-9101"));
         assertThat(getValues(publication2, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
                     "4Science",
-                    "Company",
-                    PLACEHOLDER_PARENT_METADATA_VALUE));
+                    "Company"));
         metadataValues3 = publication3.getMetadata();
-        assertThat(metadataValues3, hasSize(12));
+        assertThat(metadataValues3, hasSize(10));
         assertThat(getValues(publication3, ADDITIONAL_ORCID_FIELD),
-                containsInAnyOrder(
-                    PLACEHOLDER_PARENT_METADATA_VALUE,
-                    "orcid-person3"));
+                containsInAnyOrder("orcid-person3"));
 
         context.turnOffAuthorisationSystem();
         itemService.clearMetadata(context, person3, "person", "identifier", "orcid", Item.ANY);
@@ -273,26 +259,18 @@ public class RelatedItemEnhancerPollerIT extends AbstractIntegrationTestWithData
         assertThat(getValues(publication, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder("4Science", "Company"));
         metadataValues2 = publication2.getMetadata();
-        assertThat(metadataValues2, hasSize(13));
+        assertThat(metadataValues2, hasSize(11));
         assertThat(getValues(publication2, ADDITIONAL_ORCID_FIELD),
-                containsInAnyOrder(
-                    "1234-5678-9101",
-                    PLACEHOLDER_PARENT_METADATA_VALUE));
+                containsInAnyOrder("1234-5678-9101"));
         assertThat(getValues(publication2, ADDITIONAL_AFFILIATION_FIELD),
                 containsInAnyOrder(
                     "4Science",
-                    "Company",
-                    PLACEHOLDER_PARENT_METADATA_VALUE));
+                    "Company"));
         metadataValues3 = publication3.getMetadata();
-        assertThat(metadataValues3, hasSize(11));
-        assertThat(getValues(publication3, ADDITIONAL_ORCID_FIELD),
-                containsInAnyOrder(
-                    PLACEHOLDER_PARENT_METADATA_VALUE,
-                    PLACEHOLDER_PARENT_METADATA_VALUE));
+        assertThat(metadataValues3, hasSize(8));
+        assertThat(getValues(publication3, ADDITIONAL_ORCID_FIELD), empty());
         assertThat(getValues(publication3, ADDITIONAL_AFFILIATION_FIELD),
-                containsInAnyOrder(
-                    PLACEHOLDER_PARENT_METADATA_VALUE,
-                    "Affiliation 2"));
+                containsInAnyOrder("Affiliation 2"));
 
     }
 

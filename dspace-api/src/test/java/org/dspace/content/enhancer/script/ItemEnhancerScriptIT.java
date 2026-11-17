@@ -9,7 +9,6 @@ package org.dspace.content.enhancer.script;
 
 import static org.dspace.content.Item.ANY;
 import static org.dspace.content.enhancer.consumer.ItemEnhancerConsumer.ITEMENHANCER_ENABLED;
-import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -336,12 +335,12 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(4));
+        // authors without an ORCID (firstAuthor, fourthAuthor) yield no additional value at all,
+        // and the surviving additionals are renumbered densely by place
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(2));
         assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), containsInAnyOrder(
-                additionalAt(PLACEHOLDER_PARENT_METADATA_VALUE, firstAuthor, 0),
-                additionalAt("0000-0001-0000-0001", secondAuthor, 1),
-                additionalAt("0000-0001-0000-0002", thirdAuthor, 2),
-                additionalAt(PLACEHOLDER_PARENT_METADATA_VALUE, fourthAuthor, 3)));
+                additionalAt("0000-0001-0000-0001", secondAuthor, 0),
+                additionalAt("0000-0001-0000-0002", thirdAuthor, 1)));
     }
 
     @Test
