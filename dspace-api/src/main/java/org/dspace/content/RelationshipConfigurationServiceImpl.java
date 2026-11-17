@@ -169,13 +169,13 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         Map<String, RelationshipMetadataGenerator> generators) {
 
         // Validate the primary metadata field, if configured.
-        primaryField.ifPresent(field -> validateMetadataField(configurationId, side, field, true));
+        primaryField.ifPresent(field -> validateMetadataField(configurationId, side, field, MetadataFieldRole.PRIMARY));
 
         for (Map.Entry<String, RelationshipMetadataGenerator> entry : generators.entrySet()) {
             String field = entry.getKey();
 
             // Validate each additional metadata field.
-            validateMetadataField(configurationId, side, field, false);
+            validateMetadataField(configurationId, side, field, MetadataFieldRole.ADDITIONAL);
 
             // Prevent a primary metadata field from also being configured as additional metadata.
             if (primaryField.filter(field::equals).isPresent()) {
@@ -185,7 +185,30 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
             }
 
             // Validate the source field declared by the generator.
-            validateMetadataField(configurationId, side, entry.getValue().getSourceField(), "source");
+            validateMetadataField(configurationId, side, entry.getValue().getSourceField(), MetadataFieldRole.SOURCE);
+        }
+    }
+
+    /**
+     * The role a metadata field plays in a relationship configuration. Carried as a type-safe value
+     * instead of a bare string, and used only to phrase validation error messages.
+     */
+    private enum MetadataFieldRole {
+        PRIMARY("primary"),
+        ADDITIONAL("additional"),
+        SOURCE("source");
+
+        private final String label;
+
+        MetadataFieldRole(String label) {
+            this.label = label;
+        }
+
+        /**
+         * @return the human-readable label used in validation messages
+         */
+        String getLabel() {
+            return label;
         }
     }
 
@@ -196,26 +219,13 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
      * @param configurationId stable identifier of the relationship configuration
      * @param side            endpoint containing the field
      * @param field           metadata field name to validate
-     * @param isPrimary       whether the field is a primary metadata field
-     * @throws RelationshipConfigurationException if a primary or additional metadata field has invalid syntax
-     */
-    private void validateMetadataField(String configurationId, String side, String field, boolean isPrimary) {
-        validateMetadataField(configurationId, side, field, isPrimary ? "primary" : "additional");
-    }
-
-    /**
-     * Validates the syntax of a configured metadata field, without checking its existence in the metadata registry.
-     *
-     * @param configurationId stable identifier of the relationship configuration
-     * @param side            endpoint containing the field
-     * @param field           metadata field name to validate
      * @param role            role of the field in the configuration (primary, additional or source)
      * @throws RelationshipConfigurationException if the metadata field has invalid syntax
      */
-    private void validateMetadataField(String configurationId, String side, String field, String role) {
+    private void validateMetadataField(String configurationId, String side, String field, MetadataFieldRole role) {
         if (field == null || !field.matches("[^.\\s]+\\.[^.\\s]+(\\.[^.\\s]+)?")) {
             throw new RelationshipConfigurationException(
-                "Invalid " + role + " metadata field '" + field +
+                "Invalid " + role.getLabel() + " metadata field '" + field +
                     "' in relationship configuration " + configurationId + " on the " + side + " endpoint");
         }
     }
@@ -476,7 +486,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         }
 
         // Validate the dynamically resolved authority field, which bypasses startup validation.
-        validateMetadataField(AUTHORITY_PREFIX + field, "left", field, true);
+        validateMetadataField(AUTHORITY_PREFIX + field, "left", field, MetadataFieldRole.PRIMARY);
 
         RelationshipTypeConfiguration configuration = new RelationshipTypeConfiguration();
         configuration.setId(AUTHORITY_PREFIX + field);

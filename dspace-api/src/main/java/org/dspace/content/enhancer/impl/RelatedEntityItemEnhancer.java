@@ -183,7 +183,7 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
     private MetadataValueDTO withTargetFieldAndAuthority(Item item, MetadataValueDTO extractedValue,
                                                          String targetField, String primaryAuthority) {
         MetadataFieldName target = new MetadataFieldName(targetField);
-        String authority = derivedAuthority(item, targetField, extractedValue.getAuthority(), primaryAuthority);
+        String authority = derivedAuthority(item, target, extractedValue.getAuthority(), primaryAuthority);
         return new MetadataValueDTO(target.schema, target.element, target.qualifier,
                 extractedValue.getLanguage(), extractedValue.getValue(), authority,
                 extractedValue.getConfidence());
@@ -199,7 +199,7 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
      */
     private MetadataValueDTO placeholder(Item item, String targetField, String primaryAuthority) {
         MetadataFieldName target = new MetadataFieldName(targetField);
-        String authority = derivedAuthority(item, targetField, null, primaryAuthority);
+        String authority = derivedAuthority(item, target, null, primaryAuthority);
         return new MetadataValueDTO(target.schema, target.element, target.qualifier, null,
                 PLACEHOLDER_PARENT_METADATA_VALUE, authority, Choices.CF_UNSET);
     }
@@ -211,18 +211,17 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
      * when the item is versioned.
      *
      * @param item              the item owning the derived value
-     * @param targetField       the fully qualified target field on the owning item
+     * @param field             the parsed target field on the owning item
      * @param extractedAuthority the authority declared by the extracted value, if any
      * @param primaryAuthority  the authority of the primary relationship value, if any
      * @return the authority to persist, or null when the field does not support authorities
      */
-    private String derivedAuthority(Item item, String targetField, String extractedAuthority,
+    private String derivedAuthority(Item item, MetadataFieldName field, String extractedAuthority,
                                     String primaryAuthority) {
         String authority = StringUtils.isNotBlank(extractedAuthority) ? extractedAuthority : primaryAuthority;
         if (StringUtils.isBlank(authority)) {
             return null;
         }
-        MetadataFieldName field = new MetadataFieldName(targetField);
         String fieldKey = metadataAuthorityService.makeFieldKey(field.schema, field.element, field.qualifier);
         return metadataAuthorityService.isAuthorityAllowed(fieldKey, item.getType(), item.getOwningCollection())
                 ? authority
@@ -280,10 +279,8 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
                     current.values().stream().flatMap(List::stream).collect(Collectors.toList()));
             for (Map.Entry<AdditionalKey, List<MetadataValueDTO>> entry : desired.values().entrySet()) {
                 Relationship relationship = desired.relationships().get(entry.getKey().relationshipId());
-                for (MetadataValueDTO value : entry.getValue()) {
-                    changed = addRelationshipAdditional(context, item, relationship,
-                            entry.getKey().targetField(), value) || changed;
-                }
+                changed = addRelationshipAdditionals(context, item, relationship,
+                        entry.getKey().targetField(), entry.getValue()) || changed;
             }
             return changed;
         }
@@ -293,10 +290,8 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
             if (!equivalentToDesired(currentValues, entry.getValue())) {
                 changed = deleteRelationshipAdditionals(context, currentValues) || changed;
                 Relationship relationship = desired.relationships().get(entry.getKey().relationshipId());
-                for (MetadataValueDTO value : entry.getValue()) {
-                    changed = addRelationshipAdditional(context, item, relationship,
-                            entry.getKey().targetField(), value) || changed;
-                }
+                changed = addRelationshipAdditionals(context, item, relationship,
+                        entry.getKey().targetField(), entry.getValue()) || changed;
             }
         }
         for (Map.Entry<AdditionalKey, List<MetadataValue>> entry : current.entrySet()) {
@@ -339,6 +334,27 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
                 && StringUtils.equals(value.getLanguage(), expected.getLanguage())
                 && StringUtils.equals(value.getAuthority(), expected.getAuthority())
                 && value.getConfidence() == expected.getConfidence();
+    }
+
+    /**
+     * Persist all derived values for a single relationship and target field.
+     *
+     * @param context      the DSpace context
+     * @param item         the item being enhanced
+     * @param relationship the relationship that produced the values
+     * @param targetField  the fully qualified target field on the owning item
+     * @param values       the values to persist
+     * @return true when at least one value was persisted
+     * @throws SQLException if a value cannot be persisted
+     */
+    private boolean addRelationshipAdditionals(Context context, Item item, Relationship relationship,
+                                               String targetField, List<MetadataValueDTO> values)
+            throws SQLException {
+        boolean changed = false;
+        for (MetadataValueDTO value : values) {
+            changed = addRelationshipAdditional(context, item, relationship, targetField, value) || changed;
+        }
+        return changed;
     }
 
     /**
