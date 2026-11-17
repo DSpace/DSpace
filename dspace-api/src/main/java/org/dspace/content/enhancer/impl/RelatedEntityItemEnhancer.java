@@ -7,8 +7,6 @@
  */
 package org.dspace.content.enhancer.impl;
 
-import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,7 +21,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
-import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.enhancer.ItemEnhancer;
@@ -156,12 +153,10 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
                         : generator.get().extract(source);
                 List<MetadataValueDTO> desiredValues = values.computeIfAbsent(
                         new AdditionalKey(relationship.getID(), targetField), key -> new ArrayList<>());
-                if (extracted.isEmpty()) {
-                    desiredValues.add(placeholder(item, targetField, primary.getAuthority()));
-                } else {
+                if (!extracted.isEmpty()) {
                     for (MetadataValueDTO extractedValue : extracted) {
                         desiredValues.add(withTargetFieldAndAuthority(item, extractedValue, targetField,
-                                primary.getAuthority()));
+                                                                      primary.getAuthority()));
                     }
                 }
             }
@@ -187,21 +182,6 @@ public class RelatedEntityItemEnhancer implements ItemEnhancer {
         return new MetadataValueDTO(target.schema, target.element, target.qualifier,
                 extractedValue.getLanguage(), extractedValue.getValue(), authority,
                 extractedValue.getConfidence());
-    }
-
-    /**
-     * Create the placeholder value written when the related entity yields no source values.
-     *
-     * @param item             the item owning the derived value
-     * @param targetField      the fully qualified target field on the owning item
-     * @param primaryAuthority the authority inherited from the primary relationship value
-     * @return the placeholder value
-     */
-    private MetadataValueDTO placeholder(Item item, String targetField, String primaryAuthority) {
-        MetadataFieldName target = new MetadataFieldName(targetField);
-        String authority = derivedAuthority(item, target, null, primaryAuthority);
-        return new MetadataValueDTO(target.schema, target.element, target.qualifier, null,
-                PLACEHOLDER_PARENT_METADATA_VALUE, authority, Choices.CF_UNSET);
     }
 
     /**

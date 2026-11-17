@@ -7,8 +7,8 @@
  */
 package org.dspace.content.enhancer.impl;
 
-import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -140,16 +140,15 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
     }
 
     @Test
-    public void testPlaceholderWrittenWhenSourceHasNoValues() throws Exception {
+    public void testNoAdditionalWrittenWhenSourceHasNoValues() throws Exception {
         context.turnOffAuthorisationSystem();
         Item person = createPerson(null, null);
         Item publication = createPublication(person);
-        Relationship relationship = promote(publication, person);
+        promote(publication, person);
         context.restoreAuthSystemState();
         context.commit();
 
         publication = context.reloadEntity(publication);
-        relationship = context.reloadEntity(relationship);
 
         context.turnOffAuthorisationSystem();
         itemEnhancerService.enhance(context, publication, false);
@@ -157,10 +156,9 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
         context.commit();
 
         publication = context.reloadEntity(publication);
-        MetadataValue additional = singleAdditional(publication, ADDITIONAL_ORCID_FIELD);
 
-        assertThat(additional.getValue(), equalTo(PLACEHOLDER_PARENT_METADATA_VALUE));
-        assertThat(additional.getRelationship().getID(), equalTo(relationship.getID()));
+        // the related person has no ORCID, so no additional value is written at all
+        assertThat(itemService.getMetadataByMetadataString(publication, ADDITIONAL_ORCID_FIELD), empty());
     }
 
     @Test
@@ -190,16 +188,15 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
     }
 
     @Test
-    public void testAffiliationPlaceholderWrittenWhenPersonHasNoAffiliation() throws Exception {
+    public void testNoAffiliationAdditionalWrittenWhenPersonHasNoAffiliation() throws Exception {
         context.turnOffAuthorisationSystem();
         Item person = createPerson(ORCID, "en");
         Item publication = createPublication(person);
-        Relationship relationship = promote(publication, person);
+        promote(publication, person);
         context.restoreAuthSystemState();
         context.commit();
 
         publication = context.reloadEntity(publication);
-        relationship = context.reloadEntity(relationship);
 
         context.turnOffAuthorisationSystem();
         itemEnhancerService.enhance(context, publication, false);
@@ -207,10 +204,9 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
         context.commit();
 
         publication = context.reloadEntity(publication);
-        MetadataValue additional = singleAdditional(publication, ADDITIONAL_AFFILIATION_FIELD);
 
-        assertThat(additional.getValue(), equalTo(PLACEHOLDER_PARENT_METADATA_VALUE));
-        assertThat(additional.getRelationship().getID(), equalTo(relationship.getID()));
+        // the related person has no affiliation, so no additional value is written at all
+        assertThat(itemService.getMetadataByMetadataString(publication, ADDITIONAL_AFFILIATION_FIELD), empty());
     }
 
     @Test
