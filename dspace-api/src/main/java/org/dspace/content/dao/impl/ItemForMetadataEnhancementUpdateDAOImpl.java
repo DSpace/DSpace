@@ -105,19 +105,30 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
                     "WHERE EXISTS ( " +
                     "    SELECT 1 " +
                     "    FROM metadatavalue mv " +
-                    "    JOIN relationship r ON mv.relationship_id = r.id " +
+                    "    JOIN ( " +
+                    "        SELECT id FROM relationship WHERE left_id = :uuid " +
+                    "        UNION " +
+                    "        SELECT id FROM relationship WHERE right_id = :uuid " +
+                    "    ) r ON mv.relationship_id = r.id " +
                     "    WHERE mv.dspace_object_id = iue.uuid " +
-                    "    AND (r.left_id = :uuid OR r.right_id = :uuid) " +
+                    "    -- Intentional self-exclusion: an item that is both endpoints of the same relationship\n" +
+                    "    -- is not queued from its own recalculation.\n" +
                     "    AND mv.dspace_object_id <> :uuid " +
                     ")";
                 String sqlInsert =
                         "INSERT INTO itemupdate_metadata_enhancement (uuid, date_queued) " +
                             "SELECT DISTINCT mv.dspace_object_id, CURRENT_TIMESTAMP " +
                             "FROM metadatavalue mv " +
-                            "JOIN relationship r ON mv.relationship_id = r.id " +
+                            "JOIN ( " +
+                            "    SELECT id FROM relationship WHERE left_id = :uuid " +
+                            "    UNION " +
+                            "    SELECT id FROM relationship WHERE right_id = :uuid " +
+                            ") r ON mv.relationship_id = r.id " +
                             "LEFT JOIN itemupdate_metadata_enhancement iue ON mv.dspace_object_id = iue.uuid " +
-                            "WHERE (r.left_id = :uuid OR r.right_id = :uuid) " +
-                            "AND mv.dspace_object_id <> :uuid " +
+                            "-- Intentional self-exclusion: an item that is both endpoints of the same " +
+                            "relationship\n" +
+                            "-- is not queued from its own recalculation.\n" +
+                            "WHERE mv.dspace_object_id <> :uuid " +
                             "AND iue.uuid IS NULL";
                 NativeQuery<?> queryUpdate = session.createNativeQuery(sqlUpdate);
                 queryUpdate.setParameter("uuid", uuid);
@@ -129,9 +140,14 @@ public class ItemForMetadataEnhancementUpdateDAOImpl implements ItemForMetadataE
                 String sqlInsertOrUpdate = "INSERT INTO itemupdate_metadata_enhancement (uuid, date_queued) " +
                     "SELECT DISTINCT mv.dspace_object_id, CURRENT_TIMESTAMP " +
                     "FROM metadatavalue mv " +
-                    "JOIN relationship r ON mv.relationship_id = r.id " +
-                    "WHERE (r.left_id = :uuid OR r.right_id = :uuid) " +
-                    "AND mv.dspace_object_id <> :uuid " +
+                    "JOIN ( " +
+                    "    SELECT id FROM relationship WHERE left_id = :uuid " +
+                    "    UNION " +
+                    "    SELECT id FROM relationship WHERE right_id = :uuid " +
+                    ") r ON mv.relationship_id = r.id " +
+                    "-- Intentional self-exclusion: an item that is both endpoints of the same relationship\n" +
+                    "-- is not queued from its own recalculation.\n" +
+                    "WHERE mv.dspace_object_id <> :uuid " +
                     "ON CONFLICT (uuid) DO UPDATE " +
                     "SET date_queued = EXCLUDED.date_queued";
                 NativeQuery<?> queryInsertOrUpdate = session.createNativeQuery(sqlInsertOrUpdate);
