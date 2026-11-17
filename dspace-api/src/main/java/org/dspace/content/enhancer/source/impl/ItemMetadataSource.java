@@ -16,7 +16,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.enhancer.source.MetadataSource;
 import org.dspace.content.enhancer.source.RawMetadataValue;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Context;
 
 /**
  * Database-backed {@link MetadataSource} adapter.
@@ -35,11 +34,10 @@ public class ItemMetadataSource implements MetadataSource {
     /**
      * Create a database-backed metadata source for the given item.
      *
-     * @param context     the DSpace context, kept in the signature for the DB adapter boundary
      * @param item        the item whose metadata is read
      * @param itemService the service used to read the item metadata
      */
-    public ItemMetadataSource(Context context, Item item, ItemService itemService) {
+    public ItemMetadataSource(Item item, ItemService itemService) {
         this.item = item;
         this.itemService = itemService;
     }
