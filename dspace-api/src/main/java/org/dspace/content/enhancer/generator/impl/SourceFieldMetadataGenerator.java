@@ -7,7 +7,14 @@
  */
 package org.dspace.content.enhancer.generator.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.dspace.content.MetadataFieldName;
+import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
+import org.dspace.content.enhancer.source.MetadataSource;
+import org.dspace.content.enhancer.source.RawMetadataValue;
 
 /**
  * Default {@link RelationshipMetadataGenerator} that copies one configured source field 1:1.
@@ -39,6 +46,18 @@ public class SourceFieldMetadataGenerator implements RelationshipMetadataGenerat
      */
     public void setSourceField(String sourceField) {
         this.sourceField = sourceField;
+    }
+
+    @Override
+    public List<MetadataValueDTO> extract(MetadataSource source) {
+        MetadataFieldName fieldName = new MetadataFieldName(getSourceField());
+        List<RawMetadataValue> values = source.getValues(getSourceField());
+        List<MetadataValueDTO> result = new ArrayList<>(values.size());
+        for (RawMetadataValue value : values) {
+            result.add(new MetadataValueDTO(fieldName.schema, fieldName.element, fieldName.qualifier,
+                value.language(), value.value(), value.authority(), value.confidence()));
+        }
+        return result;
     }
 
 }
