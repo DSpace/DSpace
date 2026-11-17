@@ -316,7 +316,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         metadataAuthorityService.clearCache();
 
         assertThrows(IllegalArgumentException.class,
-                     () -> relationshipConfigurationService.getByKey(context, "authority:ds11rel.contributor.author"));
+                     () -> relationshipConfigurationService.getRelationshipConfig(context, relationships.getFirst()));
 
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<>();
@@ -360,13 +360,13 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
                    equalTo("authority:ds11rel.contributor.author"));
         assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
 
-        // Simulate removing the authority configuration after persistence
+        // Simulate removing the authority configuration after the relationship was persisted.
         configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "");
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
 
         assertThrows(IllegalArgumentException.class,
-                     () -> relationshipConfigurationService.getByKey(context, "authority:ds11rel.contributor.author"));
+                     () -> relationshipConfigurationService.getRelationshipConfig(context, relationships.getFirst()));
 
         String token = getAuthToken(admin.getEmail(), password);
 

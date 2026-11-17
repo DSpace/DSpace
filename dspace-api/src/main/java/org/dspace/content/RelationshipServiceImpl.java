@@ -134,11 +134,9 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public Relationship createConfigBackedRelationship(Context context, Item leftItem, Item rightItem,
-                                                       String relationshipConfigKey)
+                                                       RelationshipTypeConfiguration configuration)
         throws SQLException, AuthorizeException {
 
-        RelationshipTypeConfiguration configuration =
-            relationshipConfigurationService.getByKey(context, relationshipConfigKey);
         relationshipConfigurationService.validate(context, configuration, leftItem, rightItem);
 
         authorizeRelationshipCreation(context, leftItem, rightItem);
@@ -157,12 +155,9 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public Relationship createConfigBackedRelationshipForVersion(Context context, Item leftItem, Item rightItem,
-                                                                 String relationshipConfigKey,
+                                                                 RelationshipTypeConfiguration configuration,
                                                                  LatestVersionStatus latestVersionStatus)
         throws SQLException, AuthorizeException {
-
-        RelationshipTypeConfiguration configuration =
-            relationshipConfigurationService.getByKey(context, relationshipConfigKey);
 
         // Allow the new Item version to be unarchived while still validating the configured relationship semantics.
         relationshipConfigurationService.validate(context, configuration, leftItem, rightItem, true);
@@ -629,8 +624,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         RelationshipType relationshipType = relationship.getRelationshipType();
         if (relationship.isConfigurationBacked()) {
             relationshipConfigurationService.validate(context,
-                relationshipConfigurationService.getByKey(
-                    context, relationship.getRelationshipConfigKey()),
+                relationshipConfigurationService.getRelationshipConfig(context, relationship),
                 relationship.getLeftItem(), relationship.getRightItem());
             for (MetadataValue value : metadataValueDAO.findByRelationship(context, relationship)) {
                 UUID owner = value.getDSpaceObject().getID();

@@ -46,17 +46,17 @@ public interface RelationshipConfigurationService {
     RelationshipTypeConfiguration findForMetadataValue(Context context, MetadataValue value) throws SQLException;
 
     /**
-     * Resolves a relationship configuration by its stable configuration key.
+     * Resolves the configuration associated with a relationship using its persisted
+     * configuration key.
      *
-     * The key identifies configured relationship semantics; it is not itself a persisted relationship type definition.
-     *
-     * @param context current DSpace context
-     * @param key     stable identifier of the relationship configuration
-     * @return the relationship configuration identified by the supplied key
+     * @param context      current DSpace context
+     * @param relationship relationship whose configuration should be resolved
+     * @return the resolved relationship configuration
+     * @throws IllegalArgumentException           if the configuration key is missing or unknown
      * @throws RelationshipConfigurationException if a configured primary metadata field does not exist
-     * @throws SQLException             if an error occurs while accessing the metadata registry
+     * @throws SQLException                       if an error occurs while accessing the metadata registry
      */
-    RelationshipTypeConfiguration getByKey(Context context, String key) throws SQLException;
+    RelationshipTypeConfiguration getRelationshipConfig(Context context, Relationship relationship) throws SQLException;
 
     /**
      * Validates that the supplied Items can be used as the left and right endpoints of a relationship using the given

@@ -88,8 +88,8 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         Item right = ownerOnLeft ? target : owner;
         // Validate before persistence, so invalid input does not leave a half-created link.
         validateAuthorityTarget(value, target);
-        Relationship relationship = relationshipService.createConfigBackedRelationship(
-            context, left, right, configuration.getId());
+        Relationship relationship =
+            relationshipService.createConfigBackedRelationship(context, left, right, configuration);
         value.setRelationship(relationship);
         metadataValueService.update(context, value);
         itemService.update(context, owner);
@@ -128,8 +128,8 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
         authorizeRelationshipOperation(context, owner, newTarget);
         authorizeRelationshipMetadataValues(context, values);
         boolean ownerOnLeft = owner.getID().equals(relationship.getLeftItem().getID());
-        RelationshipTypeConfiguration configuration = relationshipConfigurationService.getByKey(
-            context, relationship.getRelationshipConfigKey());
+        RelationshipTypeConfiguration configuration =
+            relationshipConfigurationService.getRelationshipConfig(context, relationship);
         relationshipConfigurationService.validate(context, configuration,
             ownerOnLeft ? owner : newTarget, ownerOnLeft ? newTarget : owner);
 
@@ -273,7 +273,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
             anchor = ownerOnLeft ? configurationKey.substring(AUTHORITY_PREFIX.length()) : null;
         } else {
             RelationshipTypeConfiguration configuration =
-                relationshipConfigurationService.getByKey(context, configurationKey);
+                relationshipConfigurationService.getRelationshipConfig(context, relationship);
             anchor = (ownerOnLeft
                 ? configuration.getLeftPrimaryMetadataField()
                 : configuration.getRightPrimaryMetadataField())

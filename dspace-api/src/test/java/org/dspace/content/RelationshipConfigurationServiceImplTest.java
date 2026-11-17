@@ -223,9 +223,9 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      * Verifies that explicit relationship configurations can be resolved by ID.
      */
     @Test
-    public void testGetByKeyResolvesExplicitConfiguration() throws SQLException {
+    public void testGetRelationshipConfigResolvesExplicitConfiguration() throws SQLException {
         registerMetadataFields();
-        assertSame(configuration, service.getByKey(context, "authority:dc.contributor.author"));
+        assertSame(configuration, service.getRelationshipConfig(context, relationship));
     }
 
     /**
@@ -280,10 +280,10 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      * Verifies that primary metadata fields must exist in the metadata registry.
      */
     @Test
-    public void testGetByKeyRejectsNonexistentPrimaryMetadataField() {
+    public void testGetRelationshipConfigRejectsNonexistentPrimaryMetadataField() {
         RelationshipConfigurationException exception =
             assertThrows(RelationshipConfigurationException.class,
-                         () -> service.getByKey(context, "authority:dc.contributor.author"));
+                         () -> service.getRelationshipConfig(context, relationship));
 
         assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
         assertTrue(exception.getMessage().contains("primary metadata field"));
@@ -305,7 +305,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
                 return "person".equals(schema) ? null : mock(MetadataField.class);
             });
 
-        RelationshipTypeConfiguration resolved = service.getByKey(context, "authority:dc.contributor.author");
+        RelationshipTypeConfiguration resolved = service.getRelationshipConfig(context, relationship);
 
         assertTrue(resolved.getLeftAdditionalMetadataFields().isEmpty());
         assertTrue(resolved.getLeftMetadataGenerators().isEmpty());
@@ -356,9 +356,10 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         setConfigurations();
         enableAuthority("dc..author", "Person");
 
-        RelationshipConfigurationException exception = assertThrows(RelationshipConfigurationException.class,
-                                                                    () -> service.getByKey(context,
-                                                                                           "authority:dc..author"));
+        relationship.setRelationshipConfigKey("authority:dc..author");
+        RelationshipConfigurationException exception =
+            assertThrows(RelationshipConfigurationException.class,
+                         () -> service.getRelationshipConfig(context, relationship));
 
         assertTrue(exception.getMessage().contains("dc..author"));
         assertTrue(exception.getMessage().contains("left endpoint"));
@@ -372,7 +373,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         setConfigurations();
         assertNull(service.findForMetadataValue(context, metadataValue("dc", "contributor", "author", leftItem)));
         assertThrows(IllegalArgumentException.class,
-                     () -> service.getByKey(context, "authority:dc.contributor.author"));
+                     () -> service.getRelationshipConfig(context, relationship));
     }
 
     /**
@@ -521,7 +522,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
                 return "person".equals(schema) ? null : mock(MetadataField.class);
             });
 
-        RelationshipTypeConfiguration resolved = service.getByKey(context, "authority:dc.contributor.author");
+        RelationshipTypeConfiguration resolved = service.getRelationshipConfig(context, relationship);
 
         assertEquals(Set.of("dc.description"), resolved.getLeftAdditionalMetadataFields());
         assertSame(validGenerator, resolved.getLeftMetadataGenerators().get("dc.description"));

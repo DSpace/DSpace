@@ -18,6 +18,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -49,6 +50,8 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected RelationshipService relationshipService;
+    @Autowired
+    private RelationshipConfigurationService relationshipConfigurationService;
 
     @Override
     public Item createNewItemAndAddItInWorkspace(Context context, Item nativeItem) {
@@ -162,7 +165,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
                     context,
                     leftItem,
                     rightItem,
-                    oldRelationship.getRelationshipConfigKey(),
+                    relationshipConfigurationService.getRelationshipConfig(context, oldRelationship),
                     latestVersionStatus
                 );
                 // Associate copied metadata values with the new relationship instead of the old version's relationship.

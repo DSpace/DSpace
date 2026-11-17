@@ -32,6 +32,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipTypeConfiguration;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -231,8 +232,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     @Test
     public void testForeignKeyDirectionDoesNotRequireMetadataToExist() throws Exception {
         context.turnOffAuthorisationSystem();
-        Relationship relationship = relationshipService.createConfigBackedRelationship(context, owner, target,
-            "authority:dc.contributor.author");
+        Relationship relationship = relationshipService
+            .createConfigBackedRelationship(context, owner, target, authorRelationshipConfiguration());
         context.commit();
         relationship = context.reloadEntity(relationship);
         assertThat(relationship, notNullValue());
@@ -260,8 +261,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.setCurrentUser(user);
         context.restoreAuthSystemState();
 
-        Relationship relationship = relationshipService.createConfigBackedRelationship(
-            context, owner, target, "authority:dc.contributor.author");
+        Relationship relationship = relationshipService
+            .createConfigBackedRelationship(context, owner, target, authorRelationshipConfiguration());
 
         assertThat(relationship, notNullValue());
         assertThat(relationship.getLeftItem(), equalTo(owner));
@@ -287,8 +288,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.setCurrentUser(user);
         context.restoreAuthSystemState();
 
-        Relationship relationship = relationshipService.createConfigBackedRelationship(
-            context, owner, target, "authority:dc.contributor.author");
+        Relationship relationship = relationshipService
+            .createConfigBackedRelationship(context, owner, target, authorRelationshipConfiguration());
 
         assertThat(relationship, notNullValue());
         assertThat(relationship.getLeftItem(), equalTo(owner));
@@ -314,8 +315,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.restoreAuthSystemState();
 
         assertThrows(AuthorizeException.class,
-                     () -> relationshipService.createConfigBackedRelationship(
-                         context, owner, target, "authority:dc.contributor.author"));
+                     () -> relationshipService.createConfigBackedRelationship(context, owner, target,
+                                                                              authorRelationshipConfiguration()));
     }
 
     @Test
@@ -337,8 +338,8 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
         context.restoreAuthSystemState();
 
         assertThrows(AuthorizeException.class,
-                     () -> relationshipService.createConfigBackedRelationship(
-                         context, owner, target, "authority:dc.contributor.author"));
+                     () -> relationshipService.createConfigBackedRelationship(context, owner, target,
+                                                                              authorRelationshipConfiguration()));
     }
 
     /**
@@ -592,6 +593,18 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
                             .count();
 
         assertThat(count, is(expectedCount));
+    }
+
+    /**
+     * Creates the relationship configuration used by the configuration-backed creation tests.
+     */
+    private RelationshipTypeConfiguration authorRelationshipConfiguration() {
+        RelationshipTypeConfiguration configuration = new RelationshipTypeConfiguration();
+        configuration.setId("authority:dc.contributor.author");
+        configuration.setLeftEntityTypes(java.util.Set.of("Publication"));
+        configuration.setRightEntityTypes(java.util.Set.of("Person"));
+        configuration.setLeftPrimaryMetadataField("dc.contributor.author");
+        return configuration;
     }
 
 }

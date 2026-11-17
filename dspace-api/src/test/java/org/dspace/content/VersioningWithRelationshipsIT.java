@@ -679,8 +679,14 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                                               .withTitle("Publication")
                                               .build();
 
-        Relationship originalRelationship = relationshipService.createConfigBackedRelationship(
-            context, originalPublication, person, "authority:dc.contributor.author");
+        RelationshipTypeConfiguration configuration = new RelationshipTypeConfiguration();
+        configuration.setId("authority:dc.contributor.author");
+        configuration.setLeftEntityTypes(java.util.Set.of("Publication"));
+        configuration.setRightEntityTypes(java.util.Set.of("Person"));
+        configuration.setLeftPrimaryMetadataField("dc.contributor.author");
+
+        Relationship originalRelationship =
+            relationshipService.createConfigBackedRelationship(context, originalPublication, person, configuration);
 
         context.commit();
         originalPublication = context.reloadEntity(originalPublication);

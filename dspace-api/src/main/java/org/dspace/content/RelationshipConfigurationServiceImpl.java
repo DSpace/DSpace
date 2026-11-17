@@ -202,7 +202,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
             return configuration;
         }
 
-        // Create a filtered copy
+        // Preserve the relationship configuration while excluding unregistered additional metadata fields.
         RelationshipTypeConfiguration filtered = new RelationshipTypeConfiguration();
         filtered.setId(configuration.getId());
         filtered.setLeftEntityTypes(configuration.getLeftEntityTypes());
@@ -297,8 +297,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         return configuration;
     }
 
-    @Override
-    public RelationshipTypeConfiguration getByKey(Context context, String key) throws SQLException {
+    private RelationshipTypeConfiguration resolveConfiguration(Context context, String key) throws SQLException {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Missing relationship configuration key");
         }
@@ -320,6 +319,13 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
 
         // Validate metadata fields against the registry before returning the resolved configuration.
         return validateMetadataFields(context, match);
+    }
+
+    @Override
+    public RelationshipTypeConfiguration getRelationshipConfig(Context context, Relationship relationship)
+        throws SQLException {
+        String key = relationship.getRelationshipConfigKey();
+        return resolveConfiguration(context, key);
     }
 
     /**
@@ -373,7 +379,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @Override
     public Optional<String> getPrimaryMetadataField(Context context, Relationship relationship, Item endpoint)
         throws SQLException {
-        RelationshipTypeConfiguration configuration = getByKey(context, relationship.getRelationshipConfigKey());
+        RelationshipTypeConfiguration configuration = getRelationshipConfig(context, relationship);
         return isLeftEndpoint(relationship, endpoint)
             ? configuration.getLeftPrimaryMetadataField()
             : configuration.getRightPrimaryMetadataField();
@@ -397,7 +403,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @Override
     public Set<String> getAdditionalMetadataFields(Context context, Relationship relationship, Item endpoint)
         throws SQLException {
-        RelationshipTypeConfiguration configuration = getByKey(context, relationship.getRelationshipConfigKey());
+        RelationshipTypeConfiguration configuration = getRelationshipConfig(context, relationship);
         return isLeftEndpoint(relationship, endpoint)
             ? configuration.getLeftAdditionalMetadataFields()
             : configuration.getRightAdditionalMetadataFields();
@@ -409,7 +415,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
                                                                               String metadataField)
         throws SQLException {
 
-        RelationshipTypeConfiguration configuration = getByKey(context, relationship.getRelationshipConfigKey());
+        RelationshipTypeConfiguration configuration = getRelationshipConfig(context, relationship);
 
         Map<String, ItemAuthorityExtraMetadataGenerator> generators =
             isLeftEndpoint(relationship, endpoint)
