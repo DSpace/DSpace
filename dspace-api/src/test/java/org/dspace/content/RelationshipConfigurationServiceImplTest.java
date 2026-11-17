@@ -148,8 +148,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      * Mocks metadata field lookup to treat all fields as registered.
      */
     private void registerMetadataFields() throws SQLException {
-        when(metadataFieldService.findByElement(eq(context), any(String.class),
-                                                any(String.class), org.mockito.ArgumentMatchers.nullable(String.class)))
+        when(metadataFieldService.findByString(eq(context), any(String.class), eq('.')))
             .thenReturn(mock(MetadataField.class));
     }
 
@@ -297,12 +296,10 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
         configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
 
-        when(metadataFieldService.findByElement(
-            eq(context), any(String.class), any(String.class),
-            org.mockito.ArgumentMatchers.nullable(String.class)))
+        when(metadataFieldService.findByString(eq(context), any(String.class), eq('.')))
             .thenAnswer(invocation -> {
-                String schema = invocation.getArgument(1);
-                return "person".equals(schema) ? null : mock(MetadataField.class);
+                String field = invocation.getArgument(1);
+                return field.startsWith("person.") ? null : mock(MetadataField.class);
             });
 
         RelationshipTypeConfiguration resolved = service.getRelationshipConfig(context, relationship);
@@ -514,12 +511,10 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
             "person.identifier.orcid", invalidGenerator
         ));
 
-        when(metadataFieldService.findByElement(
-            eq(context), any(String.class), any(String.class),
-            org.mockito.ArgumentMatchers.nullable(String.class)))
+        when(metadataFieldService.findByString(eq(context), any(String.class), eq('.')))
             .thenAnswer(invocation -> {
-                String schema = invocation.getArgument(1);
-                return "person".equals(schema) ? null : mock(MetadataField.class);
+                String field = invocation.getArgument(1);
+                return field.startsWith("person.") ? null : mock(MetadataField.class);
             });
 
         RelationshipTypeConfiguration resolved = service.getRelationshipConfig(context, relationship);

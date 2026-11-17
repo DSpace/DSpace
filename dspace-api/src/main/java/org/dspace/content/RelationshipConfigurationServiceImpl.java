@@ -266,10 +266,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
      * @throws SQLException if an error occurs while accessing the metadata registry
      */
     private boolean metadataFieldExists(Context context, String field) throws SQLException {
-        String[] parts = field.split("\\.", -1);
-        String qualifier = parts.length == 3 ? parts[2] : null;
-
-        return metadataFieldService.findByElement(context, parts[0], parts[1], qualifier) != null;
+        return metadataFieldService.findByString(context, field, '.') != null;
     }
 
     @Override
