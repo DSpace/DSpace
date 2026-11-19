@@ -166,6 +166,8 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
         .getInstance().getMetadataAuthorityService();
 
+    private ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+
     private Community community;
 
     private Collection collection;
@@ -1676,7 +1678,6 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             ImportFileUtilMockClass importFileUtilSpy = spy(new ImportFileUtilMockClass(handler));
             doReturn(mockInputStream).when(importFileUtilSpy).openStream(any(URL.class));
 
-            ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
             ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
 
             BulkImport script = null;
@@ -1736,7 +1737,6 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
             ImportFileUtilMockClass importFileUtilSpy = spy(new ImportFileUtilMockClass(handler));
 
-            ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
             ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
 
             BulkImport script = null;
