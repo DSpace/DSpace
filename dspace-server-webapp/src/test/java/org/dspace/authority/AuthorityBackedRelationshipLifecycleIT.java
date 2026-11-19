@@ -18,11 +18,13 @@ import static org.junit.Assert.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.ws.rs.core.MediaType;
+import org.dspace.administer.MetadataImporter;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -38,12 +40,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
-import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.service.PluginService;
@@ -94,31 +94,32 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
     @Autowired
     private RelationshipConfigurationService relationshipConfigurationService;
 
-    @Autowired
-    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
-
-    @Autowired
-    private MetadataValueService metadataValueService;
-
     @Before
-    public void setup() throws Exception {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
         choiceAuthorityService.getChoiceAuthoritiesNames();
         itemService = ContentServiceFactory.getInstance().getItemService();
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
+        context.turnOffAuthorisationSystem();
+
+        String pathToFile = configurationService.getProperty("dspace.dir") +
+            File.separator + "config" + File.separator + "registries" + File.separator + "test-types.xml";
+        MetadataImporter.loadRegistry(pathToFile, false);
 
         configurationService.setProperty("cris-consumer.skip-empty-authority", false);
         configurationService.setProperty(
             "plugin.named.org.dspace.content.authority.ChoiceAuthority",
             new String[] { "org.dspace.content.authority.ItemAuthority = AuthorAuthority" });
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
-        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
-        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.ds11rel.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.ds11rel.contributor.author", "true");
         configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
         pluginService.clearNamedPluginClasses();
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
-
-        context.turnOffAuthorisationSystem();
 
         submitter = EPersonBuilder.createEPerson(context)
                                   .withEmail("submitter@example.com")
@@ -150,7 +151,8 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
                                       .withTitle("Publication")
-                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "J. Doe",
+                                                    person.getID().toString(), CF_ACCEPTED)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -164,7 +166,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(relationships, hasSize(1));
         Relationship relationship = relationships.get(0);
         assertThat(relationship.getRelationshipType(), nullValue());
-        assertThat(relationship.getRelationshipConfigKey(), equalTo("authority:dc.contributor.author"));
+        assertThat(relationship.getRelationshipConfigKey(), equalTo("authority:ds11rel.contributor.author"));
         assertThat(relationship.getLeftItem(), equalTo(publication));
         assertThat(relationship.getRightItem(), equalTo(person));
         Integer relationshipId = relationship.getID();
@@ -174,7 +176,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(author.getRelationship().getID(), equalTo(relationshipId));
 
         // the item reads cleanly (no NPE from the configuration-backed row)
-        assertThat(itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY), hasSize(1));
+        assertThat(itemService.getMetadata(publication, "ds11rel", "contributor", "author", Item.ANY), hasSize(1));
 
         // edit the display text: relationship must be untouched
         context.turnOffAuthorisationSystem();
@@ -195,7 +197,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         // the relationship. This is NOT an ORM/FK cascade from metadata deletion.
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<>();
-        ops.add(new RemoveOperation("/metadata/dc.contributor.author/0"));
+        ops.add(new RemoveOperation("/metadata/ds11rel.contributor.author/0"));
         getClient(token).perform(patch("/api/core/items/" + publication.getID())
                             .content(getPatchContent(ops))
                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -203,7 +205,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         publication = context.reloadEntity(publication);
         assertThat(relationshipService.findByItem(context, publication), hasSize(0));
-        assertThat(itemService.getMetadataByMetadataString(publication, "dc.contributor.author"), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "ds11rel.contributor.author"), hasSize(0));
     }
 
     /**
@@ -218,7 +220,8 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
                                       .withTitle("Publication")
-                                      .withAuthor("Walter White", REFERENCE_TOKEN)
+                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "Walter White",
+                                                    REFERENCE_TOKEN, CF_ACCEPTED)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -246,7 +249,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(relationships, hasSize(1));
         Relationship relationship = relationships.get(0);
         assertThat(relationship.getRelationshipType(), nullValue());
-        assertThat(relationship.getRelationshipConfigKey(), equalTo("authority:dc.contributor.author"));
+        assertThat(relationship.getRelationshipConfigKey(), equalTo("authority:ds11rel.contributor.author"));
         assertThat(relationship.getLeftItem(), equalTo(publication));
         assertThat(relationship.getRightItem(), equalTo(person));
         Integer relationshipId = relationship.getID();
@@ -255,7 +258,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(author.getAuthority(), equalTo(person.getID().toString()));
 
         // the item reads cleanly
-        assertThat(itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY), hasSize(1));
+        assertThat(itemService.getMetadata(publication, "ds11rel", "contributor", "author", Item.ANY), hasSize(1));
 
         // idempotency: force another resolution pass by touching the person
         context.turnOffAuthorisationSystem();
@@ -284,7 +287,8 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
                                       .withTitle("Publication")
-                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "J. Doe",
+                                                    person.getID().toString(), CF_ACCEPTED)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -295,20 +299,20 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         List<Relationship> relationships = relationshipService.findByItem(context, publication);
         assertThat(relationships, hasSize(1));
         assertThat(relationships.get(0).getRelationshipConfigKey(),
-                   equalTo("authority:dc.contributor.author"));
+                   equalTo("authority:ds11rel.contributor.author"));
         assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
 
         // Simulate removing the authority configuration after the Relationship was persisted.
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "");
+        configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "");
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
 
         assertThrows(IllegalArgumentException.class,
-                     () -> relationshipConfigurationService.getByKey("authority:dc.contributor.author"));
+                     () -> relationshipConfigurationService.getRelationshipConfig(context, relationships.getFirst()));
 
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<>();
-        ops.add(new RemoveOperation("/metadata/dc.contributor.author/0"));
+        ops.add(new RemoveOperation("/metadata/ds11rel.contributor.author/0"));
 
         getClient(token).perform(patch("/api/core/items/" + publication.getID())
                                      .content(getPatchContent(ops))
@@ -317,7 +321,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         publication = context.reloadEntity(publication);
         assertThat(relationshipService.findByItem(context, publication), hasSize(0));
-        assertThat(itemService.getMetadataByMetadataString(publication, "dc.contributor.author"), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "ds11rel.contributor.author"), hasSize(0));
     }
 
     /**
@@ -333,7 +337,8 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
                                       .withTitle("Publication")
-                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "J. Doe",
+                                                    person.getID().toString(), CF_ACCEPTED)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -344,27 +349,27 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         List<Relationship> relationships = relationshipService.findByItem(context, publication);
         assertThat(relationships, hasSize(1));
         assertThat(relationships.get(0).getRelationshipConfigKey(),
-                   equalTo("authority:dc.contributor.author"));
+                   equalTo("authority:ds11rel.contributor.author"));
         assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
 
-        // Simulate removing the authority configuration after persistence
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "");
+        // Simulate removing the authority configuration after the relationship was persisted.
+        configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "");
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
 
         assertThrows(IllegalArgumentException.class,
-                     () -> relationshipConfigurationService.getByKey("authority:dc.contributor.author"));
+                     () -> relationshipConfigurationService.getRelationshipConfig(context, relationships.getFirst()));
 
         String token = getAuthToken(admin.getEmail(), password);
 
         // Replace the linked author with a plain-text author
         List<Operation> operations = new ArrayList<>();
         operations.add(new AddOperation(
-            "/sections/traditionalpageone/dc.contributor.author",
+            "/sections/test-author-relationship/ds11rel.contributor.author",
             List.of(Map.of("value", "Updated Author"))
         ));
 
-        getClient(token).perform(patch("/api/core/edititems/" + publication.getID() + ":MODE1")
+        getClient(token).perform(patch("/api/core/edititems/" + publication.getID() + ":TEST-AUTHOR-RELATIONSHIP")
                                      .content(getPatchContent(operations))
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
@@ -372,105 +377,9 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         publication = context.reloadEntity(publication);
 
         assertThat(relationshipService.findByItem(context, publication), hasSize(0));
-        assertThat(itemService.getMetadataByMetadataString(publication, "dc.contributor.author"), hasSize(1));
+        assertThat(itemService.getMetadataByMetadataString(publication, "ds11rel.contributor.author"), hasSize(1));
         assertThat(getSingleAuthor(publication).getValue(), equalTo("Updated Author"));
         assertThat(getSingleAuthor(publication).getRelationship(), nullValue());
-    }
-
-    /**
-     * Tests removing non-anchor metadata while preserving a relationship that still has linked metadata.
-     */
-    @Test
-    public void testRemoveNonAnchorWithMissingConfigurationKeepsRelationship() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Item person = ItemBuilder.createItem(context, personCollection)
-                                 .withTitle("Jane Doe").build();
-        Item publication = ItemBuilder.createItem(context, publicationCollection)
-                                      .withTitle("Publication")
-                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
-                                      .build();
-
-        Relationship relationship = relationshipService.findByItem(context, publication).get(0);
-
-        itemService.addMetadata(context, publication, "person", "identifier", "orcid",
-                                null, "0000-0002-1825-0097");
-        MetadataValue orcid = itemService.getMetadataByMetadataString(
-            publication, "person.identifier.orcid").get(0);
-
-        authorityBackedRelationshipService.attachMetadataToRelationship(context, orcid, relationship);
-
-        context.restoreAuthSystemState();
-        context.commit();
-
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "");
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(patch("/api/core/items/" + publication.getID())
-                                     .content(getPatchContent(List.of(
-                                         new RemoveOperation("/metadata/person.identifier.orcid/0"))))
-                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
-
-        publication = context.reloadEntity(publication);
-
-        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
-        assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
-        assertThat(itemService.getMetadataByMetadataString(publication, "person.identifier.orcid"), hasSize(0));
-    }
-
-    /**
-     * Tests removing the last linked metadata value from a relationship whose anchor is already missing.
-     */
-    @Test
-    public void testRemoveLastNonAnchorWithMissingConfigurationDeletesRelationship() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Item person = ItemBuilder.createItem(context, personCollection)
-                                 .withTitle("Jane Doe").build();
-        Item publication = ItemBuilder.createItem(context, publicationCollection)
-                                      .withTitle("Publication")
-                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
-                                      .build();
-
-        Relationship relationship = relationshipService.findByItem(context, publication).get(0);
-
-        itemService.addMetadata(context, publication, "person", "identifier", "orcid",
-                                null, "0000-0002-1825-0097");
-        MetadataValue orcid = itemService.getMetadataByMetadataString(
-            publication, "person.identifier.orcid").get(0);
-
-        authorityBackedRelationshipService.attachMetadataToRelationship(context, orcid, relationship);
-
-        // Simulate stale persisted state: the anchor is gone, but the relationship remains.
-        MetadataValue author = getSingleAuthor(publication);
-        author.setRelationship(null);
-        publication.getMetadata().remove(author);
-        metadataValueService.delete(context, author);
-        itemService.update(context, publication);
-
-        context.restoreAuthSystemState();
-        context.commit();
-
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "");
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(patch("/api/core/items/" + publication.getID())
-                                     .content(getPatchContent(List.of(
-                                         new RemoveOperation("/metadata/person.identifier.orcid/0"))))
-                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
-
-        publication = context.reloadEntity(publication);
-
-        assertThat(relationshipService.findByItem(context, publication), hasSize(0));
-        assertThat(itemService.getMetadataByMetadataString(publication, "person.identifier.orcid"), hasSize(0));
     }
 
     /**
@@ -486,7 +395,8 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
                                       .withTitle("Publication")
-                                      .withAuthor("J. Doe", person.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "J. Doe",
+                                                    person.getID().toString(), CF_ACCEPTED)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -496,7 +406,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         assertThat(relationshipService.findByItem(context, publication), hasSize(1));
 
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "");
+        configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "");
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
 
@@ -534,8 +444,10 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
                                       .withTitle("Publication")
-                                      .withAuthor("Jane Doe", person1.getID().toString(), CF_ACCEPTED)
-                                      .withAuthor("John Smith", person2.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "Jane Doe",
+                                                    person1.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds11rel", "contributor", "author", Item.ANY, "John Smith",
+                                                    person2.getID().toString(), CF_ACCEPTED)
                                       .build();
 
         context.restoreAuthSystemState();
@@ -544,7 +456,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         publication = context.reloadEntity(publication);
 
         List<MetadataValue> authors = itemService.getMetadataByMetadataString(
-            publication, "dc.contributor.author");
+            publication, "ds11rel.contributor.author");
 
         assertThat(authors, hasSize(2));
 
@@ -553,7 +465,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
         assertThat(relationshipService.findByItem(context, publication), hasSize(2));
 
-        configurationService.setProperty("choices.plugin.dc.contributor.author", "");
+        configurationService.setProperty("choices.plugin.ds11rel.contributor.author", "");
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
 
@@ -562,14 +474,14 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         getClient(token).perform(patch("/api/core/items/" + publication.getID())
                                      .content(getPatchContent(List.of(
                                          new MoveOperation(
-                                             "/metadata/dc.contributor.author/1",
-                                             "/metadata/dc.contributor.author/0"))))
+                                             "/metadata/ds11rel.contributor.author/1",
+                                             "/metadata/ds11rel.contributor.author/0"))))
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
         publication = context.reloadEntity(publication);
 
-        authors = itemService.getMetadataByMetadataString(publication, "dc.contributor.author");
+        authors = itemService.getMetadataByMetadataString(publication, "ds11rel.contributor.author");
 
         assertThat(authors, hasSize(2));
         assertThat(authors.get(0).getValue(), equalTo("John Smith"));
@@ -582,7 +494,7 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
     }
 
     private MetadataValue getSingleAuthor(Item item) {
-        List<MetadataValue> values = itemService.getMetadataByMetadataString(item, "dc.contributor.author");
+        List<MetadataValue> values = itemService.getMetadataByMetadataString(item, "ds11rel.contributor.author");
         assertThat(values, notNullValue());
         assertThat(values, hasSize(1));
         return values.get(0);

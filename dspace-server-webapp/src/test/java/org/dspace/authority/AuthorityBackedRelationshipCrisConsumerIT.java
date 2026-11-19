@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.service.AuthorityValueService;
@@ -31,6 +32,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
@@ -70,6 +72,9 @@ public class AuthorityBackedRelationshipCrisConsumerIT extends AbstractControlle
 
     @Autowired
     private PluginService pluginService;
+
+    @Autowired
+    private RelationshipConfigurationService relationshipConfigurationService;
 
     @Before
     public void setup() throws Exception {
@@ -179,6 +184,66 @@ public class AuthorityBackedRelationshipCrisConsumerIT extends AbstractControlle
         assertThat(relationship.getRelationshipConfigKey(), equalTo("authority:dc.contributor.author"));
         assertThat(relationship.getLeftItem(), equalTo(publication));
         assertThat(relationship.getRightItem(), equalTo(person));
+    }
+
+    /**
+     * The CRIS author authority is configured per metadata field, not per entity type. A Publication-specific
+     * Spring relationship configuration must not prevent DataSet authors from creating Person relationships
+     * through the legacy authority fallback, even when both relationships persist the same authority:* key.
+     */
+    @Test
+    public void testGlobalAuthorAuthorityCreatesPublicationAndDataSetRelationships() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection dataSetCollection = createCollection("Collection of datasets", "DataSet");
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Smith")
+                                 .build();
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withAuthor("J. Smith", person.getID().toString(), CF_ACCEPTED)
+                                      .build();
+        Item dataSet = ItemBuilder.createItem(context, dataSetCollection)
+                                  .withTitle("DataSet")
+                                  .withAuthor("Jane Smith", person.getID().toString(), CF_ACCEPTED)
+                                  .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        dataSet = context.reloadEntity(dataSet);
+        person = context.reloadEntity(person);
+
+        List<Relationship> publicationRelationships = relationshipService.findByItem(context, publication);
+        List<Relationship> dataSetRelationships = relationshipService.findByItem(context, dataSet);
+        assertThat(publicationRelationships, hasSize(1));
+        assertThat(dataSetRelationships, hasSize(1));
+        assertThat(relationshipService.findByItem(context, person), hasSize(2));
+
+        Relationship publicationRelationship = publicationRelationships.get(0);
+        Relationship dataSetRelationship = dataSetRelationships.get(0);
+        assertThat(publicationRelationship.getRelationshipConfigKey(), equalTo("authority:dc.contributor.author"));
+        assertThat(dataSetRelationship.getRelationshipConfigKey(), equalTo("authority:dc.contributor.author"));
+        assertThat(publicationRelationship.getLeftItem(), equalTo(publication));
+        assertThat(dataSetRelationship.getLeftItem(), equalTo(dataSet));
+        assertThat(publicationRelationship.getRightItem(), equalTo(person));
+        assertThat(dataSetRelationship.getRightItem(), equalTo(person));
+
+        MetadataValue publicationAuthor = getSingleMetadata(publication, "dc.contributor.author");
+        MetadataValue dataSetAuthor = getSingleMetadata(dataSet, "dc.contributor.author");
+        assertThat(publicationAuthor.getAuthority(), equalTo(person.getID().toString()));
+        assertThat(dataSetAuthor.getAuthority(), equalTo(person.getID().toString()));
+        assertThat(publicationAuthor.getRelationship().getID(), equalTo(publicationRelationship.getID()));
+        assertThat(dataSetAuthor.getRelationship().getID(), equalTo(dataSetRelationship.getID()));
+
+        // The explicit Spring configuration applies to Publications only; DataSets keep the CRIS fallback.
+        assertThat(relationshipConfigurationService.getRelationshipConfig(context, publicationRelationship)
+                      .getLeftEntityTypes(), equalTo(Set.of("Publication")));
+        assertThat(relationshipConfigurationService.getRelationshipConfig(context, dataSetRelationship)
+                      .getLeftEntityTypes().isEmpty(), is(true));
+        assertThat(relationshipConfigurationService.getRelationshipConfig(context, dataSetRelationship)
+                      .getRightEntityTypes(), equalTo(Set.of("Person")));
     }
 
     @Test

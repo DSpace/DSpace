@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.util.Set;
+
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -63,9 +65,9 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
 
         RelationshipTypeConfiguration definition = new RelationshipTypeConfiguration();
         definition.setId("poc-publication-author");
-        definition.setLeftMetadataField("dc.contributor.author");
-        definition.setLeftEntityTypes(java.util.List.of("Publication"));
-        definition.setRightEntityTypes(java.util.List.of("Person", "OrgUnit"));
+        definition.setLeftPrimaryMetadataField("dc.contributor.author");
+        definition.setLeftEntityTypes(Set.of("Publication"));
+        definition.setRightEntityTypes(Set.of("Person", "OrgUnit"));
         RelationshipConfigurationServiceImpl configurations =
                 dspace.getServiceManager().getServiceByName(
                         RelationshipConfigurationServiceImpl.class.getCanonicalName(),
@@ -83,7 +85,8 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
             legacy.setRelationshipConfigKey(definition.getId());
             // Keep the old type table available, but this row has migrated off it.
             legacy.setRelationshipType(null);
-            service.attachMetadataToRelationship(context, value, legacy);
+            value.setRelationship(legacy);
+            metadata.update(context, value);
             relationships.update(context, legacy);
             context.commit();
 
@@ -96,7 +99,8 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
             assertThat(legacy.getRelationshipConfigKey(), equalTo(definition.getId()));
             assertThat(value.getRelationship().getID(), equalTo(legacyId));
             assertThat(value.getValue(), equalTo("Smith, Jane"));
-            assertThat(value.getPlace(), equalTo(0));
+            // The metadata value keeps the ordering of the legacy relationship it was migrated from.
+            assertThat(value.getPlace(), equalTo(legacy.getLeftPlace()));
             assertThat(metadata.findByRelationship(context, legacy), hasSize(1));
             assertThat(relationships.findByItem(context, person), hasSize(1));
             assertThat(ContentServiceFactory.getInstance().getRelationshipTypeService()

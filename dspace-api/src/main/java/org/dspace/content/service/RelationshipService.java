@@ -17,6 +17,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.RelationshipTypeConfiguration;
 import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
@@ -546,7 +547,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * Metadata association is the responsibility of the compound service.
      */
     Relationship createConfigBackedRelationship(Context context, Item leftItem, Item rightItem,
-                                               String relationshipConfigKey)
+                                                RelationshipTypeConfiguration configuration)
         throws SQLException, AuthorizeException;
 
     /**
@@ -560,14 +561,14 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param context               current DSpace context
      * @param leftItem              left endpoint of the Relationship
      * @param rightItem             right endpoint of the Relationship
-     * @param relationshipConfigKey configuration key to preserve
+     * @param configuration         configuration
      * @param latestVersionStatus   latest-version status of the copied Relationship
      * @return the newly created Relationship
      * @throws SQLException       if a database error occurs
      * @throws AuthorizeException if the user is not authorized to create the Relationship
      */
     Relationship createConfigBackedRelationshipForVersion(Context context, Item leftItem, Item rightItem,
-                                                          String relationshipConfigKey,
+                                                          RelationshipTypeConfiguration configuration,
                                                           LatestVersionStatus latestVersionStatus)
         throws SQLException, AuthorizeException;
 }

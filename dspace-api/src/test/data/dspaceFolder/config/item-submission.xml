@@ -42,6 +42,7 @@
         <name-map collection-handle="123456789/person" submission-name="person-bulkimport"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
         <name-map collection-handle="123456789/grobid-extraction" submission-name="grobidextractiontestprocess"/>
+        <name-map collection-handle="123456789/test-author-relationship" submission-name="test-author-relationship"/>
     </submission-map>
 
 
@@ -322,6 +323,12 @@
             <type>submission-form</type>
         </step-definition>
 
+        <step-definition id="test-author-relationship" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -521,6 +528,14 @@
             <step id="detect-duplicate" />
             <step id="upload" />
             <step id="license" />
+        </submission-process>
+
+        <submission-process name="test-author-relationship">
+            <step id="collection"/>
+            <step id="test-author-relationship"/>
+            <step id="upload"/>
+            <step id="license"/>
+            <step id="cclicense"/>
         </submission-process>
 
     </submission-definitions>
