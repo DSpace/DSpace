@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -1995,7 +1996,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
 
         // 3
-        String sourceDirForZip = sourcedir;
+        // extractionRoot is the directory where the Zip file will be uncompressed
+        Path extractionRoot = sourcedirFile.toPath().toRealPath();
+        // sourceDirForZip is returned from this method. It is initially set to
+        // extractionRoot, but may be modified to a subdirectory of the
+        // extractionRoot if the Zip file has a "wrapper" directory (such as
+        // "SimpleArchiveFormat") that contains the actual item directories.
+        Path sourceDirForZip = extractionRoot;
         ZipFile zf = new ZipFile(zipfile);
         ZipEntry entry;
         Enumeration<? extends ZipEntry> entries = zf.entries();
@@ -2020,8 +2027,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 File outFile = validatedOutPath.toFile();
 
                 if (entry.isDirectory()) {
-                    if (!outFile.mkdirs()) {
-                        logError("Unable to create contents directory: " + zipDir + entry.getName());
+                    try {
+                        Files.createDirectories(validatedOutPath);
+                    } catch (IOException ioe) {
+                        logError("Unable to create contents directory: " + validatedOutPath, ioe);
                     }
                 } else {
                     logInfo("Extracting file: " + entryName);
@@ -2032,26 +2041,26 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         index = entryName.lastIndexOf('\\');
                     }
                     if (index > 0) {
-                        File dir = new File(zipDir + entryName.substring(0, index));
-                        if (!dir.exists() && !dir.mkdirs()) {
-                            logError("Unable to create directory: " + dir.getAbsolutePath());
-                        }
-
-                        //Entries could have too many directories, and we need to adjust the sourcedir
-                        // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
-                        //            SimpleArchiveFormat / item2 / contents|dublin_core|...
-                        // or
-                        // file2.zip (item1 / contents|dublin_core|...
-                        //            item2 / contents|dublin_core|...
-
-                        //regex supports either windows or *nix file paths
-                        String[] entryChunks = entryName.split("/|\\\\");
-                        if (entryChunks.length > 2) {
-                            if (Strings.CS.equals(sourceDirForZip, sourcedir)) {
-                                sourceDirForZip = sourcedir + "/" + entryChunks[0];
-                            }
+                        Path validatedParent = validatedOutPath.getParent();
+                        try {
+                            Files.createDirectories(validatedParent);
+                        } catch (IOException ioe) {
+                            logError("Unable to create directory: " + validatedParent, ioe);
                         }
                     }
+
+                    //Entries could have too many directories, and we need to adjust the sourcedir
+                    // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
+                    //            SimpleArchiveFormat / item2 / contents|dublin_core|...
+                    // or
+                    // file2.zip (item1 / contents|dublin_core|...
+                    //            item2 / contents|dublin_core|...
+                    Path relativeOutPath = extractionRoot.relativize(validatedOutPath);
+                    if (sourceDirForZip.equals(extractionRoot) && relativeOutPath.getNameCount() > 2) {
+                        sourceDirForZip = extractionRoot.resolve(relativeOutPath.getName(0));
+
+                    }
+
                     byte[] buffer = new byte[1024];
                     int len;
                     InputStream in = zf.getInputStream(entry);
@@ -2064,6 +2073,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     out.close();
                 }
             }
+            sourceDirForZip = SecureFileAccess.validatePathForRead(
+                sourceDirForZip.toString(), List.of(extractionRoot.toString()), "ItemImport extracted source directory"
+            );
         } catch (Exception e) {
             // If an error occurs in unzipping, cleanup the directory we were unzipping this file into
             if (sourcedirFile.exists()) {
@@ -2076,12 +2088,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             zf.close();
         }
 
-        if (!Strings.CS.equals(sourceDirForZip, sourcedir)) {
-            sourcedir = sourceDirForZip;
-            logInfo("Set sourceDir using path inside of Zip: " + sourcedir);
+        if (!sourceDirForZip.equals(extractionRoot)) {
+            logInfo("Set sourceDir using path inside of Zip: " + sourceDirForZip);
         }
 
-        return sourcedir;
+        return sourceDirForZip.toString();
     }
 
     @Override
