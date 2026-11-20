@@ -47,7 +47,7 @@ public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfigu
                           "id of the PMH set representing the harvested collection");
         options.addOption("m", "metadata_format", true,
                           "the name of the desired metadata format for harvesting, resolved to namespace and " +
-                                  "crosswalk in dspace.cfg");
+                                  "crosswalk in oai.cfg");
 
         options.addOption("h", "help", false, "help");
 
