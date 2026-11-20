@@ -98,14 +98,45 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         return f;
     }
 
+    /**
+     * Build the ImageMagick input argument for the first frame or page of a file.
+     *
+     * @param f           the input file
+     * @param inputFormat the ImageMagick format (coder) to decode the file with, such as {@code JPEG}
+     *                    or {@code PDF}; if null, ImageMagick chooses a decoder based on the file
+     *                    contents
+     * @return the input argument, such as {@code JPEG:/tmp/imthumb123.tmp[0]}
+     */
+    static String inputImage(File f, String inputFormat) {
+        String prefix = inputFormat == null ? "" : inputFormat + ":";
+        return prefix + f.getAbsolutePath() + "[0]";
+    }
+
     public File getThumbnailFile(File f, boolean verbose)
+        throws IOException, InterruptedException, IM4JavaException {
+        return getThumbnailFile(f, null, verbose);
+    }
+
+    /**
+     * Create a thumbnail of the first frame or page of a file.
+     *
+     * @param f           the input file
+     * @param inputFormat the ImageMagick format (coder) to decode the file with, such as {@code JPEG};
+     *                    if null, ImageMagick chooses a decoder based on the file contents
+     * @param verbose     verbose mode
+     * @return the thumbnail file
+     * @throws IOException          if the command cannot be run
+     * @throws InterruptedException if interrupted while waiting for ImageMagick
+     * @throws IM4JavaException     if ImageMagick fails
+     */
+    public File getThumbnailFile(File f, String inputFormat, boolean verbose)
         throws IOException, InterruptedException, IM4JavaException {
         File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
         f2.deleteOnExit();
         ConvertCmd cmd = new ConvertCmd();
         IMOperation op = new IMOperation();
         op.autoOrient();
-        op.addImage(f.getAbsolutePath() + "[0]");
+        op.addImage(inputImage(f, inputFormat));
         op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
                         configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
         op.addImage(f2.getAbsolutePath());
@@ -163,8 +194,10 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.define("pdf:use-cropbox=true");
         }
 
-        String s = "[0]";
-        op.addImage(f.getAbsolutePath() + s);
+        // Always decode the input as PDF, so that ImageMagick cannot pick another decoder based on the
+        // file contents. PDFBox has already parsed the file as a PDF above.
+        String input = inputImage(f, "PDF");
+        op.addImage(input);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();
         }
@@ -174,7 +207,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         String cmyk_profile = configurationService.getProperty(PRE + ".cmyk_profile");
         String srgb_profile = configurationService.getProperty(PRE + ".srgb_profile");
         if (cmyk_profile != null && srgb_profile != null) {
-            Info imageInfo = new Info(f.getAbsolutePath() + s, true);
+            Info imageInfo = new Info(input, true);
             String imageClass = imageInfo.getImageClass();
             if (imageClass.contains("CMYK")) {
                 op.profile(cmyk_profile);

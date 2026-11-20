@@ -25,7 +25,8 @@ public class ImageMagickPdfThumbnailFilter extends ImageMagickThumbnailFilter {
             // Step 1: get an image from our PDF file, with PDF-specific processing options
             f2 = getImageFile(f, verbose);
             // Step 2: use the image above to create the final resized and rotated thumbnail
-            f3 = getThumbnailFile(f2, verbose);
+            // The intermediate image is always written by ImageMagick in its own MIFF format
+            f3 = getThumbnailFile(f2, "MIFF", verbose);
             byte[] bytes = Files.readAllBytes(f3.toPath());
             return new ByteArrayInputStream(bytes);
         } finally {
