@@ -7,6 +7,8 @@
             <!-- Restrict access to hidden items by default -->
             <Filter ref="defaultFilter"/>
 
+            <Set ref="openAccess"/>
+
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Format ref="xoai"/>
@@ -502,6 +504,12 @@
             </Definition>
         </Filter>
 
+        <Filter id="openAccessFilter">
+            <Definition>
+                <Custom ref="openAccessCondition"/>
+            </Definition>
+        </Filter>
+
         <!-- This condition determines if an Item has a "dc.type" field
              which contains "Thesis". -->
         <CustomCondition id="thesisDocumentTypeCondition">
@@ -643,6 +651,11 @@
             </Configuration>
         </CustomCondition>
 
+        <!-- This condition determines if an item is an open access publication -->
+        <CustomCondition id="openAccessCondition">
+            <Class>org.dspace.xoai.filter.DSpaceOpenAccessFilter</Class>
+        </CustomCondition>
+
     </Filters>
 
     <Sets>
@@ -660,6 +673,11 @@
             <Spec>rioxx</Spec>
             <Name>Rioxx set</Name>
             <!-- Just an alias -->
+        </Set>
+        <Set id="openAccess">
+            <Spec>open_access</Spec>
+            <Name>Open Access</Name>
+            <Filter ref="openAccessFilter"/>
         </Set>
     </Sets>
 </Configuration>
