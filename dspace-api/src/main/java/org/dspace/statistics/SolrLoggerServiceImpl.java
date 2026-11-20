@@ -106,6 +106,7 @@ import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
+import org.dspace.util.SolrAuthUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -1270,7 +1271,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         //DS-3458: Test to see if a solr core already exists.  If it exists,
         // return a connection to that core.  Otherwise create a new core and
         // return a connection to it.
-        HttpSolrClient returnServer = new HttpSolrClient.Builder(baseSolrUrl + coreName).build();
+        CloseableHttpClient returnServerHttpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+        HttpSolrClient returnServer = new HttpSolrClient.Builder(baseSolrUrl + coreName)
+                .withHttpClient(returnServerHttpClient)
+                .build();
         try {
             SolrPingResponse ping = returnServer.ping();
             log.debug("Ping of Solr Core {} returned with Status {}",
@@ -1290,7 +1295,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         create.setConfigSet(configSetName);
         create.setInstanceDir(coreName);
 
-        HttpSolrClient solrServer = new HttpSolrClient.Builder(baseSolrUrl).build();
+        CloseableHttpClient solrServerHttpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+        HttpSolrClient solrServer = new HttpSolrClient.Builder(baseSolrUrl)
+                .withHttpClient(solrServerHttpClient)
+                .build();
         create.process(solrServer);
         log.info("Created core with name: {} from configset {}", coreName, configSetName);
         return returnServer;
@@ -1576,7 +1585,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         //Base url should like : http://localhost:{port.number}/solr
         String baseSolrUrl = ((HttpSolrClient) solr).getBaseURL().replace(statisticsCoreBase, "");
 
-        try (HttpSolrClient enumClient = new HttpSolrClient.Builder(baseSolrUrl).build();) {
+        CloseableHttpClient enumHttpClient = DSpaceHttpClientFactory.getInstance().build(builder ->
+                SolrAuthUtils.addAuthenticationIfConfigured(builder, "solr", configurationService));
+        try (HttpSolrClient enumClient = new HttpSolrClient.Builder(baseSolrUrl)
+                .withHttpClient(enumHttpClient)
+                .build();) {
             //Attempt to retrieve all the statistic year cores
             CoreAdminRequest coresRequest = new CoreAdminRequest();
             coresRequest.setAction(CoreAdminAction.STATUS);

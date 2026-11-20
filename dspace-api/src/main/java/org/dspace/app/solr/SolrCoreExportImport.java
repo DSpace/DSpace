@@ -39,6 +39,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.SolrAuthUtils;
 import org.dspace.utils.DSpace;
 
 /**
@@ -69,6 +70,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private ObjectMapper jsonMapper = new ObjectMapper();
     private HttpClient httpClient;
+    private String authorizationHeader;
 
     // Cache for fields list to avoid multiple calls to SOLR
     private List<String> cachedFields = null;
@@ -97,6 +99,7 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
+        this.authorizationHeader = SolrAuthUtils.getAuthorizationHeaderValue("solr", null, configurationService);
 
         mode = commandLine.getOptionValue('m');
         if (StringUtils.isBlank(mode) || (!mode.equals("export") && !mode.equals("import"))) {
@@ -290,10 +293,10 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
             String statsUrl = String.format("%s/select?q=*:*&rows=0&wt=json&stats=true&stats.field=%s",
                     baseUrl, dateField);
 
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest request = withAuth(HttpRequest.newBuilder()
                     .uri(URI.create(statsUrl))
                     .timeout(Duration.ofMinutes(2))
-                    .GET()
+                    .GET())
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -409,10 +412,10 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         log.debug("Thread '{}' calling SOLR URL: {}", currentThread.getName(), url);
 
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest request = withAuth(HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofMinutes(5))
-                .GET()
+                .GET())
                 .build();
 
         long queryStart = System.currentTimeMillis();
@@ -537,11 +540,11 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         String url = baseUrl + "/update";
         String contentType = format.equals("csv") ? "application/csv" : "application/json";
 
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest request = withAuth(HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofMinutes(10))
                 .header("Content-Type", contentType)
-                .POST(HttpRequest.BodyPublishers.ofFile(file.toPath()))
+                .POST(HttpRequest.BodyPublishers.ofFile(file.toPath())))
                 .build();
 
         long uploadStart = System.currentTimeMillis();
@@ -564,11 +567,11 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     private void commitToSolr(String baseUrl) throws Exception {
         String url = baseUrl + "/update?commit=true";
 
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest request = withAuth(HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofMinutes(5))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                .POST(HttpRequest.BodyPublishers.ofString("{}")))
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -602,10 +605,10 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
 
         String url = baseUrl + "/schema/fields?wt=json";
 
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest request = withAuth(HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofMinutes(1))
-                .GET()
+                .GET())
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -642,10 +645,10 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
     private List<String> getFieldsFromSampleQuery(String baseUrl) throws Exception {
         String url = baseUrl + "/select?q=*:*&rows=1&wt=json";
 
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest request = withAuth(HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofMinutes(1))
-                .GET()
+                .GET())
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -715,5 +718,16 @@ public class SolrCoreExportImport extends DSpaceRunnable<SolrCoreExportImportScr
         handler.logInfo("- If start/end dates are not specified, they will be retrieved from SOLR");
         handler.logInfo("- Date increment determines how data is split across threads");
         handler.logInfo("- Import can process both old batch files and new range files");
+    }
+
+    /**
+     * Adds the Authorization header to a request builder, if HTTP Basic
+     * authentication is configured for Solr.
+     */
+    private HttpRequest.Builder withAuth(HttpRequest.Builder requestBuilder) {
+        if (authorizationHeader != null) {
+            requestBuilder.header("Authorization", authorizationHeader);
+        }
+        return requestBuilder;
     }
 }
