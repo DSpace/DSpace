@@ -1238,6 +1238,11 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             throw new BulkImportException("No item to delete found for entity with id " + entityRow.getId());
         }
 
+        if (!isInSpecifiedCollection(item)) {
+            throw new BulkImportException("The item related to the entity with id " + entityRow.getId()
+                + " have a different collection");
+        }
+
         itemService.delete(context, item);
         handler.logInfo("Row " + entityRow.getRow() + " - Item deleted successfully");
     }

@@ -10,13 +10,17 @@ package org.dspace.app.bulkedit;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import org.apache.commons.cli.Options;
-import org.dspace.authorize.service.AuthorizeService;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Script configuration for {@link BulkImport}.
@@ -27,15 +31,43 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptConfiguration<T> {
 
-    @Autowired
-    private AuthorizeService authorizeService;
-
     private Class<T> dspaceRunnableClass;
 
     @Override
     public boolean isAllowedToExecute(Context context, List<DSpaceCommandLineParameter> commandLineParameters) {
         try {
-            return authorizeService.isCollectionAdmin(context) || authorizeService.isAdmin(context);
+            // fall back to base tests if no other parameters passed
+            if (Objects.isNull(commandLineParameters)) {
+                return authorizeService.isCollectionAdmin(context) || authorizeService.isAdmin(context);
+            }
+
+            // admins can always execute
+            if (authorizeService.isAdmin(context)) {
+                return true;
+            }
+
+            // resolve target collection properly before checking isAdmin / can execute
+            String collectionId = commandLineParameters.stream()
+                .filter(parameter -> "-c".equals(parameter.getName()))
+                .map(DSpaceCommandLineParameter::getValue)
+                .findFirst()
+                .orElse(null);
+
+            if (StringUtils.isBlank(collectionId)) {
+                return false;
+            }
+
+            UUID collectionUuid = UUID.fromString(collectionId);
+            CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+            Collection collection = collectionService.find(context, collectionUuid);
+            if (collection == null) {
+                return false;
+            }
+
+            return authorizeService.isAdmin(context, collection);
+
+        } catch (IllegalArgumentException e) {
+            return false;
         } catch (SQLException e) {
             throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
         }
