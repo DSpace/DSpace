@@ -357,7 +357,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 InputStream srcStream = bitstreamService.retrieve(context, source);
                 // filter the source stream to produce the destination stream
                 // this is the hard work, check for OutOfMemoryErrors at the end of the try clause.
-                InputStream destStream = formatFilter.getDestinationStream(item, srcStream, isVerbose);
+                InputStream destStream = formatFilter.getDestinationStream(context, item, source, srcStream,
+                                                                           isVerbose);
         ) {
             if (destStream == null) {
                 if (!isQuiet) {

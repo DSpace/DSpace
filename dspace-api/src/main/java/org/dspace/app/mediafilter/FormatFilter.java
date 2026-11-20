@@ -60,6 +60,28 @@ public interface FormatFilter {
         throws Exception;
 
     /**
+     * Read the source stream and produce the filtered content, with access to the source
+     * bitstream (for example to use its registered format).
+     * <p>
+     * This is the method called by the media filter service. The default implementation ignores
+     * the context and bitstream and calls {@link #getDestinationStream(Item, InputStream, boolean)},
+     * so existing filters do not need to implement it.
+     *
+     * @param context   DSpace context
+     * @param item      item containing the bitstream
+     * @param bitstream source bitstream whose content is being filtered
+     * @param source    input stream with the content of the source bitstream
+     * @param verbose   verbosity flag
+     * @return result of filter's transformation as a byte stream.
+     * @throws Exception if error
+     */
+    default InputStream getDestinationStream(Context context, Item item, Bitstream bitstream,
+                                             InputStream source, boolean verbose)
+        throws Exception {
+        return getDestinationStream(item, source, verbose);
+    }
+
+    /**
      * Perform any pre-processing of the source bitstream *before* the actual
      * filtering takes place in MediaFilterManager.processBitstream().
      * <p>
