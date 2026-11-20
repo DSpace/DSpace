@@ -77,4 +77,7 @@
 
     <bean class="org.dspace.content.dao.impl.ItemForMetadataEnhancementUpdateDAOImpl"/>
 
+    <bean class="org.dspace.mfa.dao.impl.MfaDAOImpl"/>
+    <bean class="org.dspace.mfa.dao.impl.MfaRecoveryCodeDAOImpl"/>
+
 </beans>
