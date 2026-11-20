@@ -42,17 +42,20 @@ public final class TaskQueueEntry {
         this.objId = objId;
     }
 
+
     /**
-     * Constructor with a pipe-separated list of field values.
+     * TaskQueueEntry constructor with explicit field values.
      *
-     * @param entry list of field values separated by '|'s
+     * @param epersonId  task owner
+     * @param submitTime time the task was submitted (as String)
+     * @param tasks      comma-separated list of task names
+     * @param objId      usually a handle or workflow id
      */
-    public TaskQueueEntry(String entry) {
-        String[] tokens = entry.split("\\|");
-        epersonId = tokens[0];
-        submitTime = tokens[1];
-        tasks = tokens[2];
-        objId = tokens[3];
+    public TaskQueueEntry(String epersonId, String submitTime, String tasks, String objId) {
+        this.epersonId = epersonId;
+        this.submitTime = submitTime;
+        this.tasks = tasks;
+        this.objId = objId;
     }
 
     /**
