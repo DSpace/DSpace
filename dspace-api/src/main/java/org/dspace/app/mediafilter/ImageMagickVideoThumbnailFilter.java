@@ -70,7 +70,7 @@ public class ImageMagickVideoThumbnailFilter extends ImageMagickThumbnailFilter 
         if (verbose) {
             System.out.println("IM Thumbnail Param: " + op);
         }
-        cmd.run(op);
+        runCommand(cmd, op);
         return f2;
     }
 }
