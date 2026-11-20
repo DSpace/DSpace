@@ -22,7 +22,6 @@ import org.dspace.validation.GlobalSubmissionValidator;
 import org.dspace.validation.SubmissionStepValidator;
 import org.dspace.validation.model.ValidationError;
 import org.dspace.validation.service.ValidationService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link ValidationService} that cycle on all the
@@ -40,7 +39,6 @@ public class ValidationServiceImpl implements ValidationService {
 
     private SubmissionConfigReader submissionConfigReader;
 
-    @Autowired
     public ValidationServiceImpl(List<SubmissionStepValidator> stepValidators,
                                  List<GlobalSubmissionValidator> globalValidators) {
         this.stepValidators = stepValidators;
