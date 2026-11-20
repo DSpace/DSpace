@@ -498,7 +498,7 @@ public class AuditSolrServiceImpl implements AuditService {
 
     public void commit() {
         try {
-            getSolr().commit();
+            getSolr().commit(true, true, true);
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
