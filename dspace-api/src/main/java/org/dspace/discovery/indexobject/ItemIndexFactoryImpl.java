@@ -498,30 +498,15 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     }
                 }
 
-                if ((sortFields.get(field) != null || recentSubmissionsConfigurationMap
-                        .get(field) != null) && !sortFieldsAdded.contains(field)) {
-                    //Only add sort value once
-                    String type;
-                    if (sortFields.get(field) != null) {
-                        type = sortFields.get(field).getType();
-                    } else {
-                        type = recentSubmissionsConfigurationMap.get(field).getType();
-                    }
-
-                    if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
-                        ZonedDateTime date = MultiFormatDateParser.parse(value);
-                        if (date != null) {
-                            String stringDate = SolrUtils.getDateFormatter().format(date);
-                            doc.addField(field + "_dt", stringDate);
-                        } else {
-                            log.warn("Error while indexing sort date field, item: " + item
-                                    .getHandle() + " metadata field: " + field + " date value: " + date);
-                        }
-                    } else {
-                        doc.addField(field + "_sort", value);
-                    }
-                    sortFieldsAdded.add(field);
-                }
+                addSortFields(
+                    sortFields,
+                    field,
+                    recentSubmissionsConfigurationMap,
+                    sortFieldsAdded,
+                    doc,
+                    value,
+                    item
+                );
 
                 if (hitHighlightingFields.contains(field) || hitHighlightingFields
                         .contains("*") || hitHighlightingFields.contains(unqualifiedField + "." + Item.ANY)) {
@@ -835,5 +820,86 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                              currentPart.toLowerCase() + separator + value);
             }
         }
+    }
+
+    /**
+     * Adds the sort value for the given field to the Solr document
+     */
+    private void addSortFields(
+        Map<String, DiscoverySortFieldConfiguration> sortFields,
+        String field,
+        Map<String, DiscoveryRecentSubmissionsConfiguration> recentSubmissionsConfigurationMap,
+        List<String> sortFieldsAdded,
+        SolrInputDocument doc,
+        String value,
+        Item item
+    ) {
+        if ((sortFields.get(field) != null || recentSubmissionsConfigurationMap
+            .get(field) != null) && !sortFieldsAdded.contains(field)) {
+            //Only add sort value once
+            String type;
+            if (sortFields.get(field) != null) {
+                type = sortFields.get(field).getType();
+            } else {
+                type = recentSubmissionsConfigurationMap.get(field).getType();
+            }
+
+            if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
+                ZonedDateTime date = MultiFormatDateParser.parse(value);
+                if (date != null) {
+                    String stringDate = SolrUtils.getDateFormatter().format(date);
+                    doc.addField(field + "_dt", stringDate);
+                } else {
+                    log.warn("Error while indexing sort date field, item: " + item
+                        .getHandle() + " metadata field: " + field + " date value: " + date);
+                }
+            } else {
+                doc.addField(field + "_sort", normaliseLeadingSortValue(value, sortFields.get(field)));
+            }
+            sortFieldsAdded.add(field);
+        }
+    }
+
+    /**
+     * Normalize a string for sorting by optionally removing leading punctuation, spaces
+     * and special chars (ignoreLeadingNonAlphaNum) and/or digits (ignoreLeadingDigits)
+     *
+     * @param value the original value
+     * @param sortConfig Sort configuration
+     * @return normalized value (never null)
+     */
+    public String normaliseLeadingSortValue(String value,
+                                            DiscoverySortFieldConfiguration sortConfig) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+
+        int i = 0;
+        int len = value.length();
+
+        while (i < len) {
+            char c = value.charAt(i);
+
+            boolean isDigit = Character.isDigit(c);
+            boolean isLetter = Character.isLetter(c);
+
+            // punctuation/symbol = not letter and not digit
+            boolean isSpecialChar = !isLetter && !isDigit;
+
+            if (sortConfig.isIgnoreLeadingNonAlphaNum() && isSpecialChar) {
+                i++;
+                continue;
+            }
+
+            if (sortConfig.isIgnoreLeadingDigits() && isDigit) {
+                i++;
+                continue;
+            }
+
+            // stop when we hit a valid starting character
+            break;
+        }
+
+        return value.substring(i).trim();
     }
 }
