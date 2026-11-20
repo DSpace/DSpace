@@ -36,6 +36,16 @@ public class EmbeddedPage extends EmbeddedPageHeader {
         embeddedPageContent.put(relation, page.getContent());
     }
 
+    /**
+     * Returns the HAL links of the page, serialized under the {@code _links} JSON property.
+     *
+     * @return the map of page links keyed by relation
+     */
+    @JsonProperty(value = "_links")
+    public Map<String, Object> getInternalLinks() {
+        return super.getLinks();
+    }
+
     @JsonProperty(value = "_embedded")
     public Map<String, List> getPageContent() {
         return embeddedPageContent;

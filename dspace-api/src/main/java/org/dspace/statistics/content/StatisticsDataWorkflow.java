@@ -178,7 +178,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
     protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator, int facetMinCount)
             throws SolrServerException, IOException {
         ObjectCount[] objectCounts = solrLoggerService
-            .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null, facetMinCount);
+            .queryFacetField(getQuery(), (String) null, typeGenerator.getType(), -1, false, null, facetMinCount);
         Map<String, Long> result = new HashMap<>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
@@ -193,7 +193,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
         if (workflowStartDate == null) {
             //Query our solr for it !
             QueryResponse oldestRecord = solrLoggerService
-                .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true, facetMinCount);
+                .query(getQuery(), (String) null, null, 1, 0, null, null, null, null, "time", true, facetMinCount);
             if (0 < oldestRecord.getResults().getNumFound()) {
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
                 ZonedDateTime oldestDate = ((java.util.Date) solrDocument.getFieldValue("time"))

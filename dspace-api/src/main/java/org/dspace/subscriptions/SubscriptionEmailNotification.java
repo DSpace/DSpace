@@ -48,16 +48,22 @@ public class SubscriptionEmailNotification
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
         assignSpecialGroupsInContext();
+        String typeOption = commandLine.getOptionValue("t");
         String frequencyOption = commandLine.getOptionValue("f");
-        if (StringUtils.isBlank(frequencyOption)) {
-            throw new IllegalArgumentException("Option --frequency (-f) must be set");
+        if (StringUtils.isBlank(frequencyOption) || StringUtils.isBlank(typeOption)) {
+            throw new IllegalArgumentException("Options --frequency (-f) and --type (-t) must be set");
         }
 
         if (!FrequencyType.isSupportedFrequencyType(frequencyOption)) {
             throw new IllegalArgumentException(
                     "Option f must be one of following values D(Day), W(Week) or M(Month)");
         }
-        subscriptionEmailNotificationService.perform(getContext(), handler, "content", frequencyOption);
+
+        if (!StringUtils.equalsAny(typeOption, "content", "statistics")) {
+            throw new IllegalArgumentException(
+                    "Option t (type) must be one of \"content\" or \"statistics\"");
+        }
+        subscriptionEmailNotificationService.perform(getContext(), handler, typeOption, frequencyOption);
     }
 
     private void assignCurrentUserInContext() throws SQLException {

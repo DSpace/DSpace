@@ -122,4 +122,15 @@ public interface GenericDAO<T> {
      * @throws SQLException if database error
      */
     public List<T> findMany(Context context, String query) throws SQLException;
+
+    /**
+     * Checks if a given id of a target entity with the clazz type exists in the database.
+     *
+     * @param context current DSpace context
+     * @param clazz entity class
+     * @param id identifier of the entity
+     * @return true if found, false otherwise
+     * @throws SQLException
+     */
+    boolean exists(Context context, Class<T> clazz, UUID id) throws SQLException;
 }

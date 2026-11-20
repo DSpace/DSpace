@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.core.Context;
 
 /**
@@ -75,6 +77,22 @@ public interface IndexingService {
     void optimize() throws SearchServiceException;
 
     void buildSpellCheck() throws SearchServiceException, IOException;
+
+    /**
+     * Update the Solr index with the given CRIS metric.
+     *
+     * @param context the DSpace context
+     * @param metric  the CRIS metric to index
+     */
+    void updateMetrics(Context context, CrisMetrics metric);
+
+    /**
+     * Retrieve the Solr document matching the given unique index ID.
+     *
+     * @param uniqueID the unique index ID of the document to retrieve
+     * @return the query response containing the matching document
+     */
+    QueryResponse retriveSolrDocByUniqueID(String uniqueID);
 
     /**
      * Atomically update the index of a single field for an object

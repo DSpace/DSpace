@@ -31,6 +31,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.CrisMetricsBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -39,6 +41,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.MockSolrSearchCore;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.services.ConfigurationService;
@@ -530,6 +533,172 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
         assertEquals(0, receivedMessages.length);
     }
 
+    @Test
+    public void testStatisticsSubscriptionWithMetricsSendsSpreadsheet() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Metrics Item")
+                               .build();
+        CrisMetricsBuilder.createCrisMetrics(context, item)
+                          .withMetricType("ScopusCitation")
+                          .withMetricCount(12)
+                          .withDeltaPeriod1(2.0)
+                          .withDeltaPeriod2(5.0)
+                          .isLast(true)
+                          .build();
+        statisticsSubscribeTo(item);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "statistics", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+
+        MimeMessage message = receivedMessages[0];
+        assertEquals(eperson.getEmail(), message.getRecipients(Message.RecipientType.TO)[0].toString());
+        assertTrue(GreenMailUtil.getBody(message).contains("subscriptions.xlsx"));
+    }
+
+    @Test
+    public void testStatisticsSubscriptionWithoutMetricsSendsNoEmail() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("No Metrics Item")
+                               .build();
+        statisticsSubscribeTo(item);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "statistics", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(0, receivedMessages.length);
+    }
+
+    @Test
+    public void testStatisticsSubscriptionSendsOneEmailPerSubscriber() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson otherEperson = EPersonBuilder.createEPerson(context)
+                                             .withEmail("other-subscriber@example.com")
+                                             .withNameInMetadata("Other", "Subscriber")
+                                             .build();
+
+        Item itemWithMetrics = ItemBuilder.createItem(context, col)
+                                          .withTitle("Metrics Item")
+                                          .build();
+        CrisMetricsBuilder.createCrisMetrics(context, itemWithMetrics)
+                          .withMetricType("ScopusCitation")
+                          .withMetricCount(7)
+                          .isLast(true)
+                          .build();
+        Item itemWithoutMetrics = ItemBuilder.createItem(context, col)
+                                             .withTitle("No Metrics Item")
+                                             .build();
+
+        // eperson subscribes to an item that has metrics -> should receive an email
+        statisticsSubscribeTo(eperson, itemWithMetrics);
+        // otherEperson subscribes to an item with no metrics -> should receive nothing
+        statisticsSubscribeTo(otherEperson, itemWithoutMetrics);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "statistics", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+        assertEquals(eperson.getEmail(),
+                     receivedMessages[0].getRecipients(Message.RecipientType.TO)[0].toString());
+    }
+
+    @Test
+    public void testSubscriptionToItemEntityWithNewRelatedItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // A subscribed Item is treated as an entity: the subscriber is notified about the
+        // entity's related items, resolved through its inverse-relation discovery configs.
+        // For a Person, RELATION.Person.researchoutputs matches author_authority:{personUUID}.
+        Item person = ItemBuilder.createItem(context, col)
+                                 .withTitle("Jane Doe")
+                                 .withEntityType("Person")
+                                 .build();
+
+        Item publication = ItemBuilder.createItem(context, col)
+                                      .withTitle("Related Publication")
+                                      .withEntityType("Publication")
+                                      .withAuthor("Jane Doe")
+                                      .withDateAccessioned(yesterdayString)
+                                      .withLastModified(yesterday.toInstant())
+                                      .build();
+
+        // Link the publication to the Person via the author authority on the Solr document,
+        // so RELATION.Person.researchoutputs (author_authority:{personUUID}) resolves it.
+        setAuthorAuthorityOnItemSolrDocument(context, publication.getID(), person.getID(), yesterday);
+        subscribeTo(person);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "content", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+
+        MimeMessage message = receivedMessages[0];
+        assertEquals(eperson.getEmail(), message.getRecipients(Message.RecipientType.TO)[0].toString());
+        String body = GreenMailUtil.getBody(message);
+        assertTrue(body.contains("Title: Related Publication"));
+    }
+
+    @Test
+    public void testSubscriptionToItemEntityWithoutRelatedUpdatesSendsNoEmail() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Person entity with a publication that is NOT related to it (no author authority):
+        // the inverse-relation query matches nothing -> no email.
+        Item person = ItemBuilder.createItem(context, col)
+                                 .withTitle("John Roe")
+                                 .withEntityType("Person")
+                                 .build();
+
+        ItemBuilder.createItem(context, col)
+                   .withTitle("Unrelated Publication")
+                   .withEntityType("Publication")
+                   .withAuthor("John Roe")
+                   .withDateAccessioned(yesterdayString)
+                   .withLastModified(yesterday.toInstant())
+                   .build();
+
+        subscribeTo(person);
+        context.restoreAuthSystemState();
+
+        subscriptionEmailNotificationService.perform(context, null, "content", "D");
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(0, receivedMessages.length);
+    }
+
+    private void setAuthorAuthorityOnItemSolrDocument(Context c, UUID itemId, UUID authority,
+                                                      ZonedDateTime lastModified)
+            throws SolrServerException, IOException {
+        SolrDocument d = searchService.getSolr()
+                                      .query(new SolrQuery("search.resourceid:" + itemId.toString()))
+                                      .getResults()
+                                      .get(0);
+        SolrInputDocument inputdoc = new SolrInputDocument();
+        for (String name : d.getFieldNames()) {
+            inputdoc.setField(name, d.getFieldValue(name));
+        }
+        inputdoc.setField("author_authority", authority.toString());
+        inputdoc.setField("lastModified", lastModified.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        // remove, as it will be added again with the new value
+        inputdoc.removeField("lastModified_dt");
+        searchService.getSolr().add(inputdoc);
+        searchService.getSolr().commit();
+    }
+
+    private void subscribeTo(Item item) throws Exception {
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        subscribeService.subscribe(context, eperson, item, subscriptionParameterList, "content");
+    }
+
     private void subscribeTo(Collection collection) throws Exception {
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
@@ -546,6 +715,19 @@ public class SubscriptionEmailNotificationServiceIT extends AbstractIntegrationT
         subscriptionParameter.setValue("D");
         subscriptionParameterList.add(subscriptionParameter);
         subscribeService.subscribe(context, eperson, community, subscriptionParameterList, "content");
+    }
+
+    private void statisticsSubscribeTo(Item item) throws Exception {
+        statisticsSubscribeTo(eperson, item);
+    }
+
+    private void statisticsSubscribeTo(EPerson subscriber, Item item) throws Exception {
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        subscribeService.subscribe(context, subscriber, item, subscriptionParameterList, "statistics");
     }
 
     private void setFakeLastModifiedOnItemSolrDocument(Context c, UUID itemId, ZonedDateTime lastModified)

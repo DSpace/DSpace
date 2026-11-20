@@ -37,4 +37,22 @@ public class SolrUtils {
         // TODO: Can this be replaced with DateTimeFormatter.ISO_INSTANT?
         return DateTimeFormatter.ofPattern(SOLR_DATE_FORMAT).withZone(SOLR_TIME_ZONE);
     }
+
+    /**
+     * Maps target type into a string format.
+     *
+     * @param type a {@code String} that represents the date format style
+     * @return {@code String} pattern for that type
+     */
+    public static String getDateformatFrom(String type) {
+        String dateformatString = null;
+        if ("DAY".equals(type)) {
+            dateformatString = "dd-MM-yyyy";
+        } else if ("MONTH".equals(type)) {
+            dateformatString = "MMMM yyyy";
+        } else if ("YEAR".equals(type)) {
+            dateformatString = "yyyy";
+        }
+        return dateformatString;
+    }
 }

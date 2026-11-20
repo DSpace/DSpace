@@ -82,6 +82,26 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> languageFacet() {
+        return allOf(
+            hasJsonPath("$.name", is("language")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/language")),
+            hasJsonPath("$._links", matchNextLink("api/discover/facets/language"))
+        );
+    }
+
+    public static Matcher<? super Object> typesFacet() {
+        return allOf(
+            hasJsonPath("$.name", is("types")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/types")),
+            hasJsonPath("$._links", matchNextLink("api/discover/facets/types"))
+        );
+    }
+
     public static Matcher<? super Object> authorFacetWithMinMax(String min, String max) {
         return allOf(
             hasJsonPath("$.name", is("author")),
@@ -186,7 +206,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> typeFacet() {
         return allOf(
                 hasJsonPath("$.name", is("itemtype")),
-                hasJsonPath("$.facetType", is("text")),
+                hasJsonPath("$.facetType", is("hierarchical")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
                 hasJsonPath("$.openByDefault", any(Boolean.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/itemtype")),
@@ -226,6 +246,15 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> anyFacet(String name, String facetType) {
+        return allOf(
+            hasJsonPath("$.name", is(name)),
+            hasJsonPath("$.facetType", is(facetType)),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/" + name))
+        );
+    }
+
     public static Matcher<? super Object> relatedItemFacet() {
         return allOf(
             hasJsonPath("$.name", is("relateditem")),
@@ -237,17 +266,7 @@ public class FacetEntryMatcher {
         );
     }
 
-    public static Matcher<? super Object> accessStatusFacet(boolean hasNext) {
-        return allOf(
-                hasJsonPath("$.name", is("access_status")),
-                hasJsonPath("$.facetType", is("text")),
-                hasJsonPath("$.facetLimit", any(Integer.class)),
-                hasJsonPath("$._links.self.href", containsString("api/discover/facets/access_status")),
-                hasJsonPath("$._links", matchNextLink("api/discover/facets/access_status"))
-        );
-    }
-
-    public static Matcher<? super Object> originFacet() {
+    public static Matcher<? super Object> originFacet(boolean b) {
         return allOf(
             hasJsonPath("$.name", is("origin")),
             hasJsonPath("$.facetType", is("text")),
@@ -255,6 +274,16 @@ public class FacetEntryMatcher {
             hasJsonPath("$.openByDefault", any(Boolean.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/origin")),
             hasJsonPath("$._links", matchNextLink("api/discover/facets/origin"))
+        );
+    }
+
+    public static Matcher<? super Object> accessStatusFacet(boolean hasNext) {
+        return allOf(
+            hasJsonPath("$.name", is("access_status")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/access_status")),
+            hasJsonPath("$._links", matchNextLink("api/discover/facets/access_status"))
         );
     }
 

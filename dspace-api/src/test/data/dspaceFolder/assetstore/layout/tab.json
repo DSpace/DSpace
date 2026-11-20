@@ -1,0 +1,106 @@
+{
+	"shortname": "info",
+	"header": "Publication HEADER",
+	"entityType": "Publication",
+	"priority": 1,
+	"security": 0,
+	"type": "tab",
+	"leading": "true",
+	"rows": 
+    [{
+      "cells": [
+        {
+          "style": "col-md-6",
+          "boxes": [
+            {
+              "shortname": "primary",
+              "header": "Primary Information",
+              "entityType": "Publication",
+              "collapsed": true,
+              "container": false,
+              "minor": false,
+              "style": "col-md-6",
+              "security": 0,
+              "boxType": "METADATA",
+              "metadataSecurityFields": [
+                "dspace.policy.eperson"
+              ],
+              "configuration": {
+                "type": "boxmetadataconfiguration",
+                "rows": [
+                  {
+				    "style": "container row",
+                    "cells": [
+                    	{
+	                    	"fields": [
+		                      {
+		                        "metadata": "dc.title",
+		                        "label": "Name",
+		                        "labelAsHeading": true,
+		                        "fieldType": "metadata"
+		                      },
+		                      {
+						          "metadata": "dc.date.issued",
+						          "label": "Date Issued",
+						          "rendering": null,
+						          "fieldType": "METADATA",
+						          "styleLabel": "font-weight-bold col-4",
+						          "styleValue": "col",
+						          "metadataGroup": null
+						        }
+		                    ]
+                    	}
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "style": "col-md-6",
+          "boxes": [
+            {
+              "shortname": "orgUnits",
+              "header": "OrgUnits",
+              "entityType": "Publication",
+              "collapsed": false,
+              "minor": false,
+              "style": "col-md-6",
+              "container": true,
+              "security": 0,
+              "boxType": "RELATION",
+              "metadataSecurityFields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "style": "bg-light",
+      "cells": [
+        {
+          "style": "col-md-12",
+          "boxes": [
+            {
+              "shortname": "metrics",
+              "header": "Metrics",
+              "entityType": "Publication",
+              "collapsed": false,
+              "minor": false,
+              "style": null,
+              "security": 0,
+              "boxType": "METRICS",
+              "metadataSecurityFields": [],
+              "configuration": {
+                "type": "boxmetricsconfiguration",
+                "maxColumns": 2,
+                "metrics": ["views", "downloads"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2263 @@
+{
+    "author-retrieval-response": [
+        {
+            "@status": "found",
+            "@_fa": "true",
+            "coredata": {
+                "prism:url": "http://api.elsevier.com/content/author/author_id/7406754790",
+                "dc:identifier": "AUTHOR_ID:7406754790",
+                "superseding-identifier": [
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:35354080500"
+                    }
+                ],
+                "historical-identifier": [
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:16163784900"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:16164338100"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:16182403800"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:19236027800"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:48161681000"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406748482"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406751469"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406756670"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406758558"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406759079"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406761472"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406756821"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406758337"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406757377"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:24430291100"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406760222"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406751117"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406754546"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406758522"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406757840"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406760968"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406761819"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:24792320900"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406754585"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406761420"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406760476"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406760420"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406748135"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406748141"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406756467"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:24792414100"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406755698"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406757200"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406752451"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:35343787700"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406755983"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406747309"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406746824"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:35288841700"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:8886334200"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406748683"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406752882"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:16186817800"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406760300"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406751796"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406751610"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406758250"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406756361"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406758368"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406754722"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406761233"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406758186"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:55223149100"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406751745"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406757599"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406750482"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:8084650900"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:36512400300"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406756266"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:35481944600"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:55740287500"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:49962180600"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:55498586000"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:55567933800"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:55740335800"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:56718787100"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:56125651000"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:56757379200"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:56128206000"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:56751326100"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7406749093"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:55740275200"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:57202829776"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:57207896310"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:55865075800"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:57207907090"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:22977424200"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:6701331881"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:57202749922"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:7409563964"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:57208122810"
+                    },
+                    {
+                        "@_fa": "true",
+                        "$": "author_id:57215806262"
+                    }
+                ],
+                "eid": "9-s2.0-7406754790",
+                "orcid": "0000-0002-4568-3015",
+                "document-count": "249",
+                "cited-by-count": "16677",
+                "citation-count": "23324",
+                "link": [
+                    {
+                        "@href": "https://www.scopus.com/authid/detail.uri?partnerID=HzOxMe3b&authorId=7406754790&origin=inward",
+                        "@rel": "scopus-author",
+                        "@_fa": "true"
+                    },
+                    {
+                        "@href": "http://api.elsevier.com/content/author/author_id/7406754790",
+                        "@rel": "self",
+                        "@_fa": "true"
+                    },
+                    {
+                        "@href": "http://api.elsevier.com/content/search/scopus?query=au-id%287406754790%29",
+                        "@rel": "search",
+                        "@_fa": "true"
+                    },
+                    {
+                        "@href": "http://api.elsevier.com/content/search/author?co-author=7406754790",
+                        "@rel": "coauthor-search",
+                        "@_fa": "true"
+                    }
+                ]
+            },
+            "h-index": "68",
+            "coauthor-count": "15468",
+            "affiliation-current": {
+                "@id": "60017592",
+                "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60017592"
+            },
+            "affiliation-history": {
+                "affiliation": [
+                    {
+                        "@_fa": "true",
+                        "@id": "60000221",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60000221"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60121115",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60121115"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60014439",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60014439"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60032897",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60032897"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60020304",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60020304"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60019778",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60019778"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60007776",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60007776"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60026175",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60026175"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60005248",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60005248"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60010537",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60010537"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60020623",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60020623"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60020661",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60020661"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60011418",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60011418"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60013791",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60013791"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60025778",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60025778"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60031581",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60031581"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60021121",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60021121"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60024941",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60024941"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60025590",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60025590"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60009982",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60009982"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60016340",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60016340"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60003269",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60003269"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60025038",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60025038"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60000745",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60000745"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60030612",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60030612"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60030635",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60030635"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "60075450",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/60075450"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@id": "105951559",
+                        "@href": "http://api.elsevier.com/content/affiliation/affiliation_id/105951559"
+                    }
+                ]
+            },
+            "subject-areas": {
+                "subject-area": [
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "PHYS",
+                        "@code": "3100",
+                        "$": "Physics and Astronomy (all)"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "ENGI",
+                        "@code": "2208",
+                        "$": "Electrical and Electronic Engineering"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "PHYS",
+                        "@code": "3101",
+                        "$": "Physics and Astronomy (miscellaneous)"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "MULT",
+                        "@code": "1000",
+                        "$": "Multidisciplinary"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "PHYS",
+                        "@code": "3107",
+                        "$": "Atomic and Molecular Physics, and Optics"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "PHYS",
+                        "@code": "3105",
+                        "$": "Instrumentation"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "PHYS",
+                        "@code": "3106",
+                        "$": "Nuclear and High Energy Physics"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "ENGI",
+                        "@code": "2201",
+                        "$": "Engineering (miscellaneous)"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "MATH",
+                        "@code": "2610",
+                        "$": "Mathematical Physics"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "PHYS",
+                        "@code": "3103",
+                        "$": "Astronomy and Astrophysics"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "ENER",
+                        "@code": "2104",
+                        "$": "Nuclear Energy and Engineering"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "BIOC",
+                        "@code": "1300",
+                        "$": "Biochemistry, Genetics and Molecular Biology (all)"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "ARTS",
+                        "@code": "1207",
+                        "$": "History and Philosophy of Science"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "EART",
+                        "@code": "1912",
+                        "$": "Space and Planetary Science"
+                    },
+                    {
+                        "@_fa": "true",
+                        "@abbrev": "PHYS",
+                        "@code": "3104",
+                        "$": "Condensed Matter Physics"
+                    }
+                ]
+            },
+            "author-profile": {
+                "status": "update",
+                "date-created": {
+                    "@day": "02",
+                    "@month": "12",
+                    "@year": "2005"
+                },
+                "alias": {
+                    "@current-status": "moved-from",
+                    "aliased-id": [
+                        {
+                            "@status": "moved-from",
+                            "@timestamp": "2020-12-07T07:36:25.000025-05:00",
+                            "$": "57215806262"
+                        },
+                        {
+                            "@status": "moved-into",
+                            "@timestamp": "2020-12-07T07:36:25.000025-05:00",
+                            "$": "35354080500"
+                        }
+                    ]
+                },
+                "preferred-name": {
+                    "@date-locked": "2020-02-12T09:34:24.476-05:00",
+                    "@source": "corrapi-external",
+                    "initials": "A.J.",
+                    "indexed-name": "Smith A.",
+                    "surname": "Smith",
+                    "given-name": "A. J.Stewart"
+                },
+                "name-variant": [
+                    {
+                        "@doc-count": "1",
+                        "@source": "internal-ani",
+                        "initials": "A.",
+                        "indexed-name": "Smith A.",
+                        "surname": "Smith",
+                        "given-name": "A."
+                    },
+                    {
+                        "@doc-count": "7",
+                        "@source": "internal-ani",
+                        "initials": "A.M.",
+                        "indexed-name": "Smith A.",
+                        "surname": "Smith",
+                        "given-name": "A. M."
+                    },
+                    {
+                        "@doc-count": "5",
+                        "@source": "internal-ani",
+                        "initials": "A.J.",
+                        "indexed-name": "Smith A.",
+                        "surname": "Smith",
+                        "given-name": "A. J."
+                    },
+                    {
+                        "@doc-count": "145",
+                        "@source": "internal-ani",
+                        "initials": "J.",
+                        "indexed-name": "Smith J.",
+                        "surname": "Smith",
+                        "given-name": "J."
+                    },
+                    {
+                        "@doc-count": "1",
+                        "@source": "internal-ani",
+                        "initials": "A.J.S.",
+                        "indexed-name": "SMITH A.",
+                        "surname": "SMITH",
+                        "given-name": "A. J.S."
+                    },
+                    {
+                        "@doc-count": "209",
+                        "@source": "internal-ani",
+                        "initials": "J.G.",
+                        "indexed-name": "Smith J.",
+                        "surname": "Smith",
+                        "given-name": "J. G."
+                    },
+                    {
+                        "@doc-count": "46",
+                        "@source": "internal-ani",
+                        "initials": "A.J.S.",
+                        "indexed-name": "Smith A.",
+                        "surname": "Smith",
+                        "given-name": "A. J.S."
+                    }
+                ],
+                "classificationgroup": {
+                    "classifications": {
+                        "@type": "ASJC",
+                        "classification": [
+                            {
+                                "@frequency": "93",
+                                "$": "3100"
+                            },
+                            {
+                                "@frequency": "3",
+                                "$": "2208"
+                            },
+                            {
+                                "@frequency": "37",
+                                "$": "3101"
+                            },
+                            {
+                                "@frequency": "2",
+                                "$": "1000"
+                            },
+                            {
+                                "@frequency": "2",
+                                "$": "3107"
+                            },
+                            {
+                                "@frequency": "13",
+                                "$": "3105"
+                            },
+                            {
+                                "@frequency": "104",
+                                "$": "3106"
+                            },
+                            {
+                                "@frequency": "8",
+                                "$": "2201"
+                            },
+                            {
+                                "@frequency": "6",
+                                "$": "2610"
+                            },
+                            {
+                                "@frequency": "2",
+                                "$": "3103"
+                            },
+                            {
+                                "@frequency": "2",
+                                "$": "2104"
+                            },
+                            {
+                                "@frequency": "1",
+                                "$": "1300"
+                            },
+                            {
+                                "@frequency": "1",
+                                "$": "1207"
+                            },
+                            {
+                                "@frequency": "1",
+                                "$": "1912"
+                            },
+                            {
+                                "@frequency": "1",
+                                "$": "3104"
+                            }
+                        ]
+                    }
+                },
+                "publication-range": {
+                    "@end": "2019",
+                    "@start": "1957"
+                },
+                "affiliation-current": {
+                    "affiliation": {
+                        "@affiliation-id": "60017592",
+                        "@source": "corrapi-external",
+                        "ip-doc": {
+                            "@id": "60017592",
+                            "@type": "parent",
+                            "@relationship": "author",
+                            "afnameid": "Carleton University#60017592",
+                            "afdispname": "Carleton University",
+                            "manual-curation": {
+                                "@curated": "true",
+                                "date-curation": {
+                                    "@day": "01",
+                                    "@month": "12",
+                                    "@timestamp": "2016-12-01T12:07:38.373-05:00",
+                                    "@year": "2016"
+                                },
+                                "curation-source": "QABOAPI",
+                                "curation-type": "QABO-2657529"
+                            },
+                            "preferred-name": {
+                                "@source": "internal-ani",
+                                "$": "Carleton University"
+                            },
+                            "sort-name": "Carleton University",
+                            "address": {
+                                "@country": "can",
+                                "address-part": "1125 Colonel By Drive",
+                                "city": "Ottawa",
+                                "state": "ON",
+                                "postal-code": "K1S 5B6",
+                                "country": "Canada"
+                            },
+                            "org-domain": "carleton.ca",
+                            "org-URL": "http://www.carleton.ca"
+                        }
+                    }
+                },
+                "affiliation-history": {
+                    "affiliation": [
+                        {
+                            "@affiliation-id": "60000221",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60000221",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of Colorado Boulder#60000221",
+                                "afdispname": "University of Colorado Boulder",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Colorado Boulder"
+                                },
+                                "sort-name": "Colorado Boulder, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "20 UCB",
+                                    "city": "Boulder",
+                                    "state": "CO",
+                                    "postal-code": "80309-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "colorado.edu",
+                                "org-URL": "http://www.colorado.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60121115",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60121115",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Department of Physics#60121115",
+                                "afdispname": "Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "gbr",
+                                    "address-part": "19 J J Thomson Avenue",
+                                    "city": "Cambridge",
+                                    "state": "Cambridgeshire",
+                                    "postal-code": "CB3 0HE",
+                                    "country": "United Kingdom"
+                                },
+                                "org-domain": "phy.cam.ac.uk",
+                                "org-URL": "https://www.phy.cam.ac.uk/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60014439",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60014439",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of California, Davis#60014439",
+                                "afdispname": "University of California, Davis",
+                                "manual-curation": {
+                                    "@curated": "true",
+                                    "date-curation": {
+                                        "@day": "15",
+                                        "@month": "03",
+                                        "@timestamp": "2018-03-15T17:17:12.672-04:00",
+                                        "@year": "2018"
+                                    },
+                                    "curation-source": "QABOAPI",
+                                    "curation-type": "QABO-3777397"
+                                },
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of California, Davis"
+                                },
+                                "sort-name": "California, Davis, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "One Shields Avenue",
+                                    "city": "Davis",
+                                    "state": "CA",
+                                    "postal-code": "95616-5270",
+                                    "country": "United States"
+                                },
+                                "org-domain": "ucdavis.edu",
+                                "org-URL": "https://www.ucdavis.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60032897",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60032897",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Universidad de Sonora#60032897",
+                                "afdispname": "Universidad de Sonora",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Universidad de Sonora"
+                                },
+                                "sort-name": "Sonora, University of",
+                                "address": {
+                                    "@country": "mex",
+                                    "address-part": "Calle Rosales y Boulevard Luis Encinas",
+                                    "city": "Hermosillo",
+                                    "state": "SON",
+                                    "postal-code": "83000",
+                                    "country": "Mexico"
+                                },
+                                "org-domain": "uson.mx",
+                                "org-URL": "http://www.uson.mx"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60020304",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60020304",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of Maryland#60020304",
+                                "afdispname": "University of Maryland",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Maryland"
+                                },
+                                "sort-name": "Maryland, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "city": "College Park",
+                                    "state": "MD",
+                                    "postal-code": "20742",
+                                    "country": "United States"
+                                },
+                                "org-domain": "umd.edu",
+                                "org-URL": "https://umd.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "112856084",
+                            "@parent": "60020304",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "112856084",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of Maryland, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Maryland"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "city": "College Park",
+                                    "state": "MD",
+                                    "postal-code": "20742",
+                                    "country": "United States"
+                                },
+                                "org-domain": "umd.edu",
+                                "org-URL": "https://umd.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60019778",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60019778",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "European Organization for Nuclear Research#60019778",
+                                "afdispname": "European Organization for Nuclear Research",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "European Organization for Nuclear Research"
+                                },
+                                "sort-name": "European Organization for Nuclear Research",
+                                "address": {
+                                    "@country": "che",
+                                    "city": "Geneva",
+                                    "state": "GE",
+                                    "postal-code": "1211",
+                                    "country": "Switzerland"
+                                },
+                                "org-domain": "public.web.cern.ch",
+                                "org-URL": "http://public.web.cern.ch/Public/Welcome.html"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60007776",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60007776",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Cornell University#60007776",
+                                "afdispname": "Cornell University",
+                                "manual-curation": {
+                                    "@curated": "true",
+                                    "date-curation": {
+                                        "@day": "23",
+                                        "@month": "12",
+                                        "@timestamp": "2017-12-23T06:00:33.307-05:00",
+                                        "@year": "2017"
+                                    },
+                                    "curation-source": "Elsevier",
+                                    "curation-type": "SCOPUS-47"
+                                },
+                                "preferred-name": {
+                                    "@date-locked": "2017-12-23T18:26:14.976-05:00",
+                                    "@source": "corrapi-external",
+                                    "$": "Cornell University"
+                                },
+                                "sort-name": "Cornell University",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "Hungerford Hill Rd",
+                                    "city": "Ithaca",
+                                    "state": "NY",
+                                    "postal-code": "14850-2488",
+                                    "country": "United States"
+                                },
+                                "org-domain": "cornell.edu",
+                                "org-URL": "http://www.cornell.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60026175",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60026175",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Lawrence Livermore National Laboratory#60026175",
+                                "afdispname": "Lawrence Livermore National Laboratory",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Lawrence Livermore National Laboratory"
+                                },
+                                "sort-name": "Lawrence Livermore National Laboratory",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "7000 East Ave.",
+                                    "city": "Livermore",
+                                    "state": "CA",
+                                    "postal-code": "94550-9234",
+                                    "country": "United States"
+                                },
+                                "org-domain": "llnl.gov",
+                                "org-URL": "https://www.llnl.gov/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60005248",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60005248",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Johns Hopkins University#60005248",
+                                "afdispname": "Johns Hopkins University",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Johns Hopkins University"
+                                },
+                                "sort-name": "Johns Hopkins University",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "3400 N. Charles Street",
+                                    "city": "Baltimore",
+                                    "state": "MD",
+                                    "postal-code": "21218-2680",
+                                    "country": "United States"
+                                },
+                                "org-domain": "jhu.edu",
+                                "org-URL": "https://www.jhu.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60010537",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60010537",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Fairfield University#60010537",
+                                "afdispname": "Fairfield University",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Fairfield University"
+                                },
+                                "sort-name": "Fairfield University",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "1073 North Benson Road",
+                                    "city": "Fairfield",
+                                    "state": "CT",
+                                    "postal-code": "06824",
+                                    "country": "United States"
+                                },
+                                "org-domain": "fairfield.edu",
+                                "org-URL": "http://www.fairfield.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60020623",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60020623",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Brunel University London#60020623",
+                                "afdispname": "Brunel University London",
+                                "manual-curation": {
+                                    "@curated": "true",
+                                    "date-curation": {
+                                        "@day": "24",
+                                        "@month": "07",
+                                        "@timestamp": "2015-07-24T13:25:13.971-04:00",
+                                        "@year": "2015"
+                                    },
+                                    "curation-source": "QABOAPI",
+                                    "curation-type": "QABO-1542254"
+                                },
+                                "preferred-name": {
+                                    "@date-locked": "2015-07-24T13:25:13.971-04:00",
+                                    "@source": "corrapi-external",
+                                    "$": "Brunel University London"
+                                },
+                                "sort-name": "Brunel University London",
+                                "address": {
+                                    "@country": "gbr",
+                                    "address-part": "Kingston Lane",
+                                    "city": "Uxbridge",
+                                    "state": "Middlesex",
+                                    "postal-code": "UB8 3PH",
+                                    "country": "United Kingdom"
+                                },
+                                "org-domain": "brunel.ac.uk",
+                                "org-URL": "https://www.brunel.ac.uk/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60020661",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60020661",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of Liverpool#60020661",
+                                "afdispname": "University of Liverpool",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Liverpool"
+                                },
+                                "sort-name": "Liverpool, University of",
+                                "address": {
+                                    "@country": "gbr",
+                                    "address-part": "Foundation Building, Brownlow Hill",
+                                    "city": "Liverpool",
+                                    "state": "Merseyside",
+                                    "postal-code": "L69 7ZX",
+                                    "country": "United Kingdom"
+                                },
+                                "org-domain": "liverpool.ac.uk",
+                                "org-URL": "https://www.liverpool.ac.uk/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60011418",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60011418",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Kobe University#60011418",
+                                "afdispname": "Kobe University",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Kobe University"
+                                },
+                                "sort-name": "Kobe University",
+                                "address": {
+                                    "@country": "jpn",
+                                    "address-part": "1-1, Rokkodai-cho",
+                                    "city": "Kobe",
+                                    "state": "Hyogo",
+                                    "postal-code": "657-8501",
+                                    "country": "Japan"
+                                },
+                                "org-domain": "kobe-u.ac.jp",
+                                "org-URL": "https://www.kobe-u.ac.jp/en/index.html"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105181560",
+                            "@parent": "60025272",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105181560",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "The University of Tokyo, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "The University of Tokyo"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "jpn",
+                                    "address-part": "7-3-1 Hongo, Bunkyo-ku",
+                                    "city": "Tokyo",
+                                    "postal-code": "113-8654",
+                                    "country": "Japan"
+                                },
+                                "org-domain": "u-tokyo.ac.jp",
+                                "org-URL": "https://www.u-tokyo.ac.jp/en/index.html"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60013791",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60013791",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of Hawaiʻi at Mānoa#60013791",
+                                "afdispname": "University of Hawaiʻi at Mānoa",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Hawaiʻi at Mānoa"
+                                },
+                                "sort-name": "Hawaiʻi at Mānoa, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "2500 Campus Road",
+                                    "city": "Honolulu",
+                                    "state": "HI",
+                                    "postal-code": "96822-2217",
+                                    "country": "United States"
+                                },
+                                "org-domain": "manoa.hawaii.edu",
+                                "org-URL": "https://manoa.hawaii.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60025778",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60025778",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of Michigan, Ann Arbor#60025778",
+                                "afdispname": "University of Michigan, Ann Arbor",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Michigan, Ann Arbor"
+                                },
+                                "sort-name": "Michigan, Ann Arbor, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "500 S. State Street",
+                                    "city": "Ann Arbor",
+                                    "state": "MI",
+                                    "postal-code": "48109-1382",
+                                    "country": "United States"
+                                },
+                                "org-domain": "umich.edu",
+                                "org-URL": "https://umich.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60031581",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60031581",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "California Institute of Technology#60031581",
+                                "afdispname": "California Institute of Technology",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "California Institute of Technology"
+                                },
+                                "sort-name": "California Institute of Technology",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "1200 East California Boulevard",
+                                    "city": "Pasadena",
+                                    "state": "CA",
+                                    "postal-code": "91125-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "caltech.edu",
+                                "org-URL": "https://www.caltech.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60021121",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60021121",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Indiana University Bloomington#60021121",
+                                "afdispname": "Indiana University Bloomington",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Indiana University Bloomington"
+                                },
+                                "sort-name": "Indiana University Bloomington",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "107 S. Indiana Avenue",
+                                    "city": "Bloomington",
+                                    "state": "IN",
+                                    "postal-code": "47405-7000",
+                                    "country": "United States"
+                                },
+                                "org-domain": "indiana.edu",
+                                "org-URL": "https://www.indiana.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60024941",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60024941",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of California, Santa Cruz#60024941",
+                                "afdispname": "University of California, Santa Cruz",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of California, Santa Cruz"
+                                },
+                                "sort-name": "California, Santa Cruz, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "1156 High Street",
+                                    "city": "Santa Cruz",
+                                    "state": "CA",
+                                    "postal-code": "95064-1099",
+                                    "country": "United States"
+                                },
+                                "org-domain": "ucsc.edu",
+                                "org-URL": "https://www.ucsc.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "112920047",
+                            "@parent": "60025038",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "112920047",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of California, Berkeley, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of California, Berkeley"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "2000 Carleton Street",
+                                    "city": "Berkeley",
+                                    "state": "CA",
+                                    "postal-code": "94720-2284",
+                                    "country": "United States"
+                                },
+                                "org-domain": "berkeley.edu",
+                                "org-URL": "https://www.berkeley.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60025590",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60025590",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "SLAC National Accelerator Laboratory#60025590",
+                                "afdispname": "SLAC National Accelerator Laboratory",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "SLAC National Accelerator Laboratory"
+                                },
+                                "sort-name": "SLAC National Accelerator Laboratory",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "2575 Sand Hill Road",
+                                    "city": "Menlo Park",
+                                    "state": "CA",
+                                    "postal-code": "94025-7015",
+                                    "country": "United States"
+                                },
+                                "org-domain": "slac.stanford.edu",
+                                "org-URL": "https://www6.slac.stanford.edu"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "104262262",
+                            "@parent": "60025038",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "104262262",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of California, Berkeley, Department of Chemistry and Lawrence",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Chemistry and Lawrence"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of California, Berkeley"
+                                },
+                                "sort-name": "Department of Chemistry and Lawrence",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "2000 Carleton Street",
+                                    "city": "Berkeley",
+                                    "state": "CA",
+                                    "postal-code": "94720-2284",
+                                    "country": "United States"
+                                },
+                                "org-domain": "berkeley.edu",
+                                "org-URL": "https://www.berkeley.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60009982",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60009982",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Harvard University#60009982",
+                                "afdispname": "Harvard University",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Harvard University"
+                                },
+                                "sort-name": "Harvard University",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "Massachusetts Hall",
+                                    "city": "Cambridge",
+                                    "state": "MA",
+                                    "postal-code": "02138-3800",
+                                    "country": "United States"
+                                },
+                                "org-domain": "harvard.edu",
+                                "org-URL": "https://www.harvard.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "103216411",
+                            "@parent": "60003269",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "103216411",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "Princeton University, Joseph Henry Laboratories",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Joseph Henry Laboratories"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Princeton University"
+                                },
+                                "sort-name": "Joseph Henry Laboratories",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "110 Morrison Hall",
+                                    "city": "Princeton",
+                                    "state": "NJ",
+                                    "postal-code": "08544-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "princeton.edu",
+                                "org-URL": "https://www.princeton.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "108250966",
+                            "@parent": "60032179",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "108250966",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of Wisconsin-Madison, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Wisconsin-Madison"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "702 West Johnson Street, Suite 1101",
+                                    "city": "Madison",
+                                    "state": "WI",
+                                    "postal-code": "53715-1007",
+                                    "country": "United States"
+                                },
+                                "org-domain": "wisc.edu",
+                                "org-URL": "http://www.wisc.edu"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "100272888",
+                            "@parent": "60025488",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "100272888",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "The University of Utah, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "The University of Utah"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "201 Presidents Circle",
+                                    "city": "Salt Lake City",
+                                    "state": "UT",
+                                    "postal-code": "84112-9049",
+                                    "country": "United States"
+                                },
+                                "org-domain": "utah.edu",
+                                "org-URL": "https://www.utah.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105188410",
+                            "@parent": "60012708",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105188410",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "Stanford University, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@date-locked": "2016-12-30T12:15:04.293-05:00",
+                                    "@source": "corrapi-external",
+                                    "$": "Stanford University"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "450 Serra Mall, Stanford",
+                                    "city": "Palo Alto",
+                                    "state": "CA",
+                                    "postal-code": "94305",
+                                    "country": "United States"
+                                },
+                                "org-domain": "stanford.edu",
+                                "org-URL": "http://www.stanford.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "104448638",
+                            "@parent": "60028628",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "104448638",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "Northeastern University, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Northeastern University"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "360 Huntington Ave.",
+                                    "city": "Boston",
+                                    "state": "MA",
+                                    "postal-code": "02115-5000",
+                                    "country": "United States"
+                                },
+                                "org-domain": "northeastern.edu",
+                                "org-URL": "https://www.northeastern.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "100257077",
+                            "@parent": "60005837",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "100257077",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of Houston, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Houston"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "4800 Calhoun Rd.",
+                                    "city": "Houston",
+                                    "state": "TX",
+                                    "postal-code": "77204-2693",
+                                    "country": "United States"
+                                },
+                                "org-domain": "uh.edu",
+                                "org-URL": "https://www.uh.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60016340",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60016340",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "INFN, Laboratori Nazionali Di Frascati#60016340",
+                                "afdispname": "INFN, Laboratori Nazionali Di Frascati",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "INFN, Laboratori Nazionali Di Frascati"
+                                },
+                                "sort-name": "INFN, National Laboratory of Frascati",
+                                "address": {
+                                    "@country": "ita",
+                                    "address-part": "Via Enrico Fermi 40",
+                                    "city": "Frascati",
+                                    "postal-code": "00044",
+                                    "country": "Italy"
+                                },
+                                "org-domain": "w3.lnf.infn.it",
+                                "org-URL": "http://w3.lnf.infn.it/?lang=en"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105177061",
+                            "@parent": "60000221",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105177061",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of Colorado Boulder, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Colorado Boulder"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "20 UCB",
+                                    "city": "Boulder",
+                                    "state": "CO",
+                                    "postal-code": "80309-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "colorado.edu",
+                                "org-URL": "http://www.colorado.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105282824",
+                            "@parent": "60003269",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105282824",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "Princeton University, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Princeton University"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "110 Morrison Hall",
+                                    "city": "Princeton",
+                                    "state": "NJ",
+                                    "postal-code": "08544-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "princeton.edu",
+                                "org-URL": "https://www.princeton.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105378094",
+                            "@parent": "60025590",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105378094",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "SLAC National Accelerator Laboratory, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "SLAC National Accelerator Laboratory"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "2575 Sand Hill Road",
+                                    "city": "Menlo Park",
+                                    "state": "CA",
+                                    "postal-code": "94025-7015",
+                                    "country": "United States"
+                                },
+                                "org-domain": "slac.stanford.edu",
+                                "org-URL": "https://www6.slac.stanford.edu"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60003269",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60003269",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Princeton University#60003269",
+                                "afdispname": "Princeton University",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Princeton University"
+                                },
+                                "sort-name": "Princeton University",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "110 Morrison Hall",
+                                    "city": "Princeton",
+                                    "state": "NJ",
+                                    "postal-code": "08544-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "princeton.edu",
+                                "org-URL": "https://www.princeton.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60025038",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60025038",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of California, Berkeley#60025038",
+                                "afdispname": "University of California, Berkeley",
+                                "manual-curation": {
+                                    "@curated": "true",
+                                    "date-curation": {
+                                        "@day": "23",
+                                        "@month": "02",
+                                        "@timestamp": "2018-02-23T06:27:24.094-05:00",
+                                        "@year": "2018"
+                                    },
+                                    "curation-source": "QABOAPI",
+                                    "curation-type": "QABO-3729332"
+                                },
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of California, Berkeley"
+                                },
+                                "sort-name": "California, Berkeley, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "2000 Carleton Street",
+                                    "city": "Berkeley",
+                                    "state": "CA",
+                                    "postal-code": "94720-2284",
+                                    "country": "United States"
+                                },
+                                "org-domain": "berkeley.edu",
+                                "org-URL": "https://www.berkeley.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "103216339",
+                            "@parent": "60003269",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "103216339",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "Princeton University, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Princeton University"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "110 Morrison Hall",
+                                    "city": "Princeton",
+                                    "state": "NJ",
+                                    "postal-code": "08544-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "princeton.edu",
+                                "org-URL": "https://www.princeton.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "122463837",
+                            "@parent": "60072925",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "122463837",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "Njala University, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Njala University"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "sle",
+                                    "address-part": "Private Mail Bag",
+                                    "city": "Freetown",
+                                    "country": "Sierra Leone"
+                                },
+                                "org-domain": "nu-online.com",
+                                "org-URL": "http://www.nu-online.com/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "104297594",
+                            "@parent": "60025590",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "104297594",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "SLAC National Accelerator Laboratory, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "SLAC National Accelerator Laboratory"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "2575 Sand Hill Road",
+                                    "city": "Menlo Park",
+                                    "state": "CA",
+                                    "postal-code": "94025-7015",
+                                    "country": "United States"
+                                },
+                                "org-domain": "slac.stanford.edu",
+                                "org-URL": "https://www6.slac.stanford.edu"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "109524692",
+                            "@parent": "60032179",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "109524692",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of Wisconsin-Madison, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Wisconsin-Madison"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "702 West Johnson Street, Suite 1101",
+                                    "city": "Madison",
+                                    "state": "WI",
+                                    "postal-code": "53715-1007",
+                                    "country": "United States"
+                                },
+                                "org-domain": "wisc.edu",
+                                "org-URL": "http://www.wisc.edu"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105165943",
+                            "@parent": "60030612",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105165943",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of California, San Diego, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of California, San Diego"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "9500 Gilman Drive",
+                                    "city": "San Diego",
+                                    "state": "CA",
+                                    "postal-code": "92093-0021",
+                                    "country": "United States"
+                                },
+                                "org-domain": "ucsd.edu",
+                                "org-URL": "https://www.ucsd.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60000745",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60000745",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of Illinois at Urbana-Champaign#60000745",
+                                "afdispname": "University of Illinois at Urbana-Champaign",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Illinois at Urbana-Champaign"
+                                },
+                                "sort-name": "Illinois at Urbana-Champaign, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "901 West Illinois Street",
+                                    "city": "Urbana",
+                                    "state": "IL",
+                                    "postal-code": "61801-3444",
+                                    "country": "United States"
+                                },
+                                "org-domain": "illinois.edu",
+                                "org-URL": "https://illinois.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "104479385",
+                            "@parent": "60025597",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "104479385",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "The University of Chicago, Enrico Fermi Institute",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Enrico Fermi Institute"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "The University of Chicago"
+                                },
+                                "sort-name": "Enrico Fermi Institute",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "Edward H. Levi Hall, 5801 South Ellis Avenue",
+                                    "city": "Chicago",
+                                    "state": "IL",
+                                    "postal-code": "60637-5418",
+                                    "country": "United States"
+                                },
+                                "org-domain": "uchicago.edu",
+                                "org-URL": "https://www.uchicago.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "100247007",
+                            "@parent": "60006297",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "100247007",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of Pennsylvania, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Pennsylvania"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "1 College Hall, Room 100",
+                                    "city": "Philadelphia",
+                                    "state": "PA",
+                                    "postal-code": "19104-6303",
+                                    "country": "United States"
+                                },
+                                "org-domain": "home.www.upenn.edu",
+                                "org-URL": "https://home.www.upenn.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105769371",
+                            "@parent": "60000221",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105769371",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "University of Colorado Boulder, Department of Physics & Astrophysics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics & Astrophysics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of Colorado Boulder"
+                                },
+                                "sort-name": "Department of Physics & Astrophysics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "20 UCB",
+                                    "city": "Boulder",
+                                    "state": "CO",
+                                    "postal-code": "80309-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "colorado.edu",
+                                "org-URL": "http://www.colorado.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60030612",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60030612",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "University of California, San Diego#60030612",
+                                "afdispname": "University of California, San Diego",
+                                "manual-curation": {
+                                    "@curated": "true",
+                                    "date-curation": {
+                                        "@day": "20",
+                                        "@month": "02",
+                                        "@timestamp": "2018-02-20T19:13:26.482-05:00",
+                                        "@year": "2018"
+                                    },
+                                    "curation-source": "QABOAPI",
+                                    "curation-type": "QABO-3724732"
+                                },
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "University of California, San Diego"
+                                },
+                                "sort-name": "California, San Diego, University of",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "9500 Gilman Drive",
+                                    "city": "San Diego",
+                                    "state": "CA",
+                                    "postal-code": "92093-0021",
+                                    "country": "United States"
+                                },
+                                "org-domain": "ucsd.edu",
+                                "org-URL": "https://www.ucsd.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60030635",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60030635",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Deutsches Elektronen-Synchrotron (DESY)#60030635",
+                                "afdispname": "Deutsches Elektronen-Synchrotron (DESY)",
+                                "manual-curation": {
+                                    "@curated": "true",
+                                    "date-curation": {
+                                        "@day": "12",
+                                        "@month": "07",
+                                        "@timestamp": "2019-07-12T01:51:16.790-04:00",
+                                        "@year": "2019"
+                                    },
+                                    "curation-source": "PARITY",
+                                    "curation-type": "PARITY-11072019225116421"
+                                },
+                                "preferred-name": {
+                                    "@date-locked": "2019-06-18T11:42:17.399-04:00",
+                                    "@source": "corrapi-external",
+                                    "$": "Deutsches Elektronen-Synchrotron (DESY)"
+                                },
+                                "sort-name": "Deutsches Elektronen-Synchrotron",
+                                "address": {
+                                    "@country": "deu",
+                                    "address-part": "Notkestr. 85 city:Hamburg",
+                                    "city": "Hamburg",
+                                    "state": "Brandenburg",
+                                    "postal-code": "22603",
+                                    "country": "Germany"
+                                },
+                                "org-domain": "desy.de",
+                                "org-URL": "http://www.desy.de/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105179505",
+                            "@parent": "60022195",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105179505",
+                                "@type": "dept",
+                                "@relationship": "author",
+                                "afdispname": "Massachusetts Institute of Technology, Department of Physics",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Department of Physics"
+                                },
+                                "parent-preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Massachusetts Institute of Technology"
+                                },
+                                "sort-name": "Department of Physics",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "77 Massachusetts Avenue",
+                                    "city": "Cambridge",
+                                    "state": "MA",
+                                    "postal-code": "02139-4301",
+                                    "country": "United States"
+                                },
+                                "org-domain": "mit.edu",
+                                "org-URL": "http://www.mit.edu/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "60075450",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "60075450",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Frist Campus Center#60075450",
+                                "afdispname": "Frist Campus Center",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Frist Campus Center"
+                                },
+                                "sort-name": "Frist Campus Center",
+                                "address": {
+                                    "@country": "usa",
+                                    "address-part": "Frist Ln",
+                                    "city": "Princeton",
+                                    "state": "NJ",
+                                    "postal-code": "08544-0001",
+                                    "country": "United States"
+                                },
+                                "org-domain": "princeton.edu",
+                                "org-URL": "http://www.princeton.edu/frist/"
+                            }
+                        },
+                        {
+                            "@affiliation-id": "105951559",
+                            "@source": "internal-ani",
+                            "ip-doc": {
+                                "@id": "105951559",
+                                "@type": "parent",
+                                "@relationship": "author",
+                                "afnameid": "Volkswagen Foundation#105951559",
+                                "afdispname": "Volkswagen Foundation",
+                                "preferred-name": {
+                                    "@source": "internal-ani",
+                                    "$": "Volkswagen Foundation"
+                                },
+                                "sort-name": "Volkswagen Foundation"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

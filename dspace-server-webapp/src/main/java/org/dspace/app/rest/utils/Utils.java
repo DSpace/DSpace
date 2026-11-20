@@ -56,6 +56,7 @@ import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.OrcidHistoryRest;
@@ -66,6 +67,7 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.SupervisionOrderRest;
+import org.dspace.app.rest.model.UsageReportCategoryRest;
 import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
@@ -326,6 +328,12 @@ public class Utils {
         }
         if (Strings.CS.equals(modelPlural, "orcidhistories")) {
             return OrcidHistoryRest.NAME;
+        }
+        if (Strings.CS.equals(modelPlural, "metrics")) {
+            return CrisMetricsRest.NAME;
+        }
+        if (Strings.CS.equals(modelPlural, "categories")) {
+            return UsageReportCategoryRest.NAME;
         }
         if (Strings.CS.equals(modelPlural, "supervisionorders")) {
             return SupervisionOrderRest.NAME;

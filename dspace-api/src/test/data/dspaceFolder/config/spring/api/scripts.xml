@@ -70,6 +70,20 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImportCli"/>
     </bean>
 
+    <bean id="update-metrics" class="org.dspace.metrics.UpdateCrisMetricsWithExternalSourceCliScriptConfiguration">
+        <property name="description" value="Perform the metrics update using external source"/>
+        <property name="dspaceRunnableClass" value="org.dspace.metrics.UpdateCrisMetricsWithExternalSourceCli"/>
+    </bean>
+
+    <bean id="store-metrics" class="org.dspace.metrics.StoreViewDownloadsCrisMetricsCliScriptConfiguration">
+        <property name="description" value="Perform the metrics storage"/>
+        <property name="dspaceRunnableClass" value="org.dspace.metrics.StoreViewDownloadsCrisMetricsCli"/>
+    </bean>
+
+    <bean id="update-metrics-in-solr" class="org.dspace.metrics.UpdateCrisMetricsInSolrDocCliScriptConfiguration">
+        <property name="description" value="Perform the metrics update in SOLR documents"/>
+        <property name="dspaceRunnableClass" value="org.dspace.metrics.UpdateCrisMetricsInSolrDocCli"/>
+    </bean>
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
@@ -83,6 +97,16 @@
     <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
         <property name="description" value="Cleanup all the old processes in the specified state"/>
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
+    </bean>
+
+    <bean id="dynamic-layout-tool" class="org.dspace.layout.script.DynamicLayoutToolScriptConfiguration">
+        <property name="description" value="Script to import Dynamic layout configuration from excel file"/>
+        <property name="dspaceRunnableClass" value="org.dspace.layout.script.DynamicLayoutToolScript"/>
+    </bean>
+
+    <bean id="export-dynamic-layout-tool" class="org.dspace.layout.script.ExportDynamicLayoutToolCliScriptConfiguration">
+        <property name="description" value="Script to export CRIS layout configuration into excel file"/>
+        <property name="dspaceRunnableClass" value="org.dspace.layout.script.ExportDynamicLayoutToolScriptCli"/>
     </bean>
 
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
