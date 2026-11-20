@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -70,6 +72,7 @@ public class RequestItemEmailNotifierTest
     private static final String REQUESTOR_NAME = "Mark Wood";
     private static final String HELPDESK_ADDRESS = "help@example.com";
     private static final String HELPDESK_NAME = "Help Desk";
+    private static final String ADMIN_ADDRESS = "admin@example.com";
     private static final String TEST_MESSAGE = "Message";
     private static final String DUMMY_PROTO = "dummy";
 
@@ -437,10 +440,99 @@ public class RequestItemEmailNotifierTest
 
     /**
      * Test of requestOpenAccess method, of class RequestItemEmailNotifier.
+     * The request should go to the help desk, not to the Item's submitter.
      * @throws Exception passed through.
      */
-    @Ignore
     @Test
     public void testRequestOpenAccess() throws Exception {
+        String previousHelpdesk = configurationService.getProperty("mail.helpdesk");
+        try {
+            configurationService.setProperty("mail.helpdesk", HELPDESK_ADDRESS);
+
+            RequestItem ri = createOpenAccessRequest();
+            requestItemEmailNotifier.requestOpenAccess(context, ri);
+
+            assertEquals("To: address should be the help desk.",
+                    HELPDESK_ADDRESS, getSingleRecipient());
+        } finally {
+            configurationService.setProperty("mail.helpdesk", previousHelpdesk);
+        }
+    }
+
+    /**
+     * Test of requestOpenAccess method, of class RequestItemEmailNotifier.
+     * Without a help desk address, the request should go to the administrator.
+     * @throws Exception passed through.
+     */
+    @Test
+    public void testRequestOpenAccessWithoutHelpdesk() throws Exception {
+        String previousHelpdesk = configurationService.getProperty("mail.helpdesk");
+        String previousAdmin = configurationService.getProperty("mail.admin");
+        try {
+            configurationService.setProperty("mail.helpdesk", null);
+            configurationService.setProperty("mail.admin", ADMIN_ADDRESS);
+
+            RequestItem ri = createOpenAccessRequest();
+            requestItemEmailNotifier.requestOpenAccess(context, ri);
+
+            assertEquals("To: address should be the administrator.",
+                    ADMIN_ADDRESS, getSingleRecipient());
+        } finally {
+            configurationService.setProperty("mail.helpdesk", previousHelpdesk);
+            configurationService.setProperty("mail.admin", previousAdmin);
+        }
+    }
+
+    /**
+     * Create an Item with a submitter, an approved request for it, and
+     * install a fake mail transport.
+     */
+    private RequestItem createOpenAccessRequest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context)
+                .withName("Top Community")
+                .build();
+        Collection col = CollectionBuilder.createCollection(context, com)
+                .build();
+        Item item = ItemBuilder.createItem(context, col)
+                .withTitle("Test Item")
+                .build();
+        context.restoreAuthSystemState();
+        assertNotNull("Item should have a submitter", item.getSubmitter());
+        assertNotEquals("Submitter should differ from the help desk",
+                HELPDESK_ADDRESS, item.getSubmitter().getEmail());
+        assertNotEquals("Submitter should differ from the administrator",
+                ADMIN_ADDRESS, item.getSubmitter().getEmail());
+
+        RequestItem ri = new RequestItem();
+        ri.setAccept_request(true);
+        ri.setItem(item);
+        ri.setAllfiles(true);
+        ri.setReqEmail(REQUESTOR_ADDRESS);
+        ri.setReqName(REQUESTOR_NAME);
+
+        // Install a fake transport for RFC2822 email addresses.
+        Session session = DSpaceServicesFactory.getInstance().getEmailService().getSession();
+        Provider transportProvider = new Provider(Provider.Type.TRANSPORT,
+                DUMMY_PROTO, JavaMailTestTransport.class.getCanonicalName(),
+                "DSpace", "1.0");
+        session.addProvider(transportProvider);
+        session.setProvider(transportProvider);
+        session.setProtocolForAddress("rfc822", DUMMY_PROTO);
+
+        // Ensure that mail is "sent".
+        configurationService.setProperty("mail.server.disabled", "false");
+        return ri;
+    }
+
+    /**
+     * @return the only To: address of the last message sent.
+     */
+    private String getSingleRecipient() {
+        Address[] myAddresses = JavaMailTestTransport.getAddresses();
+        assertEquals("Should have one To: address.", 1, myAddresses.length);
+        assertThat("To: should be an Internet address",
+                myAddresses[0], instanceOf(InternetAddress.class));
+        return ((InternetAddress) myAddresses[0]).getAddress();
     }
 }
