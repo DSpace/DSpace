@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -86,11 +85,14 @@ public class BitstreamResourceAccessByToken extends BitstreamResource {
                 throw new AuthorizeException("Authorization to bitstream " + uuid + " by access token FAILED");
             }
             if (shouldGenerateCoverPage) {
-                var coverPage = getCoverpageByteArray(fileRetrievalContext, bitstream);
-
-                this.document = new BitstreamDocumentCoverPage(etag(bitstream),
-                        coverPage.length,
-                        new ByteArrayInputStream(coverPage));
+                var citedDocument = getCoverPageDocument(fileRetrievalContext, bitstream);
+                if (citedDocument != null) {
+                    this.document = new BitstreamDocumentCoverPage(etag(bitstream), citedDocument);
+                } else {
+                    this.document = new BitstreamDocumentAuthorizedAccess(bitstream.getChecksum(),
+                            bitstream.getSizeBytes(),
+                            bitstream.getID());
+                }
             } else {
                 this.document = new BitstreamDocumentAuthorizedAccess(bitstream.getChecksum(),
                         bitstream.getSizeBytes(),
