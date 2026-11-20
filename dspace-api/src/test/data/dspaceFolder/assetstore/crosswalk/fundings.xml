@@ -1,0 +1,56 @@
+<Fundings>
+	<Funding xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Gift</Type>	
+	    <Acronym>T-FU</Acronym>
+		<Name>Test Funding</Name>
+	    <Amount currency="EUR">
+	        30.000,00
+	    </Amount>
+		<Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#FinanceID">ID-01</Identifier>
+		<Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#AwardNumber">0001</Identifier>
+		<Description>Funding to test export</Description>
+		<Funder>
+			<OrgUnit>
+				<Name>OrgUnit Funder</Name>
+			</OrgUnit>
+		</Funder>
+	    <PartOf>
+	        <Funding>
+	        </Funding>
+	    </PartOf>
+		<Duration 
+			startDate="2015-01-01" 
+			endDate="2020-01-01" 
+		/>
+		<OAMandate 
+			mandated="true" 
+			URL="www.mandate.url" 
+		/>
+	</Funding>
+	<Funding xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant</Type>	
+	    <Acronym>AT-FU</Acronym>
+		<Name>Another Test Funding</Name>
+	    <Amount>
+	        10.000,00
+	    </Amount>
+		<Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#FinanceID">ID-02</Identifier>
+		<Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#AwardNumber">0002</Identifier>
+		<Funder>
+			<OrgUnit>
+				<Name>Test Funder</Name>
+			</OrgUnit>
+		</Funder>
+	    <PartOf>
+	        <Funding>
+	        </Funding>
+	    </PartOf>
+		<Duration 
+			startDate="2020-01-01" 
+		/>
+		<OAMandate 
+			mandated="true" 
+			URL="www.mandate.url" 
+		/>
+	</Funding>
+</Fundings>

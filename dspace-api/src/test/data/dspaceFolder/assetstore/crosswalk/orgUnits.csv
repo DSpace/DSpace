@@ -1,0 +1,4 @@
+Name,Legal name,Acronym,Type,Parent OrgUnit,Identifier(s),URL(s)
+"Test OrgUnit","Test OrgUnit LegalName","TOU","https://w3id.org/cerif/vocab/OrganisationTypes#StrategicResearchInsitute","Parent OrgUnit","ID-01||ID-02","www.orgUnit.com||www.orgUnit.it"
+"Another Test OrgUnit","","ATOU","https://w3id.org/cerif/vocab/OrganisationTypes#Privatenonprofit","Parent OrgUnit","ID-03",""
+"Third Test OrgUnit","","TTOU","https://w3id.org/cerif/vocab/OrganisationTypes#Privatenonprofit","","ID-03","www.orgUnit.test"

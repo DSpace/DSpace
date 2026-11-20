@@ -250,6 +250,10 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, language, subject);
     }
 
+    public WorkspaceItemBuilder withDoiIdentifier(String doi) {
+        return addMetadataValue("dc", "identifier", "doi", doi);
+    }
+
     public WorkspaceItemBuilder withIsniIdentifier(String isni) {
         return addMetadataValue("person", "identifier", "isni", isni);
     }

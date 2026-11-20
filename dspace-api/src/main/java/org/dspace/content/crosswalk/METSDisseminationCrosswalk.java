@@ -47,6 +47,17 @@ public class METSDisseminationCrosswalk
     // maybe make  this configurable.
     private static final String METS_PACKAGER_PLUGIN = "METS";
 
+    // Name of the packager plugin actually used by this instance (defaults to METS).
+    private final String metsPackagerPlugin;
+
+    public METSDisseminationCrosswalk() {
+        this.metsPackagerPlugin = METS_PACKAGER_PLUGIN;
+    }
+
+    public METSDisseminationCrosswalk(String metsPackagerPlugin) {
+        this.metsPackagerPlugin = metsPackagerPlugin;
+    }
+
     /**
      * MODS namespace.
      */
@@ -104,10 +115,10 @@ public class METSDisseminationCrosswalk
 
         PackageDisseminator dip = (PackageDisseminator)
             CoreServiceFactory.getInstance().getPluginService()
-                              .getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
+                              .getNamedPlugin(PackageDisseminator.class, metsPackagerPlugin);
         if (dip == null) {
             throw new CrosswalkInternalException(
-                "Cannot find a disseminate plugin for package=" + METS_PACKAGER_PLUGIN);
+                "Cannot find a disseminate plugin for package=" + metsPackagerPlugin);
         }
 
         try {

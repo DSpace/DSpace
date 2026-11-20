@@ -1,0 +1,78 @@
+<Projects>
+	<Project xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Acronym>TP</Acronym>
+		<Title>Test Project</Title>
+		<Identifier type="http://namespace.openaire.eu/oaf">11-22-33</Identifier>
+		<Identifier type="URL">www.project.test</Identifier>
+		<StartDate>2020-01-01</StartDate>
+		<EndDate>2020-12-31</EndDate>
+		<Consortium>
+			<Coordinator>
+				<OrgUnit> <Name>First Coordinator OrgUnit</Name> </OrgUnit>
+			</Coordinator>
+			<Partner>
+				<OrgUnit> <Name>Partner OrgUnit</Name> </OrgUnit>
+			</Partner>
+			<Member>
+				<OrgUnit> <Name>Member OrgUnit</Name> </OrgUnit>
+			</Member>
+		</Consortium>
+		<Team>
+			<PrincipalInvestigator>
+				<Person displayName="Investigator" />
+			</PrincipalInvestigator>
+			<Member>
+				<Person displayName="First coinvestigator" />
+				<Person displayName="Second coinvestigator" />
+			</Member>
+		</Team>
+		<Keyword>project</Keyword>
+		<Keyword>test</Keyword>
+		<Abstract>This is a project to test the export</Abstract>
+	    <Status>OPEN</Status>
+	    <Uses>
+	        <Equipment>
+	            <Name>Test equipment</Name>
+	        </Equipment>
+	    </Uses>
+		<OAMandate 
+			mandated="true" 
+			URL="oamandate-url" 
+		/>
+	</Project>
+	<Project xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+		<Acronym>STP</Acronym>
+		<Title>Second Test Project</Title>
+		<Identifier type="http://namespace.openaire.eu/oaf">55-66-77</Identifier>
+		<Identifier type="http://namespace.openaire.eu/oaf">11-33-22</Identifier>
+		<Identifier type="URL">www.project.test</Identifier>
+		<StartDate>2010-01-01</StartDate>
+		<EndDate>2012-12-31</EndDate>
+		<Consortium>
+			<Coordinator>
+				<OrgUnit> <Name>Second Coordinator OrgUnit</Name> </OrgUnit>
+			</Coordinator>
+			<Partner>
+			</Partner>
+			<Member>
+			</Member>
+		</Consortium>
+		<Team>
+			<PrincipalInvestigator>
+				<Person displayName="Second investigator" />
+			</PrincipalInvestigator>
+			<Member>
+				<Person displayName="Coinvestigator" />
+			</Member>
+		</Team>
+	    <Status>Status</Status>
+	    <Uses>
+	        <Equipment>
+	            <Name>Another test equipment</Name>
+	        </Equipment>
+	    </Uses>
+		<OAMandate 
+			URL="oamandate" 
+		/>
+	</Project>
+</Projects>

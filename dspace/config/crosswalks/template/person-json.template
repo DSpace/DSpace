@@ -1,0 +1,85 @@
+{
+	"names" : {
+		"preferred-name": "@dc.title@",
+		"full-name": "@crisrp.name@",
+		"vernacular-name": "@crisrp.name.translated@",
+		"variants": [
+			"@crisrp.name.variant@",
+		],
+		"given-name": "@person.givenName@",
+		"family-name": "@person.familyName@"
+	},
+	"birth-date": "@person.birthDate@",
+	"gender": "@oairecerif.person.gender@",
+	"job-title": "@person.jobTitle@",
+	"main-affiliation": "@person.affiliation.name@",
+	"working-groups": [
+		"@crisrp.workgroup@",
+	],
+	"personal-sites": [
+		@group.oairecerif-identifier-url.start@
+		{
+			"site-url": "@oairecerif.identifier.url@",
+			"site-title": "@crisrp.site.title@"
+		},
+		@group.oairecerif-identifier-url.end@
+	],
+	"email": "@person.email@",
+	"interests": [
+		"@dc.subject@",
+	],
+	"identifiers": {
+		"orcid": "@person.identifier.orcid@",
+		"scopus-author-ids": [
+			"@person.identifier.scopus-author-id@",
+		],
+		"researcher-ids": [
+			"researcher-id": "@person.identifier.rid@",
+		]
+	},
+	"affiliations": [
+		@group.oairecerif-person-affiliation.start@
+		{
+			"name": "@oairecerif.person.affiliation@",
+			"start-date": "@oairecerif.affiliation.startDate@",
+			"end-date": "@oairecerif.affiliation.endDate@",
+			"role": "@oairecerif.affiliation.role@"
+		},
+		@group.oairecerif-person-affiliation.end@
+	],
+	"biography": "@dc.description.abstract@",
+	"educations": [
+		@group.crisrp-education.start@
+		{
+			"name": "@crisrp.education@",
+			"start-date": "@crisrp.education.start@",
+			"end-date": "@crisrp.education.end@",
+			"role": "@crisrp.education.role@"
+		},
+		@group.crisrp-education.end@
+	],
+	"country": "@crisrp.country@",
+	"qualifications": [
+		@group.crisrp-qualification.start@
+		{
+			"name": "@crisrp.qualification@",
+			"start-date": "@crisrp.qualification.start@",
+			"end-date": "@crisrp.qualification.end@"
+		},
+		@group.crisrp-qualification.end@
+	],
+	"knows-languages": [
+		"@person.knowsLanguage@",
+	],
+	"publications": [
+		@relation.researchoutputs.start@
+		{
+			"title": "@dc.title@",
+			"date-issued": "@dc.date.issued@",
+			"authors": [
+				"@dc.contributor.author@",
+			]
+		},
+		@relation.researchoutputs.end@
+	]
+}

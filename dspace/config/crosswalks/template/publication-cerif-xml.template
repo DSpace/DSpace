@@ -1,0 +1,116 @@
+<Publication xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Publication_Types">@virtual.mapConverter.coarTypes.dc-type@</Type>
+	<Language>@dc.language.iso@</Language>
+   	<Title>@dc.title@</Title>
+   	<Subtitle>@dc.title.alternative@</Subtitle>
+   	<PublishedIn>
+    	<Publication>
+        	<Title>@dc.relation.publication@</Title>
+        	<Title>@dc.relation.ispartof@</Title>
+         	<ISSN>@dc.relation.issn@</ISSN>
+         	<ISBN>@dc.relation.isbn@</ISBN>
+         	<DOI>@dc.relation.doi@</DOI>
+      	</Publication>
+   	</PublishedIn>
+   	<PublicationDate>@dc.date.issued@</PublicationDate>
+	<Volume>@oaire.citation.volume@</Volume>
+	<Issue>@oaire.citation.issue@</Issue>
+   	<StartPage>@oaire.citation.startPage@</StartPage>
+   	<EndPage>@oaire.citation.endPage@</EndPage>
+   	<DOI>@dc.identifier.doi@</DOI>
+    <PMCID>@dc.identifier.pmid@</PMCID>
+    <ISI-Number>@dc.identifier.isi@</ISI-Number>
+    <SCP-Number>@dc.identifier.scopus@</SCP-Number>
+    <ISSN>@dc.identifier.issn@</ISSN>
+   	<ISBN>@dc.identifier.isbn@</ISBN>
+   	<Authors>
+   		@group.dc-contributor-author.start@
+      	<Author>
+        	<DisplayName>@dc.contributor.author@</DisplayName>
+			<Person id="@virtual.authority.dc-contributor-author@" />
+         	<Affiliation>
+         		<OrgUnit>
+         			<Name>@oairecerif.author.affiliation@</Name>
+         		</OrgUnit>
+         	</Affiliation>
+      	</Author>
+   	  	@group.dc-contributor-author.end@
+	</Authors>
+   	<Editors>
+   		@group.dc-contributor-editor.start@
+   	  	<Editor>
+        	<DisplayName>@dc.contributor.editor@</DisplayName>
+			<Person id="@virtual.authority.dc-contributor-editor@" />
+	   	  	<Affiliation>
+	      		<OrgUnit>
+	     			<Name>@oairecerif.editor.affiliation@</Name>
+	     		</OrgUnit>
+	      	</Affiliation>
+   	  	</Editor>
+   	    @group.dc-contributor-editor.end@
+	</Editors>
+    <Publishers>
+        <Publisher>
+            <DisplayName>@dc.publisher@</DisplayName>
+            <OrgUnit />
+        </Publisher>
+    </Publishers>
+    <License>@dc.rights.uri@</License>
+    <Keyword>@dc.subject@</Keyword>
+   	<Abstract>@dc.description.abstract@</Abstract>
+   	@relation.dc-relation-project.start@
+   	<OriginatesFrom>
+      	<Project id="@virtual.id@">
+			<Acronym>@oairecerif.acronym@</Acronym>
+         	<Title>@dc.title@</Title>
+         	<StartDate>@oairecerif.project.startDate@</StartDate>
+         	<EndDate>@oairecerif.project.endDate@</EndDate>
+         	@relation.fundings.start@
+         	<Funded>
+				<By>
+					@relation.oairecerif-funder.start@
+					<OrgUnit id="@virtual.id@">
+                        <Acronym>@oairecerif.acronym@</Acronym>
+						<Name>@dc.title@</Name>
+					</OrgUnit>
+					@relation.oairecerif-funder.end@
+					@if.not.authority.oairecerif-funder.start@
+					<OrgUnit>
+						<Name>@oairecerif.funder@</Name>
+					</OrgUnit>
+					@if.not.authority.oairecerif-funder.end@
+				</By>
+				<As>
+					<Funding id="@virtual.id@">
+						<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">@virtual.mapConverter.fundingTypes.dc-type@</Type>
+						<Name>@dc.title@</Name>
+					</Funding>
+				</As>
+			</Funded>
+         	@relation.fundings.end@
+      	</Project>
+	</OriginatesFrom>
+   	@relation.dc-relation-project.end@
+   	@relation.dc-relation-funding.start@
+   	<OriginatesFrom>
+   		<Funding id="@virtual.id@">
+			<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">@virtual.mapConverter.fundingTypes.dc-type@</Type>
+			<Acronym>@oairecerif.acronym@</Acronym>
+			<Name>@dc.title@</Name>
+			<Funder>
+				<OrgUnit>
+					<Name>@oairecerif.funder@</Name>
+				</OrgUnit>
+			</Funder>
+		</Funding>
+   	</OriginatesFrom>
+   	@relation.dc-relation-funding.end@
+	<PresentedAt> <Event> <Name>@dc.relation.conference@</Name> </Event> </PresentedAt>
+    <Coverage> <Event> <Name>@dc.coverage.publication@</Name> </Event> </Coverage>
+	<References> <Product> <Name>@dc.relation.product@</Name> </Product> </References>
+	<Access xmlns="http://purl.org/coar/access_right" 
+        endDate="@oairecerif.access.embargoEnd@"
+    >
+        @virtual.mapConverter.accessRight.oairecerif-access@
+    </Access>
+</Publication>

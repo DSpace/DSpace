@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://datacite.org/schema/kernel-4" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
+  <creators>
+      <creator>
+          <creatorName>(:unav)</creatorName>
+      </creator>
+    </creators>
+  <titles>
+    <title>Publication title</title>
+  </titles>
+  <publisher
+      publisherIdentifier="rorID2" publisherIdentifierScheme="ROR" schemeURI="https://ror.org/"
+  >Publisher</publisher>
+  <publicationYear>2023</publicationYear>
+  <dates>
+    <date dateType="Issued">2023</date>
+    <date dateType="Available">2023-10-20</date>
+  </dates>
+  <resourceType resourceTypeGeneral="Other">
+      Unknown
+  </resourceType>
+  <alternateIdentifiers>
+    <alternateIdentifier alternateIdentifierType="url">http://localhost:4000/handle/123456789/99999</alternateIdentifier>
+  </alternateIdentifiers>
+  <rightsList>
+  </rightsList>
+  <descriptions>
+  </descriptions>
+</resource>

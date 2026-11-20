@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="ResearchSubjectCategories" label="Research Subject Categories">
+	<isComposedBy>
+		<node id="SCB11" label="UMANITA e RELIGIONE">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>HUMANIORA och RELIGIONSVETENSKAP</hasNote>
+		</node>
+		<node id="SCB12" label="DIRITTO/GIURISPRUDENZA">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>RÄTTSVETENSKAP/JURIDIK</hasNote>
+		</node>
+		<node id="SCB13" label="SCIENZE SOCIALI">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>SAMHÄLLSVETENSKAP</hasNote>
+		</node>
+		<node id="SCB14" label="MATEMATICA">
+			<isComposedBy>
+				<node id="SCB1401" label="Algebra, geometria e analisi matematica">
+					<isComposedBy>
+						<node id="VR140102" label="Algebra e geometria">
+							<hasNote>Algebra och geometri</hasNote>
+						</node>
+						<node id="VR140103" label="Mathematical analysis">
+							<hasNote>Analys</hasNote>
+						</node>
+						<node id="VR140104" label="Analisi matematica">
+							<hasNote>Matematisk logik</hasNote>
+						</node>
+						<node id="VR140105" label="Matematica discreta">
+							<hasNote>Diskret matematik</hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>Algebra, geometri och analys</hasNote>
+				</node>
+				<node id="SCB1402" label="Matematica applicata">
+					<isComposedBy>
+					</isComposedBy>
+					<hasNote>Tillämpad matematik</hasNote>
+				</node>
+				<node id="SCB1409" label="Altra matematica">
+					<hasNote>Övrig matematik</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>MATEMATIK</hasNote>
+		</node>
+		<node id="SCB15" label="SCIENZE NATURALI">
+		        <isComposedBy>
+				</isComposedBy>
+		    <hasNote>NATURVETENSKAP</hasNote>
+		</node>
+		<node id="SCB16" label="TECNOLOGIA">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>TEKNIKVETENSKAP</hasNote>
+		</node>	
+		<node id="SCB17" label="FORESTRE, SCIENZE AGRICOLE e PIANIFICAZIONE DEL PAESAGGIO">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>SKOGS- och JORDBRUKSVETENSKAP samt LANDSKAPSPLANERING</hasNote>
+		</node>
+		<node id="SCB18" label="MEDICINA">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>MEDICIN</hasNote>
+		</node>
+		<node id="SCB19" label="ODONTOLOGIA">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>ODONTOLOGI</hasNote>
+		</node>
+		<node id="SCB21" label="FARMACIA">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>FARMACI</hasNote>
+		</node>
+		<node id="SCB22" label="MEDICINA VETERINARIA">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>VETERINÄRMEDICIN</hasNote>
+		</node>
+		<node id="SCB23" label="AREE DI RICERCA INTERDISCIPLINARI">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>TVÄRVETENSKAPLIGA FORSKNINGSOMRÅDEN</hasNote>
+		</node>
+	</isComposedBy>
+	<hasNote>Ämneskategorier för vetenskapliga publikationer</hasNote>
+</node>

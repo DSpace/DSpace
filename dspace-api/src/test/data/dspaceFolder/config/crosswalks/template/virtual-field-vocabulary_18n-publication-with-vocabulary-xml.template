@@ -1,0 +1,7 @@
+<publication>
+    <Type>@dspace.entity.type@</Type>
+    <Title>@dc.title@</Title>
+    <VocabularyType>@virtual.vocabulary_i18n.dc-type.publication-coar-types@</VocabularyType>
+    <ValuePairLanguage>@virtual.vocabulary_i18n.dc-language-iso.common_iso_languages@</ValuePairLanguage>
+    <Country>@virtual.vocabulary_i18n.organization-address-addressCountry.common_iso_countries@</Country>
+</publication>

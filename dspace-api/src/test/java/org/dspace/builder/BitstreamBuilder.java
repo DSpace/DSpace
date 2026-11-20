@@ -190,6 +190,12 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return withMetadata("dc", "description", "provenance", null, provenance);
     }
 
+    public BitstreamBuilder withType(String type) throws SQLException {
+
+        bitstreamService.addMetadata(context, bitstream, "dc", "type", null, null, type);
+
+        return this;
+    }
 
     public BitstreamBuilder withIIIFDisabled() throws SQLException {
         bitstreamService.addMetadata(context, bitstream, "dspace", "iiif", "enabled", null, "false");
@@ -215,6 +221,12 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     public BitstreamBuilder withMetadata(String schema, String element, String qualifier, String lang, String value)
         throws SQLException {
         bitstreamService.addMetadata(context, bitstream, schema, element, qualifier, lang, value);
+        return this;
+    }
+
+    public BitstreamBuilder withMetadata(String schema, String element, String qualifier, String value)
+        throws SQLException {
+        bitstreamService.addMetadata(context, bitstream, schema, element, qualifier, null, value);
         return this;
     }
 

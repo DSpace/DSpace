@@ -1,0 +1,92 @@
+{
+	"acronym":"@oairecerif.acronym@",
+	"title":"@dc.title@",
+	"openaireid": [
+		"@crispj.openaireid@",
+	],
+	"url": [
+		"@oairecerif.identifier.url@",
+	],
+	"startDate":"@oairecerif.project.startDate@",
+	"endDate":"@oairecerif.project.endDate@",
+	"status":"@oairecerif.project.status@",
+	"consortium": {
+		"coordinators": [
+			@relation.crispj-coordinator.start@
+			{
+				"name":"@dc.title@",
+				"acronym":"@oairecerif.acronym@"
+			},
+			@relation.crispj-coordinator.end@
+			@if.not.authority.crispj-coordinator.start@
+			{ "name": "@crispj.coordinator@" },
+			@if.not.authority.crispj-coordinator.end@
+		],
+		"partners": [
+			@relation.crispj-partnerou.start@
+			{
+				"name":"@dc.title@",
+				"acronym":"@oairecerif.acronym@"
+			},
+			@relation.crispj-partnerou.end@
+			@if.not.authority.crispj-partnerou.start@
+			{	"name": "@crispj.partnerou@" },
+			@if.not.authority.crispj-partnerou.end@
+		],
+		"members": [
+			@relation.crispj-organization.start@
+			{
+				"name":"@dc.title@",
+				"acronym":"@oairecerif.acronym@"
+			},
+			@relation.crispj-organization.end@
+			@if.not.authority.crispj-organization.start@
+			{	"name": "@crispj.organization@" },
+			@if.not.authority.crispj-organization.end@
+		]
+	},
+	"team": {
+		"principalInvestigator": "@crispj.investigator@",
+		"members": [
+			"@crispj.coinvestigators@",
+		]
+	},
+	"uses": {
+		"equipment": [
+			"@dc.relation.equipment@",
+		]
+	},
+	"funded": [
+		@relation.fundings.start@
+		{
+			"by": {
+				@relation.oairecerif-funder.start@
+				"orgUnit": {
+					"name":"@dc.title@",
+					"acronym":"@oairecerif.acronym@"
+				}
+				@relation.oairecerif-funder.end@
+				@if.not.authority.oairecerif-funder.start@
+				"orgUnit": {
+					"name": "@oairecerif.funder@"
+				}
+				@if.not.authority.oairecerif-funder.end@
+			},
+			"as": {
+				"funding": {
+					"type": "@virtual.mapConverter.fundingTypes.dc-type@",
+					"name": "@dc.title@"
+				}
+			}
+		},
+	@relation.fundings.end@
+	],
+	"keywords": [
+		"@dc.subject@",
+	],
+	"abstract": "@dc.description.abstract@",
+	"OAMandate": {
+		"mandated": "@oairecerif.oamandate@",
+		"URL": "@oairecerif.oamandate.url@" 
+	}
+}

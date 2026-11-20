@@ -1,0 +1,14 @@
+%0 @virtual.reftype.endnote@
+%A @virtual.authors@
+%T @dc.title@
+%D @dc.date.issued@
+%I @dc.publisher@
+%J @dc.relation.ispartof@
+%V @oaire.citation.volume@
+%N @oaire.citation.issue@
+%X @dc.description.abstract@
+%K @dc.subject@
+%U @dc.identifier.uri@
+%R @dc.identifier.doi@
+%P @virtual.fullpage@
+%G @dc.language.iso@

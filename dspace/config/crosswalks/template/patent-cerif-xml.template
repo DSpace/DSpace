@@ -1,0 +1,27 @@
+<Patent xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+   <Type xmlns="https://www.openaire.eu/cerif-profile/vocab/COAR_Patent_Types">http://purl.org/coar/resource_type/c_15cd</Type>
+   <Title>@dc.title@</Title>
+   <RegistrationDate>@dc.date.issued@</RegistrationDate>
+   <ApprovalDate>@dcterms.dateAccepted@</ApprovalDate>
+   <Issuer> <OrgUnit> <Name>@dc.publisher@</Name> </OrgUnit> </Issuer>
+   <PatentNumber>@dc.identifier.patentno@</PatentNumber>
+   <Inventors>
+      @group.dc-contributor-author.start@
+	  <Inventor>
+         <DisplayName>@dc.contributor.author@</DisplayName>
+		 <Person id="@virtual.authority.dc-contributor-author@" />
+         <Affiliation>
+            <OrgUnit>
+         	   <Name>@oairecerif.author.affiliation@</Name>
+         	</OrgUnit>
+         </Affiliation>
+      </Inventor>
+   	  @group.dc-contributor-author.end@
+   </Inventors>
+   <Holders>
+      <Holder> <OrgUnit> <Name>@dcterms.rightsHolder@</Name> </OrgUnit> </Holder>
+   </Holders>
+   <Abstract>@dc.description.abstract@</Abstract>
+   <Keyword>@dc.subject@</Keyword>
+   <Predecessor> <Patent> <Title>@dc.relation.patent@</Title> </Patent> </Predecessor>
+</Patent>

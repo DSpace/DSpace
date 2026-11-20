@@ -1,0 +1,17 @@
+Title = dc.title
+Acronym = oairecerif.acronym
+OpenAIRE id(s) = crispj.openaireid
+URL(s) = oairecerif.identifier.url
+Start date = oairecerif.project.startDate
+End date = oairecerif.project.endDate
+Status = oairecerif.project.status
+Coordinator(s) = crispj.coordinator
+Partner Organization(s) = crispj.partnerou
+Participant Organization(s) = crispj.organization
+Project Coordinator = crispj.investigator
+Co-Investigator(s) = crispj.coinvestigators
+Uses equipment(s) = dc.relation.equipment
+Keyword(s) = dc.subject
+Description = dc.description.abstract
+OA Mandate = oairecerif.oamandate
+OA Policy URL = oairecerif.oamandate.url

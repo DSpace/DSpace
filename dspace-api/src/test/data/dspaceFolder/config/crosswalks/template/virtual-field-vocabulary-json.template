@@ -1,0 +1,7 @@
+{
+	"first-element": "@virtual.vocabulary.dc-type.0@",
+	"second-element": "@virtual.vocabulary.dc-type.1@",
+	"last-element": "@virtual.vocabulary.dc-type.leaf@",
+	"second-last-element": "@virtual.vocabulary.dc-type.leaf-1@",
+	"deep-element": "@virtual.vocabulary.dc-type.100@"
+}

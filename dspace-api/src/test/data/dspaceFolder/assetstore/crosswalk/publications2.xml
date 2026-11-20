@@ -1,0 +1,29 @@
+<Publications>
+	<Publication xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+	   	<Title>Title test</Title>
+	   	<PublishedIn>
+	    	<Publication>
+	      	</Publication>
+	   	</PublishedIn>
+	   	<PublicationDate>2020-01-01</PublicationDate>
+	   	<DOI>doi:111.111/publication</DOI>
+	   	<Authors>
+	      	<Author>
+	         	<Affiliation>
+	         		<OrgUnit>
+	         		</OrgUnit>
+	         	</Affiliation>
+	      	</Author>
+		</Authors>
+	   	<Editors>
+		</Editors>
+	    <Publishers>
+	        <Publisher>
+	            <OrgUnit />
+	        </Publisher>
+	    </Publishers>
+		<Access xmlns="http://purl.org/coar/access_right" 
+	    >
+	    </Access>
+	</Publication>
+</Publications>

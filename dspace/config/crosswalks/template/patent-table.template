@@ -1,0 +1,15 @@
+Title = dc.title
+Approval date = dcterms.dateAccepted
+Registration date = dc.date.issued
+Patent number = dc.identifier.patentno
+Type = dc.type
+Language = dc.language.iso
+Inventor(s) = group.dc-contributor-author
+Holder(s) = dcterms.rightsHolder
+Issuer(s) = dc.publisher
+Keyword(s) = dc.subject
+Funding(s) = dc.relation.funding
+Project(s) = dc.relation.project
+Predecessor(s) = dc.relation.patent
+Reference(s) = dc.relation.reference
+Abstract = dc.description.abstract

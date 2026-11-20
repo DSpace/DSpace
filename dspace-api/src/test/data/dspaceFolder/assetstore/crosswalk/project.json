@@ -1,0 +1,67 @@
+{
+	"acronym":"TP",
+	"title":"Test Project",
+	"openaireid": [
+		"11-22-33"
+	],
+	"url": [
+		"www.project.test"
+	],
+	"startDate":"2020-01-01",
+	"endDate":"2020-12-31",
+	"status":"OPEN",
+	"consortium": {
+		"coordinators": [
+			{
+				"name":"Coordinator OrgUnit",
+				"acronym":"COU"
+			}
+		],
+		"partners": [
+			{	"name": "Partner OrgUnit" },
+			{	"name": "Another Partner OrgUnit" }
+		],
+		"members": [
+			{	"name": "First Member OrgUnit" },
+			{	"name": "Second Member OrgUnit" },
+			{	"name": "Third Member OrgUnit" }
+		]
+	},
+	"team": {
+		"principalInvestigator": "Investigator",
+		"members": [
+			"First coinvestigator",
+			"Second coinvestigator"
+		]
+	},
+	"uses": {
+		"equipment": [
+			"Test equipment"
+		]
+	},
+	"funded": [
+		{
+			"by": {
+				"orgUnit": {
+					"name": "OrgUnit Funder"
+				}
+			},
+			"as": {
+				"funding": {
+					"type": "https:\/\/www.openaire.eu\/cerif-profile\/vocab\/OpenAIRE_Funding_Types#Award",
+					"name": "Test funding"
+				}
+			}
+		}
+	],
+	"keywords": [
+		"project",
+		"test"
+	],
+	"abstract": "This is a project to test the export",
+	"OAMandate": {
+		"mandated": "true",
+		"URL": "oamandate-url" 
+	}
+}
+

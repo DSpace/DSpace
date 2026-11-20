@@ -1,0 +1,66 @@
+{
+  "items": [
+    {
+      "id": "4a2ff8af-8bc5-4418-bd9d-76d3513c3fb8",
+      "type": "ARTICLE_JOURNAL",
+      "language": "en",
+      "author": [
+        {
+          "family": "Smith",
+          "given": "John"
+        },
+        {
+          "family": "Red",
+          "given": "Edward"
+        }
+      ],
+      "editor": [
+        {
+          "family": "Editor"
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            2018,
+            5,
+            17
+          ]
+        ]
+      },
+      "DOI": "10.1000/182",
+      "event": "Conference",
+      "ISBN": "11-22-33",
+      "ISSN": "0002",
+      "issue": "03",
+      "keyword": "publication",
+      "publisher": "Publisher",
+      "title": "Publication title",
+      "URL": "http://localhost:4000/handle/123456789/0001",
+      "volume": "V01"
+    },
+    {
+      "id": "780ac861-88e0-4cb6-abcd-59c30a7002bb",
+      "type": "BOOK",
+      "language": "en",
+      "author": [
+        {
+          "family": "White",
+          "given": "Walter"
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            2020,
+            1,
+            1
+          ]
+        ]
+      },
+      "DOI": "10.1000/183",
+      "title": "Another Publication title",
+      "URL": "http://localhost:4000/handle/123456789/0002"
+    }
+  ]
+}

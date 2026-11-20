@@ -1,0 +1,21 @@
+{
+	"name": "Test OrgUnit",
+	"legalName": "Test OrgUnit LegalName",
+	"acronym": "TOU",
+	"type": "https:\/\/w3id.org\/cerif\/vocab\/OrganisationTypes#StrategicResearchInsitute",
+	"parentOrganization": {
+		"name": "Parent OrgUnit",
+		"acronym": "POU"
+	},
+	"identifiers": [
+		"ID-01",
+		"ID-02"
+	],
+	"url-identifiers": [
+		"www.orgUnit.com",
+		"www.orgUnit.it"
+	],
+	"People": [
+		"Walter White"
+	]
+}

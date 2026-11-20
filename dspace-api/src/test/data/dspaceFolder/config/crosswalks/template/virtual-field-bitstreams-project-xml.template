@@ -1,0 +1,47 @@
+<project>
+
+    <all-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL@</bitstream>
+    </all-bitstreams>
+
+    <project-picture>
+        <bitstream>@virtual.bitstream.ORIGINAL.project picture@</bitstream>
+    </project-picture>
+
+    <image-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.*.image@</bitstream>
+    </image-bitstreams>
+
+    <first-image-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.*.image.1@</bitstream>
+    </first-image-bitstreams>
+
+    <pdf-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.*.pdf@</bitstream>
+    </pdf-bitstreams>
+
+    <first-two-pdf-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.*.pdf.2@</bitstream>
+    </first-two-pdf-bitstreams>
+
+    <txt-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.*.txt@</bitstream>
+    </txt-bitstreams>
+
+    <first-three-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.*.*.3@</bitstream>
+    </first-three-bitstreams>
+
+    <wrong-bundle-bitstreams>
+        <bitstream>@virtual.bitstream.FAKE@</bitstream>
+    </wrong-bundle-bitstreams>
+
+    <wrong-type-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.fake@</bitstream>
+    </wrong-type-bitstreams>
+
+    <wrong-mimeType-bitstreams>
+        <bitstream>@virtual.bitstream.ORIGINAL.project picture.wrong@</bitstream>
+    </wrong-mimeType-bitstreams>
+
+</project>

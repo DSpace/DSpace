@@ -133,11 +133,16 @@
     <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
     <bean id="clientInfoService" class="org.dspace.service.impl.ClientInfoServiceImpl"/>
 
+    <bean class="org.dspace.statistics.LoginStatisticsServiceImpl"/>
+
+    <bean class="org.dspace.statistics.WorkflowStatisticsServiceImpl"/>
+
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <bean class="org.dspace.util.FrontendUrlService"/>
 
     <bean class="org.dspace.content.security.MetadataSecurityServiceImpl"/>
+    <bean class="org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService"/>
 
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
@@ -159,7 +164,24 @@
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.LDNMessageEntityIndexFactoryImpl" autowire-candidate="true"/>
+
+    <!-- Configurable layout services -->
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutTabServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutBoxServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutFieldServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutMetadataGroupServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutMetric2BoxServiceImpl"/>
+
+    <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutBoxAccessServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.DynamicLayoutTabAccessServiceImpl"/>
     <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
+    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl"/>
+
+    <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolValidatorImpl"/>
+    <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolParserImpl"/>
+    <bean class="org.dspace.layout.script.service.impl.DynamicLayoutToolConverterImpl"/>
+
 
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
@@ -188,6 +210,8 @@
     <context:component-scan base-package="org.dspace.identifier.doi.crossref" />
 
     <bean class="org.dspace.content.BitstreamLinkingServiceImpl"/>
+
+    <bean class="org.dspace.discovery.configuration.DiscoveryConfigurationUtilsService"/>
 
 </beans>
 

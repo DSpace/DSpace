@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -118,10 +119,33 @@ public interface DSpaceRunnableHandler {
         throws IOException, SQLException, AuthorizeException;
 
     /**
+     * This method will write the InputStream to either a file on the filesystem or a bitstream in the database
+     * depending on whether it's coming from a CommandLine call or REST call respectively
+     * @param context       The relevant DSpace context
+     * @param fileName      The filename
+     * @param inputStream   The inputstream to be written
+     * @param type          The type of the file
+     * @param isPublicReadable The file can be read by everyone
+     * @throws IOException  If something goes wrong
+     */
+    public default void writeFilestream(Context context, String fileName, InputStream inputStream, String type,
+            boolean isPublicReadable) throws IOException, SQLException, AuthorizeException {
+        this.writeFilestream(context, fileName, inputStream, type);
+    }
+
+    /**
      * This method will return a List of UUIDs for the special groups
      * associated with the processId contained by specific implementations of this interface.
      * Otherwise, it returns an empty collection.
      * @return List containing UUIDs of Special Groups of the associated Process.
      */
     public List<UUID> getSpecialGroups();
+
+    /**
+     * This method returns the {@link Locale} associated with the current script execution. The exact value
+     * depends on the implementation: a REST call carries the requesting user's locale, while a CommandLine
+     * call falls back to the DSpace default locale.
+     * @return the Locale associated with the current script execution
+     */
+    public Locale getLocale();
 }

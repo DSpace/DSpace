@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="ResearchSubjectCategories" label="Research Subject Categories">
+	<isComposedBy>
+		<node id="SCB11" label="ЛЮДИНА та РЕЛІГІЯ">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>HUMANIORA och RELIGIONSVETENSKAP</hasNote>
+		</node>
+		<node id="SCB12" label="ЗАКОН/ЮРИСПРУДЕНЦIЯ">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>RÄTTSVETENSKAP/JURIDIK</hasNote>
+		</node>
+		<node id="SCB13" label="СОЦІАЛЬНІ НАУКИ">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>SAMHÄLLSVETENSKAP</hasNote>
+		</node>
+		<node id="SCB14" label="МАТЕМАТИКА">
+			<isComposedBy>
+				<node id="SCB1401" label="Алгебра, геометрія та математичний аналіз">
+					<isComposedBy>
+						<node id="VR140102" label="Алгебра та геометрія">
+							<hasNote>Algebra och geometri</hasNote>
+						</node>
+						<node id="VR140103" label="Математичний аналіз">
+							<hasNote>Analys</hasNote>
+						</node>
+						<node id="VR140104" label="Математична логіка">
+							<hasNote>Matematisk logik</hasNote>
+						</node>
+						<node id="VR140105" label="Дискретна математика">
+							<hasNote>Diskret matematik</hasNote>
+						</node>
+					</isComposedBy>
+					<hasNote>Algebra, geometri och analys</hasNote>
+				</node>
+				<node id="SCB1402" label="Прикладна математика">
+					<isComposedBy>
+					</isComposedBy>
+					<hasNote>Tillämpad matematik</hasNote>
+				</node>
+				<node id="SCB1409" label="Інша математика">
+					<hasNote>Övrig matematik</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>MATEMATIK</hasNote>
+		</node>
+		<node id="SCB15" label="ПРИРОДНІ НАУКИ">
+		        <isComposedBy>
+				</isComposedBy>
+		    <hasNote>NATURVETENSKAP</hasNote>
+		</node>
+		<node id="SCB16" label="ТЕХНОЛОГІЯ">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>TEKNIKVETENSKAP</hasNote>
+		</node>	
+		<node id="SCB17" label="ЛIСОВЕ ГОСПОДАРСТВО, СIЛЬСЬКОГОСПОДАРСЬКі НАУКИ ТА ПЛАНУВАННЯ ЗЕМЛЕРОБСТВА">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>SKOGS- och JORDBRUKSVETENSKAP samt LANDSKAPSPLANERING</hasNote>
+		</node>
+		<node id="SCB18" label="МЕДИЦИНА">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>MEDICIN</hasNote>
+		</node>
+		<node id="SCB19" label="ОДОНТОЛОГІЯ">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>ODONTOLOGI</hasNote>
+		</node>
+		<node id="SCB21" label="ЛIКИ">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>FARMACI</hasNote>
+		</node>
+		<node id="SCB22" label="ВЕТЕРИНАРНА МЕДИЦИНА">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>VETERINÄRMEDICIN</hasNote>
+		</node>
+		<node id="SCB23" label="МІЖДИСЦІПЛІНАРНІ ДОСЛІДЖЕННЯ">
+		        <isComposedBy>
+				</isComposedBy>
+			<hasNote>TVÄRVETENSKAPLIGA FORSKNINGSOMRÅDEN</hasNote>
+		</node>
+	</isComposedBy>
+	<hasNote>Ämneskategorier för vetenskapliga publikationer</hasNote>
+</node>

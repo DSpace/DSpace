@@ -13,9 +13,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.cli.HelpFormatter;
@@ -27,11 +30,13 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.Process;
@@ -51,28 +56,33 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
 
     private Integer processId;
     private String scriptName;
     private UUID ePersonId;
+    private Locale locale;
 
     /**
      * This constructor will initialise the handler with the process created from the parameters
      * @param ePerson       The eperson that creates the process
      * @param scriptName    The name of the script for which is a process will be created
      * @param parameters    The parameters for this process
-     * @param specialGroups specialGroups The list of special groups related to eperson
-     *                      creating process at process creation time
+     * @param specialGroups The list of special groups related to eperson creating process at process creation time
+     * @param currentLocale The context current locale to use inside the runnable handler
      */
     public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters,
-                                     final Set<Group> specialGroups) {
+            final List<Group> specialGroups, final Locale currentLocale) {
         Context context = new Context();
+        this.locale = Optional.ofNullable(currentLocale).orElse(context.getCurrentLocale());
+        context.setCurrentLocale(this.locale);
         try {
-            ePersonId = ePerson.getID();
+            this.ePersonId = Objects.nonNull(ePerson) ? ePerson.getID() : null;
             setCurrentUser(context);
-            Process process = processService.create(context, ePerson, scriptName, parameters, specialGroups);
-            processId = process.getID();
+            Process process = processService.create(context, ePerson, scriptName, parameters,
+                new HashSet<>(specialGroups));
+            this.processId = process.getID();
             this.scriptName = process.getName();
 
             context.complete();
@@ -257,6 +267,21 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         processService.appendFile(context, process, inputStream, type, fileName);
     }
 
+    @Override
+    public void writeFilestream(Context context, String fileName, InputStream inputStream, String type,
+            boolean isPubliclyReadable)
+            throws IOException, SQLException, AuthorizeException {
+        Process process = processService.find(context, processId);
+        Map<Integer, EPerson> userPolicies = Optional.ofNullable(context.getCurrentUser())
+                .map(user -> Map.of(Constants.READ, user, Constants.WRITE, user, Constants.DELETE, user))
+                .orElse(null);
+        Map<Integer, Group> groupPolicies = null;
+        if (isPubliclyReadable || context.getCurrentUser() == null) {
+            groupPolicies = Map.of(Constants.READ, groupService.findByName(context, Group.ANONYMOUS));
+        }
+        processService.appendFile(context, process, inputStream, type, fileName, groupPolicies, userPolicies);
+    }
+
     /**
      * This method will return the process created by this handler
      * @return The Process database object created by this handler
@@ -331,6 +356,11 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             }
         }
         return specialGroups;
+    }
+
+    @Override
+    public Locale getLocale() {
+        return this.locale;
     }
 
     /**

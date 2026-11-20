@@ -277,6 +277,30 @@ public class DCInputsReader {
     }
 
     /**
+     * Returns whether a form with the given name exists.
+     *
+     * @param formName the form name
+     * @return true if the form exists
+     */
+    public boolean hasFormWithName(String formName) {
+        return formDefns.get(formName) != null;
+    }
+
+    /**
+     * Returns all the field names in the given form.
+     *
+     * @param formName the form name
+     * @return the field names
+     * @throws DCInputsReaderException if not found
+     */
+    public List<String> getAllFieldNamesByFormName(String formName) throws DCInputsReaderException {
+        return Arrays.stream(getInputsByFormName(formName).getFields())
+            .flatMap(dcInputs -> Arrays.stream(dcInputs))
+            .map(dcInput -> dcInput.getFieldName())
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Returns the set of DC inputs used for a particular input form
      *
      * @param formName input form unique name

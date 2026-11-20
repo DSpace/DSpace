@@ -1,0 +1,24 @@
+<OrgUnits>
+	<OrgUnit xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+	    <Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">https://w3id.org/cerif/vocab/OrganisationTypes#StrategicResearchInsitute</Type>
+	    <Acronym>TOU</Acronym>
+		<Name>Test OrgUnit</Name>
+		<Name>Test OrgUnit LegalName</Name>
+	    <Identifier>ID-01</Identifier>
+	    <Identifier>ID-02</Identifier>
+	    <Identifier type="URL">www.orgUnit.com</Identifier>
+	    <Identifier type="URL">www.orgUnit.it</Identifier>
+		<PartOf>
+			<OrgUnit> <Name>Parent OrgUnit</Name> </OrgUnit>
+		</PartOf>
+	</OrgUnit>
+	<OrgUnit xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="mock-id">
+	    <Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">https://w3id.org/cerif/vocab/OrganisationTypes#Privatenonprofit</Type>
+	    <Acronym>ATOU</Acronym>
+		<Name>Another Test OrgUnit</Name>
+	    <Identifier>ID-03</Identifier>
+		<PartOf>
+			<OrgUnit> <Name>Parent OrgUnit</Name> </OrgUnit>
+		</PartOf>
+	</OrgUnit>
+</OrgUnits>

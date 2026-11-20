@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config />
+    <!-- allows us to use spring annotations in beans -->
+
+    <!-- WOS citation count -->
+    <bean class="org.dspace.metrics.wos.WOSProvider"/>
+
+    <bean class="org.dspace.metrics.wos.WOSRestConnector">
+        <property name="wosUrl" value="${metrics.wos.citation-count.url}" />
+        <property name="apiKey" value="${metrics.wos.citation-count.apiKey}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.wos.WOSPersonRestConnector">
+        <property name="wosUrl" value="${metrics.wos.citation-count.url}" />
+        <property name="apiKey" value="${metrics.wos.citation-count.apiKey}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.wos.UpdateWOSMetrics"/>
+
+    <bean class="org.dspace.metrics.wos.UpdateWOSPersonMetrics"/>
+
+    <!-- Scopus citation count -->
+    <bean class="org.dspace.metrics.scopus.ScopusRestConnector">
+        <property name="scopusUrl" value="${metrics.scopus.citation-count.url}" />
+        <property name="apiKey" value="${metrics.scopus.citation-count.apiKey}" />
+        <property name="insttoken" value="${metrics.scopus.citation-count.instToken}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.scopus.ScopusProvider"/>
+
+    <bean class="org.dspace.metrics.scopus.UpdateScopusMetrics">
+        <property name="fetchSize" value="${metrics.scopus.citation-count.fetchSize}" />
+    </bean>
+
+    <!-- Scopus h-index -->
+    <bean class="org.dspace.metrics.scopus.ScopusPersonProvider"/>
+
+    <bean class="org.dspace.metrics.scopus.UpdateScopusPersonMetrics"/>
+
+    <bean class="org.dspace.metrics.scopus.ScopusPersonRestConnector">
+        <property name="url" value="${metrics.scopus.person.url}" />
+        <property name="apiKey" value="${metrics.scopus.person.apiKey}" />
+        <property name="insttoken" value="${metrics.scopus.person.instToken}" />
+        <property name="viewMode" value="${metrics.scopus.person.viewMode}" />
+    </bean>
+
+
+    <!-- 
+        CrisItem Metrics Beans and Embeddable Providers
+     -->
+    <bean id="org.dspace.metrics.CrisItemMetricsServiceImpl"
+          class="org.dspace.metrics.CrisItemMetricsServiceImpl"
+          autowire="byType"
+          scope="singleton"/>
+
+    <bean class="org.dspace.metrics.embeddable.impl.EmbeddableGoogleScholarProvider">
+        <property name="filterService">
+            <ref bean="item-has-googlescholar"/>
+        </property>
+        <property name="enabled" value="${google-scholar.enabled}" />
+        <property name="field" value="${google-scholar.field}" />
+        <property name="fallbackField" value="${google-scholar.fallbackField}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.embeddable.impl.EmbeddableAltmetricsProvider">
+        <property name="filterService">
+            <ref bean="item-has-altmetrics"/>
+        </property>
+        <property name="detailViewEnabled" value="${altmetric.data-badge-enabled:#{true}}" />
+        <property name="listViewEnabled" value="${altmetric.list-data-badge-enabled:#{true}}" />
+        <property name="doiField" value="${altmetric.doiField}" />
+        <property name="pmidField" value="${altmetric.pmidField}" />
+        <property name="badgeType" value="${altmetric.badgeType:#{'donut'}}" />
+        <property name="linkTarget" value="${altmetric.linkTarget:#{'_blank'}}" />
+        <property name="popover" value="${altmetric.popover}" />
+        <property name="details" value="${altmetric.details:#{null}}" />
+        <property name="minScore" value="${altmetric.hideLessThan:#{null}}" />
+        <property name="hideNoMentions" value="${altmetric.hideNoMentions:#{null}}" />
+        <property name="listBadgeType" value="${altmetric.list-badgeType:#{'donut'}}" />
+        <property name="listPopOver" value="${altmetric.list-popover}" />
+        <property name="listLinkTarget" value="${altmetric.list-linkTarget:#{'_blank'}}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.embeddable.impl.EmbeddablePlumXMetricProvider">
+        <property name="personDetailViewEnabled" value="${plumx.data-person-badge-enabled:#{false}}" />
+        <property name="personListViewEnabled" value="${plumx.list-data-person-badge-enabled:#{false}}" />
+        <property name="publicationDetailViewEnabled" value="${plumx.data-publication-badge-enabled:#{false}}" />
+        <property name="publicationListViewEnabled" value="${plumx.list-data-publication-badge-enabled:#{false}}" />
+        <property name="personPlumXScript" value="${plumx.person-plumx-script}" />
+        <property name="publicationPlumXScript" value="${plumx.publication-plumx-script}" />
+        <property name="publicationHref" value="${plumx.publication-href}" />
+        <property name="personHref" value="${plumx.person-href}" />
+        <property name="dataNoName" value="${plumx.data-no-name:#{false}}" />
+        <property name="dataNumArtifacts" value="${plumx.data-num-artifacts:#{5}}" />
+        <property name="dataWidth" value="${plumx.data-width:#{'350px'}}" />
+        <property name="dataNoDescription" value="${plumx.data-no-description:#{false}}" />
+        <property name="dataNoStats" value="${plumx.data-no-stats:#{false}}" />
+        <property name="dataNoThumbnail" value="${plumx.data-no-thumbnail:#{false}}" />
+        <property name="dataNoArtifacts" value="${plumx.data-no-artifacts:#{false}}" />
+        <property name="dataPopup" value="${plumx.data-popup:#{'left'}}" />
+        <property name="dataHideWhenEmpty" value="${plumx.data-hide-when-empty:#{true}}" />
+        <property name="dataHideUsage" value="${plumx.data-hide-usage:#{false}}" />
+        <property name="dataHideCaptures" value="${plumx.data-hide-captures:#{false}}" />
+        <property name="dataHideMentions" value="${plumx.data-hide-mentions:#{false}}" />
+        <property name="dataHideSocialMedia" value="${plumx.data-hide-socialmedia:#{false}}" />
+        <property name="dataHideCitations" value="${plumx.data-hide-citations:#{false}}" />
+        <property name="dataPassHiddenCategories" value="${plumx.data-pass-hidden-categories:#{false}}" />
+        <property name="dataDetailSamePage" value="${plumx.data-detail-same-page:#{false}}" />
+
+        <property name="listDataNoName" value="${plumx.list-data-no-name:#{true}}" />
+        <property name="listDataNumArtifacts" value="${plumx.list-data-num-artifacts:#{5}}" />
+        <property name="listDataWidth" value="${plumx.list-data-width:#{'6em'}}" />
+        <property name="listDataNoDescription" value="${plumx.list-data-no-description:#{true}}" />
+        <property name="listDataNoStats" value="${plumx.list-data-no-stats:#{true}}" />
+        <property name="listDataNoThumbnail" value="${plumx.list-data-no-thumbnail:#{true}}" />
+        <property name="listDataNoArtifacts" value="${plumx.list-data-no-artifacts:#{true}}" />
+        <property name="listDataPopup" value="${plumx.list-data-popup:#{'left'}}" />
+        <property name="listDataHideWhenEmpty" value="${plumx.list-data-hide-when-empty:#{true}}" />
+        <property name="listDataHideUsage" value="${plumx.list-data-hide-usage:#{false}}" />
+        <property name="listDataHideCaptures" value="${plumx.list-data-hide-captures:#{false}}" />
+        <property name="listDataHideMentions" value="${plumx.list-data-hide-mentions:#{false}}" />
+        <property name="listDataHideSocialMedia" value="${plumx.list-data-hide-socialmedia:#{false}}" />
+        <property name="listDataHideCitations" value="${plumx.list-data-hide-citations:#{false}}" />
+        <property name="listDataPassHiddenCategories" value="${plumx.list-data-pass-hidden-categories:#{false}}" />
+        <property name="listDataDetailSamePage" value="${plumx.list-data-detail-same-page:#{false}}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.embeddable.impl.EmbeddableDimensionsMetricProvider">
+        <property name="filterService">
+            <ref bean="item-has-dimensions"/>
+        </property>
+        <property name="detailViewEnabled" value="${dimensions.data-badge-enabled:#{true}}" />
+        <property name="listViewEnabled" value="${dimensions.list-data-badge-enabled:#{true}}" />
+        <property name="dataLegend" value="${dimensions.data-legend:#{'hover-right'}}" />
+        <property name="dataStyle" value="${dimensions.data-style:#{'small_circle'}}" />
+        <property name="listDataLegend" value="${dimensions.list-data-legend:#{'hover-right'}}" />
+        <property name="listDataStyle" value="${dimensions.list-data-style:#{'small_circle'}}" />
+        <property name="hideZeroCitations" value="${dimensions.data-hide-zero-citations:#{true}}" />
+        <property name="doiField" value="${dimensions.doiField}" />
+        <property name="pmidField" value="${dimensions.pmidField}" />
+    </bean>
+
+    <bean class="org.dspace.metrics.embeddable.impl.DefaultViewEmbeddableMetricProvider">
+    </bean>
+    <bean class="org.dspace.metrics.embeddable.impl.DefaultDownloadEmbeddableProvider">
+    </bean>
+    <!-- 
+        VALIDATORS
+     -->
+    <!-- 
+        Sub Conditions
+     -->
+    <bean id="item-is-person" class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dspace.entity.type" />
+                <entry key="pattern" value="^Person$" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="item-is-publication" class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dspace.entity.type" />
+                <entry key="pattern" value="^Publication$" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="item-is-product" class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dspace.entity.type" />
+                <entry key="pattern" value="^Product$" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="item-has-doi" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.identifier.doi" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="item-has-pmid" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.identifier.pmid" />
+            </map>
+        </property>
+    </bean>
+
+    <!-- 
+        Altmetrics
+     -->
+    <bean id="publication-has-altmetrics" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <property name="statements">
+                    <list>
+                        <ref bean="item-is-publication"/>
+                        <bean class="org.dspace.content.logic.operator.Or">
+                            <property name="statements">
+                                <list>
+                                    <ref bean="item-has-doi"/>
+                                    <ref bean="item-has-pmid"/>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="product-has-altmetrics" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <property name="statements">
+                    <list>
+                        <ref bean="item-is-product"/>
+                        <ref bean="item-has-doi"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="item-has-altmetrics" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.Or">
+                <property name="statements">
+                     <list>
+                        <ref bean="publication-has-altmetrics"/>
+                        <ref bean="product-has-altmetrics"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- 
+        Google scholar: we assume that dc.title metadata is always present
+     -->
+    <bean id="item-has-googlescholar" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <property name="statements">
+                    <list>
+                        <ref bean="title-or-gscholarlink"/>
+                        <ref bean="person-or-publication"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="item-has-dimensions" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <property name="statements">
+                    <list>
+                        <ref bean="item-is-publication"/>
+                        <ref bean="item-has-doi"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="person-or-publication" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.Or">
+                <property name="statements">
+                    <list>
+                        <ref bean="item-is-publication"/>
+                        <ref bean="item-is-person"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="title-or-gscholarlink" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.Or">
+                <property name="statements">
+                    <list>
+                        <ref bean="item-has-gscholar-field"/>
+                        <ref bean="item-has-gscholar-fallback-field"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="item-has-gscholar-field"
+          class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="${google-scholar.field}" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="item-has-gscholar-fallback-field"
+          class="org.dspace.content.logic.condition.RequiredMetadataCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="${google-scholar.fallbackField}" />
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.metrics.UpdateCrisMetricsInSolrDocService"/>
+
+
+</beans>

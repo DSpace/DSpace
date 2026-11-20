@@ -6,4 +6,636 @@
     <bean class="org.dspace.content.converter.ItemToItemDTOConverter" />
     <bean class="org.dspace.app.bulkimport.service.BulkImportWorkbookBuilderImpl" />
 
+    <bean class="org.dspace.content.integration.crosswalks.StreamDisseminationCrosswalkMapper">
+        <constructor-arg>
+            <map>
+                <entry key="person-xml" value-ref="referCrosswalkPersonXml"/>
+                <entry key="endnote" value-ref="referCrosswalkEndnote"/>
+                <entry key="bibtex" value-ref="cslItemDataCrosswalkBibtex"/>
+                <entry key="publication-json" value-ref="cslItemDataCrosswalkJson"/>
+                <entry key="publication-apa" value-ref="cslItemDataCrosswalkApa"/>
+                <entry key="publication-chicago" value-ref="cslItemDataCrosswalkChicago"/>
+                <entry key="person-cerif-xml" value-ref="referCrosswalkPersonCerifXml"/>
+                <entry key="person-json" value-ref="referCrosswalkPersonJson"/>
+                <entry key="publication-cerif-xml" value-ref="referCrosswalkPublicationCerifXml"/>
+                <entry key="project-cerif-xml" value-ref="referCrosswalkProjectCerifXml"/>
+                <entry key="project-json" value-ref="referCrosswalkProjectJson"/>
+                <entry key="orgUnit-cerif-xml" value-ref="referCrosswalkOrgUnitCerifXml"/>
+                <entry key="orgUnit-json" value-ref="referCrosswalkOrgUnitJson"/>
+                <entry key="funding-cerif-xml" value-ref="referCrosswalkFundingCerifXml"/>
+                <entry key="funding-json" value-ref="referCrosswalkFundingJson"/>
+                <entry key="publication-csv" value-ref="csvCrosswalkPublication"/>
+                <entry key="publication-xls" value-ref="xlsCrosswalkPublication"/>
+                <entry key="person-csv" value-ref="csvCrosswalkPerson"/>
+                <entry key="person-xls" value-ref="xlsCrosswalkPerson"/>
+                <entry key="journal-csv" value-ref="csvCrosswalkJournal"/>
+                <entry key="journal-xls" value-ref="xlsCrosswalkJournal"/>
+                <entry key="project-csv" value-ref="csvCrosswalkProject"/>
+                <entry key="project-xls" value-ref="xlsCrosswalkProject"/>
+                <entry key="orgUnit-csv" value-ref="csvCrosswalkOrgUnit"/>
+                <entry key="orgUnit-xls" value-ref="xlsCrosswalkOrgUnit"/>
+                <entry key="orgUnit-xml" value-ref="referCrosswalkOrgUnitXml"/>
+                <entry key="funding-csv" value-ref="csvCrosswalkFunding"/>
+                <entry key="funding-xls" value-ref="xlsCrosswalkFunding"/>
+                <entry key="person-pdf" value-ref="pdfCrosswalkPerson"/>
+                <entry key="person-cv-pdf" value-ref="pdfCrosswalkPersonCv"/>
+                <entry key="person-rtf" value-ref="rtfCrosswalkPerson"/>
+                <entry key="publication-pdf" value-ref="pdfCrosswalkPublication"/>
+                <entry key="project-pdf" value-ref="pdfCrosswalkProject"/>
+                <entry key="orgUnit-pdf" value-ref="pdfCrosswalkOrgUnit"/>
+                <entry key="funding-pdf" value-ref="pdfCrosswalkFunding"/>
+                <entry key="publication-datacite-xml" value-ref="referCrosswalkPublicationDataciteXml"/>
+                <entry key="collection-xls" value-ref="xlsCrosswalkCollection"/>
+                <entry key="item-zip" value-ref="zipCrosswalk"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean class="org.dspace.content.integration.crosswalks.service.ItemExportFormatServiceImpl" />
+
+	<!-- VIRTUAL FIELDS CONFIGURATION -->
+
+    <bean id="virtualFieldsMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="id" value-ref="virtualFieldId" />
+                <entry key="authority" value-ref="virtualFieldAuthority" />
+                <entry key="primary-doi" value-ref="virtualFieldPrimaryDOI" />
+                <entry key="alternative-doi" value-ref="virtualFieldAlternativeDOI" />
+                <entry key="reftype" value-ref="virtualFieldRefererType" />
+                <entry key="authors" value-ref="virtualFieldAuthors" />
+                <entry key="fullpage" value-ref="virtualFieldPageNumber" />
+                <entry key="bitstream" value-ref="virtualFieldBitstream" />
+                <entry key="mapConverter" value-ref="virtualFieldMapConverter" />
+                <entry key="personName" value-ref="virtualFieldPersonName" />
+                <entry key="date" value-ref="virtualFieldDateFormatter" />
+                <entry key="vocabulary" value-ref="virtualFieldVocabulary" />
+                <entry key="vocabulary_i18n" value-ref="virtualFieldVocabularyI18n" />
+                <entry key="metric" value-ref="virtualFieldMetric" />
+                <entry key="citations" value-ref="virtualFieldCitations" />
+                <entry key="place" value-ref="virtualFieldAtPlace" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="virtualFieldMapper"
+          class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper" lazy-init="true">
+		<constructor-arg ref="virtualFieldsMap"/>
+	</bean>
+
+    <bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldToEnhancedMetadata"
+        id="virtualFieldToEnhancedMetadata" />
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldId" id="virtualFieldId"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAuthority" id="virtualFieldAuthority"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.ItemDOIService"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPrimaryDOI" id="virtualFieldPrimaryDOI"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAlternativeDOI" id="virtualFieldAlternativeDOI"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldRefererType" id="virtualFieldRefererType"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAuthors" id="virtualFieldAuthors"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPageNumber" id="virtualFieldPageNumber"/>	
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldPersonName" id="virtualFieldPersonName"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldBitstream" id="virtualFieldBitstream">
+		<constructor-arg name="bitstreamTypeMap">
+			<map>
+				<entry key="picture" value="personal picture" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="bitstreamMIMETypeMap">
+			<map>
+				<entry key="image">
+					<set>
+						<value>image/jpeg</value>
+						<value>image/png</value>
+						<value>image/gif</value>
+					</set>
+				</entry>
+				<entry key="pdf">
+					<set>
+						<value>application/pdf</value>
+						<value>application/x-pdf</value>
+					</set>
+				</entry>
+				<entry key="txt">
+					<set>
+						<value>text/plain</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapConverter" id="virtualFieldMapConverter">
+		<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
+		<constructor-arg name="mapConverters" ref="org.dspace.util.MapConverters"/>
+	</bean>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldDateFormatter" id="virtualFieldDateFormatter"/>
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldVocabulary" id="virtualFieldVocabulary"/>
+    <bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMetric" id="virtualFieldMetric"/>
+    <bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCitations" id="virtualFieldCitations"/>
+    <bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldVocabularyI18nValuePair" id="virtualFieldVocabularyI18n"/>
+    
+    <bean class="org.dspace.content.integration.crosswalks.virtualfields.postprocessors.FirstSelectedCitationsPostProcessor" />
+    <bean class="org.dspace.content.integration.crosswalks.virtualfields.postprocessors.GroupByTypeCitationsPostProcessor" />
+	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldAtPlace" id="virtualFieldAtPlace"/>
+
+	<!-- CSL citation generators (used by VirtualFieldCitations) -->
+	<bean class="org.dspace.content.integration.crosswalks.csl.CSLGeneratorFactory" />
+	<bean class="org.dspace.content.integration.crosswalks.csl.CSLNestedGenerator" />
+	<bean class="org.dspace.content.integration.crosswalks.csl.CSLWebServiceGenerator" />
+
+	<!-- MapConverter configuration -->
+
+	<bean id="org.dspace.util.MapConverters"  class="org.dspace.util.MapConverters"> 
+		<constructor-arg name="mapConverters">
+			<map>
+				<entry key="coarTypes" value-ref="mapConverterCoarTypes" />
+				<entry key="fundingTypes" value-ref="mapConverterFundingTypes" />
+				<entry key="eventTypes" value-ref="mapConverterEventTypes" />
+				<entry key="orgUnitTypes" value-ref="mapConverterOrgUnitTypes" />
+				<entry key="accessRight" value-ref="mapConverterAccessRight" />
+				<entry key="coarToPublicationTypes" value-ref="mapConverterCoarToPublicationTypes" />
+				<entry key="scopusToCoarPublicationTypes" value-ref="mapConverterScopusToCoarPublicationTypes" />
+				<entry key="rorToOrgunitTypes" value-ref="mapConverterRorToOrgunitTypes" />
+				<entry key="pubmedToCoarPublicationTypes" value-ref="mapConverterPubmedToCoarPublicationTypes" />
+				<entry key="cerifToOrgUnitTypes" value-ref="mapConverterCerifToOrgUnitTypes" />
+				<entry key="cerifToFundingTypes" value-ref="mapConverterCerifToFundingTypes" />
+                <entry key="type2datacite" value-ref="mapConverterDataciteToPublicationTypes" />
+				<entry key="type2datacitelabel" value-ref="mapConverterDataciteToPublicationLabelTypes" />
+                <entry key="right2licenseUrl" value-ref="mapConverterDataciteToPublicationLicense" />
+                <entry key="right2conceptUrl" value-ref="mapConverterDataciteToPublicationAccessRights" />
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean name="mapConverterCoarTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-coarTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="http://purl.org/coar/resource_type/c_1843"/>
+	</bean>
+	
+	<bean name="mapConverterFundingTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-fundingTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types"/>
+	</bean>
+
+	<bean name="mapConverterOrgUnitTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-orgUnitTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_OrgUnit_Types"/>
+	</bean>
+
+	<bean name="mapConverterEventTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-eventTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+	
+	<bean name="mapConverterAccessRight" class="org.dspace.util.SimpleMapConverter" init-method="init">
+	    <property name="converterNameFile" value="mapConverter-accessRight.properties" />
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+	    <property name="defaultValue" value=""/>
+	</bean>
+	
+	<bean name="mapConverterCoarToPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-coarToPublicationTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="other"/>
+	</bean>
+	
+	<bean name="mapConverterCerifToOrgUnitTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-cerifToOrgUnitTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Unspecified"/>
+	</bean>
+	
+	<bean name="mapConverterCerifToFundingTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-cerifToFundingTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Unspecified"/>
+	</bean>
+	
+    <bean name="mapConverterOpenAccessScopus" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-openAccesFlag.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="Unspecified"/>
+	</bean>
+
+    <bean name="mapConverterTesseract" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="mapConverter-tesseract-languages.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value="@@ident@@"/>
+    </bean>
+
+	<bean name="mapConverterPubmedToCoarPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-pubmedToCoarPublicationTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+
+	<bean name="mapConverterScopusToCoarPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-scopusToCoarPublicationTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="other"/>
+	</bean>
+
+    <bean name="mapConverterRorToOrgunitTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="mapConverter-rorToOrgunitTypes.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value="other"/>
+    </bean>
+
+    <bean name="mapConverterDataciteToPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="mapConverter-datacitePublicationTypes.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value="Text"/>
+        <property name="useAuthority" value="true" />
+    </bean>
+
+    <bean name="mapConverterDataciteToPublicationLabelTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="mapConverter-datacitePublicationLabelTypes.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value="Text"/>
+        <property name="useAuthority" value="true" />
+    </bean>
+
+    <bean name="mapConverterDataciteToPublicationLicense" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="mapConverter-datacitePublicationLicense.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value=""/>
+    </bean>
+
+    <bean name="mapConverterDataciteToPublicationAccessRights" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="mapConverter-datacitePublicationRights.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value=""/>
+    </bean>
+
+	<!-- REFER CROSSWALK CONFIGURATION -->
+
+	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />
+	<bean class="org.dspace.content.integration.crosswalks.converter.JsonValueConverter" id="jsonValueConverter" />
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonXml">
+		<property name="templateFileName" value="crosswalks/template/person-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="person.xml"/>
+		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml.template"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkEndnote">
+		<property name="templateFileName" value="crosswalks/template/endnote.template"/>
+		<property name="mimeType" value="application/x-endnote-refer; charset=UTF-8"/>
+		<property name="fileName" value="publication"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
+	</bean>
+
+	<!-- CSL CITATION CROSSWALK CONFIGURATION -->
+
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="cslItemDataCrosswalkBibtex">
+		<property name="style" value="bibtex"/>
+		<property name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
+		<property name="format" value="text"/>
+		<property name="fileName" value="references.bib"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="cslItemDataCrosswalkApa">
+		<property name="style" value="crosswalks/csl/apa.csl"/>
+		<property name="mimeType" value="text/plain"/>
+		<property name="format" value="text"/>
+		<property name="fileName" value="publications.txt"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="cslItemDataCrosswalkChicago">
+		<property name="style" value="crosswalks/csl/chicago.csl"/>
+		<property name="mimeType" value="text/plain"/>
+		<property name="format" value="text"/>
+		<property name="fileName" value="publications.txt"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="cslItemDataCrosswalkJson">
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="publications.json"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk" id="referCrosswalkPublicationIeeeHtml">
+		<property name="style" value="ieee"/>
+		<property name="mimeType" value="text/html; charset=UTF-8"/>
+		<property name="format" value="html"/>
+		<property name="fileName" value="publications-ieee.html"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<!-- ADDITIONAL REFER CROSSWALKS (entities present on main) -->
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonCerifXml">
+		<property name="templateFileName" value="crosswalks/template/person-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="person.xml"/>
+		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-cerif-xml.template"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonJson">
+		<property name="templateFileName" value="crosswalks/template/person-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="person.json"/>
+		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-json.template"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPublicationCerifXml">
+		<property name="templateFileName" value="crosswalks/template/publication-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="publication.xml"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/publications-xml.template"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkProjectCerifXml">
+		<property name="templateFileName" value="crosswalks/template/project-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="project.xml"/>
+		<property name="entityType" value="Project"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/projects-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkProjectJson">
+		<property name="templateFileName" value="crosswalks/template/project-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="project.json"/>
+		<property name="entityType" value="Project"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/projects-json.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkOrgUnitCerifXml">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="orgUnit.xml"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/orgUnits-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkOrgUnitJson">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="orgUnit.json"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/orgUnits-json.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkOrgUnitXml">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="orgUnit.xml"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/orgUnits-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonCvXml">
+		<property name="templateFileName" value="crosswalks/template/person-cv-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="person.xml"/>
+		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/persons-xml.template"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<!-- PDF/RTF document crosswalks (Apache FOP + XSL) -->
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPerson">
+		<property name="templateFileName" value="crosswalks/template/person-template.xsl"/>
+		<property name="fileName" value="person.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Person"/>
+		<property name="referCrosswalk" ref="referCrosswalkPersonXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPersonCv">
+		<property name="templateFileName" value="crosswalks/template/person-cv-template.xsl"/>
+		<property name="fileName" value="person-cv.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Person"/>
+		<property name="referCrosswalk" ref="referCrosswalkPersonCvXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="rtfCrosswalkPerson">
+		<property name="templateFileName" value="crosswalks/template/person-template.xsl"/>
+		<property name="fileName" value="person.rtf"/>
+		<property name="mimeType" value="application/rtf"/>
+		<property name="entityType" value="Person"/>
+		<property name="referCrosswalk" ref="referCrosswalkPersonXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPublication">
+		<property name="templateFileName" value="crosswalks/template/publication-template.xsl"/>
+		<property name="fileName" value="publication.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Publication"/>
+		<property name="referCrosswalk" ref="referCrosswalkPublicationCerifXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkProject">
+		<property name="templateFileName" value="crosswalks/template/project-template.xsl"/>
+		<property name="fileName" value="project.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Project"/>
+		<property name="referCrosswalk" ref="referCrosswalkProjectCerifXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkOrgUnit">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-template.xsl"/>
+		<property name="fileName" value="orgUnit.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="referCrosswalk" ref="referCrosswalkOrgUnitXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-template.xsl"/>
+		<property name="fileName" value="funding.pdf"/>
+		<property name="mimeType" value="application/pdf"/>
+		<property name="entityType" value="Funding"/>
+		<property name="referCrosswalk" ref="referCrosswalkFundingCerifXml"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkFundingCerifXml">
+		<property name="templateFileName" value="crosswalks/template/funding-cerif-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="funding.xml"/>
+		<property name="entityType" value="Funding"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/fundings-xml.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkFundingJson">
+		<property name="templateFileName" value="crosswalks/template/funding-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="funding.json"/>
+		<property name="entityType" value="Funding"/>
+		<property name="multipleItemsTemplateFileName" value="crosswalks/template/fundings-json.template"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPublicationDataciteXml">
+		<property name="templateFileName" value="crosswalks/template/publication-datacite-xml.template"/>
+		<property name="mimeType" value="application/xml; charset=UTF-8"/>
+		<property name="fileName" value="datacite44.xml"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
+		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCollectionCrosswalk" id="xlsCrosswalkCollection"/>
+
+	<bean class="org.dspace.content.integration.crosswalks.ZipItemExportCrosswalk" id="zipCrosswalk">
+		<property name="zipName" value="items.zip"/>
+		<property name="bitstreamBundle" value="ORIGINAL"/>
+		<property name="metadataFileName" value="mets.xml"/>
+		<property name="crosswalk" ref="metsCrosswalk"/>
+		<property name="allowedGroups">
+			<list>
+				<value>Administrator</value>
+				<value>Curators</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.METSStreamDisseminationCrosswalk" id="metsCrosswalk"/>
+
+	<bean class="org.dspace.content.integration.crosswalks.postprocessors.JsonPostProcessor" id="jsonPostProcessor" />
+
+	<!-- TABULAR CROSSWALKS -->
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPublication">
+		<property name="templateFileName" value="crosswalks/template/publication-table.template"/>
+		<property name="fileName" value="publications.csv"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkPublication">
+		<property name="templateFileName" value="crosswalks/template/publication-table.template"/>
+		<property name="fileName" value="publications.xls"/>
+		<property name="sheetName" value="Publications"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkPerson">
+		<property name="templateFileName" value="crosswalks/template/person-table.template"/>
+		<property name="fileName" value="persons.csv"/>
+		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkPerson">
+		<property name="templateFileName" value="crosswalks/template/person-table.template"/>
+		<property name="fileName" value="persons.xls"/>
+		<property name="sheetName" value="Persons"/>
+		<property name="entityType" value="Person"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkJournal">
+		<property name="templateFileName" value="crosswalks/template/journal-table.template"/>
+		<property name="fileName" value="journals.csv"/>
+		<property name="entityType" value="Journal"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkJournal">
+		<property name="templateFileName" value="crosswalks/template/journal-table.template"/>
+		<property name="fileName" value="journals.xls"/>
+		<property name="sheetName" value="Journals"/>
+		<property name="entityType" value="Journal"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkProject">
+		<property name="templateFileName" value="crosswalks/template/project-table.template"/>
+		<property name="fileName" value="projects.csv"/>
+		<property name="entityType" value="Project"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkProject">
+		<property name="templateFileName" value="crosswalks/template/project-table.template"/>
+		<property name="fileName" value="projects.xls"/>
+		<property name="sheetName" value="Projects"/>
+		<property name="entityType" value="Project"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkOrgUnit">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-table.template"/>
+		<property name="fileName" value="orgUnits.csv"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkOrgUnit">
+		<property name="templateFileName" value="crosswalks/template/orgUnit-table.template"/>
+		<property name="fileName" value="orgUnits.xls"/>
+		<property name="sheetName" value="OrgUnits"/>
+		<property name="entityType" value="OrgUnit"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.CsvCrosswalk" id="csvCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-table.template"/>
+		<property name="fileName" value="fundings.csv"/>
+		<property name="entityType" value="Funding"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.XlsCrosswalk" id="xlsCrosswalkFunding">
+		<property name="templateFileName" value="crosswalks/template/funding-table.template"/>
+		<property name="fileName" value="fundings.xls"/>
+		<property name="sheetName" value="Fundings"/>
+		<property name="entityType" value="Funding"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).MULTIPLE}"/>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.evaluators.ConditionEvaluatorMapper" id="conditionEvaluatorMapper">
+		<constructor-arg name="conditionEvaluators">
+			<map>
+				<entry key="authority" value-ref="authorityConditionEvaluator" />
+				<entry key="metadata" value-ref="metadataConditionEvaluator" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean class="org.dspace.content.integration.crosswalks.evaluators.AuthorityNotBlankCondition" id="authorityConditionEvaluator"/>
+	<bean class="org.dspace.content.integration.crosswalks.evaluators.HasMetadataCondition" id="metadataConditionEvaluator"/>
+
 </beans>

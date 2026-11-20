@@ -8,7 +8,6 @@
 package org.dspace.qaevent.script;
 
 import static java.util.List.of;
-import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.matcher.QAEventMatcher.pendingOpenaireEventWith;
 import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
@@ -59,7 +58,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -481,34 +479,6 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         verifyNoMoreInteractions(mockBrokerClient);
     }
 
-    /**
-     * Improper test for ENRICH/MORE/REVIEW qa. It has the COAR_NOTIFY source
-     * which must be tested via LDNMessage at DNInboxControllerIT
-    */
-    @Test
-    @Ignore
-    public void testImportFromFileEventMoreReview() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-        Item firstItem = createItem("Test item", "123456789/99998");
-        Item secondItem = createItem("Test item 2", "123456789/99999");
-
-        context.restoreAuthSystemState();
-
-        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
-
-        String[] args = new String[] { "import-openaire-events", "-f", getFileLocation("event-more-review.json") };
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
-
-        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20,
-            ORDER_FIELD, false), contains(
-            QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW, 1L)));
-
-        assertThat(qaEventService.findAllSources(context, 0, 20),
-            hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
-
-        verifyNoInteractions(mockBrokerClient);
-    }
 
     private Item createItem(String title, String handle) {
         return ItemBuilder.createItem(context, collection)

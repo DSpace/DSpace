@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://datacite.org/schema/kernel-4" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
+  <creators>
+      <creator>
+            <creatorName>Author, Name in Pub</creatorName>
+            <nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org/">1234-5678-9012</nameIdentifier>
+            <affiliation
+                affiliationIdentifier="rorID" affiliationIdentifierScheme="ROR" schemeURI="https://ror.org/"
+            >OrgUnit Name</affiliation>
+      </creator>
+      <creator>
+            <creatorName>External, Auth</creatorName>
+      </creator>
+      <creator>
+            <creatorName>Author, Name in Pub</creatorName>
+            <affiliation>OrgUnit in pub2</affiliation>
+      </creator>
+    </creators>
+  <titles>
+    <title>Publication title</title>
+  </titles>
+  <publisher
+      publisherIdentifier="rorID2" publisherIdentifierScheme="ROR" schemeURI="https://ror.org/"
+  >Publisher</publisher>
+  <publicationYear>2023</publicationYear>
+  <dates>
+    <date dateType="Issued">2023</date>
+    <date dateType="Available">2023-10-20</date>
+  </dates>
+  <resourceType resourceTypeGeneral="JournalArticle">
+  review article
+  </resourceType>
+  <alternateIdentifiers>
+    <alternateIdentifier alternateIdentifierType="url">http://localhost:4000/handle/123456789/99999</alternateIdentifier>
+  </alternateIdentifiers>
+  <rightsList>
+  </rightsList>
+  <descriptions>
+  </descriptions>
+</resource>

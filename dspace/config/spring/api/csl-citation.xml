@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-lazy-init="true">
+
+    <bean id="DSpaceListItemDataProvider" class="org.dspace.content.integration.crosswalks.csl.DSpaceListItemDataProvider" scope="prototype">
+    	<property name="typeConverter" ref="mapConverterPublicationTypes"/>
+    	<property name="type" value="dc.type"/>
+    	<property name="language" value="dc.language.iso"/>
+        <!-- please note the following is not a typo abstract is a reserved word in JAVA
+             so the property has been named abstrct (without the a) -->
+        <property name="abstrct" value="dc.description.abstract"/>
+        <property name="DOI" value="dc.identifier.doi"/>
+        <property name="ISBN" value="dc.identifier.isbn"/>
+        <property name="ISSN" value="dc.identifier.issn"/>
+        <property name="keyword" value="dc.subject"/>
+        <property name="publisher" value="dc.publisher"/>
+        <property name="volume" value="oaire.citation.volume"/>
+        <property name="issue" value="oaire.citation.issue"/>
+        <property name="event" value="dc.relation.conference"/>
+        <property name="title" value="dc.title"/>
+        <property name="URL" value="dc.identifier.uri"/>
+        <property name="issued" value="dc.date.issued"/>
+        <property name="author" value="dc.contributor.author"/>
+        <property name="editor" value="dc.contributor.editor"/>
+        <property name="containerTitle" ref="containerTitleRules" />
+        <property name="edition" value="oaire.citation.edition" />
+        <!-- <property name="page-first" value="oaire.citation.startPage"/> -->
+        <!-- <property name="eventPlace" ref="eventPlaceRules" /> -->
+        <!-- <property name="genre" ref="genreRules" /> -->
+        <!-- <property name="URL" ref="urlRules" /> -->
+    </bean>
+    
+    <bean name="mapConverterPublicationTypes" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="mapConverter-publicationTypes.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+
+    <bean id="containerTitleRules" class="org.dspace.content.integration.crosswalks.csl.CascadeMetadataRule">
+        <property name="fields">
+            <list>
+                <value>dc.relation.journal</value>
+                <value>dc.relation.ispartof</value>
+            </list>
+        </property>
+    </bean>
+    <!-- <bean id="eventPlaceRules" class="org.dspace.content.integration.crosswalks.csl.MetadataMergeRule">
+        <property name="separator" value=", "/>
+        <property name="replacementRegex" value="^,|,$"/>
+        <property name="replacementValue" value="" />
+        <property name="onlyFirstValues" value="true"/>
+        <property name="fields">
+            <list>
+                <value>oaire.citation.conferencePlace</value>
+                <value>oairecerif.event.country</value>
+            </list>
+        </property>
+    </bean> -->
+    <!-- <bean id="genreRules" class="org.dspace.content.integration.crosswalks.csl.MetadataMergeRuleWithMapping">
+        <property name="separator" value=", "/>
+        <property name="replacementRegex" value="^,|,$"/>
+        <property name="replacementValue" value="" />
+        <property name="onlyFirstValues" value="true"/>
+        <property name="mapping">
+            <map>
+                <entry key="thesis">
+                    <list>
+                        <value>dc.format.extent</value>
+                    </list>
+                </entry>
+                <entry key="default">
+                    <list>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean> -->
+    <!-- <bean id="urlRules" class="org.dspace.content.integration.crosswalks.csl.ComplexUrlRule">
+        <property name="fields">
+            <list>
+                <value>dc.identifier.doi</value>
+                <value>dc.identifier.uri</value>
+                <value>[[handle]]</value>
+            </list>
+        </property>
+    </bean> -->
+</beans>

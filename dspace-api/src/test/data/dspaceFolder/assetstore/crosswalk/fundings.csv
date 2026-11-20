@@ -1,0 +1,4 @@
+Name,Acronym,Type,Funding Code,Grant Number,Amount,Amount currency,Description,Funder,Start date,End date,OA Mandate,OA Policy URL
+"Test Funding","T-FU","https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Gift","ID-01","0001","30.000,00","EUR","Funding to test export","OrgUnit Funder","2015-01-01","2020-01-01","true","www.mandate.url"
+"Another Test Funding","AT-FU","https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant","ID-02","0002","10.000,00","","","Test Funder","2020-01-01","","true","www.mandate.url"
+"Third Test Funding","TT-FU","https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types#Grant","ID-03","0003","20.000,00","EUR","","","","2010-01-01","false","www.mandate.com"

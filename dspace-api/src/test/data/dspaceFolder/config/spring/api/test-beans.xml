@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkVirtualFieldDate">
+		<property name="templateFileName" value="crosswalks/template/virtual-field-date-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="test.json"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkVirtualFieldDOI">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-doi-json.template"/>
+        <property name="mimeType" value="application/json; charset=UTF-8"/>
+        <property name="fileName" value="test.json"/>
+        <property name="entityType" value="Publication"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
+        <property name="converter" ref="jsonValueConverter" />
+        <property name="linesPostProcessor" ref="jsonPostProcessor" />
+    </bean>
+
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkVirtualFieldVocabulary">
+		<property name="templateFileName" value="crosswalks/template/virtual-field-vocabulary-json.template"/>
+		<property name="mimeType" value="application/json; charset=UTF-8"/>
+		<property name="fileName" value="test.json"/>
+		<property name="entityType" value="Publication"/>
+		<property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE}"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
+	</bean>
+    
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonVirtualFieldCitations">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-citations-person-xml.template"/>
+        <property name="mimeType" value="application/xml; charset=UTF-8"/>
+        <property name="fileName" value="person.xml"/>
+        <property name="entityType" value="Person"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+        <property name="converter" ref="xmlValueConverter" />
+    </bean>
+    
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkFirstSelectedVirtualFieldCitations">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-citations-first-selected-xml.template"/>
+        <property name="mimeType" value="application/xml; charset=UTF-8"/>
+        <property name="fileName" value="person.xml"/>
+        <property name="entityType" value="Person"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+        <property name="converter" ref="xmlValueConverter" />
+    </bean>
+    
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkGroupByTypeVirtualFieldCitations">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-citations-group-by-type-xml.template"/>
+        <property name="mimeType" value="application/xml; charset=UTF-8"/>
+        <property name="fileName" value="person.xml"/>
+        <property name="entityType" value="Person"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+        <property name="converter" ref="xmlValueConverter" />
+    </bean>
+
+    <bean class="org.dspace.content.integration.crosswalks.DocumentCrosswalk" id="pdfCrosswalkPersonGroupPublicationsByType">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-citations-group-by-type-template.xsl"/>
+        <property name="fileName" value="person.pdf"/>
+        <property name="mimeType" value="application/pdf"/>
+        <property name="entityType" value="Person"/>
+        <property name="referCrosswalk" ref="referCrosswalkGroupByTypeVirtualFieldCitations"/>
+    </bean>
+    
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPublicationVirtualFieldCitations">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-citations-publication-xml.template"/>
+        <property name="mimeType" value="application/xml; charset=UTF-8"/>
+        <property name="fileName" value="publication.xml"/>
+        <property name="entityType" value="Publication"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+        <property name="converter" ref="xmlValueConverter" />
+    </bean>
+
+   
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPublicationVirtualVocabularyI18nField">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-vocabulary_18n-publication-xml.template"/>
+        <property name="mimeType" value="application/xml; charset=UTF-8"/>
+        <property name="fileName" value="publication.xml"/>
+        <property name="entityType" value="Publication"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+        <property name="converter" ref="xmlValueConverter" />
+    </bean>
+    
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPublicationVirtualVocabularyI18nFieldWithVocabulary">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-vocabulary_18n-publication-with-vocabulary-xml.template"/>
+        <property name="mimeType" value="application/xml; charset=UTF-8"/>
+        <property name="fileName" value="publication.xml"/>
+        <property name="entityType" value="Publication"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+        <property name="converter" ref="xmlValueConverter" />
+    </bean>
+
+    <bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkProjectVirtualFieldBitstreams">
+        <property name="templateFileName" value="crosswalks/template/virtual-field-bitstreams-project-xml.template"/>
+        <property name="mimeType" value="application/xml; charset=UTF-8"/>
+        <property name="fileName" value="project.xml"/>
+        <property name="entityType" value="Project"/>
+        <property name="crosswalkMode" value="#{T(org.dspace.content.crosswalk.CrosswalkMode).SINGLE_AND_MULTIPLE}"/>
+        <property name="converter" ref="xmlValueConverter" />
+    </bean>
+
+</beans>

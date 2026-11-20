@@ -1,0 +1,20 @@
+<OrgUnit xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+    <Type scheme="https://w3id.org/cerif/vocab/OrganisationTypes">@virtual.mapConverter.orgUnitTypes.dc-type@</Type>
+    <Acronym>@oairecerif.acronym@</Acronym>
+	<Name>@dc.title@</Name>
+	<Name>@organization.legalName@</Name>
+    <Identifier>@organization.identifier@</Identifier>
+    <Identifier type="URL">@oairecerif.identifier.url@</Identifier>
+    <RORID>@organization.identifier.ror@</RORID>
+	<PartOf>
+		@relation.organization-parentOrganization.start@
+		<OrgUnit id="@virtual.id@">
+            <Acronym>@oairecerif.acronym@</Acronym>
+			<Name>@dc.title@</Name>
+		</OrgUnit>
+		@relation.organization-parentOrganization.end@
+		@if.not.authority.organization-parentOrganization.start@
+		<OrgUnit> <Name>@organization.parentOrganization@</Name> </OrgUnit>
+		@if.not.authority.organization-parentOrganization.end@
+	</PartOf>
+</OrgUnit>

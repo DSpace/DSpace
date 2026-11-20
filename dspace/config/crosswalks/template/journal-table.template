@@ -1,0 +1,5 @@
+Journal Title = dc.title
+ISSN = dc.identifier.issn
+Publisher = dc.publisher
+Description = dc.description
+Subject = dc.subject

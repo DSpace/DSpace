@@ -1,0 +1,6 @@
+Name = dc.title
+Acronym = oairecerif.acronym
+Institution assigned identifier = oairecerif.internalid
+Description = dc.description
+Owner organization = crisequipment.ownerou
+Owner person = crisequipment.ownerrp

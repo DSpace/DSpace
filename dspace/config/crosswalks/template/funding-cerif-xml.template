@@ -1,0 +1,51 @@
+<Funding xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+	<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">@virtual.mapConverter.fundingTypes.dc-type@</Type>	
+    <Acronym>@oairecerif.acronym@</Acronym>
+	<Name>@dc.title@</Name>
+    @if.metadata.oairecerif-amount-currency.start@
+    <Amount currency="@oairecerif.amount.currency@">
+    @if.metadata.oairecerif-amount-currency.end@
+    @if.not.metadata.oairecerif-amount-currency.start@
+    <Amount>
+    @if.not.metadata.oairecerif-amount-currency.end@
+        @oairecerif.amount@
+    </Amount>
+	<Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#FinanceID">@oairecerif.internalid@</Identifier>
+	<Identifier type="https://w3id.org/cerif/vocab/IdentifierTypes#AwardNumber">@oairecerif.funding.identifier@</Identifier>
+	<Description>@dc.description@</Description>
+    <Keyword>@dc.subject@</Keyword>
+	<Funder>
+		@relation.oairecerif-funder.start@
+		<OrgUnit id="@virtual.id@">
+            <Acronym>@oairecerif.acronym@</Acronym>
+			<Name>@dc.title@</Name>
+		</OrgUnit>
+		@relation.oairecerif-funder.end@
+		@if.not.authority.oairecerif-funder.start@
+		<OrgUnit>
+			<Name>@oairecerif.funder@</Name>
+		</OrgUnit>
+		@if.not.authority.oairecerif-funder.end@
+	</Funder>
+    <PartOf>
+        @relation.oairecerif-fundingParent.start@
+        <Funding id="@virtual.id@">
+            <Acronym>@oairecerif.acronym@</Acronym>
+            <Name>@dc.title@</Name>
+        </Funding>
+        @relation.oairecerif-fundingParent.end@
+        @if.not.authority.oairecerif-fundingParent.start@
+        <Funding>
+            <Name>@oairecerif.fundingParent@</Name>
+        </Funding>
+        @if.not.authority.oairecerif-fundingParent.end@
+    </PartOf>
+	<Duration 
+		startDate="@oairecerif.funding.startDate@" 
+		endDate="@oairecerif.funding.endDate@" 
+	/>
+	<OAMandate 
+		mandated="@oairecerif.oamandate@" 
+		URL="@oairecerif.oamandate.url@" 
+	/>
+</Funding>

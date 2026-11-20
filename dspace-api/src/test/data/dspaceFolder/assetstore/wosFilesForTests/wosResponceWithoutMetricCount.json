@@ -1,0 +1,572 @@
+{
+    "Data": {
+        "Records": {
+            "records": {
+                "REC": [
+                    {
+                        "UID": "WOS:000544718700031",
+                        "static_data": {
+                            "summary": {
+                                "pub_info": {
+                                    "coverdate": "JUL 2020",
+                                    "vol": 48,
+                                    "pubyear": 2020,
+                                    "issue": 7,
+                                    "sortdate": "2020-07-01",
+                                    "has_abstract": "Y",
+                                    "pubmonth": "JUL",
+                                    "pubtype": "Journal",
+                                    "page": {
+                                        "end": 1008,
+                                        "begin": 1001,
+                                        "page_count": 8,
+                                        "content": "1001-1008"
+                                    }
+                                },
+                                "names": {
+                                    "count": 6,
+                                    "name": [
+                                        {
+                                            "seq_no": 1,
+                                            "role": "author",
+                                            "full_name": "Saffaran, Sina",
+                                            "addr_no": 1,
+                                            "last_name": "Saffaran",
+                                            "display_name": "Saffaran, Sina",
+                                            "wos_standard": "Saffaran, S",
+                                            "daisng_id": 12953931,
+                                            "first_name": "Sina"
+                                        },
+                                        {
+                                            "seq_no": 2,
+                                            "role": "author",
+                                            "full_name": "Das, Anup",
+                                            "addr_no": 1,
+                                            "last_name": "Das",
+                                            "display_name": "Das, Anup",
+                                            "wos_standard": "Das, A",
+                                            "daisng_id": 4813219,
+                                            "first_name": "Anup"
+                                        },
+                                        {
+                                            "seq_no": 3,
+                                            "role": "author",
+                                            "full_name": "Laffey, John G.",
+                                            "addr_no": 2,
+                                            "last_name": "Laffey",
+                                            "display_name": "Laffey, John G.",
+                                            "wos_standard": "Laffey, JG",
+                                            "daisng_id": 80745,
+                                            "first_name": "John G."
+                                        },
+                                        {
+                                            "seq_no": 4,
+                                            "role": "author",
+                                            "full_name": "Hardman, Jonathan G.",
+                                            "addr_no": 3,
+                                            "last_name": "Hardman",
+                                            "display_name": "Hardman, Jonathan G.",
+                                            "wos_standard": "Hardman, JG",
+                                            "daisng_id": 35285335,
+                                            "first_name": "Jonathan G."
+                                        },
+                                        {
+                                            "seq_no": 5,
+                                            "role": "author",
+                                            "full_name": "Yehya, Nadir",
+                                            "reprint": "Y",
+                                            "addr_no": 4,
+                                            "last_name": "Yehya",
+                                            "display_name": "Yehya, Nadir",
+                                            "wos_standard": "Yehya, N",
+                                            "daisng_id": 673390,
+                                            "first_name": "Nadir"
+                                        },
+                                        {
+                                            "seq_no": 6,
+                                            "role": "author",
+                                            "full_name": "Bates, Declan G.",
+                                            "addr_no": 1,
+                                            "last_name": "Bates",
+                                            "display_name": "Bates, Declan G.",
+                                            "wos_standard": "Bates, DG",
+                                            "daisng_id": 273309,
+                                            "first_name": "Declan G."
+                                        }
+                                    ]
+                                },
+                                "doctypes": {
+                                    "doctype": "Article",
+                                    "count": 1
+                                },
+                                "publishers": {
+                                    "publisher": {
+                                        "names": {
+                                            "count": 1,
+                                            "name": {
+                                                "seq_no": 1,
+                                                "role": "publisher",
+                                                "full_name": "LIPPINCOTT WILLIAMS & WILKINS",
+                                                "addr_no": 1,
+                                                "display_name": "LIPPINCOTT WILLIAMS & WILKINS"
+                                            }
+                                        },
+                                        "address_spec": {
+                                            "city": "PHILADELPHIA",
+                                            "addr_no": 1,
+                                            "full_address": "TWO COMMERCE SQ, 2001 MARKET ST, PHILADELPHIA, PA 19103 USA"
+                                        }
+                                    }
+                                },
+                                "EWUID": {
+                                    "WUID": {
+                                        "coll_id": "WOS"
+                                    },
+                                    "edition": {
+                                        "value": "WOS.SCI"
+                                    }
+                                },
+                                "titles": {
+                                    "count": 6,
+                                    "title": [
+                                        {
+                                            "type": "source",
+                                            "content": "CRITICAL CARE MEDICINE"
+                                        },
+                                        {
+                                            "type": "source_abbrev",
+                                            "content": "CRIT CARE MED"
+                                        },
+                                        {
+                                            "type": "abbrev_iso",
+                                            "content": "Crit. Care Med."
+                                        },
+                                        {
+                                            "type": "abbrev_11",
+                                            "content": "CRIT CARE M"
+                                        },
+                                        {
+                                            "type": "abbrev_29",
+                                            "content": "CRIT CARE MED"
+                                        },
+                                        {
+                                            "type": "item",
+                                            "content": "Utility of Driving Pressure and Mechanical Power to Guide Protective Ventilator Settings in Two Cohorts of Adult and Pediatric Patients With Acute Respiratory Distress Syndrome: A Computational Investigation"
+                                        }
+                                    ]
+                                }
+                            },
+                            "item": {
+                                "xsi:type": "itemType_wos",
+                                "coll_id": "WOS",
+                                "ids": {
+                                    "avail": "N",
+                                    "content": "ME5TS"
+                                },
+                                "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                                "bib_pagecount": {
+                                    "type": "Journal",
+                                    "content": 270
+                                },
+                                "keywords_plus": {
+                                    "count": 10,
+                                    "keyword": [
+                                        "ACUTE LUNG INJURY",
+                                        "END-EXPIRATORY PRESSURE",
+                                        "TIDAL VOLUME",
+                                        "RECRUITMENT MANEUVERS",
+                                        "INTENSIVE-CARE",
+                                        "HIGH PEEP",
+                                        "CHILDREN",
+                                        "OXYGENATION",
+                                        "MORTALITY",
+                                        "SURVIVAL"
+                                    ]
+                                },
+                                "bib_id": "48 (7): 1001-1008 JUL 2020"
+                            },
+                            "fullrecord_metadata": {
+                                "addresses": {
+                                    "count": 4,
+                                    "address_name": [
+                                        {
+                                            "names": {
+                                                "count": 3,
+                                                "name": [
+                                                    {
+                                                        "seq_no": 1,
+                                                        "role": "author",
+                                                        "full_name": "Saffaran, Sina",
+                                                        "addr_no": 1,
+                                                        "last_name": "Saffaran",
+                                                        "display_name": "Saffaran, Sina",
+                                                        "wos_standard": "Saffaran, S",
+                                                        "daisng_id": 12953931,
+                                                        "first_name": "Sina"
+                                                    },
+                                                    {
+                                                        "seq_no": 2,
+                                                        "role": "author",
+                                                        "full_name": "Das, Anup",
+                                                        "addr_no": 1,
+                                                        "last_name": "Das",
+                                                        "display_name": "Das, Anup",
+                                                        "wos_standard": "Das, A",
+                                                        "daisng_id": 4813219,
+                                                        "first_name": "Anup"
+                                                    },
+                                                    {
+                                                        "seq_no": 6,
+                                                        "role": "author",
+                                                        "full_name": "Bates, Declan G.",
+                                                        "addr_no": 1,
+                                                        "last_name": "Bates",
+                                                        "display_name": "Bates, Declan G.",
+                                                        "wos_standard": "Bates, DG",
+                                                        "daisng_id": 273309,
+                                                        "first_name": "Declan G."
+                                                    }
+                                                ]
+                                            },
+                                            "address_spec": {
+                                                "country": "England",
+                                                "city": "Coventry",
+                                                "addr_no": 1,
+                                                "organizations": {
+                                                    "organization": [
+                                                        "Univ Warwick",
+                                                        {
+                                                            "pref": "Y",
+                                                            "content": "University of Warwick"
+                                                        }
+                                                    ],
+                                                    "count": 2
+                                                },
+                                                "full_address": "Univ Warwick, Sch Engn, Coventry, W Midlands, England",
+                                                "state": "W Midlands",
+                                                "suborganizations": {
+                                                    "count": 1,
+                                                    "suborganization": "Sch Engn"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "names": {
+                                                "count": 1,
+                                                "name": {
+                                                    "seq_no": 3,
+                                                    "role": "author",
+                                                    "full_name": "Laffey, John G.",
+                                                    "addr_no": 2,
+                                                    "last_name": "Laffey",
+                                                    "display_name": "Laffey, John G.",
+                                                    "wos_standard": "Laffey, JG",
+                                                    "daisng_id": 80745,
+                                                    "first_name": "John G."
+                                                }
+                                            },
+                                            "address_spec": {
+                                                "country": "Ireland",
+                                                "city": "Galway",
+                                                "addr_no": 2,
+                                                "organizations": {
+                                                    "organization": [
+                                                        "NUI Galway",
+                                                        {
+                                                            "pref": "Y",
+                                                            "content": "National University of Ireland (NUI) Galway"
+                                                        }
+                                                    ],
+                                                    "count": 2
+                                                },
+                                                "full_address": "NUI Galway, Sch Med, Anaesthesia & Intens Care Med, Galway, Ireland",
+                                                "suborganizations": {
+                                                    "count": 2,
+                                                    "suborganization": [
+                                                        "Sch Med",
+                                                        "Anaesthesia & Intens Care Med"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "names": {
+                                                "count": 1,
+                                                "name": {
+                                                    "seq_no": 4,
+                                                    "role": "author",
+                                                    "full_name": "Hardman, Jonathan G.",
+                                                    "addr_no": 3,
+                                                    "last_name": "Hardman",
+                                                    "display_name": "Hardman, Jonathan G.",
+                                                    "wos_standard": "Hardman, JG",
+                                                    "daisng_id": 35285335,
+                                                    "first_name": "Jonathan G."
+                                                }
+                                            },
+                                            "address_spec": {
+                                                "country": "England",
+                                                "city": "Nottingham",
+                                                "addr_no": 3,
+                                                "organizations": {
+                                                    "organization": [
+                                                        "Univ Nottingham",
+                                                        {
+                                                            "pref": "Y",
+                                                            "content": "University of Nottingham"
+                                                        }
+                                                    ],
+                                                    "count": 2
+                                                },
+                                                "full_address": "Univ Nottingham, Sch Med, Div Clin Neurosci, Anaesthesia & Crit Care, Nottingham, England",
+                                                "suborganizations": {
+                                                    "count": 3,
+                                                    "suborganization": [
+                                                        "Sch Med",
+                                                        "Div Clin Neurosci",
+                                                        "Anaesthesia & Crit Care"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "names": {
+                                                "count": 1,
+                                                "name": {
+                                                    "seq_no": 5,
+                                                    "role": "author",
+                                                    "full_name": "Yehya, Nadir",
+                                                    "reprint": "Y",
+                                                    "addr_no": 4,
+                                                    "last_name": "Yehya",
+                                                    "display_name": "Yehya, Nadir",
+                                                    "wos_standard": "Yehya, N",
+                                                    "daisng_id": 673390,
+                                                    "first_name": "Nadir"
+                                                }
+                                            },
+                                            "address_spec": {
+                                                "zip": {
+                                                    "location": "AP",
+                                                    "content": 19104
+                                                },
+                                                "country": "USA",
+                                                "city": "Philadelphia",
+                                                "addr_no": 4,
+                                                "organizations": {
+                                                    "organization": [
+                                                        "Univ Penn",
+                                                        {
+                                                            "pref": "Y",
+                                                            "content": "University of Pennsylvania"
+                                                        },
+                                                        {
+                                                            "pref": "Y",
+                                                            "content": "Childrens Hospital of Philadelphia"
+                                                        }
+                                                    ],
+                                                    "count": 3
+                                                },
+                                                "full_address": "Univ Penn, Childrens Hosp Philadelphia, Dept Anaesthesiol & Crit Care Med, Philadelphia, PA 19104 USA",
+                                                "state": "PA",
+                                                "suborganizations": {
+                                                    "count": 2,
+                                                    "suborganization": [
+                                                        "Childrens Hosp Philadelphia",
+                                                        "Dept Anaesthesiol & Crit Care Med"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "category_info": {
+                                    "subheadings": {
+                                        "count": 1,
+                                        "subheading": "Life Sciences & Biomedicine"
+                                    },
+                                    "subjects": {
+                                        "subject": [
+                                            {
+                                                "ascatype": "traditional",
+                                                "content": "Critical Care Medicine"
+                                            },
+                                            {
+                                                "ascatype": "extended",
+                                                "content": "General & Internal Medicine"
+                                            }
+                                        ],
+                                        "count": 2
+                                    },
+                                    "headings": {
+                                        "heading": "Science & Technology",
+                                        "count": 1
+                                    }
+                                },
+                                "normalized_languages": {
+                                    "count": 1,
+                                    "language": {
+                                        "type": "primary",
+                                        "content": "English"
+                                    }
+                                },
+                                "languages": {
+                                    "count": 1,
+                                    "language": {
+                                        "type": "primary",
+                                        "content": "English"
+                                    }
+                                },
+                                "keywords": {
+                                    "count": 6,
+                                    "keyword": [
+                                        "adult acute respiratory distress syndrome",
+                                        "computer simulation",
+                                        "mechanical ventilation",
+                                        "pediatric acute respiratory distress syndrome",
+                                        "protective ventilation",
+                                        "ventilator-induced lung injury"
+                                    ]
+                                },
+                                "refs": {
+                                    "count": 31
+                                },
+                                "reprint_addresses": {
+                                    "count": 1,
+                                    "address_name": {
+                                        "names": {
+                                            "count": 1,
+                                            "name": {
+                                                "seq_no": 1,
+                                                "role": "author",
+                                                "full_name": "Yehya, Nadir",
+                                                "reprint": "Y",
+                                                "addr_no": 1,
+                                                "last_name": "Yehya",
+                                                "display_name": "Yehya, Nadir",
+                                                "wos_standard": "Yehya, N",
+                                                "first_name": "Nadir"
+                                            }
+                                        },
+                                        "address_spec": {
+                                            "zip": {
+                                                "location": "AP",
+                                                "content": 19104
+                                            },
+                                            "country": "USA",
+                                            "city": "Philadelphia",
+                                            "addr_no": 1,
+                                            "organizations": {
+                                                "organization": [
+                                                    "Univ Penn",
+                                                    {
+                                                        "pref": "Y",
+                                                        "content": "University of Pennsylvania"
+                                                    },
+                                                    {
+                                                        "pref": "Y",
+                                                        "content": "Childrens Hospital of Philadelphia"
+                                                    }
+                                                ],
+                                                "count": 3
+                                            },
+                                            "full_address": "Univ Penn, Childrens Hosp Philadelphia, Dept Anaesthesiol & Crit Care Med, Philadelphia, PA 19104 USA",
+                                            "state": "PA",
+                                            "suborganizations": {
+                                                "count": 2,
+                                                "suborganization": [
+                                                    "Childrens Hosp Philadelphia",
+                                                    "Dept Anaesthesiol & Crit Care Med"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                "abstracts": {
+                                    "count": 1,
+                                    "abstract": {
+                                        "abstract_text": {
+                                            "p": "Objectives: Mechanical power and driving pressure have been proposed as indicators, and possibly drivers, of ventilator-induced lung injury. We tested the utility of these different measures as targets to derive maximally protective ventilator settings. Design: A high-fidelity computational simulator was matched to individual patient data and used to identify strategies that minimize driving pressure, mechanical power, and a modified mechanical power that removes the direct linear, positive dependence between mechanical power and positive end-expiratory pressure. Setting: Interdisciplinary Collaboration in Systems Medicine Research Network. Subjects: Data were collected from a prospective observational cohort of pediatric acute respiratory distress syndrome from the Children's Hospital of Philadelphia (n= 77) and from the low tidal volume arm of the Acute Respiratory Distress Syndrome Network tidal volume trial (n= 100). Interventions: Global optimization algorithms evaluated more than 26.7 million changes to ventilator settings (approximately 150,000 per patient) to identify strategies that minimize driving pressure, mechanical power, or modified mechanical power. Measurements and Main Results: Large average reductions in driving pressure (pediatric: 23%, adult: 23%), mechanical power (pediatric: 44%, adult: 66%), and modified mechanical power (pediatric: 61%, adult: 67%) were achievable in both cohorts when oxygenation and ventilation were allowed to vary within prespecified ranges. Reductions in driving pressure (pediatric: 12%, adult: 2%), mechanical power (pediatric: 24%, adult: 46%), and modified mechanical power (pediatric: 44%, adult: 46%) were achievable even when no deterioration in gas exchange was allowed. Minimization of mechanical power and modified mechanical power was achieved by increasing tidal volume and decreasing respiratory rate. In the pediatric cohort, minimum driving pressure was achieved by reducing tidal volume and increasing respiratory rate and positive end-expiratory pressure. The Acute Respiratory Distress Syndrome Network dataset had limited scope for further reducing tidal volume, but driving pressure was still significantly reduced by increasing positive end-expiratory pressure. Conclusions: Our analysis identified different strategies that minimized driving pressure or mechanical power consistently across pediatric and adult datasets. Minimizing standard and alternative formulations of mechanical power led to significant increases in tidal volume. Targeting driving pressure for minimization resulted in ventilator settings that also reduced mechanical power and modified mechanical power, but not vice versa.",
+                                            "count": 1
+                                        }
+                                    }
+                                },
+                                "fund_ack": {
+                                    "grants": {
+                                        "count": 4,
+                                        "grant": [
+                                            {
+                                                "grant_agency": "Research Councils UK (RCUK)"
+                                            },
+                                            {
+                                                "grant_ids": {
+                                                    "grant_id": "EP/P023444/1",
+                                                    "count": 1
+                                                },
+                                                "grant_agency": "Engineering and Physical Sciences RCUK"
+                                            },
+                                            {
+                                                "grant_agency": "National Heart, Lung, and Blood Institute"
+                                            },
+                                            {
+                                                "grant_ids": {
+                                                    "grant_id": "NIH K23 HL-136688",
+                                                    "count": 1
+                                                },
+                                                "grant_agency": "National Institutes of Health (NIH)"
+                                            }
+                                        ]
+                                    },
+                                    "fund_text": {
+                                        "p": "Drs. Das, Hardman, and Bates received support for article research from the Research Councils UK (RCUK). Drs. Hardman's and Bates's institution received funding from Engineering and Physical Sciences RCUK (Grant Number EP/P023444/1). Dr. Yehya's institution received funding from the National Heart, Lung, and Blood Institute and he received support for article research from the National Institutes of Health (NIH) (Grant Number NIH K23 HL-136688). The remaining authors have disclosed that they do not have any potential conflicts of interest."
+                                    }
+                                },
+                                "normalized_doctypes": {
+                                    "doctype": "Article",
+                                    "count": 1
+                                }
+                            }
+                        },
+                        "r_id_disclaimer": "ResearcherID data provided by Clarivate Analytics",
+                        "dynamic_data": {
+                            "citation_related": {
+                                "tc_list": {
+                                    "silo_tc": {
+                                        "coll_id": "WOS"
+                                    }
+                                }
+                            },
+                            "cluster_related": {
+                                "identifiers": {
+                                    "identifier": [
+                                        {
+                                            "type": "issn",
+                                            "value": "0090-3493"
+                                        },
+                                        {
+                                            "type": "eissn",
+                                            "value": "1530-0293"
+                                        },
+                                        {
+                                            "type": "doi",
+                                            "value": "10.1097/CCM.0000000000000000"
+                                        },
+                                        {
+                                            "type": "pmid",
+                                            "value": "MEDLINE:32574467"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "QueryResult": {
+        "QueryID": 1,
+        "RecordsSearched": 64666906,
+        "RecordsFound": 1
+    }
+}

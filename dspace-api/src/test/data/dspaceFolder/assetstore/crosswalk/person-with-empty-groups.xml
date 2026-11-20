@@ -1,0 +1,58 @@
+<person>
+	<names>
+		<preferred-name>John Smith</preferred-name>
+		<full-name>John Smith</full-name>
+		<variants>
+			<variant>J.S.</variant>
+			<variant>Smith John</variant>
+		</variants>
+		<given-name>John</given-name>
+		<family-name>Smith</family-name>
+	</names>
+	<birth-date>1992-06-26</birth-date>
+	<gender>M</gender>
+	<job-title>Researcher</job-title>
+	<main-affiliation>University</main-affiliation>
+	<working-groups>
+		<working-group>First work group</working-group>
+		<working-group>Second work group</working-group>
+	</working-groups>
+	<personal-sites>
+	</personal-sites>
+	<email>test@test.com</email>
+	<interests>
+		<interest>Science</interest>
+	</interests>
+	<identifiers>
+		<orcid>0000-0002-9079-5932</orcid>
+		<scopus-author-ids>
+			<scopus-author-id>111-222-333</scopus-author-id>
+		</scopus-author-ids>
+		<researcher-ids>
+			<researcher-id>0001</researcher-id>
+			<researcher-id>0002</researcher-id>
+		</researcher-ids>
+	</identifiers>
+	<affiliations>
+		<affiliation>
+			<name>Company</name>
+			<start-date>2018-01-01</start-date>
+			<role>Developer</role>
+		</affiliation>
+	</affiliations>
+	<educations>
+		<education>
+			<name>School</name>
+			<start-date>2000-01-01</start-date>
+			<end-date>2005-01-01</end-date>
+			<role>Student</role>
+		</education>
+	</educations>
+	<country>England</country>
+	<qualifications>
+	</qualifications>
+	<knows-languages>
+	</knows-languages>
+	<publications>
+	</publications>
+</person>

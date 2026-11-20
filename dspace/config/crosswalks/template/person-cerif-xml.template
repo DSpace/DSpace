@@ -1,0 +1,29 @@
+<Person xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+	<PersonName>
+		<FamilyNames>@virtual.personName.lastName@</FamilyNames>
+		<FirstNames>@virtual.personName.firstName@</FirstNames>
+		<OtherNames>@crisrp.name.variant@</OtherNames>
+		<OtherNames>@crisrp.name.translated@</OtherNames>
+	</PersonName>
+	<Gender>@oairecerif.person.gender@</Gender>
+	<ORCID>@person.identifier.orcid@</ORCID>
+	<ResearcherID>@person.identifier.rid@</ResearcherID>
+	<ScopusAuthorID>@person.identifier.scopus-author-id@</ScopusAuthorID>
+	<ElectronicAddress>@person.email@</ElectronicAddress>
+	@group.oairecerif-person-affiliation.start@
+	<Affiliation
+		startDate="@oairecerif.affiliation.startDate@"
+		endDate="@oairecerif.affiliation.endDate@"
+		role="@oairecerif.affiliation.role@"
+	>
+		<OrgUnit> 
+			<Name>@oairecerif.person.affiliation@</Name> 
+		</OrgUnit>
+	</Affiliation>
+	@group.oairecerif-person-affiliation.end@
+	<Affiliation> 
+		<OrgUnit> 
+			<Acronym>@person.affiliation.name@</Acronym> 
+		</OrgUnit> 
+	</Affiliation>
+</Person>

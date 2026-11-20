@@ -1,0 +1,86 @@
+<Project xmlns="https://www.openaire.eu/cerif-profile/1.1/" id="@virtual.id@">
+	<Acronym>@oairecerif.acronym@</Acronym>
+	<Title>@dc.title@</Title>
+	<Identifier type="http://namespace.openaire.eu/oaf">@crispj.openaireid@</Identifier>
+	<Identifier type="URL">@oairecerif.identifier.url@</Identifier>
+	<StartDate>@oairecerif.project.startDate@</StartDate>
+	<EndDate>@oairecerif.project.endDate@</EndDate>
+	<Consortium>
+		<Coordinator>
+			@relation.crispj-coordinator.start@
+			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
+				<Name>@dc.title@</Name>
+			</OrgUnit>
+			@relation.crispj-coordinator.end@
+			@if.not.authority.crispj-coordinator.start@
+			<OrgUnit> <Name>@crispj.coordinator@</Name> </OrgUnit>
+			@if.not.authority.crispj-coordinator.end@
+		</Coordinator>
+		<Partner>
+			@relation.crispj-partnerou.start@
+			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
+				<Name>@dc.title@</Name>
+			</OrgUnit>
+			@relation.crispj-partnerou.end@
+			@if.not.authority.crispj-partnerou.start@
+			<OrgUnit> <Name>@crispj.partnerou@</Name> </OrgUnit>
+			@if.not.authority.crispj-partnerou.end@
+		</Partner>
+		<Member>
+			@relation.crispj-organization.start@
+			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
+				<Name>@dc.title@</Name>
+			</OrgUnit>
+			@relation.crispj-organization.end@
+			@if.not.authority.crispj-organization.start@
+			<OrgUnit> <Name>@crispj.organization@</Name> </OrgUnit>
+			@if.not.authority.crispj-organization.end@
+		</Member>
+	</Consortium>
+	<Team>
+		<PrincipalInvestigator>
+			<Person displayName="@crispj.investigator@" />
+		</PrincipalInvestigator>
+		<Member>
+			<Person displayName="@crispj.coinvestigators@" />
+		</Member>
+	</Team>
+	@relation.fundings.start@
+	<Funded>
+		<By>
+			@relation.oairecerif-funder.start@
+			<OrgUnit id="@virtual.id@">
+                <Acronym>@oairecerif.acronym@</Acronym>
+				<Name>@dc.title@</Name>
+			</OrgUnit>
+			@relation.oairecerif-funder.end@
+			@if.not.authority.oairecerif-funder.start@
+			<OrgUnit>
+				<Name>@oairecerif.funder@</Name>
+			</OrgUnit>
+			@if.not.authority.oairecerif-funder.end@
+		</By>
+		<As>
+			<Funding id="@virtual.id@">
+				<Type xmlns="https://www.openaire.eu/cerif-profile/vocab/OpenAIRE_Funding_Types">@virtual.mapConverter.fundingTypes.dc-type@</Type>
+				<Name>@dc.title@</Name>
+			</Funding>
+		</As>
+	</Funded>
+	@relation.fundings.end@
+	<Keyword>@dc.subject@</Keyword>
+	<Abstract>@dc.description.abstract@</Abstract>
+    <Status>@oairecerif.project.status@</Status>
+    <Uses>
+        <Equipment>
+            <Name>@dc.relation.equipment@</Name>
+        </Equipment>
+    </Uses>
+	<OAMandate 
+		mandated="@oairecerif.oamandate@" 
+		URL="@oairecerif.oamandate.url@" 
+	/>
+</Project>

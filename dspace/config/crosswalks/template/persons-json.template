@@ -1,0 +1,5 @@
+{
+	"persons": [
+		@item.template@,
+	]
+}

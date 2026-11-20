@@ -1,0 +1,26 @@
+{
+	"name": "@dc.title@",
+	"legalName": "@organization.legalName@",
+	"acronym": "@oairecerif.acronym@",
+	"type": "@virtual.mapConverter.orgUnitTypes.dc-type@",
+	"parentOrganization": {
+		@relation.organization-parentOrganization.start@
+		"name": "@dc.title@",
+		"acronym": "@oairecerif.acronym@"
+		@relation.organization-parentOrganization.end@
+		@if.not.authority.organization-parentOrganization.start@
+		"name": "@organization.parentOrganization@"
+		@if.not.authority.organization-parentOrganization.end@
+	},
+	"identifiers": [
+		"@organization.identifier@",
+	],
+	"url-identifiers": [
+		"@oairecerif.identifier.url@",
+	],
+	"People": [
+		@relation.people.start@
+		"@dc.title@",
+		@relation.people.end@
+	]
+}

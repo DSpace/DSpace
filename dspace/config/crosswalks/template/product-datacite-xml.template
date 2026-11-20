@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://datacite.org/schema/kernel-4" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
+  <identifier identifierType="DOI">@virtual.primary-doi.dc-identifier-doi@</identifier>
+  <creators>
+      @group.dc-contributor-author.start@
+      <creator>
+            <creatorName>@dc.contributor.author@</creatorName>
+            @relation.dc-contributor-author.start@
+            <nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org/">@person.identifier.orcid@</nameIdentifier>
+            @relation.dc-contributor-author.end@
+            @relation.oairecerif-author-affiliation.start@
+            <affiliation 
+                affiliationIdentifier="@organization.identifier.ror@" affiliationIdentifierScheme="ROR" schemeURI="https://ror.org/"
+            >@dc.title@</affiliation>
+            @relation.oairecerif-author-affiliation.end@
+            @if.not.authority.oairecerif-author-affiliation.start@
+            <affiliation>@oairecerif.author.affiliation@</affiliation>
+            @if.not.authority.oairecerif-author-affiliation.end@
+      </creator>
+      @group.dc-contributor-author.end@
+    </creators>
+  <titles>
+    <title>@dc.title@</title>
+  </titles>
+  @if.metadata.dc-publisher.start@
+  <publisher
+  @relation.dc-publisher.start@
+      publisherIdentifier="@organization.identifier.ror@" publisherIdentifierScheme="ROR" schemeURI="https://ror.org/"
+  @relation.dc-publisher.end@
+  >@dc.publisher@</publisher>
+  @if.metadata.dc-publisher.end@
+  @if.metadata.dc-date-issued.start@
+  		<publicationYear>@virtual.date.dc-date-issued.YYYY@</publicationYear>
+  @if.metadata.dc-date-issued.end@
+  @if.not.metadata.dc-date-issued.start@
+  		<publicationYear>(:unav)</publicationYear>
+  @if.not.metadata.dc-date-issued.end@
+  @if.metadata.dc-subject.start@
+  <subjects>
+    <subject>@dc.subject@</subject>
+  </subjects>
+  @if.metadata.dc-subject.end@
+  <dates>
+    <date dateType="Issued">@dc.date.issued@</date>
+    @if.metadata.datacite-available.start@
+    <date dateType="Available">@datacite.available@</date>
+    @if.metadata.datacite-available.end@
+    @if.not.metadata.datacite-available.start@
+    <date dateType="Available">@dc.date.available@</date>
+    @if.not.metadata.datacite-available.end@
+  </dates>
+  <language>@virtual.place.dc-language-iso.0@</language>
+  @if.metadata.dc-type.start@
+  <resourceType resourceTypeGeneral="@virtual.mapConverter.type2datacite.dc-type@">
+  @virtual.mapConverter.type2datacitelabel.dc-type@
+  </resourceType>
+  @if.metadata.dc-type.end@
+  @if.not.metadata.dc-type.start@
+  <resourceType resourceTypeGeneral="Other">
+    Unknown
+  </resourceType>
+  @if.not.metadata.dc-type.end@
+  <alternateIdentifiers>
+    <alternateIdentifier alternateIdentifierType="url">@dc.identifier.uri@</alternateIdentifier>
+    <alternateIdentifier alternateIdentifierType="doi">@virtual.alternative-doi.dc-identifier-doi@</alternateIdentifier>
+  </alternateIdentifiers>
+  <version>@dc.description.version@</version>
+  <rightsList>
+    <rights rightsURI="@virtual.mapConverter.right2licenseUrl.oaire-licenseCondition@">
+        @oaire.licenseCondition@</rights>
+    <rights rightsURI="@virtual.mapConverter.right2conceptUrl.datacite-rights@">
+        @datacite.rights@</rights>
+  </rightsList>
+  <descriptions>
+    <description descriptionType="Abstract">@dc.description.abstract@</description>
+    <description descriptionType="Other">@dc.description@</description>
+  </descriptions>
+</resource>

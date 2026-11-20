@@ -59,6 +59,7 @@ public class ItemMatcher {
                 "relationships[]",
                 "templateItemOf",
                 "thumbnail",
+                "metrics",
                 "submitter"
         );
     }

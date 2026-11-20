@@ -1,0 +1,5 @@
+<person>
+	<publications xmlns:fo="http://www.w3.org/1999/XSL/Format">
+        	@virtual.citations.fo.apa-cv.researchoutputs.group-by-type@
+    </publications>
+</person>

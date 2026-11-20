@@ -1,0 +1,29 @@
+{
+	"type": "@virtual.mapConverter.fundingTypes.dc-type@",
+	"name": "@dc.title@",
+	"acronym": "@oairecerif.acronym@",
+	"fundingCode": "@oairecerif.internalid@",
+	"grantNumber": "@oairecerif.funding.identifier@",
+	"amount": {
+		"currency": "@oairecerif.amount.currency@",
+		"value": "@oairecerif.amount@"
+	},
+	"description": "@dc.description@",
+	"funder": {
+		@relation.oairecerif-funder.start@
+		"name": "@dc.title@",
+		"acronym": "@oairecerif.acronym@"
+		@relation.oairecerif-funder.end@
+		@if.not.authority.oairecerif-funder.start@
+		"name": "@oairecerif.funder@"
+		@if.not.authority.oairecerif-funder.end@
+	},
+	"duration": {
+		"startDate": "@oairecerif.funding.startDate@",
+		"endDate": "@oairecerif.funding.endDate@"
+	},
+	"OAMandate": {
+		"mandated": "@oairecerif.oamandate@",
+		"URL": "@oairecerif.oamandate.url@"
+	}
+}

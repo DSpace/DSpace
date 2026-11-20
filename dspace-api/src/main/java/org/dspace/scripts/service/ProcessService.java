@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
@@ -131,6 +132,27 @@ public interface ProcessService {
      */
     public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
         throws IOException, SQLException, AuthorizeException;
+
+    /**
+     * The method will create a bitstream from the given inputstream with the given type as metadata and given name
+     * as name and attach it to the given process
+     *
+     * @param context       The relevant DSpace context
+     * @param process       The process for which the bitstream will be made
+     * @param is            The inputstream for the bitstream
+     * @param type          The type of the bitstream
+     * @param fileName      The name of the bitstream
+     * @param groupPolicy   The map of groupPolicies
+     * @param userPolicy    The map of userPolicies
+     * @throws IOException  If something goes wrong
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public default void appendFile(Context context, Process process, InputStream is, String type, String fileName,
+            Map<Integer, Group> groupPolicy, Map<Integer, EPerson> userPolicy)
+            throws IOException, SQLException, AuthorizeException {
+        this.appendFile(context, process, is, type, fileName);
+    }
 
     /**
      * This method will delete the given Process object from the database

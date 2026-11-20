@@ -1,0 +1,94 @@
+{
+	"names" : {
+		"preferred-name": "John Smith",
+		"full-name": "John Smith",
+		"vernacular-name": "JOHN SMITH",
+		"variants": [
+			"J.S.",
+			"Smith John"
+		],
+		"given-name": "John",
+		"family-name": "Smith"
+	},
+	"birth-date": "1992-06-26",
+	"gender": "M",
+	"job-title": "Researcher",
+	"main-affiliation": "University",
+	"working-groups": [
+		"First work group",
+		"Second work group"
+	],
+	"personal-sites": [
+		{
+			"site-url": "www.test.com",
+			"site-title": "Test"
+		},
+		{
+			"site-url": "www.john-smith.com"
+		},
+		{
+			"site-url": "www.site.com",
+			"site-title": "Site"
+		}
+	],
+	"email": "test@test.com",
+	"interests": [
+		"Science"
+	],
+	"identifiers": {
+		"orcid": "0000-0002-9079-5932",
+		"scopus-author-ids": [
+		],
+		"researcher-ids": [
+		]
+	},
+	"affiliations": [
+		{
+			"name": "Company",
+			"start-date": "2018-01-01",
+			"role": "Developer"
+		}
+	],
+	"biography": "Biography: \n\t\"This is my biography\"",
+	"educations": [
+		{
+			"name": "School",
+			"start-date": "2000-01-01",
+			"end-date": "2005-01-01",
+			"role": "Student"
+		}
+	],
+	"country": "England",
+	"qualifications": [
+		{
+			"name": "First Qualification",
+			"start-date": "2015-01-01",
+			"end-date": "2016-01-01"
+		},
+		{
+			"name": "Second Qualification",
+			"start-date": "2016-01-02"
+		}
+	],
+	"knows-languages": [
+		"English",
+		"Italian"
+	],
+	"publications": [
+		{
+			"title": "First Publication",
+			"date-issued": "2020-01-01",
+			"authors": [
+				"John Smith",
+				"Walter White"
+			]
+		},
+		{
+			"title": "Second Publication",
+			"date-issued": "2020-04-01",
+			"authors": [
+				"John Smith"
+			]
+		}
+	]
+}
