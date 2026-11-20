@@ -8,7 +8,7 @@
  <!ELEMENT row (field|relation-field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
 
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, max-occurrences?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -24,6 +24,7 @@
  <!ELEMENT required (#PCDATA)>
  <!ELEMENT name-variants (#PCDATA)>
  <!ELEMENT regex (#PCDATA) >
+ <!ELEMENT max-occurrences (#PCDATA) >
 
  <!ELEMENT form-value-pairs (value-pairs)* >
  <!ELEMENT value-pairs (pair)+ >
