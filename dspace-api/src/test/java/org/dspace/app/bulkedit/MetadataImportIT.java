@@ -36,9 +36,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -57,6 +59,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     private final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
+    private final MetadataValueService metadataValueService
+            = ContentServiceFactory.getInstance().getMetadataValueService();
     private final EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
     private final RelationshipService relationshipService
@@ -281,6 +285,131 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
     }
 
+    @Test
+    public void metadataImportDetectsTrailingWhitespaceChangeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing trailing whitespace change";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withAuthor("Gopalan, Deepa")
+                               .withTitle(itemTitle)
+                               .build();
+        // Simulate an existing value from a submission path that preserved trailing whitespace.
+        MetadataValue author = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0);
+        author.setValue("Gopalan, Deepa ");
+        metadataValueService.update(context, author);
+        context.restoreAuthSystemState();
+
+        assertEquals("Gopalan, Deepa ",
+            itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue());
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle + ",\"Gopalan, Deepa\""};
+        performImportScript(csv);
+
+        item = findItemByName(itemTitle);
+        assertEquals("Gopalan, Deepa",
+            itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).get(0).getValue());
+    }
+
+    @Test
+    public void metadataImportReportsNewlineRemovalAlongsideOtherChangesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing newline removal";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withTitle(itemTitle)
+                               .withMetadata("dc", "contributor", "other", "Name with space at the end")
+                               .withMetadata("dc", "contributor", "other", "Name with newline at the end")
+                               .withMetadata("dc", "contributor", "other", "Name with nothing at the end")
+                               .build();
+        List<MetadataValue> existing = itemService.getMetadata(
+            item, "dc", "contributor", "other", Item.ANY);
+        existing.get(0).setValue("Name with space at the end ");
+        metadataValueService.update(context, existing.get(0));
+        existing.get(1).setValue("Name with newline at the end\n");
+        metadataValueService.update(context, existing.get(1));
+        context.restoreAuthSystemState();
+
+        assertEquals("Name with space at the end ", existing.get(0).getValue());
+        assertEquals("Name with newline at the end\n", existing.get(1).getValue());
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.other",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle +
+                ",\"Name with space at the end||Name with newline at the end||Name with nothing at the end\""};
+        TestDSpaceRunnableHandler handler = performImportScript(csv, false);
+
+        assertTrue("The import summary must report removal of the value containing a newline",
+            handler.getInfoMessages().contains("Name with newline at the end\n"));
+        item = findItemByName(itemTitle);
+        assertEquals(List.of("Name with space at the end", "Name with newline at the end",
+                "Name with nothing at the end"),
+            itemService.getMetadata(item, "dc", "contributor", "other", Item.ANY)
+                       .stream().map(MetadataValue::getValue).toList());
+    }
+
+    @Test
+    public void metadataImportPreservesNewlineOnUnchangedValueTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing unchanged newline preservation";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withTitle(itemTitle)
+                               .withMetadata("dc", "contributor", "other", "First Author")
+                               .withMetadata("dc", "contributor", "other", "Second Author")
+                               .build();
+        List<MetadataValue> existing = itemService.getMetadata(
+            item, "dc", "contributor", "other", Item.ANY);
+        existing.get(1).setValue("Second Author\n");
+        metadataValueService.update(context, existing.get(1));
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.other",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle +
+                ",\"first Author||Second Author\n\""};
+        performImportScript(csv);
+
+        item = findItemByName(itemTitle);
+        assertEquals(List.of("first Author", "Second Author\n"),
+            itemService.getMetadata(item, "dc", "contributor", "other", Item.ANY)
+                       .stream().map(MetadataValue::getValue).toList());
+    }
+
+    @Test
+    public void metadataImportPreservesNewlinesForChangedAndUnchangedAuthorValuesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String itemTitle = "Testing unchanged author newlines";
+        Item item = ItemBuilder.createItem(context, personCollection)
+                               .withTitle(itemTitle)
+                               .withAuthor("Orth, Alan")
+                               .withAuthor("Donohue, Tim")
+                               .withAuthor("Goyal, Sakshamm")
+                               .build();
+        List<MetadataValue> existing = itemService.getMetadata(
+            item, "dc", "contributor", "author", Item.ANY);
+        existing.get(0).setValue("Orth, Alan\n");
+        metadataValueService.update(context, existing.get(0));
+        existing.get(1).setValue("Donohue, Tim\n");
+        metadataValueService.update(context, existing.get(1));
+        existing.get(2).setValue("Goyal, Sakshamm\n");
+        metadataValueService.update(context, existing.get(2));
+        context.restoreAuthSystemState();
+
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
+            item.getID() + "," + personCollection.getHandle() + "," + itemTitle +
+                ",\"Oorth, Alan\n||Donohue, Tim\n||Goyal, Sakshamm\n\""};
+        performImportScript(csv);
+
+        item = findItemByName(itemTitle);
+        assertEquals(List.of("Oorth, Alan\n", "Donohue, Tim\n", "Goyal, Sakshamm\n"),
+            itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY)
+                       .stream().map(MetadataValue::getValue).toList());
+    }
+
+    @Test
+    public void cleanNormalizesLineEndingsWithoutRemovingNewlinesTest() {
+        MetadataImport metadataImport = new MetadataImport();
+
+        assertEquals("First line\nSecond line\n", metadataImport.clean("First line\r\nSecond line\r"));
+    }
+
     private Item findItemByName(String name) throws Exception {
         List<Item> items =
             IteratorUtils.toList(itemService.findArchivedByMetadataField(context, "dc", "title", null, name));
@@ -303,7 +432,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
      * @param csv content for test file.
      * @throws java.lang.Exception passed through.
      */
-    public void performImportScript(String[] csv, boolean useTemplate) throws Exception {
+    public TestDSpaceRunnableHandler performImportScript(String[] csv, boolean useTemplate) throws Exception {
         File csvFile = File.createTempFile("dspace-test-import", "csv");
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"));
         for (String csvLine : csv) {
@@ -312,17 +441,18 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         out.flush();
         out.close();
         String fileLocation = csvFile.getAbsolutePath();
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
         try {
             String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", admin.getEmail(), "-s"};
             if (useTemplate) {
                 args = ArrayUtils.add(args, "-t");
             }
-            TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
             ScriptLauncher
                 .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         } finally {
             csvFile.delete();
         }
+        return testDSpaceRunnableHandler;
     }
 
     @Test
