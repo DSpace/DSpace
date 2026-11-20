@@ -145,6 +145,21 @@ public class UploadStep extends AbstractProcessingStep
             bf = bitstreamFormatService.guessFormat(context, source);
             source.setFormat(context, bf);
 
+            // Enforce the (opt-in) upload format whitelist: reject files whose identified
+            // format is not allowed, removing the just-uploaded bitstream from the item.
+            if (!bitstreamFormatService.isUploadAllowed(bf)) {
+                Bundle bundle = source.getBundles().get(0);
+                bundleService.removeBitstream(context, bundle, source);
+                if (bundle.getBitstreams().isEmpty()) {
+                    itemService.removeBundle(context, item, bundle);
+                }
+                ErrorRest result = new ErrorRest();
+                result.setMessage("error.validation.upload.format-not-allowed");
+                result.getPaths().add(
+                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + stepConfig.getId());
+                return Pair.of(null, result);
+            }
+
             // Update to DB
             bitstreamService.update(context, source);
             itemService.update(context, item);
