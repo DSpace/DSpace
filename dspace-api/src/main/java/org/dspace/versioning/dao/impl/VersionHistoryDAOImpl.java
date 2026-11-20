@@ -10,7 +10,9 @@ package org.dspace.versioning.dao.impl;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -22,6 +24,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.Version_;
 import org.dspace.versioning.dao.VersionHistoryDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the VersionHistory object.
@@ -52,5 +55,35 @@ public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> 
         criteriaQuery.orderBy(orderList);
 
         return singleResult(context, criteriaQuery);
+    }
+
+    @Override
+    public void lockVersionCreation(Context context, Item item) throws SQLException {
+        Session session = getHibernateSession(context);
+        Integer historyId = findHistoryId(session, item.getID());
+
+        if (historyId == null) {
+            // No history exists (yet). Serialize first-time version creation for this Item.
+            session.lock(item, LockModeType.PESSIMISTIC_WRITE);
+
+            // Recheck after waiting for the Item lock — another transaction may have created the history.
+            historyId = findHistoryId(session, item.getID());
+        }
+
+        if (historyId != null) {
+            // All Item versions sharing a history use this lock.
+            session.find(VersionHistory.class, historyId, LockModeType.PESSIMISTIC_WRITE);
+        }
+    }
+
+    private Integer findHistoryId(Session session, UUID itemId) {
+        return session.createQuery("""
+            SELECT v.versionHistory.id
+            FROM Version v
+            WHERE v.item.id = :itemId
+            """, Integer.class)
+                      .setParameter("itemId", itemId)
+                      .setMaxResults(1)
+                      .uniqueResult();
     }
 }
