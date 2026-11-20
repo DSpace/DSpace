@@ -97,7 +97,6 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             // restore the submitter as current user
             context.setCurrentUser(submitter);
             context.dispatchEvents();
-            indexingService.commit();
             return claimedTask;
         } catch (Exception e) {
             return handleException(e);

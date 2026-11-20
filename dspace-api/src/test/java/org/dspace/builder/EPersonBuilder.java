@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -52,8 +51,7 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
     public EPerson build() {
         try {
             ePersonService.update(context, ePerson);
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException | AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             LOG.warn("Failed to complete the EPerson", e);
         }
         return ePerson;

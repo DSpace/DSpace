@@ -18,7 +18,6 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 public class RelationshipBuilder extends AbstractBuilder<Relationship, RelationshipService> {
 
@@ -47,7 +46,6 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
                 delete(c, relationship);
             }
             c.complete();
-            indexingService.commit();
         }
     }
 
@@ -65,8 +63,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
             relationshipService.update(context, relationship);
             context.dispatchEvents();
 
-            indexingService.commit();
-        } catch (SearchServiceException | SQLException | AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error(e);
         }
         return relationship;
@@ -82,7 +79,6 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
             c.complete();
         }
 
-        indexingService.commit();
     }
 
     /**
