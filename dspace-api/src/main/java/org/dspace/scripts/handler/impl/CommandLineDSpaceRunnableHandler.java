@@ -23,8 +23,7 @@ import org.dspace.core.Context;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
- * This is an implementation for the CommandLineDSpaceRunnables which means that these implementations
- * are used by DSpaceRunnables which are called from the CommandLine
+ * Support for scripts when called from the command line.
  */
 public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private static final Logger log = org.apache.logging.log4j.LogManager
