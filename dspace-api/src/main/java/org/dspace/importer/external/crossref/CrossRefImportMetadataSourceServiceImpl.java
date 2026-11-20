@@ -10,6 +10,7 @@ package org.dspace.importer.external.crossref;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,8 +28,10 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
+import org.dspace.importer.external.datamodel.ExactImportRecords;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.datamodel.RecordsCount;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
@@ -48,6 +51,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     private String url;
 
+    /** When true, only exact DOI lookups are used (no query fallback). */
+    private boolean exactIdOnly = false;
+
     @Autowired
     private LiveImportClient liveImportClient;
 
@@ -62,35 +68,90 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
     @Override
     public ImportRecord getRecord(String recordId) throws MetadataSourceException {
         String id = getID(recordId);
-        List<ImportRecord> records = StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
-                                                                : retry(new SearchByIdCallable(recordId));
+        if (StringUtils.isNotBlank(id)) {
+            List<ImportRecord> records = retry(new SearchByIdCallable(id));
+            if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
+                return CollectionUtils.isEmpty(records) ? null : records.get(0);
+            }
+            records = retry(new SearchByQueryCallable(recordId, 1, 0));
+            return CollectionUtils.isEmpty(records) ? null : records.get(0);
+        }
+        if (isExactIdOnly()) {
+            return null;
+        }
+        List<ImportRecord> records = retry(new SearchByIdCallable(recordId));
         return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(String query) throws MetadataSourceException {
         String id = getID(query);
-        return StringUtils.isNotBlank(id) ? retry(new DoiCheckCallable(id)) : retry(new CountByQueryCallable(query));
+        if (StringUtils.isNotBlank(id)) {
+            int count = retry(new DoiCheckCallable(id));
+            if (count > 0 || isExactIdOnly()) {
+                return RecordsCount.exact(count);
+            }
+            return RecordsCount.query(retry(new CountByQueryCallable(query)));
+        }
+        if (isExactIdOnly()) {
+            return RecordsCount.query(0);
+        }
+        return RecordsCount.query(retry(new CountByQueryCallable(query)));
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
+        return getRecordsCountResult(query).getCount();
+    }
+
+    @Override
+    public RecordsCount getRecordsCountResult(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        return StringUtils.isNotBlank(id) ? retry(new DoiCheckCallable(id)) : retry(new CountByQueryCallable(query));
+        if (StringUtils.isNotBlank(id)) {
+            int count = retry(new DoiCheckCallable(id));
+            if (count > 0 || isExactIdOnly()) {
+                return RecordsCount.exact(count);
+            }
+            return RecordsCount.query(retry(new CountByQueryCallable(query)));
+        }
+        if (isExactIdOnly()) {
+            return RecordsCount.query(0);
+        }
+        return RecordsCount.query(retry(new CountByQueryCallable(query)));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
-        String id = getID(query.toString());
-        return StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
-                                          : retry(new SearchByQueryCallable(query, count, start));
+        String id = getID(query);
+        if (StringUtils.isNotBlank(id)) {
+            List<ImportRecord> records = retry(new SearchByIdCallable(id));
+            if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
+                return new ExactImportRecords(records);
+            }
+            return retry(new SearchByQueryCallable(query, count, start));
+        }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
+        }
+        return retry(new SearchByQueryCallable(query, count, start));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
         if (StringUtils.isNotBlank(id)) {
-            return retry(new SearchByIdCallable(id));
+            List<ImportRecord> records = retry(new SearchByIdCallable(id));
+            if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
+                return new ExactImportRecords(records);
+            }
+        }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
         }
         return retry(new SearchByQueryCallable(query));
     }
@@ -98,16 +159,35 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        List<ImportRecord> records = StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
-                                                                : retry(new SearchByIdCallable(query));
+        if (StringUtils.isNotBlank(id)) {
+            List<ImportRecord> records = retry(new SearchByIdCallable(id));
+            if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
+                return CollectionUtils.isEmpty(records) ? null : records.get(0);
+            }
+            records = retry(new SearchByQueryCallable(query));
+            return CollectionUtils.isEmpty(records) ? null : records.get(0);
+        }
+        if (isExactIdOnly()) {
+            return null;
+        }
+        List<ImportRecord> records = retry(new SearchByIdCallable(query));
         return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        return StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
-                                          : retry(new FindMatchingRecordCallable(query));
+        if (StringUtils.isNotBlank(id)) {
+            List<ImportRecord> records = retry(new SearchByIdCallable(id));
+            if (CollectionUtils.isNotEmpty(records) || isExactIdOnly()) {
+                return new ExactImportRecords(records);
+            }
+            return retry(new SearchByQueryCallable(query));
+        }
+        if (isExactIdOnly()) {
+            return Collections.emptyList();
+        }
+        return retry(new FindMatchingRecordCallable(query));
     }
 
     @Override
@@ -116,7 +196,16 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
     }
 
     public String getID(String id) {
-        return DoiCheck.isDoi(id) ? "filter=doi:" + id : StringUtils.EMPTY;
+        String normalized = DoiCheck.purgeDoiValue(id);
+        return DoiCheck.isDoi(normalized) ? normalized : StringUtils.EMPTY;
+    }
+
+    public boolean isExactIdOnly() {
+        return exactIdOnly;
+    }
+
+    public void setExactIdOnly(boolean exactIdOnly) {
+        this.exactIdOnly = exactIdOnly;
     }
 
     /**
@@ -198,6 +287,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+            if (jsonNode == null) {
+                return results;
+            }
             JsonNode messageNode = jsonNode.at("/message");
             if (!messageNode.isMissingNode()) {
                 results.add(transformSourceRecords(messageNode.toString()));
@@ -324,7 +416,10 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             uriBuilder.setPath(uriBuilder.getPath() + "/" + query.getParameterAsClass("id", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
-            return Strings.CS.equals(jsonNode.at("/status").toString(), "ok") ? 1 : 0;
+            if (jsonNode == null) {
+                return 0;
+            }
+            return Strings.CS.equals(jsonNode.at("/status").asText(), "ok") ? 1 : 0;
         }
     }
 

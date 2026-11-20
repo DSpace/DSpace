@@ -13,6 +13,7 @@ import java.util.Collection;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.datamodel.RecordsCount;
 import org.dspace.importer.external.exception.MetadataSourceException;
 
 
@@ -45,6 +46,18 @@ public interface QuerySource extends MetadataSource {
     public int getRecordsCount(String query) throws MetadataSourceException;
 
     /**
+     * Gets the number of records matching a query, including whether the count came from
+     * an exact id lookup or a query search. Default: non-exact.
+     *
+     * @param query the query in string format
+     * @return count with exact/query flag
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    default RecordsCount getRecordsCountResult(String query) throws MetadataSourceException {
+        return RecordsCount.query(getRecordsCount(query));
+    }
+
+    /**
      * Gets the number of records matching a query
      *
      * @param query the query object
@@ -52,6 +65,18 @@ public interface QuerySource extends MetadataSource {
      * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public int getRecordsCount(Query query) throws MetadataSourceException;
+
+    /**
+     * Gets the number of records matching a query, including whether the count came from
+     * an exact id lookup or a query search. Default: non-exact.
+     *
+     * @param query the query object
+     * @return count with exact/query flag
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    default RecordsCount getRecordsCountResult(Query query) throws MetadataSourceException {
+        return RecordsCount.query(getRecordsCount(query));
+    }
 
     /**
      * Gets a set of records matching a query. Supports pagination
