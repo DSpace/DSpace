@@ -61,6 +61,9 @@ public class BitstreamAccessStatusLinkRepository extends AbstractDSpaceRestRepos
                 LocalDate availabilityDate = accessStatus.getAvailabilityDate();
                 String embargoDate = availabilityDate.toString();
                 accessStatusRest.setEmbargoDate(embargoDate);
+            } else if (status == DefaultAccessStatusHelper.LEASE) {
+                LocalDate leaseDate = accessStatus.getLeaseDate();
+                accessStatusRest.setLeaseDate(leaseDate.toString());
             }
             accessStatusRest.setStatus(status);
             return accessStatusRest;
