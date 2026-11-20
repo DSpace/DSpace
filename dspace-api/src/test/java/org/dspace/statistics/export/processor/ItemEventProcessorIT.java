@@ -10,10 +10,9 @@ package org.dspace.statistics.export.processor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.codec.CharEncoding;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -44,11 +43,7 @@ public class ItemEventProcessorIT extends AbstractIntegrationTestWithDatabase {
         configurationService.setProperty("irus.statistics.tracker.enabled", true);
 
         String dspaceUrl = configurationService.getProperty("dspace.ui.url");
-        try {
-            encodedUrl = URLEncoder.encode(dspaceUrl, CharEncoding.UTF_8);
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError("Error occurred in setup()", e);
-        }
+        encodedUrl = URLEncoder.encode(dspaceUrl, StandardCharsets.UTF_8);
 
     }
 
@@ -56,14 +51,14 @@ public class ItemEventProcessorIT extends AbstractIntegrationTestWithDatabase {
     /**
      * Test the method that adds data based on the object types
      */
-    public void testAddObectSpecificData() throws UnsupportedEncodingException {
+    public void testAddObectSpecificData() {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
         context.restoreAuthSystemState();
 
-        String encodedHandle = URLEncoder.encode(item.getHandle(), CharEncoding.UTF_8);
+        String encodedHandle = URLEncoder.encode(item.getHandle(), StandardCharsets.UTF_8);
 
         ItemEventProcessor itemEventProcessor = new ItemEventProcessor(context, null, item);
         String result = itemEventProcessor.addObjectSpecificData("existing-string", item);

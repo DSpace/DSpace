@@ -298,14 +298,8 @@ public class HttpHeadersInitializer {
         if (originalFilename == null) {
             return "";
         }
-        try {
-            String encoded = URLEncoder.encode(originalFilename, StandardCharsets.UTF_8.toString());
-            return encoded.replace("+", "%20");
-        } catch (java.io.UnsupportedEncodingException e) {
-            // Fallback to a simple ASCII name if encoding fails.
-            log.error("UTF-8 encoding not supported, which should not happen.", e);
-            return createFallbackAsciiName(originalFilename);
-        }
+        String encoded = URLEncoder.encode(originalFilename, StandardCharsets.UTF_8);
+        return encoded.replace("+", "%20");
     }
 
 }

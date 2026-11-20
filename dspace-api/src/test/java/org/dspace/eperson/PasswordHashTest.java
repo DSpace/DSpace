@@ -12,13 +12,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.codec.DecoderException;
 import org.dspace.AbstractDSpaceTest;
-import org.dspace.core.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,14 +79,19 @@ public class PasswordHashTest extends AbstractDSpaceTest {
      * Test of matches method, of class PasswordHash.
      */
     @Test
-    public void testMatches()
-        throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public void testMatches() {
         System.out.println("matches");
         final String secret = "Clark Kent is Superman";
 
         // Test old 1-trip MD5 hash
-        MessageDigest digest = MessageDigest.getInstance("MD5");
-        PasswordHash hash = new PasswordHash(null, null, digest.digest(secret.getBytes(Constants.DEFAULT_ENCODING)));
+        MessageDigest digester;
+        try {
+            digester = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            // This should never happen, and if it does, check your JVM security policy
+            throw new IllegalStateException("MD5 not supported by this JVM", e);
+        }
+        PasswordHash hash = new PasswordHash(null, null, digester.digest(secret.getBytes(StandardCharsets.UTF_8)));
         boolean result = hash.matches(secret);
         assertTrue("Old unsalted 1-trip MD5 hash", result);
 

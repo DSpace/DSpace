@@ -7,15 +7,14 @@
  */
 package org.dspace.app.rest.utils;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.dspace.core.Constants;
 
 /**
  * Utility class to encode or decode URL
@@ -33,11 +32,7 @@ public class URLUtils {
      * @return decoded URL
      */
     public static String decode(String url) {
-        try {
-            return URLDecoder.decode(url, Constants.DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            return url;
-        }
+        return URLDecoder.decode(url, StandardCharsets.UTF_8);
     }
 
     /**
@@ -46,11 +41,7 @@ public class URLUtils {
      * @return encoded URL
      */
     public static String encode(String url) {
-        try {
-            return URLEncoder.encode(url, Constants.DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            return url;
-        }
+        return URLEncoder.encode(url, StandardCharsets.UTF_8);
     }
 
     /**

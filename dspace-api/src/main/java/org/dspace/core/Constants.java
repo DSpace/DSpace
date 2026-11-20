@@ -228,6 +228,12 @@ public class Constants {
         RBITSTREAM | RBUNDLE | RITEM // 12 - WITHDRAWN_READ
     };
 
+    /**
+     * @deprecated UTF-8 is a universal standard, not a configurable default.
+     *             Use {@link java.nio.charset.StandardCharsets#UTF_8} directly
+     *             to avoid {@link java.io.UnsupportedEncodingException} when using "UTF-8" as a string.
+     */
+    @Deprecated
     public static final String DEFAULT_ENCODING = "UTF-8";
 
     public static final String VIRTUAL_AUTHORITY_PREFIX = "virtual::";

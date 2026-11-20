@@ -168,7 +168,7 @@ public class AltchaCaptchaRestController implements InitializingBean {
      */
     public static String calculateHash(String input, String algorithm) throws NoSuchAlgorithmException {
         MessageDigest sha256 = MessageDigest.getInstance(algorithm);
-        byte[] hashBytes = sha256.digest(input.getBytes());
+        byte[] hashBytes = sha256.digest(input.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(hashBytes);
     }
 

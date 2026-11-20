@@ -9,6 +9,8 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -28,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 
@@ -75,6 +76,18 @@ public class Util {
     }
 
     /**
+     * @deprecated use Util#encodeBitstreamName(String, Charset)
+     */
+    @Deprecated
+    public static String encodeBitstreamName(String stringIn, String encoding) {
+        if (StringUtils.isBlank(encoding) || !Charset.isSupported(encoding)) {
+            throw new IllegalArgumentException("Unsupported encoding: " + encoding);
+        }
+
+        return encodeBitstreamName(stringIn, Charset.forName(encoding));
+    }
+
+    /**
      * Encode a bitstream name for inclusion in a URL in an HTML document. This
      * differs from the usual URL-encoding, since we want pathname separators to
      * be passed through verbatim; this is required so that relative paths in
@@ -89,12 +102,10 @@ public class Util {
      * @param stringIn input string to encode
      * @param encoding character encoding, e.g. UTF-8
      * @return the encoded string
-     * @throws java.io.UnsupportedEncodingException if encoding error
      */
-    public static String encodeBitstreamName(String stringIn, String encoding)
-        throws java.io.UnsupportedEncodingException {
+    public static String encodeBitstreamName(String stringIn, Charset encoding) {
         // FIXME: This should be moved elsewhere, as it is used outside the UI
-        if (stringIn == null) {
+        if (StringUtils.isBlank(stringIn)) {
             return "";
         }
 
@@ -155,15 +166,15 @@ public class Util {
     }
 
     /**
-     * Version of encodeBitstreamName with one parameter, uses default encoding
+     * Version of {@link Util#encodeBitstreamName(String, Charset)} with one parameter, uses
+     * {@link StandardCharsets#UTF_8} as a default encoding
      * <P>
      *
      * @param stringIn input string to encode
      * @return the encoded string
-     * @throws java.io.UnsupportedEncodingException if encoding error
      */
-    public static String encodeBitstreamName(String stringIn) throws java.io.UnsupportedEncodingException {
-        return encodeBitstreamName(stringIn, Constants.DEFAULT_ENCODING);
+    public static String encodeBitstreamName(String stringIn) {
+        return encodeBitstreamName(stringIn, StandardCharsets.UTF_8);
     }
 
     /**

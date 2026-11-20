@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import javax.xml.stream.XMLStreamException;
 
@@ -106,7 +107,7 @@ public class DSpaceXOAICacheService implements XOAICacheService {
             context.getWriter().flush();
             context.getWriter().close();
 
-            String xoaiResponse = output.toString();
+            String xoaiResponse = output.toString(StandardCharsets.UTF_8);
 
             // Cutting the header (to allow one to change the response time)
             String end = "</responseDate>";

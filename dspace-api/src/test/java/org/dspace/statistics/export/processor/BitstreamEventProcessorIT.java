@@ -14,11 +14,10 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.codec.CharEncoding;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -50,12 +49,7 @@ public class BitstreamEventProcessorIT extends AbstractIntegrationTestWithDataba
         configurationService.setProperty("irus.statistics.tracker.enabled", true);
 
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
-        try {
-            encodedUrl = URLEncoder.encode(dspaceUrl, CharEncoding.UTF_8);
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError("Error occurred in setup()", e);
-        }
-
+        encodedUrl = URLEncoder.encode(dspaceUrl, StandardCharsets.UTF_8);
     }
 
     @Test

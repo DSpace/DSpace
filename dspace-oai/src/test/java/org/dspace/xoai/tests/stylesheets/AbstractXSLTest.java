@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -57,7 +58,7 @@ public abstract class AbstractXSLTest {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             this.transformer.transform(new StreamSource(input), new StreamResult(outputStream));
             outputStream.close();
-            return outputStream.toString();
+            return outputStream.toString(StandardCharsets.UTF_8);
         }
     }
 }

@@ -10,7 +10,6 @@ package org.dspace.app.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -911,11 +910,9 @@ public class GoogleMetadata {
                 }
 
                 path.append("/");
-                path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
+                path.append(Util.encodeBitstreamName(bitstream.getName()));
                 return path.toString();
             }
-        } catch (UnsupportedEncodingException ex) {
-            log.debug(ex.getMessage());
         } catch (SQLException ex) {
             log.debug(ex.getMessage());
         }
