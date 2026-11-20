@@ -52,7 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * <p>The service applies a multi-layered filtering approach in the following priority order:</p>
  * <ol>
  *   <li><strong>Withdrawn Item Check:</strong> If an item is withdrawn and the user is not
- *       an admin, no metadata is returned (complete access denial)</li>
+ *       an admin, only the fields listed in {@code item.withdrawn.publicField} are returned,
+ *       so that the tombstone page can explain why the item was withdrawn and where its
+ *       content moved to. The property is empty by default, which denies access completely</li>
  *   <li><strong>Submission Context Check:</strong> If accessed within a submission workflow,
  *       applies submission-definition-based filtering first</li>
  *   <li><strong>Public Metadata Check:</strong> Fields configured as public via
@@ -108,8 +110,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see MetadataSecurityEvaluation
  * @author Mykhaylo Boychuk (4science.it)
  * @author Luca Giamminonni (4science.it)
+ * @author Stefano Maffei (steph-ieffam - stefano.maffei at 4science.com)
  */
 public class MetadataSecurityServiceImpl implements MetadataSecurityService {
+
+    /**
+     * Configuration property holding the metadata fields that can be exposed on the
+     * tombstone page of a withdrawn item. When no value is configured no metadata is
+     * returned at all, preserving the historical behaviour.
+     */
+    private static final String WITHDRAWN_PUBLIC_FIELD_PROPERTY = "item.withdrawn.publicField";
 
     @Resource(name = "securityLevelsMap")
     private final Map<String, MetadataSecurityEvaluation> securityLevelsMap = new HashMap<>();
@@ -177,7 +187,8 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
      *   <li><strong>Public Access:</strong> Fields configured as public are always visible</li>
      *   <li><strong>Edit Permission:</strong> Users who can edit the item see all non-hidden fields</li>
      *   <li><strong>View Permission:</strong> Regular users see only public and non-hidden fields</li>
-     *   <li><strong>No Access:</strong> Withdrawn dso hide all metadata from non-admins</li>
+     *   <li><strong>No Access:</strong> Withdrawn dso hide from non-admins every metadata but the
+ *       ones configured through {@code item.withdrawn.publicField}</li>
      * </ul>
      *
      * @param context        the DSpace context containing user and permission information
@@ -189,7 +200,7 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
                                                               List<MetadataValue> metadataValues) {
 
         if ((dso instanceof Item item) && item.isWithdrawn() && isNotAdmin(context, dso)) {
-            return List.of();
+            return getWithdrawnPublicMetadata(context, dso, metadataValues);
         }
 
         Optional<List<DCInputSet>> inputs = submissionDefinitionInputs();
@@ -344,6 +355,34 @@ public class MetadataSecurityServiceImpl implements MetadataSecurityService {
 
     private List<String> getPublicMetadataFromConfig() {
         return List.of(configurationService.getArrayProperty("metadata.publicField"));
+    }
+
+    /**
+     * Returns the subset of the given metadata values that can be shown on the tombstone page
+     * of a withdrawn item, according to the {@code item.withdrawn.publicField} configuration.
+     * Wildcards are supported, e.g. {@code dc.relation.*}.
+     *
+     * <p>When no field is configured the list is empty, which is the historical behaviour of
+     * hiding every metadata value of a withdrawn item from non administrators.</p>
+     *
+     * @param context        the DSpace context containing user and permission information
+     * @param dso            the withdrawn item
+     * @param metadataValues the complete list of metadata values to filter
+     * @return the metadata values that can be publicly exposed
+     */
+    private <T extends DSpaceObject> List<MetadataValue> getWithdrawnPublicMetadata(Context context, T dso,
+                                                              List<MetadataValue> metadataValues) {
+
+        List<String> publicFields = List.of(configurationService.getArrayProperty(WITHDRAWN_PUBLIC_FIELD_PROPERTY));
+        if (publicFields.isEmpty()) {
+            return List.of();
+        }
+
+        return metadataValues.stream()
+                             .filter(value -> publicFields.stream()
+                                 .anyMatch(publicField -> metadataMatch(value.getMetadataField(), publicField)))
+                             .filter(value -> isMetadataValueReturnAllowed(context, dso, value))
+                             .collect(Collectors.toList());
     }
 
     private Optional<List<DCInputSet>> submissionDefinitionInputs() {
