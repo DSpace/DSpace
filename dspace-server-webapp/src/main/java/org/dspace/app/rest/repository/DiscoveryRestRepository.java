@@ -87,7 +87,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrIndexableObject(context, configuration, scopeObject);
 
-        return discoverConfigurationConverter.convert(discoveryConfiguration, utils.obtainProjection());
+        return discoverConfigurationConverter.convert(configuration, dsoScope, discoveryConfiguration,
+                                                      utils.obtainProjection());
     }
 
     public SearchResultsRest getSearchObjects(final String query, final List<String> dsoTypes, final String dsoScope,
