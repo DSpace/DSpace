@@ -1,0 +1,19 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Bitstream</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>bitstream</name>
+        <namespace>http://dspace.org/bitstream</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>bitstream</schema>
+        <element>iiif</element>
+        <qualifier>canvasid</qualifier>
+        <scope_note>Metadata field used to store the canvas identifier (the UUID of the bitstream)</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
