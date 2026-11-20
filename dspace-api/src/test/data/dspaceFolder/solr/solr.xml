@@ -1,0 +1,3 @@
+<?xml version='1.0'?>
+<!-- This empty configuration is required to start EmbeddedSolrServer for Integration Tests (see MockSolrServer) -->
+<solr/>
