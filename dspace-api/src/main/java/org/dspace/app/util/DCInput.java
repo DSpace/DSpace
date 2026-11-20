@@ -203,7 +203,7 @@ public class DCInput {
         inputType = fieldMap.get("input-type");
         // these types are list-controlled
         if ("dropdown".equals(inputType) || "qualdrop_value".equals(inputType)
-            || "list".equals(inputType)) {
+            || "list".equals(inputType) || "tag".equals(inputType)) {
             valueListName = fieldMap.get("value-pairs-name");
             valueList = listMap.get(valueListName);
         }
