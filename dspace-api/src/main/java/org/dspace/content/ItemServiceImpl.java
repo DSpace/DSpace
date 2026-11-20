@@ -1922,8 +1922,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         values = getFilteredMetadataValuesByLanguage(values, lang);
 
-        // Create an array of matching values
-        return values;
+        return applyMetadataSecurity(item, values);
     }
 
     @Override
