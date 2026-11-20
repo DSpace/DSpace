@@ -7,10 +7,14 @@
  */
 package org.dspace.app.mediafilter;
 
+import static org.dspace.core.Constants.DEFAULT_BUNDLE_NAME;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -189,53 +193,110 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         return f2;
     }
 
+    /**
+     * Helper method to check if a bitstream is of a supported format of the plugin
+     */
+    private boolean isSupportedFormat(Context c, Bitstream bitstream) {
+        List<String> supportedFormats = List.of(configurationService.getArrayProperty(
+                "filter." + this.getClass().getName() + ".inputFormats"));
+        try {
+            return supportedFormats.contains(bitstream.getFormatDescription(c));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public boolean preProcessBitstream(Context c, Item item, Bitstream source, boolean verbose) throws Exception {
-        String nsrc = source.getName();
-        for (Bundle b : itemService.getBundles(item, "THUMBNAIL")) {
-            for (Bitstream bit : b.getBitstreams()) {
-                String n = bit.getName();
-                if (n != null) {
-                    if (nsrc != null) {
-                        if (!n.startsWith(nsrc)) {
-                            continue;
-                        }
-                    }
+        boolean enforcePrimaryLogic = configurationService.getBooleanProperty("filter.imagemagick.thumbnails" +
+                ".only-pimary", true);
+        // Ensure only one thumbnail is generated for the ORIGINAL bundle.
+        Bundle originalBundle = getOriginalBundle(source);
+        if (originalBundle == null) {
+            return false; // No ORIGINAL bundle found, so skip processing.
+        }
+
+        if (enforcePrimaryLogic && !shouldProcessBitstream(c, originalBundle, source, verbose, item)) {
+            return false; // Skip processing for this bitstream.
+        }
+
+        String sourceName = source.getName();
+        for (Bundle thumbnailBundle : itemService.getBundles(item, "THUMBNAIL")) {
+            for (Bitstream bitstream : thumbnailBundle.getBitstreams()) {
+                if (!isReplaceableThumbnail(bitstream, sourceName, verbose)) {
+                    System.out.printf("Custom thumbnail exists for %s for item %s. Thumbnail will not be generated.%n",
+                            sourceName, item.getHandle());
+                    return false;
                 }
-                String description = bit.getDescription();
-                // If anything other than a generated thumbnail
-                // is found, halt processing
-                Pattern replaceRegex;
-                try {
-                    String patt = configurationService.getProperty(PRE + ".replaceRegex", DEFAULT_PATTERN);
-                    replaceRegex = Pattern.compile(patt == null ? DEFAULT_PATTERN : patt);
-                } catch (PatternSyntaxException e) {
-                    System.err.println("Invalid thumbnail replacement pattern: " + e.getMessage());
-                    throw e;
-                }
-                if (description != null) {
-                    if (replaceRegex.matcher(description).matches()) {
-                        if (verbose) {
-                            System.out.format("%s %s matches pattern and is replaceable.%n",
-                                    description, n);
-                        }
-                        continue;
-                    }
-                    if (description.equals(getDescription())) {
-                        if (verbose) {
-                            System.out.format("%s %s is replaceable.%n",
-                                    getDescription(), n);
-                        }
-                        continue;
-                    }
-                }
-                System.out.format("Custom thumbnail exists for %s for item %s. Thumbnail will not be generated.%n",
-                        nsrc, item.getHandle());
-                return false;
             }
         }
 
-        return true; // assume that the thumbnail is a custom one
+        return true; // Assume the thumbnail is custom and replaceable.
     }
 
+    private Bundle getOriginalBundle(Bitstream source) throws SQLException {
+        return source.getBundles().stream()
+                     .filter(bundle -> DEFAULT_BUNDLE_NAME.equals(bundle.getName()))
+                     .findFirst()
+                     .orElse(null);
+    }
+
+    private boolean shouldProcessBitstream(Context c, Bundle originalBundle, Bitstream source,
+                                           boolean verbose, Item item) {
+        Bitstream primaryBitstream = originalBundle.getPrimaryBitstream();
+
+        if (primaryBitstream != null) {
+            // Process only the primary bitstream if it exists.
+            if (!source.equals(primaryBitstream)) {
+                if (verbose) {
+                    System.out.printf("Skipping non-primary bitstream %s for item %s.%n", source.getName(),
+                            item.getHandle());
+                }
+                return false;
+            }
+            return true;
+        }
+
+        // Process the first supported bitstream if no primary exists.
+        return isFirstSupportedBitstream(c, originalBundle, source);
+    }
+
+    private boolean isFirstSupportedBitstream(Context c, Bundle originalBundle, Bitstream source) {
+        return originalBundle.getBitstreams().stream()
+                             .filter(bitstream -> isSupportedFormat(c, bitstream))
+                             .findFirst()
+                             .map(source::equals)
+                             .orElse(false);
+    }
+
+    private boolean isReplaceableThumbnail(Bitstream bitstream, String sourceName,
+                                           boolean verbose) throws PatternSyntaxException {
+        String bitstreamName = bitstream.getName();
+        if (bitstreamName == null || sourceName == null || !bitstreamName.startsWith(sourceName)) {
+            return true;
+        }
+
+        String description = bitstream.getDescription();
+        Pattern replaceRegex = getReplacePattern();
+        if (description != null) {
+            if (replaceRegex.matcher(description).matches() || description.equals(getDescription())) {
+                if (verbose) {
+                    System.out.printf("%s %s is replaceable.%n", description, bitstreamName);
+                }
+                return true;
+            }
+        }
+
+        return false; // A custom, non-replaceable thumbnail exists.
+    }
+
+    private Pattern getReplacePattern() throws PatternSyntaxException {
+        String pattern = configurationService.getProperty(PRE + ".replaceRegex", DEFAULT_PATTERN);
+        try {
+            return Pattern.compile(pattern != null ? pattern : DEFAULT_PATTERN);
+        } catch (PatternSyntaxException e) {
+            System.err.printf("Invalid thumbnail replacement pattern: %s%n", e.getMessage());
+            throw e;
+        }
+    }
 }
