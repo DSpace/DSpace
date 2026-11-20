@@ -35,13 +35,12 @@ import org.dspace.workflow.TaskSet;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.XmlWorkflowServiceImpl;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
-import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,9 +75,6 @@ public class XmlWorkflowCuratorServiceImpl
 
     @Autowired(required = true)
     protected CollectionService collectionService;
-
-    @Autowired(required = true)
-    protected ClaimedTaskService claimedTaskService;
 
     @Autowired(required = true)
     protected CurationTaskConfig curationTaskConfig;
@@ -155,7 +151,13 @@ public class XmlWorkflowCuratorServiceImpl
                         case Curator.CURATE_FAIL:
                             // task failed - notify any contacts the task has assigned
                             if (task.powers.contains("reject")) {
-                                action = "reject";
+                                if (XmlWorkflowServiceImpl.AFTER_ARCHIVE_STEP.equals(wfi.getStepID())) {
+                                    // the item is already archived, so it cannot be rejected
+                                    LOG.warn("Curation task {} cannot reject the archived item {}",
+                                            task.name, item.getID());
+                                } else {
+                                    action = "reject";
+                                }
                             }
                             notifyContacts(c, wfi, task, "fail", action, result);
                             // if task so empowered, reject submission and terminate
@@ -207,22 +209,13 @@ public class XmlWorkflowCuratorServiceImpl
      */
     protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException {
-        if (claimedTaskService.find(c, wfi).isEmpty()) { // No claimed tasks:  assume first step
-            Collection coll = wfi.getCollection();
-            String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
-                    coll.getHandle() : CurationTaskConfig.DEFAULT_TASKSET_NAME;
-            TaskSet ts = curationTaskConfig.findTaskSet(taskSetName);
-            return ts.steps.isEmpty() ? null : ts.steps.get(0);
-        }
-        ClaimedTask claimedTask
-                = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
-        if (claimedTask != null) {
+        if (wfi.getStepID() != null) {
             Collection coll = wfi.getCollection();
             String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
                     coll.getHandle() : CurationTaskConfig.DEFAULT_TASKSET_NAME;
             TaskSet ts = curationTaskConfig.findTaskSet(taskSetName);
             for (FlowStep fstep : ts.steps) {
-                if (fstep.step.equals(claimedTask.getStepID())) {
+                if (fstep.step.equals(wfi.getStepID())) {
                     return fstep;
                 }
             }
@@ -276,11 +269,10 @@ public class XmlWorkflowCuratorServiceImpl
             // decode contacts
             if ("$flowgroup".equals(contact)) {
                 // special literal for current flowgoup
-                String stepID = getFlowStep(c, wfi).step;
                 Step step;
                 try {
-                    Workflow workflow = workflowFactory.getWorkflow(wfi.getCollection());
-                    step = workflow.getStep(stepID);
+                    Workflow workflow = workflowFactory.getWorkflowByName(wfi.getWorkflowID());
+                    step = workflow.getStep(wfi.getStepID());
                 } catch (WorkflowConfigurationException e) {
                     LOG.error("Failed to locate current workflow step for workflow item {}",
                             String.valueOf(wfi.getID()), e);

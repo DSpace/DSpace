@@ -103,7 +103,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         //Make sure the removed user has their custom rights removed
         xmlWorkflowService.removeUserItemPolicies(context, wfi.getItem(), user);
 
-        Workflow workflow = workflowFactory.getWorkflow(wfi.getCollection());
+        Workflow workflow = workflowFactory.getWorkflowByName(wfi.getWorkflowID());
         Step step = workflow.getStep(stepID);
 
 //        WorkflowManager.deleteOwnedTask(c, user, wfi, step, step.getActionConfig());

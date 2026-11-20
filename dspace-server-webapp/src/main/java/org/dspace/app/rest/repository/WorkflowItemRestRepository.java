@@ -285,7 +285,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                 throw new UnprocessableEntityException("WorkflowItem with id " + xmlWorkflowItem.getID()
                     + " has not been claimed yet.");
             }
-            Workflow workflow = workflowFactory.getWorkflow(claimedTask.getWorkflowItem().getCollection());
+            Workflow workflow = workflowFactory.getWorkflowByName(claimedTask.getWorkflowItem().getWorkflowID());
             Step step = workflow.getStep(claimedTask.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(claimedTask.getActionID());
             if (!currentActionConfig.getProcessingAction().getOptions().contains(SUBMIT_EDIT_METADATA)) {

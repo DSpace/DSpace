@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -40,6 +42,8 @@ import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -58,6 +62,8 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected XmlWorkflowItemService xmlWorkflowItemService =
+        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
 
     /**
      * Cleans up the created workflow role groups after each test
@@ -195,6 +201,63 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         // Reviewers should have access to workflow item
         assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewer1, Constants.WRITE));
         assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewer2, Constants.WRITE));
+    }
+
+    /**
+     * Test to verify that when an item enters the workflow, the workflow item stores its workflow and its first step
+     */
+    @Test
+    public void workflowStart_ShouldStoreWorkflowAndFirstStep() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson reviewer = EPersonBuilder.createEPerson(context).withEmail("reviewer@example.org").build();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+        Collection colWithWorkflow = CollectionBuilder.createCollection(context, community)
+                                                      .withName("Collection WITH workflow")
+                                                      .withWorkflowGroup("reviewer", reviewer)
+                                                      .build();
+        XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, colWithWorkflow)
+                                                          .withTitle("Test workflow item").build();
+        context.restoreAuthSystemState();
+
+        workflowItem = xmlWorkflowItemService.find(context, workflowItem.getID());
+        assertEquals("defaultWorkflow", workflowItem.getWorkflowID());
+        assertEquals("reviewstep", workflowItem.getStepID());
+    }
+
+    /**
+     * Test to verify that when a step is approved, the workflow item stores the next step
+     */
+    @Test
+    public void workflowStepApproved_ShouldStoreNextStep() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson reviewer = EPersonBuilder.createEPerson(context).withEmail("reviewer@example.org").build();
+        EPerson editor = EPersonBuilder.createEPerson(context).withEmail("editor@example.org").build();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community")
+                                              .build();
+        Collection colWithWorkflow = CollectionBuilder.createCollection(context, community)
+                                                      .withName("Collection WITH workflow")
+                                                      .withWorkflowGroup("reviewer", reviewer)
+                                                      .withWorkflowGroup("editor", editor)
+                                                      .build();
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(colWithWorkflow);
+        ClaimedTask task = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, reviewer)
+                                             .withTitle("Test workflow item to approve").build();
+        context.restoreAuthSystemState();
+
+        int workflowItemId = task.getWorkflowItem().getID();
+        assertEquals("reviewstep", xmlWorkflowItemService.find(context, workflowItemId).getStepID());
+
+        // approve
+        MockHttpServletRequest httpApproveRequest = new MockHttpServletRequest();
+        httpApproveRequest.setParameter("submit_approve", "submit_approve");
+        executeWorkflowAction(httpApproveRequest, workflow, task);
+
+        XmlWorkflowItem workflowItem = xmlWorkflowItemService.find(context, workflowItemId);
+        assertEquals("defaultWorkflow", workflowItem.getWorkflowID());
+        assertEquals("editstep", workflowItem.getStepID());
     }
 
     private boolean containsRPForUser(Item item, EPerson user, int action) throws SQLException {
