@@ -61,6 +61,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
     private int max2Process = Integer.MAX_VALUE;
     private String[] filterNames;
     private String[] skipIds = null;
+    private String[] bundleNames = null;
     private Map<String, List<String>> filterFormats = new HashMap<>();
     private LocalDate fromDate = null;
 
@@ -119,6 +120,9 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
             fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
         }
 
+        if (commandLine.hasOption('b')) {
+            bundleNames = commandLine.getOptionValues('b');
+        }
 
     }
 
@@ -224,6 +228,10 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
 
         if (fromDate != null) {
             mediaFilterService.setFromDate(fromDate);
+        }
+
+        if (bundleNames != null && bundleNames.length > 0) {
+            mediaFilterService.setSourceBundles(Arrays.asList(bundleNames));
         }
 
         Context c = null;

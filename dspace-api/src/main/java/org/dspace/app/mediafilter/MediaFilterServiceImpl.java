@@ -97,6 +97,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected boolean isQuiet = false;
     protected boolean isForce = false; // default to not forced
     protected LocalDate fromDate = null;
+    protected List<String> sourceBundles = Collections.singletonList("ORIGINAL");
 
     protected MediaFilterServiceImpl() {
 
@@ -201,8 +202,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
     @Override
     public boolean filterItem(Context context, Item myItem) throws Exception {
-        // get 'original' bundles
-        List<Bundle> myBundles = itemService.getBundles(myItem, "ORIGINAL");
+        List<Bundle> myBundles = new ArrayList<>();
+        for (String bundleName : sourceBundles) {
+            myBundles.addAll(itemService.getBundles(myItem, bundleName));
+        }
         boolean done = false;
         for (Bundle myBundle : myBundles) {
             // now look at all of the bitstreams
@@ -626,5 +629,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void setFromDate(LocalDate fromDate) {
         this.fromDate = fromDate;
+    }
+
+    @Override
+    public void setSourceBundles(List<String> sourceBundles) {
+        this.sourceBundles = sourceBundles;
     }
 }
