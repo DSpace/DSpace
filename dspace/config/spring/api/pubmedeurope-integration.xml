@@ -78,7 +78,7 @@
     </bean>
 
     <bean id="pubEuKeywordContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="pubeu.type"/>
+        <property name="field" ref="pubeu.keyword"/>
         <property name="query" value="keywordList/keyword"/>
         <property name="prefixToNamespaceMapping" ref="pubEuPrefixToNamespaceMapping"/>
     </bean>        
