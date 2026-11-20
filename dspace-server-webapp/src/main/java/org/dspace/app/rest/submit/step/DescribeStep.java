@@ -79,6 +79,8 @@ public class DescribeStep extends AbstractProcessingStep {
                            DCInputSet inputConfig) throws DCInputsReaderException {
         List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj);
 
+        String scope = config.getScope(obj);
+
         // Get list of all field names (including qualdrop names) allowed for this dc.type
         List<String> allowedFieldNames =
             inputConfig.populateAllowedFieldNames(documentTypes.stream().map(MetadataValue::getValue).toList());
@@ -86,6 +88,10 @@ public class DescribeStep extends AbstractProcessingStep {
         // Loop input rows and process submitted metadata
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
+                if (!input.isVisible(scope)) {
+                    continue;
+                }
+
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
                     for (Object qualifier : input.getPairs()) {
