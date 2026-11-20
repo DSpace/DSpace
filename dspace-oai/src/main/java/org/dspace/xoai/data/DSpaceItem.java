@@ -53,10 +53,29 @@ public abstract class DSpaceItem implements Item {
         return elems;
     }
 
+    private static List<String> noQualifierValues(List<Element> input) {
+        List<String> elems = new ArrayList<>();
+        for (Element e : input) {
+            if (e.getElement() != null) {
+                for (Element child : e.getElement()) {
+                    boolean hasFields = child.getField() != null && !child.getField().isEmpty();
+                    boolean hasSubElements = child.getElement() != null && !child.getElement().isEmpty();
+                    if (hasFields && !hasSubElements) {
+                        for (Field f : child.getField()) {
+                            if (f.getName() != null && f.getName().equals("value")) {
+                                elems.add(f.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return elems;
+    }
 
     private List<String> getMetadata(String schema, String element) {
         List<Element> metadata = this.getMetadata().getMetadata().getElement();
-        return values(filter(flat(filter(metadata, schema)), element));
+        return noQualifierValues(filter(flat(filter(metadata, schema)), element));
     }
 
     private List<String> getMetadata(String schema, String element, String qualifier) {
