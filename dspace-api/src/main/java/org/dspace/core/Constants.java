@@ -61,10 +61,15 @@ public class Constants {
     public static final int LDN_MESSAGE = 8;
 
     /**
+     * Type of process objects
+     */
+    public static final int PROCESS = 9;
+
+    /**
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM", "COLLECTION", "COMMUNITY", "SITE", "GROUP",
-        "EPERSON", "LDN_MESSAGE"};
+        "EPERSON", "LDN_MESSAGE", "PROCESS"};
 
     /**
      * Special Bundle and Bitstream Names:
