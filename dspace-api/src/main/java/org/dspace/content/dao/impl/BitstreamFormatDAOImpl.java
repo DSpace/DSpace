@@ -132,7 +132,11 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     @Override
     public List<BitstreamFormat> findByFileExtension(Context context, String extension) throws SQLException {
 
-        Query query = createQuery(context, "from BitstreamFormat bf where :extension in elements(bf.fileExtensions)");
+        // Order by id so that, when more than one format claims the same extension, the
+        // caller (e.g. BitstreamFormatService.guessFormat) always gets a deterministic
+        // result instead of one that depends on database row order.
+        Query query = createQuery(context,
+            "from BitstreamFormat bf where :extension in elements(bf.fileExtensions) order by bf.id");
         query.setParameter("extension", extension);
 
         return list(query);
