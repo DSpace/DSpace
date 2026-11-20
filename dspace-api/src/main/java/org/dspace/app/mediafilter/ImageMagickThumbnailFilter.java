@@ -11,6 +11,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -25,11 +29,16 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.im4java.core.CommandException;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
+import org.im4java.core.ImageCommand;
 import org.im4java.core.Info;
+import org.im4java.process.ProcessEvent;
+import org.im4java.process.ProcessListener;
 import org.im4java.process.ProcessStarter;
+import org.im4java.process.ProcessTask;
 
 /**
  * Filter image bitstreams, scaling the image to be within the bounds of
@@ -45,6 +54,12 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     protected static final String PRE = ImageMagickThumbnailFilter.class.getName();
+
+    /**
+     * Default maximum number of seconds a single ImageMagick command may run.
+     * Overridden by the {@code <PRE>.timeout} configuration property.
+     */
+    static final int DEFAULT_TIMEOUT = 120;
 
     static {
         String s = configurationService.getProperty(PRE + ".ProcessStarter");
@@ -112,8 +127,76 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         if (verbose) {
             System.out.println("IM Thumbnail Param: " + op);
         }
-        cmd.run(op);
+        runCommand(cmd, op);
         return f2;
+    }
+
+    /**
+     * Run an ImageMagick command, stopping it if it does not finish within the number of seconds
+     * configured in {@code <PRE>.timeout} (default {@link #DEFAULT_TIMEOUT}). A value of 0 or less
+     * disables the time limit.
+     * <p>
+     * When the time limit is reached, the ImageMagick process and any processes it started (such as
+     * Ghostscript for PDFs or ffmpeg for videos) are killed, and a {@link CommandException} is thrown.
+     * Failures of the command itself are reported in the same way as {@link ConvertCmd#run}.
+     *
+     * @param cmd the ImageMagick command to run
+     * @param op  the operation (arguments) to run it with
+     * @throws IOException          if the command cannot be started
+     * @throws InterruptedException if the current thread is interrupted while waiting
+     * @throws IM4JavaException     if the command fails or does not finish in time
+     */
+    protected void runCommand(ImageCommand cmd, IMOperation op)
+        throws IOException, InterruptedException, IM4JavaException {
+        int timeout = configurationService.getIntProperty(PRE + ".timeout", DEFAULT_TIMEOUT);
+        if (timeout <= 0) {
+            cmd.run(op);
+            return;
+        }
+
+        AtomicReference<Process> process = new AtomicReference<>();
+        cmd.addProcessListener(new ProcessListener() {
+            @Override
+            public void processStarted(Process p) {
+                process.set(p);
+            }
+
+            @Override
+            public void processTerminated(ProcessEvent event) {
+            }
+        });
+        ProcessTask task = cmd.getProcessTask(op);
+        Thread runner = new Thread(task, "imagemagick-command");
+        runner.setDaemon(true);
+        runner.start();
+
+        ProcessEvent event;
+        try {
+            event = task.get(timeout, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            stop(task, process.get());
+            throw new CommandException("ImageMagick command did not finish within " + timeout
+                                           + " seconds and was stopped: " + op);
+        } catch (InterruptedException e) {
+            stop(task, process.get());
+            throw e;
+        } catch (ExecutionException e) {
+            throw new CommandException(e.getCause());
+        }
+        if (event.getException() != null) {
+            throw new CommandException(event.getException());
+        }
+    }
+
+    /**
+     * Kill a running ImageMagick process together with any processes it started, then cancel its task.
+     */
+    private void stop(ProcessTask task, Process process) {
+        if (process != null) {
+            process.descendants().forEach(ProcessHandle::destroyForcibly);
+            process.destroyForcibly();
+        }
+        task.cancel(true);
     }
 
     /**
@@ -185,7 +268,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         if (verbose) {
             System.out.println("IM Image Param: " + op);
         }
-        cmd.run(op);
+        runCommand(cmd, op);
         return f2;
     }
 
