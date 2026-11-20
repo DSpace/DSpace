@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -870,6 +871,24 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void findOneCustomSecurityModeTest() throws Exception {
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.EPersonAuthority = EPersonAuthority",
+                                             "org.dspace.content.authority.GroupAuthority = GroupAuthority"
+                                         });
+
+        configurationService.setProperty("choices.plugin.dspace.policy.eperson", "EPersonAuthority");
+        configurationService.setProperty("choices.presentation.dspace.policy.eperson", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.eperson", "true");
+
+        configurationService.setProperty("choices.plugin.dspace.policy.group", "GroupAuthority");
+        configurationService.setProperty("choices.presentation.dspace.policy.group", "suggest");
+        configurationService.setProperty("authority.controlled.dspace.policy.group", "true");
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
         context.turnOffAuthorisationSystem();
 
         EPerson userA = EPersonBuilder.createEPerson(context)
@@ -2257,6 +2276,160 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.[0].message", is("error.validation.required")))
                 .andExpect(jsonPath("$.[0].paths[0]", is("/sections/funding/dc.title")));
+    }
+
+    /**
+     * Verifies that once the authority configuration for dc.contributor.author has been removed,
+     * editing an item whose author was previously linked to a Person authority still succeeds,
+     * as long as no authority is being (re)attached.
+     *
+     * The ChoiceAuthority config is enabled first; a Person item is created and a Publication is
+     * built with its author linked to that Person's UUID (so the author genuinely carries an
+     * authority). The authority config is then dropped, and a single PATCH replaces the title and
+     * adds a new plain (authority-less) author, which must complete without error.
+     */
+    @Test
+    public void editItemAfterAuthorityConfigRemovedTest() throws Exception {
+        // enable the ChoiceAuthority configuration for dc.contributor.author
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.OrcidAuthority = AuthorAuthority"
+                                         });
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+
+        // Ensure the ChoiceAuthorityService is initialized before clearing its cache.
+        // clearCache() calls submissionConfigService.reload(), and that field is only
+        // populated by the service's lazy init() (triggered here via a read-only call),
+        // so without this the first clearCache() on a fresh singleton throws NPE.
+        choiceAuthorityService.getChoiceAuthoritiesNames();
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Person")
+                                           .withName("People").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Publication")
+                                           .withSubmissionDefinition("traditional")
+                                           .withName("Collection 1").build();
+
+        // the Person the publication author will be linked to via its authority
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Rossi, Mario")
+                                 .build();
+
+        // target publication whose author is linked to the Person above (carries an authority)
+        Item item = ItemBuilder.createItem(context, col1)
+                                .withTitle("Original Title")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Rossi, Mario", person.getID().toString())
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        // MODE1 (submission definition "traditional", section "traditionalpageone") is the only
+        // edit mode in the test environment whose form exposes dc.contributor.author; it requires
+        // an administrator.
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // sanity check: the item is editable and currently carries its original title
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + item.getID() + ":MODE1"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                                 is("Original Title")))
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].authority",
+                                 is(person.getID().toString())))
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author'][0].value",
+                                                 is("Rossi, Mario")));
+
+        // remove the authority configuration for dc.contributor.author
+        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
+        configurationService.setProperty("choices.presentation.dc.contributor.author", null);
+        configurationService.setProperty("authority.controlled.dc.contributor.author", null);
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        // first PATCH: replace the title (no authority involved); must succeed
+        List<Operation> titleOperations = new ArrayList<Operation>();
+        Map<String, String> titleValue = new HashMap<String, String>();
+        titleValue.put("value", "Test to break authority");
+        titleValue.put("confidence", "-1");
+        titleOperations.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", titleValue));
+
+        getClient(tokenAdmin).perform(patch("/api/core/edititems/" + item.getID() + ":MODE1")
+                             .content(getPatchContent(titleOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                                 is("Test to break authority")));
+
+        // verify the title change has been persisted
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + item.getID() + ":MODE1"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                                 is("Test to break authority")));
+
+        // second PATCH: add a NEW, explicitly different author with no authority; must succeed
+        List<Operation> authorOperations = new ArrayList<Operation>();
+        List<Map<String, String>> authorValues = new ArrayList<Map<String, String>>();
+        Map<String, String> authorValue = new HashMap<String, String>();
+        authorValue.put("value", "Giuseppe Verdi (no authority)");
+        authorValue.put("authority", null);
+        authorValue.put("confidence", "-1");
+        authorValues.add(authorValue);
+        authorOperations.add(new AddOperation("/sections/traditionalpageone/dc.contributor.author", authorValues));
+
+        getClient(tokenAdmin).perform(patch("/api/core/edititems/" + item.getID() + ":MODE1")
+                             .content(getPatchContent(authorOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(
+                                     hasJsonPath("$['dc.contributor.author'][0].value",
+                                         is("Giuseppe Verdi (no authority)")),
+                                     hasJsonPath("$['dc.contributor.author'][0].authority", nullValue())
+                                     )));
+
+        // verify the author change has been persisted (and the title is still updated)
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + item.getID() + ":MODE1"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(
+                                     hasJsonPath("$['dc.title'][0].value", is("Test to break authority")),
+                                     hasJsonPath("$['dc.contributor.author'][0].value",
+                                         is("Giuseppe Verdi (no authority)")),
+                                     hasJsonPath("$['dc.contributor.author'][0].authority", nullValue())
+                                     )));
+
+        // third PATCH: remove the author metadata value entirely; must succeed
+        List<Operation> removeOperations = new ArrayList<Operation>();
+        removeOperations.add(new RemoveOperation("/sections/traditionalpageone/dc.contributor.author/0"));
+
+        getClient(tokenAdmin).perform(patch("/api/core/edititems/" + item.getID() + ":MODE1")
+                             .content(getPatchContent(removeOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author']")
+                                            .doesNotExist());
+
+        // verify the author removal has been persisted (and the title is still updated)
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + item.getID() + ":MODE1"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
+                                 is("Test to break authority")))
+                             .andExpect(jsonPath("$.sections.traditionalpageone['dc.contributor.author']")
+                                            .doesNotExist());
     }
 
     private Bitstream getBitstream(Item item, String name) throws SQLException {
