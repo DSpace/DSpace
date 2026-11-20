@@ -112,6 +112,8 @@ public class DOIIdentifierException extends IdentifierException {
                 return "UNAUTHORIZED_METADATA_MANIPULATION";
             case DOI_IS_DELETED:
                 return "DELETED";
+            case BAD_REQUEST:
+                return "BAD_REQUEST (Malformed request)";
             default:
                 return "UNKNOWN";
         }
