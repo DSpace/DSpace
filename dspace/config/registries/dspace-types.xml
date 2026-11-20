@@ -444,6 +444,13 @@
 
     <dc-type>
         <schema>dspace</schema>
+        <element>filtermedia</element>
+        <qualifier>lastdate</qualifier>
+        <scope_note>Last date filter-media was run</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
         <element>bitstream</element>
         <qualifier>hasCopies</qualifier>
         <scope_note>Stores the UUID's of the copies of this bitstream</scope_note>
