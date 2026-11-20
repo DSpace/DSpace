@@ -80,14 +80,15 @@ public class MetadataValidator implements SubmissionStepValidator {
         List<ValidationError> errors = new ArrayList<>();
 
         DCInputSet inputConfig = getDCInputSet(config);
-        List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj);
-
-        // Get list of all field names (including qualdrop names) allowed for this dc.type
-        List<String> allowedFieldNames =
-            inputConfig.populateAllowedFieldNames(documentTypes.stream().map(MetadataValue::getValue).toList());
 
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
+                List<MetadataValue> documentTypes = TypeBindUtils.getTypeBindMetadataValues(obj, input);
+
+                // Get list of all field names allowed for the type-bound field
+                List<String> allowedFieldNames =
+                    inputConfig.populateAllowedFieldNames(documentTypes.stream().map(MetadataValue::getValue).toList());
+
                 String fieldKey = metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(),
                                                                         input.getQualifier());
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);

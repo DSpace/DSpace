@@ -99,6 +99,11 @@ public class SubmissionFormFieldRest {
     private List<String> typeBind;
 
     /**
+     * The field to type-bind- to (instead of default, which is defined in dspace.cfg
+     */
+    private String typeBindToField;
+
+    /**
      * Getter for {@link #selectableMetadata}
      * 
      * @return {@link #selectableMetadata}
@@ -304,6 +309,14 @@ public class SubmissionFormFieldRest {
 
     public void setTypeBind(List<String> typeBind) {
         this.typeBind = typeBind;
+    }
+
+    public String getTypeBindToField() {
+        return typeBindToField;
+    }
+
+    public void setTypeBindToField(String typeBindToField) {
+        this.typeBindToField = typeBindToField;
     }
 
     public SelectableRelationship getSelectableRelationship() {

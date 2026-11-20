@@ -9,6 +9,7 @@ package org.dspace.app.util;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
@@ -41,7 +42,11 @@ public class TypeBindUtils {
      *
      * @return the field used for type-bind.
      */
-    public static String getTypeBindField() {
+    public static String getTypeBindField(String typeBindToField) {
+        if (StringUtils.isNotEmpty(typeBindToField)) {
+            return typeBindToField;
+        }
+
         return configurationService.getProperty("submit.type-bind.field", "dc.type");
     }
 
@@ -51,8 +56,12 @@ public class TypeBindUtils {
      * @param obj the in-progress submission
      * @return the list of MetadataValue objects of the type-bind field
      */
-    public static List<MetadataValue> getTypeBindMetadataValues(InProgressSubmission<?> obj) {
-        return itemService.getMetadataByMetadataString(obj.getItem(), getTypeBindField());
+    public static List<MetadataValue> getTypeBindMetadataValues(InProgressSubmission<?> obj, DCInput input) {
+        return itemService.getMetadataByMetadataString(obj.getItem(), getTypeBindField(input.getTypeBindToField()));
+    }
+
+    public static String getTypeBindValueSeparator() {
+        return configurationService.getProperty("submit.type-bind.value-separator", ",");
     }
 
 }
