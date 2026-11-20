@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.input.NullInputStream;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -131,9 +133,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
     protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-
     protected final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-
 
     /**
      * <p>
@@ -637,17 +637,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             addBitstreams(context, item, manifest, pkgFile, params, callback);
 
             // have subclass manage license since it may be extra package file.
-            Collection owningCollection = (Collection) ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
-                                                                            .getParentObject(context, dso);
-            if (owningCollection == null) {
-                //We are probably dealing with an item that isn't archived yet
-                InProgressSubmission inProgressSubmission = workspaceItemService.findByItem(context, item);
-                if (inProgressSubmission == null) {
-                    inProgressSubmission = WorkflowServiceFactory.getInstance().getWorkflowItemService()
-                                                                 .findByItem(context, item);
-                }
-                owningCollection = inProgressSubmission.getCollection();
-            }
+            Collection owningCollection = getOwningCollection(context, dso, item);
 
             itemService.populateWithTemplateItemMetadata(context, owningCollection, params.useCollectionTemplate(),
                 item);
@@ -688,6 +678,29 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         PackageUtils.updateDSpaceObject(context, dso);
 
         return dso;
+    }
+
+    /**
+     * Helper method to determine the Item owning Collection
+     * @param context       DSpace Context
+     * @param dso           DSpace Container Object
+     * @param item          DSpace Item
+     * @return The owning Collection the given Item
+     * @throws SQLException                if database error
+     */
+    private Collection getOwningCollection(Context context, DSpaceObject dso, Item item) throws SQLException {
+        Collection owningCollection = (Collection) ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
+                .getParentObject(context, dso);
+        if (owningCollection == null) {
+            //We are probably dealing with an item that isn't archived yet
+            InProgressSubmission inProgressSubmission = workspaceItemService.findByItem(context, item);
+            if (inProgressSubmission == null) {
+                inProgressSubmission = WorkflowServiceFactory.getInstance().getWorkflowItemService()
+                        .findByItem(context, item);
+            }
+            owningCollection = inProgressSubmission.getCollection();
+        }
+        return owningCollection;
     }
 
     /**
@@ -732,6 +745,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         boolean setPrimaryBitstream = false;
         BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context);
 
+        // Retrieve collection required mime types if configured
+        String[] collectionMimetypes = configurationService
+            .getArrayProperty("swordv2-server.accept-mimetypes.collection."
+                + getOwningCollection(context, item, item).getHandle());
+
         for (Iterator<Element> mi = manifestContentFiles.iterator(); mi
             .hasNext(); ) {
             Element mfile = mi.next();
@@ -748,6 +766,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // extract the file input stream from package (or retrieve
             // externally, if it is an externally referenced file)
             InputStream fileStream = getFileInputStream(pkgFile, params, path);
+
+            // Only collection required mime types should be considered as Bitstreams if configured
+            if (isNotCollectionSpecificMimeTypes(context, collectionMimetypes,
+                    mfile.getAttributeValue("MIMETYPE"), path)) {
+                continue;
+            }
 
             // Before proceeding we must ensure we have a non-empty input stream
             // NOTE: If getFileInputStream encounters a zero-sized file, then it returns NullInputStream
@@ -861,6 +885,31 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                          + "\" in manifest file \"" + pkgFile.getAbsolutePath()
                          + "\"");
         }
+    }
+
+    /**
+     * Helper method to Check if a file matches a Collection specific mime types
+     *
+     * @param context  DSpace Context
+     * @param collectionMimetypes Collection specific mime types
+     * @param manifestFileMimeType Mime type of the manifest's File
+     * @param path File path name
+     * @return Either or not the given file matches a Collection specific mime types
+     * @throws SQLException                if database error
+     */
+    private boolean isNotCollectionSpecificMimeTypes(Context context, String[] collectionMimetypes,
+                                                     String manifestFileMimeType, String path) throws SQLException {
+        if (!ArrayUtils.isEmpty(collectionMimetypes)) {
+            BitstreamFormat bitstreamFormat = (manifestFileMimeType == null) ? null
+                    : bitstreamFormatService.findByMIMEType(context, manifestFileMimeType);
+            if (bitstreamFormat == null) {
+                bitstreamFormat = bitstreamFormatService.guessFileFormat(context, path);
+            }
+            String mimeType = bitstreamFormat == null ? null : bitstreamFormat.getMIMEType();
+            return mimeType == null
+                    || Arrays.stream(collectionMimetypes).noneMatch(mimeType::contentEquals);
+        }
+        return false;
     }
 
     /**
