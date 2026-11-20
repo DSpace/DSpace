@@ -843,7 +843,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             String message = "Updated the eperson's minimal metadata: \n";
             message += " Email Header: '" + emailHeader + "' = '" + email + "' \n";
             message += " First Name Header: '" + fnameHeader + "' = '" + fname + "' \n";
-            message += " Last Name Header: '" + fnameHeader + "' = '" + lname + "'";
+            message += " Last Name Header: '" + lnameHeader + "' = '" + lname + "'";
             log.debug(message);
         }
 
