@@ -93,6 +93,8 @@ public class MetadataValidator implements SubmissionStepValidator {
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
                 List<String> fieldsName = new ArrayList<String>();
+                boolean hasMetadataValue = false;
+
                 if (input.isQualdropValue()) {
                     boolean foundResult = false;
                     List<Object> inputPairs = input.getPairs();
@@ -118,7 +120,8 @@ public class MetadataValidator implements SubmissionStepValidator {
                             }
                         }
                     }
-                    if (input.isRequired() && !foundResult) {
+                    hasMetadataValue = foundResult;
+                    if (input.isRequired() && !input.isRelationshipField() && !foundResult) {
                         // for this required qualdrop no value was found, add to the list of error fields
                         addError(errors, ERROR_VALIDATION_REQUIRED,
                                  "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
@@ -153,7 +156,8 @@ public class MetadataValidator implements SubmissionStepValidator {
                     }
                     validateMetadataValues(obj.getCollection(), mdv, input, config,
                                            isAuthorityControlled, fieldKey, errors);
-                    if ((input.isRequired() && mdv.size() == 0)
+                    hasMetadataValue = !mdv.isEmpty() && !valuesRemoved;
+                    if ((input.isRequired() && !input.isRelationshipField() && mdv.size() == 0)
                         && (input.isVisible(DCInput.SUBMISSION_SCOPE)
                         || (obj instanceof WorkflowItem && input.isVisible(DCInput.WORKFLOW_SCOPE)))
                         && !valuesRemoved) {
@@ -169,45 +173,45 @@ public class MetadataValidator implements SubmissionStepValidator {
                         }
                     }
                 }
-                relationshipRequiredFieldCheck(context, obj.getItem(), input, errors,
-                                               config);
+                if (input.isRelationshipField() && input.isRequired() && input.isVisible(DCInput.SUBMISSION_SCOPE)
+                        && ((documentTypes.isEmpty() && input.isAllowedFor("")) ||
+                        documentTypes.stream().anyMatch(dt -> input.isAllowedFor(dt.getValue()))) && !hasMetadataValue
+                        && !hasRelationship(context, obj.getItem(), input)) {
+                    addError(errors, ERROR_VALIDATION_REQUIRED,
+                            "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                    input.getFieldName());
+                }
             }
         }
         return errors;
     }
 
     /**
-     * Checks if the relation type exists on the item. If not, sets the error state.
+     * Checks whether the item has a relationship of the input's configured type.
      *
      * @param context the current context
-     * @param item    item in the submission
-     * @param input   input field
-     * @param errors  List holding all errors
-     * @param config  submission step config
-     * @throws SQLException if database error
+     * @param item item in the submission
+     * @param input input field
+     * @return whether the relationship exists
      */
-    private void relationshipRequiredFieldCheck(Context context, Item item, DCInput input, List<ValidationError> errors,
-                                                SubmissionStepConfig config) {
-        if (input.isRelationshipField() && input.isRequired()) {
-            String relationshipType = input.getRelationshipType();
-            if (itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
-                try {
-                    List<RelationshipType> relationTypes =
-                        relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
-                    for (RelationshipType relationType : relationTypes) {
-                        if (!relationshipService.findByItemAndRelationshipType(context, item, relationType).isEmpty()) {
-                            return;
-                        }
-                    }
-                } catch (SQLException e) {
-                    throw new SQLRuntimeException(e);
-                }
-
-                addError(errors, ERROR_VALIDATION_REQUIRED,
-                         "/" + OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                             input.getFieldName());
-            }
+    private boolean hasRelationship(Context context, Item item, DCInput input) {
+        String relationshipType = input.getRelationshipType();
+        if (!itemService.getMetadataByMetadataString(item, "relation." + relationshipType).isEmpty()) {
+            return true;
         }
+        try {
+            List<RelationshipType> relationTypes =
+                    relationshipTypeService.findByLeftwardOrRightwardTypeName(context, relationshipType);
+            for (RelationshipType relationType : relationTypes) {
+                if (!relationshipService.findByItemAndRelationshipType(context, item, relationType).isEmpty()) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error checking for relationship type " + relationshipType + " on item " + item.getID(), e);
+            return false;
+        }
+        return false;
     }
 
     private DCInputSet getDCInputSet(SubmissionStepConfig config) {
