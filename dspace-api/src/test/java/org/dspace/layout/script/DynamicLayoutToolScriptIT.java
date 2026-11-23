@@ -113,6 +113,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getException(), nullValue());
         assertThat(handler.getWarningMessages(), empty());
 
         List<DynamicLayoutTab> personTabs = tabService.findByEntityType(context, "Person", null);
@@ -219,6 +220,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -237,6 +239,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             List<DynamicLayoutTab> personTabs = tabService.findByEntityType(context, "Person", null);
             DynamicLayoutTab reimportedTabTwo = findTab(personTabs, "tabTwo");
@@ -301,6 +304,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -310,6 +314,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             List<DynamicLayoutTab> scopedTabs = tabService.findByEntityType(context, "Person", "special");
             assertThat(scopedTabs, hasSize(1));
@@ -361,6 +366,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getException(), nullValue());
 
         assertThat(tabService.findAll(context), not(empty()));
 
@@ -399,6 +405,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
 
         assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -419,6 +426,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             assertThat(tabService.findAll(context), hasSize(1));
 
@@ -632,6 +640,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -643,6 +652,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
 
             // The two leading tabs live on different scopes, so the import must not be rejected.
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             List<DynamicLayoutTab> bookTabs = tabService.findByEntityType(context, "Person", "book");
             assertThat(bookTabs, hasSize(1));
@@ -700,6 +710,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
 
         assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try (Workbook workbook = WorkbookFactory.create(new FileInputStream(exportedFile))) {
@@ -779,6 +790,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -787,6 +799,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             // Count the persisted boxes sharing the entity + shortname.
             long sharedBoxInstances = boxService.findByEntityType(context, "Publication", null, null).stream()
@@ -962,6 +975,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getException(), nullValue());
         assertThat(handler.getWarningMessages(), empty());
 
         List<String> infoMessages = handler.getInfoMessages();
@@ -1272,6 +1286,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
         assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getException(), nullValue());
         assertThat(handler.getWarningMessages(), empty());
 
         assertThat(tabService.findAll(context), hasSize(3));
@@ -1516,6 +1531,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -1525,6 +1541,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             List<DynamicLayoutTab> scopedTabs = tabService.findByEntityType(context, "Person", "special");
             assertThat(scopedTabs, hasSize(1));
@@ -1592,6 +1609,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -1607,6 +1625,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             DynamicLayoutTab owner = findTab(tabService.findByEntityType(context, "Person", "special"), "owner");
             DynamicLayoutTab target = owner.getTab2SecurityGroups().iterator().next().getAlternativeTab();
@@ -1673,6 +1692,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -1688,6 +1708,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             DynamicLayoutTab owner = findTab(tabService.findByEntityType(context, "Person", "special"), "owner");
             DynamicLayoutBox reimportedOwnerBox = findBox(owner.getBoxes(), "ownerBox");
@@ -1730,6 +1751,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         TestDSpaceRunnableHandler exportHandler = new TestDSpaceRunnableHandler();
         handleScript(exportArgs, ScriptLauncher.getConfig(kernelImpl), exportHandler, kernelImpl, admin);
         assertThat(exportHandler.getErrorMessages(), empty());
+        assertThat(exportHandler.getException(), nullValue());
 
         File exportedFile = new File("dynamic-layout-tool-exported.xls");
         try {
@@ -1749,6 +1771,7 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
             TestDSpaceRunnableHandler importHandler = new TestDSpaceRunnableHandler();
             handleScript(importArgs, ScriptLauncher.getConfig(kernelImpl), importHandler, kernelImpl, admin);
             assertThat(importHandler.getErrorMessages(), empty());
+            assertThat(importHandler.getException(), nullValue());
 
             DynamicLayoutTab reimportedTab = findTab(tabService.findByEntityType(context, "Person", null), "plainTab");
             DynamicLayoutTab2SecurityGroup tab2SecurityGroup =
