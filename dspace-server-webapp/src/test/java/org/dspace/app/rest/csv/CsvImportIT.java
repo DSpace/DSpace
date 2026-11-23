@@ -224,17 +224,20 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
 
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
+        Iterator<Item> itemIteratorItem = itemService.findArchivedByMetadataField(context, "dc",
+                "title", null, itemTitle);
         Item item = itemIteratorItem.next();
 
         List<Relationship> relationships = relationshipService.findByItem(context, item);
         assertEquals(reasonAssertCheck, sizeToCheck, relationships.size());
         getClient().perform(get("/api/core/items/" + item.getID())).andExpect(status().isOk());
-        getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
+        getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID())
+                        .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(leftPlaceToCheck)))
                    .andExpect(jsonPath("$.rightPlace", is(rightPlaceToCheck)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
+                   .andExpect(jsonPath("$",
+                           Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
 
         return item;
     }
@@ -256,7 +259,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             .getHandle() + "," + itemTitle + "," + entityType + "," + idStringRelatedItems;
         String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
+        Iterator<Item> itemIteratorItem = itemService.findArchivedByMetadataField(context, "dc",
+                "title", null, itemTitle);
         Item item = itemIteratorItem.next();
 
 
@@ -279,7 +283,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         parameters.add(new DSpaceCommandLineParameter("-s", ""));
 
         List<ParameterValueRest> list = parameters.stream()
-                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                  .map(dSpaceCommandLineParameter ->
+                                                          dSpaceRunnableParameterConverter
                                                       .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
                                                   .collect(Collectors.toList());
 
@@ -338,7 +343,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         parameters.add(new DSpaceCommandLineParameter("-e", "dspace@dspace.com"));
 
         List<ParameterValueRest> list = parameters.stream()
-                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                  .map(dSpaceCommandLineParameter ->
+                                                          dSpaceRunnableParameterConverter
                                                       .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
                                                   .collect(Collectors.toList());
 
@@ -359,7 +365,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             ProcessBuilder.deleteProcess(idRef.get());
         }
 
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, "TestItemB");
+        Iterator<Item> itemIteratorItem = itemService.findArchivedByMetadataField(context, "dc",
+                "title", null, "TestItemB");
         assertFalse(itemIteratorItem.hasNext());
     }
 }

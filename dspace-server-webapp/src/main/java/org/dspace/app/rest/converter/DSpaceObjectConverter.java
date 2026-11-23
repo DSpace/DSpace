@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +15,11 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.MetadataField;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.security.service.MetadataSecurityService;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,11 +47,10 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
     AuthorizeService authorizeService;
 
     @Autowired
-    MetadataExposureService metadataExposureService;
+    MetadataSecurityService metadataSecurityService;
 
     @Autowired
     RequestService requestService;
-
 
     @Override
     public R convert(M obj, Projection projection) {
@@ -65,7 +63,8 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         resource.setName(obj.getName());
 
         MetadataValueList metadataValues = getPermissionFilteredMetadata(
-                ContextUtil.obtainCurrentRequestContext(), obj);
+            ContextUtil.obtainCurrentRequestContext(), obj, projection
+        );
         resource.setMetadata(converter.toRest(metadataValues, projection));
         return resource;
     }
@@ -80,23 +79,22 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
      * @param obj       The object of which the filtered metadata will be retrieved
      * @return A list of object metadata filtered based on the the hidden metadata configuration
      */
-    public MetadataValueList getPermissionFilteredMetadata(Context context, M obj) {
-        List<MetadataValue> metadata = obj.getMetadata();
-        List<MetadataValue> visibleMetadata = new ArrayList<MetadataValue>();
+    public MetadataValueList getPermissionFilteredMetadata(Context context, M obj, Projection projection) {
+        List<MetadataValue> visibleMetadata = new ArrayList<>();
+        String language = Item.ANY;
+
+        if (context != null && !projection.isAllLanguages()) {
+            language = context.getCurrentLocale().getLanguage();
+        }
+
         try {
-            if (context != null && authorizeService.isAdmin(context)) {
-                return new MetadataValueList(metadata);
-            }
-            for (MetadataValue mv : metadata) {
-                MetadataField metadataField = mv.getMetadataField();
-                if (!metadataExposureService
-                        .isHidden(context, metadataField.getMetadataSchema().getName(),
-                                  metadataField.getElement(),
-                                  metadataField.getQualifier())) {
-                    visibleMetadata.add(mv);
-                }
-            }
-        } catch (SQLException e) {
+            List<MetadataValue> metadata =
+                metadataSecurityService.getPermissionFilteredMetadataValues(
+                    context, obj, Item.ANY, Item.ANY, Item.ANY, language
+                );
+
+            return new MetadataValueList(metadata);
+        } catch (Exception e) {
             log.error("Error filtering metadata based on permissions", e);
         }
         return new MetadataValueList(visibleMetadata);

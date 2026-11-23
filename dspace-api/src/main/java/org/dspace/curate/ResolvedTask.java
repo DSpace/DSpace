@@ -57,26 +57,28 @@ public class ResolvedTask {
      * Since the curator can provide services to the task, this represents
      * curation DI.
      *
+     * @param ctx DSpace context object
      * @param curator the Curator controlling this task
      * @throws IOException if IO error
      */
-    public void init(Curator curator) throws IOException {
+    public void init(Context ctx, Curator curator) throws IOException {
         if (unscripted()) {
-            cTask.init(curator, taskName);
+            cTask.init(ctx, curator, taskName);
         } else {
-            sTask.init(curator, taskName);
+            sTask.init(ctx, curator, taskName);
         }
     }
 
     /**
      * Perform the curation task upon passed DSO
      *
+     * @param ctx DSpace context object
      * @param dso the DSpace object
      * @return status code
      * @throws IOException if error
      */
-    public int perform(DSpaceObject dso) throws IOException {
-        return unscripted() ? cTask.perform(dso) : sTask.performDso(dso);
+    public int perform(Context ctx, DSpaceObject dso) throws IOException {
+        return unscripted() ? cTask.perform(ctx, dso) : sTask.performDso(ctx, dso);
     }
 
     /**

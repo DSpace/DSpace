@@ -37,10 +37,12 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.DefaultTlsDirContextAuthenticationStrategy;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.ldap.filter.PresentFilter;
 import org.springframework.ldap.query.LdapQueryBuilder;
+import org.springframework.ldap.query.SearchScope;
 import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.ldap.support.LdapUtils;
 
@@ -417,6 +419,80 @@ public class LDAPAuthentication implements AuthenticationMethod {
     }
 
     /**
+     * Create the Spring LDAP context source used for the user lookup and the password check.
+     * <p>
+     * When "authentication-ldap.starttls" is enabled, every connection negotiates StartTLS
+     * before it binds, so that neither the search account's password nor the user's password
+     * is sent in cleartext. JNDI connection pooling is turned off in that case, because a
+     * pooled connection cannot be upgraded to TLS. Without a search account, the user lookup
+     * binds anonymously after StartTLS, so the user id and the returned attributes are not
+     * sent in cleartext either.
+     *
+     * @param url       the LDAP provider URL
+     * @param adminUser the DN of the search account, possibly blank
+     * @param adminPass the password of the search account, possibly blank
+     * @param useTLS    whether to negotiate StartTLS
+     * @return the initialised context source
+     */
+    static LdapContextSource createContextSource(String url, String adminUser, String adminPass, boolean useTLS) {
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl(url);
+
+        boolean hasSearchAccount = StringUtils.isNotBlank(adminUser) && StringUtils.isNotBlank(adminPass);
+        if (hasSearchAccount) {
+            contextSource.setUserDn(adminUser);
+            contextSource.setPassword(adminPass);
+        } else {
+            contextSource.setAnonymousReadOnly(true);
+        }
+
+        if (useTLS) {
+            contextSource.setAuthenticationStrategy(new DefaultTlsDirContextAuthenticationStrategy());
+            contextSource.setPooled(false);
+        } else {
+            contextSource.setPooled(true);
+        }
+        contextSource.afterPropertiesSet();
+        if (useTLS && !hasSearchAccount) {
+            // afterPropertiesSet() switches to an anonymous read-only context when no user DN is set,
+            // and that context is created without StartTLS. Turn it off again so that the lookup
+            // binds with an empty DN and password (an anonymous bind) after StartTLS.
+            contextSource.setAnonymousReadOnly(false);
+        }
+        return contextSource;
+    }
+
+    /**
+     * Translate the value of "authentication-ldap.search_scope" (0 = object, 1 = one level,
+     * 2 = subtree, the same numbers as javax.naming.directory.SearchControls) into the
+     * Spring LDAP search scope used when looking up the DN of a user.
+     * <p>
+     * When the property is not set, subtree is used: it is the default documented in
+     * authentication-ldap.cfg and the scope Spring LDAP queries use when none is given.
+     * An invalid value is logged and treated the same way.
+     *
+     * @param value the configured value, possibly null
+     * @return the search scope to use
+     */
+    static SearchScope parseSearchScope(String value) {
+        if (StringUtils.isBlank(value)) {
+            return SearchScope.SUBTREE;
+        }
+        switch (value.trim()) {
+            case "0":
+                return SearchScope.OBJECT;
+            case "1":
+                return SearchScope.ONELEVEL;
+            case "2":
+                return SearchScope.SUBTREE;
+            default:
+                log.warn("Invalid value '{}' for authentication-ldap.search_scope (expected 0, 1 or 2);"
+                             + " using subtree scope", value);
+                return SearchScope.SUBTREE;
+        }
+    }
+
+    /**
      * Internal class to manage LDAP query and results, mainly
      * because there are multiple values to return.
      */
@@ -436,7 +512,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
         final String ldap_provider_url;
         final String ldap_id_field;
         final String ldap_search_context;
-        final String ldap_search_scope;
+        final SearchScope ldap_search_scope;
 
         final String ldap_email_field;
         final String ldap_givenname_field;
@@ -455,7 +531,8 @@ public class LDAPAuthentication implements AuthenticationMethod {
             ldap_provider_url = configurationService.getProperty("authentication-ldap.provider_url");
             ldap_id_field = configurationService.getProperty("authentication-ldap.id_field");
             ldap_search_context = configurationService.getProperty("authentication-ldap.search_context");
-            ldap_search_scope = configurationService.getProperty("authentication-ldap.search_scope");
+            ldap_search_scope = parseSearchScope(
+                configurationService.getProperty("authentication-ldap.search_scope"));
             ldap_email_field = configurationService.getProperty("authentication-ldap.email_field");
             ldap_givenname_field = configurationService.getProperty("authentication-ldap.givenname_field");
             ldap_surname_field = configurationService.getProperty("authentication-ldap.surname_field");
@@ -467,26 +544,14 @@ public class LDAPAuthentication implements AuthenticationMethod {
         }
 
         private void setupSpringLdap(ConfigurationService cfg) {
-            LdapContextSource contextSource = new LdapContextSource();
             if (StringUtils.isBlank(ldap_provider_url)) {
                 throw new IllegalStateException(
                     "LDAP provider URL is empty! Please check 'authentication-ldap.provider_url' in your configuration."
                 );
             }
-            contextSource.setUrl(ldap_provider_url);
-
-            String adminUser = cfg.getProperty("authentication-ldap.search.user");
-            String adminPass = cfg.getProperty("authentication-ldap.search.password");
-
-            if (StringUtils.isNotBlank(adminUser) && StringUtils.isNotBlank(adminPass)) {
-                contextSource.setUserDn(adminUser);
-                contextSource.setPassword(adminPass);
-            } else {
-                contextSource.setAnonymousReadOnly(true);
-            }
-
-            contextSource.setPooled(true);
-            contextSource.afterPropertiesSet();
+            LdapContextSource contextSource = createContextSource(ldap_provider_url,
+                cfg.getProperty("authentication-ldap.search.user"),
+                cfg.getProperty("authentication-ldap.search.password"), useTLS);
             this.ldapTemplate = new LdapTemplate(contextSource);
             this.ldapTemplate.setIgnorePartialResultException(true);
         }
@@ -498,7 +563,11 @@ public class LDAPAuthentication implements AuthenticationMethod {
                 log.debug("Searching for user using Spring LDAP filter: {}", filter.toString());
 
                 List<String> foundDNs = ldapTemplate.search(
-                    LdapQueryBuilder.query().base(ldap_search_context).filter(filter),
+                    // The scope must be set explicitly: LdapQueryBuilder searches the whole
+                    // subtree by default, which ignores authentication-ldap.search_scope and
+                    // finds several DNs when entries below the user also match the id field.
+                    LdapQueryBuilder.query().searchScope(ldap_search_scope)
+                        .base(ldap_search_context).filter(filter),
                     (ContextMapper<String>) (originalCtx) -> {
                         DirContextOperations ctx = (DirContextOperations) originalCtx;
 
@@ -549,18 +618,28 @@ public class LDAPAuthentication implements AuthenticationMethod {
          */
         protected boolean ldapAuthenticate(String dn, String password, Context context) {
             if (StringUtils.isBlank(password)) {
+                log.warn(LogHelper.getHeader(context, "ldap_authentication",
+                                             "type=failed_auth empty password for DN " + dn));
                 return false;
             }
 
             try {
-                boolean authenticated = ldapTemplate.authenticate(
-                    LdapUtils.newLdapName(dn),
-                    new PresentFilter(ldap_id_field).toString(),
+                // Object scope: the base is the DN of the user, found by getDNOfUser, and
+                // only that entry has to be checked. With LdapTemplate's default subtree
+                // scope, entries below the user that also have the id field are found too,
+                // and authenticate() fails with IncorrectResultSizeDataAccessException.
+                ldapTemplate.authenticate(
+                    LdapQueryBuilder.query().searchScope(SearchScope.OBJECT)
+                        .base(LdapUtils.newLdapName(dn))
+                        .filter(new PresentFilter(ldap_id_field)),
                     password
                 );
-                return authenticated;
+                return true;
 
             } catch (Exception e) {
+                // authenticate() throws on a wrong password instead of returning false, so this
+                // also covers ordinary failed logins. Logged at warn, as before, because the
+                // cause is often a configuration error in local.cfg.
                 log.warn(LogHelper.getHeader(context, "ldap_authentication", "type=failed_auth " + e));
                 return false;
             }

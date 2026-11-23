@@ -47,7 +47,8 @@ public class SolrAuthority implements ChoiceAuthority {
      * the metadata managed by the plugin instance, derived from its authority name
      * in the form schema_element_qualifier
      */
-    private String field;
+    protected String field;
+
     protected SolrAuthorityInterface source =
         DSpaceServicesFactory.getInstance().getServiceManager()
                              .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);

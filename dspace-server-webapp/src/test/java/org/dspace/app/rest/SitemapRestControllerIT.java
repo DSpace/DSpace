@@ -134,7 +134,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
         //** WHEN **
         //We attempt to use endpoint for malicious file system traversal
         getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/%2e%2e/config/dspace.cfg"))
-                   .andExpect(status().isBadRequest());
+                   .andExpect(status().isForbidden());
     }
 
     @Test
@@ -142,7 +142,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
         //** WHEN **
         //We attempt to use endpoint for malicious file system traversal
         getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/%2e%2e%2fconfig%2fdspace.cfg"))
-                   .andExpect(status().isBadRequest());
+                   .andExpect(status().isForbidden());
     }
 
     @Test

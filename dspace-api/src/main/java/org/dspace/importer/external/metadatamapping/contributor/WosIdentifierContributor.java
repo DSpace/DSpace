@@ -46,15 +46,18 @@ public class WosIdentifierContributor extends SimpleXpathMetadatumContributor {
         List<Element> nodes = xpath.evaluate(element);
         for (Element el : nodes) {
             String type = el.getAttributeValue("type");
-            setIdentyfier(type, el, values);
+            setIdentifier(type, el, values);
         }
         return values;
     }
 
-    private void setIdentyfier(String type, Element el, List<MetadatumDTO> values) {
+    private void setIdentifier(String type, Element el, List<MetadatumDTO> values) {
         for (String id : identifier2field.keySet()) {
             if (Strings.CS.equals(id, type)) {
                 String value = el.getAttributeValue("value");
+                if (type.equals("doi")) {
+                    value = "https://doi.org/" + value;
+                }
                 values.add(metadataFieldMapping.toDCValue(identifier2field.get(id), value));
             }
         }

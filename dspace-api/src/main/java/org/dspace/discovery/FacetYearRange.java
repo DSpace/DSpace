@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -18,7 +19,16 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
  * Utility class that represents the year range for a date facet
  */
 public class FacetYearRange {
-    private static final Pattern PATTERN = Pattern.compile("\\[(.*? TO .*?)\\]");
+    /**
+     * Matches a Solr year range such as <code>[2000 TO 2010]</code>.
+     * <p>
+     * The bounds are restricted to (optionally negative) integers instead of the <code>.*?</code>
+     * wildcards this pattern used previously. Both bounds are parsed with
+     * {@link Integer#parseInt} immediately below, so no other bound was ever usable, and the
+     * wildcard form allowed a crafted filter query to drive matching into quadratic time
+     * (CodeQL <code>java/polynomial-redos</code>).
+     */
+    private static final Pattern PATTERN = Pattern.compile("\\[( *-?\\d+ +TO +-?\\d+ *)\\]");
 
     private final DiscoverySearchFilterFacet facet;
     private String dateFacet;
@@ -104,7 +114,15 @@ public class FacetYearRange {
         yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.asc);
         yearRangeQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
         yearRangeQuery.addSearchField(dateFacet);
-        DiscoverResult lastYearResult = searchService.search(context, scope, yearRangeQuery);
+        boolean isRelatedEntity =
+            StringUtils.isNotBlank(parentQuery.getDiscoveryConfigurationName()) &&
+            parentQuery.getDiscoveryConfigurationName().toUpperCase().startsWith("RELATION");
+        DiscoverResult lastYearResult;
+        if (isRelatedEntity) {
+            lastYearResult = searchService.search(context, yearRangeQuery);
+        } else {
+            lastYearResult = searchService.search(context, scope, yearRangeQuery);
+        }
 
         if (0 < lastYearResult.getIndexableObjects().size()) {
             List<DiscoverResult.SearchDocument> searchDocuments = lastYearResult
@@ -115,7 +133,12 @@ public class FacetYearRange {
         }
         //Now get the first year
         yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.desc);
-        DiscoverResult firstYearResult = searchService.search(context, scope, yearRangeQuery);
+        DiscoverResult firstYearResult;
+        if (isRelatedEntity) {
+            firstYearResult = searchService.search(context, yearRangeQuery);
+        } else {
+            firstYearResult = searchService.search(context, scope, yearRangeQuery);
+        }
         if (0 < firstYearResult.getIndexableObjects().size()) {
             List<DiscoverResult.SearchDocument> searchDocuments = firstYearResult
                 .getSearchDocument(firstYearResult.getIndexableObjects().get(0));

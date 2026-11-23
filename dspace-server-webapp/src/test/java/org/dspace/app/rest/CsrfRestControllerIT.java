@@ -7,17 +7,22 @@
  */
 package org.dspace.app.rest;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
+
+import jakarta.servlet.http.Cookie;
 import org.dspace.app.rest.security.DSpaceCsrfTokenRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -56,5 +61,33 @@ public class CsrfRestControllerIT extends AbstractControllerIntegrationTest {
                                     .getHeader(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME);
 
         assertNotEquals("CSRF Tokens should not be the same in separate requests", headerToken, headerToken2);
+    }
+
+    @Test
+    public void getCsrfSendsCookieOnce() throws Exception {
+        // Without a CSRF cookie in the request, a new token is generated
+        MockHttpServletResponse response = mockMvc.perform(get("/api/security/csrf"))
+                                                  .andExpect(status().isNoContent())
+                                                  .andReturn().getResponse();
+        String headerToken = response.getHeader(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME);
+        Cookie[] csrfCookies = getCsrfCookies(response);
+        assertEquals("CSRF cookie should be sent once", 1, csrfCookies.length);
+        assertEquals("CSRF cookie should match the header", headerToken, csrfCookies[0].getValue());
+
+        // With a CSRF cookie in the request, the existing token is sent back
+        response = mockMvc.perform(get("/api/security/csrf").cookie(csrfCookies[0]))
+                          .andExpect(status().isNoContent())
+                          .andExpect(header().string(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME,
+                                                     headerToken))
+                          .andReturn().getResponse();
+        csrfCookies = getCsrfCookies(response);
+        assertEquals("CSRF cookie should be sent once", 1, csrfCookies.length);
+        assertEquals("CSRF cookie should match the header", headerToken, csrfCookies[0].getValue());
+    }
+
+    private Cookie[] getCsrfCookies(MockHttpServletResponse response) {
+        return Arrays.stream(response.getCookies())
+                     .filter(c -> DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME.equals(c.getName()))
+                     .toArray(Cookie[]::new);
     }
 }

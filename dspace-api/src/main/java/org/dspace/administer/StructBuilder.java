@@ -16,7 +16,6 @@ import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTIO
 import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +55,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -128,25 +128,37 @@ public class StructBuilder {
     private StructBuilder() { }
 
     /**
-     * Main method to be run from the command line to import a structure into
-     * DSpacee or export existing structure to a file.The command is of the form:
+     * Main method to be run from the command line to import a community/collection structure into
+     * DSpace or export the existing structure to an XML file.
      *
-     * <p>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}
+     * <p>This method provides two primary operations:</p>
+     * <ul>
+     *   <li><b>Import:</b> Creates communities and collections from an XML structure file</li>
+     *   <li><b>Export:</b> Exports the current DSpace community/collection hierarchy to XML</li>
+     * </ul>
      *
-     * <p>to import, or
+     * <p><b>Import Usage:</b></p>
+     * <pre>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}</pre>
      *
-     * <p>{@code StructBuilder -x -e [administrator email] -o [output file]}</p>
+     * <p><b>Export Usage:</b></p>
+     * <pre>{@code StructBuilder -x -e [administrator email] -o [output file]}</pre>
      *
-     * <p>to export.  The output will contain exactly the same as the source XML
-     * document, but with the Handle for each imported item added as an attribute.
+     * <p>The output will contain the same structure as the source XML document, but with the Handle
+     * for each imported community and collection added as an attribute for reference.</p>
      *
+     * <p><b>Additional Options:</b></p>
+     * <ul>
+     *   <li>{@code -k, --keep-handles}: Apply Handles from the input document during import</li>
+     *   <li>{@code -p, --parent}: Specify a parent community ID or Handle (optional)</li>
+     *   <li>{@code -h, --help}: Display help information</li>
+     * </ul>
      *
-     * @param argv command line arguments.
-     * @throws ParserConfigurationException passed through.
-     * @throws SQLException passed through.
-     * @throws FileNotFoundException if input or output could not be opened.
-     * @throws TransformerException if the input document is invalid.
-     * @throws XPathExpressionException passed through.
+     * @param argv command line arguments containing options for import/export operations
+     * @throws ParserConfigurationException if a DocumentBuilder cannot be created with the requested configuration
+     * @throws SQLException if a database access error occurs during community/collection operations
+     * @throws IOException if the input file cannot be read or output file cannot be written
+     * @throws TransformerException if the input XML document is invalid or cannot be processed
+     * @throws XPathExpressionException if an XPath expression cannot be evaluated
      */
     public static void main(String[] argv)
         throws ParserConfigurationException, SQLException,
@@ -347,6 +359,7 @@ public class StructBuilder {
         communityMap.put("sidebar", MD_SIDEBAR_TEXT);
 
         collectionMap.put("name", MD_NAME);
+        collectionMap.put("shared-workspace", CrisConstants.MD_SHARED_WORKSPACE);
         collectionMap.put("description", MD_SHORT_DESCRIPTION);
         collectionMap.put("intro", MD_INTRODUCTORY_TEXT);
         collectionMap.put("copyright", MD_COPYRIGHT_TEXT);

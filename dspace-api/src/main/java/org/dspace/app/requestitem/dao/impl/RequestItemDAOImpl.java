@@ -9,6 +9,7 @@ package org.dspace.app.requestitem.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.UUID;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -61,6 +62,13 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
         criteriaQuery.select(requestItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.item), item));
         Query query = createQuery(context, criteriaQuery);
+        return iterate(query);
+    }
+
+    @Override
+    public Iterator<RequestItem> findByBitstreamId(Context context, UUID bitstreamId) throws SQLException {
+        Query query = createQuery(context, "FROM RequestItem WHERE bitstream.id = :bitstreamId");
+        query.setParameter("bitstreamId", bitstreamId);
         return iterate(query);
     }
 }

@@ -11,9 +11,11 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import org.dspace.app.rest.RestResourceController;
-
-
+import org.dspace.eperson.RegistrationTypeEnum;
 /**
  * This class acts as the REST representation of the RegistrationData model class.
  * This class acts as a data holder for the RegistrationResource
@@ -26,10 +28,18 @@ public class RegistrationRest extends RestAddressableModel {
     public static final String CATEGORY = EPERSON;
 
     private Integer id;
+
+    @Email
+    @NotEmpty
     private String email;
+
     private UUID user;
-    private String registrationType;
+
+    private RegistrationTypeEnum registrationType;
+
+    @Size(max = 64)
     private String netId;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MetadataRest<RegistrationMetadataRest> registrationMetadata;
 
@@ -77,11 +87,11 @@ public class RegistrationRest extends RestAddressableModel {
         this.user = user;
     }
 
-    public String getRegistrationType() {
+    public RegistrationTypeEnum getRegistrationType() {
         return registrationType;
     }
 
-    public void setRegistrationType(String registrationType) {
+    public void setRegistrationType(RegistrationTypeEnum registrationType) {
         this.registrationType = registrationType;
     }
 

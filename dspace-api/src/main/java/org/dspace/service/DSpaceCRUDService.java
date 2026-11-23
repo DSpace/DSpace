@@ -29,7 +29,7 @@ public interface DSpaceCRUDService<T> {
     /**
      * Persist a model object.
      *
-     * @param context
+     * @param context DSpace context object
      * @param t object to be persisted.
      * @throws SQLException passed through.
      * @throws AuthorizeException passed through.
@@ -40,7 +40,7 @@ public interface DSpaceCRUDService<T> {
     /**
      * Persist a collection of model objects.
      *
-     * @param context
+     * @param context DSpace context object
      * @param t object to be persisted.
      * @throws SQLException passed through.
      * @throws AuthorizeException passed through.

@@ -81,7 +81,7 @@ public class ItemTemplateRestController {
      * @param uuid      A UUID of a template item
      * @return The template item corresponding to the UUID above
      */
-    @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEMTEMPLATE', 'READ')")
     @RequestMapping(method = RequestMethod.GET)
     public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid) {
 

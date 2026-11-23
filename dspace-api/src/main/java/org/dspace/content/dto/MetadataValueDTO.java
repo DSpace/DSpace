@@ -11,9 +11,11 @@ import java.util.Comparator;
 import java.util.Objects;
 
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
 /**
  * This class acts as Data transfer object in which we can store data like in a regular MetadataValue object, but this
@@ -31,6 +33,7 @@ public class MetadataValueDTO {
     private String value;
     private String authority;
     private int confidence = Choices.CF_UNSET;
+    private Integer securityLevel;
 
     public MetadataValueDTO(MetadataValue metadataValue) {
         MetadataField metadataField = metadataValue.getMetadataField();
@@ -42,6 +45,7 @@ public class MetadataValueDTO {
         value = metadataValue.getValue();
         authority = metadataValue.getAuthority();
         confidence = metadataValue.getConfidence();
+        securityLevel = metadataValue.getSecurityLevel();
     }
 
     public MetadataValueDTO() {
@@ -68,6 +72,28 @@ public class MetadataValueDTO {
         this.confidence = confidence;
     }
 
+    public MetadataValueDTO(String metadataField, String value) {
+        MetadataFieldName fieldName = new MetadataFieldName(metadataField);
+        this.schema = fieldName.schema;
+        this.element = fieldName.element;
+        this.qualifier = fieldName.qualifier;
+        this.value = value;
+    }
+
+    /**
+     * Constructor for the MetadataValueDTO class
+     * @param schema    The schema to be assigned to this MetadataValueDTO object
+     * @param element   The element to be assigned to this MetadataValueDTO object
+     * @param qualifier The qualifier to be assigned to this MetadataValueDTO object
+     * @param value     The value to be assigned to this MetadataValueDTO object
+     */
+    public MetadataValueDTO(String schema, String element, String qualifier, String value) {
+        this.schema = schema;
+        this.element = element;
+        this.qualifier = qualifier;
+        this.value = value;
+    }
+
     /**
      * Constructor for the MetadataValueDTO class
      * @param schema        The schema to be assigned to this MetadataValueDTO object
@@ -82,6 +108,17 @@ public class MetadataValueDTO {
         this.qualifier = qualifier;
         this.language = language;
         this.value = value;
+    }
+
+    public MetadataValueDTO(MetadatumDTO metadata) {
+        this.schema = metadata.getSchema();
+        this.element = metadata.getElement();
+        this.qualifier = metadata.getQualifier();
+        this.value = metadata.getValue();
+    }
+
+    public String getMetadataField() {
+        return new MetadataFieldName(schema, element, qualifier).toString();
     }
 
     public String getSchema() {
@@ -140,6 +177,13 @@ public class MetadataValueDTO {
         this.confidence = confidence;
     }
 
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(int securityLevel) {
+        this.securityLevel = securityLevel;
+    }
     @Override
     public String toString() {
         return "MetadataValueDTO{" +
@@ -195,6 +239,5 @@ public class MetadataValueDTO {
                 .thenComparing(MetadataValueDTO::getLanguage, Comparator.nullsFirst(Comparator.naturalOrder()))
                 .thenComparing(MetadataValueDTO::getAuthority, Comparator.nullsFirst(Comparator.naturalOrder()));
     }
-
 
 }

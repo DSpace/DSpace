@@ -16,6 +16,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
     private AuthorizeService authorizeService;
     @Autowired
     private ResourcePolicyService resourcePolicyService;
+    @Autowired
+    private ItemService itemService;
 
     @Override
     void remove(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
@@ -67,6 +70,18 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
         } else {
             throw new UnprocessableEntityException("The patch operation for path:" + path + " is not supported!");
         }
+
+        if (item != null && item.isArchived() && noLongerHasCustomPolicies(context, item)) {
+            List<ResourcePolicy> defaultCollectionPolicies = authorizeService
+                .getPoliciesActionFilter(context, item.getOwningCollection(), Constants.DEFAULT_BITSTREAM_READ);
+
+            authorizeService.addDefaultPoliciesNotInPlace(context, item, defaultCollectionPolicies);
+        }
+    }
+
+    private boolean noLongerHasCustomPolicies(Context context, Item item) {
+        return item.getResourcePolicies().stream()
+            .noneMatch(policy -> ResourcePolicy.TYPE_CUSTOM.equals(policy.getRpType()));
     }
 
     @Override

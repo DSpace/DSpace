@@ -110,7 +110,7 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO contributor = createMetadatumDTO("dc", "contributor", "author", "Olempska E");
         MetadatumDTO contributor2 = createMetadatumDTO("dc", "contributor", "author", "Horne DJ");
         MetadatumDTO contributor3 = createMetadatumDTO("dc", "contributor", "author", "Szaniawski H");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.1098/rspb.2011.0943");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.1098/rspb.2011.0943");
         MetadatumDTO source = createMetadatumDTO("dc", "source", null, "Proceedings. Biological sciences");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2012");
         MetadatumDTO language = createMetadatumDTO("dc", "language", "iso", "eng");

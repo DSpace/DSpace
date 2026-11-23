@@ -232,13 +232,65 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 // We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 // Match only that a section exists with a submission configuration behind
-                .andExpect(jsonPath("$._embedded.submissionsections", hasSize(6)))
+                .andExpect(jsonPath("$._embedded.submissionsections", hasSize(7)))
                 .andExpect(jsonPath("$._embedded.submissionsections",
                         Matchers.not(Matchers.hasItem(
                                             hasJsonPath("$.id", is("extractionstep"))
                                         ))))
      ;
 
+    }
+
+    @Test
+    public void findByCollectionWithMetadataSubmissionDefinitionTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection 1")
+            .withSubmissionDefinition("traditional")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissiondefinitions/search/findByCollection")
+            .param("uuid", col1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$", SubmissionDefinitionsMatcher
+                .matchSubmissionDefinition(true, "traditional", "traditional")));
+    }
+
+    @Test
+    public void findByCollectionWithRelationTypeTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection 1")
+            .withEntityType("patent")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissiondefinitions/search/findByCollection")
+            .param("uuid", col1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$", SubmissionDefinitionsMatcher
+                .matchProperties(false, "patent", "patent")));
     }
 
     @Test

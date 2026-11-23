@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.dspace.app.rest.security.DSpaceCsrfTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.rest.webmvc.ControllerUtils;
@@ -53,8 +54,12 @@ public class CsrfRestController {
     public ResponseEntity<RepresentationModel<?>> getCsrf(HttpServletRequest request,
                                                           HttpServletResponse response,
                                                           CsrfToken csrfToken) {
-        // Save the CSRF token to our response using the currently enabled CsrfTokenRepository
-        csrfTokenRepository.saveToken(csrfToken, request, response);
+        // Save the CSRF token to our response using the currently enabled CsrfTokenRepository.
+        // Skip this if Spring Security's CsrfFilter already saved it (it does so for a newly generated token),
+        // as saving it again would send the same CSRF cookie twice.
+        if (!response.containsHeader(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME)) {
+            csrfTokenRepository.saveToken(csrfToken, request, response);
+        }
 
         // Return a 204 No Content status
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);

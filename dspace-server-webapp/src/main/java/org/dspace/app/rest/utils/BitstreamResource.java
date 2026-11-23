@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -28,6 +29,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -45,6 +47,8 @@ public class BitstreamResource extends AbstractResource {
     protected final UUID currentUserUUID;
     protected final boolean shouldGenerateCoverPage;
     protected final Set<UUID> currentSpecialGroups;
+    protected final boolean skipAuthCheck;
+
 
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -61,6 +65,17 @@ public class BitstreamResource extends AbstractResource {
         this.currentUserUUID = currentUserUUID;
         this.currentSpecialGroups = currentSpecialGroups;
         this.shouldGenerateCoverPage = shouldGenerateCoverPage;
+        this.skipAuthCheck = false;
+    }
+
+    public BitstreamResource(String name, UUID uuid, UUID currentUserUUID, Set<UUID> currentSpecialGroups,
+        boolean shouldGenerateCoverPage, boolean skipAuth) {
+        this.name = name;
+        this.uuid = uuid;
+        this.currentUserUUID = currentUserUUID;
+        this.currentSpecialGroups = currentSpecialGroups;
+        this.shouldGenerateCoverPage = shouldGenerateCoverPage;
+        this.skipAuthCheck = skipAuth;
     }
 
     /**
@@ -92,7 +107,7 @@ public class BitstreamResource extends AbstractResource {
     public InputStream getInputStream() throws IOException {
         fetchDocument();
 
-        return document.inputStream();
+        return document.getInputStream();
     }
 
     @Override
@@ -110,7 +125,7 @@ public class BitstreamResource extends AbstractResource {
     public String getChecksum() {
         fetchDocument();
 
-        return document.etag();
+        return document.getEtag();
     }
 
     void fetchDocument() {
@@ -123,16 +138,18 @@ public class BitstreamResource extends AbstractResource {
             if (shouldGenerateCoverPage) {
                 var coverPage = getCoverpageByteArray(context, bitstream);
 
-                this.document = new BitstreamDocument(etag(bitstream),
+                this.document = new BitstreamDocumentCoverPage(etag(bitstream),
                         coverPage.length,
                         new ByteArrayInputStream(coverPage));
             } else {
-                this.document = new BitstreamDocument(bitstream.getChecksum(),
+                this.document = new BitstreamDocumentInputstream(bitstream.getChecksum(),
                         bitstream.getSizeBytes(),
-                        bitstreamService.retrieve(context, bitstream));
+                        bitstream.getID());
             }
-        } catch (SQLException | AuthorizeException | IOException e) {
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e.getMessage());
         }
 
         LOG.debug("fetched document {} {}", shouldGenerateCoverPage, document);
@@ -157,13 +174,84 @@ public class BitstreamResource extends AbstractResource {
         return builder.toString();
     }
 
+    /**
+     * Initializes a DSpace context for bitstream retrieval.
+     * <p>
+     * This method creates a new context, sets the current user and special groups, and optionally
+     * turns off authorization checks if {@link #skipAuthCheck} is {@code true}.
+     * <p>
+     * <strong>Authorization Handling:</strong>
+     * <ul>
+     *   <li>If {@code skipAuthCheck = false}: Standard authorization checks apply during
+     *       {@link BitstreamService#retrieve}</li>
+     *   <li>If {@code skipAuthCheck = true}: Authorization system is disabled via
+     *       {@link Context#turnOffAuthorisationSystem()}, allowing bitstream retrieval without
+     *       permission checks (used when authorization was already verified at controller level)</li>
+     * </ul>
+     *
+     * @return a newly initialized DSpace context with user, groups, and authorization state configured
+     * @throws SQLException if database operations fail during context initialization or user lookup
+     * @see #skipAuthCheck
+     */
     Context initializeContext() throws SQLException {
-        Context context = new Context();
+        Context context = new Context(Context.Mode.READ_ONLY);
         EPerson currentUser = ePersonService.find(context, currentUserUUID);
         context.setCurrentUser(currentUser);
         currentSpecialGroups.forEach(context::setSpecialGroup);
+        if (skipAuthCheck) {
+            context.turnOffAuthorisationSystem();
+        }
         return context;
     }
 
-    record BitstreamDocument(String etag, long length, InputStream inputStream) {}
+    protected abstract class BitstreamDocument implements InputStreamSource {
+        private final String etag;
+        private final long length;
+
+        protected BitstreamDocument(String etag, long length) {
+            this.etag = etag;
+            this.length = length;
+        }
+
+        public String getEtag() {
+            return etag;
+        }
+
+        public long length() {
+            return length;
+        }
+    }
+
+    protected class BitstreamDocumentInputstream extends BitstreamDocument {
+        protected final UUID bitstreamUUID;
+
+        public BitstreamDocumentInputstream(String etag, long length, UUID bitstreamUUID) {
+            super(etag, length);
+            this.bitstreamUUID = bitstreamUUID;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            try (Context context = initializeContext()) {
+                return bitstreamService.retrieve(context, bitstreamService.find(context, bitstreamUUID));
+            } catch (SQLException | AuthorizeException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    protected class BitstreamDocumentCoverPage extends BitstreamDocument {
+        private final ByteArrayInputStream coverpage;
+
+        public BitstreamDocumentCoverPage(String etag, long length, ByteArrayInputStream byteArrayInputStream) {
+            super(etag, length);
+            this.coverpage = byteArrayInputStream;
+        }
+
+        @Override
+        public InputStream getInputStream() {
+            return coverpage;
+        }
+    }
+
 }

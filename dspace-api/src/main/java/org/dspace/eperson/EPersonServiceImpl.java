@@ -717,6 +717,22 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
+    public boolean isOwnerOfItem(EPerson user, Item item) {
+
+        if (user == null) {
+            return false;
+        }
+
+        return getDSpaceObjectOwnerMetadataValues(item).stream()
+            .anyMatch(metadataValue -> user.getID().toString().equals(metadataValue.getAuthority()));
+
+    }
+
+    private List<MetadataValue> getDSpaceObjectOwnerMetadataValues(Item item) {
+        return itemService.getMetadata(item, "dspace", "object", "owner", Item.ANY);
+    }
+
+    @Override
     public String getName(EPerson dso) {
         return dso.getName();
     }

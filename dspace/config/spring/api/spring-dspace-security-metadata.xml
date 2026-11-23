@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--
+        Metadata Security Levels Configuration
+
+        This section defines the three-tier metadata security system used throughout DSpace
+        to control visibility of metadata values at a granular level. Each security level
+        corresponds to a specific access control implementation.
+
+        Security Level Definitions:
+        - Level 0 (Public Access): Metadata is visible to everyone, including anonymous users.
+                                   Implementation: org.dspace.content.MetadataPublicAccess
+                                   Use for: Public announcements, open access metadata, transparency requirements
+
+        - Level 1 (Group Access): Metadata is visible to members of the "Trusted" group, plus administrators
+                                  and item owners (cascading from level 2).
+                                  Implementation: org.dspace.content.MetadataGroupBasedAccess
+                                  Use for: Internal metadata, reviewer notes, pre-publication data
+
+        - Level 2 (Admin/Owner): Metadata is visible ONLY to DSpace administrators and item owners.
+                                 Item "owners" are determined by the dspace.object.owner metadata field.
+                                 Implementation: org.dspace.content.MetadataAdministratorAndOwnerAccess
+                                 Use for: Sensitive personal info, privacy-protected fields, internal admin notes
+
+        Default Behavior (null/unset):
+        - When a metadata value has NO securityLevel set, it follows standard
+          field-level visibility rules and item READ permissions. This is the most common case.
+
+        WARNING: DO NOT MODIFY THESE MAPPINGS UNLESS YOU UNDERSTAND THE CONSEQUENCES!
+        ========
+        These security level mappings (0, 1, 2 -> implementation classes) are stored as integers
+        in the database's metadatavalue.security_level column. Existing metadata values reference
+        these integer keys.
+
+        Risks of modification:
+        - Changing the implementation class for a level (e.g., making level 1 point to a different
+          class) will change the security behavior for ALL existing metadata with that security level.
+        - Changing the "Trusted" group name in level 1 will affect ALL metadata configured with level 1.
+        - Removing a level will cause errors when filtering metadata with that security_level value.
+        - Adding new levels (3, 4, etc.) is safe, but changing existing mappings (0, 1, 2) affects
+          existing data.
+
+        If you need custom security behavior:
+        - Create NEW security levels (3, 4, 5, etc.) with custom implementations
+        - DO NOT modify the behavior of existing levels 0, 1, 2
+        - Consider data migration if you must change existing level behavior
+    -->
+    <util:map id="securityLevelsMap">
+        <entry key="0" value-ref="level0Security"/>
+        <entry key="1" value-ref="level1Security"/>
+        <entry key="2" value-ref="level2Security"/>
+    </util:map>
+    <bean id ="level0Security" name="level0Security" class="org.dspace.content.MetadataPublicAccess"/>
+    <bean id ="level1Security" name="level1Security" class="org.dspace.content.MetadataGroupBasedAccess">
+        <property name="egroup" value="Trusted"/>
+    </bean>
+    <bean  id ="level2Security" name="level2Security" class="org.dspace.content.MetadataAdministratorAndOwnerAccess"/>
+</beans>

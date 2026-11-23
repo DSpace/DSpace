@@ -12,6 +12,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
@@ -265,6 +267,36 @@ public class JPEGFilterTest extends AbstractUnitTest {
         assertNotNull(rotatedImage);
         assertEquals(50, rotatedImage.getWidth());
         assertEquals(100, rotatedImage.getHeight());
+    }
+
+    /**
+     * Tests that getBlurredInstance does NOT change the edge pixels of the input image.
+     * Previously, the edge pixels were set to black, which resulted in a dark border in the thumbnail.
+     */
+    @Test
+    public void test_getBlurredInstance_keepsEdgePixels() {
+        // create an image with white background
+        BufferedImage original = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = original.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, original.getWidth(), original.getHeight());
+        g2d.dispose();
+
+        JPEGFilter filter = new JPEGFilter();
+        BufferedImage blurred = filter.getBlurredInstance(original);
+
+        int white = Color.WHITE.getRGB();
+        int last = original.getWidth() - 1;
+
+        // check that both corners remain white
+        assertEquals("Top left corner should stay white", white, blurred.getRGB(0, 0));
+        assertEquals("Bottom right corner should stay white", white, blurred.getRGB(last, last));
+
+        // check that all edges remain white
+        assertEquals("Left edge should stay white", white, blurred.getRGB(0, 5));
+        assertEquals("Right edge should stay white", white, blurred.getRGB(last, 5));
+        assertEquals("Top edge should stay white", white, blurred.getRGB(5, 0));
+        assertEquals("Bottom edge should stay white", white, blurred.getRGB(5, last));
     }
 
 }

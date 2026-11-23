@@ -11,7 +11,21 @@ on:
       - 'dspace-**'
     tags:
       - 'dspace-**'
+    # Don't run if PR is only updating static documentation
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'LICENSES_THIRD_PARTY'
+      - 'NOTICE'
+      - '**/*.md'
   pull_request:
+    # Don't run if PR is only updating static documentation
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'LICENSES_THIRD_PARTY'
+      - 'NOTICE'
+      - '**/*.md'
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
@@ -163,10 +177,10 @@ jobs:
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       # Download Docker image artifacts (which were just built by reusable-docker-build.yml)
       - name: Download Docker image artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           # Download all amd64 Docker images (TAR files) into the /tmp/docker directory
           pattern: docker-image-*-linux-amd64
@@ -185,8 +199,11 @@ jobs:
           sleep 10
           docker container ls
       # Create a test admin account. Load test data from a simple set of AIPs as defined in cli.ingest.yml
+      # NOTE: Before creating test data, we wait for the backend to become responsive by requesting it every 10 sec.
+      # Timeout after 5 minutes. This is done to ensure the backend is fully initialized before we create test data.
       - name: Load test data into Backend
         run: |
+          timeout 5m wget --retry-connrefused -t 0 --waitretry=10 http://127.0.0.1:8080/server/api
           docker compose -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
           docker compose -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
       # Verify backend started successfully.

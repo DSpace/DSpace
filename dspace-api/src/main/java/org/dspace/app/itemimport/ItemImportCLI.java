@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.storage.secure.SecureFileAccess;
 
 /**
  * CLI variant for the {@link ItemImport} class.
@@ -103,8 +105,14 @@ public class ItemImportCLI extends ItemImport {
         // If this is a zip archive, unzip it first
         if (zip) {
             if (!remoteUrl) {
+                // zipfilename is user controlled (via -z or -u param). So, we must validate the expected
+                // file path using SecureFileAccess to protect against path traversal attacks.
+                String fileAbsolutePath = SecureFileAccess.calculateAbsolutePathUsingBaseDir(zipfilename, sourcedir);
+                Path validatedZipPath = SecureFileAccess.validatePathForRead(fileAbsolutePath, List.of(sourcedir),
+                                                                             "ItemImportCLI zip validation");
+                File myZipFile = validatedZipPath.toFile();
+
                 // confirm zip file exists
-                File myZipFile = new File(sourcedir + File.separator + zipfilename);
                 if ((!myZipFile.exists()) || (!myZipFile.isFile())) {
                     throw new IllegalArgumentException(
                         "Error reading file, the file couldn't be found for filename: " + zipfilename);
@@ -120,8 +128,7 @@ public class ItemImportCLI extends ItemImport {
 
                 workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
                         + File.separator + context.getCurrentUser().getID());
-                sourcedir = itemImportService.unzip(
-                        new File(sourcedir + File.separator + zipfilename), workDir.getAbsolutePath());
+                sourcedir = itemImportService.unzip(myZipFile, workDir.getAbsolutePath());
             } else {
                 // manage zip via remote url
                 Optional<InputStream> optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
@@ -134,10 +141,19 @@ public class ItemImportCLI extends ItemImport {
                             validateZip(validationFileStream.get());
                         }
 
-                        workFile = new File(itemImportService.getTempWorkDir() + File.separator
-                                + zipfilename + "-" + context.getCurrentUser().getID());
+                        // zipfilename is user controlled (via -z or -u param). So, we must validate the expected
+                        // file path using SecureFileAccess to protect against path traversal attacks.
+                        String tempWorkDir = itemImportService.getTempWorkDir();
+                        String zipName = zipfilename + "-" + context.getCurrentUser().getID();
+                        String fileAbsolutePath = SecureFileAccess.calculateAbsolutePathUsingBaseDir(zipName,
+                                                                                                     tempWorkDir);
+                        Path validatedZipPath = SecureFileAccess
+                            .validatePathForWrite(fileAbsolutePath, List.of(tempWorkDir),
+                                                  "ItemImportCLI remote zip validation");
+
+                        workFile = validatedZipPath.toFile();
                         FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
-                        workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                        workDir = new File(tempWorkDir + File.separator + TEMP_DIR
                                 + File.separator + context.getCurrentUser().getID());
                         sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
                     } else {

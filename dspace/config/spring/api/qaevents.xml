@@ -89,7 +89,7 @@
 	<!--The key are the type of identifier (or subject) reported in the message, the value is the metadata in 
         the linked entity where the information should be stored -->
                <entry key="default" value="dc.identifier.other" />
-               <!-- <entry key="doi" value="dc.identifier.doi" />
+               <!-- <entry key="doi" value="dc.relation.hasversion" />
                <entry key="pmid" value="dc.identifier.pmid" /> -->
 	         </map>
 	     </property>    

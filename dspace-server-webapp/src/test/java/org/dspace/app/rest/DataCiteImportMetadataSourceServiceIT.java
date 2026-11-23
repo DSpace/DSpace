@@ -148,7 +148,7 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         List<MetadatumDTO> metadatums  = new ArrayList<>();
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
                 "Mathematical Proof Between Generations");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.48550/arxiv.2207.04779");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.48550/arxiv.2207.04779");
         MetadatumDTO author1 = createMetadatumDTO("dc", "contributor", "author", "Bayer, Jonas");
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Benzmüller, Christoph");
         MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Buzzard, Kevin");
@@ -207,7 +207,7 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         List<MetadatumDTO> metadatums  = new ArrayList<>();
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
             "Der Professorinnen- und Professorenkatalog der Universität Bamberg");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.5446/57552");
+        MetadatumDTO doi = createMetadatumDTO("dc", "relation", "hasversion", "https://doi.org/10.5446/57552");
         MetadatumDTO author1 = createMetadatumDTO("dc", "contributor", "author", "Prussat, Margrit");
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Gantner, Florian");
         MetadatumDTO dateissued = createMetadatumDTO("dc", "date", "issued", "2022");

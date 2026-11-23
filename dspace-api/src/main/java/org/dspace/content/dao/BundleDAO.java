@@ -22,4 +22,6 @@ import org.dspace.core.Context;
  */
 public interface BundleDAO extends DSpaceObjectLegacySupportDAO<Bundle> {
     int countRows(Context context) throws SQLException;
+
+    int countBitstreams(Context context, Bundle bundle) throws SQLException;
 }

@@ -127,12 +127,6 @@ public class SitemapRestController {
 
             sender.withLastModified(foundSitemapFile.lastModified());
 
-            // Determine if we need to send the file as a download or if the browser can open it inline
-            long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
-            if (dispositionThreshold >= 0 && foundSitemapFile.length() > dispositionThreshold) {
-                sender.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
-            }
-
             Context context = ContextUtil.obtainContext(request);
 
             // We have all the data we need, close the connection to the database so that it doesn't stay open during

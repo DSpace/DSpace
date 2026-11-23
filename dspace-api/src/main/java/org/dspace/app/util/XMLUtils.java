@@ -9,16 +9,27 @@ package org.dspace.app.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.input.SAXBuilder;
@@ -188,6 +199,7 @@ public class XMLUtils {
      * @return document builder factory to generate new builders
      * @throws ParserConfigurationException
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static DocumentBuilderFactory getTrustedDocumentBuilderFactory()
             throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -200,6 +212,7 @@ public class XMLUtils {
      * @return document builder factory to generate new builders
      * @throws ParserConfigurationException
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static DocumentBuilderFactory getDocumentBuilderFactory()
             throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -242,7 +255,7 @@ public class XMLUtils {
         factory.setIgnoringElementContentWhitespace(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         builder.setEntityResolver(new PathRestrictedEntityResolver(allowedPaths));
-        return factory.newDocumentBuilder();
+        return builder;
     }
 
     /**
@@ -271,6 +284,7 @@ public class XMLUtils {
      * @param validate whether to use JDOM XSD validation
      * @return SAX document builder for use in XML parsing
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static SAXBuilder getSAXBuilder(boolean validate) {
         SAXBuilder saxBuilder = new SAXBuilder();
         if (validate) {
@@ -295,6 +309,7 @@ public class XMLUtils {
      * to avoid XXE attacks and other unwanted content inclusion
      * @return XML input factory for use in XML parsing
      */
+    @SuppressWarnings("checkstyle:Regexp")
     public static XMLInputFactory getXMLInputFactory() {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
@@ -324,21 +339,43 @@ public class XMLUtils {
                 return null;
             }
 
-            String filePath;
-            if (systemId.startsWith("file://")) {
-                filePath = systemId.substring(7);
-            } else if (systemId.startsWith("file:")) {
-                filePath = systemId.substring(5);
-            } else if (!systemId.contains("://")) {
-                filePath = systemId;
-            } else {
+            URI fileUri;
+            try {
+                // First, try to parse this string as a URI.
+                fileUri = new URI(systemId);
+            } catch (Exception e) {
+                try {
+                    // Could not be parsed as a URI.
+                    // Second, try to parse it as a Path and convert to URI.
+                    fileUri = Paths.get(systemId).toUri();
+                } catch (Exception e2) {
+                    // Doesn't appear to be a valid URI or a Path, so we'll have to throw an error.
+                    throw new SAXException("Invalid URI or path: " + systemId, e2);
+                }
+            }
+
+            String scheme = fileUri.getScheme();
+
+            // If our URI has a null scheme, that means it's a relative URI or missing its scheme (e.g. /tmp/path)
+            // Because we only accept file URIs, we'll attempt to recreate it as a file URI.
+            if (scheme == null) {
+                try {
+                    fileUri = new URI("file", fileUri.getSchemeSpecificPart(), fileUri.getFragment());
+                    scheme = fileUri.getScheme();
+                } catch (URISyntaxException e) {
+                    throw new SAXException("Cannot convert to absolute file URI:" + systemId, e);
+                }
+            }
+
+            // Only allow for "file" scheme
+            if (!"file".equalsIgnoreCase(scheme)) {
                 throw new SAXException("External resources not allowed: " + systemId +
                         ". Only local file paths are permitted.");
             }
 
             Path resolvedPath;
             try {
-                resolvedPath = Paths.get(filePath).toAbsolutePath().normalize();
+                resolvedPath = Paths.get(fileUri).toAbsolutePath().normalize();
             } catch (Exception e) {
                 throw new SAXException("Invalid path: " + systemId, e);
             }
@@ -365,5 +402,173 @@ public class XMLUtils {
         }
     }
 
+    /**
+     * Initialize and return the javax TransformerFactory with some basic security
+     * applied to avoid XXE attacks and other unwanted content inclusion
+     * @return transformer factory to generate new transformers
+     * @throws TransformerConfigurationException
+     */
+    @SuppressWarnings("checkstyle:Regexp")
+    public static TransformerFactory getTransformerFactory() throws TransformerConfigurationException {
+        TransformerFactory factory = TransformerFactory.newInstance();
 
+        // Process XML securely
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        // No external DTDs or Stylesheets
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+        return factory;
+    }
+
+    /**
+     * Initialize and return the javax TransformerFactory with less security applied.  This is intended only for
+     * internal or configuration use where external stylesheets and other dangerous features are purposefully
+     * included, but are only allowed from specific paths, e.g. ${dspace.dir}/config or some other path specified
+     * by the java caller.
+     * <p>
+     * If no allowedPaths are passed, then all external stylesheets are rejected.
+     * @param allowedBasePaths path(s) where all stylesheets should be located. Only these path will be "trusted"
+     *                         for externally referenced stylesheets.
+     * @return TransformerFactory that allows references to external stylesheets but only for the given base Paths.
+     * @throws TransformerConfigurationException
+     */
+    public static TransformerFactory getTrustedTransformerFactory(String... allowedBasePaths)
+        throws TransformerConfigurationException {
+        // Initialize a default trusted TransformerFactory by specifying "null" as the factoryClassName
+        return getTrustedTransformerFactory(null, allowedBasePaths);
+    }
+
+    /**
+     * Initialize and return the javax TransformerFactory with less security applied.  This is intended only for
+     * internal or configuration use where external stylesheets and other dangerous features are purposefully
+     * included, but are only allowed from specific paths, e.g. ${dspace.dir}/config or some other path specified
+     * by the java caller.
+     * <p>
+     * If no allowedPaths are passed, then all external stylesheets are rejected.
+     * @param factoryClassName optional factory class to use to initialize TransformerFactory. If `null` a default
+     *                         TransformerFactory will be initialized
+     * @param allowedBasePaths path(s) where all stylesheets should be located. Only these path will be "trusted"
+     *                         for externally referenced stylesheets.
+     * @return TransformerFactory that allows references to external stylesheets but only for the given base Paths.
+     * @throws TransformerConfigurationException
+     */
+    @SuppressWarnings("checkstyle:Regexp")
+    public static TransformerFactory getTrustedTransformerFactory(String factoryClassName, String... allowedBasePaths)
+        throws TransformerConfigurationException {
+        // If not null, use the passed in factoryClassName. Otherwise, initialize a default TransformerFactory
+        TransformerFactory factory = factoryClassName != null ?
+            TransformerFactory.newInstance(factoryClassName, null) : TransformerFactory.newInstance();
+
+        // Process XML securely
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        // No external DTDs
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+
+        // NOTE: We cannot disable XMLConstants.ACCESS_EXTERNAL_STYLESHEETS because OAI-PMH references some external
+        // stylesheets during XOAI transformations. Therefore, we set a custom URIResolver to ensure all external
+        // stylesheets come from trusted directories.
+        factory.setURIResolver(new PathRestrictedURIResolver(allowedBasePaths));
+
+        return factory;
+    }
+
+
+    /**
+     * This URIResolver accepts one or more path strings in its
+     * constructor and throws a TransformerException if the entity systemID
+     * is not within the allowed path (or a subdirectory).
+     * If no parameters are passed, then this effectively disallows
+     * any external entity resolution.
+     */
+    public static class PathRestrictedURIResolver implements URIResolver {
+
+        private final List<String> allowedBasePaths;
+
+        public PathRestrictedURIResolver(String... allowedBasePaths) {
+            this.allowedBasePaths = Arrays.asList(allowedBasePaths);
+        }
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            URI uri;
+            // Base path is optional, as the "href" might already be an absolute path
+            if (base == null || base.isEmpty()) {
+                uri = URI.create(href);
+            } else {
+                uri = URI.create(base).resolve(href);
+            }
+
+            String scheme = uri.getScheme();
+
+            // If our URI has a null scheme, that means it's a relative URI or missing its scheme (e.g. /tmp/path)
+            // Because we only accept file URIs, we'll attempt to recreate it as a file URI.
+            if (scheme == null) {
+                try {
+                    uri = new URI("file", uri.getSchemeSpecificPart(), uri.getFragment());
+                    scheme = uri.getScheme();
+                } catch (URISyntaxException e) {
+                    throw new TransformerException("Cannot convert to absolute file URI:" + uri, e);
+                }
+            }
+
+            // Only allow for "file" scheme
+            if (!"file".equalsIgnoreCase(scheme)) {
+                throw new TransformerException("External resources not allowed: " + uri +
+                                           ". Only local file paths are permitted.");
+            }
+
+            Path resolvedPath;
+            try {
+                // Resolve to an absolute path
+                resolvedPath = Paths.get(uri).toAbsolutePath().normalize();
+            } catch (Exception e) {
+                throw new TransformerException("Invalid path: " + uri, e);
+            }
+
+            boolean isAllowed = false;
+            for (String basePath : allowedBasePaths) {
+                Path allowedPath = Paths.get(basePath).toAbsolutePath().normalize();
+                if (resolvedPath.startsWith(allowedPath)) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+
+            if (!isAllowed) {
+                throw new TransformerException("Access denied to path: " + resolvedPath);
+            }
+
+            File file = resolvedPath.toFile();
+            if (!file.exists() || !file.canRead()) {
+                throw new TransformerException("File not found or not readable: " + resolvedPath);
+            }
+
+            try {
+                return new StreamSource(new FileInputStream(file));
+            } catch (FileNotFoundException e) {
+                throw new TransformerException("Unable to stream file at: " + resolvedPath);
+            }
+        }
+    }
+
+    /**
+     * Initialize and return the javax SchemaFactory with some basic security
+     * applied to avoid XXE attacks and other unwanted content inclusion
+     * @param schemaLanguage locates an implementation of SchemaFactory that supports the specified schema language
+     * @return schema factory to generate new schema
+     * @throws SAXException
+     */
+    @SuppressWarnings("checkstyle:Regexp")
+    public static SchemaFactory getSchemaFactory(String schemaLanguage) throws SAXException {
+        SchemaFactory factory = SchemaFactory.newInstance(schemaLanguage);
+
+        // No external DTDs or Schema
+        factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+        return factory;
+    }
 }

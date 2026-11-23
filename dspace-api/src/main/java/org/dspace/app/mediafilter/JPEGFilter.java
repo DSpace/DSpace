@@ -399,8 +399,9 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats 
             0.111f, 0.111f, 0.111f,
         };
 
-        // perform the blur and return the blurred version.
-        BufferedImageOp blur = new ConvolveOp(new Kernel(3, 3, matrix));
+        // perform the blur and return the blurred version (EDGE_NO_OP keeps edge pixels unchanged; the
+        // default EDGE_ZERO_FILL would turn them black which results in a dark border around the thumbnail)
+        BufferedImageOp blur = new ConvolveOp(new Kernel(3, 3, matrix), ConvolveOp.EDGE_NO_OP, null);
         BufferedImage blurbuf = blur.filter(buf, null);
         return blurbuf;
     }

@@ -15,13 +15,29 @@ List of changes in this PR:
 
 **Include guidance for how to test or review your PR.** This may include: steps to reproduce a bug, screenshots or description of a new feature, or reasons behind specific changes. 
 
+## AI Disclosure (REQUIRED)
+
+Per our [AI Contribution Policy](https://wiki.lyrasis.org/display/DSPACE/AI+Contribution+Policy), all contributors to DSpace MUST disclose AI/LLM usage.
+This information helps reviewers assess provenance, licensing, security, and the level of verification needed.
+
+If AI tools were ONLY used for incidental assistance (such as spelling/grammar correction, variable auto-completion, or translation), then select 'No'.
+
+**Were AI tools used in the creation of this PR?**
+   - [ ] No (This PR does NOT include AI-generated or AI-assisted content that requires disclosure.)
+   - [ ] Yes (This PR includes AI-generated or AI-assisted content that requires disclosure.)
+
+**If "Yes", briefly describe what portion of this PR was generated or assisted by AI. Additionally, tell us how you've verified the AI output aligns with DSpace's coding standards and is secure and accurate.**
+
+(Example: "AI assisted me in investigating the bug and generated a suggested patch. I reviewed, modified and tested the code. No AI was used for the PR description.")
+
 ## Checklist
 _This checklist provides a reminder of what we are going to look for when reviewing your PR. You need not complete this checklist prior to creating your PR (draft PRs are always welcome).
 However, reviewers may request that you complete any actions in this list if you have not done so. If you are unsure about an item in the checklist, don't hesitate to ask. We're here to help!_
 
 - [ ] My PR is **created against the `main` branch** of code (unless it is a backport or is fixing an issue specific to an older branch).
 - [ ] My PR is **small in size** (e.g. less than 1,000 lines of code, not including comments & integration tests). Exceptions may be made if previously agreed upon.
-- [ ] My PR **passes Checkstyle** validation based on the [Code Style Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide).
+- [ ] My PR **follows all coding best practices** based on the [Code Conventions Guide](../CODE_CONVENTIONS.md).
+- [ ] My PR **passes Checkstyle** validation based on the [Code Style Guide](../CODE_STYLE.md).
 - [ ] My PR **includes Javadoc** for _all new (or modified) public methods and classes_. It also includes Javadoc for large or complex private methods.
 - [ ] My PR **passes all tests and includes new/updated Unit or Integration Tests** based on the [Code Testing Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Testing+Guide).
 - [ ] My PR **includes details on how to test it**. I've provided clear instructions to reviewers on how to successfully test this fix or feature.

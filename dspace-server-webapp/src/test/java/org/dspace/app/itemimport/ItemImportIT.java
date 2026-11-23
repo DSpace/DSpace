@@ -59,6 +59,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 /**
  * Basic integration testing for the SAF Import feature via UI {@link ItemImport}.
@@ -138,6 +139,39 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
     }
 
     @Test
+    public void importItemUsingInvalidZipName() throws Exception {
+        String zipfileName = "saf-bitstreams.zip";
+        // This zip name is invalid as it must only contain a file name.
+        // This is an example path traversal attack.
+        String badZipFileName = "../../../" + zipfileName;
+
+        // First attack attempt. Provide a path traversal via both "-z" param and "filename" of multipart request.
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-c", collection.getID().toString()));
+        parameters.add(new DSpaceCommandLineParameter("-z", badZipFileName));
+        MockMultipartFile bitstreamFile = new MockMultipartFile("file", badZipFileName,
+                                                                MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                                                                getClass().getResourceAsStream("saf-bitstreams.zip"));
+
+        // Verify this import will fail and throw a 422 error
+        performImportScriptExpectError(parameters, bitstreamFile, status().isUnprocessableEntity());
+
+        // Second attack attempt. Provide a path traversal via "-z" param but a VALID file in "filename"
+        // of multipart request.
+        parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-c", collection.getID().toString()));
+        parameters.add(new DSpaceCommandLineParameter("-z", badZipFileName));
+        bitstreamFile = new MockMultipartFile("file", zipfileName,
+                                              MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                                              getClass().getResourceAsStream("saf-bitstreams.zip"));
+
+        // Verify this import will also fail and throw a 422 error
+        performImportScriptExpectError(parameters, bitstreamFile, status().isUnprocessableEntity());
+    }
+
+    @Test
     public void importItemByZipSafWithRelationships() throws Exception {
         context.turnOffAuthorisationSystem();
         // create collection that contains person
@@ -169,7 +203,7 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkMetadata() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item item = itemService.findArchivedByMetadataField(context, "dc", "title", null, publicationTitle).next();
         getClient().perform(get("/api/core/items/" + item.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata", allOf(
@@ -183,7 +217,7 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkMetadataWithAnotherSchema() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item item = itemService.findArchivedByMetadataField(context, "dc", "title", null, publicationTitle).next();
         getClient().perform(get("/api/core/items/" + item.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata", allOf(
@@ -195,7 +229,8 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkBitstream() throws Exception {
-        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
+        Bitstream bitstream = itemService.findArchivedByMetadataField(context, "dc", "title",
+                        null, publicationTitle).next()
                 .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isOk())
@@ -208,8 +243,8 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkRelationship() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
-        Item author = itemService.findByMetadataField(context, "dc", "title", null, personTitle).next();
+        Item item = itemService.findArchivedByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item author = itemService.findArchivedByMetadataField(context, "dc", "title", null, personTitle).next();
         List<Relationship> relationships = relationshipService.findByItem(context, item);
         assertEquals(1, relationships.size());
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
@@ -265,5 +300,24 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
                 process.getBitstreams().stream()
                 .filter(b -> Strings.CS.contains(b.getName(), ".zip"))
                 .count());
+    }
+
+    private void performImportScriptExpectError(LinkedList<DSpaceCommandLineParameter> parameters,
+                                               MockMultipartFile bitstreamFile,
+                                               ResultMatcher expectedErrorMatcher)
+        throws Exception {
+        List<ParameterValueRest> list = parameters.stream()
+                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                      .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
+                                                  .collect(Collectors.toList());
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        // Verify process fails
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(multipart("/api/system/scripts/import/processes")
+                         .file(bitstreamFile)
+                         .param("properties", mapper.writeValueAsString(list)))
+            .andExpect(expectedErrorMatcher);
     }
 }

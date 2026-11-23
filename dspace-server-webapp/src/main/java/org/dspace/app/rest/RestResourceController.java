@@ -440,7 +440,9 @@ public class RestResourceController implements InitializingBean {
         }
         DSpaceResource result = converter.toResource(modelObject);
         //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(result.getRequiredLink("self").toUri());
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, headers, result);
     }
 
     /**

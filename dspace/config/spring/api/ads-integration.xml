@@ -87,10 +87,16 @@
 
     <bean id="adsDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ads.doi"/>
-        <property name="query" value="/doi"/>
+        <property name="metadataProcessor" ref="adsDoiMetadataProcessor"/>
+    </bean>
+    <bean name="adsDoiMetadataProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
+        <property name="path" value="/doi"/>
+        <property name="regexPattern" value="^"/>
+        <property name="replacement" value="https://doi.org/"/>
     </bean>
     <bean id="ads.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="adsAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">

@@ -151,7 +151,7 @@ public class ExternalDataObject {
 
     /**
      * Sort metadata before printing, to help with comparison by eye
-     * @return
+     * @return  sorted string representation of this ExternalDataObject
      */
     @Override
     public String toString() {
@@ -200,7 +200,7 @@ public class ExternalDataObject {
 
     /**
      * Explicit override of Object hashCode()
-     * @return
+     * @return  hash code based on id, value, source, metadata, and displayValue
      */
     @Override
     public int hashCode() {

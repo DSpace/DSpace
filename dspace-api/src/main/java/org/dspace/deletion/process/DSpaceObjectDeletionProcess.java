@@ -55,7 +55,7 @@ public class DSpaceObjectDeletionProcess
     private CollectionService collectionService;
 
     private String id;
-    private Context context;
+    protected Context context;
     private String[] copyVirtualMetadata;
     private List<DSpaceObjectDeletionStrategy> deletionStrategies = new ArrayList<>();
 
@@ -91,23 +91,40 @@ public class DSpaceObjectDeletionProcess
     @Override
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
-        Optional<DSpaceObject> dSpaceObjectOptional = resolveDSpaceObject(this.id);
+        try {
+            Optional<DSpaceObject> dSpaceObjectOptional = resolveDSpaceObject(this.id);
 
-        if (dSpaceObjectOptional.isEmpty()) {
-            var error = String.format("DSpaceObject for provided identifier:%s doesn't exist!", this.id);
-            throw new IllegalArgumentException(error);
+            if (dSpaceObjectOptional.isEmpty()) {
+                var error = String.format("DSpaceObject for provided identifier:%s doesn't exist!", this.id);
+                throw new IllegalArgumentException(error);
+            }
+
+            DSpaceObject dso = dSpaceObjectOptional.get();
+
+            if (!authorizeService.isAdmin(context, dso)) {
+                throw new AuthorizeException("Current user is not eligible to execute script: " +
+                                                 "'" + OBJECT_DELETION_SCRIPT + "'");
+            }
+
+            var info = "Performing deletion of DSpaceObject (and all child objects) for type=%s and uuid=%s";
+            handler.logInfo(String.format(info, Constants.typeText[dso.getType()], dso.getID().toString()));
+            getStrategy(dso).delete(this.context, dso, this.copyVirtualMetadata);
+
+            handleCompletion();
+            handler.logInfo("Deletion completed!");
+        } catch (Exception e) {
+            handler.handleException("Error during deletion process: " + e.getMessage(), e);
+        } finally {
+            if (context != null && context.isValid()) {
+                context.abort();
+            }
         }
+    }
 
-        DSpaceObject dso = dSpaceObjectOptional.get();
-
-        if (!authorizeService.isAdmin(context, dso)) {
-            throw new AuthorizeException("Current user is not eligible to execute script: " + OBJECT_DELETION_SCRIPT);
+    private void handleCompletion() throws SQLException {
+        if (context != null) {
+            context.complete();
         }
-
-        var info = "Performing deletion of DSpaceObject (and all child objects) for type=%s and uuid=%s";
-        handler.logInfo(String.format(info, Constants.typeText[dso.getType()], dso.getID().toString()));
-        getStrategy(dso).delete(this.context, dso, this.copyVirtualMetadata);
-        handler.logInfo("Deletion completed!");
     }
 
     private DSpaceObjectDeletionStrategy getStrategy(DSpaceObject dso) {
@@ -118,11 +135,34 @@ public class DSpaceObjectDeletionProcess
                                  .orElseThrow(() -> new IllegalArgumentException(error));
     }
 
-    private void assignCurrentUserInContext() throws SQLException {
+    /**
+     * Assigns the current user to the context for script execution.
+     * 
+     * This method creates a new DSpace context and sets the current user based on the
+     * EPerson identifier obtained from the script handler. This method is protected to
+     * allow CLI extensions (like {@link DSpaceObjectDeletionProcessCli}) to override
+     * the user assignment logic and use alternative methods such as email-based lookup.
+     * 
+     * Default behavior:
+     * <ul>
+     *   <li>Creates a new Context instance</li>
+     *   <li>Retrieves the EPerson UUID from the script handler via {@link #getEpersonIdentifier()}</li>
+     *   <li>If UUID is present, looks up the EPerson and sets them as current user</li>
+     *   <li>If UUID is null, context remains without a current user (anonymous)</li>
+     * </ul>
+     *
+     * @throws SQLException if a database error occurs during EPerson lookup
+     * @throws ParseException if command line parsing fails (used by CLI extensions)
+     */
+    protected void assignCurrentUserInContext() throws SQLException, ParseException {
         this.context = new Context();
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
+            if (ePerson == null) {
+                handler.logError("EPerson not found for UUID: " + uuid);
+                throw new IllegalArgumentException("Unable to find a user with UUID: " + uuid);
+            }
             context.setCurrentUser(ePerson);
         }
     }

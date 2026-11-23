@@ -66,6 +66,7 @@ import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
@@ -93,8 +94,12 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.orcid.OrcidHistory;
@@ -127,6 +132,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private PluginService pluginService;
+
+    @Autowired
+    private ChoiceAuthorityService choiceAuthorityService;
+
+    @Autowired
+    private MetadataAuthorityService metadataAuthorityService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -1415,6 +1432,157 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.uuid", Matchers.is(item2.getID().toString())))
                         .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
 
+    }
+
+    /**
+     * Administrative edit counterpart of
+     * {@link EditItemRestRepositoryIT#editItemAfterAuthorityConfigRemovedTest()}: verifies that once
+     * the authority configuration for dc.contributor.author has been removed, editing an item whose
+     * author was previously linked to a Person authority still succeeds through the administrative
+     * item-edit endpoint (PATCH /api/core/items/{uuid}), as long as no authority is being (re)attached.
+     *
+     * The title and the author are updated with two separate PATCH requests, each followed by a GET
+     * that verifies the specific metadata change has been persisted.
+     */
+    @Test
+    public void editItemMetadataAfterAuthorityConfigRemovedTest() throws Exception {
+        // enable the ChoiceAuthority configuration for dc.contributor.author
+        configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
+                                         new String[] {
+                                             "org.dspace.content.authority.OrcidAuthority = AuthorAuthority"
+                                         });
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("cris.ItemAuthority.AuthorAuthority.entityType", "Person");
+
+        // Ensure the ChoiceAuthorityService is initialized before clearing its cache.
+        // clearCache() calls submissionConfigService.reload(), and that field is only
+        // populated by the service's lazy init() (triggered here via a read-only call),
+        // so without this the first clearCache() on a fresh singleton throws NPE.
+        choiceAuthorityService.getChoiceAuthoritiesNames();
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Person")
+                                           .withName("People").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1").build();
+
+        // the Person the publication author will be linked to via its authority
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Rossi, Mario")
+                                 .build();
+
+        // target publication whose author is linked to the Person above (carries an authority)
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Original Title")
+                               .withIssueDate("2015-06-25")
+                               .withAuthor("Rossi, Mario", person.getID().toString())
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // sanity check: the item is readable and currently carries its original title and
+        // authority-backed author
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata", Matchers.allOf(
+                                     Matchers.is(matchMetadata("dc.title", "Original Title")),
+                                     hasJsonPath("$['dc.contributor.author'][0].value", is("Rossi, Mario")),
+                                     hasJsonPath("$['dc.contributor.author'][0].authority",
+                                         is(person.getID().toString()))
+                                     )));
+
+        // remove the authority configuration for dc.contributor.author
+        configurationService.setProperty("choices.plugin.dc.contributor.author", null);
+        configurationService.setProperty("choices.presentation.dc.contributor.author", null);
+        configurationService.setProperty("authority.controlled.dc.contributor.author", null);
+
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        // first PATCH: replace the title (no authority involved); must succeed
+        MetadataValueRest newTitle = new MetadataValueRest();
+        newTitle.setValue("Test to break authority");
+        List<Operation> titleOps = new ArrayList<Operation>();
+        titleOps.add(new ReplaceOperation("/metadata/dc.title/0", newTitle));
+
+        getClient(tokenAdmin).perform(patch("/api/core/items/" + item.getID())
+                             .content(getPatchContent(titleOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata",
+                                 Matchers.is(matchMetadata("dc.title", "Test to break authority"))));
+
+        // verify the title change has been persisted
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata",
+                                 Matchers.is(matchMetadata("dc.title", "Test to break authority"))));
+
+        // second PATCH: replace the author in place, dropping its authority (empty authority);
+        // must succeed now that the authority configuration is gone
+        MetadataValueRest newAuthor = new MetadataValueRest();
+        newAuthor.setValue("Giuseppe Verdi (no authority)");
+        newAuthor.setAuthority("");
+        newAuthor.setConfidence(600);
+        List<Operation> authorOps = new ArrayList<Operation>();
+        authorOps.add(new ReplaceOperation("/metadata/dc.contributor.author/0", newAuthor));
+
+        getClient(tokenAdmin).perform(patch("/api/core/items/" + item.getID())
+                             .content(getPatchContent(authorOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata", Matchers.allOf(
+                                     hasJsonPath("$['dc.contributor.author'][0].value",
+                                         is("Giuseppe Verdi (no authority)")),
+                                     hasJsonPath("$['dc.contributor.author'][0].authority",
+                                         Matchers.anyOf(nullValue(), is("")))
+                                     )));
+
+        // verify the author change has been persisted (and the title is still updated)
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata", Matchers.allOf(
+                                     Matchers.is(matchMetadata("dc.title", "Test to break authority")),
+                                     hasJsonPath("$['dc.contributor.author'][0].value",
+                                         is("Giuseppe Verdi (no authority)")),
+                                     hasJsonPath("$['dc.contributor.author'][0].authority",
+                                         Matchers.anyOf(nullValue(), is("")))
+                                     )));
+
+        // third PATCH: remove the author metadata value entirely; must succeed
+        List<Operation> removeOps = new ArrayList<Operation>();
+        removeOps.add(new RemoveOperation("/metadata/dc.contributor.author/0"));
+
+        getClient(tokenAdmin).perform(patch("/api/core/items/" + item.getID())
+                             .content(getPatchContent(removeOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata",
+                                 Matchers.is(matchMetadataDoesNotExist("dc.contributor.author"))));
+
+        // verify the author removal has been persisted (and the title is still updated)
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata", Matchers.allOf(
+                                     Matchers.is(matchMetadata("dc.title", "Test to break authority")),
+                                     Matchers.is(matchMetadataDoesNotExist("dc.contributor.author"))
+                                     )));
     }
 
     @Test
@@ -3052,7 +3220,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        getClient(token).perform(get("/api/core/items/" + item.getID())
+                            .param("projection", "allLanguages"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
                    .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
@@ -3083,7 +3252,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/items/" + item.getID()))
+        getClient(token).perform(get("/api/core/items/" + item.getID())
+                                     .param("projection", "allLanguages"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
@@ -5031,7 +5201,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/core/items/search/findByCustomURL")
                                      .param("q", "my-custom-url"))
-                        .andExpect(status().isInternalServerError());
+                        .andExpect(status().isBadRequest());
 
     }
 
@@ -5504,6 +5674,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withName("col3")
             .withAdminGroup(eperson)
             .build();
+        Collection col4 = CollectionBuilder.createCollection(context, child2)
+            .withName("col4")
+            .withAdminGroup(eperson2)
+            .build();
         Item item1 = ItemBuilder.createItem(context, col1)
             .withTitle("Sample item")
             .build();
@@ -5512,6 +5686,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         Item item3 = ItemBuilder.createItem(context, col3)
             .withTitle("Item of sample bitstreams")
+            .build();
+        Item item4 = ItemBuilder.createItem(context, col4)
+            .withTitle("Testing autocomplete in items")
+            .build();
+        Item item5 = ItemBuilder.createItem(context, col4)
+            .withTitle("Title: subtitle (special characters)")
             .build();
 
         context.restoreAuthSystemState();
@@ -5544,11 +5724,29 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // Test eperson with no authorized items
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
-        getClient(tokenEPerson2).perform(get("/api/core/items/search/" + method)
-                .param("query", "community"))
+        getClient(tokenEPerson).perform(get("/api/core/items/search/" + method)
+                .param("query", "auto"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
+        // Test eperson2 with one authorized item
+        getClient(tokenEPerson2).perform(get("/api/core/items/search/" + method)
+                .param("query", "auto"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.contains(
+                ItemMatcher.matchItemProperties(item4)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Test query with multiple words
+        getClient(tokenEPerson2).perform(get("/api/core/items/search/" + method)
+                .param("query", "testing auto"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
+                ItemMatcher.matchItemProperties(item4)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         // Test query as admin
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -5575,7 +5773,17 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("query", "test"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                ItemMatcher.matchItemProperties(item2)
+                ItemMatcher.matchItemProperties(item2),
+                ItemMatcher.matchItemProperties(item4)
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // Test special characters in query
+        getClient(tokenAdmin).perform(get("/api/core/items/search/" + method)
+                .param("query", "title: subtitle (special"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.items", Matchers.contains(
+                ItemMatcher.matchItemProperties(item5)
             )))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
 

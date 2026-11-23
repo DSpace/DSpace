@@ -62,9 +62,18 @@ public class HandleServiceImpl implements HandleService {
     private static final Pattern[] IDENTIFIER_PATTERNS = {
         Pattern.compile("^hdl:(.*)$"),
         Pattern.compile("^info:hdl/(.*)$"),
-        Pattern.compile("^https?://hdl\\.handle\\.net/(.*)$"),
-        Pattern.compile("^https?://.+/handle/(.*)$")
+        Pattern.compile("^https?://hdl\\.handle\\.net/(.*)$")
     };
+
+    /**
+     * Path segment separating a repository base URL from the handle it resolves.
+     */
+    private static final String HANDLE_URL_SEGMENT = "/handle/";
+
+    /**
+     * The characters that "." in a regular expression never matches.
+     */
+    private static final Pattern LINE_TERMINATOR = Pattern.compile("[\\n\\r\\u0085\\u2028\\u2029]");
 
     /**
      * Public Constructor
@@ -391,6 +400,11 @@ public class HandleServiceImpl implements HandleService {
             }
         }
 
+        String handleFromUrl = parseHandleFromUrl(identifier);
+        if (handleFromUrl != null) {
+            return handleFromUrl;
+        }
+
         // Check additional prefixes supported in the config file
         String[] additionalPrefixes = getAdditionalPrefixes();
         for (String additionalPrefix : additionalPrefixes) {
@@ -401,6 +415,45 @@ public class HandleServiceImpl implements HandleService {
         }
 
         return null;
+    }
+
+    /**
+     * Extract the handle from a <code>http(s)://&lt;base&gt;/handle/&lt;handle&gt;</code> URL.
+     * <p>
+     * This replaces the pattern <code>^https?://.+/handle/(.*)$</code>. The unbounded
+     * <code>.+</code> preceding a literal that <code>.</code> can itself match allowed a crafted
+     * identifier to drive matching into quadratic time (CodeQL
+     * <code>java/polynomial-redos</code>). Because <code>.+</code> was greedy it selected the
+     * last <code>/handle/</code> segment, which is what scanning backwards does here, in linear
+     * time.
+     *
+     * @param identifier the identifier to parse
+     * @return the handle, or null if the identifier is not a handle URL
+     */
+    protected String parseHandleFromUrl(String identifier) {
+        int baseStart;
+        if (identifier.startsWith("http://")) {
+            baseStart = "http://".length();
+        } else if (identifier.startsWith("https://")) {
+            baseStart = "https://".length();
+        } else {
+            return null;
+        }
+
+        // neither ".+" nor ".*" in the replaced pattern matched a line terminator. Rejecting such
+        // identifiers up front is also what removes the backtracking: it was a trailing line
+        // terminator that forced the greedy ".+" to retry every "/handle/" segment in turn.
+        if (LINE_TERMINATOR.matcher(identifier).find()) {
+            return null;
+        }
+
+        int segmentStart = identifier.lastIndexOf(HANDLE_URL_SEGMENT);
+        // ".+" required at least one character between the scheme and "/handle/"
+        if (segmentStart < baseStart + 1) {
+            return null;
+        }
+
+        return identifier.substring(segmentStart + HANDLE_URL_SEGMENT.length());
     }
 
     @Override

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -206,8 +207,12 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private CharSequence getContent(Bitstream bitstream) throws IOException, SQLException, AuthorizeException {
+        // TEXT bundles are now expected to be admin-only, and this test does not care about authZ
+        context.turnOffAuthorisationSystem();
         try (InputStream input = bitstreamService.retrieve(context, bitstream)) {
-            return IOUtils.toString(input, "UTF-8");
+            return IOUtils.toString(input, StandardCharsets.UTF_8);
+        } finally {
+            context.restoreAuthSystemState();
         }
     }
 

@@ -32,6 +32,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.validation.util.CustomUrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,7 +188,13 @@ public class CustomUrlServiceImpl implements CustomUrlService {
         String cleanBase = normalizeUrl(rawInput);
         if (StringUtils.isBlank(cleanBase)) {
             throw new IllegalArgumentException("Input '" + rawInput + "' does not contain any valid " +
-                                                   "alphanumeric characters to generate a URL");
+                                                   "Latin characters to generate a URL");
+        }
+
+        // Verify the normalized result is a valid custom URL (should only contain Latin chars, digits, hyphens)
+        if (CustomUrlUtils.hasInvalidCharacters(cleanBase)) {
+            throw new IllegalArgumentException("Normalized URL '" + cleanBase + "' from input '" + rawInput +
+                                                   "' contains invalid characters");
         }
 
         if (!customUrlExists(context, cleanBase)) {
@@ -198,35 +205,45 @@ public class CustomUrlServiceImpl implements CustomUrlService {
     }
 
     /**
-     * Normalizes a given string into a URL-friendly "slug".
+     * Normalizes a given string into a URL-friendly "slug" containing only Latin characters.
      * <p>
      * The normalization process follows these steps:
      * <ul>
      * <li>Decomposes Unicode characters to remove accents (e.g., "é" becomes "e").</li>
+     * <li>Removes any remaining non-Latin characters (Cyrillic, Arabic, Chinese, etc.).</li>
      * <li>Converts the entire string to lowercase.</li>
      * <li>Replaces all sequences of non-alphanumeric characters with a single hyphen.</li>
      * <li>Trims leading and trailing hyphens.</li>
      * </ul>
      * </p>
-     * * @param text the raw string to be normalized (e.g., an Item title or metadata value).
+     * <p>
+     * Note: This method only preserves Latin letters (a-z, A-Z) and digits (0-9).
+     * Characters from other scripts (Cyrillic, Arabic, Chinese, etc.) are removed
+     * to prevent UI rendering issues.
+     * </p>
      *
+     * @param text the raw string to be normalized (e.g., an Item title or metadata value).
      * @return a sanitized, lowercase, hyphenated string suitable for use in a URL,
-     * or an empty string if the input is {@code null} or blank.
+     *         or an empty string if the input is {@code null}, blank, or contains only non-Latin characters.
      */
     private String normalizeUrl(String text) {
         if (StringUtils.isBlank(text)) {
             return "";
         }
 
-        // 1. Remove accents (Normalize Unicode to ASCII)
+        // 1. Remove accents (Normalize Unicode to decompose accented characters like é -> e + ́)
         String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
         normalized = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}", "");
 
-        // 2. Lowercase and replace anything NOT alphanumeric with a dash
+        // 2. Remove any remaining non-Latin characters (Cyrillic, Arabic, Chinese, emoji, etc.)
+        //    Keep only Latin letters (a-z, A-Z), digits (0-9), spaces, hyphens, underscores, and dots
+        normalized = normalized.replaceAll("[^a-zA-Z0-9\\s.\\-_]+", "");
+
+        // 3. Lowercase and replace any sequence of non-alphanumeric characters with a single hyphen
         normalized = normalized.toLowerCase()
                                .replaceAll("[^a-z0-9]+", "-");
 
-        // 3. Remove leading/trailing dashes that might result from step 2
+        // 4. Remove leading/trailing dashes that might result from step 3
         normalized = normalized.replaceAll("^-|-$", "");
 
         return normalized;

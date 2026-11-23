@@ -27,6 +27,7 @@ public class VocabularyEntryRest implements RestModel {
     private String display;
     private String value;
     private Map<String, String> otherInformation;
+    private String source;
 
     /**
      * The Vocabulary Entry Details resource if available related to this entry
@@ -72,6 +73,14 @@ public class VocabularyEntryRest implements RestModel {
 
     public VocabularyEntryDetailsRest getVocabularyEntryDetailsRest() {
         return vocabularyEntryDetailsRest;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     @Override

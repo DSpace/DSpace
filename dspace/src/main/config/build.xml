@@ -126,6 +126,7 @@ Common usage:
         <echo message="fresh_install   --> Perform a fresh installation of the software. " />
         <echo message="" />
         <echo message="clean_backups   --> Remove .bak directories under install directory" />
+        <echo message="clean_obsolete  --> Remove configuration files retired by update_configs (*.obsolete-*)" />
         <echo message="test_database   --> Attempt to connect to the DSpace database in order to verify that configuration is correct" />
         <echo message="" />
         <echo message="" />
@@ -164,6 +165,16 @@ Common usage:
     </target>
 
     <!-- ============================================================= -->
+    <!-- clean out configuration files retired by update_configs       -->
+    <!-- ============================================================= -->
+    <target name="clean_obsolete"
+            description="Remove configuration files which were retired by a previous 'ant update'">
+        <delete>
+            <fileset dir="${dspace.dir}" includes="config/**/*.obsolete-**" />
+        </delete>
+    </target>
+
+    <!-- ============================================================= -->
     <!-- Update an installation                                        -->
     <!-- ============================================================= -->
 
@@ -178,9 +189,81 @@ Common usage:
     <!-- and should be hand updated afterward.                         -->
     <!-- ============================================================= -->
     <target name="update_configs"
-            depends="overwrite_configs,overwrite_solr_configs"
+            depends="retire_obsolete_configs,overwrite_configs,overwrite_solr_configs"
             description="Updates the Configuration Directory">
         <antcall target="init_spiders" />
+    </target>
+
+    <!-- ============================================================= -->
+    <!-- Retire configuration files which DSpace no longer ships.      -->
+    <!-- They are renamed rather than deleted, so that they can no     -->
+    <!-- longer be picked up by the wildcard configuration loaders     -->
+    <!-- while any local customizations remain available for review.   -->
+    <!-- ============================================================= -->
+    <target name="retire_obsolete_configs"
+            depends="move_obsolete_configs,report_obsolete_configs"
+            description="Rename configuration files DSpace no longer ships, so they are no longer loaded">
+    </target>
+
+    <target name="move_obsolete_configs">
+
+        <!--
+        ****************************************************************
+        Configuration files which DSpace shipped in an earlier version
+        and no longer ships. Paths are relative to ${dspace.dir}/config.
+
+        WHEN A PULL REQUEST REMOVES OR RENAMES A FILE UNDER dspace/config,
+        ADD ITS OLD PATH HERE IN THE SAME PULL REQUEST.
+
+        A <filelist> is used rather than a <fileset> on purpose: it names
+        files instead of matching patterns, so entries which are not
+        installed are simply skipped by <exists>, and an empty list stays
+        empty. (A <fileset> with no include patterns matches everything,
+        which would rename the entire configuration directory.)
+        ****************************************************************
+        -->
+        <restrict id="obsolete.configs">
+            <filelist dir="${dspace.dir}/config">
+                <!-- Sherpa Romeo became Open Policy Finder in PR #12005, and this file
+                     was replaced by spring/api/openpolicyfinder.xml -->
+                <file name="spring/api/sherpa.xml" />
+            </filelist>
+            <exists />
+        </restrict>
+
+        <!--
+        The property is left unset when nothing matched (setonempty="false"), which is
+        what suppresses the report below.
+        -->
+        <pathconvert pathsep="${line.separator}    " property="obsolete.configs.found"
+                     refid="obsolete.configs" setonempty="false" />
+
+        <!--
+        Rename (never delete), so that the file no longer matches the "*.xml" pattern
+        which the Spring configuration loaders use to scan config/spring/**.
+        -->
+        <move todir="${dspace.dir}/config" failonerror="false">
+            <resources refid="obsolete.configs" />
+            <globmapper from="*" to="*.obsolete-${build.date}" />
+        </move>
+
+    </target>
+
+    <target name="report_obsolete_configs" if="obsolete.configs.found">
+
+        <echo>
+====================================================================
+ The following configuration files are no longer part of DSpace.
+ Each one has been renamed to "&lt;filename&gt;.obsolete-${build.date}"
+ so that it can no longer be loaded by DSpace:
+
+    ${obsolete.configs.found}
+
+ Nothing was deleted. Review these files for any local customizations
+ you still need, then run "ant clean_obsolete" to remove them.
+====================================================================
+        </echo>
+
     </target>
 
     <target name="overwrite_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_configs_keep">

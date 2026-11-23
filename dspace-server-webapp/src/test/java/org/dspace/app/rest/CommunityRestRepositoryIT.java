@@ -3169,6 +3169,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             .withName("community of sample items")
             .withAdminGroup(eperson)
             .build();
+        Community com4 = CommunityBuilder.createSubCommunity(context, child2)
+            .withName("Testing autocomplete in community")
+            .withAdminGroup(eperson2)
+            .build();
+        Community com5 = CommunityBuilder.createSubCommunity(context, child2)
+            .withName("Title: subtitle (special characters)")
+            .build();
         context.restoreAuthSystemState();
 
         // Test simple query
@@ -3199,11 +3206,29 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // Test eperson with no authorized communities
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
-        getClient(tokenEPerson2).perform(get("/api/core/communities/search/" + method)
-                .param("query", "community"))
+        getClient(tokenEPerson).perform(get("/api/core/communities/search/" + method)
+                .param("query", "auto"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
+        // Test eperson2 gets only their authorized community
+        getClient(tokenEPerson2).perform(get("/api/core/communities/search/" + method)
+                .param("query", "auto"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                CommunityMatcher.matchProperties(com4.getName(), com4.getID(), com4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Test query with multiple words
+        getClient(tokenEPerson2).perform(get("/api/core/communities/search/" + method)
+                .param("query", "testing auto"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                CommunityMatcher.matchProperties(com4.getName(), com4.getID(), com4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         // Test as admin
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -3230,7 +3255,17 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("query", "test"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                CommunityMatcher.matchProperties(com2.getName(), com2.getID(), com2.getHandle())
+                CommunityMatcher.matchProperties(com2.getName(), com2.getID(), com2.getHandle()),
+                CommunityMatcher.matchProperties(com4.getName(), com4.getID(), com4.getHandle())
+            )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // Test query with special characters
+        getClient(tokenAdmin).perform(get("/api/core/communities/search/" + method)
+                .param("query", "title: subtitle"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                CommunityMatcher.matchProperties(com5.getName(), com5.getID(), com5.getHandle())
             )))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
 
