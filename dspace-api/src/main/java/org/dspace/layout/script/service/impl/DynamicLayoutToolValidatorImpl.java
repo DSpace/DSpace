@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
@@ -54,6 +55,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidator {
+
+    private static final Pattern SHORTNAME_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
 
     @Autowired
     private EntityTypeService entityTypeService;
@@ -128,10 +131,37 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
             validateDuplicateLeadingTabs(tabSheet, result, entityTypeColumn, leadingColumn);
         }
 
+        if (shortnameColumn != -1) {
+            validateShortnameFormat(tabSheet, result, shortnameColumn);
+        }
+
         if (entityTypeColumn != -1 && shortnameColumn != -1) {
             validatePresenceInTab2BoxSheet(result, tabSheet, TAB_COLUMN, entityTypeColumn, shortnameColumn);
         }
 
+    }
+
+    /**
+     * Validates that every shortname of the given sheet only contains letters, digits, underscores and
+     * dashes. Shortnames are combined with the entity scope using {@code :} in the exported
+     * {@code ALTERNATIVE_TO} references, so they must not contain that separator (or any other
+     * ambiguous character) to survive an export/import round-trip.
+     *
+     * @param sheet           the tab or box sheet to validate
+     * @param result          the validation result to populate with errors
+     * @param shortnameColumn the index of the shortname column
+     */
+    private void validateShortnameFormat(Sheet sheet, DynamicLayoutToolValidationResult result,
+        int shortnameColumn) {
+
+        for (Row row : getNotEmptyRowsSkippingHeader(sheet)) {
+            String shortname = getCellValue(row, shortnameColumn);
+            if (StringUtils.isNotBlank(shortname) && !SHORTNAME_PATTERN.matcher(shortname).matches()) {
+                result.addError("The " + SHORTNAME_COLUMN + " value specified on the row " + row.getRowNum()
+                    + " of sheet " + sheet.getSheetName() + " is not valid: " + shortname
+                    + ". Only letters, digits, underscores and dashes are allowed");
+            }
+        }
     }
 
     /**
@@ -205,6 +235,10 @@ public class DynamicLayoutToolValidatorImpl implements DynamicLayoutToolValidato
         int shortnameColumn = getCellIndexFromHeaderName(boxSheet, SHORTNAME_COLUMN);
         if (shortnameColumn == -1) {
             result.addError("The sheet " + BOX_SHEET + " has no " + SHORTNAME_COLUMN + " column");
+        }
+
+        if (shortnameColumn != -1) {
+            validateShortnameFormat(boxSheet, result, shortnameColumn);
         }
 
         if (entityTypeColumn != -1 && shortnameColumn != -1) {

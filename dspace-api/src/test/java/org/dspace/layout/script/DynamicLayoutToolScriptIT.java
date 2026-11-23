@@ -485,6 +485,66 @@ public class DynamicLayoutToolScriptIT extends AbstractIntegrationTestWithDataba
         }
     }
 
+
+    @Test
+    public void testWithInvalidShortnames() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createEntityType("Publication");
+        context.restoreAuthSystemState();
+
+        assertThat(tabService.findAll(context), empty());
+
+        // Each of these contains a character that is used as a delimiter in the layout workbook
+        // (':' qualified ALTERNATIVE_TO, '.' entity/customFilter and RELATION config, ',' BOXES cell,
+        // '||' render field type) or is simply not allowed (space, '/').
+        String[] invalidShortnames = new String[] { "bad:name", "bad.name", "bad,name", "bad||name",
+            "bad name", "bad/name" };
+
+        File invalidFile = new File(BASE_XLS_DIR_PATH, "invalid-shortnames.xls");
+        invalidFile.getParentFile().mkdirs();
+
+        try (Workbook workbook = new HSSFWorkbook()) {
+            for (String sheetName : new String[] { DynamicLayoutToolValidator.TAB_SHEET,
+                DynamicLayoutToolValidator.BOX_SHEET }) {
+                Sheet sheet = workbook.createSheet(sheetName);
+                Row header = sheet.createRow(0);
+                header.createCell(0).setCellValue(DynamicLayoutToolValidator.ENTITY_COLUMN);
+                header.createCell(1).setCellValue(DynamicLayoutToolValidator.SHORTNAME_COLUMN);
+
+                for (int i = 0; i < invalidShortnames.length; i++) {
+                    Row row = sheet.createRow(i + 1);
+                    row.createCell(0).setCellValue("Publication");
+                    row.createCell(1).setCellValue(invalidShortnames[i]);
+                }
+            }
+
+            try (FileOutputStream out = new FileOutputStream(invalidFile)) {
+                workbook.write(out);
+            }
+        }
+
+        try {
+            String[] args = new String[] { "dynamic-layout-tool", "-f", invalidFile.getAbsolutePath() };
+            TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+            handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+            assertThat(handler.getInfoMessages(), empty());
+            for (int i = 0; i < invalidShortnames.length; i++) {
+                for (String sheetName : new String[] { DynamicLayoutToolValidator.TAB_SHEET,
+                    DynamicLayoutToolValidator.BOX_SHEET }) {
+                    assertThat(handler.getErrorMessages(),
+                        hasItem(startsWith("The SHORTNAME value specified on the row " + (i + 1) + " of sheet "
+                            + sheetName + " is not valid: " + invalidShortnames[i])));
+                }
+            }
+            assertThat(tabService.findAll(context), empty());
+        } finally {
+            invalidFile.delete();
+        }
+    }
+
     /**
      * Verifies that importing a workbook that defines more than one leading tab for the same
      * entity type is rejected by validation and no layout is persisted. Only one leading tab per
