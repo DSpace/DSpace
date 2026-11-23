@@ -235,6 +235,47 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     }
 
     @Test
+    public void testDetachRetainsTextAndDoesNotRemint() throws Exception {
+        context.turnOffAuthorisationSystem();
+        MetadataValue value = author();
+        value.setAuthority(target.getID().toString());
+        value.setConfidence(Choices.CF_ACCEPTED);
+        Relationship relationship = service.promoteResolvedAuthority(context, owner, value, target);
+        service.detachRelationshipKeepMetadata(context, relationship);
+        itemService.update(context, owner);
+        context.commit();
+        value = context.reloadEntity(value);
+        assertThat(value.getRelationship(), nullValue());
+        assertThat(value.getAuthority(), nullValue());
+        assertThat(value.getValue(), equalTo("Smith, John"));
+        assertThat(value.getConfidence(), equalTo(Choices.CF_REJECTED));
+        assertThat(relationshipService.find(context, relationship.getID()), nullValue());
+    }
+
+    @Test
+    public void testChangingPrimaryTargetIsDeleteThenCreate() throws Exception {
+        context.turnOffAuthorisationSystem();
+        author().setAuthority(target.getID().toString());
+        Relationship first = service.promoteResolvedAuthority(context, owner, author(), target);
+        Integer firstId = first.getID();
+        Item replacement = ItemBuilder.createItem(context, collection).withTitle("replacement")
+            .withEntityType("Person").build();
+
+        service.removeRelationshipAndMetadata(context, first);
+        assertThat(itemService.getMetadata(owner, "dc", "contributor", "author", Item.ANY), hasSize(0));
+        itemService.addMetadata(context, owner, "dc", "contributor", "author", null, "Smith, John",
+            replacement.getID().toString(), Choices.CF_ACCEPTED);
+        Relationship second = service.promoteResolvedAuthority(context, owner, author(), replacement);
+        context.commit();
+
+        assertThat(relationshipService.find(context, firstId), nullValue());
+        assertThat(second.getID(), not(equalTo(firstId)));
+        assertThat(second.getRightItem(), equalTo(replacement));
+        assertThat(author().getValue(), equalTo("Smith, John"));
+        assertThat(author().getAuthority(), equalTo(replacement.getID().toString()));
+    }
+
+    @Test
     public void testPromotesRightEndpointWithMatchingPrimaryFieldOnBothSides() throws Exception {
         context.turnOffAuthorisationSystem();
         RelationshipConfigurationServiceImpl configurations = new DSpace().getServiceManager().getServiceByName(

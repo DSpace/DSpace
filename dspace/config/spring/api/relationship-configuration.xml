@@ -50,4 +50,25 @@
     </property>
   </bean>
 
+  <bean id="publicationEditorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
+    <property name="id" value="authority:dc.contributor.editor" />
+    <property name="leftEntityTypes">
+      <set>
+        <value>Publication</value>
+      </set>
+    </property>
+    <property name="rightEntityTypes">
+      <set>
+        <value>Person</value>
+      </set>
+    </property>
+    <property name="leftPrimaryMetadataField" value="dc.contributor.editor" />
+    <property name="leftMetadataGenerators">
+      <map>
+        <entry key="additional.identifier.orcid" value-ref="authorOrcidMetadataGenerator" />
+        <entry key="additional.affiliation.name" value-ref="authorAffiliationMetadataGenerator" />
+      </map>
+    </property>
+  </bean>
+
 </beans>

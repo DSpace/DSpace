@@ -8,12 +8,14 @@
 package org.dspace.content.enhancer.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
@@ -75,6 +77,7 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
 
         ConfigurationService configurationService = dspace.getSingletonService(ConfigurationService.class);
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
         // The derived authority is only stamped when the target field is authority controlled, otherwise
         // it is dropped by the enhancer to keep the value copyable (e.g. on versioning).
         configurationService.setProperty("authority.controlled.additional.identifier.orcid", "true");
@@ -241,6 +244,109 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
         assertThat(additionals, hasSize(1));
         assertThat(additionals.get(0).getID(), equalTo(firstId));
         assertThat(additionals.get(0).getRelationship().getID(), equalTo(relationship.getID()));
+    }
+
+    @Test
+    public void testChangeOnOneRelationshipDoesNotTouchValuesOfTheOtherOnTheSameTargetField() throws Exception {
+        String editorOrcid = "0000-0001-5109-3700";
+        context.turnOffAuthorisationSystem();
+        Item author = createPerson(ORCID, "en");
+        Item editor = createPerson(editorOrcid, "en");
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("publication")
+            .withEntityType("Publication")
+            .withAuthor("Smith, John", author.getID().toString())
+            .withEditor("Doe, Jane", editor.getID().toString())
+            .inArchive()
+            .build();
+        promote(publication, author);
+        MetadataValue editorValue = itemService
+            .getMetadata(publication, "dc", "contributor", "editor", Item.ANY).get(0);
+        authorityBackedRelationshipService.promoteResolvedAuthority(context, publication, editorValue, editor);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        context.turnOffAuthorisationSystem();
+        itemEnhancerService.enhance(context, publication, false);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        Integer authorValueId = itemService.getMetadataByMetadataString(publication, ADDITIONAL_ORCID_FIELD)
+            .stream().filter(v -> ORCID.equals(v.getValue())).findFirst().get().getID();
+
+        // the editor's ORCID changes: only the editor-derived value is rebuilt
+        context.turnOffAuthorisationSystem();
+        editor = context.reloadEntity(editor);
+        itemService.clearMetadata(context, editor, "person", "identifier", "orcid", Item.ANY);
+        itemService.addMetadata(context, editor, "person", "identifier", "orcid", "en", "0000-0003-1415-9269");
+        itemService.update(context, editor);
+        itemEnhancerService.enhance(context, context.reloadEntity(publication), false);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        List<MetadataValue> additionals =
+            itemService.getMetadataByMetadataString(publication, ADDITIONAL_ORCID_FIELD);
+        assertThat(additionals, hasSize(2));
+        assertThat(additionals.stream().map(MetadataValue::getValue).collect(Collectors.toList()),
+            containsInAnyOrder(ORCID, "0000-0003-1415-9269"));
+        assertThat(additionals.stream().filter(v -> ORCID.equals(v.getValue())).findFirst().get().getID(),
+            equalTo(authorValueId));
+    }
+
+    @Test
+    public void testRemovingEditorKeepsOnlyAuthorAdditional() throws Exception {
+        assertOnlyOtherAdditionalSurvivesRemoval("editor");
+    }
+
+    @Test
+    public void testRemovingAuthorKeepsOnlyEditorAdditional() throws Exception {
+        assertOnlyOtherAdditionalSurvivesRemoval("author");
+    }
+
+    private void assertOnlyOtherAdditionalSurvivesRemoval(String qualifierToRemove) throws Exception {
+        String editorOrcid = "0000-0001-5109-3700";
+        context.turnOffAuthorisationSystem();
+        Item author = createPerson(ORCID, "en");
+        Item editor = createPerson(editorOrcid, "en");
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("publication")
+            .withEntityType("Publication")
+            .withAuthor("Smith, John", author.getID().toString())
+            .withEditor("Doe, Jane", editor.getID().toString())
+            .inArchive()
+            .build();
+        promote(publication, author);
+        MetadataValue editorValue = itemService
+            .getMetadata(publication, "dc", "contributor", "editor", Item.ANY).get(0);
+        authorityBackedRelationshipService.promoteResolvedAuthority(context, publication, editorValue, editor);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        context.turnOffAuthorisationSystem();
+        itemEnhancerService.enhance(context, publication, false);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        assertThat(itemService.getMetadataByMetadataString(publication, ADDITIONAL_ORCID_FIELD), hasSize(2));
+
+        MetadataValue toRemove = itemService
+            .getMetadata(publication, "dc", "contributor", qualifierToRemove, Item.ANY).get(0);
+        context.turnOffAuthorisationSystem();
+        itemService.removeMetadataValues(context, publication, List.of(toRemove));
+        itemService.update(context, publication);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        List<MetadataValue> additionals =
+            itemService.getMetadataByMetadataString(publication, ADDITIONAL_ORCID_FIELD);
+        assertThat(additionals, hasSize(1));
+        assertThat(additionals.get(0).getValue(), equalTo("editor".equals(qualifierToRemove) ? ORCID : editorOrcid));
     }
 
     private Item createPerson(String orcid, String language) throws Exception {

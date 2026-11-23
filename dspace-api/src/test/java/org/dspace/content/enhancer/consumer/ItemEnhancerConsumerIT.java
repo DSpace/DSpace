@@ -9,14 +9,17 @@ package org.dspace.content.enhancer.consumer;
 
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.matcher.MetadataValueMatcher;
@@ -62,6 +65,7 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
 
     private static final String ADDITIONAL_FIELD = "additional.identifier.orcid";
     private static final String AUTHOR_FIELD = "dc.contributor.author";
+    private static final String EDITOR_FIELD = "dc.contributor.editor";
 
     private ItemService itemService;
 
@@ -84,6 +88,7 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
             AuthorityBackedRelationshipService.class);
 
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        configurationService.setProperty("authority.controlled.dc.contributor.editor", "true");
         configurationService.setProperty("authority.controlled.additional.identifier.orcid", "true");
         metadataAuthorityService.clearCache();
 
@@ -146,8 +151,16 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         Item person2 = createPerson("John Smith", null);
         Item person3 = createPerson("Jesse Pinkman", "0000-0001-0000-0003");
 
-        Item publication = createPublication("Test publication", person1, person2, person3);
-        promoteAuthors(publication, person1, person2, person3);
+        // person1 and person2 are authors, person3 is an editor: both relationships derive the same target
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .withEntityType("Publication")
+            .withAuthor("Walter White", person1.getID().toString())
+            .withAuthor("John Smith", person2.getID().toString())
+            .withEditor("Jesse Pinkman", person3.getID().toString())
+            .build();
+        promoteAuthors(publication, person1, person2);
+        promoteEditor(publication, person3);
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
@@ -155,7 +168,7 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         List<MetadataValue> values = publication.getMetadata();
         assertThat(values, hasItem(with(AUTHOR_FIELD, "Walter White", person1.getID().toString(), 0, 600)));
         assertThat(values, hasItem(with(AUTHOR_FIELD, "John Smith", person2.getID().toString(), 1, 600)));
-        assertThat(values, hasItem(with(AUTHOR_FIELD, "Jesse Pinkman", person3.getID().toString(), 2, 600)));
+        assertThat(values, hasItem(with(EDITOR_FIELD, "Jesse Pinkman", person3.getID().toString(), 0, 600)));
 
         // additional metadata is not required to respect the order of the source metadata;
         // a person without an ORCID (person2) yields no additional value at all
@@ -290,8 +303,16 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         itemService.addMetadata(context, person, "person", "identifier", "orcid", null, "0000-0001-0000-0002");
         itemService.update(context, person);
 
-        Item publication = createPublication("Test publication", person);
+        Item editor = createPerson("Jesse Pinkman", "0000-0001-0000-0003");
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .withEntityType("Publication")
+            .withAuthor("Walter White", person.getID().toString())
+            .withEditor("Jesse Pinkman", editor.getID().toString())
+            .build();
         promoteAuthors(publication, person);
+        promoteEditor(publication, editor);
 
         context.restoreAuthSystemState();
         publication = commitAndReload(publication);
@@ -299,7 +320,54 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
         List<MetadataValue> values = publication.getMetadata();
         assertThat(values, hasItem(additionalValue("0000-0001-0000-0001", person)));
         assertThat(values, hasItem(additionalValue("0000-0001-0000-0002", person)));
-        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(2));
+        assertThat(values, hasItem(additionalValue("0000-0001-0000-0003", editor)));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(3));
+
+    }
+
+    @Test
+    public void testMixedAuthorityAndPlainAuthorsKeepOrder() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item person1 = createPerson("Walter White", "0000-0001-0000-0001");
+        Item person3 = createPerson("Jesse Pinkman", "0000-0001-0000-0003");
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .withEntityType("Publication")
+            .withAuthor("Red Smith")
+            .withAuthor("Walter White", person1.getID().toString())
+            .withAuthor("Saul Goodman")
+            .withAuthor("Jesse Pinkman", person3.getID().toString())
+            .build();
+
+        List<MetadataValue> authors = getMetadataValues(publication, AUTHOR_FIELD);
+        assertThat(authorityBackedRelationshipService
+            .promoteResolvedAuthority(context, publication, authors.get(1), person1), notNullValue());
+        assertThat(authorityBackedRelationshipService
+            .promoteResolvedAuthority(context, publication, authors.get(3), person3), notNullValue());
+
+        context.restoreAuthSystemState();
+        publication = commitAndReload(publication);
+
+        // the plain authors are untouched and the source order is stable
+        authors = getMetadataValues(publication, AUTHOR_FIELD);
+        assertThat(authors, hasSize(4));
+        assertThat(authors.get(0).getValue(), equalTo("Red Smith"));
+        assertThat(authors.get(1).getValue(), equalTo("Walter White"));
+        assertThat(authors.get(2).getValue(), equalTo("Saul Goodman"));
+        assertThat(authors.get(3).getValue(), equalTo("Jesse Pinkman"));
+        assertThat(authors.get(0).getRelationship(), nullValue());
+        assertThat(authors.get(2).getRelationship(), nullValue());
+
+        // only relationship-backed authors yield derived values, each tied to its own relationship
+        List<MetadataValue> additionals = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(additionals, hasSize(2));
+        assertThat(publication.getMetadata(), hasItem(additionalValue("0000-0001-0000-0001", person1)));
+        assertThat(publication.getMetadata(), hasItem(additionalValue("0000-0001-0000-0003", person3)));
+        assertThat(additionals.stream().map(v -> v.getRelationship().getID()).collect(Collectors.toSet()),
+            containsInAnyOrder(authors.get(1).getRelationship().getID(), authors.get(3).getRelationship().getID()));
 
     }
 
@@ -351,6 +419,12 @@ public class ItemEnhancerConsumerIT extends AbstractIntegrationTestWithDatabase 
                 .promoteResolvedAuthority(context, publication, authors.get(i), persons[i]);
             assertThat(relationship, notNullValue());
         }
+    }
+
+    private void promoteEditor(Item publication, Item person) throws Exception {
+        MetadataValue editor = getMetadataValues(publication, EDITOR_FIELD).get(0);
+        assertThat(authorityBackedRelationshipService
+            .promoteResolvedAuthority(context, publication, editor, person), notNullValue());
     }
 
     private Relationship primaryRelationship(Item publication) {
