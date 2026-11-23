@@ -14,7 +14,6 @@ import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -42,7 +41,6 @@ public class DiscoverySortConfiguration {
         return defaultSortField;
     }
 
-    @Autowired(required = true)
     public void setDefaultSortField(DiscoverySortFieldConfiguration configuration) {
         this.defaultSortField = configuration;
     }

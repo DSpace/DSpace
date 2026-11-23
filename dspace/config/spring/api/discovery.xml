@@ -1345,6 +1345,7 @@
     <!-- Inverse Relations -->
         <!-- project of an researcher -->
     <bean id="relationInvestigatorProjectsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="id" value="relationPersonProjects" />
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -1398,6 +1399,7 @@
 
     <!-- publications of an author -->
     <bean id="relationAuthorResearchOutputsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="id" value="relationPersonResearchoutputs" />
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -1472,6 +1474,7 @@
     <!-- OrgUnit → RP Projects (via join from person affiliation) -->
     <!-- Maps to: OrgUnit.isProjectOfOrgUnit via Person investigators -->
     <bean id="relationOrgunitRPProjectConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="id" value="relationOrgUnitRpProjects" />
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
@@ -1492,6 +1495,7 @@
     <!-- OrgUnit → RP Publications (via join from author affiliation) -->
     <!-- Maps to: OrgUnit.isPublicationOfOrgUnit via Person authors -->
     <bean id="relationOrgunitRPPublicationsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="id" value="relationOrgUnitRpPublications" />
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
@@ -1513,6 +1517,7 @@
     <!-- OrgUnit → People (via person.affiliation.name_authority) -->
     <!-- Maps to: OrgUnit.isPersonOfOrgUnit (affiliated people) -->
     <bean id="relationOrgunitPersonsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="id" value="relationOrgUnitPersons" />
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
@@ -1533,6 +1538,7 @@
     <!-- OrgUnit → Projects (via dc.contributor.other_authority) -->
     <!-- Maps to: OrgUnit.isProjectOfOrgUnit (participated projects) -->
     <bean id="relationOrgunitProjectsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <property name="id" value="relationOrgUnitProjects" />
         <property name="searchSortConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
