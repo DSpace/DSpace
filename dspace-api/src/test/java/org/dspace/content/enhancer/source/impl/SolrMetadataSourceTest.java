@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.enhancer.source.RawMetadataValue;
 import org.dspace.discovery.indexobject.ItemIndexFactoryImpl;
 import org.junit.Before;
@@ -84,6 +85,16 @@ public class SolrMetadataSourceTest {
 
         assertTrue(new SolrMetadataSource(document).getValues(FIELD).isEmpty());
         assertTrue(new SolrMetadataSource(document).getValues("dc.subject").isEmpty());
+    }
+
+    @Test
+    public void testGetValuesReportsUnsetConfidence() {
+        document.addField(STORED_FIELD, stored("Alice", "null", "null", "authority-alice", "en"));
+
+        List<RawMetadataValue> values = new SolrMetadataSource(document).getValues(FIELD);
+
+        assertEquals(1, values.size());
+        assertEquals(Choices.CF_UNSET, values.get(0).confidence());
     }
 
     /**

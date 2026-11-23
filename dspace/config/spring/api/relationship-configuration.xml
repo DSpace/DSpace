@@ -24,6 +24,11 @@
     <property name="sourceField" value="person.affiliation.name" />
   </bean>
 
+  <bean id="authorOairecerifAffiliationMetadataGenerator"
+        class="org.dspace.content.enhancer.generator.impl.SourceFieldMetadataGenerator">
+    <property name="sourceField" value="oairecerif.person.affiliation" />
+  </bean>
+
   <bean id="publicationAuthorRelationship" class="org.dspace.content.RelationshipTypeConfiguration">
     <property name="id" value="authority:dc.contributor.author" />
     <property name="leftEntityTypes">

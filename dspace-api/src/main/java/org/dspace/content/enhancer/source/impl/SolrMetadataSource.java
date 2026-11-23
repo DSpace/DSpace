@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.solr.common.SolrDocument;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.enhancer.source.MetadataSource;
 import org.dspace.content.enhancer.source.RawMetadataValue;
 import org.dspace.discovery.indexobject.ItemIndexFactoryImpl;
@@ -32,8 +33,8 @@ import org.dspace.discovery.indexobject.ItemIndexFactoryImpl;
  * <p>Only the value, authority and language segments are used. The indexer writes the literal
  * {@code "null"} in place of an absent segment, so that literal is mapped to {@code null}. The
  * authority confidence is not stored in the index and is therefore always reported as
- * {@code -1}. An entry without a separator is treated as a plain value, with {@code null}
- * language and authority.</p>
+ * {@link Choices#CF_UNSET}. An entry without a separator is treated as a plain value, with
+ * {@code null} language and authority.</p>
  *
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  */
@@ -48,8 +49,6 @@ public class SolrMetadataSource implements MetadataSource {
     private static final int AUTHORITY_SEGMENT = 3;
 
     private static final int LANGUAGE_SEGMENT = 4;
-
-    private static final int NO_CONFIDENCE = -1;
 
     private static final Pattern STORE_SEPARATOR_PATTERN =
             Pattern.compile(Pattern.quote(ItemIndexFactoryImpl.STORE_SEPARATOR));
@@ -106,7 +105,7 @@ public class SolrMetadataSource implements MetadataSource {
             return null;
         }
         return new RawMetadataValue(value, segmentOrNull(segments, LANGUAGE_SEGMENT),
-                segmentOrNull(segments, AUTHORITY_SEGMENT), NO_CONFIDENCE);
+                segmentOrNull(segments, AUTHORITY_SEGMENT), Choices.CF_UNSET);
     }
 
     /**
