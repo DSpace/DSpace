@@ -235,7 +235,7 @@ public class RelationshipTypeConfigurationTest {
             RelationshipTypeConfiguration configuration =
                 context.getBean("testPublicationAuthorRelationship", RelationshipTypeConfiguration.class);
 
-            assertEquals("authority:ds11rel.contributor.author", configuration.getId());
+            assertEquals("authority:ds-rel-test.contributor.author", configuration.getId());
 
             ItemAuthorityExtraMetadataGenerator generator =
                 configuration.getLeftMetadataGenerators().get("additional.test.orcid");
