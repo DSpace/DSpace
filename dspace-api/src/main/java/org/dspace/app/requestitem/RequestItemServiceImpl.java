@@ -158,8 +158,8 @@ public class RequestItemServiceImpl implements RequestItemService {
         // Save the request item
         requestItemDAO.save(context, requestItem);
 
-        log.debug("Created RequestItem with ID {}, approval token {}, access token {}, access expiry {}",
-                requestItem::getID, requestItem::getToken, requestItem::getAccess_token, requestItem::getAccess_expiry);
+        log.debug("Created RequestItem with ID {}, access expiry {}",
+                requestItem::getID, requestItem::getAccess_expiry);
 
         // Return the approver token
         return requestItem.getToken();
