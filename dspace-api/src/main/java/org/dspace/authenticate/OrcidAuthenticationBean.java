@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -317,6 +318,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         }
 
         return emails.stream()
+            .filter(Objects::nonNull)
             .filter(Email::isVerified)
             .sorted(Comparator.comparing(Email::isPrimary).reversed())
             .map(Email::getEmail)
