@@ -15,6 +15,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
+
 import com.lyncode.xoai.dataprovider.data.Item;
 import com.lyncode.xoai.dataprovider.exceptions.IdDoesNotExistException;
 import org.apache.solr.client.solrj.SolrClient;
@@ -55,6 +57,7 @@ public class DSpaceItemSolrRepositoryTest {
         SolrDocument doc = new SolrDocument();
         doc.addField("item.handle", "123456789/1");
         doc.addField("item.deleted", false);
+        doc.addField("item.lastmodified", new Date());
         results.add(doc);
         results.setNumFound(1);
 
