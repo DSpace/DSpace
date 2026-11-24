@@ -46,6 +46,21 @@ public interface RelationshipConfigurationService {
     RelationshipTypeConfiguration findForMetadataValue(Context context, MetadataValue value) throws SQLException;
 
     /**
+     * Resolves the relationship configuration applicable to the supplied metadata value
+     * for relationship creation, without validating fields against the metadata registry.
+     *
+     * Metadata registry validation is deferred to {@link #validateForCreation}.
+     *
+     * @param context current DSpace context
+     * @param value   metadata value for which relationship configuration should be resolved
+     * @return the matching relationship configuration, or {@code null} if no configuration applies
+     * @throws IllegalArgumentException if multiple configurations match
+     * @throws SQLException if a database error occurs during resolution
+     */
+    RelationshipTypeConfiguration findForMetadataValueForCreation(Context context, MetadataValue value)
+        throws SQLException;
+
+    /**
      * Resolves the configuration associated with a relationship using its persisted
      * configuration key.
      *
@@ -57,6 +72,21 @@ public interface RelationshipConfigurationService {
      * @throws SQLException                       if an error occurs while accessing the metadata registry
      */
     RelationshipTypeConfiguration getRelationshipConfig(Context context, Relationship relationship) throws SQLException;
+
+    /**
+     * Resolves the configuration associated with a relationship for relationship creation,
+     * without validating fields against the metadata registry.
+     *
+     * Metadata registry validation is deferred to {@link #validateForCreation}.
+     *
+     * @param context      current DSpace context
+     * @param relationship relationship whose configuration should be resolved
+     * @return the resolved relationship configuration
+     * @throws IllegalArgumentException if the configuration key is missing or not resolvable
+     * @throws SQLException if a database error occurs during resolution
+     */
+    RelationshipTypeConfiguration getRelationshipConfigForCreation(Context context, Relationship relationship)
+        throws SQLException;
 
     /**
      * Validates that the supplied Items can be used as the left and right endpoints of a relationship using the given
