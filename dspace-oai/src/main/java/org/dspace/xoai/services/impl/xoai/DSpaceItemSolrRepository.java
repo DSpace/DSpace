@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.xoai.data.DSpaceSolrItem;
@@ -51,6 +52,15 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
         this.solrQueryResolver = solrQueryResolver;
     }
 
+    /**
+     * Find the indexed item for an OAI identifier ({@code oai:<host>:<handle>}).
+     * The handle part comes from the OAI request and is escaped, so it is matched literally
+     * and cannot inject Solr query syntax.
+     *
+     * @param identifier OAI identifier from the request
+     * @return the matching item
+     * @throws IdDoesNotExistException if the identifier is malformed or no item has this handle
+     */
     @Override
     public Item getItem(String identifier) throws IdDoesNotExistException {
         if (identifier == null) {
@@ -59,7 +69,7 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
         String[] parts = identifier.split(Pattern.quote(":"));
         if (parts.length == 3) {
             try {
-                SolrQuery params = new SolrQuery("item.handle:" + parts[2]);
+                SolrQuery params = new SolrQuery("item.handle:" + ClientUtils.escapeQueryChars(parts[2]));
                 return new DSpaceSolrItem(DSpaceSolrSearch.querySingle(server, params));
             } catch (SolrSearchEmptyException | IOException ex) {
                 throw new IdDoesNotExistException(ex);
