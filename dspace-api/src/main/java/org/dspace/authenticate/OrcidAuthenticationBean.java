@@ -318,10 +318,10 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         }
 
         return emails.stream()
-            .filter(Objects::nonNull)
             .filter(Email::isVerified)
             .sorted(Comparator.comparing(Email::isPrimary).reversed())
             .map(Email::getEmail)
+            .filter(Objects::nonNull)
             .findFirst();
     }
 
