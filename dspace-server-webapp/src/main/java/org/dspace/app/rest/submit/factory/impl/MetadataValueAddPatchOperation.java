@@ -11,11 +11,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "add" common PATCH operation.
@@ -35,6 +37,9 @@ public abstract class MetadataValueAddPatchOperation<DSO extends DSpaceObject>
         return MetadataValueRest.class;
     }
 
+    @Autowired
+    private AuthorizeService authorizeService;
+
     protected void replaceValue(Context context, DSO source, String target, List<MetadataValueRest> list)
         throws SQLException {
         String[] metadata = Utils.tokenize(target);
@@ -51,7 +56,7 @@ public abstract class MetadataValueAddPatchOperation<DSO extends DSpaceObject>
         throws SQLException {
         String[] metadata = Utils.tokenize(target);
         if (index == -1) {
-            if (object.getSecurityLevel() != null) {
+            if (object.getSecurityLevel() != null && authorizeService.isAdmin(context, source)) {
                 getDSpaceObjectService().addSecuredMetadata(context, source, metadata[0], metadata[1], metadata[2],
                         object.getLanguage(), object.getValue(), object.getAuthority(),
                         object.getConfidence(), object.getSecurityLevel());
@@ -62,7 +67,7 @@ public abstract class MetadataValueAddPatchOperation<DSO extends DSpaceObject>
             }
 
         } else {
-            if (object.getSecurityLevel() != null) {
+            if (object.getSecurityLevel() != null && authorizeService.isAdmin(context, source)) {
                 getDSpaceObjectService().addAndShiftRightSecuredMetadata(context, source, metadata[0], metadata[1],
                     metadata[2], object.getLanguage(), object.getValue(),
                         object.getAuthority(), object.getConfidence(), index, object.getSecurityLevel());
