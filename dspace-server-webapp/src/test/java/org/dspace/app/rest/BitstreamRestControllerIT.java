@@ -30,6 +30,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -53,6 +54,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -2114,6 +2117,57 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             if (bitstreamRetrieved) {
                 Mockito.verify(spyStream, times(1)
                                .description("InputStream should have been closed after HEAD request"))
+                       .close();
+            }
+        } finally {
+            ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", originalService);
+        }
+    }
+
+    @Test
+    public void bitstreamInputStreamsCloseWhenCitationPageGenerationFailsTest() throws Exception {
+        configurationService.setProperty("citation-page.enable_globally", true);
+        citationDocumentService.afterPropertiesSet();
+
+        String bitstreamContent = "0123456789";
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        // Plain text labelled as PDF, so the cover page generation fails and the original file is returned
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                                        .withMimeType("application/pdf")
+                                        .build();
+        }
+        context.restoreAuthSystemState();
+
+        BitstreamStorageService originalService =
+                StorageServiceFactory.getInstance().getBitstreamStorageService();
+        BitstreamStorageService spyService = spy(originalService);
+
+        List<InputStream> openedStreams = new ArrayList<>();
+        doAnswer(invocation -> {
+            InputStream spyStream = spy((InputStream) invocation.callRealMethod());
+            openedStreams.add(spyStream);
+            return spyStream;
+        }).when(spyService).retrieve(any(), eq(bitstream));
+
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", spyService);
+
+        try {
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isOk())
+                       .andExpect(content().bytes(bitstreamContent.getBytes()));
+
+            // One stream for the failed cover page attempt and one for the fallback to the original file
+            assertEquals(2, openedStreams.size());
+            for (InputStream spyStream : openedStreams) {
+                Mockito.verify(spyStream, times(1)
+                               .description("InputStream should have been closed after cover page fallback"))
                        .close();
             }
         } finally {
