@@ -10,6 +10,7 @@ package org.dspace.content.authority;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 
@@ -89,6 +90,38 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
         Choices result = instance.getMatches(text, start, limit, locale);
         assertNotEquals("At least one match expected", 0, result.values.length);
         assertEquals("north 40", result.values[0].value);
+    }
+
+    /**
+     * Node ids (entryID, parent, child) must be compared as plain strings, not spliced into the XPath expression.
+     * @throws java.lang.ClassNotFoundException passed through.
+     */
+    @Test
+    public void testNodeIdIsNotEvaluatedAsXPath() throws ClassNotFoundException {
+        DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
+            CoreServiceFactory.getInstance().getPluginService()
+                .getNamedPlugin(Class.forName("org.dspace.content.authority.ChoiceAuthority"), "farm");
+        assertNotNull(instance);
+
+        Choice choice = instance.getChoice("s40", null);
+        assertNotNull(choice);
+        assertEquals("south 40", choice.label);
+
+        // Spliced into the expression this would select //node[@id = 'x' or @label='south 40']
+        assertNull(instance.getChoice("x' or @label='south 40", null));
+        // ... and here the root node, returning its children
+        Choices children = instance.getChoicesByParent("farm", "x' or @label='the farm", 0, 10, null);
+        assertEquals(0, children.values.length);
+
+        children = instance.getChoicesByParent("farm", "s40", 0, 10, null);
+        assertEquals(1, children.values.length);
+        assertEquals("pond", children.values[0].authority);
+
+        Choice parent = instance.getParentChoice("farm", "pond", null);
+        assertNotNull(parent);
+        assertEquals("s40", parent.authority);
+        // ... and here the parent of 'pond'
+        assertNull(instance.getParentChoice("farm", "x' or @id='pond", null));
     }
 
     /**
