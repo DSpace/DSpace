@@ -198,10 +198,10 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testRedirectiViaOrcidLoginWithoutEmail() throws Exception {
+    public void testRedirectViaOrcidLoginWithoutEmail() throws Exception {
 
         when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
-        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User"));
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User", "test@email.it"));
 
         MvcResult orcidLogin =
             getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid").param("code", CODE))
@@ -230,7 +230,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         configurationService.setProperty("authentication-orcid.can-self-register", "false");
 
         when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
-        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User"));
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User", "test@email.it"));
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
             .param("code", CODE))
@@ -376,7 +376,142 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testNoAuthenticationIfAnErrorOccursRetrivingOrcidToken() throws Exception {
+    public void testEPersonCanLogInByVerifiedOrcidEmail() throws Exception {
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(
+            buildPersonWithEmails("Test", "User", buildEmail("test@email.it", true, true)));
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+                .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
+            .andExpect(cookie().exists("Authorization-cookie"))
+            .andReturn();
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        String ePersonId = getEPersonIdFromAuthorizationCookie(mvcResult);
+        assertThat(ePersonId, notNullValue());
+        assertThat(ePersonId, equalTo(ePerson.getID().toString()));
+    }
+
+    @Test
+    public void testEPersonCannotLogInByUnverifiedOrcidEmail() throws Exception {
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(
+            buildPersonWithEmails("Test", "User", buildEmail("test@email.it", true, false)));
+
+        context.turnOffAuthorisationSystem();
+
+        EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+                .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(cookie().doesNotExist("Authorization-cookie"))
+            .andReturn();
+
+        assertThat(mvcResult.getResponse().getRedirectedUrl(),
+            not(equalTo(configurationService.getProperty("dspace.ui.url"))));
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testPrimaryVerifiedOrcidEmailIsPreferred() throws Exception {
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(
+            buildPersonWithEmails("Test", "User",
+                buildEmail("secondary@email.it", false, true),
+                buildEmail("primary@email.it", true, true)));
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson primaryEPerson = EPersonBuilder.createEPerson(context)
+            .withEmail("primary@email.it")
+            .withNameInMetadata("Primary", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
+            .andExpect(cookie().exists("Authorization-cookie"))
+            .andReturn();
+
+        String ePersonId = getEPersonIdFromAuthorizationCookie(mvcResult);
+        assertThat(ePersonId, notNullValue());
+        assertThat(ePersonId, equalTo(primaryEPerson.getID().toString()));
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testEPersonCannotLoginWhenAllOrcidEmailsAreUnverified() throws Exception {
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+        when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(
+            buildPersonWithEmails("Test", "User",
+                buildEmail("primary@email.it", true, false),
+                buildEmail("secondary@email.it", false, false)));
+
+        context.turnOffAuthorisationSystem();
+
+        EPersonBuilder.createEPerson(context)
+            .withEmail("primary@email.it")
+            .withNameInMetadata("Primary", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+                .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(cookie().doesNotExist("Authorization-cookie"))
+            .andReturn();
+
+        assertThat(mvcResult.getResponse().getRedirectedUrl(),
+            not(equalTo(configurationService.getProperty("dspace.ui.url"))));
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testNoAuthenticationIfAnErrorOccursRetrievingOrcidToken() throws Exception {
 
         when(orcidClientMock.getAccessToken(CODE)).thenThrow(new OrcidClientException(500, "internal error"));
 
@@ -402,7 +537,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testNoAuthenticationIfAnErrorOccursRetrivingOrcidPerson() throws Exception {
+    public void testNoAuthenticationIfAnErrorOccursRetrievingOrcidPerson() throws Exception {
 
         when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
         when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenThrow(new OrcidClientException(500, "Internal Error"));
@@ -558,31 +693,39 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         return token;
     }
 
-    private Person buildPerson(String firstName, String lastName) {
-        return buildPerson(firstName, lastName, null);
+    /**
+     * Build person with one email address that is primary and verified
+     */
+    private Person buildPerson(String firstName, String lastName, String email) {
+        return buildPersonWithEmails(firstName, lastName, buildEmail(email, true, true));
     }
 
-    private Person buildPerson(String firstName, String lastName, String email) {
+    /**
+     * Build person with multiple emails
+     */
+    private Person buildPersonWithEmails(String firstName, String lastName, Email... emails) {
         Person person = new Person();
-
-        if (email != null) {
-            person.setEmails(buildEmails(email));
-        }
 
         Name name = new Name();
         name.setFamilyName(new FamilyName(lastName));
         name.setGivenNames(new GivenNames(firstName));
         person.setName(name);
 
+        if (emails.length > 0) {
+            Emails emailsObject = new Emails();
+            emailsObject.getEmails().addAll(asList(emails));
+            person.setEmails(emailsObject);
+        }
+
         return person;
     }
 
-    private Emails buildEmails(String email) {
+    private Email buildEmail(String email, boolean primary, boolean verified) {
         Email emailObject = new Email();
         emailObject.setEmail(email);
-        Emails emails = new Emails();
-        emails.getEmails().add(emailObject);
-        return emails;
+        emailObject.setPrimary(primary);
+        emailObject.setVerified(verified);
+        return emailObject;
     }
 
     private String getEPersonIdFromAuthorizationCookie(MvcResult mvcResult) throws ParseException, JOSEException {
