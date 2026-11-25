@@ -16,7 +16,9 @@ import static org.dspace.content.Item.ANY;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -314,7 +316,13 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         if (CollectionUtils.isEmpty(emails)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(emails.get(0).getEmail());
+
+        return emails.stream()
+            .filter(Email::isVerified)
+            .sorted(Comparator.comparing(Email::isPrimary).reversed())
+            .map(Email::getEmail)
+            .filter(Objects::nonNull)
+            .findFirst();
     }
 
     private String getFirstName(Person person) {
