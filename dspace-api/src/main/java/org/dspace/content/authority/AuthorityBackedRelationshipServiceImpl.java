@@ -144,7 +144,12 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
             return;
         }
         Relationship relationship = value.getRelationship();
-        // A relationship-backed value is the primary metadata value, so removing it also removes the relationship.
+        if (!relationshipConfigurationService.isPrimaryMetadata(context, relationship, value)) {
+            // Additional values are managed by the enhancer: removing one must not remove the primary value or
+            // the relationship, so this is a no-op.
+            return;
+        }
+        // The primary metadata value owns the relationship, so removing it also removes the relationship.
         removeRelationshipAndMetadata(context, relationship, metadataOwnerWithActiveIterator);
     }
 

@@ -15,7 +15,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
@@ -491,6 +493,60 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(authors.get(1).getRelationship().getID(), equalTo(firstRelationshipId));
 
         assertThat(relationshipService.findByItem(context, publication), hasSize(2));
+    }
+
+    /**
+     * Removing a value derived by the enhancer (an additional value) through the REST API must not remove the
+     * primary value nor the relationship it belongs to.
+     */
+    @Test
+    public void testRemovingAdditionalValueKeepsPrimaryAndRelationship() throws Exception {
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Walter White")
+                                 .withPersonMainAffiliation("4Science")
+                                 .build();
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withAuthor("Walter White", person.getID().toString())
+                                      .build();
+        context.restoreAuthSystemState();
+        context.commit();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/items/" + publication.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata['additional.affiliation.name'][0].value", is("4Science")));
+
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new RemoveOperation("/metadata/additional.affiliation.name/0"));
+        getClient(token).perform(patch("/api/core/items/" + publication.getID())
+                                     .content(getPatchContent(ops))
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/items/" + publication.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata['dc.contributor.author'][0].authority",
+                                            is(person.getID().toString())))
+                        .andExpect(jsonPath("$.metadata['additional.affiliation.name'][0].value", is("4Science")));
+
+        publication = context.reloadEntity(publication);
+        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(publication, "dc.contributor.author");
+        assertThat(authors, hasSize(1));
+        assertThat(authors.get(0).getRelationship(), notNullValue());
+        List<MetadataValue> affiliations = itemService.getMetadataByMetadataString(publication,
+                                                                                   "additional.affiliation.name");
+        assertThat(affiliations, hasSize(1));
+        assertThat(affiliations.get(0).getRelationship(), notNullValue());
     }
 
     private MetadataValue getSingleAuthor(Item item) {

@@ -95,6 +95,8 @@ public interface AuthorityBackedRelationshipService {
     /**
      * Remove relationship-backed metadata while a caller is actively iterating one owner's in-memory metadata list.
      *
+     * Removing an additional (enhancer-managed) value is a no-op: the value, the primary value and the relationship
+     * are left untouched.
      * Removing a relationship-backed primary metadata value removes the relationship together with all its
      * relationship-backed metadata values. This overload avoids modifying the in-memory metadata collection of
      * {@code metadataOwnerWithActiveIterator}. The caller is responsible for removing affected metadata values from
