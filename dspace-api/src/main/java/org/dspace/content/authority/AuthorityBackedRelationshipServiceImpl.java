@@ -79,7 +79,7 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
             return existing;
         }
         RelationshipTypeConfiguration configuration =
-            relationshipConfigurationService.findForMetadataValue(context, value);
+            relationshipConfigurationService.findForMetadataValueForCreation(context, value);
         if (configuration == null) {
             return null;
         }

@@ -165,7 +165,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
                     context,
                     leftItem,
                     rightItem,
-                    relationshipConfigurationService.getRelationshipConfig(context, oldRelationship),
+                    relationshipConfigurationService.getRelationshipConfigForCreation(context, oldRelationship),
                     latestVersionStatus
                 );
                 // Associate copied metadata values with the new relationship instead of the old version's relationship.

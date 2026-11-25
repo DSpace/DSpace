@@ -314,6 +314,21 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
     @Override
     public RelationshipTypeConfiguration findForMetadataValue(Context context, MetadataValue value)
         throws SQLException {
+        return findForMetadataValue(context, value, true);
+    }
+
+    @Override
+    public RelationshipTypeConfiguration findForMetadataValueForCreation(Context context, MetadataValue value)
+        throws SQLException {
+        return findForMetadataValue(context, value, false);
+    }
+
+    /**
+     * Resolves the configuration applicable to a metadata value, optionally validating
+     * its fields against the metadata registry.
+     */
+    private RelationshipTypeConfiguration findForMetadataValue(Context context, MetadataValue value, boolean validate)
+        throws SQLException {
 
         String field = fieldName(value);
         String ownerEntityType = itemService.getEntityTypeLabel((Item) value.getDSpaceObject());
@@ -336,13 +351,8 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         // of persisted Relationships must also consider their endpoint types (see resolveConfiguration below).
         RelationshipTypeConfiguration configuration = match != null ? match : fromLinkedEntityAuthority(field);
 
-        // Validate metadata fields against the registry before returning an explicit or authority-derived
-        // configuration.
-        if (configuration != null) {
-            configuration = validateMetadataFields(context, configuration);
-        }
-
-        return configuration;
+        // Defer metadata registry validation for relationship creation workflows.
+        return validate && configuration != null ? validateMetadataFields(context, configuration) : configuration;
     }
 
     /**
@@ -392,7 +402,8 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
             throw new IllegalArgumentException("Unknown relationship configuration " + key);
         }
 
-        // Only normal resolution checks the registry. Primary/additional classification remains lightweight.
+        // Only normal resolution checks the registry. Primary/additional classification and pre-creation lookups
+        // remain lightweight.
         return validate ? validateMetadataFields(context, match) : match;
     }
 
@@ -418,6 +429,13 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
         throws SQLException {
         return resolveConfiguration(context, relationship.getRelationshipConfigKey(),
                                     relationship.getLeftItem(), relationship.getRightItem(), true);
+    }
+
+    @Override
+    public RelationshipTypeConfiguration getRelationshipConfigForCreation(Context context, Relationship relationship)
+        throws SQLException {
+        return resolveConfiguration(context, relationship.getRelationshipConfigKey(),
+                                    relationship.getLeftItem(), relationship.getRightItem(), false);
     }
 
     /**

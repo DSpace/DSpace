@@ -17,6 +17,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
@@ -232,6 +236,28 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         assertSame(configuration, service.getRelationshipConfig(context, relationship));
     }
 
+    @Test
+    public void testGetRelationshipConfigForCreationDefersRegistryValidation() throws SQLException {
+        mockOwnerEntityTypes();
+        registerMetadataFields();
+
+        ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
+
+        RelationshipTypeConfiguration resolved =
+            service.getRelationshipConfigForCreation(context, relationship);
+
+        assertSame(configuration, resolved);
+        verifyNoInteractions(metadataFieldService);
+
+        service.validateForCreation(context, resolved, leftItem, rightItem, true);
+
+        verify(metadataFieldService, times(1)).findByString(context, "dc.contributor.author", '.');
+        verify(metadataFieldService, times(1)).findByString(context, "dc.relation.isAuthorOfPublication", '.');
+        verify(metadataFieldService, times(1)).findByString(context, "person.identifier.orcid", '.');
+        verifyNoMoreInteractions(metadataFieldService);
+    }
+
     /**
      * Verifies that either endpoint's primary metadata field resolves the configuration.
      */
@@ -244,6 +270,28 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         assertSame(configuration,
                    service.findForMetadataValue(context,
                                                 metadataValue("dc", "relation", "isAuthorOfPublication", rightItem)));
+    }
+
+    @Test
+    public void testFindForMetadataValueForCreationDefersRegistryValidation() throws SQLException {
+        mockOwnerEntityTypes();
+        registerMetadataFields();
+
+        ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
+
+        RelationshipTypeConfiguration resolved =
+            service.findForMetadataValueForCreation(context, metadataValue("dc", "contributor", "author", leftItem));
+
+        assertSame(configuration, resolved);
+        verifyNoInteractions(metadataFieldService);
+
+        service.validateForCreation(context, resolved, leftItem, rightItem, false);
+
+        verify(metadataFieldService, times(1)).findByString(context, "dc.contributor.author", '.');
+        verify(metadataFieldService, times(1)).findByString(context, "dc.relation.isAuthorOfPublication", '.');
+        verify(metadataFieldService, times(1)).findByString(context, "person.identifier.orcid", '.');
+        verifyNoMoreInteractions(metadataFieldService);
     }
 
     /**
@@ -647,13 +695,16 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
 
         // A Publication-specific explicit bean may share its key with a generic authority fallback.
         // A DataSet must select the fallback, and the persisted Relationship must resolve to that fallback.
-        RelationshipTypeConfiguration fallback = service.findForMetadataValue(context,
-            metadataValue("dc", "contributor", "author", dataset));
+        RelationshipTypeConfiguration fallback =
+            service.findForMetadataValueForCreation(context, metadataValue("dc", "contributor", "author", dataset));
+        verifyNoInteractions(metadataFieldService);
         assertEquals("authority:dc.contributor.author", fallback.getId());
         assertTrue(fallback.getLeftEntityTypes().isEmpty());
         assertEquals(Set.of("Person"), fallback.getRightEntityTypes());
 
         service.validateForCreation(context, fallback, dataset, rightItem, true);
+        verify(metadataFieldService, times(1)).findByString(context, "dc.contributor.author", '.');
+        verifyNoMoreInteractions(metadataFieldService);
         Relationship datasetRelationship = mock(Relationship.class);
         when(datasetRelationship.getRelationshipConfigKey()).thenReturn("authority:dc.contributor.author");
         when(datasetRelationship.getLeftItem()).thenReturn(dataset);
@@ -691,10 +742,13 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         registerMetadataFields();
         when(itemService.getEntityTypeLabel(rightItem)).thenReturn("Person");
 
-        RelationshipTypeConfiguration authorityOnly = service.findForMetadataValue(context,
-            metadataValue("dc", "contributor", "author", leftItem));
+        RelationshipTypeConfiguration authorityOnly =
+            service.findForMetadataValueForCreation(context, metadataValue("dc", "contributor", "author", leftItem));
+        verifyNoInteractions(metadataFieldService);
         assertEquals("authority:dc.contributor.author", authorityOnly.getId());
         service.validateForCreation(context, authorityOnly, leftItem, rightItem, true);
+        verify(metadataFieldService, times(1)).findByString(context, "dc.contributor.author", '.');
+        verifyNoMoreInteractions(metadataFieldService);
         assertEquals(authorityOnly.getLeftPrimaryMetadataField(),
                      service.getRelationshipConfig(context, relationship).getLeftPrimaryMetadataField());
     }
@@ -721,6 +775,22 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
         // The supplied configuration is known, but its primary metadata field is not in the registry.
         assertThrows(RelationshipConfigurationException.class,
             () -> service.validateForCreation(context, configuration, leftItem, rightItem, false));
+    }
+
+    @Test
+    public void testLightweightResolutionDoesNotBypassCreationValidation() throws SQLException {
+        when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
+
+        RelationshipTypeConfiguration resolved =
+            service.findForMetadataValueForCreation(context, metadataValue("dc", "contributor", "author", leftItem));
+
+        assertSame(configuration, resolved);
+        verifyNoInteractions(metadataFieldService);
+
+        assertThrows(RelationshipConfigurationException.class,
+                     () -> service.validateForCreation(context, resolved, leftItem, rightItem, false));
+
+        verify(metadataFieldService).findByString(context, "dc.contributor.author", '.');
     }
 
     @Test
