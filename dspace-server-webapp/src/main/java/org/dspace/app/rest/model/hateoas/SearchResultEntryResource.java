@@ -9,11 +9,13 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
  * This class' purpose is to create a container for the information, links and embeds for the search results entries
  */
+@RelNameDSpaceResource(SearchResultEntryRest.OBJECT)
 public class SearchResultEntryResource extends HALResource<SearchResultEntryRest> {
 
     public static final String INDEXABLE_OBJECT_LINK = "indexableObject";

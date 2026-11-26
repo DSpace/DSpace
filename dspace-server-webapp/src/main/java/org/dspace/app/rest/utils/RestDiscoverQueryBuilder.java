@@ -78,6 +78,48 @@ public class RestDiscoverQueryBuilder {
                                     DiscoveryConfiguration discoveryConfiguration,
                                     String query, List<SearchFilter> searchFilters,
                                     List<String> dsoTypes, Pageable page)
+        throws DSpaceBadRequestException {
+        return buildQuery(context, scope, discoveryConfiguration, query, searchFilters, dsoTypes, page, true);
+    }
+
+    /**
+     * Build a discovery query
+     *
+     * @param context                the DSpace context
+     * @param scope                  the scope for this discovery query
+     * @param discoveryConfiguration the discovery configuration for this discovery query
+     * @param query                  the query string for this discovery query
+     * @param searchFilters          the search filters for this discovery query
+     * @param dsoTypes               only include search results with one of these types
+     * @param page                   the pageable for this discovery query
+     * @param hitHighlighting        enable hitHighlighting of fields
+     */
+    public DiscoverQuery buildQuery(Context context, IndexableObject scope,
+                                    DiscoveryConfiguration discoveryConfiguration,
+                                    String query, List<SearchFilter> searchFilters,
+                                    List<String> dsoTypes, Pageable page, boolean hitHighlighting)
+        throws DSpaceBadRequestException {
+        return buildQuery(context, scope, discoveryConfiguration, query, searchFilters, dsoTypes, page, hitHighlighting,
+            true);
+    }
+
+    /**
+     * Build a discovery query
+     *
+     * @param context                the DSpace context
+     * @param scope                  the scope for this discovery query
+     * @param discoveryConfiguration the discovery configuration for this discovery query
+     * @param query                  the query string for this discovery query
+     * @param searchFilters          the search filters for this discovery query
+     * @param dsoTypes               only include search results with one of these types
+     * @param page                   the pageable for this discovery query
+     * @param hitHighlighting        enable hitHighlighting of fields
+     * @param addFaceting            add facets
+     */
+    public DiscoverQuery buildQuery(Context context, IndexableObject scope,
+                                    DiscoveryConfiguration discoveryConfiguration,
+                                    String query, List<SearchFilter> searchFilters,
+                                    List<String> dsoTypes, Pageable page, boolean hitHighlighting, boolean addFaceting)
             throws DSpaceBadRequestException {
 
         try {
@@ -95,10 +137,12 @@ public class RestDiscoverQueryBuilder {
                 }
                 return discoverQueryBuilder.buildQuery(context, scope, discoveryConfiguration, query,
                                                        transformedFilters, dsoTypes, page.getPageSize(),
-                                                       page.getOffset(), sortBy, sortOrder);
+                                                       page.getOffset(), sortBy, sortOrder, hitHighlighting,
+                                                       addFaceting);
             } else {
                 return discoverQueryBuilder.buildQuery(context, scope, discoveryConfiguration, query,
-                                                       transformedFilters, dsoTypes, null, null, null, null);
+                                                       transformedFilters, dsoTypes, null, null, null, null,
+                    hitHighlighting, addFaceting);
             }
         } catch (IllegalArgumentException e) {
             throw new DSpaceBadRequestException(e.getMessage());

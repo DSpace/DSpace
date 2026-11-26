@@ -8,7 +8,7 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class' purpose is to create a container for the information used in the SearchFacetValueResource
@@ -28,6 +28,8 @@ public class SearchFacetValueRest extends RestAddressableModel {
     private String sortValue;
     @JsonIgnore
     private String filterType;
+    @JsonIgnore
+    private SearchFacetInformation facetInformation;
 
     public String getCategory() {
         return CATEGORY;
@@ -46,7 +48,7 @@ public class SearchFacetValueRest extends RestAddressableModel {
     }
 
     public Class getController() {
-        return DiscoveryRestController.class;
+        return RestResourceController.class;
     }
 
     public String getLabel() {
@@ -96,5 +98,13 @@ public class SearchFacetValueRest extends RestAddressableModel {
     public void setFilterType(final String filterType) {
 
         this.filterType = filterType;
+    }
+
+    public SearchFacetInformation getFacetInformation() {
+        return facetInformation;
+    }
+
+    public void setFacetInformation(SearchFacetInformation facetInformation) {
+        this.facetInformation = facetInformation;
     }
 }

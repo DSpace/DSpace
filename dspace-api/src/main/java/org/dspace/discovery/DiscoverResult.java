@@ -128,6 +128,18 @@ public class DiscoverResult {
         return ListUtils.emptyIfNull(facetValues);
     }
 
+    public List<IndexableObjectHighlightResult> getAllHighlightedResults() {
+        List<IndexableObjectHighlightResult> results = new ArrayList<>();
+        for (IndexableObject dso : indexableObjects) {
+            IndexableObjectHighlightResult result = getHighlightedResults(dso);
+            if (result == null) {
+                result = new IndexableObjectHighlightResult(dso, Map.of());
+            }
+            results.add(result);
+        }
+        return results;
+    }
+
     public IndexableObjectHighlightResult getHighlightedResults(IndexableObject dso) {
         return highlightedResults.get(dso.getUniqueIndexID());
     }

@@ -36,7 +36,7 @@ public class SearchFilterMatcher {
         return allOf(
                 hasJsonPath("$.filter", is(searchFilter.getIndexFieldName())),
                 hasJsonPath("$.hasFacets", is(isFacet(searchFilter))),
-                hasJsonPath("$.type", is(searchFilter.getType())),
+                hasJsonPath("$.filterType", is(searchFilter.getType())),
                 hasJsonPath("$.openByDefault", is(searchFilter.isOpenByDefault())),
                 checkOperators()
         );

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class' purpose is to create a container for the information in the SearchResultEntryResource
@@ -22,6 +22,7 @@ public class SearchResultEntryRest extends RestAddressableModel {
     public static final String NAME = "discover";
     public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
+    public static final String OBJECT = "object";
 
     private Map<String, List<String>> hitHighlights;
 
@@ -46,7 +47,7 @@ public class SearchResultEntryRest extends RestAddressableModel {
 
     @JsonIgnore
     public Class getController() {
-        return DiscoveryRestController.class;
+        return RestResourceController.class;
     }
 
     public Map<String, List<String>> getHitHighlights() {

@@ -13,13 +13,15 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Strings;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class DiscoveryConfiguration implements InitializingBean {
+public class DiscoveryConfiguration implements InitializingBean, BeanNameAware {
+    private String beanName;
 
     /**
      * The configuration for the sidebar facets
@@ -184,6 +186,10 @@ public class DiscoveryConfiguration implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() throws Exception {
+        if (id == null) {
+            throw new DiscoveryConfigurationException("Discovery ID is required for " + beanName + " configuration");
+        }
+
         Collection missingSearchFilters = CollectionUtils.subtract(getSidebarFacets(), getSearchFilters());
         if (CollectionUtils.isNotEmpty(missingSearchFilters)) {
             StringBuilder error = new StringBuilder();
@@ -221,5 +227,10 @@ public class DiscoveryConfiguration implements InitializingBean {
             }
         }
         return null;
+    }
+
+    @Override
+    public void setBeanName(String name) {
+        this.beanName = name;
     }
 }

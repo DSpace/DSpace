@@ -50,17 +50,18 @@ public class DiscoverySortConfiguration {
             return null;
         }
 
+        for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
+            if (Strings.CS.equals(sortFieldConfiguration.getSortField(), sortField)) {
+                return sortFieldConfiguration;
+            }
+        }
+
         if (Strings.CI.equals(SCORE, sortField)) {
             DiscoverySortFieldConfiguration configuration = new DiscoverySortFieldConfiguration();
             configuration.setMetadataField(SCORE);
             return configuration;
         }
 
-        for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
-            if (Strings.CS.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
-                return sortFieldConfiguration;
-            }
-        }
         return null;
     }
 }

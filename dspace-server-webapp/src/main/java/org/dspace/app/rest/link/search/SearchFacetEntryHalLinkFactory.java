@@ -7,19 +7,16 @@
  */
 package org.dspace.app.rest.link.search;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.dspace.app.rest.model.DiscoveryResultsRest;
+import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
-import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
+import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.SearchFacetEntryResource;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -30,42 +27,36 @@ import org.springframework.web.util.UriComponentsBuilder;
  * from the HalLinkService addLinks method is called if the HalResource given is eligible
  */
 @Component
-public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchFacetEntryResource> {
-
+public class SearchFacetEntryHalLinkFactory extends HalLinkFactory<SearchFacetEntryResource, RestResourceController> {
     @Override
     protected void addLinks(SearchFacetEntryResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
+        SearchFacetEntryRest facet = halResource.getContent();
+        if (facet != null && facet.getFacetInformation() != null) {
+            List<Link> updatedLinks = new ArrayList<>();
+            halResource.getLinks().forEach(link -> {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(link.getHref());
+                facet.getFacetInformation().appendQueryParameters(builder, true);
+                updatedLinks.add(buildLink(link.getRel().value(), builder.build().encode().toUriString()));
+            });
+            halResource.removeLinks();
+            list.addAll(updatedLinks);
 
-        SearchFacetEntryRest facetData = halResource.getFacetData();
-        DiscoveryResultsRest searchData = halResource.getSearchData();
-
-        String query = searchData == null ? null : searchData.getQuery();
-        List<String> dsoType = searchData == null ? null : searchData.getDsoTypes();
-        String scope = searchData == null ? null : searchData.getScope();
-        String configuration = searchData == null ? null : searchData.getConfiguration();
-
-        UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn().getFacetValues(facetData.getName(), null, query,
-                dsoType, scope, configuration, null, null));
-
-        addFilterParams(uriBuilder, searchData);
-
-        //If our rest data contains a list of values, construct the page links. Otherwise, only add a self link
-        if (CollectionUtils.isNotEmpty(facetData.getValues())) {
-            PageImpl page = new PageImpl<>(facetData.getValues(), PageRequest.of(0, facetData.getFacetLimit()),
-                                           facetData.getValues().size() + (BooleanUtils
-                                               .isTrue(facetData.isHasMore()) ? 1 : 0));
-
-            halResource.setPageHeader(new EmbeddedPageHeader(uriBuilder, page, false));
-
-        } else {
-            list.add(buildLink(IanaLinkRelations.SELF.value(), uriBuilder.build().toUriString()));
+            halResource.getEmbeddedResources().values().forEach(embeddedResource -> {
+                if (embeddedResource instanceof EmbeddedPage embeddedPage) {
+                    facet.getFacetInformation().appendQueryParameters(embeddedPage.getSelf(), false);
+                }
+            });
         }
+    }
 
+    @Override
+    protected Class<RestResourceController> getControllerClass() {
+        return RestResourceController.class;
     }
 
     @Override
     protected Class<SearchFacetEntryResource> getResourceClass() {
         return SearchFacetEntryResource.class;
     }
-
 }
