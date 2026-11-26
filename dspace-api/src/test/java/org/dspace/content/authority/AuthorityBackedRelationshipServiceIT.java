@@ -179,7 +179,7 @@ public class AuthorityBackedRelationshipServiceIT extends AbstractIntegrationTes
     public void testRemovingFinalPrimaryRelationshipMetadataRemovesAllRelationshipMetadata() throws Exception {
         context.turnOffAuthorisationSystem();
         Relationship relationship = service.promoteResolvedAuthority(context, owner, author(), target);
-        service.removeMetadataValue(context, author(), null);
+        assertThat(service.removeMetadataValue(context, author(), null), is(true));
         context.commit();
         assertThat(relationshipService.find(context, relationship.getID()), nullValue());
         assertThat(itemService.getMetadata(owner, "dc", "contributor", "author", Item.ANY), hasSize(0));

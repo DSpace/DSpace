@@ -129,6 +129,27 @@ public interface RelationshipConfigurationService {
         throws SQLException;
 
     /**
+     * Checks whether the supplied relationship-backed metadata value may be removed.
+     *
+     * A value is deletable when it is the primary metadata value of its relationship under a resolvable
+     * configuration. A value whose configuration key is unknown is also deletable, so that relationships whose
+     * configuration has disappeared can still be cleaned up. A resolvable additional (enhancer-managed) value is not
+     * deletable: those values are owned by the enhancer and must survive user-facing removals.
+     *
+     * Other resolution failures raise the same errors as normal configuration resolution: missing or duplicate
+     * keys and authority-derived configurations that do not support the relationship endpoints.
+     *
+     * @param context       current DSpace context
+     * @param relationship  relationship containing the metadata value's Item
+     * @param metadataValue metadata value to check
+     * @return {@code true} if the value may be removed, {@code false} otherwise
+     * @throws IllegalArgumentException if the relationship configuration is invalid
+     * @throws SQLException             if an error occurs while accessing the metadata registry
+     */
+    boolean isMetadataDeletable(Context context, Relationship relationship, MetadataValue metadataValue)
+        throws SQLException;
+
+    /**
      * Returns the primary metadata field configured for the specified relationship endpoint.
      * A relationship endpoint may have no primary metadata field configured.
      *

@@ -97,6 +97,8 @@ public interface AuthorityBackedRelationshipService {
      *
      * Removing an additional (enhancer-managed) value is a no-op: the value, the primary value and the relationship
      * are left untouched.
+     * If the relationship configuration key cannot be resolved to a known configuration, the value is considered
+     * deletable (a warning is logged) so that legacy data can still be cleaned up.
      * Removing a relationship-backed primary metadata value removes the relationship together with all its
      * relationship-backed metadata values. This overload avoids modifying the in-memory metadata collection of
      * {@code metadataOwnerWithActiveIterator}. The caller is responsible for removing affected metadata values from
@@ -109,10 +111,14 @@ public interface AuthorityBackedRelationshipService {
      * @param value relationship-backed metadata value to remove
      * @param metadataOwnerWithActiveIterator owner whose metadata collection is currently being iterated by the caller,
      *        or {@code null} when no metadata collection is being iterated
+     * @return {@code true} if the relationship and its metadata values were removed, {@code false} when nothing
+     *         changed because the value has no relationship or the removal was rejected by the deletability policy
      * @throws SQLException if a database error occurs while evaluating or performing the removal
      * @throws AuthorizeException if the current user is not authorized to modify the affected metadata or relationship
-     * @throws IllegalArgumentException if the relationship is not editable using the configured relationship lifecycle
+     * @throws IllegalArgumentException if the relationship is not persistent or not configuration-backed, if its
+     *         configuration key is null or blank, or if the configuration is duplicated or does not support the
+     *         relationship endpoints (an unknown key does not throw)
      */
-    void removeMetadataValue(Context context, MetadataValue value, DSpaceObject metadataOwnerWithActiveIterator)
+    boolean removeMetadataValue(Context context, MetadataValue value, DSpaceObject metadataOwnerWithActiveIterator)
         throws SQLException, AuthorizeException;
 }

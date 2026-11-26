@@ -412,6 +412,29 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
      */
     private RelationshipTypeConfiguration resolveConfiguration(Context context, String key, Item left, Item right,
                                                               boolean validate) throws SQLException {
+        RelationshipTypeConfiguration match = lookupConfiguration(key, left, right);
+        if (match == null) {
+            throw new IllegalArgumentException("Unknown relationship configuration " + key);
+        }
+
+        // Only normal resolution validates against the registry; classification does not.
+        return validate ? validateMetadataFields(context, match) : match;
+    }
+
+    /**
+     * Looks up the configuration matching the supplied key and endpoint types, returning {@code null} when the key
+     * has no registered or authority-derived definition.
+     *
+     * Missing, duplicate and endpoint-mismatched keys still raise the same errors as normal resolution; only an
+     * entirely unknown key is reported as {@code null} so callers can decide how to treat it.
+     *
+     * @param key   relationship configuration key
+     * @param left  left endpoint, or null when endpoint types are not available
+     * @param right right endpoint, or null when endpoint types are not available
+     * @return the matching configuration, or {@code null} when the key is unknown
+     * @throws IllegalArgumentException if the key is missing, duplicated or does not support the endpoints
+     */
+    private RelationshipTypeConfiguration lookupConfiguration(String key, Item left, Item right) {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Missing relationship configuration key");
         }
@@ -436,12 +459,7 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
                     "Relationship configuration " + key + " does not support the relationship endpoints");
             }
         }
-        if (match == null) {
-            throw new IllegalArgumentException("Unknown relationship configuration " + key);
-        }
-
-        // Only normal resolution validates against the registry; classification does not.
-        return validate ? validateMetadataFields(context, match) : match;
+        return match;
     }
 
     /**
@@ -560,12 +578,42 @@ public class RelationshipConfigurationServiceImpl implements RelationshipConfigu
             resolveConfiguration(context, relationship.getRelationshipConfigKey(),
                                  relationship.getLeftItem(), relationship.getRightItem(), false);
 
-        Item endpoint = (Item) metadataValue.getDSpaceObject();
+        return isPrimaryField(configuration, relationship, metadataValue);
+    }
 
+    @Override
+    public boolean isMetadataDeletable(Context context, Relationship relationship, MetadataValue metadataValue)
+        throws SQLException {
+        RelationshipTypeConfiguration configuration =
+            lookupConfiguration(relationship.getRelationshipConfigKey(),
+                              relationship.getLeftItem(), relationship.getRightItem());
+
+        if (configuration == null) {
+            // The configuration may disappear between restarts, for example when a linked-entity authority is
+            // removed from the configuration. Allowing the removal prevents orphaned relationships from lingering,
+            // which matches the behavior before the deletability policy was introduced.
+            log.warn("Relationship configuration {} is unknown; allowing removal of its metadata values",
+                     relationship.getRelationshipConfigKey());
+            return true;
+        }
+
+        return isPrimaryField(configuration, relationship, metadataValue);
+    }
+
+    /**
+     * Returns whether the supplied value is the primary metadata value on its relationship endpoint.
+     *
+     * @param configuration the resolved relationship configuration
+     * @param relationship  the relationship the value belongs to
+     * @param metadataValue the metadata value to classify
+     * @return true when the value is the primary value of its endpoint
+     */
+    private boolean isPrimaryField(RelationshipTypeConfiguration configuration, Relationship relationship,
+                                   MetadataValue metadataValue) {
+        Item endpoint = (Item) metadataValue.getDSpaceObject();
         Optional<String> primaryField = isLeftEndpoint(relationship, endpoint)
             ? configuration.getLeftPrimaryMetadataField()
             : configuration.getRightPrimaryMetadataField();
-
         return primaryField.filter(fieldName(metadataValue)::equals).isPresent();
     }
 

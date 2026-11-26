@@ -137,20 +137,23 @@ public class AuthorityBackedRelationshipServiceImpl implements AuthorityBackedRe
     }
 
     @Override
-    public void removeMetadataValue(Context context, MetadataValue value,
-                                    DSpaceObject metadataOwnerWithActiveIterator)
+    public boolean removeMetadataValue(Context context, MetadataValue value,
+                                       DSpaceObject metadataOwnerWithActiveIterator)
         throws SQLException, AuthorizeException {
         if (value == null || value.getRelationship() == null) {
-            return;
+            return false;
         }
         Relationship relationship = value.getRelationship();
-        if (!relationshipConfigurationService.isPrimaryMetadata(context, relationship, value)) {
+
+        if (!relationshipConfigurationService.isMetadataDeletable(context, relationship, value)) {
             // Additional values are managed by the enhancer: removing one must not remove the primary value or
             // the relationship, so this is a no-op.
-            return;
+            return false;
         }
+
         // The primary metadata value owns the relationship, so removing it also removes the relationship.
         removeRelationshipAndMetadata(context, relationship, metadataOwnerWithActiveIterator);
+        return true;
     }
 
     /**

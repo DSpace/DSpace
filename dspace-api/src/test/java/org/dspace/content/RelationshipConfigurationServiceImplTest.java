@@ -489,6 +489,118 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
     }
 
     /**
+     * Verifies that an unknown configuration key allows metadata removal and only logs a warning.
+     */
+    @Test
+    public void testIsDeletableReturnsTrueForUnknownConfiguration() throws SQLException {
+        relationship.setRelationshipConfigKey("unknown:configuration");
+
+        assertTrue(service.isMetadataDeletable(context, relationship,
+                                       metadataValue("dc", "contributor", "author", leftItem)));
+    }
+
+    /**
+     * Verifies that primary metadata values can be removed while the configuration is resolvable.
+     */
+    @Test
+    public void testIsDeletableReturnsTrueForPrimaryMetadata() throws SQLException {
+        assertTrue(service.isMetadataDeletable(context, relationship,
+                                       metadataValue("dc", "contributor", "author", leftItem)));
+        assertTrue(service.isMetadataDeletable(context, relationship,
+                                       metadataValue("dc", "relation", "isAuthorOfPublication", rightItem)));
+    }
+
+    /**
+     * Verifies that metadata values which are not primary on their endpoint cannot be removed.
+     */
+    @Test
+    public void testIsDeletableReturnsFalseForNonPrimaryMetadata() throws SQLException {
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
+        configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
+
+        MetadataValue additional = metadataValue("person", "identifier", "orcid", leftItem);
+        assertTrue(service.isAdditionalMetadata(context, relationship, additional));
+        assertFalse(service.isMetadataDeletable(context, relationship, additional));
+    }
+
+    /**
+     * Verifies that a missing configuration key is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsMissingConfigurationKey() {
+        relationship.setRelationshipConfigKey(" ");
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertEquals("Missing relationship configuration key", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a null configuration key is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsNullConfigurationKey() {
+        relationship.setRelationshipConfigKey(null);
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertEquals("Missing relationship configuration key", exception.getMessage());
+    }
+
+    /**
+     * Verifies that an empty configuration key is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsEmptyConfigurationKey() {
+        relationship.setRelationshipConfigKey("");
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertEquals("Missing relationship configuration key", exception.getMessage());
+    }
+
+    /**
+     * Verifies that duplicate configuration keys are rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsDuplicateConfigurationKey() {
+        setConfigurations(configuration, configuration("authority:dc.contributor.author", "dc.title", null));
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertTrue(exception.getMessage().startsWith("Duplicate relationship configuration key"));
+    }
+
+    /**
+     * Verifies that an authority-prefixed configuration whose endpoints do not match is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsEndpointMismatch() throws SQLException {
+        configuration.setLeftEntityTypes(Set.of("Book"));
+        mockOwnerEntityTypes();
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertTrue(exception.getMessage().startsWith(
+            "Relationship configuration authority:dc.contributor.author does not support the relationship endpoints"));
+    }
+
+    /**
      * Verifies that concrete relationships require archived items.
      */
     @Test

@@ -247,6 +247,40 @@ public class RelatedEntityItemEnhancerIT extends AbstractIntegrationTestWithData
     }
 
     @Test
+    public void testReconcileNeverRemovesPrimaryValueOrRelationship() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item person = createPerson(ORCID, "en");
+        Item publication = createPublication(person);
+        Relationship relationship = promote(publication, person);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        context.turnOffAuthorisationSystem();
+        itemEnhancerService.enhance(context, publication, false);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        // the source changes, so the derived value is deleted and rebuilt
+        context.turnOffAuthorisationSystem();
+        person = context.reloadEntity(person);
+        itemService.clearMetadata(context, person, "person", "identifier", "orcid", Item.ANY);
+        itemService.addMetadata(context, person, "person", "identifier", "orcid", "en", "0000-0003-1415-9269");
+        itemService.update(context, person);
+        itemEnhancerService.enhance(context, context.reloadEntity(publication), true);
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+        MetadataValue primary = itemService.getMetadata(publication, "dc", "contributor", "author", Item.ANY).get(0);
+        assertThat(primary.getRelationship().getID(), equalTo(relationship.getID()));
+        assertThat(primary.getAuthority(), equalTo(person.getID().toString()));
+        assertThat(context.reloadEntity(relationship), notNullValue());
+        assertThat(singleAdditional(publication, ADDITIONAL_ORCID_FIELD).getValue(),
+            equalTo("0000-0003-1415-9269"));
+    }
+
+    @Test
     public void testChangeOnOneRelationshipDoesNotTouchValuesOfTheOtherOnTheSameTargetField() throws Exception {
         String editorOrcid = "0000-0001-5109-3700";
         context.turnOffAuthorisationSystem();
