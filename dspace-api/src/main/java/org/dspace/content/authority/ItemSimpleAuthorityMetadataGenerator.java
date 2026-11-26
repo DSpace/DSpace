@@ -7,7 +7,6 @@
  */
 package org.dspace.content.authority;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,21 +19,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.content.service.ItemService;
-import org.dspace.discovery.indexobject.ItemIndexFactoryImpl;
-import org.dspace.services.RequestService;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
+import org.dspace.content.enhancer.source.MetadataSource;
+import org.dspace.content.enhancer.source.impl.SolrMetadataSource;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Implementation of {@link ItemAuthorityExtraMetadataGenerator} that extracts
  * metadata from DSpace items and adds them as extra information to authority choices.
  * <p>
- * This generator reads metadata values from Solr documents and populates the
- * Choice's extras map. It supports both simple and nested metadata fields.
+ * This generator reads metadata values from Solr documents by delegating the extraction
+ * to a {@link RelationshipMetadataGenerator} and populates the Choice's extras map.
+ * It supports both simple and nested metadata fields.
  * </p>
  * <p>
  * Key features:
@@ -60,25 +61,33 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mykhaylo Boychuk (4Science.it)
  */
-public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraMetadataGenerator {
+public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraMetadataGenerator, InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(ItemSimpleAuthorityMetadataGenerator.class);
 
-    private final String storedSeparatorSplit = java.util.regex.Pattern.quote(ItemIndexFactoryImpl.STORE_SEPARATOR);
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    RequestService requestService;
     private String keyId;
-    private String schema;
-    private String element;
-    private String qualifier;
     // use with aggregate mode
     private boolean singleResultOnAggregate = true;
     // limit the generator to a specific authority
     private String authorityName;
     private boolean useForDisplay = true;
     private boolean useAsData = true;
+    // required delegate used to extract the metadata values from the Solr document
+    private RelationshipMetadataGenerator delegate;
+
+    /**
+     * Verify that the required delegate has been configured, failing fast at startup
+     * otherwise.
+     *
+     * @throws IllegalStateException if no delegate has been configured
+     */
+    @Override
+    public void afterPropertiesSet() {
+        if (delegate == null) {
+            throw new IllegalStateException("No delegate configured for ItemSimpleAuthorityMetadataGenerator "
+                + "with keyId " + keyId + ": a RelationshipMetadataGenerator is required");
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -108,35 +117,51 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     @Override
     public List<Choice> buildAggregate(String checkAuthorityName, SolrDocument document) {
         List<Choice> choiceList = new LinkedList<Choice>();
-        String title = ((ArrayList<String>) document.getFieldValue("dc.title")).get(0);
+        String title = getFirstValue(document, "dc.title");
         if (StringUtils.isNotBlank(authorityName) && !Strings.CS.equals(authorityName, checkAuthorityName)) {
             choiceList.add(
-                new Choice((String) document.getFieldValue("search.resourceid"),
+                new Choice(getFirstValue(document, "search.resourceid"),
                            title, title, new HashMap<String, String>()));
         } else {
             if (isSingleResultOnAggregate()) {
                 Map<String, String> extras = new HashMap<String, String>();
                 buildSingleExtraByRP(document, extras);
-                choiceList.add(new Choice((String) document.getFieldValue("search.resourceid"),
+                choiceList.add(new Choice(getFirstValue(document, "search.resourceid"),
                                           title, title, extras));
             } else {
-                List<MetadataValueDTO> metadataValues = getMetadataValueDTOsFromSolr(schema, element, qualifier,
-                                                                                     document);
-                if (metadataValues != null && metadataValues.size() != 0) {
+                List<MetadataValueDTO> metadataValues = getMetadataValueDTOs(document);
+                if (!metadataValues.isEmpty()) {
                     for (MetadataValueDTO metadataValue : metadataValues) {
                         Map<String, String> extras = new HashMap<String, String>();
                         buildSingleExtraByMetadata(metadataValue, extras);
-                        choiceList.add(new Choice((String) document.getFieldValue("search.resourceid"),
+                        choiceList.add(new Choice(getFirstValue(document, "search.resourceid"),
                                                   title + "(" + metadataValue.getValue() + ")", title, extras));
                     }
                 } else {
                     Map<String, String> extras = new HashMap<String, String>();
-                    choiceList.add(new Choice((String) document.getFieldValue("search.resourceid"),
+                    choiceList.add(new Choice(getFirstValue(document, "search.resourceid"),
                                               title, title, extras));
                 }
             }
         }
         return choiceList;
+    }
+
+    /**
+     * Return the first value stored in the given Solr field, supporting both single
+     * valued and multi valued fields.
+     *
+     * @param document the Solr document
+     * @param field    the field name
+     * @return the first value, or {@code null} when the field is absent
+     */
+    private String getFirstValue(SolrDocument document, String field) {
+        Object fieldValue = document.getFieldValue(field);
+        if (fieldValue instanceof List) {
+            List<?> values = (List<?>) fieldValue;
+            return values.isEmpty() ? null : String.valueOf(values.get(0));
+        }
+        return fieldValue == null ? null : String.valueOf(fieldValue);
     }
 
     protected void buildSingleExtraByMetadata(MetadataValueDTO metadataValue, Map<String, String> extras) {
@@ -177,7 +202,7 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     }
 
     protected void buildSingleExtraByRP(SolrDocument solrDocument, Map<String, String> extras) {
-        List<MetadataValueDTO> metadataValues = getMetadataValueDTOsFromSolr(schema, element, qualifier, solrDocument);
+        List<MetadataValueDTO> metadataValues = getMetadataValueDTOs(solrDocument);
         if (metadataValues.isEmpty()) {
             buildSingleExtraByMetadata(null, extras);
         } else {
@@ -205,54 +230,42 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
         }
     }
 
-    private List<MetadataValueDTO> getMetadataValueDTOsFromSolr(String schema, String element, String qualifier,
-                                                                SolrDocument solrDocument) {
-        if (!projectionFieldsContain(schema, element, qualifier)) {
-            log.error("the metadata " + getMetadata(schema, element, qualifier)
-                          + " is not configured to be stored in solr,"
-                          + " check the discovery.index.projection properties in the discovery.cfg");
-            return Collections.EMPTY_LIST;
+    /**
+     * Extract the metadata values for the configured delegate from the given Solr document.
+     * <p>
+     * The configured delegate source field must be part of the discovery projection, otherwise
+     * an error is logged and an empty list is returned. The returned list is never {@code null}.
+     * </p>
+     *
+     * @param solrDocument the Solr document from which the values are extracted
+     * @return the extracted metadata values, possibly empty
+     */
+    private List<MetadataValueDTO> getMetadataValueDTOs(SolrDocument solrDocument) {
+        if (!projectionFieldsContain(delegate.getSourceField())) {
+            log.error("the metadata {} is not configured to be stored in solr, check the discovery.index.projection " +
+                          "properties in the discovery.cfg",
+                delegate.getSourceField());
+            return Collections.emptyList();
         }
-        String metadata = getMetadata(schema, element, qualifier) + "_stored";
-        List<MetadataValueDTO> metadataValues = new ArrayList<MetadataValueDTO>();
-        ArrayList<String> fieldValue = (ArrayList<String>) solrDocument.getFieldValue(metadata);
-        if (fieldValue != null) {
-            for (String storedValue : fieldValue) {
-                MetadataValueDTO dto = new MetadataValueDTO();
-                dto.setSchema(schema);
-                dto.setElement(element);
-                dto.setQualifier(qualifier);
-                String[] split = storedValue.split(storedSeparatorSplit);
-                dto.setValue(nullOrValue(split[0]));
-                dto.setAuthority(nullOrValue(split[3]));
-                dto.setLanguage(nullOrValue(split[4]));
-                metadataValues.add(dto);
-            }
-        }
-        return metadataValues;
+        MetadataSource source = new SolrMetadataSource(solrDocument);
+        List<MetadataValueDTO> metadataValues = delegate.extract(source);
+        return metadataValues != null ? metadataValues : Collections.emptyList();
     }
 
-    private String nullOrValue(String string) {
-        if (Strings.CS.equals(string, "null")) {
-            return null;
-        } else {
-            return string;
-        }
-    }
-
-    private String getMetadata(String schema, String element, String qualifier) {
-        if (StringUtils.isNotBlank(qualifier)) {
-            return StringUtils.join(new String[] {schema, element, qualifier}, ".");
-        } else {
-            return StringUtils.join(new String[] {schema, element}, ".");
-        }
-    }
-
-    private boolean projectionFieldsContain(String schema, String element, String qualifier) {
+    /**
+     * Check whether the given source field is configured in the discovery projection, either
+     * with its full name or with the qualifier replaced by the {@link Item#ANY} wildcard.
+     *
+     * @param sourceField the field to check, in the form {@code schema.element[.qualifier]}
+     * @return {@code true} if the field is part of the discovery projection
+     */
+    private boolean projectionFieldsContain(String sourceField) {
         String[] projectionFields = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                          .getArrayProperty("discovery.index.projection");
-        return ArrayUtils.contains(projectionFields, getMetadata(schema, element, qualifier)) ||
-            ArrayUtils.contains(projectionFields, getMetadata(schema, element, Item.ANY));
+        MetadataFieldName field = new MetadataFieldName(sourceField);
+        String wildcardField = new MetadataFieldName(field.schema, field.element, Item.ANY).toString();
+        return ArrayUtils.contains(projectionFields, sourceField) ||
+            ArrayUtils.contains(projectionFields, wildcardField);
     }
 
     public void setRelatedInputformMetadata(String keyId) {
@@ -261,28 +274,22 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
         this.keyId = keyId;
     }
 
-    public String getElement() {
-        return element;
+    /**
+     * Return the delegate used to extract the metadata values from the Solr document.
+     *
+     * @return the configured delegate
+     */
+    public RelationshipMetadataGenerator getDelegate() {
+        return delegate;
     }
 
-    public void setElement(String element) {
-        this.element = element;
-    }
-
-    public String getQualifier() {
-        return qualifier;
-    }
-
-    public void setQualifier(String qualifier) {
-        this.qualifier = qualifier;
-    }
-
-    public String getSchema() {
-        return schema;
-    }
-
-    public void setSchema(String schema) {
-        this.schema = schema;
+    /**
+     * Set the delegate used to extract the metadata values from the Solr document.
+     *
+     * @param delegate the required {@link RelationshipMetadataGenerator}
+     */
+    public void setDelegate(RelationshipMetadataGenerator delegate) {
+        this.delegate = delegate;
     }
 
     public boolean isSingleResultOnAggregate() {

@@ -270,34 +270,6 @@
 
     <dc-type>
         <schema>dspace</schema>
-        <element>virtual</element>
-        <qualifier>department</qualifier>
-        <scope_note>Virtual metadata field holding department/affiliation value derived from linked Person entity</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>virtual</element>
-        <qualifier>orcid</qualifier>
-        <scope_note>Virtual metadata field holding ORCID value derived from linked Person entity</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>virtualsource</element>
-        <qualifier>department</qualifier>
-        <scope_note>Reference to the source Person entity UUID for virtual department metadata</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>virtualsource</element>
-        <qualifier>orcid</qualifier>
-        <scope_note>Reference to the source Person entity UUID for virtual ORCID metadata</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
         <element>cms</element>
         <qualifier>home-header</qualifier>
         <scope_note>Content Management System header content for the repository home page</scope_note>
@@ -412,20 +384,6 @@
         <element>entity</element>
         <qualifier>style</qualifier>
         <scope_note>CSS styling class for entity display customization in the user interface</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>virtual</element>
-        <qualifier>journalance</qualifier>
-        <scope_note>Virtual metadata field holding journal identifier value derived from linked Journal entity</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>virtualsource</element>
-        <qualifier>journalance</qualifier>
-        <scope_note>Reference to the source Journal entity UUID for virtual journal metadata</scope_note>
     </dc-type>
 
     <dc-type>

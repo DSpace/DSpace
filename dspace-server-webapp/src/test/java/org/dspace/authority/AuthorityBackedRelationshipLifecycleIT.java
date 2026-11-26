@@ -15,13 +15,16 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.ws.rs.core.MediaType;
 import org.dspace.administer.MetadataImporter;
@@ -40,12 +43,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
-import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
+import org.dspace.content.RelationshipTypeConfiguration;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipConfigurationService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.service.PluginService;
@@ -54,6 +56,7 @@ import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * End-to-end verification of the phase-1 authority-backed relationship lifecycle. Exercises both
@@ -95,12 +98,6 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
 
     @Autowired
     private RelationshipConfigurationService relationshipConfigurationService;
-
-    @Autowired
-    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
-
-    @Autowired
-    private MetadataValueService metadataValueService;
 
     @Before
     @Override
@@ -283,10 +280,12 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
     }
 
     /**
-     * Tests removing relationship-backed metadata when its authority configuration is no longer available.
+     * Pins current behaviour when the relationship's configuration key becomes unknown, for example because the
+     * linked-entity authority was removed from the configuration between restarts. A PATCH removal succeeds and
+     * fully cleans up both the relationship and its metadata values instead of failing.
      */
     @Test
-    public void testRemoveRelationshipMetadataWithMissingAuthorityConfiguration() throws Exception {
+    public void testPinsCurrentBehaviourRemoveWithUnknownConfigurationCleansUpRelationshipAndValues() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Item person = ItemBuilder.createItem(context, personCollection)
@@ -391,101 +390,147 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
     }
 
     /**
-     * Tests removing non-anchor metadata while preserving a relationship that still has linked metadata.
+     * Pins the edit path when the authority configuration disappeared and the item holds several relationships:
+     * the update succeeds and replaces all of them with a plain value.
+     *
+     * @throws Exception if the request or the setup fails
      */
     @Test
-    public void testRemoveNonAnchorWithMissingConfigurationKeepsRelationship() throws Exception {
+    public void testEditItemWithMultipleRelationshipsAndMissingAuthorityConfiguration() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Item person = ItemBuilder.createItem(context, personCollection)
-                                 .withTitle("Jane Doe").build();
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item person2 = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item person3 = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
         Item publication = ItemBuilder.createItem(context, publicationCollection)
                                       .withTitle("Publication")
                                       .withMetadata("ds-rel-test", "contributor", "author", Item.ANY, "J. Doe",
                                                     person.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds-rel-test", "contributor", "author", Item.ANY, "J. Doe",
+                                                    person2.getID().toString(), CF_ACCEPTED)
+                                      .withMetadata("ds-rel-test", "contributor", "author", Item.ANY, "J. Doe",
+                                                    person3.getID().toString(), CF_ACCEPTED)
                                       .build();
-
-        Relationship relationship = relationshipService.findByItem(context, publication).get(0);
-
-        itemService.addMetadata(context, publication, "person", "identifier", "orcid",
-                                null, "0000-0002-1825-0097");
-        MetadataValue orcid = itemService.getMetadataByMetadataString(
-            publication, "person.identifier.orcid").get(0);
-
-        authorityBackedRelationshipService.attachMetadataToRelationship(context, orcid, relationship);
 
         context.restoreAuthSystemState();
         context.commit();
-
-        configurationService.setProperty("choices.plugin.ds-rel-test.contributor.author", "");
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(patch("/api/core/items/" + publication.getID())
-                                     .content(getPatchContent(List.of(
-                                         new RemoveOperation("/metadata/person.identifier.orcid/0"))))
-                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
 
         publication = context.reloadEntity(publication);
 
-        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
-        assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
-        assertThat(itemService.getMetadataByMetadataString(publication, "person.identifier.orcid"), hasSize(0));
-    }
+        List<Relationship> relationships = relationshipService.findByItem(context, publication);
+        assertThat(relationships, hasSize(3));
 
-    /**
-     * Tests removing the last linked metadata value from a relationship whose anchor is already missing.
-     */
-    @Test
-    public void testRemoveLastNonAnchorWithMissingConfigurationDeletesRelationship() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Item person = ItemBuilder.createItem(context, personCollection)
-                                 .withTitle("Jane Doe").build();
-        Item publication = ItemBuilder.createItem(context, publicationCollection)
-                                      .withTitle("Publication")
-                                      .withMetadata("ds-rel-test", "contributor", "author", Item.ANY, "J. Doe",
-                                                    person.getID().toString(), CF_ACCEPTED)
-                                      .build();
-
-        Relationship relationship = relationshipService.findByItem(context, publication).get(0);
-
-        itemService.addMetadata(context, publication, "person", "identifier", "orcid",
-                                null, "0000-0002-1825-0097");
-        MetadataValue orcid = itemService.getMetadataByMetadataString(
-            publication, "person.identifier.orcid").get(0);
-
-        authorityBackedRelationshipService.attachMetadataToRelationship(context, orcid, relationship);
-
-        // Simulate stale persisted state: the anchor is gone, but the relationship remains.
-        MetadataValue author = getSingleAuthor(publication);
-        author.setRelationship(null);
-        publication.getMetadata().remove(author);
-        metadataValueService.delete(context, author);
-        itemService.update(context, publication);
-
-        context.restoreAuthSystemState();
-        context.commit();
-
+        // Simulate removing the authority configuration after the relationship was persisted.
         configurationService.setProperty("choices.plugin.ds-rel-test.contributor.author", "");
         choiceAuthorityService.clearCache();
         metadataAuthorityService.clearCache();
 
+        assertThrows(IllegalArgumentException.class,
+                     () -> relationshipConfigurationService.getRelationshipConfig(context, relationships.getFirst()));
+
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(patch("/api/core/items/" + publication.getID())
-                                     .content(getPatchContent(List.of(
-                                         new RemoveOperation("/metadata/person.identifier.orcid/0"))))
+        // Replace the linked author with a plain-text author
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new AddOperation(
+            "/sections/test-author-relationship/ds-rel-test.contributor.author",
+            List.of(Map.of("value", "Updated Author"))
+        ));
+
+        getClient(token).perform(patch("/api/core/edititems/" + publication.getID() + ":TEST-AUTHOR-RELATIONSHIP")
+                                     .content(getPatchContent(operations))
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
         publication = context.reloadEntity(publication);
 
         assertThat(relationshipService.findByItem(context, publication), hasSize(0));
-        assertThat(itemService.getMetadataByMetadataString(publication, "person.identifier.orcid"), hasSize(0));
+        assertThat(itemService.getMetadataByMetadataString(publication, "ds-rel-test.contributor.author"), hasSize(1));
+        assertThat(getSingleAuthor(publication).getValue(), equalTo("Updated Author"));
+        assertThat(getSingleAuthor(publication).getRelationship(), nullValue());
+    }
+
+    /**
+     * Pins current behaviour when the relationship configuration key still resolves but its primary metadata field
+     * is no longer the field backing the stored relationship value. The value is now treated as an additional
+     * (enhancer-managed) value, so a PATCH removal succeeds as a no-op and both the relationship and its values
+     * remain after a database reload.
+     */
+    @Test
+    public void testPinsCurrentBehaviourRemoveWhenPrimaryFieldChangedIsNoOp() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Jane Doe")
+                                 .build();
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withMetadata("ds-rel-test", "contributor", "author", Item.ANY, "J. Doe",
+                                                    person.getID().toString(), CF_ACCEPTED)
+                                      .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        publication = context.reloadEntity(publication);
+
+        List<Relationship> relationships = relationshipService.findByItem(context, publication);
+        assertThat(relationships, hasSize(1));
+        Relationship relationship = relationships.get(0);
+        assertThat(relationship.getRelationshipConfigKey(),
+                   equalTo("authority:ds-rel-test.contributor.author"));
+        Integer relationshipId = relationship.getID();
+        assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
+
+        // Simulate a restart where the same configuration key now designates a different primary field. The key
+        // still resolves, so the removal must not fail; the old author value is no longer the primary.
+        RelationshipTypeConfiguration redefined = new RelationshipTypeConfiguration();
+        redefined.setId("authority:ds-rel-test.contributor.author");
+        redefined.setLeftEntityTypes(Set.of("Publication"));
+        redefined.setRightEntityTypes(Set.of("Person"));
+        redefined.setLeftPrimaryMetadataField("dc.title");
+
+        Object originalConfigurations = ReflectionTestUtils.getField(
+            relationshipConfigurationService, "configurations");
+        ReflectionTestUtils.setField(relationshipConfigurationService, "configurations", List.of(redefined));
+        try {
+            assertThat(relationshipConfigurationService.getRelationshipConfig(context, relationship)
+                                                       .getLeftPrimaryMetadataField().orElse(null),
+                       equalTo("dc.title"));
+            assertThat(relationshipConfigurationService.isMetadataDeletable(context, relationship,
+                                                                    getSingleAuthor(publication)), is(false));
+
+            String token = getAuthToken(admin.getEmail(), password);
+            List<Operation> ops = new ArrayList<>();
+            ops.add(new RemoveOperation("/metadata/ds-rel-test.contributor.author/0"));
+
+            getClient(token).perform(patch("/api/core/items/" + publication.getID())
+                                         .content(getPatchContent(ops))
+                                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk());
+        } finally {
+            ReflectionTestUtils.setField(relationshipConfigurationService, "configurations",
+                                         originalConfigurations);
+        }
+
+        // Reload from the database: the removal was a no-op, so the relationship and its value survive.
+        publication = context.reloadEntity(publication);
+        List<Relationship> afterRemoval = relationshipService.findByItem(context, publication);
+        assertThat(afterRemoval, hasSize(1));
+        assertThat(afterRemoval.get(0).getID(), is(relationshipId));
+        assertThat(getSingleAuthor(publication).getRelationship(), notNullValue());
+        assertThat(getSingleAuthor(publication).getRelationship().getID(), is(relationshipId));
+        assertThat(getSingleAuthor(publication).getValue(), equalTo("J. Doe"));
     }
 
     /**
@@ -597,6 +642,60 @@ public class AuthorityBackedRelationshipLifecycleIT extends AbstractControllerIn
         assertThat(authors.get(1).getRelationship().getID(), equalTo(firstRelationshipId));
 
         assertThat(relationshipService.findByItem(context, publication), hasSize(2));
+    }
+
+    /**
+     * Removing a value derived by the enhancer (an additional value) through the REST API must not remove the
+     * primary value nor the relationship it belongs to.
+     */
+    @Test
+    public void testRemovingAdditionalValueKeepsPrimaryAndRelationship() throws Exception {
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "AuthorAuthority");
+        configurationService.setProperty("choices.presentation.dc.contributor.author", "suggest");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+        pluginService.clearNamedPluginClasses();
+        choiceAuthorityService.clearCache();
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+        Item person = ItemBuilder.createItem(context, personCollection)
+                                 .withTitle("Walter White")
+                                 .withPersonMainAffiliation("4Science")
+                                 .build();
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+                                      .withTitle("Publication")
+                                      .withAuthor("Walter White", person.getID().toString())
+                                      .build();
+        context.restoreAuthSystemState();
+        context.commit();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/items/" + publication.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata['additional.affiliation.name'][0].value", is("4Science")));
+
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new RemoveOperation("/metadata/additional.affiliation.name/0"));
+        getClient(token).perform(patch("/api/core/items/" + publication.getID())
+                                     .content(getPatchContent(ops))
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/items/" + publication.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata['dc.contributor.author'][0].authority",
+                                            is(person.getID().toString())))
+                        .andExpect(jsonPath("$.metadata['additional.affiliation.name'][0].value", is("4Science")));
+
+        publication = context.reloadEntity(publication);
+        assertThat(relationshipService.findByItem(context, publication), hasSize(1));
+        List<MetadataValue> authors = itemService.getMetadataByMetadataString(publication, "dc.contributor.author");
+        assertThat(authors, hasSize(1));
+        assertThat(authors.get(0).getRelationship(), notNullValue());
+        List<MetadataValue> affiliations = itemService.getMetadataByMetadataString(publication,
+                                                                                   "additional.affiliation.name");
+        assertThat(affiliations, hasSize(1));
+        assertThat(affiliations.get(0).getRelationship(), notNullValue());
     }
 
     private MetadataValue getSingleAuthor(Item item) {

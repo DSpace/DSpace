@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<dspace-dc-types>
+
+    <!-- These metadata fields hold values derived from a related entity by the
+         relationship metadata generators configured in
+         config/spring/api/relationship-configuration.xml -->
+    <dspace-header>
+        <title>DSpace Relationship-derived Additional Types</title>
+    </dspace-header>
+
+    <!-- "additional" schema -->
+    <dc-schema>
+        <name>additional</name>
+        <namespace>http://dspace.org/additional</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>additional</schema>
+        <element>affiliation</element>
+        <qualifier>name</qualifier>
+        <scope_note>
+            The name of an affiliation derived from the person.affiliation.name field of the related Person
+        </scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>additional</schema>
+        <element>identifier</element>
+        <qualifier>orcid</qualifier>
+        <scope_note>
+            The ORCID identifier derived from the person.identifier.orcid field of the related Person
+        </scope_note>
+    </dc-type>
+
+</dspace-dc-types>

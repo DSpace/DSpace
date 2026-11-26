@@ -85,7 +85,8 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
             legacy.setRelationshipConfigKey(definition.getId());
             // Keep the old type table available, but this row has migrated off it.
             legacy.setRelationshipType(null);
-            service.attachMetadataToRelationship(context, value, legacy);
+            value.setRelationship(legacy);
+            metadata.update(context, value);
             relationships.update(context, legacy);
             context.commit();
 
@@ -98,17 +99,18 @@ public class UnifiedRelationshipPersistenceIT extends AbstractIntegrationTestWit
             assertThat(legacy.getRelationshipConfigKey(), equalTo(definition.getId()));
             assertThat(value.getRelationship().getID(), equalTo(legacyId));
             assertThat(value.getValue(), equalTo("Smith, Jane"));
-            assertThat(value.getPlace(), equalTo(0));
+            // The value keeps the ordering of its relationship.
+            assertThat(value.getPlace(), equalTo(legacy.getLeftPlace()));
             assertThat(metadata.findByRelationship(context, legacy), hasSize(1));
             assertThat(relationships.findByItem(context, person), hasSize(1));
             assertThat(ContentServiceFactory.getInstance().getRelationshipTypeService()
                 .find(context, legacyType.getID()), notNullValue());
-            // Demonstrate that migrated rows do not also generate virtual author values.
+            // The migrated relationship does not produce any relationship metadata value.
             assertThat(ContentServiceFactory.getInstance().getRelationshipMetadataService()
                 .findRelationshipMetadataValueForItemRelationship(context, publication,
                     "Publication", legacy, true), hasSize(0));
         } finally {
-            // Remove this fixture's projections/link before removing its temporary definition.
+            // Remove this fixture's relationship before removing its temporary definition.
             Relationship current = relationships.find(context, legacyId);
             if (current != null) {
                 if (current.isConfigurationBacked()) {

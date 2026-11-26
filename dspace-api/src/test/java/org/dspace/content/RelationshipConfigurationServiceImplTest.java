@@ -32,8 +32,8 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
-import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
@@ -218,7 +218,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testPrimaryFieldCannotAlsoBeAdditionalOnLeft() {
-        ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
         configuration.setLeftMetadataGenerators(Map.of("dc.contributor.author", generator));
         assertThrows(IllegalArgumentException.class, () -> service.validateConfigurations());
     }
@@ -267,7 +267,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
     @Test
     public void testFindForMetadataValueDoesNotMatchAdditionalFields() throws SQLException {
         when(itemService.getEntityTypeLabel(leftItem)).thenReturn("Publication");
-        ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
         configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
         assertNull(service.findForMetadataValue(context, metadataValue("person", "identifier", "orcid", leftItem)));
     }
@@ -303,7 +303,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testNonexistentAdditionalMetadataFieldIsIgnored() throws SQLException {
-        ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
         configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
 
         when(metadataFieldService.findByString(eq(context), any(String.class), eq('.')))
@@ -326,7 +326,7 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testInvalidAdditionalMetadataFieldRejectedAtStartup() {
-        ItemAuthorityExtraMetadataGenerator generator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
         configuration.setLeftMetadataGenerators(Map.of("dc..author", generator));
 
         RelationshipConfigurationException exception =
@@ -335,6 +335,64 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
 
         assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
         assertTrue(exception.getMessage().contains("dc..author"));
+    }
+
+    /**
+     * Verifies that a generator whose source metadata field is not registered is dropped, following the
+     * same severity rule as a missing additional field.
+     */
+    @Test
+    public void testNonexistentSourceMetadataFieldDropsGenerator() throws SQLException {
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
+        when(generator.getSourceField()).thenReturn("person.identifier.orcid");
+        configuration.setLeftMetadataGenerators(Map.of("dc.description", generator));
+
+        when(metadataFieldService.findByString(eq(context), any(String.class), eq('.')))
+            .thenAnswer(invocation -> "person.identifier.orcid".equals(invocation.getArgument(1))
+                ? null
+                : mock(MetadataField.class));
+        mockOwnerEntityTypes();
+
+        RelationshipTypeConfiguration resolved = service.getRelationshipConfig(context, relationship);
+
+        assertTrue(resolved.getLeftMetadataGenerators().isEmpty());
+        assertTrue(resolved.getLeftAdditionalMetadataFields().isEmpty());
+    }
+
+    /**
+     * Verifies that a generator with a missing target field is dropped without validating its source field.
+     */
+    @Test
+    public void testMissingAdditionalFieldDropsGeneratorWithoutValidatingSource() throws SQLException {
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
+        configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
+
+        when(metadataFieldService.findByString(eq(context), any(String.class), eq('.')))
+            .thenAnswer(invocation -> ((String) invocation.getArgument(1)).startsWith("person.")
+                ? null
+                : mock(MetadataField.class));
+        mockOwnerEntityTypes();
+
+        RelationshipTypeConfiguration resolved = service.getRelationshipConfig(context, relationship);
+
+        assertTrue(resolved.getLeftMetadataGenerators().isEmpty());
+        assertTrue(resolved.getLeftAdditionalMetadataFields().isEmpty());
+    }
+
+    /**
+     * Verifies that a generator without a usable source metadata field is rejected at startup.
+     */
+    @Test
+    public void testMissingSourceMetadataFieldRejectedAtStartup() {
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
+        configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
+
+        RelationshipConfigurationException exception =
+            assertThrows(RelationshipConfigurationException.class,
+                         () -> service.validateConfigurations());
+
+        assertTrue(exception.getMessage().contains("authority:dc.contributor.author"));
+        assertTrue(exception.getMessage().contains("source metadata field"));
     }
 
     /**
@@ -388,8 +446,10 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
      */
     @Test
     public void testMetadataHelpersForBothEndpoints() throws SQLException {
-        ItemAuthorityExtraMetadataGenerator leftGenerator = mock(ItemAuthorityExtraMetadataGenerator.class);
-        ItemAuthorityExtraMetadataGenerator rightGenerator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator leftGenerator = mock(RelationshipMetadataGenerator.class);
+        RelationshipMetadataGenerator rightGenerator = mock(RelationshipMetadataGenerator.class);
+        when(leftGenerator.getSourceField()).thenReturn("person.identifier.orcid");
+        when(rightGenerator.getSourceField()).thenReturn("dc.description");
         configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", leftGenerator));
         configuration.setRightMetadataGenerators(Map.of("dc.description", rightGenerator));
         registerMetadataFields();
@@ -426,6 +486,118 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
                    service.getMetadataGenerator(context, relationship, rightItem, "dc.description").orElse(null));
 
         assertTrue(service.getMetadataGenerator(context, relationship, leftItem, "dc.title").isEmpty());
+    }
+
+    /**
+     * Verifies that an unknown configuration key allows metadata removal and only logs a warning.
+     */
+    @Test
+    public void testIsDeletableReturnsTrueForUnknownConfiguration() throws SQLException {
+        relationship.setRelationshipConfigKey("unknown:configuration");
+
+        assertTrue(service.isMetadataDeletable(context, relationship,
+                                       metadataValue("dc", "contributor", "author", leftItem)));
+    }
+
+    /**
+     * Verifies that primary metadata values can be removed while the configuration is resolvable.
+     */
+    @Test
+    public void testIsDeletableReturnsTrueForPrimaryMetadata() throws SQLException {
+        assertTrue(service.isMetadataDeletable(context, relationship,
+                                       metadataValue("dc", "contributor", "author", leftItem)));
+        assertTrue(service.isMetadataDeletable(context, relationship,
+                                       metadataValue("dc", "relation", "isAuthorOfPublication", rightItem)));
+    }
+
+    /**
+     * Verifies that metadata values which are not primary on their endpoint cannot be removed.
+     */
+    @Test
+    public void testIsDeletableReturnsFalseForNonPrimaryMetadata() throws SQLException {
+        RelationshipMetadataGenerator generator = mock(RelationshipMetadataGenerator.class);
+        configuration.setLeftMetadataGenerators(Map.of("person.identifier.orcid", generator));
+
+        MetadataValue additional = metadataValue("person", "identifier", "orcid", leftItem);
+        assertTrue(service.isAdditionalMetadata(context, relationship, additional));
+        assertFalse(service.isMetadataDeletable(context, relationship, additional));
+    }
+
+    /**
+     * Verifies that a missing configuration key is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsMissingConfigurationKey() {
+        relationship.setRelationshipConfigKey(" ");
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertEquals("Missing relationship configuration key", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a null configuration key is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsNullConfigurationKey() {
+        relationship.setRelationshipConfigKey(null);
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertEquals("Missing relationship configuration key", exception.getMessage());
+    }
+
+    /**
+     * Verifies that an empty configuration key is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsEmptyConfigurationKey() {
+        relationship.setRelationshipConfigKey("");
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertEquals("Missing relationship configuration key", exception.getMessage());
+    }
+
+    /**
+     * Verifies that duplicate configuration keys are rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsDuplicateConfigurationKey() {
+        setConfigurations(configuration, configuration("authority:dc.contributor.author", "dc.title", null));
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertTrue(exception.getMessage().startsWith("Duplicate relationship configuration key"));
+    }
+
+    /**
+     * Verifies that an authority-prefixed configuration whose endpoints do not match is rejected.
+     */
+    @Test
+    public void testIsDeletableRejectsEndpointMismatch() throws SQLException {
+        configuration.setLeftEntityTypes(Set.of("Book"));
+        mockOwnerEntityTypes();
+
+        IllegalArgumentException exception =
+            assertThrows(IllegalArgumentException.class,
+                         () -> service.isMetadataDeletable(context, relationship,
+                                                   metadataValue("dc", "contributor", "author", leftItem)));
+
+        assertTrue(exception.getMessage().startsWith(
+            "Relationship configuration authority:dc.contributor.author does not support the relationship endpoints"));
     }
 
     /**
@@ -519,8 +691,9 @@ public class RelationshipConfigurationServiceImplTest extends AbstractIntegratio
 
     @Test
     public void testValidAdditionalMetadataFieldsRemainAvailable() throws SQLException {
-        ItemAuthorityExtraMetadataGenerator validGenerator = mock(ItemAuthorityExtraMetadataGenerator.class);
-        ItemAuthorityExtraMetadataGenerator invalidGenerator = mock(ItemAuthorityExtraMetadataGenerator.class);
+        RelationshipMetadataGenerator validGenerator = mock(RelationshipMetadataGenerator.class);
+        RelationshipMetadataGenerator invalidGenerator = mock(RelationshipMetadataGenerator.class);
+        when(validGenerator.getSourceField()).thenReturn("dc.title");
 
         configuration.setLeftMetadataGenerators(Map.of(
             "dc.description", validGenerator,

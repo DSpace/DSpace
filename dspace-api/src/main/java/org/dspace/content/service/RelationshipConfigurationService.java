@@ -15,7 +15,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipTypeConfiguration;
-import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
 import org.dspace.core.Context;
 
 /**
@@ -25,8 +25,8 @@ import org.dspace.core.Context;
  * {@link org.dspace.content.RelationshipType} database entity. A persisted {@link org.dspace.content.Relationship}
  * may store a configuration key identifying which configured semantics apply to that relationship.
  *
- * Implementations may also provide compatibility mappings from existing authority configuration, for example while
- * migrating existing CRIS authority-backed relationships to the configuration-backed relationship model.
+ * Implementations may also resolve relationships created from the authority configuration while a repository moves
+ * to configuration-backed relationships.
  */
 public interface RelationshipConfigurationService {
 
@@ -129,6 +129,27 @@ public interface RelationshipConfigurationService {
         throws SQLException;
 
     /**
+     * Checks whether the supplied relationship-backed metadata value may be removed.
+     *
+     * A value is deletable when it is the primary metadata value of its relationship under a resolvable
+     * configuration. A value whose configuration key is unknown is also deletable, so that relationships whose
+     * configuration has disappeared can still be cleaned up. A resolvable additional (enhancer-managed) value is not
+     * deletable: those values are owned by the enhancer and must survive user-facing removals.
+     *
+     * Other resolution failures raise the same errors as normal configuration resolution: missing or duplicate
+     * keys and authority-derived configurations that do not support the relationship endpoints.
+     *
+     * @param context       current DSpace context
+     * @param relationship  relationship containing the metadata value's Item
+     * @param metadataValue metadata value to check
+     * @return {@code true} if the value may be removed, {@code false} otherwise
+     * @throws IllegalArgumentException if the relationship configuration is invalid
+     * @throws SQLException             if an error occurs while accessing the metadata registry
+     */
+    boolean isMetadataDeletable(Context context, Relationship relationship, MetadataValue metadataValue)
+        throws SQLException;
+
+    /**
      * Returns the primary metadata field configured for the specified relationship endpoint.
      * A relationship endpoint may have no primary metadata field configured.
      *
@@ -194,7 +215,7 @@ public interface RelationshipConfigurationService {
      *                                  is not an endpoint of the relationship
      * @throws SQLException             if an error occurs while accessing the metadata registry
      */
-    Optional<ItemAuthorityExtraMetadataGenerator> getMetadataGenerator(Context context, Relationship relationship,
-                                                                       Item endpoint, String metadataField)
+    Optional<RelationshipMetadataGenerator> getMetadataGenerator(Context context, Relationship relationship,
+                                                                 Item endpoint, String metadataField)
         throws SQLException;
 }

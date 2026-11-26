@@ -19,10 +19,6 @@ import org.dspace.core.Context;
  */
 public interface ItemEnhancer {
 
-    public static final String VIRTUAL_METADATA_SCHEMA = "dspace";
-    public static final String VIRTUAL_METADATA_ELEMENT = "virtual";
-    public static final String VIRTUAL_SOURCE_METADATA_ELEMENT = "virtualsource";
-
     /**
      * Check if the given item can be enhanced.
      *
@@ -33,15 +29,11 @@ public interface ItemEnhancer {
     boolean canEnhance(Context context, Item item);
 
     /**
-     * Enhances the metadata of the given item according to a specific logic. The
-     * added metadata have the form dspace.virtual.<qualifier>, where <qualifier> is
-     * set arbitrarily based on the strategy used. In addition, metadata of the type
-     * dspace.virtualsource.<qualifier> can be added to specify the source of the
-     * enhancement. Multiple metadata values can be added on the given item. This
-     * method returns true if the given item's metadata values are changed. The
-     * enhancement is idempotent: multiple invocations on the same item must not
-     * produce metadata different from those that would be obtained with a single
-     * invocation.
+     * Enhances the metadata of the given item according to a specific logic. Multiple
+     * metadata values can be added on the given item. This method returns true if the
+     * given item's metadata values are changed. The enhancement is idempotent: multiple
+     * invocations on the same item must not produce metadata different from those that
+     * would be obtained with a single invocation.
      *
      * @param  context the DSpace Context
      * @param  item    the item to enhance

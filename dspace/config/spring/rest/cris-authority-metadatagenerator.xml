@@ -24,9 +24,7 @@
     <bean class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
         <property name="authorityName" value="AuthorAuthority"/>
         <property name="keyId" value="oairecerif_author_affiliation"/>
-        <property name="schema" value="oairecerif" />
-        <property name="element" value="person" />
-        <property name="qualifier" value="affiliation" />
+        <property name="delegate" ref="authorOairecerifAffiliationMetadataGenerator"/>
         <property name="singleResultOnAggregate" value="false"/>
      </bean>
 
@@ -35,18 +33,14 @@
         <property name="keyId" value="person_identifier_orcid"/>
         <property name="useForDisplay" value="true"/>
         <property name="useAsData" value="true"/>
-        <property name="schema" value="person"/>
-        <property name="element" value="identifier"/>
-        <property name="qualifier" value="orcid"/>
+        <property name="delegate" ref="authorOrcidMetadataGenerator"/>
         <property name="singleResultOnAggregate" value="true"/>
     </bean>
 
     <bean class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
         <property name="authorityName" value="EditorAuthority"/>
         <property name="keyId" value="oairecerif_editor_affiliation"/>
-        <property name="schema" value="person"/>
-        <property name="element" value="affiliation"/>
-        <property name="qualifier" value="name"/>
+        <property name="delegate" ref="authorAffiliationMetadataGenerator"/>
         <property name="singleResultOnAggregate" value="false"/>
      </bean>
 

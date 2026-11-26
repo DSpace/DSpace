@@ -7,79 +7,94 @@
  */
 package org.dspace.content.enhancer.script;
 
-import static org.dspace.app.matcher.MetadataValueMatcher.with;
-import static org.dspace.app.matcher.MetadataValueMatcher.withNoPlace;
 import static org.dspace.content.Item.ANY;
 import static org.dspace.content.enhancer.consumer.ItemEnhancerConsumer.ITEMENHANCER_ENABLED;
-import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
+import org.dspace.app.matcher.MetadataValueMatcher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.MetadataFieldBuilder;
+import org.dspace.builder.MetadataSchemaBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.AuthorityBackedRelationshipServiceImpl;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.AuthorityBackedRelationshipService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.CrisConstants;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.ReloadableEntity;
-import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.core.service.PluginService;
 import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * Integration tests for the {@link ItemEnhancerScript}.
+ *
+ * <p>The script enhances every archived item and supports a forced (deep) mode. The tests assert on
+ * the {@code additional.identifier.orcid} values produced for the relationship-backed authors.</p>
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ */
 public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
+
+    private static final String ADDITIONAL_FIELD = "additional.identifier.orcid";
+    private static final String AUTHOR_FIELD = "dc.contributor.author";
+    private static final String EDITOR_FIELD = "dc.contributor.editor";
 
     private static ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private static final EventService eventService = EventServiceFactory.getInstance().getEventService();
 
-    private PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
-
-    private ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory
-        .getInstance().getChoiceAuthorityService();
-
     private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory
         .getInstance().getMetadataAuthorityService();
 
-    private static boolean isEnabled;
     private static String[] consumers;
     private ItemService itemService;
 
     private Collection collection;
 
+    private AuthorityBackedRelationshipService authorityBackedRelationshipService;
 
     /**
      * This method will be run before the first test as per @BeforeClass. It will
-     * configure the event.dispatcher.default.consumers property to remove the
+     * configure the event.dispatcher.default.consumers property to add the
      * ItemEnhancerConsumer.
      */
     @BeforeClass
@@ -104,16 +119,19 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
     @Before
     public void setup() throws Exception {
-        choiceAuthorityService.getChoiceAuthoritiesNames();
         configService.setProperty("authority.controlled.dc.contributor.author", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
+        configService.setProperty("authority.controlled.dc.contributor.editor", "true");
+        configService.setProperty("authority.controlled.additional.identifier.orcid", "true");
         metadataAuthorityService.clearCache();
         configService.setProperty(ITEMENHANCER_ENABLED, false);
 
         itemService = ContentServiceFactory.getInstance().getItemService();
+        authorityBackedRelationshipService = new DSpace().getServiceManager().getServiceByName(
+            AuthorityBackedRelationshipServiceImpl.class.getCanonicalName(),
+            AuthorityBackedRelationshipService.class);
 
         context.turnOffAuthorisationSystem();
+        registerAdditionalOrcidField();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
@@ -128,59 +146,27 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void testItemsEnhancement() throws Exception {
-        choiceAuthorityService.getChoiceAuthoritiesNames();
-        configService.setProperty("authority.controlled.dc.contributor.editor", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
         context.turnOffAuthorisationSystem();
 
-        Item firstAuthor = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
-
+        Item firstAuthor = createPerson("Walter White", "0000-0001-0000-0001");
         String firstAuthorId = firstAuthor.getID().toString();
 
-        Item secondAuthor = ItemBuilder.createItem(context, collection)
-            .withTitle("Jesse Pinkman")
-            .withPersonMainAffiliation("Company")
-            .build();
-
+        Item secondAuthor = createPerson("Jesse Pinkman", "0000-0001-0000-0002");
         String secondAuthorId = secondAuthor.getID().toString();
 
-        Item firstPublication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication")
-            .withEntityType("Publication")
-            .withAuthor("Walter White", firstAuthorId)
-            .build();
-
-        Item secondPublication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication 2")
-            .withEntityType("Publication")
-            .withAuthor("Walter White", firstAuthorId)
-            .withAuthor("Jesse Pinkman", secondAuthorId)
-            .build();
-
-        final String randomUUID = UUID.randomUUID().toString();
-        Item thirdPublication = ItemBuilder.createItem(context, collection)
-                .withTitle("Test publication 3")
-                .withEntityType("Publication")
-                .withAuthor("Walter White", firstAuthorId)
-                .withAuthor("Jesse Pinkman", secondAuthorId)
-                // same author multiple time
-                .withAuthor("Walter White", firstAuthorId)
-                // an author is also an editor
-                .withEditor("Jesse Pinkman", secondAuthorId)
-                .withEditor("Editor WithExternaAuthority", "external-authority")
-                .withEditor("Editor WithExternaUUIDAuthority", randomUUID)
-                .build();
+        Item firstPublication = createPublication("Test publication", firstAuthor);
+        Item secondPublication = createPublication("Test publication 2", firstAuthor, secondAuthor);
+        Item thirdPublication = createPublication("Test publication 3", firstAuthor, firstAuthor, secondAuthor);
 
         WorkspaceItem wsPublication = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
             .withTitle("Test workspace publication")
             .withEntityType("Publication")
-            .withEditor("Jesse Pinkman", secondAuthorId)
+            .withAuthor("Jesse Pinkman", secondAuthorId)
             .build();
+
+        promoteAuthors(firstPublication, firstAuthor);
+        promoteAuthors(secondPublication, firstAuthor, secondAuthor);
+        promoteAuthors(thirdPublication, firstAuthor, firstAuthor, secondAuthor);
 
         context.commit();
 
@@ -188,12 +174,9 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
         secondPublication = reload(secondPublication);
         wsPublication = reload(wsPublication);
 
-        assertThat(getMetadataValues(firstPublication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(firstPublication, "dspace.virtualsource.department"), empty());
-        assertThat(getMetadataValues(secondPublication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(secondPublication, "dspace.virtualsource.department"), empty());
-        assertThat(getMetadataValues(wsPublication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(wsPublication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(firstPublication, ADDITIONAL_FIELD), empty());
+        assertThat(getMetadataValues(secondPublication, ADDITIONAL_FIELD), empty());
+        assertThat(getMetadataValues(wsPublication, ADDITIONAL_FIELD), empty());
 
         TestDSpaceRunnableHandler runnableHandler = runScript(false);
 
@@ -205,37 +188,25 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
         thirdPublication = reload(thirdPublication);
         wsPublication = reload(wsPublication);
 
-        assertThat(getMetadataValues(firstPublication, "dspace.virtual.department"), hasSize(1));
-        assertThat(getMetadataValues(firstPublication, "dspace.virtualsource.department"), hasSize(1));
-        assertThat(firstPublication.getMetadata(), hasItem(with("dspace.virtual.department", "4Science")));
-        assertThat(firstPublication.getMetadata(), hasItem(with("dspace.virtualsource.department", firstAuthorId)));
+        assertThat(getMetadataValues(firstPublication, ADDITIONAL_FIELD), hasSize(1));
+        assertThat(firstPublication.getMetadata(), hasItem(additionalValue("0000-0001-0000-0001", firstAuthor)));
+        assertThat(getMetadataValues(firstPublication, ADDITIONAL_FIELD).get(0).getAuthority(),
+            is(firstAuthorId));
 
-        assertThat(getMetadataValues(secondPublication, "dspace.virtual.department"), hasSize(2));
-        assertThat(getMetadataValues(secondPublication, "dspace.virtualsource.department"), hasSize(2));
-        assertThat(getMetadataValues(secondPublication, "dspace.virtual.department"),
+        assertThat(getMetadataValues(secondPublication, ADDITIONAL_FIELD), hasSize(2));
+        assertThat(getMetadataValues(secondPublication, ADDITIONAL_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", "4Science"),
-                    withNoPlace("dspace.virtual.department", "Company")));
-        assertThat(getMetadataValues(secondPublication, "dspace.virtualsource.department"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", firstAuthorId),
-                    withNoPlace("dspace.virtualsource.department", secondAuthorId)));
+                    additionalValue("0000-0001-0000-0001", firstAuthor),
+                    additionalValue("0000-0001-0000-0002", secondAuthor)));
 
-        assertThat(getMetadataValues(thirdPublication, "dspace.virtual.department"), hasSize(3));
-        assertThat(getMetadataValues(thirdPublication, "dspace.virtualsource.department"), hasSize(3));
-        assertThat(getMetadataValues(thirdPublication, "dspace.virtual.department"),
+        assertThat(getMetadataValues(thirdPublication, ADDITIONAL_FIELD), hasSize(3));
+        assertThat(getMetadataValues(thirdPublication, ADDITIONAL_FIELD),
                 containsInAnyOrder(
-                    withNoPlace("dspace.virtual.department", "4Science"),
-                    withNoPlace("dspace.virtual.department", CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE),
-                    withNoPlace("dspace.virtual.department", "Company")));
-        assertThat(getMetadataValues(thirdPublication, "dspace.virtualsource.department"),
-                containsInAnyOrder(
-                    withNoPlace("dspace.virtualsource.department", randomUUID),
-                    withNoPlace("dspace.virtualsource.department", firstAuthorId),
-                    withNoPlace("dspace.virtualsource.department", secondAuthorId)));
+                    additionalValue("0000-0001-0000-0001", firstAuthor),
+                    additionalValue("0000-0001-0000-0001", firstAuthor),
+                    additionalValue("0000-0001-0000-0002", secondAuthor)));
 
-        assertThat(getMetadataValues(wsPublication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(wsPublication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(wsPublication, ADDITIONAL_FIELD), empty());
 
     }
 
@@ -244,32 +215,16 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        Item firstAuthor = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
+        Item firstAuthor = createPerson("Walter White", "0000-0001-0000-0001");
+        Item secondAuthor = createPerson("Jesse Pinkman", "0000-0001-0000-0002");
 
-        String firstAuthorId = firstAuthor.getID().toString();
-
-        Item secondAuthor = ItemBuilder.createItem(context, collection)
-            .withTitle("Jesse Pinkman")
-            .withPersonMainAffiliation("Company")
-            .build();
-
-        String secondAuthorId = secondAuthor.getID().toString();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication 2 ")
-            .withEntityType("Publication")
-            .withAuthor("Walter White", firstAuthorId)
-            .withAuthor("Jesse Pinkman", secondAuthorId)
-            .build();
+        Item publication = createPublication("Test publication 2", firstAuthor, secondAuthor);
+        promoteAuthors(publication, firstAuthor, secondAuthor);
 
         context.commit();
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
 
         TestDSpaceRunnableHandler runnableHandler = runScript(false);
 
@@ -278,23 +233,17 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(2));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(2));
-
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), containsInAnyOrder(
-                withNoPlace("dspace.virtual.department", "4Science"),
-                withNoPlace("dspace.virtual.department", "Company")));
-
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), containsInAnyOrder(
-                withNoPlace("dspace.virtualsource.department", firstAuthorId),
-                withNoPlace("dspace.virtualsource.department", secondAuthorId)));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(2));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), containsInAnyOrder(
+                additionalValue("0000-0001-0000-0001", firstAuthor),
+                additionalValue("0000-0001-0000-0002", secondAuthor)));
 
         context.turnOffAuthorisationSystem();
 
-        MetadataValue authorToRemove = getMetadataValues(publication, "dc.contributor.author").get(1);
+        MetadataValue authorToRemove = getMetadataValues(publication, AUTHOR_FIELD).get(1);
         itemService.removeMetadataValues(context, publication, List.of(authorToRemove));
 
-        replaceMetadata(firstAuthor, "person", "affiliation", "name", "University");
+        replaceMetadata(firstAuthor, "person", "identifier", "orcid", "0000-0001-0000-0003");
 
         context.restoreAuthSystemState();
 
@@ -304,50 +253,29 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(1));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(1));
-
-        assertThat(publication.getMetadata(), hasItem(with("dspace.virtual.department", "4Science")));
-        assertThat(publication.getMetadata(), hasItem(with("dspace.virtualsource.department", firstAuthorId)));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(1));
+        assertThat(publication.getMetadata(), hasItem(additionalValue("0000-0001-0000-0003", firstAuthor)));
 
     }
 
     @Test
     public void testItemEnhancementWithForce() throws Exception {
-        choiceAuthorityService.getChoiceAuthoritiesNames();
-        configService.setProperty("authority.controlled.dc.contributor.editor", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
         context.turnOffAuthorisationSystem();
 
-        Item editor = ItemBuilder.createItem(context, collection)
-            .withTitle("Walter White")
-            .withPersonMainAffiliation("4Science")
-            .build();
+        Item firstAuthor = createPerson("Walter White", "0000-0001-0000-0001");
+        itemService.addMetadata(context, firstAuthor, "person", "identifier", "orcid", null,
+            "0000-0001-0000-0002");
+        itemService.update(context, firstAuthor);
 
-        String editorId = editor.getID().toString();
+        Item secondAuthor = createPerson("Jesse Pinkman", "0000-0001-0000-0003");
 
-        Item author = ItemBuilder.createItem(context, collection)
-            .withTitle("Jesse Pinkman")
-            .withPersonMainAffiliation("Company")
-            .withPersonMainAffiliation("Another Company")
-            .build();
-
-        String authorId = author.getID().toString();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-            .withTitle("Test publication 2 ")
-            .withEntityType("Publication")
-            .withEditor("Walter White", editorId)
-            .withAuthor("Jesse Pinkman", authorId)
-            .build();
+        Item publication = createPublication("Test publication 2", firstAuthor, secondAuthor);
+        promoteAuthors(publication, firstAuthor, secondAuthor);
 
         context.commit();
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
 
         TestDSpaceRunnableHandler runnableHandler = runScript(false);
 
@@ -356,26 +284,15 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(3));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(3));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(3));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), containsInAnyOrder(
+                additionalValue("0000-0001-0000-0001", firstAuthor),
+                additionalValue("0000-0001-0000-0002", firstAuthor),
+                additionalValue("0000-0001-0000-0003", secondAuthor)));
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), containsInAnyOrder(
-                withNoPlace("dspace.virtual.department", "4Science"),
-                withNoPlace("dspace.virtual.department", "Another Company"),
-                withNoPlace("dspace.virtual.department", "Company")));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), containsInAnyOrder(
-                withNoPlace("dspace.virtualsource.department", editorId),
-                withNoPlace("dspace.virtualsource.department", authorId),
-                withNoPlace("dspace.virtualsource.department", authorId)));
-
-        context.turnOffAuthorisationSystem();
-
-        MetadataValue authorToRemove = getMetadataValues(publication, "dc.contributor.author").get(0);
-        itemService.removeMetadataValues(context, publication, List.of(authorToRemove));
-
-        replaceMetadata(editor, "person", "affiliation", "name", "University");
-
-        context.restoreAuthSystemState();
+        List<Integer> additionalIds = getMetadataValues(publication, ADDITIONAL_FIELD).stream()
+            .map(MetadataValue::getID)
+            .collect(Collectors.toList());
 
         runnableHandler = runScript(true);
         assertThat(runnableHandler.getErrorMessages(), empty());
@@ -383,13 +300,165 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(1));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(1));
+        List<MetadataValue> additionals = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(additionals, hasSize(3));
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasItem(
-                with("dspace.virtual.department", "University")));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasItem(
-                with("dspace.virtualsource.department", editorId)));
+        List<Integer> forcedIds = additionals.stream()
+            .map(MetadataValue::getID)
+            .collect(Collectors.toList());
+
+        // the forced (deep) enhancement rebuilds every derived value from scratch
+        assertThat(Collections.disjoint(additionalIds, forcedIds), is(true));
+
+    }
+
+    @Test
+    public void testItemsEnhancementWithAuthorsAndEditors() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item author = createPerson("Walter White", "0000-0001-0000-0001");
+        Item editor = createPerson("Jesse Pinkman", "0000-0001-0000-0002");
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .withEntityType("Publication")
+            .withAuthor("Walter White", author.getID().toString())
+            .withEditor("Jesse Pinkman", editor.getID().toString())
+            .build();
+        promote(publication, AUTHOR_FIELD, 0, author);
+        promote(publication, EDITOR_FIELD, 0, editor);
+
+        WorkspaceItem wsPublication = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("Test workspace publication")
+            .withEntityType("Publication")
+            .withEditor("Jesse Pinkman", editor.getID().toString())
+            .build();
+
+        context.commit();
+        publication = reload(publication);
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
+
+        TestDSpaceRunnableHandler runnableHandler = runScript(false);
+        assertThat(runnableHandler.getErrorMessages(), empty());
+        assertThat(runnableHandler.getInfoMessages(), contains("Enhancement completed with success"));
+
+        publication = reload(publication);
+        wsPublication = reload(wsPublication);
+
+        // author and editor both derive the same target field, each from its own relationship
+        List<MetadataValue> additionals = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(additionals, containsInAnyOrder(
+            additionalValue("0000-0001-0000-0001", author),
+            additionalValue("0000-0001-0000-0002", editor)));
+        assertThat(additionals.stream().map(v -> v.getRelationship().getID()).collect(Collectors.toSet()),
+            hasSize(2));
+
+        assertThat(getMetadataValues(wsPublication, ADDITIONAL_FIELD), empty());
+    }
+
+    @Test
+    public void testItemEnhancementWithNonUuidAndRandomAuthorities() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item person = createPerson("Walter White", "0000-0001-0000-0001");
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .withEntityType("Publication")
+            .withAuthor("Walter White", person.getID().toString())
+            .withAuthor("External Author", "external-authority")
+            .withAuthor("Unknown Author", UUID.randomUUID().toString())
+            .build();
+        promote(publication, AUTHOR_FIELD, 0, person);
+
+        context.commit();
+
+        TestDSpaceRunnableHandler runnableHandler = runScript(false);
+        assertThat(runnableHandler.getErrorMessages(), empty());
+        assertThat(runnableHandler.getInfoMessages(), contains("Enhancement completed with success"));
+
+        publication = reload(publication);
+
+        // only the author backed by a relationship yields a derived value
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), contains(
+            additionalAt("0000-0001-0000-0001", person, 0)));
+    }
+
+    @Test
+    public void testItemEnhancementSourceWithoutAuthority() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item editor = createPerson("Jesse Pinkman", "0000-0001-0000-0002");
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .withEntityType("Publication")
+            .withAuthor("Walter White")
+            .withEditor("Jesse Pinkman", editor.getID().toString())
+            .build();
+        promote(publication, EDITOR_FIELD, 0, editor);
+
+        context.commit();
+
+        TestDSpaceRunnableHandler runnableHandler = runScript(false);
+        assertThat(runnableHandler.getErrorMessages(), empty());
+        assertThat(runnableHandler.getInfoMessages(), contains("Enhancement completed with success"));
+
+        publication = reload(publication);
+
+        List<MetadataValue> additionals = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(additionals, contains(additionalAt("0000-0001-0000-0002", editor, 0)));
+        assertThat(additionals.get(0).getRelationship().getID(),
+            is(getMetadataValues(publication, EDITOR_FIELD).get(0).getRelationship().getID()));
+    }
+
+    @Test
+    public void testItemEnhancementWithForceRefreshesAfterSourceChanges() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item firstAuthor = createPerson("Walter White", "0000-0001-0000-0001");
+        Item secondAuthor = createPerson("Jesse Pinkman", "0000-0001-0000-0002");
+        Item editor = createPerson("Saul Goodman", "0000-0001-0000-0003");
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle("Test publication")
+            .withEntityType("Publication")
+            .withAuthor("Walter White", firstAuthor.getID().toString())
+            .withAuthor("Jesse Pinkman", secondAuthor.getID().toString())
+            .withEditor("Saul Goodman", editor.getID().toString())
+            .build();
+        promote(publication, AUTHOR_FIELD, 0, firstAuthor);
+        promote(publication, AUTHOR_FIELD, 1, secondAuthor);
+        promote(publication, EDITOR_FIELD, 0, editor);
+
+        context.commit();
+
+        assertThat(runScript(false).getErrorMessages(), empty());
+
+        publication = reload(publication);
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(3));
+        List<Integer> initialIds = getMetadataValues(publication, ADDITIONAL_FIELD).stream()
+            .map(MetadataValue::getID)
+            .collect(Collectors.toList());
+
+        context.turnOffAuthorisationSystem();
+        itemService.removeMetadataValues(context, publication,
+            List.of(getMetadataValues(publication, AUTHOR_FIELD).get(1)));
+        replaceMetadata(editor, "person", "identifier", "orcid", "0000-0001-0000-0004");
+        context.restoreAuthSystemState();
+
+        TestDSpaceRunnableHandler runnableHandler = runScript(true);
+        assertThat(runnableHandler.getErrorMessages(), empty());
+        assertThat(runnableHandler.getInfoMessages(), contains("Enhancement completed with success"));
+
+        publication = reload(publication);
+
+        List<MetadataValue> additionals = getMetadataValues(publication, ADDITIONAL_FIELD);
+        assertThat(additionals, containsInAnyOrder(
+            additionalValue("0000-0001-0000-0001", firstAuthor),
+            additionalValue("0000-0001-0000-0004", editor)));
+        assertThat(Collections.disjoint(initialIds,
+            additionals.stream().map(MetadataValue::getID).collect(Collectors.toList())), is(true));
     }
 
     @Test
@@ -397,44 +466,19 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        Item firstAuthor = ItemBuilder.createItem(context, collection)
-                                       .withTitle("John Doe")
-                                       .build();
-        String firstAuthorId = firstAuthor.getID().toString();
+        Item firstAuthor = createPerson("John Doe", null);
+        Item secondAuthor = createPerson("Walter White", "0000-0001-0000-0001");
+        Item thirdAuthor = createPerson("Jesse Pinkman", "0000-0001-0000-0002");
+        Item fourthAuthor = createPerson("Jesse Smith", null);
 
-        Item secondAuthor = ItemBuilder.createItem(context, collection)
-                                      .withTitle("Walter White")
-                                      .withPersonMainAffiliation("4Science")
-                                      .build();
-        String secondAuthorId = secondAuthor.getID().toString();
-
-        Item thirdAuthor = ItemBuilder.createItem(context, collection)
-                                       .withTitle("Jesse Pinkman")
-                                       .withPersonMainAffiliation("Company")
-                                       .build();
-
-        String thirdAuthorId = thirdAuthor.getID().toString();
-
-        Item fourthAuthor = ItemBuilder.createItem(context, collection)
-                                      .withTitle("Jesse Smith")
-                                      .build();
-
-        String fourthAuthorId = fourthAuthor.getID().toString();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-                                      .withTitle("Test publication 2 ")
-                                      .withEntityType("Publication")
-                                      .withAuthor("John Doe", firstAuthorId)
-                                      .withAuthor("Walter White", secondAuthorId)
-                                      .withAuthor("Jesse Pinkman", thirdAuthorId)
-                                      .withAuthor("Jesse Smith", fourthAuthorId)
-                                      .build();
+        Item publication = createPublication("Test publication 2", firstAuthor, secondAuthor,
+            thirdAuthor, fourthAuthor);
+        promoteAuthors(publication, firstAuthor, secondAuthor, thirdAuthor, fourthAuthor);
 
         context.commit();
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
 
         TestDSpaceRunnableHandler runnableHandler = runScript(false);
 
@@ -443,63 +487,12 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(4));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(4));
-
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), containsInAnyOrder(
-                withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE),
-                withNoPlace("dspace.virtual.department", "4Science"),
-                withNoPlace("dspace.virtual.department", "Company"),
-                withNoPlace("dspace.virtual.department", PLACEHOLDER_PARENT_METADATA_VALUE)));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), containsInAnyOrder(
-                withNoPlace("dspace.virtualsource.department", firstAuthorId),
-                withNoPlace("dspace.virtualsource.department", secondAuthorId),
-                withNoPlace("dspace.virtualsource.department", thirdAuthorId),
-                withNoPlace("dspace.virtualsource.department", fourthAuthorId)));
-    }
-
-    @Test
-    public void testItemEnhancementSourceWithoutAuthority() throws Exception {
-        choiceAuthorityService.getChoiceAuthoritiesNames();
-        configService.setProperty("authority.controlled.dc.contributor.editor", "true");
-        pluginService.clearNamedPluginClasses();
-        choiceAuthorityService.clearCache();
-        metadataAuthorityService.clearCache();
-        context.turnOffAuthorisationSystem();
-
-        Item secondAuthor = ItemBuilder.createItem(context, collection)
-                                       .withTitle("Jesse Smith")
-                                       .withPersonMainAffiliation("4Science")
-                                       .build();
-
-        String secondAuthorId = secondAuthor.getID().toString();
-
-        Item publication = ItemBuilder.createItem(context, collection)
-                                      .withTitle("Test publication 2 ")
-                                      .withEntityType("Publication")
-                                      .withAuthor("Jesse Pinkman")
-                                      .withEditor("Jesse Smith", secondAuthorId)
-                                      .build();
-
-        context.commit();
-        publication = reload(publication);
-
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
-
-        TestDSpaceRunnableHandler runnableHandler = runScript(false);
-
-        assertThat(runnableHandler.getErrorMessages(), empty());
-        assertThat(runnableHandler.getInfoMessages(), contains("Enhancement completed with success"));
-
-        publication = reload(publication);
-
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), hasSize(1));
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), hasSize(1));
-
-        assertThat(publication.getMetadata(), hasItem(with("dspace.virtual.department", "4Science", 0)));
-        assertThat(publication.getMetadata(), hasItem(with("dspace.virtualsource.department", secondAuthorId,0)));
-
+        // authors without an ORCID (firstAuthor, fourthAuthor) yield no additional value at all,
+        // and the surviving additionals are renumbered densely by place
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), hasSize(2));
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), containsInAnyOrder(
+                additionalAt("0000-0001-0000-0001", secondAuthor, 0),
+                additionalAt("0000-0001-0000-0002", thirdAuthor, 1)));
     }
 
     @Test
@@ -507,18 +500,15 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
-        Item publication = ItemBuilder.createItem(context, collection)
-                                      .withTitle("Test publication 2 ")
-                                      .withEntityType("Publication")
-                                      .withAuthor("Jesse Pinkman")
-                                      .withAuthor("Jesse Smith")
-                                      .build();
+        Item publication = createPublication("Test publication 2");
+        itemService.addMetadata(context, publication, "dc", "contributor", "author", null, "Jesse Pinkman");
+        itemService.addMetadata(context, publication, "dc", "contributor", "author", null, "Jesse Smith");
+        itemService.update(context, publication);
 
         context.commit();
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
 
         TestDSpaceRunnableHandler runnableHandler = runScript(false);
 
@@ -527,8 +517,7 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
 
         publication = reload(publication);
 
-        assertThat(getMetadataValues(publication, "dspace.virtual.department"), empty());
-        assertThat(getMetadataValues(publication, "dspace.virtualsource.department"), empty());
+        assertThat(getMetadataValues(publication, ADDITIONAL_FIELD), empty());
 
     }
 
@@ -537,6 +526,74 @@ public class ItemEnhancerScriptIT extends AbstractIntegrationTestWithDatabase {
         String[] args = force ? new String[] { "item-enhancer", "-f" } : new String[] { "item-enhancer" };
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), runnableHandler, kernelImpl);
         return runnableHandler;
+    }
+
+    /**
+     * Register the target metadata field used by the production relationship configuration.
+     */
+    private void registerAdditionalOrcidField() throws Exception {
+        MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        MetadataField existing = metadataFieldService.findByElement(context, "additional", "identifier", "orcid");
+        if (existing != null) {
+            return;
+        }
+
+        MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+        MetadataSchema schema = metadataSchemaService.find(context, "additional");
+        if (schema == null) {
+            schema = MetadataSchemaBuilder
+                .createMetadataSchema(context, "additional", "http://dspace.org/additional")
+                .build();
+        }
+        MetadataFieldBuilder.createMetadataField(context, schema, "identifier", "orcid", null).build();
+    }
+
+    private Item createPerson(String title, String orcid) throws Exception {
+        ItemBuilder builder = ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withEntityType("Person");
+        if (orcid != null) {
+            builder.withOrcidIdentifier(orcid);
+        }
+        return builder.build();
+    }
+
+    private Item createPublication(String title, Item... persons) throws Exception {
+        ItemBuilder builder = ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withEntityType("Publication");
+        for (Item person : persons) {
+            builder.withAuthor(titleOf(person), person.getID().toString());
+        }
+        return builder.build();
+    }
+
+    private void promoteAuthors(Item publication, Item... persons) throws Exception {
+        List<MetadataValue> authors = getMetadataValues(publication, AUTHOR_FIELD);
+        assertThat(authors, hasSize(persons.length));
+        for (int i = 0; i < persons.length; i++) {
+            Relationship relationship = authorityBackedRelationshipService
+                .promoteResolvedAuthority(context, publication, authors.get(i), persons[i]);
+            assertThat(relationship, notNullValue());
+        }
+    }
+
+    private void promote(Item publication, String field, int index, Item person) throws Exception {
+        MetadataValue value = getMetadataValues(publication, field).get(index);
+        assertThat(authorityBackedRelationshipService
+            .promoteResolvedAuthority(context, publication, value, person), notNullValue());
+    }
+
+    private String titleOf(Item item) {
+        return itemService.getMetadata(item, "dc", "title", null, Item.ANY).get(0).getValue();
+    }
+
+    private MetadataValueMatcher additionalValue(String value, Item person) {
+        return additionalAt(value, person, null);
+    }
+
+    private MetadataValueMatcher additionalAt(String value, Item person, Integer place) {
+        return MetadataValueMatcher.with(ADDITIONAL_FIELD, value, null, person.getID().toString(), place, -1);
     }
 
     @SuppressWarnings("rawtypes")

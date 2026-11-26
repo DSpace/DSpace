@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.dspace.content.authority.ItemAuthorityExtraMetadataGenerator;
+import org.dspace.content.enhancer.generator.RelationshipMetadataGenerator;
 
 /**
  * Spring-configurable definition of a relationship between two Item entity types.
@@ -34,8 +34,8 @@ public class RelationshipTypeConfiguration {
     private Set<String> leftEntityTypes = new HashSet<>();
     private Set<String> rightEntityTypes = new HashSet<>();
 
-    private Map<String, ItemAuthorityExtraMetadataGenerator> leftMetadataGenerators = new HashMap<>();
-    private Map<String, ItemAuthorityExtraMetadataGenerator> rightMetadataGenerators = new HashMap<>();
+    private Map<String, RelationshipMetadataGenerator> leftMetadataGenerators = new HashMap<>();
+    private Map<String, RelationshipMetadataGenerator> rightMetadataGenerators = new HashMap<>();
 
     public String getId() {
         return id;
@@ -113,11 +113,11 @@ public class RelationshipTypeConfiguration {
             && (rightEntityTypes.isEmpty() || rightEntityTypes.contains(ownerEntityType)));
     }
 
-    public Map<String, ItemAuthorityExtraMetadataGenerator> getLeftMetadataGenerators() {
+    public Map<String, RelationshipMetadataGenerator> getLeftMetadataGenerators() {
         return Map.copyOf(leftMetadataGenerators);
     }
 
-    public void setLeftMetadataGenerators(Map<String, ItemAuthorityExtraMetadataGenerator> leftMetadataGenerators) {
+    public void setLeftMetadataGenerators(Map<String, RelationshipMetadataGenerator> leftMetadataGenerators) {
         if (leftMetadataGenerators.values().stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Metadata generators cannot be null on the left endpoint");
         }
@@ -125,11 +125,11 @@ public class RelationshipTypeConfiguration {
         this.leftMetadataGenerators = new HashMap<>(leftMetadataGenerators);
     }
 
-    public Map<String, ItemAuthorityExtraMetadataGenerator> getRightMetadataGenerators() {
+    public Map<String, RelationshipMetadataGenerator> getRightMetadataGenerators() {
         return Map.copyOf(rightMetadataGenerators);
     }
 
-    public void setRightMetadataGenerators(Map<String, ItemAuthorityExtraMetadataGenerator> rightMetadataGenerators) {
+    public void setRightMetadataGenerators(Map<String, RelationshipMetadataGenerator> rightMetadataGenerators) {
         if (rightMetadataGenerators.values().stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Metadata generators cannot be null on the right endpoint");
         }
