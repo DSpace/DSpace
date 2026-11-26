@@ -356,6 +356,61 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                 communityService.getMetadataFirstValue(c, CommunityService.MD_SIDEBAR_TEXT, Item.ANY));
     }
 
+
+    /**
+     * Verify that clearing Community metadata only removes values matching
+     * the requested field, without affecting unrelated metadata.
+     */
+    @Test
+    public void testClearMetadata() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        communityService.addMetadata(context, c, "dc", "description", "abstract",
+                                     null, "Description to remove");
+        communityService.addMetadata(context, c, "dc", "description", "abstract",
+                                     null, "Another description to remove");
+        communityService.addMetadata(context, c, "dc", "title", null,
+                                     null, "Community title");
+
+        communityService.clearMetadata(context, c, "dc", "description", "abstract", Item.ANY);
+
+        assertTrue(communityService.getMetadata(
+            c, "dc", "description", "abstract", Item.ANY).isEmpty());
+
+        List<MetadataValue> titles = communityService.getMetadata(
+            c, "dc", "title", null, Item.ANY);
+
+        assertEquals(1, titles.size());
+        assertEquals("Community title", titles.getFirst().getValue());
+
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * Verify that removing selected Community metadata values does not
+     * remove other values of the same field.
+     */
+    @Test
+    public void testRemoveMetadataValues() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataValue valueToRemove = communityService.addMetadata(
+            context, c, "dc", "description", "abstract", null, "First description");
+
+        communityService.addMetadata(
+            context, c, "dc", "description", "abstract", null, "Second description");
+
+        communityService.removeMetadataValues(context, c, List.of(valueToRemove));
+
+        List<MetadataValue> remaining = communityService.getMetadata(
+            c, "dc", "description", "abstract", Item.ANY);
+
+        assertEquals(1, remaining.size());
+        assertEquals("Second description", remaining.getFirst().getValue());
+
+        context.restoreAuthSystemState();
+    }
+
     /**
      * Test of getName method, of class Community.
      */
